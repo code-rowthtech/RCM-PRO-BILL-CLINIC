@@ -1,0 +1,13 @@
+# Ignore compiled output, dependencies, and sensitive files
+
+# Node.js dependencies
+node_modules
+
+# Environment variables
+.env
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+
+# Optional: Exclude package.json if not necessary

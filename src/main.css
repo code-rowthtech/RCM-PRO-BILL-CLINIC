@@ -1,0 +1,97 @@
+.cursor-pointer {
+    cursor: pointer;
+}
+.btn:focus {
+    outline: 0;
+    box-shadow: 0 ; 
+}
+.headers {
+    background-color: #010101 !important;
+}
+
+.custom-buttons {
+    background-color: #6169d0 !important;
+    border: none !important;
+}
+
+
+.light-border-bottom {
+    border-bottom: 1px solid #313a4615 !important;
+}
+
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+.card {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+input,
+textarea,
+select {
+    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+}
+.input{
+border-radius: 4px !important;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #efefef !important;
+}
+
+thead {
+    background-color: #313a46 !important;
+    color: white !important;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.box-shadow-none {
+    box-shadow: none !important;
+}
+
+.custom-file-upload {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    border-radius: 4px;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #6c757d;
+}
+
+.upload-icon {
+    color: #6c757d;
+    width: 5vw;
+    height: 5vw;
+}
+
+.file-input {
+    display: none; 
+}
+.custom-file-upload-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    padding: 20px;
+    width: 6vw;
+    height: 11vh;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid red !important;
+}
+
+
