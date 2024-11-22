@@ -21,7 +21,10 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [amount, setAmount] = useState((null));
-    const subscriptionsData = store?.getSubscriptionsReducer?.data?.plans;
+    const subscriptionsData = store?.getSubscriptionsReducer?.data?.result;
+    console.log(subscriptionsData,'resassss')
+
+
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
     useEffect(() => {
         if (activeTab === 'billing') {
@@ -34,7 +37,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const onSubmit = (data) => {
         const payload = {
             subscription: data?.subscription,
-            userId: billingId,
+            // userId: billingId,
             billingContactName: data?.name,
             billingContactPhone: data?.contact,
             billingContactemail: data?.email
@@ -66,7 +69,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
                             }}
                         >
                             <option>Select</option>
-                            {subscriptionsData?.map((data) => (
+                            {subscriptionsData  ?.map((data) => (
                                 <option value={data?._id} key={data?._id} className='text-capitalize'>
                                     {data?.name} {data?.billingFrequency} {data?.price}
                                 </option>

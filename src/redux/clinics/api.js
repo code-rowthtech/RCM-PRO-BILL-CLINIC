@@ -30,7 +30,7 @@ export function getCityByStateApi(params: any): any {
 
 export function getClinicApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getClinic}?name=${data?.payload?.name}&page=${data?.payload?.skip}&limit=${data?.payload?.limit}&status=${data?.payload?.status}`);
+    return api.create(`${URL.getClinic}`);
 }
 
 export function addSubscriptionPlanApi(params: any): any {
