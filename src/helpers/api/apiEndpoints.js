@@ -2,7 +2,6 @@ export const addPermissions = '/api/v1/permisssions';
 export const getPermissions = '/api/v1/permisssions';
 export const deletePermissions = '/api/v1/permisssions/delete';
 export const updatePermissions = '/api/v1/permisssions';
-export const addSubscriptionPlan='/api/v1/clinic/addSubscriptionPlan';
 export const deleteClinicOnboarding= "";
 export const getClinicsByParentId = '';
 
@@ -30,4 +29,5 @@ export const getPatients = '/api/v1/admin/getAllPatients';
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';
 // SUBSCRIPTIONS
-export const getSubscriptions = '/api/v1/clinic/getSubscriptionsList'
+export const getSubscriptions = '/api/v1/clinic/getSubscriptionsList';
+export const addSubscriptionPlan='/api/v1/clinic/addSubscriptionPlan';
