@@ -1,72 +1,96 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { BiEdit } from 'react-icons/bi';
-import ProfileDummy from "../../../assets/images/profileDummy.png";
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, Form } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
+import { useDispatch, useSelector } from 'react-redux';
+import { createDoctorAction, getDoctorsrolesAction } from '../../../redux/actions';
+import EmailToDoctorModal from './EmailToDoctorModal';
 import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
-import { Button, Card, Col, Form, Modal, Row } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
-import { IoMdClose } from 'react-icons/io';
-import { FiUploadCloud } from "react-icons/fi";
+import { handleUpload } from '../../../helpers/HandleUpload';
+import { encryptMessage } from '../../../cryptoUtils';
+
 
 const NewDoctor = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
+    const logoFileInputRef = useRef(null);
+    const [logo, setLogo] = useState(null);
+    const [logoName, setLogoName] = useState('');
 
-    const closeModal = () => {
-        setShow(false);
-    };
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const {
         register,
         handleSubmit,
         formState: { errors },
         reset,
+        watch,
     } = useForm();
 
-    const handleTabChange = (tab) => {
-        setActiveTab(tab);
-    };
+    useEffect(() => {
+        dispatch(
+            getDoctorsrolesAction({ })
+        );
+    }, [dispatch]);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+    const store = useSelector((state) => state);
+    const response = store?.getDoctorsRolesReducer?.data?.result?._id
 
-    const navigate = useNavigate();
+    console.log(response);
+
+    const closeModal = () => {
+        setShow(false);
+    };
 
     const handleNewDoctor = () => {
         navigate('/apps/doctors/list');
     };
 
-    const onSubmit = (data) => {
-        console.log('Form Submitted:', data);
-        reset(); // Optional: Reset the form after submission for UI demo purposes
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setLogoName(file.name);
+            // You can upload the file or store it in the form state here if required.
+        }
     };
 
+    const handleLogoClick = () => {
+        logoFileInputRef.current.click();
+    };
+
+    const submitData = (data) => {
+        const payload = {
+            ...data,
+            profileImage: logo, // Add uploaded logo to the payload
+            role:response
+        };
+        console.log('Form Submitted:', payload);
+        dispatch(createDoctorAction({ key: encryptMessage(payload) })); // Dispatch with payload
+        reset(); // Reset form after submission
+    };
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+    };
 
     return (
         <>
-            <div className='pt-1 pb-2' >
+            <div className='pt-1 pb-2'>
                 <div className="container-fluid mt-4">
                     <Card className='px-3 py-2'>
                         <div className="row">
-                            <div className="col-12 d-flex justify-content-between align-itmes-center">
+                            <div className="col-12 d-flex justify-content-between align-items-center">
                                 <p className="fw-bold" style={{ fontWeight: '600' }}>
                                     NEW DOCTOR
                                 </p>
                                 <div className='d-flex gap-2'>
-                                    <Button className="custom-buttons "
-                                        onClick={() => setShow(true)}
-                                    >
-                                        Email to Doctor
-                                    </Button>
-                                    <Button
-                                        className=""
-                                        onClick={handleNewDoctor}
-                                    >
-                                        Back
-                                    </Button>
+                                    <Button onClick={() => setShow(true)}>Email to Doctor</Button>
+                                    <Button onClick={handleNewDoctor}>Back</Button>
                                 </div>
                             </div>
                             <div>
@@ -97,358 +121,200 @@ const NewDoctor = () => {
                                     </li>
                                 </ul>
                             </div>
-
                             {activeTab === "personalDetails" && (
-                                <>
-                                    <div className="col-12 mt-3" style={{ borderBottom: '1px solid #444141' }}>
-                                        <div className="row">
+                                <Form onSubmit={handleSubmit(submitData)}>
+                                    <div className="col-12 mt-3">
+                                        <div className="row" style={{ borderBottom: '1px solid #444141' }}>
                                             <div className="col-6">
-                                                <form>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="firstName" className="form-label">
-                                                            First Name*
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="w-100 input ps-2 py-1"
-                                                            placeholder="Enter first name"
-                                                        />
-                                                    </div>
-
-                                                    <div className="mb-3">
-                                                        <label htmlFor="Email" className="form-label">
-                                                            Email*
-                                                        </label>
-                                                        <input
-                                                            type="email"
-                                                            className="w-100 input ps-2 py-1"
-                                                            id="emailName"
-                                                            placeholder="Enter Email"
-                                                            aria-describedby="emailHelp"
-                                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141', paddingTop: "10px", paddingBottom: "10px" }}
-                                                        />
-                                                    </div>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="Phone" className="form-label">
-                                                            Phone*
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="w-100 input ps-2 py-1"
-                                                            id="phone"
-                                                            placeholder="Enter Phone number"
-                                                            aria-describedby="phoneNumberHelp"
-                                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141', paddingTop: "10px", paddingBottom: "10px" }}
-                                                        />
-                                                    </div>
-                                                    <div className="mb-3" style={{ position: "relative" }}>
-                                                        <label htmlFor="Phone" className="form-label">
-                                                            Profile image*
-                                                        </label>
-                                                        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                                                            <input
-                                                                type="text"
-                                                                className="w-100 input ps-2 py-1"
-                                                                placeholder="Upload Image"
-                                                                style={{
-                                                                    border: "1px solid #444141",
-                                                                    fontSize: "14px",
-                                                                    color: "#444141",
-                                                                    paddingTop: "10px",
-                                                                    paddingBottom: "10px",
-                                                                    paddingRight: "35px", // Add padding to avoid text overlapping the icon
-                                                                }}
-                                                            />
-                                                            <FiUploadCloud
-                                                                style={{
-                                                                    position: "absolute",
-                                                                    right: "10px", // Adjust position
-                                                                    color: "#444141",
-                                                                    fontSize: "20px",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="mb-3" style={{ position: "relative" }}>
-                                                        <label htmlFor="Phone" className="form-label">
-                                                            Degree
-                                                        </label>
-                                                        <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                                                            <input
-                                                                type="text"
-                                                                className="w-100 input ps-2 py-1"
-                                                                placeholder="Upload Image"
-                                                                style={{
-                                                                    border: "1px solid #444141",
-                                                                    fontSize: "14px",
-                                                                    color: "#444141",
-                                                                    paddingTop: "10px",
-                                                                    paddingBottom: "10px",
-                                                                    paddingRight: "35px", // Add padding to avoid text overlapping the icon
-                                                                }}
-                                                            />
-                                                            <FiUploadCloud
-                                                                style={{
-                                                                    position: "absolute",
-                                                                    right: "10px", // Adjust position
-                                                                    color: "#444141",
-                                                                    fontSize: "20px",
-                                                                    cursor: "pointer",
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-
-                                            <div className="col-6">
-                                                <form>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="LastName" className="form-label">
-                                                            Last Name*
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="w-100 input ps-2 py-1"
-                                                            id="lastName"
-                                                            placeholder="Enter Last name"
-                                                            aria-describedby="lastNameHelp"
-                                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
-                                                        />
-                                                    </div>
-
-                                                    <div className="mb-3">
-                                                        <label htmlFor="date of birth" className="form-label">
-                                                            Date of Birth*
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="w-100 input ps-2 py-1"
-                                                            id="dateofbirth"
-                                                            placeholder="Enter Date of birth"
-                                                            aria-describedby="lastNameHelp"
-                                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141', paddingTop: "10px", paddingBottom: "10px" }}
-                                                        />
-                                                    </div>
-
-                                                    <div className='row mb-3'>
-                                                        <div className=''>
-                                                            <p>Gender*</p>
-                                                            <div className='d-flex gap-2'>
-                                                                <div class="form-check ">
-                                                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Male
-                                                                    </label>
-                                                                </div>
-                                                                <div class="form-check ">
-                                                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Female
-                                                                    </label>
-                                                                </div>
-                                                                <div class="form-check ">
-                                                                    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" />
-                                                                    <label class="form-check-label" for="flexRadioDefault1">
-                                                                        Transgender
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                    <div className="row ">
-                                                        <div className="col-6 mt-1">
-                                                            <div className="mb-2 ">
-                                                                <label htmlFor="Password" className="form-label">
-                                                                    Password*
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-100 input ps-2 py-1"
-                                                                    id="Password"
-                                                                    placeholder="Password"
-                                                                    aria-describedby="lastNameHelp"
-                                                                    style={{
-                                                                        border: '1px solid #444141',
-                                                                        fontSize: '14px',
-                                                                        color: '#444141',
-                                                                        paddingTop: "10px", paddingBottom: "10px"
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-6 mt-1">
-                                                            <div className="mb-3">
-                                                                <label htmlFor="Confirm Password" className="form-label">
-                                                                    Confirm Password*
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-100 input ps-2 py-1"
-                                                                    id="confirmPassword"
-                                                                    placeholder="Confirm Password"
-                                                                    aria-describedby="lastNameHelp"
-                                                                    style={{
-                                                                        border: '1px solid #444141',
-                                                                        fontSize: '14px',
-                                                                        color: '#444141',
-                                                                        paddingTop: "10px", paddingBottom: "10px"
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12 mt-3" >
-                                        <p>Address Details*</p>
-                                        <div className="row">
-                                            <div className="col-6">
-                                                <form>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="firstName" className="form-label">
-                                                            Address 1
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            className="w-100 input ps-2 py-1"
-                                                            id="Address 1"
-                                                            placeholder="Address 1 "
-                                                            aria-describedby="Address 1Help"
-                                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
-                                                        />
-                                                    </div>
-                                                </form>
-                                                <div className="row mb-3">
-                                                    <div className="col-6">
-                                                        <form>
-                                                            <div className="mb-3">
-                                                                <label htmlFor="city" className="form-label">
-                                                                    City*
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-100 input ps-2 py-1"
-                                                                    id="city"
-                                                                    placeholder="City "
-                                                                    aria-describedby="cityHelp"
-                                                                    style={{
-                                                                        border: '1px solid #444141',
-                                                                        fontSize: '14px',
-                                                                        color: '#444141',
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div className="col-6">
-                                                        <form>
-                                                            <div className="mb-3">
-                                                                <label htmlFor="Zip" className="form-label">
-                                                                    Zip*
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="w-100 input ps-2 py-1"
-                                                                    id="Zip"
-                                                                    placeholder="Zip "
-                                                                    aria-describedby="ZipHelp"
-                                                                    style={{
-                                                                        border: '1px solid #444141',
-                                                                        fontSize: '14px',
-                                                                        color: '#444141',
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="mb-3">
-                                                    <label htmlFor="Address 2" className="form-label">
-                                                        Address 2*
-                                                    </label>
-                                                    <input
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>First Name*</Form.Label>
+                                                    <Form.Control
                                                         type="text"
-                                                        className="w-100 input ps-2 py-1"
-                                                        id="Address 2"
-                                                        placeholder="Address 2 "
-                                                        aria-describedby="Address 2Help"
-                                                        style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
+                                                        {...register('firstName', { required: 'First name is required' })}
+                                                        placeholder="Enter first name"
                                                     />
+                                                    {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
+                                                </Form.Group>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Email*</Form.Label>
+                                                    <Form.Control
+                                                        type="email"
+                                                        {...register('email', { required: 'Email is required' })}
+                                                        placeholder="Enter email"
+                                                    />
+                                                    {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                </Form.Group>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Phone*</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        {...register('phone', { required: 'Phone is required' })}
+                                                        placeholder="Enter phone number"
+                                                    />
+                                                    {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
+                                                </Form.Group>
+
+                                                <div className="mb-3 d-flex flex-column position-relative">
+                                                    <Form.Label>Profile Image*</Form.Label>
+                                                    <div
+                                                        onClick={() => logoFileInputRef.current.click()}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer`}
+                                                    >
+                                                        {logoName ? logoName : 'Upload Profile Image'}
+                                                        <p className="mb-0">
+                                                            <FiUploadCloud />
+                                                        </p>
+                                                    </div>
+                                                    <Form.Control
+                                                        type="file"
+                                                        className="d-none"
+                                                        {...register('profileImage', {
+                                                            // required: 'Profile image is required',
+                                                        })}
+                                                        ref={logoFileInputRef}
+                                                        onChange={handleFileChange}
+                                                    />
+                                                    {errors.profileImage && (
+                                                        <p className="text-danger">{errors.profileImage.message}</p>
+                                                    )}
                                                 </div>
+                                            </div>
+                                            <div className="col-6">
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Last Name*</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        {...register('lastName', { required: 'Last name is required' })}
+                                                        placeholder="Enter last name"
+                                                    />
+                                                    {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                                                </Form.Group>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Date of Birth*</Form.Label>
+                                                    <Form.Control
+                                                        type="date"
+                                                        {...register('dateOfBirth', { required: 'Date of birth is required' })}
+                                                    />
+                                                    {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
+                                                </Form.Group>
+                                                <Form.Group className='mb-3'>
+                                                    <Form.Label>Gender*</Form.Label>
+                                                    <div className="d-flex gap-2 mt-1">
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Male"
+                                                            value="Male"
+                                                            {...register('gender', { required: 'Gender is required' })}
+                                                        />
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Female"
+                                                            value="Female"
+                                                            {...register('gender')}
+                                                        />
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Transgender"
+                                                            value="Transgender"
+                                                            {...register('gender')}
+                                                        />
+                                                    </div>
+                                                    {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                </Form.Group>
+
+                                                <div className='row '>
+                                                    <div className='col-6 '>
+                                                        <Form.Group className="mb-3 mt-2 ">
+                                                            <Form.Label>Password*</Form.Label>
+                                                            <Form.Control
+                                                                type="password"
+                                                                {...register('password', { required: 'Password is required' })}
+                                                                placeholder="Enter password"
+                                                            />
+                                                            {errors.password && <span className="text-danger">{errors.password.message}</span>}
+                                                        </Form.Group>
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <Form.Group className="mb-3 mt-2 ">
+                                                            <Form.Label>Confirm Password*</Form.Label>
+                                                            <Form.Control
+                                                                type="password"
+                                                                {...register('confirmPassword', {
+                                                                    required: 'Please confirm your password',
+                                                                    validate: (value) => value === watch('password') || 'Passwords do not match',
+                                                                })}
+                                                                placeholder="Confirm password"
+                                                            />
+                                                            {errors.confirmPassword && (
+                                                                <span className="text-danger">{errors.confirmPassword.message}</span>
+                                                            )}
+                                                        </Form.Group>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div className='row mt-2'>
+                                            <div className='col-6'>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Address 1*</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        {...register('address1', { required: 'Address 1 is required' })}
+                                                        placeholder="Enter address line 1"
+                                                    />
+                                                    {errors.address1 && <span className="text-danger">{errors.address1.message}</span>}
+                                                </Form.Group>
+                                                <div className='row'>
+                                                    <div className='col-6'>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>City*</Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                {...register('city', { required: 'City is required' })}
+                                                                placeholder="Enter city"
+                                                            />
+                                                            {errors.city && <span className="text-danger">{errors.city.message}</span>}
+                                                        </Form.Group>
+                                                    </div>
+                                                    <div className='col-6'>
+                                                        <Form.Group className="mb-3">
+                                                            <Form.Label>Zip Code*</Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                {...register('zip', { required: 'Zip code is required' })}
+                                                                placeholder="Enter zip code"
+                                                            />
+                                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
+                                                        </Form.Group>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className='col-6'>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Label>Address 2</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        {...register('address2')}
+                                                        placeholder="Enter address line 2"
+                                                    />
+                                                </Form.Group>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div className='col-12'>
-                                        <div className='d-flex justify-content-end gap-2'>
-                                            <Button className=''>Cancel</Button>
-                                            <Button className=''>Save</Button>
-                                        </div>
+                                    <div className="col-12 d-flex justify-content-end gap-2 mt-3">
+                                        <Button variant="secondary">Cancel</Button>
+                                        <Button type="submit">Save</Button>
                                     </div>
-                                </>
+                                </Form>
                             )}
-                            {activeTab === 'departmentDetails' ?
-                                <DepartmentDetails />
-                                :
-                                activeTab === "documents" ?
-                                    <Documents />
-                                    : ''
-                            }
+                            {activeTab === "departmentDetails" && <DepartmentDetails />}
+                            {activeTab === "documents" && <Documents />}
                         </div>
                     </Card>
                 </div>
+                <EmailToDoctorModal closeModal={closeModal} show={show} />
             </div>
-
-            <Modal centered show={show} onHide={closeModal}>
-                <Modal.Body>
-                    <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
-                        <Col sm={1}></Col>
-                        <Col sm={10}>
-                            <h4 className="mb-0 text-center">Email to Doctor</h4>
-                        </Col>
-                        <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
-                        </Col>
-                    </Row>
-                    <Form onSubmit={handleSubmit(onSubmit)}>
-                        <Row>
-                            <Col md={12}>
-                                <Form.Group className="my-2 mx-3">
-
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter email address"
-                                        {...register('name', { required: 'Name is required' })}
-                                    />
-                                    {errors.name && <span className="text-danger">{errors.name.message}</span>}
-                                </Form.Group>
-
-                                <div className='text-center'>
-                                    <p className='mb-0'>The Doctor will receive an onboarding email on</p>
-                                    <p > "xyz.com"</p>
-                                </div>
-                            </Col>
-
-                        </Row>
-                        <Modal.Footer className='d-flex justify-content-center'>
-                            <Button type="submit" className="custom-buttons">
-                                Send
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal.Body>
-            </Modal>
-
-
         </>
     );
 };

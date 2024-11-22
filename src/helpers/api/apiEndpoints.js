@@ -25,7 +25,9 @@ export const addMastersData = '/api/v1/clinic/masterdata';
 export const getMastersData = '/api/v1/clinic/masterdata';
 export const updateMastersData = '/api/v1/clinic/masterdata';
 // DOCTORS
-export const getDoctor = '/api/v1/admin/getAllDoctors';
+export const getDoctor = '/api/v1/doctors/getClinicDoctors';
+export const createDoctor = '/api/v1/clinics/createOrUpdateUser';
+export const getDoctorRoles = '/api/v1/clinic/getRoles';
 // PATIENTS
 export const getPatients = '/api/v1/admin/getAllPatients';
 // DASHBOARD

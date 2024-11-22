@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { getDoctorsApi } from './api';
+import { createDoctorApi, getDoctorsApi, getDoctorsRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -17,7 +17,7 @@ function* getDoctorsFunction(data) {
         });
         const response = yield call(getDoctorsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
+        console.log(decryptedData, 'decccccccccc')
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.GET_DOCTORS_SUCCESS,
@@ -37,6 +37,63 @@ function* getDoctorsFunction(data) {
     }
 }
 
+function* getDoctorsRoleFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_DOCTORS_ROLES_LOADING,
+            payload: {},
+        });
+        const response = yield call(getDoctorsRolesApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'rolessaga')
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.GET_DOCTORS_ROLES_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.GET_DOCTORS_ROLES_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.GET_DOCTORS_ROLES_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createDoctorsFunction(data) {
+    console.log(data)
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_DOCTORS_LOADING,
+            payload: {},
+        });
+        const response = yield call(createDoctorApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'decccccccccc')
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -50,6 +107,14 @@ export function* watchGetDoctors() {
     yield takeEvery(DoctorsActionTypes.GET_DOCTORS, getDoctorsFunction);
 }
 
+export function* watchGetDoctorsRoles() {
+    yield takeEvery(DoctorsActionTypes.GET_DOCTORS_ROLES, getDoctorsRoleFunction);
+}
+
+export function* watchCreateDoctors() {
+    yield takeEvery(DoctorsActionTypes.CREATE_DOCTORS, createDoctorsFunction);
+}
+
 
 
 export function* watchresetState() {
@@ -59,7 +124,9 @@ export function* watchresetState() {
 function* doctorsSaga() {
     yield all([
         fork(watchGetDoctors),
-        fork(watchresetState)
+        fork(watchresetState),
+        fork(watchCreateDoctors),
+        fork(watchGetDoctorsRoles),
     ]);
 }
 export default doctorsSaga;

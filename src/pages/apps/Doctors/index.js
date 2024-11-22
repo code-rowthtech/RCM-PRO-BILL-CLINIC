@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
+import { useDispatch, useSelector } from 'react-redux';
+import { getDoctorsAction } from '../../../redux/actions';
 
 const Doctors = () => {
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
-    const [status, setStatus] = useState("Active");
+    const [status, setStatus] = useState(true);
+    const [search, setSearch] = useState('');
 
     const handleStatusChange = (isActive) => {
         setStatus(isActive);
     };
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(
+            getDoctorsAction({ status: status, search: search })
+        );
+    }, [dispatch, status, search]);
+
+    const store = useSelector((state) => state);
+    const response = store?.getDoctorsReducer
+
+    console.log(response);
+
 
     // Static patient data
     const patientsData = [
@@ -183,8 +200,8 @@ const Doctors = () => {
         setDetailsModal(false);
         setSelectedDetails(null);
     };
-     // Filter patients based on selected status
-     const filteredPatients = patientsData.filter((patient) =>
+    // Filter patients based on selected status
+    const filteredPatients = patientsData.filter((patient) =>
         status === 'Active' ? patient.status === 'Active' : patient.status === 'Inactive'
     );
 
@@ -196,16 +213,16 @@ const Doctors = () => {
                     <Card>
                         <Card.Body>
                             <Row className="mb-2">
-                            <Col sm={6}>
+                                <Col sm={6}>
                                     <Button
-                                        onClick={() => setStatus('Active')}
+                                        onClick={() => setStatus(true)}
                                         className={`me-2 ${status === 'Active' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Active
                                     </Button>
 
                                     <Button
-                                        onClick={() => setStatus('Inactive')}
+                                        onClick={() => setStatus(false)}
                                         className={`me-2 ${status === 'Inactive' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Inactive
@@ -241,7 +258,7 @@ const Doctors = () => {
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead className="text-white">
                                             <tr className=''>
-                                            <th className='text-white'>S.No.</th>
+                                                <th className='text-white'>S.No.</th>
                                                 <th className='text-white'>Doctor Name</th>
                                                 <th className='text-white'>Specialist</th>
                                                 <th className='text-white'>Department Name</th>
@@ -259,7 +276,7 @@ const Doctors = () => {
                                             ) : (
                                                 filteredPatients.map((data, index) => (
                                                     <tr key={index}>
-                                                        <td>{index+1}</td>
+                                                        <td>{index + 1}</td>
                                                         <td className=''>
                                                             {data.firstName}
                                                         </td>
