@@ -220,6 +220,7 @@ function* createSubscriptionPlanFunction(data) {
             payload: {},
         });
         const response = yield call(addSubscriptionPlanApi, data);
+        console.log(response,'response of createSubscriptionPlan');
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {

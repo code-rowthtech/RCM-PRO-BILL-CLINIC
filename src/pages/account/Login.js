@@ -83,7 +83,7 @@ const Login = (): React$Element<any> => {
                 <div className="text-center w-75 m-auto">
                     <h4 className="text-dark-50 text-center mt-0 fw-bold">{t('Sign In')}</h4>
                     <p className="text-muted mb-4">
-                        {t('Enter your email address and password to access admin panel.')}
+                        {t('Enter your email address and password to access Clinic panel.')}
                     </p>
                 </div>
 

@@ -5,8 +5,8 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-// import { getMastersDataAction, stateEmptydAction } from '../../../../redux/settings/actions';
-import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicById, getClinicByParentAction, getStatesByCountryAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { getMastersDataAction, stateEmptydAction } from '../../../../redux/settings/action';
+import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getStatesByCountryAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -103,7 +103,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             dispatch(getClinicById({ key: encryptMessage({ id: updateId }) }))
             setUpdatePage(true)
         }
-        // dispatch(getMastersDataAction({ status: true, category: 'clinic_type', search: '', limit: '' }));
+        dispatch(getMastersDataAction({ status: true, category: 'clinic_type', search: '', limit: '' }));
         dispatch(getStatesByCountryAction());
     }, [dispatch, updateId, createResponse === 200]);
     const statesData = store?.getStatesReducer?.data;
@@ -124,6 +124,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const citySelected = JSON.parse(e.target.value);
         setSelectedCity(citySelected)
     }
+    useEffect(() => {
+        dispatch(getClinicAction());
+    }, [dispatch])
+    const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(clinicsDataGet, 'datasssssssssss');
 
     const decryptedRolesData = store?.getRolesDataReducer?.data?.roles;
     // const onSubmit = (data) => {
@@ -169,7 +174,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             });
             return;
         }
-
         const clinicRoleId = decryptedRolesData && decryptedRolesData.find(role => role?.name === "clinic")?._id;
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
@@ -198,7 +202,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
         // Dispatch appropriate action based on whether this is an update or creation
         if (updatePage) {
-            // dispatch(updateClinicAction({ key: encryptMessage() }));
+            dispatch(updateClinicAction({ key: encryptMessage(newPayload) }));
+        
         } else {
             dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
         }
@@ -372,7 +377,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Form.Control
                                 type="text"
                                 {...register('clinicname')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.name : ''}
+                                defaultValue={updatePage ? clinicDataToUpdate?.name : clinicsDataGet?.name || ''}
                                 placeholder="Clinic name" />
                             {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
                         </Form.Group>
@@ -381,7 +386,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Clinic type</Form.Label>
                             <Form.Select
-                                defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
+                                defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
                                 {...register('clinicType')}                        >
                                 <option>Clinic type</option>
                                 {clinicTypeData?.map((data) => (
@@ -395,7 +400,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Form.Label className='mb-1'>Email</Form.Label>
                             <Form.Control
                                 type="email"
-                                defaultValue={updatePage ? clinicDataToUpdate?.email : ''}
+                                defaultValue={updatePage ? clinicDataToUpdate?.email : clinicsDataGet?.userId.email || ''}
                                 {...register('email')}
                                 placeholder="Email" />
                             {/* {errors.email && <span className="text-danger">{errors.email.message}</span>} */}
@@ -418,7 +423,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 type="text"
                                 style={{ paddingLeft: '5%' }}
                                 {...register('contact')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.phone : ''}
+                                defaultValue={updatePage ? clinicDataToUpdate?.phone : clinicsDataGet?.userId.phone || ''}
                                 placeholder="+1 1234-234-234" />
                             {/* {errors.contact1 && <span className="text-danger">{errors.contact1.message}</span>} */}
                             <img
@@ -742,13 +747,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                         </Row>
                     </Col>
-                    <hr/>
+                    <hr />
                     <Col sm={12}>
                         <Row>
                             <Col sm={12} className='mb-2'>
                                 <span className='text-black fw-semibold'>POC 1 (point of contact)*</span>
                             </Col>
-                          
+
                             <Col>
                                 <Row>
                                     <Col sm={6}>
@@ -795,7 +800,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
                                         </Form.Group>
                                     </Col>
-                                    
+
                                 </Row>
                             </Col>
                         </Row>

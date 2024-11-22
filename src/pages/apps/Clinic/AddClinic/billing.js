@@ -21,8 +21,12 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [amount, setAmount] = useState((null));
-    const subscriptionsData = store?.getSubscriptionsReducer?.data?.plans;
-    const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    const subscriptionsData = store?.getSubscriptionsReducer?.data?.result;
+    const createResponse = store?.createSubscriptionPlanReducer?.data;
+    console.log(createResponse,'new Data')
+
+
+
     useEffect(() => {
         if (activeTab === 'billing') {
             dispatch(getSubscriptionsAction());
@@ -34,7 +38,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const onSubmit = (data) => {
         const payload = {
             subscription: data?.subscription,
-            userId: billingId,
+            // userId: billingId,
             billingContactName: data?.name,
             billingContactPhone: data?.contact,
             billingContactemail: data?.email
@@ -42,7 +46,8 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
         dispatch(addSubscriptionPlanAction({ key: encryptMessage(payload) }));
     };
 
-    const billingAddResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    const billingAddResponse = store?.createSubscriptionPlanReducer?.data;
+    console.log(billingAddResponse, "billing add response");
     useEffect(() => {
         if (billingAddResponse === 200) {
             reset();
@@ -66,7 +71,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
                             }}
                         >
                             <option>Select</option>
-                            {subscriptionsData?.map((data) => (
+                            {subscriptionsData  ?.map((data) => (
                                 <option value={data?._id} key={data?._id} className='text-capitalize'>
                                     {data?.name} {data?.billingFrequency} {data?.price}
                                 </option>

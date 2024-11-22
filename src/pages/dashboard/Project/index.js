@@ -17,9 +17,9 @@ import { getAnalyticsAction } from '../../../redux/dashboard/actions';
 const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    useEffect(() => {
-        dispatch(getAnalyticsAction())
-    }, [dispatch])
+    // useEffect(() => {
+    //     dispatch(getAnalyticsAction())
+    // }, [dispatch])
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
         <>
