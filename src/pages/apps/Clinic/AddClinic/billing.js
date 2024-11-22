@@ -22,7 +22,10 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const store = useSelector((state) => state);
     const [amount, setAmount] = useState((null));
     const subscriptionsData = store?.getSubscriptionsReducer?.data?.result;
-    const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    const createResponse = store?.createSubscriptionPlanReducer?.data;
+    console.log(createResponse,'new Data')
+
+
 
     useEffect(() => {
         if (activeTab === 'billing') {
@@ -43,7 +46,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
         dispatch(addSubscriptionPlanAction({ key: encryptMessage(payload) }));
     };
 
-    const billingAddResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    const billingAddResponse = store?.createSubscriptionPlanReducer?.data;
     console.log(billingAddResponse, "billing add response");
     useEffect(() => {
         if (billingAddResponse === 200) {
