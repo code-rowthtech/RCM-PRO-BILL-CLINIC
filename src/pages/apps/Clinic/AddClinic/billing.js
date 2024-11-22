@@ -22,10 +22,8 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const store = useSelector((state) => state);
     const [amount, setAmount] = useState((null));
     const subscriptionsData = store?.getSubscriptionsReducer?.data?.result;
-    console.log(subscriptionsData,'resassss')
-
-
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
+
     useEffect(() => {
         if (activeTab === 'billing') {
             dispatch(getSubscriptionsAction());
@@ -46,6 +44,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     };
 
     const billingAddResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    console.log(billingAddResponse, "billing add response");
     useEffect(() => {
         if (billingAddResponse === 200) {
             reset();
