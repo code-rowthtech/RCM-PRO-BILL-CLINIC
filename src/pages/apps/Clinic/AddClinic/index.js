@@ -17,8 +17,8 @@ const Index = () => {
     const [activeTab, setActiveTab] = useState('clinic');
     const [clinicId, setClinicId] = useState(null);
     const [billingId, setBillingId] = useState(null);
-    const [showModal, setShowModal] = useState(false); // Modal visibility state
-    const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
+    // const [showModal, setShowModal] = useState(false); // Modal visibility state
+    // const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
     const store = useSelector((state) => state);
 
     const navigate = useNavigate();
@@ -31,13 +31,13 @@ const Index = () => {
         setActiveTab(data);
     };
 
-    const handleOpenModal = () => {
-        setShowModal(true);
-    };
+    // const handleOpenModal = () => {
+    //     setShowModal(true);
+    // };
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-    };
+    // const handleCloseModal = () => {
+    //     setShowModal(false);
+    // };
 
     return (
         <>
@@ -64,12 +64,12 @@ const Index = () => {
                                         </span>
                                     ))}
                                 </div>
-                                <div className="d-flex gap-2">
+                                {/* <div className="d-flex gap-2">
                                     <Button className="custom-buttons" onClick={handleOpenModal}>
                                         Email to Clinic
                                     </Button>
                                     <Button className="custom-buttons">View</Button>
-                                </div>
+                                </div> */}
                             </Col>
                         </Row>
 
@@ -96,7 +96,7 @@ const Index = () => {
             </Row>
 
             {/* Include Modal */}
-            <SendEmailModal show={showModal} closeModal={handleCloseModal} mailId={mailId} />
+            {/* <SendEmailModal show={showModal} closeModal={handleCloseModal} mailId={mailId} /> */}
         </>
     );
 };

@@ -7,6 +7,7 @@ export const createClinicAction = (data): AuthAction => ({
     type: ClinicsActionTypes.CREATE_CLINIC,
     data
 });
+
 export const getClinicAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_CLINIC,
     data

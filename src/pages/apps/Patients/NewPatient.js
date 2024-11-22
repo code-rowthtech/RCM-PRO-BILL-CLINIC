@@ -58,141 +58,143 @@ const NewPatient = () => {
                         </ul>
 
                         {/* Form Section */}
-                        <div className="row pb-4 mt-3" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-6">
-                                <div>
-                                    <p>First Name*</p>
-                                    <input
-                                        placeholder="First Name"
-                                        className="w-100 input ps-2 py-1"
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <p>Email*</p>
-                                    <input
-                                        placeholder="Email"
-                                        className="w-100 input ps-2 py-1"
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <p>Phone*</p>
-                                    <input
-                                        placeholder="0987654321"
-                                        className="w-100 input ps-2 py-1"
-                                    />
-                                </div>
-                                <div className="mt-3" style={{ position: "relative" }}>
-                                    <label htmlFor="profileImage" className="form-label ">
-                                        Profile Image*
-                                    </label>
-                                    <div
-                                        style={{
-                                            position: "relative",
-                                            display: "flex",
-                                            alignItems: "center",
-                                        }}
-                                    >
+                        <Form>
+                            <div className="row pb-4 mt-3" style={{ borderBottom: "1px solid #444141" }}>
+                                <div className="col-6">
+                                    <div>
+                                        <p>First Name*</p>
                                         <input
-                                            type="text"
+                                            placeholder="First Name"
                                             className="w-100 input ps-2 py-1"
-                                            placeholder="Upload Image"
-                                            style={{
-                                                border: "1px solid #444141",
-                                                fontSize: "14px",
-                                                color: "#444141",
-                                                paddingTop: "10px",
-                                                paddingBottom: "10px",
-                                                paddingRight: "35px",
-                                            }}
                                         />
-                                        <FiUploadCloud
-                                            style={{
-                                                position: "absolute",
-                                                right: "10px",
-                                                color: "#444141",
-                                                fontSize: "20px",
-                                                cursor: "pointer",
-                                            }}
+                                    </div>
+                                    <div className="mt-3">
+                                        <p>Email*</p>
+                                        <input
+                                            placeholder="Email"
+                                            className="w-100 input ps-2 py-1"
                                         />
+                                    </div>
+                                    <div className="mt-3">
+                                        <p>Phone*</p>
+                                        <input
+                                            placeholder="0987654321"
+                                            className="w-100 input ps-2 py-1"
+                                        />
+                                    </div>
+                                    <div className="mt-3" style={{ position: "relative" }}>
+                                        <label htmlFor="profileImage" className="form-label ">
+                                            Profile Image*
+                                        </label>
+                                        <div
+                                            style={{
+                                                position: "relative",
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}
+                                        >
+                                            <input
+                                                type="text"
+                                                className="w-100 input ps-2 py-1"
+                                                placeholder="Upload Image"
+                                                style={{
+                                                    border: "1px solid #444141",
+                                                    fontSize: "14px",
+                                                    color: "#444141",
+                                                    paddingTop: "10px",
+                                                    paddingBottom: "10px",
+                                                    paddingRight: "35px",
+                                                }}
+                                            />
+                                            <FiUploadCloud
+                                                style={{
+                                                    position: "absolute",
+                                                    right: "10px",
+                                                    color: "#444141",
+                                                    fontSize: "20px",
+                                                    cursor: "pointer",
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div>
+                                        <p>Last Name*</p>
+                                        <input
+                                            placeholder="Last Name"
+                                            className="w-100 input ps-2 py-1"
+                                        />
+                                    </div>
+                                    <div className="mt-3">
+                                        <p>Date Of Birth*</p>
+                                        <input
+                                            placeholder="Date Of Birth"
+                                            className="w-100 input ps-2 py-1"
+                                        />
+                                    </div>
+                                    <div className="mt-3">
+                                        <p>Gender*</p>
+                                        <div className="d-flex gap-2">
+                                            <Form.Check type="radio" name="gender" label="Male" />
+                                            <Form.Check type="radio" name="gender" label="Female" />
+                                            <Form.Check type="radio" name="gender" label="Others" />
+                                        </div>
+                                    </div>
+                                    <div className="row mt-3 pt-1">
+                                        <div className="col-6">
+                                            <p>Password*</p>
+                                            <input
+                                                placeholder="Password"
+                                                className="w-100 input ps-2 py-1"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <p>Confirm Password*</p>
+                                            <input
+                                                placeholder="Confirm Password"
+                                                className="w-100 input ps-2 py-1"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-6">
-                                <div>
-                                    <p>Last Name*</p>
-                                    <input
-                                        placeholder="Last Name"
-                                        className="w-100 input ps-2 py-1"
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <p>Date Of Birth*</p>
-                                    <input
-                                        placeholder="Date Of Birth"
-                                        className="w-100 input ps-2 py-1"
-                                    />
-                                </div>
-                                <div className="mt-3">
-                                    <p>Gender*</p>
-                                    <div className="d-flex gap-2">
-                                        <Form.Check type="radio" name="gender" label="Male" />
-                                        <Form.Check type="radio" name="gender" label="Female" />
-                                        <Form.Check type="radio" name="gender" label="Others" />
-                                    </div>
-                                </div>
-                                <div className="row mt-3 pt-1">
-                                    <div className="col-6">
-                                        <p>Password*</p>
-                                        <input
-                                            placeholder="Password"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="col-6">
-                                        <p>Confirm Password*</p>
-                                        <input
-                                            placeholder="Confirm Password"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Address Section */}
-                        <div className="row pb-4">
-                            <p className="my-3">Address Details</p>
-                            <div className="col-6">
-                                <p>Address 1*</p>
-                                <input
-                                    placeholder="Address 1"
-                                    className="w-100 input ps-2 py-1"
-                                />
-                                <div className="row mt-3">
-                                    <div className="col-6">
-                                        <p>City*</p>
-                                        <input
-                                            placeholder="City"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="col-6">
-                                        <p>Zip*</p>
-                                        <input
-                                            placeholder="Zip"
-                                            className="w-100 input ps-2 py-1"
-                                        />
+                            {/* Address Section */}
+                            <div className="row pb-4">
+                                <p className="my-3">Address Details</p>
+                                <div className="col-6">
+                                    <p>Address 1*</p>
+                                    <input
+                                        placeholder="Address 1"
+                                        className="w-100 input ps-2 py-1"
+                                    />
+                                    <div className="row mt-3">
+                                        <div className="col-6">
+                                            <p>City*</p>
+                                            <input
+                                                placeholder="City"
+                                                className="w-100 input ps-2 py-1"
+                                            />
+                                        </div>
+                                        <div className="col-6">
+                                            <p>Zip*</p>
+                                            <input
+                                                placeholder="Zip"
+                                                className="w-100 input ps-2 py-1"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
+                                <div className="col-6">
+                                    <p>Address 2*</p>
+                                    <input
+                                        placeholder="Address 2"
+                                        className="w-100 input ps-2 py-1"
+                                    />
+                                </div>
                             </div>
-                            <div className="col-6">
-                                <p>Address 2*</p>
-                                <input
-                                    placeholder="Address 2"
-                                    className="w-100 input ps-2 py-1"
-                                />
-                            </div>
-                        </div>
+                        </Form>
 
                         {/* Buttons */}
                         <div className="d-flex gap-2 justify-content-end mb-2">
