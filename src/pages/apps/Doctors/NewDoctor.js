@@ -41,8 +41,6 @@ const NewDoctor = () => {
     const store = useSelector((state) => state);
     const response = store?.getDoctorsRolesReducer?.data?.result?._id
 
-    console.log(response);
-
     const closeModal = () => {
         setShow(false);
     };
@@ -127,7 +125,7 @@ const NewDoctor = () => {
                                         <div className="row" style={{ borderBottom: '1px solid #444141' }}>
                                             <div className="col-6">
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>First Name*</Form.Label>
+                                                    <Form.Label>First Name<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('firstName', { required: 'First name is required' })}
@@ -136,7 +134,7 @@ const NewDoctor = () => {
                                                     {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Email*</Form.Label>
+                                                    <Form.Label>Email<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="email"
                                                         {...register('email', { required: 'Email is required' })}
@@ -145,7 +143,7 @@ const NewDoctor = () => {
                                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Phone*</Form.Label>
+                                                    <Form.Label>Phone<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('phone', { required: 'Phone is required' })}
@@ -155,10 +153,10 @@ const NewDoctor = () => {
                                                 </Form.Group>
 
                                                 <div className="mb-3 d-flex flex-column position-relative">
-                                                    <Form.Label>Profile Image*</Form.Label>
+                                                    <Form.Label>Profile Image<span className='text-danger'>*</span></Form.Label>
                                                     <div
                                                         onClick={() => logoFileInputRef.current.click()}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer`}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
                                                     >
                                                         {logoName ? logoName : 'Upload Profile Image'}
                                                         <p className="mb-0">
@@ -167,7 +165,7 @@ const NewDoctor = () => {
                                                     </div>
                                                     <Form.Control
                                                         type="file"
-                                                        className="d-none"
+                                                        className="d-none "
                                                         {...register('profileImage', {
                                                             // required: 'Profile image is required',
                                                         })}
@@ -181,7 +179,7 @@ const NewDoctor = () => {
                                             </div>
                                             <div className="col-6">
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Last Name*</Form.Label>
+                                                    <Form.Label>Last Name<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('lastName', { required: 'Last name is required' })}
@@ -190,7 +188,7 @@ const NewDoctor = () => {
                                                     {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                                 </Form.Group>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Date of Birth*</Form.Label>
+                                                    <Form.Label>Date of Birth<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="date"
                                                         {...register('dateOfBirth', { required: 'Date of birth is required' })}
@@ -198,7 +196,7 @@ const NewDoctor = () => {
                                                     {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                 </Form.Group>
                                                 <Form.Group className='mb-3'>
-                                                    <Form.Label>Gender*</Form.Label>
+                                                    <Form.Label>Gender<span className='text-danger'>*</span></Form.Label>
                                                     <div className="d-flex gap-2 mt-1">
                                                         <Form.Check
                                                             type="radio"
@@ -225,7 +223,7 @@ const NewDoctor = () => {
                                                 <div className='row '>
                                                     <div className='col-6 '>
                                                         <Form.Group className="mb-3 mt-2 ">
-                                                            <Form.Label>Password*</Form.Label>
+                                                            <Form.Label>Password<span className='text-danger'>*</span></Form.Label>
                                                             <Form.Control
                                                                 type="password"
                                                                 {...register('password', { required: 'Password is required' })}
@@ -236,7 +234,7 @@ const NewDoctor = () => {
                                                     </div>
                                                     <div className='col-6'>
                                                         <Form.Group className="mb-3 mt-2 ">
-                                                            <Form.Label>Confirm Password*</Form.Label>
+                                                            <Form.Label>Confirm Password<span className='text-danger'>*</span></Form.Label>
                                                             <Form.Control
                                                                 type="password"
                                                                 {...register('confirmPassword', {
@@ -257,7 +255,7 @@ const NewDoctor = () => {
                                         <div className='row mt-2'>
                                             <div className='col-6'>
                                                 <Form.Group className="mb-3">
-                                                    <Form.Label>Address 1*</Form.Label>
+                                                    <Form.Label>Address 1<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('address1', { required: 'Address 1 is required' })}
@@ -268,7 +266,7 @@ const NewDoctor = () => {
                                                 <div className='row'>
                                                     <div className='col-6'>
                                                         <Form.Group className="mb-3">
-                                                            <Form.Label>City*</Form.Label>
+                                                            <Form.Label>City<span className='text-danger'>*</span></Form.Label>
                                                             <Form.Control
                                                                 type="text"
                                                                 {...register('city', { required: 'City is required' })}
@@ -279,7 +277,7 @@ const NewDoctor = () => {
                                                     </div>
                                                     <div className='col-6'>
                                                         <Form.Group className="mb-3">
-                                                            <Form.Label>Zip Code*</Form.Label>
+                                                            <Form.Label>Zip Code<span className='text-danger'>*</span></Form.Label>
                                                             <Form.Control
                                                                 type="text"
                                                                 {...register('zip', { required: 'Zip code is required' })}
