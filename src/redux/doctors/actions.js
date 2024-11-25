@@ -23,3 +23,8 @@ export const createDoctorAction = (data): LayoutAction => ({
     type: DoctorsActionTypes.CREATE_DOCTORS,
     data
 });
+
+export const createDoctorDetailAction = (data): LayoutAction => ({
+    type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL,
+    data
+});

@@ -17,7 +17,7 @@ const Documents = () => {
     <>
       <div className="container-fluid">
         <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
-          <p className="fw-bold">Licensing Information*</p>
+          <p className="fw-bold">Licensing Information<span className='text-danger'>*</span></p>
           <div className="col-6">
             <form>
               <div className="mb-3">
@@ -35,7 +35,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="stateLicense" className="form-label">
-                      State License Obtained (state)*
+                      State License Obtained (state)<span className='text-danger'>*</span>
                     </label>
                     <select
                       id="stateLicense"
@@ -112,7 +112,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="firstName" className="form-label">
-                      State License Issue Date*
+                      State License Issue Date<span className='text-danger'>*</span>
                     </label>
                     <input
                       type="text"
@@ -124,7 +124,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="firstName" className="form-label">
-                      License Expiration Date*
+                      License Expiration Date<span className='text-danger'>*</span>
                     </label>
                     <input
                       type="text"
@@ -138,7 +138,7 @@ const Documents = () => {
           </div>
         </div>
         <div className="row mt-3" >
-          <p className="fw-bold">Licensing Information*</p>
+          <p className="fw-bold">Licensing Information<span className='text-danger'>*</span></p>
           <div className="col-6">
             <form>
               <div className="mb-3">
@@ -156,7 +156,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="stateLicense" className="form-label">
-                      State License Obtained (state)*
+                      State License Obtained (state)<span className='text-danger'>*</span>
                     </label>
                     <select
                       id="stateLicense"
@@ -233,7 +233,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="firstName" className="form-label">
-                      State License Issue Date*
+                      State License Issue Date<span className='text-danger'>*</span>
                     </label>
                     <input
                       type="text"
@@ -245,7 +245,7 @@ const Documents = () => {
                 <div className="col-6">
                   <div className="mb-3">
                     <label htmlFor="firstName" className="form-label">
-                      License Expiration Date*
+                      License Expiration Date<span className='text-danger'>*</span>
                     </label>
                     <input
                       type="text"

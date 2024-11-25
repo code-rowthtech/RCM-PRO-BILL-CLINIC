@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { createDoctorApi, getDoctorsApi, getDoctorsRolesApi } from './api';
+import { createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -17,7 +17,6 @@ function* getDoctorsFunction(data) {
         });
         const response = yield call(getDoctorsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decccccccccc')
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.GET_DOCTORS_SUCCESS,
@@ -45,7 +44,6 @@ function* getDoctorsRoleFunction(data) {
         });
         const response = yield call(getDoctorsRolesApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'rolessaga')
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.GET_DOCTORS_ROLES_SUCCESS,
@@ -74,7 +72,6 @@ function* createDoctorsFunction(data) {
         });
         const response = yield call(createDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decccccccccc')
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
@@ -89,6 +86,34 @@ function* createDoctorsFunction(data) {
     } catch (error) {
         yield put({
             type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createDoctorsDetailFunction(data) {
+    console.log(data)
+    try {
+        yield put({
+            type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_LOADING,
+            payload: {},
+        });
+        const response = yield call(createDoctorDetailApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR,
             payload: error,
         });
     }
@@ -115,6 +140,10 @@ export function* watchCreateDoctors() {
     yield takeEvery(DoctorsActionTypes.CREATE_DOCTORS, createDoctorsFunction);
 }
 
+export function* watchCreateDoctorsDeatil() {
+    yield takeEvery(DoctorsActionTypes.CREATE_DOCTORS_DETAIL, createDoctorsDetailFunction);
+}
+
 
 
 export function* watchresetState() {
@@ -127,6 +156,7 @@ function* doctorsSaga() {
         fork(watchresetState),
         fork(watchCreateDoctors),
         fork(watchGetDoctorsRoles),
+        fork(watchCreateDoctorsDeatil),
     ]);
 }
 export default doctorsSaga;

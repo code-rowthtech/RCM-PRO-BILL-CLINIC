@@ -42,7 +42,9 @@
     width: 5vw;
     height: 5vw;
 }
-
+.custom-form-fields {
+    color: #a9a9a9 !important;
+}
 .file-input {
     display: none; 
 }
