@@ -3,7 +3,9 @@ import { PatientsActionTypes } from "./constants"
 
 const GET_PATIENTS_INITIAL_STATE = {
     data: [],
-    loading: false
+    loading: false,
+    page: 1,
+    limit :10,
 }
 
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {

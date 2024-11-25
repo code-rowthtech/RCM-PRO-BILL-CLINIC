@@ -6,6 +6,8 @@ import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
 import { FaEye, FaEyeSlash, FaStarOfLife } from 'react-icons/fa';
 import ToastHandle from '../../../helpers/ToastMessage';
+import { useDispatch } from 'react-redux';
+import { getPatientsAction } from '../../../redux/patients/actions';
 
 const Patients = () => {
     const [detailsModal, setDetailsModal] = useState(false);
@@ -31,11 +33,11 @@ const Patients = () => {
             ToastHandle("password success", "success");
 
             const id = setTimeout(() => {
-                setIsPasswordCorrect(false);  
-                setIsVisible(false);        
-            }, 300000); 
+                setIsPasswordCorrect(false);
+                setIsVisible(false);
+            }, 300000);
 
-            setTimeoutId(id);  
+            setTimeoutId(id);
         } else {
             ToastHandle("password incorrect", "danger");
         }
@@ -54,7 +56,8 @@ const Patients = () => {
             setIsVisible(!isVisible);
         } else {
             handleShowDetails();
-        }    };
+        }
+    };
     const patientsData = [
         {
             id: 1,
@@ -107,6 +110,11 @@ const Patients = () => {
         setSelectedDetails(null);
     };
 
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getPatientsAction({ page: 1, limit: 10 }));
+    }, [dispatch]);
     // Filter patients based on selected status
     const filteredPatients = patientsData.filter((patient) =>
         status === 'Active' ? patient.status === 'Active' : patient.status === 'Inactive'
@@ -180,7 +188,7 @@ const Patients = () => {
                                                         <td>{index + 1}</td>
                                                         <td>{data.firstName} {data.lastName}</td>
                                                         <td className="">
-                                                        {data.phone}
+                                                            {data.phone}
                                                         </td>
                                                         {/* <td>{data.email}</td> */}
                                                         <td>{data.lastVisit}</td>

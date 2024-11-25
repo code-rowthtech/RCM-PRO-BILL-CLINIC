@@ -1,6 +1,6 @@
 // @flow
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
@@ -12,8 +12,6 @@ import ProfileDropdown from '../components/ProfileDropdown';
 
 // images
 import profilePic from '../assets/images/users/avatar-1.jpg';
-import avatar1 from '../assets/images/users/avatar-2.jpg';
-import avatar2 from '../assets/images/users/avatar-4.jpg';
 import logoSmDark from '../assets/images/logo_sm_dark.png';
 import logoSmLight from '../assets/images/logo_sm.png';
 import logo from '../assets/images/logo-light.png';
@@ -21,25 +19,7 @@ import logo from '../assets/images/logo-light.png';
 //constants
 import * as layoutConstants from '../constants/layout';
 
-// get the notifications
-
-// get the profilemenu
 const ProfileMenus = [
-    // {
-    //     label: 'My Account',
-    //     icon: 'mdi mdi-account-circle',
-    //     redirectTo: '#',
-    // },
-    // {
-    //     label: 'Settings',
-    //     icon: 'mdi mdi-account-edit',
-    //     redirectTo: '#',
-    // },
-    // {
-    //     label: 'Support',
-    //     icon: 'mdi mdi-lifebuoy',
-    //     redirectTo: '#',
-    // },
     {
         label: 'Lock Screen',
         icon: 'mdi mdi-lock-outline',
@@ -61,8 +41,40 @@ type TopbarProps = {
 
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
-
     const [isopen, setIsopen] = useState(false);
+
+    const location = useLocation(); // Get the current location object
+    const { pathname } = location; // Extract pathname
+
+    // Define a mapping of paths to titles
+    const pathToTitleMap = {
+        '/dashboard': 'Dashboard',
+        '/dashboard/project': 'Dashboard',
+        '/apps/appointments/list': 'Appointments',
+        '/apps/appointments/newAppointment': 'New Appointments',
+        '/apps/doctors/list': 'Doctors',
+        '/apps/doctors/new-doctor': 'New Doctors',
+        '/apps/patients/list': 'Patients',
+        '/apps/patients/new-patient': 'New Patients',
+        '/apps/role-management/list': 'Role Management',
+        '/apps/crm/addclinic': 'Profile',
+        '/apps/settings/department': 'Settings',
+        '/apps/settings/desigination': 'Settings',
+    };
+
+    // Get the title for the current path or use a default value
+    const getPageTitle = (path) => {
+        const keys = Object.keys(pathToTitleMap);
+        // Match the full path or prefixes
+        for (const key of keys) {
+            if (path.startsWith(key)) {
+                return pathToTitleMap[key];
+            }
+        }
+        return 'Page Not Found'; // Fallback title
+    };
+
+    const pageTitle = getPageTitle(pathname);
 
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';
@@ -72,16 +84,12 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         leftSideBarType: state.Layout.leftSideBarType,
     }));
 
-    /**
-     * Toggle the leftmenu when having mobile screen
-     */
     const handleLeftMenuCallBack = () => {
         setIsopen((prevState) => !prevState);
         if (openLeftMenuCallBack) openLeftMenuCallBack();
 
         switch (layoutType) {
             case layoutConstants.LAYOUT_VERTICAL:
-                // condition added
                 if (window.innerWidth >= 768) {
                     if (leftSideBarType === 'fixed' || leftSideBarType === 'scrollable')
                         dispatch(changeSidebarType(layoutConstants.LEFT_SIDEBAR_TYPE_CONDENSED));
@@ -99,13 +107,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                 break;
         }
     };
-
-    /**
-     * Toggles the right sidebar
-     */
-    // const handleRightSideBar = () => {
-    //     dispatch(showRightSidebar());
-    // };
 
     return (
         <>
@@ -135,17 +136,16 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         </li>
                     </ul>
 
-                    {/* toggle for vertical layout */}
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <div className='d-flex align-items-center'>
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
                                 <i className="mdi mdi-menu" />
                             </button>
-                            <h4 className=''>Title</h4>
+                            {/* Display the user-friendly page title */}
+                            <h4 className=''>{pageTitle}</h4>
                         </div>
                     )}
 
-                    {/* toggle for horizontal layout */}
                     {layoutType === layoutConstants.LAYOUT_HORIZONTAL && (
                         <Link
                             to="#"
@@ -159,7 +159,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                         </Link>
                     )}
 
-                    {/* toggle for detached layout */}
                     {layoutType === layoutConstants.LAYOUT_DETACHED && (
                         <Link to="#" className="button-menu-mobile disable-btn" onClick={handleLeftMenuCallBack}>
                             <div className="lines">

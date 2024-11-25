@@ -25,6 +25,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         formState: { errors },
         reset,
         watch,
+        setValue,
         setError,
         clearErrors
     } = useForm();
@@ -99,8 +100,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [createResponse, deleteClinicResponse])
     useEffect(()=>{
         dispatch(getClinicTypeAction())
+    },[dispatch]);
 
-    },[dispatch])
+
     useEffect(() => {
         if (updateId) {
             dispatch(getClinicById({ key: encryptMessage({ id: updateId }) }))
@@ -363,8 +365,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-
-
+console.log(clinicsDataGet,'clinicsDataGetclinicsDataGetclinicsDataGet')
+    useEffect(() => {
+        if (clinicsDataGet?.clinicType) {
+            setValue('clinicType', clinicsDataGet.clinicType); // Set the pre-selected value
+        }
+    }, [clinicsDataGet, setValue]);
 
 
     return (
@@ -387,9 +393,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Clinic type</Form.Label>
                             <Form.Select
-                                defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
+                                // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
                                 {...register('clinicType')}                        >
-                                <option>Clinic type</option>
+                                <option>Select Clinic type</option>
                                 {clinectypes?.map((data) => (
                                     <option key={data?._id} value={data?.name}>{data?.name}</option>
                                 ))}
