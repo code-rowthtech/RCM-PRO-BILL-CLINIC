@@ -81,7 +81,6 @@ function* forgotPassword({ payload }) {
             key: encryptMessage(payload)
         }
         const response = yield call(forgotPasswordApi, encryptedPayload);
-        console.log(response, "forgot password")
         yield put(authApiResponseSuccess(AuthActionTypes.FORGOT_PASSWORD, decryptMessage(response?.data?.data)));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.FORGOT_PASSWORD, error));
@@ -108,7 +107,6 @@ function* forgotPasswordChange({ payload }) {
 }
 function* verifyTokenFunction({ payload }) {
     const { token } = payload;
-    console.log(token, 'tokentokentokentoken')
     try {
         setAuthorization(token)
         const response = yield call(verifyToken);
@@ -120,14 +118,12 @@ function* verifyTokenFunction({ payload }) {
 
 function* setPasswordChange({ payload }) {
     const { token, newPassword } = payload;
-    console.log(payload, 'payloadpayloadpayloadpayloadpayloadpayloadpayload')
     const passwordPayload = {
         newPassword: newPassword,
     }
     const encryptedNewPassword = {
         key: encryptMessage(passwordPayload)
     }
-    console.log(payload, 'payload')
 
     try {
         setAuthorization(token)

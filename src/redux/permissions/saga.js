@@ -17,11 +17,8 @@ function* addPermissionsFunction(data) {
             payload: {},
         });
         const response = yield call(createPermissionsApi, data);
-        // console.log(response, "response")
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        // console.log(decryptedData, 'decryptedData')
         if (response.status === 201) {
-            // ToastHandle('Permission created successfully', 'success')
             yield put({
                 type: PermissionsActionTypes.CREATE_PERMISSIONS_SUCCESS,
                 payload: { ...decryptedData },
@@ -61,7 +58,6 @@ function* getPermissionsFunction(data) {
             });
         }
     } catch (error) {
-        // console.log(error, 'error in getPermissions')
         yield put({
             type: PermissionsActionTypes.GET_PERMISSIONS_ERROR,
             payload: error,
@@ -70,7 +66,6 @@ function* getPermissionsFunction(data) {
 }
 
 function* deletePermissionsFunction(data) {
-    // console.log(data, 'sattaaaat')
     try {
         yield put({
             type: PermissionsActionTypes.DELETE_PERMISSIONS_LOADING,
@@ -90,7 +85,6 @@ function* deletePermissionsFunction(data) {
             });
         }
     } catch (error) {
-        console.log(error, 'error in getPermissions')
         yield put({
             type: PermissionsActionTypes.DELETE_PERMISSIONS_ERROR,
             payload: error,

@@ -12,11 +12,15 @@ export const getRoles = '/api/v1/roles';
 
 // CLINIC
 export const createClinic = '/api/v1/clinic/editClinicDetails';
-export const updateClinic = '/api/v1/clinic/editClinicDetails';
+// export const updateClinic = '/api/v1/clinic/editClinicDetails';
 export const getClinic = '/api/v1/clinic/getClinicDetails';
 export const getClinicById = '/api/v1/clinic/byId';
 export const getStatedByCountry = '/api/v1/clinic/states/US';
 export const getCityByState = '/api/v1/clinic/cities/';
+export const getClinicType = '/api/v1/clinic/getClinicTypes';
+
+//CONTRACT
+export const createContract = '/api/v1/clinic/getContractDetails';
 
 // SETTING
 export const addMastersData = '/api/v1/clinic/masterdata';

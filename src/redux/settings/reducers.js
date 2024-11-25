@@ -42,7 +42,6 @@ export const createMastersDataReducer = (state = CREATE_MASTERS_DATA_INITIAL_STA
 }
 
 export const getMastersDataReducer = (state = GET_MASTERS_DATA_INITIAL_STATE, action) => {
-    console.log(GET_MASTERS_DATA_INITIAL_STATE,"reducer")
     switch (action.type) {
         case SettingsActionTypes.GET_MASTERS_DATA_LOADING:
             return {
