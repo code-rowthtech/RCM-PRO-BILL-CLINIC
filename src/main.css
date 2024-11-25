@@ -48,7 +48,28 @@
 .file-input {
     display: none; 
 }
+.form-label {
+    color: black;
+    font-weight: 650 !important;
+}
+.form-control,
+.form-select {
+    color: black !important;
+    font-weight: 550 !important;
+}
+/* .form-select.empty {
+    color: red !important;
+} */
 
+/* .form-control::placeholder {
+    color: #a9a9a9;
+    opacity: 0.8;
+} */
+
+.custom-form-fields,
+.form-control::placeholder {
+    color: #a9a9a982 !important;
+}
 table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
