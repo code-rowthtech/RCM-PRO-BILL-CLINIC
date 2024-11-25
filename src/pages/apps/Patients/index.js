@@ -7,7 +7,7 @@ import { FiFilter } from "react-icons/fi";
 import { FaEye, FaEyeSlash, FaStarOfLife } from 'react-icons/fa';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { useDispatch } from 'react-redux';
-import { getPatientsAction } from '../../../redux/patients/actions';
+import { getPatientsAction, updatePatientsAction } from '../../../redux/patients/actions';
 
 const Patients = () => {
     const [detailsModal, setDetailsModal] = useState(false);
@@ -58,6 +58,7 @@ const Patients = () => {
             handleShowDetails();
         }
     };
+   
     const patientsData = [
         {
             id: 1,
@@ -114,6 +115,7 @@ const Patients = () => {
 
     useEffect(() => {
         dispatch(getPatientsAction({ page: 1, limit: 10 }));
+        dispatch(updatePatientsAction());
     }, [dispatch]);
     // Filter patients based on selected status
     const filteredPatients = patientsData.filter((patient) =>

@@ -9,7 +9,7 @@ import { createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer
 import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer,getStatesReducer,getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer,createtDoctorsDetailReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
-import { getPatientsReducer } from './patients/reducers';
+import { createPatientsReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
 export default (combineReducers({
     Auth,
@@ -21,7 +21,7 @@ export default (combineReducers({
     getDoctorsReducer,getClinicTypeReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer,getStatesReducer,getCitiesReducer,
     getAnalyticsReducer,createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer,createSubscriptionPlanReducer,
-    getDoctorsReducer,createtDoctorsDetailReducer,
+    getDoctorsReducer,createtDoctorsDetailReducer,createPatientsReducer,updatePatientsReducer,
     getDoctorsRolesReducer,
     getPatientsReducer,
     getSubscriptionsReducer,

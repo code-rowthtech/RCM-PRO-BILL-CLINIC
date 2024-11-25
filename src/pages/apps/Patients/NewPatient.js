@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import ProfileDummy from "../../../assets/images/profileDummy.png";
 import { Button, Card, Col, Form, Modal, Row } from "react-bootstrap";
 import { FiUploadCloud } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { createPatientsAction, updatePatientsAction } from "../../../redux/patients/actions";
 
 const NewPatient = () => {
     const [smShow, setSmShow] = useState(false);
@@ -20,18 +22,21 @@ const NewPatient = () => {
             setIsPasswordCorrect(true);
             setSmShow(false);
             setIsVisible(true);
-            //   ToastHandle("Password correct", "success");
 
             const id = setTimeout(() => {
                 setIsPasswordCorrect(false);
                 setIsVisible(false);
-            }, 300000); // 5 minutes
+            }, 300000); 
 
             setTimeoutId(id);
         } else {
-            //   ToastHandle("Password incorrect", "danger");
-        }
+   }
     };
+    const dispatch = useDispatch('');
+    useEffect(()=>{
+       dispatch(createPatientsAction());
+    },[dispatch])
+
 
     return (
         <div className="background_Color pt-1 pb-2">

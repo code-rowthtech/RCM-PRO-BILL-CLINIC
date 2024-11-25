@@ -33,6 +33,9 @@ export const getDoctorRoles = '/api/v1/clinic/getRoles';
 export const createDoctorDetail = '/api/v1/clinics/createOrUpdateDoctor';
 // PATIENTS
 export const getPatients = '/api/v1/clinics/patient/all';
+export const createPatients = '/api/v1/clinics/patient';
+export const updatePatients = '/api/v1/clinics/patient';
+
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';
 // SUBSCRIPTIONS

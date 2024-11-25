@@ -365,7 +365,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-console.log(clinicsDataGet,'clinicsDataGetclinicsDataGetclinicsDataGet')
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
             setValue('clinicType', clinicsDataGet.clinicType); // Set the pre-selected value
