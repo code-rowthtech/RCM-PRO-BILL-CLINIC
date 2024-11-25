@@ -20,6 +20,11 @@ const GET_CITIES_INITIAL_STATE = {
     loading: false
 }
 
+const GET_CLINIC_TYPE_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 const UPDATE_CLINICS_INITIAL_STATE = {
     data: [],
     loading: false
@@ -36,6 +41,11 @@ const GET_CLINIC_BY_PARENT_INITIAL_STATE = {
 }
 
 const CREATE_SUBSCRIPTION_PLAN_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const CREATE_CONTRACT_INITIAL_STATE = {
     data: [],
     loading: false
 }
@@ -199,31 +209,55 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     }
 }
 
-export const updateClinicsReducer = (state = UPDATE_CLINICS_INITIAL_STATE, action) => {
+export const getClinicTypeReducer = (state = GET_CLINIC_TYPE_INITIAL_STATE, action) => {
     switch (action.type) {
-        case ClinicsActionTypes.UPDATE_CLINIC_LOADING:
+        case ClinicsActionTypes.GET_CLINIC_TYPE_LOADING:
             return {
-                data: state.data,
-                loading: true
-            }
-        case ClinicsActionTypes.UPDATE_CLINIC_SUCCESS:
-            return {
-                data: action.payload,
-                loading: false
-            }
-        case ClinicsActionTypes.UPDATE_CLINIC_ERROR:
+                ...state,
+                loading: true,
+            };
+        case ClinicsActionTypes.GET_CLINIC_TYPE_SUCCESS:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+                loading: false,
+            };
+        case ClinicsActionTypes.GET_CLINIC_TYPE_ERROR:
             return {
-                data: [],
-                loading: false
-            }
-        default: return state
+                ...state,
+                loading: false,
+            };
+        case ClinicsActionTypes.GET_CLINIC_TYPE_RESET:
+            return GET_CLINIC_TYPE_INITIAL_STATE;
+        default:
+            return state;
     }
-}
+};
+
+// export const updateClinicsReducer = (state = UPDATE_CLINICS_INITIAL_STATE, action) => {
+//     switch (action.type) {
+//         case ClinicsActionTypes.UPDATE_CLINIC_LOADING:
+//             return {
+//                 data: state.data,
+//                 loading: true
+//             }
+//         case ClinicsActionTypes.UPDATE_CLINIC_SUCCESS:
+//             return {
+//                 data: action.payload,
+//                 loading: false
+//             }
+//         case ClinicsActionTypes.UPDATE_CLINIC_ERROR:
+//             return {
+//                 data: action.payload,
+//                 loading: false
+//             }
+//         case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+//             return {
+//                 data: [],
+//                 loading: false
+//             }
+//         default: return state
+//     }
+// }
 
 export const createSubscriptionPlanReducer = (state = CREATE_SUBSCRIPTION_PLAN_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -238,6 +272,32 @@ export const createSubscriptionPlanReducer = (state = CREATE_SUBSCRIPTION_PLAN_I
                 loading: false
             }
         case ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const createContractReducer = (state = CREATE_CONTRACT_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicsActionTypes.CREATE_CONTRACT_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicsActionTypes.CREATE_CONTRACT_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.CREATE_CONTRACT_ERROR:
             return {
                 data: action.payload,
                 loading: false

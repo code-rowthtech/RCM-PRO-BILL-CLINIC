@@ -8,10 +8,14 @@ export function createClinicApi(params: any): any {
     return api.create(URL.createClinic, data);
 }
 
-export function updateClinicApi(params: any): any {
-    const { data } = params;
-    return api.update(URL.updateClinic, data);
+export function getClinicTypeApi(params: any): any {
+    return api.get(URL.getClinicType);
 }
+
+// export function updateClinicApi(params: any): any {
+//     const { data } = params;
+//     return api.update(URL.updateClinic, data);
+// }
 
 export function getClinicByIdApi(params: any): any {
     const { data } = params;
@@ -36,13 +40,17 @@ export function getClinicApi(params: any): any {
 export function addSubscriptionPlanApi(params: any): any {
     const { data } = params;
     return api.create(URL.addSubscriptionPlan, data);
+};
+
+export function createContract(params: any): any {
+    const { data } = params;
+    return api.create(URL.createContract, data);
 }
 
 export function getClinicsByParentIdApi(params: any): any {
     const { data } = params;
     return api.create(URL.getClinicsByParentId, data)
 }
-
 export function deleteClinicOnboardingApi(params: any): any {
     const { data } = params;
     return api.create(URL.deleteClinicOnboarding, data)

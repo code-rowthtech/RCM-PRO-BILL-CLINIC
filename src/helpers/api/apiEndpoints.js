@@ -12,20 +12,30 @@ export const getRoles = '/api/v1/roles';
 
 // CLINIC
 export const createClinic = '/api/v1/clinic/editClinicDetails';
-export const updateClinic = '/api/v1/clinic/editClinicDetails';
+// export const updateClinic = '/api/v1/clinic/editClinicDetails';
 export const getClinic = '/api/v1/clinic/getClinicDetails';
 export const getClinicById = '/api/v1/clinic/byId';
 export const getStatedByCountry = '/api/v1/clinic/states/US';
 export const getCityByState = '/api/v1/clinic/cities/';
+export const getClinicType = '/api/v1/clinic/getClinicTypes';
+
+//CONTRACT
+export const createContract = '/api/v1/clinic/getContractDetails';
 
 // SETTING
 export const addMastersData = '/api/v1/clinic/masterdata';
 export const getMastersData = '/api/v1/clinic/masterdata';
 export const updateMastersData = '/api/v1/clinic/masterdata';
 // DOCTORS
-export const getDoctor = '/api/v1/admin/getAllDoctors';
+export const getDoctor = '/api/v1/doctors/getClinicDoctors';
+export const createDoctor = '/api/v1/clinics/createOrUpdateUser';
+export const getDoctorRoles = '/api/v1/clinic/getRoles';
+export const createDoctorDetail = '/api/v1/clinics/createOrUpdateDoctor';
 // PATIENTS
-export const getPatients = '/api/v1/admin/getAllPatients';
+export const getPatients = '/api/v1/clinics/patient/all';
+export const createPatients = '/api/v1/clinics/patient';
+export const updatePatients = '/api/v1/clinics/patient';
+
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';
 // SUBSCRIPTIONS

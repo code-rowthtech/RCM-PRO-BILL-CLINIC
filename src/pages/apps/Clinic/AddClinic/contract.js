@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 import { Table } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { createContractAction } from '../../../../redux/actions';
+import { encryptMessage } from '../../../../cryptoUtils';
+import Spinner from '../../../../constants/Spinner';
 
-
-const Contract = () => {
+const Contract = ({ billingId, activeTab, contractId }) => {
     const {
         register,
         handleSubmit,
@@ -13,37 +16,73 @@ const Contract = () => {
         setError,
         clearErrors
     } = useForm();
+
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const contract = store?.createContractReducer?.data?.contract;
+
+    useEffect(() => {
+        if (activeTab === 'contract') {
+            const payload = {
+                parentClinicId: billingId,
+            };
+            dispatch(createContractAction({ key: encryptMessage(payload) }));
+        } 
+    }, [activeTab, store?.createContractReducer?.data?.status]);
+
     return (
         <>
             <Table responsive className="table-centered border border-muted table-nowrap mb-0">
                 <thead>
                     <tr>
-                        <th className='text-white'>Contract Name</th>
-                        <th className='text-white'>Clinic Sign</th>
-                        <th className='text-white'>Probill Sign</th>
-                        <th className='text-white'>Date</th>
-                        <th className='text-white'>Action</th>
+                        <th className="text-white">Contract Name</th>
+                        <th className="text-white">Clinic Sign</th>
+                        <th className="text-white">Probill Sign</th>
+                        <th className="text-white">Date</th>
+                        <th className="text-white">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {[0, 1, 2, 3, 4, 5].map((item) => (
-                        <tr key={item}>
-                            <td>XYZ</td>
-                            <td><span className='bg-secondary text-light px-1 rounded-1'>Pending</span></td>
-                            <td><span className='bg-secondary text-light px-1 rounded-1'>Pending</span></td>
-                            <td>8:00 AM 26th Sep, 2024</td>
-                            <td>
-                                <i className="fs-5 mdi mdi-eye"></i>
-                                <i className="fs-5 mdi mdi-download"></i>
+                    {store?.createContractReducer?.loading ? (
+                        <tr>
+                            <td className="text-center" colSpan={5}>
+                                <Spinner />
                             </td>
                         </tr>
-                    ))}
-
-
+                    ) : (
+                        contract && (
+                            <tr>
+                                <td className='text-black'>{contract?.contractName}</td>
+                                <td>
+                                    <span
+                                        className={`${
+                                            contract?.clinicSignStatus ? 'bg-success' : 'bg-secondary'
+                                        } text-light px-1 rounded-1`}
+                                    >
+                                        {contract?.clinicSignStatus ? 'Signed' : 'Pending'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span
+                                        className={`${
+                                            contract?.adminSignStatus ? 'bg-success' : 'bg-secondary'
+                                        } text-light px-1 rounded-1`}
+                                    >
+                                        {contract?.adminSignStatus ? 'Signed' : 'Pending'}
+                                    </span>
+                                </td>
+                                <td>8:00 AM 26th Sep, 2024</td>
+                                <td>
+                                    <i className="fs-5 mdi mdi-eye"></i>
+                                    <i className="fs-5 mdi mdi-download"></i>
+                                </td>
+                            </tr>
+                        )
+                    )}
                 </tbody>
             </Table>
         </>
     );
-}
+};
 
-export default Contract
+export default Contract;

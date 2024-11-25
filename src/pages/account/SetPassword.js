@@ -88,10 +88,9 @@ const SetPassword = (): React$Element<any> => {
         }
         if (verifyResponse?.status !== 200 && verifyResponse) {
             ToastHandle('The token is not valid, please request new token.', 'danger')
-            // navigate('/account/login');
+            navigate('/account/login');
         }
     }, [changeSetPassword, navigate, verifyResponse]);
-
     return (
         <AccountLayout bottomLinks={<BottomLink />}>
             <div className="text-center m-auto">

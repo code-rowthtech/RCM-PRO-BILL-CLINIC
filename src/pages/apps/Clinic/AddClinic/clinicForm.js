@@ -5,8 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { getMastersDataAction, stateEmptydAction } from '../../../../redux/settings/action';
-import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getStatesByCountryAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -26,6 +25,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         formState: { errors },
         reset,
         watch,
+        setValue,
         setError,
         clearErrors
     } = useForm();
@@ -57,7 +57,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         { name: '', number: '', url: null, fileName: '' }
     ]);
     const [nextClicked, setNextClicked] = useState(false);
-    const clinicTypeData = store?.getMastersDataReducer?.data?.clinicTypes;
+    const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
@@ -98,12 +98,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
         }
     }, [createResponse, deleteClinicResponse])
+    useEffect(()=>{
+        dispatch(getClinicTypeAction())
+    },[dispatch]);
+
+
     useEffect(() => {
         if (updateId) {
             dispatch(getClinicById({ key: encryptMessage({ id: updateId }) }))
             setUpdatePage(true)
         }
-        dispatch(getMastersDataAction({ status: true, category: 'clinic_type', search: '', limit: '' }));
         dispatch(getStatesByCountryAction());
     }, [dispatch, updateId, createResponse === 200]);
     const statesData = store?.getStatesReducer?.data;
@@ -128,9 +132,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getClinicAction());
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'datasssssssssss');
-
-    const decryptedRolesData = store?.getRolesDataReducer?.data?.roles;
+    // const decryptedRolesData = store?.getRolesDataReducer?.data?.roles;
     // const onSubmit = (data) => {
     //     if (data.Password !== data.confirmPassword) {
     //         setError('confirmPassword', {
@@ -173,16 +175,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 message: 'Passwords do not match',
             });
             return;
+       
+
         }
-        const clinicRoleId = decryptedRolesData && decryptedRolesData.find(role => role?.name === "clinic")?._id;
+        // const clinicRoleId = decryptedRolesData && decryptedRolesData.find(role => role?.name === "clinic")?._id;
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
             ...(updateId && { id: updateId }),
-            name: data?.clinicname,
-            email: data?.email,
-            role: clinicRoleId,
-            phone: data?.contact,
-            clinicType: data?.clinicType,
+            name: data?.clinicname || clinicsDataGet?.name,
+            email: data?.email || clinicsDataGet?.userId?.email,
+            // role: clinicRoleId,
+            phone: data?.contact || clinicsDataGet?.userId?.phone,
+            clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
             medicalLicenses: medicalDetails,
@@ -202,8 +206,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
         // Dispatch appropriate action based on whether this is an update or creation
         if (updatePage) {
-            dispatch(updateClinicAction({ key: encryptMessage(newPayload) }));
-        
+            // dispatch(updateClinicAction({ key: encryptMessage(newPayload) }));
         } else {
             dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
         }
@@ -362,8 +365,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-
-
+    useEffect(() => {
+        if (clinicsDataGet?.clinicType) {
+            setValue('clinicType', clinicsDataGet.clinicType); // Set the pre-selected value
+        }
+    }, [clinicsDataGet, setValue]);
 
 
     return (
@@ -386,10 +392,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Clinic type</Form.Label>
                             <Form.Select
-                                defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
+                                // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
                                 {...register('clinicType')}                        >
-                                <option>Clinic type</option>
-                                {clinicTypeData?.map((data) => (
+                                <option>Select Clinic type</option>
+                                {clinectypes?.map((data) => (
                                     <option key={data?._id} value={data?.name}>{data?.name}</option>
                                 ))}
                             </Form.Select>
@@ -866,11 +872,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <tr>
                                 <th>Clinic Name</th>
                                 <th>Location</th>
-                                {/* <th>Specialist</th> */}
+                                <th>Specialist</th>
                                 <th>Email</th>
                                 <th>Contact</th>
-                                {/* <th>Tax / EIN Id</th> */}
-                                {/* <th></th> */}
+                                <th>Tax / EIN Id</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -884,10 +889,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <td>{index}</td>
                                         <td className='text-capitalize'>{multipleData?.name}</td>
                                         <td>{multipleData?.address?.city?.state_code + ' / ' + multipleData?.address?.city?.name}</td>
-                                        {/* <td>{multipleData?.clinicType}</td> */}
+                                        <td>{multipleData?.clinicType}</td>
                                         <td className='text-lowercase'>{multipleData?.email}</td>
                                         <td>{multipleData?.phone}</td>
-                                        {/* <td>{multipleData?.taxIdOrEIN}</td> */}
+                                        <td>{multipleData?.taxIdOrEIN}</td>
                                         <td className='fs-4 d-flex gap-1'>
                                             <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
                                             <i
@@ -901,7 +906,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         id: multipleData?._id,
                                                     };
                                                     dispatch(deleteClinicAction({ key: encryptMessage(payload) }));
-                                                    // dispatch(stateEmptydAction());
+                                                    dispatch(stateEmptydAction());
                                                 }}
                                             ></i>
                                         </td>

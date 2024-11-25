@@ -25,6 +25,12 @@ const MENU_ITEMS = [
     //     url: '/apps/transaction/transaction-list',
     // },
     {
+        key: 'schedule',
+        label: 'Schedule',
+        icon: 'uil-clock',
+        url: '/apps/schedule/list',
+    },
+    {
         key: 'doctors',
         label: 'Doctor',
         icon: 'dripicons-medical',

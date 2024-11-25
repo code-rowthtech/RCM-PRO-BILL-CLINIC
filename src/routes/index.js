@@ -11,6 +11,9 @@ import VerticalLayout from '../layouts/Vertical';
 import DetachedLayout from '../layouts/Detached';
 import HorizontalLayout from '../layouts/Horizontal';
 import FullLayout from '../layouts/Full';
+import schedule from '../pages/apps/Schedule/schedule';
+import AddHoliday from '../pages/apps/Schedule/AddHoliday';
+import AddBreak from '../pages/apps/Schedule/AddBreak';
 
 // lazy load all the views
 
@@ -288,6 +291,23 @@ const AllRoutes = () => {
                                     )
                                  }
                               
+                            ],
+                        },
+                        {
+                            path: 'schedule',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element: <LoadComponent component={schedule} />,
+                                },
+                                {
+                                    path: 'addHoliday',
+                                    element: <LoadComponent component={AddHoliday} />,
+                                },
+                                {
+                                    path: 'addBreak',
+                                    element: <LoadComponent component={AddBreak} />,
+                                },
                             ],
                         },
                         {

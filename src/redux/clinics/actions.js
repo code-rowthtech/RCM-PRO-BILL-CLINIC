@@ -13,6 +13,10 @@ export const getClinicAction = (data): AuthAction => ({
     data
 });
 
+export const getClinicTypeAction = (data): AuthAction => ({
+    type: ClinicsActionTypes.GET_CLINIC_TYPE,
+    data
+});
 
 export const getStatesByCountryAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_STATES,
@@ -37,7 +41,12 @@ export const getClinicById = (data): AuthAction => ({
 export const addSubscriptionPlanAction = (data): LayoutAction => ({
     type: ClinicsActionTypes.CREATE_SUBSCRIPTION,
     data
-})
+});
+
+export const createContractAction = (data): LayoutAction => ({
+    type: ClinicsActionTypes.CREATE_CONTRACT,
+    data
+});
 
 export const getClinicByParentAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_CLINIC_BY_PARENT,

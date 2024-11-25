@@ -86,7 +86,6 @@ function* getRolesFunction(data) {
             });
         }
     } catch (error) {
-        // console.log(error, 'error in getPermissions')
         yield put({
             type: RolesActionTypes.GET_ROLES_ERROR,
             payload: error,

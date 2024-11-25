@@ -8,7 +8,9 @@
 .headers {
     background-color: #010101 !important;
 }
-
+/* :root{
+    overflow: hidden;
+} */
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
@@ -19,6 +21,55 @@
     border-bottom: 1px solid #313a4615 !important;
 }
 
+.custom-file-upload {
+    display: flex;
+    align-items: center;
+    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    border-radius: 4px;
+    padding: 8px 12px;
+    width: 100%;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #6c757d;
+}
+
+.upload-icon {
+    color: #6c757d;
+    width: 5vw;
+    height: 5vw;
+}
+.custom-form-fields {
+    color: #a9a9a9 !important;
+}
+.file-input {
+    display: none; 
+}
+.form-label {
+    color: black;
+    font-weight: 650 !important;
+}
+.form-control,
+.form-select {
+    color: black !important;
+    font-weight: 550 !important;
+}
+/* .form-select.empty {
+    color: red !important;
+} */
+
+/* .form-control::placeholder {
+    color: #a9a9a9;
+    opacity: 0.8;
+} */
+
+.custom-form-fields,
+.form-control::placeholder {
+    color: #a9a9a982 !important;
+}
 table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
