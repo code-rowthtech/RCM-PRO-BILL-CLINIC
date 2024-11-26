@@ -5,8 +5,9 @@ import { Button, Collapse, Modal } from 'react-bootstrap';
 import classNames from 'classnames';
 
 import { findAllParent, findMenuItem } from '../helpers/menu';
+import { logoutUser, resetAuth } from '../redux/actions';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../redux/actions';
+import { APICore, setAuthorization } from '../helpers/api/apiCore';
 
 const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMenuItems, toggleMenu }) => {
     const [open, setOpen] = useState(activeMenuItems.includes(item.key));
@@ -44,7 +45,7 @@ const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMe
                         {item.badge.text}
                     </span>
                 )}
-                <span className=''> {item.label} </span>
+                <span> {item.label} </span>
             </Link>
             <Collapse in={open}>
                 <ul className={classNames(subMenuClassNames)}>
@@ -53,7 +54,7 @@ const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMe
                             <React.Fragment key={i}>
                                 {child.children ? (
                                     <>
-                                        {/* parent */}
+                                        {/* {/ parent /} */}
                                         <MenuItemWithChildren
                                             item={child}
                                             linkClassName={activeMenuItems.includes(child.key) ? 'active' : ''}
@@ -64,7 +65,7 @@ const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMe
                                     </>
                                 ) : (
                                     <>
-                                        {/* child */}
+                                        {/* {/ child /} */}
                                         <MenuItem
                                             item={child}
                                             className={activeMenuItems.includes(child.key) ? 'menuitem-active' : ''}
@@ -82,7 +83,6 @@ const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMe
 };
 
 const MenuItem = ({ item, className, linkClassName }) => {
-
     return (
         <li className={classNames('side-nav-item', className)}>
             <MenuItemLink item={item} className={linkClassName} />
@@ -91,6 +91,8 @@ const MenuItem = ({ item, className, linkClassName }) => {
 };
 
 const MenuItemLink = ({ item, className }) => {
+    const api = new APICore();
+
     const [show, setShow] = useState(false)
     const handleCheckLogout = (data) => {
         if (data === 'Logout') {
@@ -104,6 +106,8 @@ const MenuItemLink = ({ item, className }) => {
     const handleLogout = () => {
         dispatch(logoutUser())
         navigate('account/logout')
+        // api.setLoggedInUser(null);
+        // setAuthorization(null);
     }
     const closeModal = () => {
         setShow(false);
@@ -113,6 +117,7 @@ const MenuItemLink = ({ item, className }) => {
             to={{ pathname: item.url }}
             target={item.target}
             className={classNames('side-nav-link-ref', 'side-sub-nav-link', className)}
+            onClick={() => handleCheckLogout(item.label)}
             data-menu-key={item.key}>
             {item.icon && <i className={item.icon}></i>}
             {item.badge && (
@@ -123,15 +128,12 @@ const MenuItemLink = ({ item, className }) => {
                     {item.badge.text}
                 </span>
             )}
-            <span onClick={() => handleCheckLogout(item.label)}> {item.label} </span>
+            <span> {item.label} </span>
             <Modal centered show={show} onHide={closeModal}>
                 <Modal.Body>
                     <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
                         <div className="card-body text-center">
-                            <h5 className="card-title">Are you sure you want to logout!</h5>
-                            <p className="card-text my-4">
-                                You are also logged out from your personal cloud and any local data apps open in this browser.
-                            </p>
+                            <h4 className="card-title">Are you sure you want to logout!</h4>
                             <div className="d-flex justify-content-center gap-3">
                                 <Button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>
                                     Cancel
@@ -145,6 +147,7 @@ const MenuItemLink = ({ item, className }) => {
                 </Modal.Body>
             </Modal>
         </Link>
+
     );
 };
 
@@ -166,7 +169,9 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
     * toggle the menus
     */
     const toggleMenu = (menuItem, show) => {
-        if (show) setActiveMenuItems([menuItem['key'], ...findAllParent(menuItems, menuItem)]);
+        if (show && menuItem.key !== 'logout') {
+            setActiveMenuItems([menuItem['key'], ...findAllParent(menuItems, menuItem)]);
+        }
     };
 
     /**
@@ -188,7 +193,7 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
             if (matchingMenuItem) {
                 const mid = matchingMenuItem.getAttribute('data-menu-key');
                 const activeMt = findMenuItem(menuItems, mid);
-                if (activeMt) {
+                if (activeMt && activeMt.key !== 'logout') {
                     setActiveMenuItems([activeMt['key'], ...findAllParent(menuItems, activeMt)]);
                 }
             }
@@ -220,8 +225,11 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
                                     ) : (
                                         <MenuItem
                                             item={item}
-                                            linkClassName="side-nav-link"
-                                            className={activeMenuItems.includes(item.key) ? 'menuitem-active' : ''}
+                                            linkClassName={classNames('side-nav-link', {
+                                                'menuitem-active':
+                                                    activeMenuItems.includes(item.key) && item.key !== 'logout',
+                                            })}
+                                            className={activeMenuItems.includes(item.key) && item.key !== 'logout' ? 'menuitem-active' : ''}
                                         />
                                     )}
                                 </>
@@ -233,5 +241,6 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
         </>
     );
 };
+
 
 export default AppMenu;
