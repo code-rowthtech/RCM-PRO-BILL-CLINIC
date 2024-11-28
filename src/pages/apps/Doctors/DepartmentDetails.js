@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { Button, Spinner } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
 import { createDoctorDetailAction } from "../../../redux/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
+import { getMastersDataAction } from "../../../redux/settings/action";
 
-const DepartmentDetails = () => {
+const DepartmentDetails = ({ docId }) => {
 
   const dispatch = useDispatch();
+  const store = useSelector((state) => state);
+  const departmentId = store?.getMastersDataReducer?.data?.result
 
   const {
     register,
@@ -16,20 +19,30 @@ const DepartmentDetails = () => {
     reset,
     watch,
   } = useForm();
-
+  const id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+console.log(id,'12345678998765432')
   const onsubmit = (data) => {
     const payload = {
       ...data,
-
+      clinicId: id,
+      userId: docId,
+      departmentId: data?.department,
     }
     console.log('Form Submitted:', payload);
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) })); // Dispatch with payload
-    reset(); // Reset form after submission
   }
+
+  useEffect(() => {
+    dispatch(
+      getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' })
+    );
+  }, [dispatch]);
+
   return (
     <>
       <div className="container-fluid">
         <form onSubmit={handleSubmit(onsubmit)}>
+          {docId}
           <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
             <p className="fw-bold">Identification & Credentials <span className='text-danger'>*</span></p>
             <div className="col-6">
@@ -151,30 +164,57 @@ const DepartmentDetails = () => {
               </div>
             </div>
             <div className="col-6">
-              <div>
-                <div className="mb-3">
-                  <label htmlFor="firstName" className="form-label">
-                    Medicaid ID<span className='text-danger'>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="w-100 input ps-2 py-1"
-                    placeholder=""
-                    {...register('medicaidID', { required: 'TIN/SSN is required' })}
-                  />
+              <div className="row">
+                <div className="col-6">
+                  <div className="mb-3">
+                    <label htmlFor="firstName" className="form-label">
+                      Medicaid ID<span className='text-danger'>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="w-100 input ps-2 py-1"
+                      placeholder=""
+                      {...register('medicaidID', { required: 'TIN/SSN is required' })}
+                    />
+                  </div>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="firstName" className="form-label">
-                    Medicare PECOS Login<span className='text-danger'>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="w-100 input ps-2 py-1"
-                    placeholder=""
-                    {...register('Medicare_PECOS_Logins', { required: 'TIN/SSN is required' })}
+                <div className="col-6">
+                  <div className="mb-3">
+                    <label htmlFor="stateLicense" className="form-label">
+                      Department<span className='text-danger'>*</span>
+                    </label>
+                    <select
+                      className="w-100 input ps-2 py-1"
+                      style={{
+                        border: "1px solid #444141",
+                        fontSize: "14px",
+                        color: "#444141",
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                      }}
+                      {...register('department')}
+                    >
+                      <option value="" disabled selected>
+                        Select Department
+                      </option>
+                      {departmentId && departmentId.map((data) => (
+                        <option key={data?._id} value={data?._id}>{data?.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="mb-3">
+                <label htmlFor="firstName" className="form-label">
+                  Medicare PECOS Login<span className='text-danger'>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-100 input ps-2 py-1"
+                  placeholder=""
+                  {...register('Medicare_PECOS_Logins', { required: 'TIN/SSN is required' })}
 
-                  />
-                </div>
+                />
               </div>
             </div>
           </div>
@@ -195,7 +235,7 @@ const DepartmentDetails = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="firstName" className="form-label">
-                  State License Obtained (state)<span className='text-danger'>*</span>
+                    State License Obtained (state)<span className='text-danger'>*</span>
                   </label>
                   <input
                     type="text"
@@ -204,7 +244,7 @@ const DepartmentDetails = () => {
                     {...register('stateLicenseObtained', { required: 'State License Obtained is required' })}
                   />
                 </div>
-               
+
               </div>
             </div>
             <div className="col-6">
@@ -281,16 +321,16 @@ const DepartmentDetails = () => {
                 </div> */}
 
                 <div className="mb-3">
-                    <label htmlFor="firstName" className="form-label">
+                  <label htmlFor="firstName" className="form-label">
                     DEA # (Drug Enforcement Administration number)<span className='text-danger'>*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="w-100 input ps-2 py-1"
-                      placeholder=""
-                      {...register('DEA', { required: 'DEA is required' })}
-                    />
-                  </div>
+                  </label>
+                  <input
+                    type="text"
+                    className="w-100 input ps-2 py-1"
+                    placeholder=""
+                    {...register('DEA', { required: 'DEA is required' })}
+                  />
+                </div>
               </div>
             </div>
             <div className="col-6">
@@ -327,8 +367,15 @@ const DepartmentDetails = () => {
             <Button className="" variant="secondary">
               Cancel
             </Button>
-            <Button className="" type="submit">
+            {/* <Button className="" type="submit">
               Save
+            </Button> */}
+            <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsDetailReducer?.loading} >
+              {store?.createtDoctorsDetailReducer?.loading ?
+                <Spinner color='white' className='spinner-border-sm' />
+                :
+                'Save'
+              }
             </Button>
           </div>
         </form>

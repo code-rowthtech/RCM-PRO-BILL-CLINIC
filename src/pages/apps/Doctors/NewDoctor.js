@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Form } from 'react-bootstrap';
+import { Button, Card, Form, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,13 +13,12 @@ import { encryptMessage } from '../../../cryptoUtils';
 
 
 const NewDoctor = () => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
     const logoFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
-
+    const [docId, setDocId] = useState(null);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -34,13 +33,24 @@ const NewDoctor = () => {
 
     useEffect(() => {
         dispatch(
-            getDoctorsrolesAction({ })
+            getDoctorsrolesAction({ search: 'Doctor' })
         );
     }, [dispatch]);
 
     const store = useSelector((state) => state);
-    const response = store?.getDoctorsRolesReducer?.data?.result?._id
-
+    // const response = store?.getDoctorsRolesReducer?.data?.result?._id
+    const createResponse = store?.createtDoctorsReducer?.data?.status
+    // console.log(store?.createtDoctorsReducer?.data, '12345678')
+    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
+    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
+    console.log(doctorRoleId, 'newDoctorId')
+    // const doctorRoleId=doctorRole&&doctorRole.find((data=>data?.name==='doctor')?._id)
+    // console.log(doctorRoleId, 'id')
+    useEffect(() => {
+        if (createResponse === 200) {
+            setDocId(newDoctorId)
+        }
+    }, [createResponse])
     const closeModal = () => {
         setShow(false);
     };
@@ -49,27 +59,33 @@ const NewDoctor = () => {
         navigate('/apps/doctors/list');
     };
 
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setLogoName(file.name);
-            // You can upload the file or store it in the form state here if required.
+    // const handleFileChange = (event) => {
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         setLogoName(file.name);
+    //         // You can upload the file or store it in the form state here if required.
+    //     }
+    // };
+    const handleFileChange = async (e) => {
+        const selectedFile = e.target.files[0];
+        try {
+            const url = await handleUpload(selectedFile);
+            setLogo(url);
+            setLogoName(selectedFile?.name)
+        } catch (error) {
+            console.error('Error during file upload:', error);
         }
     };
-
-    const handleLogoClick = () => {
-        logoFileInputRef.current.click();
-    };
+    console.log(logo)
 
     const submitData = (data) => {
         const payload = {
             ...data,
-            profileImage: logo, // Add uploaded logo to the payload
-            role:response
+            profileImage: logo?.url.split('?')[0], // Add uploaded logo to the payload
+            role: doctorRoleId
         };
-        console.log('Form Submitted:', payload);
         dispatch(createDoctorAction({ key: encryptMessage(payload) })); // Dispatch with payload
-        reset(); // Reset form after submission
+
     };
 
     const handleTabChange = (tab) => {
@@ -302,11 +318,17 @@ const NewDoctor = () => {
                                     </div>
                                     <div className="col-12 d-flex justify-content-end gap-2 mt-3">
                                         <Button variant="secondary">Cancel</Button>
-                                        <Button type="submit">Save</Button>
+                                        <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsDetailReducer?.loading} >
+                                            {store?.createtDoctorsDetailReducer?.loading ?
+                                                <Spinner color='white' className='spinner-border-sm' />
+                                                :
+                                                'Save'
+                                            }
+                                        </Button>
                                     </div>
                                 </Form>
                             )}
-                            {activeTab === "departmentDetails" && <DepartmentDetails />}
+                            {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} />}
                             {activeTab === "documents" && <Documents />}
                         </div>
                     </Card>

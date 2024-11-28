@@ -27,12 +27,14 @@ function* login({ payload }) {
         }
         const response = yield call(loginApi, encryptedPayload);
         const user = JSON.parse(decryptMessage(response?.data?.data));
+        console.log(user,'"6746c249525680b5e3733e0a"')
         const userData = {
             name: user?.name,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
-            _id: user?._id
+            _id: user?.userId,
+            clinicId: user?.clinicId
         }
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);

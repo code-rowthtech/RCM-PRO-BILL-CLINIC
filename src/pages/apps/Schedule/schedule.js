@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { FormInput } from '../../../components';
-import { FiFileText, FiFilter } from 'react-icons/fi';
 import classNames from 'classnames';
 import DoctorHoliday from './doctorHoliday';
 import Breaks from './breaks';
