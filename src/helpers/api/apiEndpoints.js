@@ -24,7 +24,7 @@ export const createContract = '/api/v1/clinic/getContractDetails';
 
 // SETTING
 export const addMastersData = '/api/v1/clinic/masterdata';
-export const getMastersData = '/api/v1/clinic/masterdata';
+export const getMastersData = '/api/v1/clinic/getmasterData';
 export const updateMastersData = '/api/v1/clinic/masterdata';
 // DOCTORS
 export const getDoctor = '/api/v1/doctors/getClinicDoctors';

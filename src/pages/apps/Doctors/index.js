@@ -6,6 +6,7 @@ import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction } from '../../../redux/actions';
+import { encryptMessage } from '../../../cryptoUtils';
 
 const Doctors = () => {
     const [detailsModal, setDetailsModal] = useState(false);
@@ -13,199 +14,30 @@ const Doctors = () => {
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
 
-    const handleStatusChange = (isActive) => {
-        setStatus(isActive);
-    };
 
     const dispatch = useDispatch();
 
     useEffect(() => {
+        const payload = { status: status, search: search }
         dispatch(
-            getDoctorsAction({ status: status, search: search })
+            getDoctorsAction({ key: encryptMessage(payload) })
         );
     }, [dispatch, status, search]);
 
     const store = useSelector((state) => state);
-    const response = store?.getDoctorsReducer
+    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
 
-    console.log(response);
-
-
-    // Static patient data
-    const patientsData = [
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-            phone: '123-456-7890',
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            phone: '123-456-7890',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-
-            phone: '123-456-7890',
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            phone: '123-456-7890',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-
-
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            phone: '123-456-7890',
-            departmentName: 'Cardiology',
-            status: 'Inactive',
-            specialist: 'Bones',
-
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            phone: '123-456-7890',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'mailto:john.doe@example.com',
-            phone: '123-456-7890',
-            departmentName: 'Cardiology',
-            status: 'Active',
-            specialist: 'Bones',
-
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-    ];
+    console.log(doctorDetails);
 
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);
     };
-    // Filter patients based on selected status
-    const filteredPatients = patientsData.filter((patient) =>
-        status === 'Active' ? patient.status === 'Active' : patient.status === 'Inactive'
+
+    const filteredDoctors = doctorDetails.filter((doctor) =>
+        doctor.userDetails?.status === status &&
+        doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
-
-
     return (
         <>
             <Row className='mt-2'>
@@ -215,15 +47,15 @@ const Doctors = () => {
                             <Row className="mb-2">
                                 <Col sm={6}>
                                     <Button
-                                        onClick={() => setStatus(true)}
-                                        className={`me-2 ${status === 'Active' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                        onClick={() => setStatus(true)} // Active filter
+                                        className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Active
                                     </Button>
 
                                     <Button
-                                        onClick={() => setStatus(false)}
-                                        className={`me-2 ${status === 'Inactive' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                        onClick={() => setStatus(false)} // Inactive filter
+                                        className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Inactive
                                     </Button>
@@ -234,8 +66,10 @@ const Doctors = () => {
                                         <Col xs="auto" className='d-flex gap-2'>
                                             <FormInput
                                                 type="text"
-                                                // onChange={(e) => setName(e.target.value)}
-                                                placeholder="Search..." />
+                                                value={search}
+                                                onChange={(e) => setSearch(e.target.value)} // Update search query
+                                                placeholder="Search..."
+                                            />
                                             {/* <Button className="custom-buttons ">
                                                 <FiFilter className='fs-4' />
                                             </Button>
@@ -267,33 +101,33 @@ const Doctors = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredPatients.length === 0 ? (
+                                            {filteredDoctors.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={6} className='text-center'>
                                                         <h3 className='my-5'>No Data Found</h3>
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                filteredPatients.map((data, index) => (
+                                                filteredDoctors.map((data, index) => (
                                                     <tr key={index}>
                                                         <td>{index + 1}</td>
-                                                        <td className=''>
-                                                            {data.firstName}
+                                                        <td className='text-capitalise'>
+                                                            {data?.userDetails?.firstName}
                                                         </td>
-                                                        <td>{data.specialist}</td>
+                                                        <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
                                                         <td>
-                                                            <span className='text-truncate text-lowercase cursor-pointer'>
-                                                                {data.departmentName}
+                                                            <span className='text-truncate text-capitalise cursor-pointer'>
+                                                                {data?.departmentDetails?.name}
                                                             </span>
                                                         </td>
                                                         <td><Form.Switch checked /></td>
                                                         <td>
                                                             <div className='d-flex gap-2'>
-                                                                <div>
-                                                                    <FiEdit className='fs-5' />
+                                                                <div onClick={() => { setDetailsModal(true); setSelectedDetails(data?.userDetails); }}>
+                                                                    <FiEdit className="fs-4 cursor-pointer" />
                                                                 </div>
                                                                 <div>
-                                                                    <FiTrash className='fs-5' />
+                                                                    <FiTrash className="fs-4" />
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -316,7 +150,7 @@ const Doctors = () => {
                     className={'modal-colored-header pb-0 border-0 text-center'}>
                 </Modal.Header>
                 <Modal.Body>
-                    <h4 className="mt-0 text-center">Patient Details</h4>
+                    <h4 className="mt-0 text-center">Doctor Details</h4>
                     <Row>
                         <Col className='light-border-bottom d-flex justify-content-between align-items-center'>
                             <Col sm={6}><h5>Name</h5></Col>
