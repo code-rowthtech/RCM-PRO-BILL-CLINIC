@@ -11,6 +11,7 @@ import { getDoctorsReducer, getDoctorsRolesReducer,createtDoctorsDetailReducer }
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
+import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer } from './sub clinic/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -25,4 +26,5 @@ export default (combineReducers({
     getDoctorsRolesReducer,
     getPatientsReducer,
     getSubscriptionsReducer,
+    createSubClinicsReducer,getSubClinicsReducer,getSubClinicTypeReducer,
 }): any);

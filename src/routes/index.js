@@ -63,6 +63,14 @@ const DepartmentDetails = React.lazy(() => import('../pages/apps/Doctors/Departm
 
 const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
 const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'));
+
+
+const NewClinic = React.lazy(() => import('../pages/apps/SubClinics/NewClinic'));
+const Clinic = React.lazy(() => import('../pages/apps/SubClinics/index'));
+const ClinincDetails = React.lazy(() => import('../pages/apps/SubClinics/ClinicDetails'));
+
+
+
 const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
 const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
@@ -334,6 +342,24 @@ const AllRoutes = () => {
                                     path: 'list',
                                     element: <LoadComponent component={RoleManagement} />,
                                 },
+                            ],
+                        },
+                        {
+                            path: 'clinics',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element: <LoadComponent component={Clinic} />,
+                                },
+                                {
+                                    path: 'new-clinic',
+                                    element: <LoadComponent component={NewClinic} />,
+                                },
+                                {
+                                    path: 'clinicDetails',
+                                    element: <LoadComponent component={ClinincDetails} />,
+                                },
+                                
                             ],
                         },
                         {

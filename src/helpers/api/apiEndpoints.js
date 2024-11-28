@@ -19,6 +19,15 @@ export const getStatedByCountry = '/api/v1/clinic/states/US';
 export const getCityByState = '/api/v1/clinic/cities/';
 export const getClinicType = '/api/v1/clinic/getClinicTypes';
 
+
+
+// SUB CLINIC
+export const createSubClinic = '/api/v1/clinic/createSubClinics'
+export const getSubClinic = ''
+export const getSubClinicType = '/api/v1/clinic/getClinicTypes'
+
+
+
 //CONTRACT
 export const createContract = '/api/v1/clinic/getContractDetails';
 
