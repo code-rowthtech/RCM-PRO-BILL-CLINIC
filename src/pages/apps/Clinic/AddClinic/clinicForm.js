@@ -39,6 +39,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [updatePage, setUpdatePage] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
+    const [focused, setFocused] = useState(false);
+
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
@@ -456,7 +458,59 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setValue('clinicType', clinicsDataGet.clinicType); // Set the pre-selected value
         }
     }, [clinicsDataGet, setValue]);
+    const [searchedLocations, setSearchedLocations] = useState(null)
 
+    const getGeolocation = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data; // Return the geocoding data
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null; // Return null in case of error
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedLocations(data?.results)
+                } else {
+                    console.log("No data returned.");
+                }
+            });
+    }
+    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [stateToSelect, setStateToSelect] = useState(null);
+    useEffect(() => {
+        if (latitude && longitude) {
+            setFocused(false);
+        }
+    }, [latitude, longitude])
+
+    const stateGeoLocation = watch('stateName');
+    useEffect(() => {
+        if (stateGeoLocation) {
+            setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
+        }
+    }, [stateGeoLocation])
+
+    useEffect(() => {
+        if (stateToSelect) {
+            console.log('called')
+            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+        }
+    }, [stateToSelect])
 
     return (
         <>
@@ -738,19 +792,94 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     <Col sm={12}>
                         <Row>
                             <Col sm={12} className='mb-2'>
-                                <span className='text-black fw-semibold'>Address Details</span>
+                                <span className='text-black fw-semibold form-label'>Address Details</span>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>Address 1</Form.Label>
-                                    <Form.Control
-                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
-                                        as={'textarea'}
-                                        rows={8}
-                                        {...register('address')}
-                                        placeholder="Address 1" />
-                                    {/* {errors.address1 && <span className="text-danger">{errors.address1.message}</span>} */}
-                                </Form.Group>
+                                <Row className='position-relative'>
+                                    <Col sm={12}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Address</Form.Label>
+                                            <div style={{ position: 'relative' }}>
+                                                <Form.Control
+                                                    type="text"
+                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
+                                                    {...register('address')}
+                                                    onChange={(e) => {
+                                                        getGeolocation(e);
+                                                        setFocused(true); // Open dropdown on input
+                                                    }}
+                                                    onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                    onBlur={() => {
+                                                        setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                    }}
+                                                    placeholder="Search for address"
+                                                    autoComplete="off"
+                                                />
+                                                {/* Dropdown suggestions */}
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        width: '100%',
+                                                        maxHeight: '150px',
+                                                        zIndex: 111,
+                                                        backgroundColor: '#fff',
+                                                        border: '1px solid #ced4da',
+                                                        borderTop: 'none',
+                                                    }}
+                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                >
+                                                    {searchedLocations?.map((data, index) => (
+                                                        <p
+                                                            key={index}
+                                                            onClick={() => {
+                                                                console.log(data)
+                                                                setValue('zip', data?.components?.postcode)
+                                                                setValue('stateName', data?.components?.state_code)
+                                                                setLatitude(data?.bounds?.southwest?.lat);
+                                                                setLongitude(data?.bounds?.southwest?.lng);
+                                                                setValue('address', data?.formatted)
+                                                                setFocused(false); // Close dropdown after selection
+                                                            }}
+                                                            style={{
+                                                                margin: 0,
+                                                                padding: '8px 12px',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            className="hover-bg-change text-black"
+                                                        >
+                                                            {data?.formatted}
+                                                        </p>
+                                                    ))}
+                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                </div>
+                                            </div>
+                                        </Form.Group>
+                                    </Col>
+
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Latitude</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                defaultValue={latitude}
+                                                placeholder="Latitude"
+                                            />
+                                            {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Longitude</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                defaultValue={longitude}
+                                                placeholder="Longitude" />
+                                            {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
                             </Col>
                             <Col sm={6}>
                                 <Row>
@@ -763,9 +892,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             >
                                                 <option>State</option>
                                                 {statesData?.states?.map((data) => (
-                                                    <option selected={clinicsDataGet?.userId?.address?.state === data?._id}
-                                                        key={data?.state_code}
-                                                        value={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id })}
+                                                    <option
+                                                        key={data?.state_code} // Unique key for each option
+                                                        // defau={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id }) || data?.state_code}
+                                                        value={data?.state_code}
                                                     >
                                                         {data?.name}
                                                     </option>
@@ -790,9 +920,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 {...register('city')}
                                                 onChange={(e) => handleCitySelection(e)}
                                             >
-                                                <option>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities?.map((data, index) => (
-                                                    <option key={data?._id} selected={data?.name === clinicsDataGet?.userId?.address?.city === data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
+                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                {cities?.map((data) => (
+                                                    <option key={data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
                                                         {data?.name}
                                                     </option>
                                                 ))}
@@ -823,30 +953,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* {errors.zip && <span className="text-danger">{errors.zip.message}</span>} */}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                value={selectedCity?.latitude || clinicsDataGet?.userId?.address?.latitude || ''} // Use selectedCity or fallback to clinicsDataGet
-                                                readOnly
-                                                placeholder="Latitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                value={selectedCity?.longitude || clinicsDataGet?.userId?.address?.longitude || ''} // Use selectedCity or fallback to clinicsDataGet
-                                                readOnly
-                                                placeholder="Longitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-
                                 </Row>
                             </Col>
                         </Row>
@@ -923,7 +1029,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Col>
                     <hr />
                     <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
-                        <Button variant="primary" className='custom-buttons'  onClick={() => setShowModal(true)}>
+                        <Button variant="primary" className='custom-buttons' onClick={() => setShowModal(true)}>
                             Change Password
                         </Button>
                         {/* <Button variant="primary" type='submit' className='custom-buttons'>
@@ -938,7 +1044,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         </Button>
                     </Col>
                     <Col>
-                    <ChangePasswordModal show={showModal} closeModal={closeModal} />
+                        <ChangePasswordModal show={showModal} closeModal={closeModal} />
                     </Col>
                 </Row >
             </Form >

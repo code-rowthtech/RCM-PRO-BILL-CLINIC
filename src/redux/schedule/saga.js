@@ -3,7 +3,7 @@ import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createScheduleApi } from './api';
+import { createScheduleApi, getDoctorsListApi } from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -22,7 +22,7 @@ function* createScheduleFunction(data) {
         if (response.status === 200) {
             yield put({
                 type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
-                payload: { ...decryptedData },
+                payload: { response },
             });
         } else {
             yield put({
@@ -38,15 +38,48 @@ function* createScheduleFunction(data) {
     }
 }
 
+function* getDoctorListFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.GET_DOCTORS_LIST_LOADING,
+            payload: {},
+
+        });
+        const response = yield call(getDoctorsListApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'saga of doctor list');
+
+        if (response.status === 200) {
+            yield put({
+                type: ScheduleActionTypes.GET_DOCTORS_LIST_SUCCESS,
+                payload: { response },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.GET_DOCTORS_LIST_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.GET_DOCTORS_LIST_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 export function* watchSchedule() {
     yield takeEvery(ScheduleActionTypes.GET_SCHEDULE, createScheduleFunction);
 }
-
+export function* watchGetDoctorsList() {
+    yield takeEvery(ScheduleActionTypes.GET_DOCTORS_LIST, getDoctorListFunction);
+}
 
 function* scheduleSaga() {
     yield all([
         fork(watchSchedule), 
+        fork(watchGetDoctorsList)
     ]);
 }
 export default scheduleSaga;

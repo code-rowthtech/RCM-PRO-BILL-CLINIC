@@ -1,28 +1,25 @@
 import React, { useState } from 'react';
 import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';  // Eye icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordAction, resetAuth } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
+import ToastHandle from '../helpers/ToastMessage';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
   const dispatch = useDispatch();
 
-  // Initialize useForm
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
-  // Watch new password field to compare with confirmPassword
   const newPassword = watch('newPassword');
   const oldPassword = watch('oldPassword');
 
-  // State to toggle password visibility
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Form submission handler
   const onSubmit = (data) => {
     console.log('Old Password:', data.oldPassword);  
     console.log('New Password:', data.newPassword); 
@@ -31,8 +28,10 @@ const ChangePasswordModal = ({ show, closeModal }) => {
       newPassword: data.newPassword
     };
     dispatch(confirmPasswordAction({key: encryptMessage(payload)}));
+    ToastHandle("Your password will be changed!",'Success')
     closeModal();
     reset();
+   
   };
 
   return (
@@ -62,7 +61,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 />
                 <span 
                   className="position-absolute" 
-                  style={{ top: '50%', right: '10px', transform: 'translateY(20%)', cursor: 'pointer' }} 
+                  style={{ top: '35px', right: '10px',  cursor: 'pointer' }} 
                   onClick={() => setShowOldPassword(!showOldPassword)}
                 >
                   {showOldPassword ? <FaEyeSlash /> : <FaEye />}
@@ -83,7 +82,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                   {...register('newPassword', {
                     required: 'New password is required',
                     minLength: {
-                      value: 6,
+                      value: 8,
                       message: 'Password must be at least 6 characters long'
                     },
                     validate: value => 
@@ -92,7 +91,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 />
                 <span 
                   className="position-absolute" 
-                  style={{ top: '50%', right: '10px', transform: 'translateY(20%)', cursor: 'pointer' }} 
+                  style={{ top: '35px', right: '10px', cursor: 'pointer' }} 
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -108,7 +107,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
               <Form.Group className="mb-2 w-100 position-relative">
                 <Form.Label>Confirm New Password</Form.Label>
                 <Form.Control
-                  type={showConfirmPassword ? 'text' : 'password'}  // Toggle password visibility
+                  type={showConfirmPassword ? 'text' : 'password'}  
                   placeholder="Confirm new password"
                   {...register('confirmPassword', {
                     required: 'Please confirm your new password',
@@ -118,7 +117,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 />
                 <span 
                   className="position-absolute" 
-                  style={{ top: '50%', right: '10px', transform: 'translateY(20%)', cursor: 'pointer' }} 
+                  style={{ top: '35px', right: '10px', cursor: 'pointer' }} 
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}

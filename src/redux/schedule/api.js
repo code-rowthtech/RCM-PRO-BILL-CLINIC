@@ -7,3 +7,8 @@ export function createScheduleApi(params: any): any {
     const { data } = params;
     return api.create(URL.createSchedule, data);
 }
+
+export function getDoctorsListApi(params: any): any {
+    const { data } = params;
+    return api.get(URL.getDoctorsList,data);
+}

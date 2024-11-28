@@ -110,7 +110,7 @@ const MenuItemLink = ({ item, className }) => {
         // setAuthorization(null);
     }
     const closeModal = () => {
-        setShow(false);
+       window.location.reload();
     }
     return (
         <Link
@@ -135,7 +135,7 @@ const MenuItemLink = ({ item, className }) => {
                         <div className="card-body text-center">
                             <h4 className="card-title">Are you sure you want to logout!</h4>
                             <div className="d-flex justify-content-center gap-3">
-                                <Button type="button" className="btn btn-secondary" onClick={() => setShow(false)}>
+                                <Button type="button" className="btn btn-secondary" onClick={closeModal}>
                                     Cancel
                                 </Button>
                                 <Button type="button" className="custom-buttons " onClick={handleLogout}>

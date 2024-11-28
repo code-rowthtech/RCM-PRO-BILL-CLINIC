@@ -1,33 +1,43 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { createScheduleAction } from "../../../redux/schedule/action";
+import { useDispatch, useSelector } from "react-redux";
+import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
 
 const AddHoliday = () => {
+    const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const doctorLists = store?.getDoctorsListReducer
+    console.log(doctorLists, 'doctor list');
 
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const doctor_id = JSON.parse(sessionStorage.getItem('hyper_user'))
+    console.log(doctor_id,'doctor_id')
+    console.log(clinic_id,'clinic_id')
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
     } = useForm();
-const clinicId = '673c2af0bb78fd313f4a752c';
-const doctorId = '6737353f66b5859c2182146a';
-const reason = 'Weekly availability setup';
+    const doctor_Id = "6748316e08b1a41d733d1a02";
+    const reason = 'Weekly availability setup';
 
     const onSubmit = (data) => {
         const payload = {
             ...data, // Spread form data
-            clinicId,
-            doctorId,
+            clinic_id,
+            doctor_Id,
             reason,
         };
-        dispatch(createScheduleAction(payload)); 
+        dispatch(createScheduleAction(payload));
     };
+
+    useEffect(()=>{
+dispatch(getDoctorsListAction());
+    },[dispatch])
 
     return (
         <div className="background_Color pt-1 pb-2">
@@ -54,9 +64,9 @@ const reason = 'Weekly availability setup';
                                             })}
                                         >
                                             <option value="">Select doctor</option>
-                                            <option value="Doctor A">Doctor A</option>
-                                            <option value="Doctor B">Doctor B</option>
-                                            <option value="Doctor C">Doctor C</option>
+                                          {/* {doctorLists?.map((doctor)=>(
+                                             <option key={doctor._id} value={doctor._id}>{doctor.name}</option>
+                                          ))} */}
                                         </Form.Select>
                                         {errors.doctorName && (
                                             <small className="text-danger">{errors.doctorName.message}</small>
