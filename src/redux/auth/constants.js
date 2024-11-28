@@ -9,6 +9,7 @@ export const AuthActionTypes = {
     FORGOT_PASSWORD_CHANGE: '@@auth/FORGOT_PASSWORD_CHANGE',
 
     RESET: '@@auth/RESET',
+    CONFIRMPASSWORD: '@@auth/CONFIRMPASSWORD',
 
     VERIFY_TOKEN: '@@auth/VERIFY_TOKEN',
     SET_PASSWORD: '@@auth/SET_PASSWORD',

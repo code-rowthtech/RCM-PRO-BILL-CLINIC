@@ -13,7 +13,7 @@ import { APICore, setAuthorization } from '../../helpers/api/apiCore';
 import { authApiResponseSuccess, authApiResponseError } from './actions';
 import { AuthActionTypes } from './constants';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
-import { setPasswordApi } from '../../helpers/api/auth';
+import {  confirmPasswordApi, setPasswordApi } from '../../helpers/api/auth';
 const api = new APICore();
 
 /**
@@ -27,12 +27,14 @@ function* login({ payload }) {
         }
         const response = yield call(loginApi, encryptedPayload);
         const user = JSON.parse(decryptMessage(response?.data?.data));
+        console.log(user,'"6746c249525680b5e3733e0a"')
         const userData = {
             name: user?.name,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
-            _id: user?._id
+            _id: user?.userId,
+            clinicId: user?.clinicId
         }
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);
@@ -133,6 +135,25 @@ function* setPasswordChange({ payload }) {
         yield put(authApiResponseError(AuthActionTypes.SET_PASSWORD, error));
     }
 }
+
+function* setChangePasswordChange({ payload }) {
+    const { oldPassword,token, newPassword } = payload;
+    const confirmpasswordPayload = {
+        newPassword: newPassword,
+        oldPassword: oldPassword,
+    }
+    // const encryptedNewPassword = {
+    //     key: encryptMessage(confirmpasswordPayload)
+    // }
+
+    try {
+        const response = yield call(confirmPasswordApi, payload);
+        console.log(response,'sagaresponseofconfirmPasswrod')
+        yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
+    } catch (error) {
+        yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));
+    }
+}
 export function* watchLoginUser(): any {
     yield takeEvery(AuthActionTypes.LOGIN_USER, login);
 }
@@ -160,6 +181,11 @@ export function* watchSetPassword(): any {
 }
 
 
+export function* watchChangePassword(): any {
+    yield takeEvery(AuthActionTypes.CONFIRMPASSWORD, setChangePasswordChange);
+}
+
+
 function* authSaga(): any {
     yield all([
         fork(watchLoginUser),
@@ -169,6 +195,7 @@ function* authSaga(): any {
         fork(watchForgotPasswordChange),
         fork(watchVerifyToken),
         fork(watchSetPassword),
+        fork(watchChangePassword),
 
     ]);
 }

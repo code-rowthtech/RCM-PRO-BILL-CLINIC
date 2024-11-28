@@ -16,9 +16,7 @@ function* getPatientsFunction(data) {
             payload: {},
         });
         const response = yield call(getPatientsApi, data);
-        console.log(response, 'getPatientsFunction');
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decrypted');
         if (response.status === 200) {
             yield put({
                 type: PatientsActionTypes.GET_PATIENTS_SUCCESS,
