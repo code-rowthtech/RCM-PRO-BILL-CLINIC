@@ -112,7 +112,7 @@ const Doctors = () => {
                                                     <tr key={index}>
                                                         <td>{index + 1}</td>
                                                         <td className='text-capitalise'>
-                                                            {data?.userDetails?.firstName}
+                                                            {data?.userDetails?.firstName} {data?.userDetails?.lastName}
                                                         </td>
                                                         <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
                                                         <td>
