@@ -16,6 +16,7 @@ import { handleUpload } from '../../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../../cryptoUtils';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import { FiUploadCloud } from "react-icons/fi";
+import ChangePasswordModal from '../../../../components/ChangePasswordModal';
 
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
@@ -38,13 +39,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [updatePage, setUpdatePage] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
-    console.log(selectedState, 'selectedStateselectedStateselectedState')
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
-    const [smShow, setSmShow] = useState(false);
     const [logoName, setLogoName] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const closeModal = () => setShowModal(false);
 
 
 
@@ -475,7 +477,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Clinic type</Form.Label>
                             <Form.Select
-                                {...register('clinicType')}                        >
+                                {...register('clinicType')}>
                                 <option>Select Clinic type</option>
                                 {clinectypes?.map((data) => (
                                     <option key={data?._id} value={data?.name}>{data?.name}</option>
@@ -789,8 +791,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 onChange={(e) => handleCitySelection(e)}
                                             >
                                                 <option>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities?.map((data,index) => (
-                                                    <option key={data?._id}selected={data?.name === clinicsDataGet?.userId?.address?.city ===data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
+                                                {cities?.map((data, index) => (
+                                                    <option key={data?._id} selected={data?.name === clinicsDataGet?.userId?.address?.city === data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
                                                         {data?.name}
                                                     </option>
                                                 ))}
@@ -921,8 +923,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Col>
                     <hr />
                     <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
-                        <Button variant="primary" className='custom-buttons' onClick={() => setSmShow(true)}>
-                            Reset Password
+                        <Button variant="primary" className='custom-buttons'  onClick={() => setShowModal(true)}>
+                            Change Password
                         </Button>
                         {/* <Button variant="primary" type='submit' className='custom-buttons'>
                             Add Multiple
@@ -936,40 +938,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         </Button>
                     </Col>
                     <Col>
-                        <Modal
-                            size="sm"
-                            show={smShow}
-                            centered
-                            onHide={() => setSmShow(false)}
-                            aria-labelledby="example-modal-sizes-title-sm"
-                            className=""
-                        >
-                            <Modal.Body className='rounded-4'>
-                                <Form>
-                                    <Form.Group controlId="email" className='text-center'>
-                                        <Form.Label>Email Address</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            placeholder="Enter your email"
-                                            // value={email}
-                                            // onChange={(e) => setEmail(e.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
-                                </Form>
-                                <Row className="mt-1">
-                                    <Col sm={12} className='text-center'>
-                                        <p className=''> The clinic will receive a onboarding mail email at 'xyz@gmail.com.</p>
-                                    </Col>
-                                    <Col sm={12} className='text-center'>
-                                        <Button variant="primary" >
-                                            Send
-                                        </Button>
-                                    </Col>
-
-                                </Row>
-                            </Modal.Body>
-                        </Modal>
+                    <ChangePasswordModal show={showModal} closeModal={closeModal} />
                     </Col>
                 </Row >
             </Form >

@@ -13,7 +13,7 @@ import { APICore, setAuthorization } from '../../helpers/api/apiCore';
 import { authApiResponseSuccess, authApiResponseError } from './actions';
 import { AuthActionTypes } from './constants';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
-import { setPasswordApi } from '../../helpers/api/auth';
+import {  confirmPasswordApi, setPasswordApi } from '../../helpers/api/auth';
 const api = new APICore();
 
 /**
@@ -135,6 +135,25 @@ function* setPasswordChange({ payload }) {
         yield put(authApiResponseError(AuthActionTypes.SET_PASSWORD, error));
     }
 }
+
+function* setChangePasswordChange({ payload }) {
+    const { oldPassword,token, newPassword } = payload;
+    const confirmpasswordPayload = {
+        newPassword: newPassword,
+        oldPassword: oldPassword,
+    }
+    // const encryptedNewPassword = {
+    //     key: encryptMessage(confirmpasswordPayload)
+    // }
+
+    try {
+        const response = yield call(confirmPasswordApi, payload);
+        console.log(response,'sagaresponseofconfirmPasswrod')
+        yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
+    } catch (error) {
+        yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));
+    }
+}
 export function* watchLoginUser(): any {
     yield takeEvery(AuthActionTypes.LOGIN_USER, login);
 }
@@ -162,6 +181,11 @@ export function* watchSetPassword(): any {
 }
 
 
+export function* watchChangePassword(): any {
+    yield takeEvery(AuthActionTypes.CONFIRMPASSWORD, setChangePasswordChange);
+}
+
+
 function* authSaga(): any {
     yield all([
         fork(watchLoginUser),
@@ -171,6 +195,7 @@ function* authSaga(): any {
         fork(watchForgotPasswordChange),
         fork(watchVerifyToken),
         fork(watchSetPassword),
+        fork(watchChangePassword),
 
     ]);
 }

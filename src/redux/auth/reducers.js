@@ -60,7 +60,7 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                         passwordChange: true,
                     };
                 }
-              
+
                 case AuthActionTypes.VERIFY_TOKEN: {
                     return {
                         ...state,
@@ -76,6 +76,14 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                         changeSetPasswordSuccess: action?.payload?.data,
                         loading: false,
                         changeSetPassword: true,
+                    };
+                }
+                case AuthActionTypes.CONFIRMPASSWORD: {
+                    return {
+                        ...state,
+                        changeConfirmPasswordSuccess: action?.payload?.data,
+                        loading: false,
+                        changeChangePassword: true,
                     };
                 }
                 default:
@@ -133,6 +141,14 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                         changeSetPassword: false,
                     };
                 }
+                case AuthActionTypes.CONFIRMPASSWORD: {
+                    return {
+                        ...state,
+                        error: action.payload.error,
+                        loading: false,
+                        changeChangePassword: false,
+                    };
+                }
                 default:
                     return { ...state };
             }
@@ -151,6 +167,8 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
             return { ...state, loading: true, verifyToken: false };
         case AuthActionTypes.SET_PASSWORD:
             return { ...state, loading: true, changeSetPassword: false };
+        case AuthActionTypes.CONFIRMPASSWORD:
+            return { ...state, loading: true, changeChangePassword: false };
         case AuthActionTypes.RESET:
             return {
                 ...state,
@@ -160,7 +178,8 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                 userLoggedIn: false,
                 passwordReset: false,
                 passwordChange: false,
-                changeSetPassword:false,
+                changeSetPassword: false,
+                changeChangePassword:false,
                 resetPasswordSuccess: null,
             };
         default:
