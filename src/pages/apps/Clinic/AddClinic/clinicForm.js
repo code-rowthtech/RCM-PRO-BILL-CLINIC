@@ -38,12 +38,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [updatePage, setUpdatePage] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
+    console.log(selectedState, 'selectedStateselectedStateselectedState')
     const [medicalLicenses, setMedicalLicenses] = useState(null);
-    const [stateOfLicensing, setStateOfLicensing] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [smShow, setSmShow] = useState(false);
+    const [logoName, setLogoName] = useState(null);
+
+
 
 
     // const [clinicId, setClinicId] = useState(null);
@@ -53,9 +56,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [medicalDetails, setMedicalDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
+    const [posDetails, setPosDetails] = useState([
+        { name: '', email: '', role: '', contact: '', fileName: '' }
+    ])
+
     const [stateDetails, setStateDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
+
+
+
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -77,7 +87,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const deleteClinicResponse = store?.deleteClinicOnboardingReducer?.data?.status;
     useEffect(() => {
         if (createResponse === 200) {
-            reset();
             if (clinicsList?.length > 0) {
                 const payload = {
                     parentClinic: clinicId,
@@ -98,9 +107,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
         }
     }, [createResponse, deleteClinicResponse])
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(getClinicTypeAction())
-    },[dispatch]);
+    }, [dispatch]);
 
 
     useEffect(() => {
@@ -132,42 +141,54 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getClinicAction());
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    // const decryptedRolesData = store?.getRolesDataReducer?.data?.roles;
-    // const onSubmit = (data) => {
-    //     if (data.Password !== data.confirmPassword) {
-    //         setError('confirmPassword', {
-    //             type: 'manual',
-    //             message: 'Passwords do not match',
-    //         });
-    //         return;
-    //     }
-    //     const clinicRoleId = decryptedRolesData && decryptedRolesData.find(role => role?.name === "clinic")?._id;
-    //     const payload = {
-    //         ...(clinicsList && { parentClinic: clinicId }),
-    //         name: data?.clinicname,
-    //         email: data?.email,
-    //         role: clinicRoleId,
-    //         phone: data?.contact,
-    //         clinicType: data?.clinicType,
-    //         taxIdOrEIN: data?.taxId,
-    //         npiNumber: data?.npi,
-    //         medicalLicenses: medicalDetails,
-    //         stateOfLicensing: stateDetails,
-    //         accreditationDetails: accreditationDetails,
-    //         logo: logo?.url.split('?')[0],
-    //         address: {
-    //             address1: data?.address,
-    //             city: selectedCity?._id,
-    //             state: selectedState?._id,
-    //             street: data?.street,
-    //             zip: data?.zip,
-    //             latitude: selectedCity?.latitude,
-    //             longitude: selectedCity?.longitude,
-    //         }
-    //     }
-    //     dispatch(createClinicAction({ key: encryptMessage(payload) }))
-    // };
+    console.log(clinicsDataGet, 'clinicsDataGetclinicsDataGet')
+    const setField = (key, value) => value && setValue(key, value);
+    // console.log(clinicsDataGet?.userId?.address?.state?._id ,"data?._iddata?._id")
+    useEffect(() => {
+        setField('clinicType', clinicsDataGet?.clinicType);
+        setField('contact', clinicsDataGet?.userId?.phone);
+        setField('clinicname', clinicsDataGet?.name);
+        setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
+        setField('npi', clinicsDataGet?.npiNumber);
+        setField('email', clinicsDataGet?.userId?.email);
+        setField('address', clinicsDataGet?.userId?.address?.address1);
+        setField('street', clinicsDataGet?.userId?.address?.street);
+        setField('zip', clinicsDataGet?.userId?.address?.zip);
+        setField('latitude', clinicsDataGet?.userId?.address?.latitude);
+        setField('longitude', clinicsDataGet?.userId?.address?.longitude);
 
+
+        if (clinicsDataGet?.accreditationDetails) {
+            setAccreditationDetails(clinicsDataGet?.accreditationDetails)
+        }
+        if (clinicsDataGet?.medicalLicenses) {
+            setMedicalDetails(clinicsDataGet?.medicalLicenses)
+        }
+        if (clinicsDataGet?.pos) {
+            setPosDetails(clinicsDataGet?.pos)
+        }
+        if (clinicsDataGet?.logo) {
+            setLogoName(clinicsDataGet?.logo)
+        }
+        if (clinicsDataGet?.stateOfLicensing) {
+            setStateDetails(clinicsDataGet?.stateOfLicensing)
+        }
+        const stateName = clinicsDataGet?.userId?.address?.state;
+
+        if (stateName) {
+            const matchingState = statesData?.states?.find(
+                (state) => state.name === stateName
+            );
+            if (matchingState) {
+                setValue('stateName', JSON.stringify({
+                    name: matchingState?.name,
+                    state_code: matchingState?.state_code,
+                    id: matchingState?.id,
+                    _id: matchingState?._id,
+                }));
+            }
+        }
+    }, [clinicsDataGet, statesData, setValue]);
     const onSubmit = (data) => {
         if (data.Password !== data.confirmPassword) {
             setError('confirmPassword', {
@@ -175,16 +196,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 message: 'Passwords do not match',
             });
             return;
-       
+
 
         }
-        // const clinicRoleId = decryptedRolesData && decryptedRolesData.find(role => role?.name === "clinic")?._id;
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
             ...(updateId && { id: updateId }),
             name: data?.clinicname || clinicsDataGet?.name,
             email: data?.email || clinicsDataGet?.userId?.email,
-            // role: clinicRoleId,
             phone: data?.contact || clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
@@ -192,17 +211,19 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             medicalLicenses: medicalDetails,
             stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
+            pos: posDetails,
             logo: logo?.url.split('?')[0],
             address: {
                 address1: data?.address,
                 city: selectedCity?._id,
-                state: selectedState?._id,
+                state: JSON.parse(selectedState)?._id,
                 street: data?.street,
                 zip: data?.zip,
                 latitude: selectedCity?.latitude,
                 longitude: selectedCity?.longitude,
             }
         };
+        console.log(newPayload, 'newPayloadnewPayload')
 
         // Dispatch appropriate action based on whether this is an update or creation
         if (updatePage) {
@@ -227,6 +248,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         try {
             const url = await handleUpload(selectedFile);
             setLogo(url);
+            setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -299,6 +321,41 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
+    const handleAddPOS = () => {
+        const isIncomplete = posDetails.some(
+            (pos) =>
+                !pos.name || !pos.role || !pos.contact || !pos.email
+        );
+
+        if (isIncomplete) {
+            // Show a toast message if any field is incomplete
+            ToastHandle('Please fill all the fields before adding a new one', 'danger');
+            return;
+        }
+        setPosDetails([
+            ...posDetails,
+            { name: '', email: '', role: null, contact: '' }
+        ]);
+    };
+    const handleRemovePOS = (index) => {
+        setPosDetails((prevDetails) => {
+            const updatedDetails = prevDetails.filter((_, i) => i !== index);
+            return updatedDetails;
+        });
+    };
+
+    const handlePOSInputChange = (e, field, index) => {
+        const value = e.target.value;
+        setPosDetails((prevDetails) => {
+            const updatedDetails = [...prevDetails];
+            updatedDetails[index] = {
+                ...updatedDetails[index],
+                [field]: value
+            };
+            return updatedDetails;
+        });
+    };
+
 
     const handleMedicalInputChange = (e, field, index) => {
         const value = e.target.value;
@@ -325,6 +382,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     const handleAddAccreditation = () => {
+        const isIncomplete = accreditationDetails.some(
+            (data) =>
+                !data.name || !data.number || !data.url
+        );
+        if (isIncomplete) {
+            // Show a toast message if any field is incomplete
+            ToastHandle('Please fill all the fields before adding a new one', 'danger');
+            return;
+        }
         setAccreditationDetails([
             ...accreditationDetails,
             { name: '', number: '', url: null }
@@ -337,8 +403,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-
     const handleAddMedical = () => {
+        const isIncomplete = medicalDetails.some(
+            (medical) =>
+                !medical.name || !medical.number || !medical.url
+        );
+        if (isIncomplete) {
+            // Show a toast message if any field is incomplete
+            ToastHandle('Please fill all the fields before adding a new one', 'danger');
+            return;
+        }
         setMedicalDetails([
             ...medicalDetails,
             { name: '', number: '', url: null }
@@ -353,6 +427,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     const handleAddState = () => {
+        const isIncomplete = stateDetails.some(
+            (state) =>
+                !state.name || !state.number || !state.url
+        );
+
+        if (isIncomplete) {
+            // Show a toast message if any field is incomplete
+            ToastHandle('Please fill all the fields before adding a new one', 'danger');
+            return;
+        }
         setStateDetails([
             ...stateDetails,
             { name: '', number: '', url: null }
@@ -383,7 +467,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Form.Control
                                 type="text"
                                 {...register('clinicname')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.name : clinicsDataGet?.name || ''}
                                 placeholder="Clinic name" />
                             {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
                         </Form.Group>
@@ -392,7 +475,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Clinic type</Form.Label>
                             <Form.Select
-                                // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : clinicsDataGet?.clinicType || ''}
                                 {...register('clinicType')}                        >
                                 <option>Select Clinic type</option>
                                 {clinectypes?.map((data) => (
@@ -406,7 +488,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Form.Label className='mb-1'>Email</Form.Label>
                             <Form.Control
                                 type="email"
-                                defaultValue={updatePage ? clinicDataToUpdate?.email : clinicsDataGet?.userId.email || ''}
                                 {...register('email')}
                                 placeholder="Email" />
                             {/* {errors.email && <span className="text-danger">{errors.email.message}</span>} */}
@@ -418,70 +499,64 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Form.Control
                                 type="text"
                                 {...register('taxId')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.taxIdOrEIN : ''}
                                 placeholder="Tax ID / EIN" />
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-2 position-relative">
-                            <Form.Label className='mb-1'>Contact Person</Form.Label>
+                            <Form.Label className="mb-1">Contact Person</Form.Label>
                             <Form.Control
-                                type="text"
+                                type="tel"
                                 style={{ paddingLeft: '5%' }}
-                                {...register('contact')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.phone : clinicsDataGet?.userId.phone || ''}
-                                placeholder="+1 1234-234-234" />
+                                value={`+1 ${watch('contact', '').replace(/^\+1\s*/, '')}`} // Ensures `+1` is always present
+                                onChange={(e) =>
+                                    setValue('contact', e.target.value.replace(/^\+1\s*/, '')) // Updates only the number
+                                }
+                                placeholder="+1 1234-234-234"
+                            />
                             {/* {errors.contact1 && <span className="text-danger">{errors.contact1.message}</span>} */}
                             <img
                                 src={us}
                                 alt="country code flag"
                                 style={{ top: '60%', left: '1%' }}
-                                className='position-absolute' width={20} />
-
+                                className="position-absolute"
+                                width={20}
+                            />
                         </Form.Group>
                     </Col>
+
                     <Col sm={6}>
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>NPI Number</Form.Label>
                             <Form.Control
                                 type="text"
                                 {...register('npi')}
-                                defaultValue={updatePage ? clinicDataToUpdate?.npiNumber : ''}
                                 placeholder="NPI Number" />
                             {/* {errors.npi && <span className="text-danger">{errors.npi.message}</span>} */}
                         </Form.Group>
                     </Col>
-                    <Col sm={6} className='mb-2 d-flex flex-column position-relative'>
-                        <div className="mb-3" style={{ position: "relative" }}>
-                            <label htmlFor="Phone" className="form-label">
-                                Profile image*
-                            </label>
-                            <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                                <input
-                                    type="text"
-                                    className="w-100 input ps-2 py-1"
-                                    placeholder="Upload Image"
-                                    style={{
-                                        border: "1px solid #444141",
-                                        fontSize: "14px",
-                                        color: "#444141",
-                                        paddingTop: "10px",
-                                        paddingBottom: "10px",
-                                        paddingRight: "35px", // Add padding to avoid text overlapping the icon
-                                    }}
-                                />
-                                <FiUploadCloud
-                                    style={{
-                                        position: "absolute",
-                                        right: "10px", // Adjust position
-                                        color: "#444141",
-                                        fontSize: "20px",
-                                        cursor: "pointer",
-                                    }}
-                                />
-                            </div>
+                    <Col sm={6} className="mb-2 d-flex flex-column position-relative">
+                        <Form.Label>Upload Logo</Form.Label>
+                        <div
+                            onClick={handleLogoClick}
+                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
+                        >
+                            {logoName
+                                ? logoName.split('/').pop()
+                                : 'Upload Logo'}
+                            <p className="mb-0"><FiDownloadCloud /></p>
                         </div>
+                        <Form.Control
+                            type="file"
+                            className="rounded-circle"
+                            style={{ display: 'none' }}
+                            ref={logoFileInputRef}
+                            accept=".png, .jpg, .jpeg, .svg"
+                            onChange={handleFileChange}
+                        />
+                        {/* {errors.logoimage && <span className="text-danger">{errors.logoimage.message}</span>} */}
                     </Col>
+
                     <hr />
                     <Col sm={12}>
                         <Form.Label>
@@ -489,7 +564,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <span
                                 onClick={handleAddAccreditation}
                                 className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
-                                {/* <CiCirclePlus size={20} /> */}
                             </span>
                         </Form.Label>
                     </Col>
@@ -512,15 +586,20 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 />
                             </Col>
                             <Col sm={4} className="mb-2 position-relative">
-                                <div onClick={() => accreditationFileInputRef.current.click()}
-                                    className=' custom-file-upload justify-content-between cursor-pointer'>
-                                    {accreditation.fileName ? accreditation.fileName : 'Upload Document'}
-                                    <p className='mb-0'><FiDownloadCloud /></p>
+                                <div
+                                    onClick={() => accreditationFileInputRef.current.click()}
+                                    className="custom-file-upload justify-content-between cursor-pointer"
+                                >
+                                    {accreditation.loading ? 'Loading...'
+                                        : accreditation.url
+                                            ? accreditation.url.split('/').pop()
+                                            : accreditation?.fileName || 'Upload Document'}
+                                    <p className="mb-0"><FiDownloadCloud /></p>
                                 </div>
-                                {/* <img className={`${accreditation ? "" : "d-none"}`} src={accreditation?.url} alt='...' /> */}
+
                                 <Form.Control
                                     type="file"
-                                    className="rounded-circle "
+                                    className="rounded-circle"
                                     style={{ display: 'none' }}
                                     ref={accreditationFileInputRef}
                                     onChange={(e) => handleAccreditationChange(e, index)}
@@ -528,11 +607,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <span
                                     onClick={() => handleRemoveAccreditation(index)}
                                     style={{ right: '-2%', top: '20%' }}
-                                    className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}>
-                                    {/* <CiCircleMinus size={16} fontWeight={900} /> */}
+                                    className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                >
                                 </span>
                             </Col>
-
                         </React.Fragment>
                     ))}
                     <hr />
@@ -564,25 +642,31 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 />
                             </Col>
                             <Col sm={4} className="mb-2 position-relative">
-                                <div onClick={() => medicalFileInputRef.current.click()}
-                                    className=' custom-file-upload justify-content-between cursor-pointer'>
-                                    {medical.fileName ? medical.fileName : 'Upload Document'}
-                                    <p className='mb-0'><FiDownloadCloud /></p>
+                                <div
+                                    onClick={() => medicalFileInputRef.current.click()}
+                                    className="custom-file-upload justify-content-between cursor-pointer"
+                                >
+                                    {medical.url
+                                        ? medical.url.split('/').pop()
+                                        : medical?.fileName || 'Upload Document'}
+                                    <p className="mb-0"><FiDownloadCloud /></p>
                                 </div>
+
                                 <Form.Control
                                     type="file"
-                                    className="rounded-circle "
+                                    className="rounded-circle"
                                     style={{ display: 'none' }}
                                     ref={medicalFileInputRef}
                                     onChange={(e) => handleMedicalChange(e, index)}
                                 />
+
                                 <span
                                     onClick={() => handleRemoveMedical(index)}
                                     style={{ right: '-2%', top: '20%' }}
-                                    className={`${medicalDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}>
+                                    className={`${medicalDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                >
                                 </span>
                             </Col>
-
                         </React.Fragment>
                     ))}
                     <hr />
@@ -602,9 +686,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     onChange={(e) => handleStateInputChange(e, 'name', index)}
                                 >
                                     <option>State</option>
-                                    {statesData?.states?.map((data) => (
-                                        <option
-                                            value={data?.name} key={data?._id}
+                                    {statesData?.states?.map((data, i) => (
+
+                                        <option key={i} selected={data?.name === clinicsDataGet?.stateOfLicensing[index]?.name
+                                        }
                                         >
                                             {data?.name}
                                         </option>
@@ -620,25 +705,31 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 />
                             </Col>
                             <Col sm={4} className="mb-2 position-relative">
-                                <div onClick={() => stateFileInputRef.current.click()}
-                                    className=' custom-file-upload justify-content-between cursor-pointer'>
-                                    {data.fileName ? data.fileName : 'Upload Document'}
-                                    <p className='mb-0'><FiDownloadCloud /></p>
+                                <div
+                                    onClick={() => stateFileInputRef.current.click()}
+                                    className="custom-file-upload justify-content-between cursor-pointer"
+                                >
+                                    {data.url
+                                        ? data.url.split('/').pop()
+                                        : data?.fileName || 'Upload Document'}
+                                    <p className="mb-0"><FiDownloadCloud /></p>
                                 </div>
+
                                 <Form.Control
                                     type="file"
-                                    className="rounded-circle "
+                                    className="rounded-circle"
                                     style={{ display: 'none' }}
                                     ref={stateFileInputRef}
                                     onChange={(e) => handleStateChange(e, index)}
                                 />
+
                                 <span
                                     onClick={() => handleRemoveState(index)}
                                     style={{ right: '-2%', top: '20%' }}
-                                    className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}>
+                                    className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                >
                                 </span>
                             </Col>
-
                         </React.Fragment>
                     ))}
                     <hr />
@@ -670,7 +761,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             >
                                                 <option>State</option>
                                                 {statesData?.states?.map((data) => (
-                                                    <option
+                                                    <option selected={clinicsDataGet?.userId?.address?.state === data?._id}
                                                         key={data?.state_code}
                                                         value={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id })}
                                                     >
@@ -684,26 +775,27 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
                                             <Form.Label className='mb-1'>City</Form.Label>
-                                            {
+                                            {/* {
                                                 store?.getCitiesReducer?.loading ?
                                                     <Row>
                                                         <Col sm={12}>
                                                             <Spinner className='fs-5' />
                                                         </Col>
                                                     </Row>
-                                                    :
-                                                    <Form.Select
-                                                        {...register('city')}
-                                                    // onChange={(e) => handleCitySelection(e)}
-                                                    >
-                                                        <option>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                        {cities?.map((data) => (
-                                                            <option key={data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                            }
+                                                    : */}
+                                            <Form.Select
+                                                disabled={store?.getCitiesReducer?.loading}
+                                                {...register('city')}
+                                                onChange={(e) => handleCitySelection(e)}
+                                            >
+                                                <option>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                {cities?.map((data,index) => (
+                                                    <option key={data?._id}selected={data?.name === clinicsDataGet?.userId?.address?.city ===data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {/* } */}
                                         </Form.Group>
                                     </Col>
 
@@ -734,21 +826,25 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label className='mb-1'>Latitude</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                // {...register('zip')}
-                                                placeholder="Latitude" />
-                                            {/* {errors.zip && <span className="text-danger">{errors.zip.message}</span>} */}
+                                                value={selectedCity?.latitude || clinicsDataGet?.userId?.address?.latitude || ''} // Use selectedCity or fallback to clinicsDataGet
+                                                readOnly
+                                                placeholder="Latitude"
+                                            />
                                         </Form.Group>
                                     </Col>
+
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
                                             <Form.Label className='mb-1'>Longitude</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                // {...register('zip')}
-                                                placeholder="Longitude" />
-                                            {/* {errors.zip && <span className="text-danger">{errors.zip.message}</span>} */}
+                                                value={selectedCity?.longitude || clinicsDataGet?.userId?.address?.longitude || ''} // Use selectedCity or fallback to clinicsDataGet
+                                                readOnly
+                                                placeholder="Longitude"
+                                            />
                                         </Form.Group>
                                     </Col>
+
                                 </Row>
                             </Col>
                         </Row>
@@ -756,59 +852,71 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     <hr />
                     <Col sm={12}>
                         <Row>
-                            <Col sm={12} className='mb-2'>
-                                <span className='text-black fw-semibold'>POC 1 (point of contact)*</span>
+                            <Col sm={12} className="mb-2">
+                                <span className="text-black fw-semibold form-label">
+                                    POC (Point of contact)
+                                    <span
+                                        onClick={handleAddPOS}
+                                        className="plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer">
+                                    </span>
+                                </span>
                             </Col>
-
-                            <Col>
-                                <Row>
+                            {posDetails.map((data, index) => (
+                                <React.Fragment key={index}>
+                                    <Col sm={12} className='form-label'>
+                                        {'POS ' + `${index + 1}`}
+                                        <span
+                                            onClick={() => handleRemovePOS(index)}
+                                            className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
+                                        </span>
+                                    </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Full Name</Form.Label>
+                                            <Form.Label className="mb-1">Full Name</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                {...register('fullname')}
-                                                defaultValue={updatePage ? clinicDataToUpdate?.name : ''}
-                                                placeholder="Full name" />
-                                            {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
+                                                value={data.name}
+                                                onChange={(e) => handlePOSInputChange(e, 'name', index)}
+                                                placeholder="Full Name"
+                                            />
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Contact Email</Form.Label>
+                                            <Form.Label className="mb-1">Contact Email</Form.Label>
                                             <Form.Control
-                                                type="text"
-                                                {...register('contactemail')}
-                                                defaultValue={updatePage ? clinicDataToUpdate?.name : ''}
-                                                placeholder="Contact Email" />
-                                            {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
+                                                type="email"
+                                                value={data.email}
+                                                onChange={(e) => handlePOSInputChange(e, 'email', index)}
+                                                placeholder="Contact Email"
+                                            />
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Job Title/Role</Form.Label>
+                                            <Form.Label className="mb-1">Job Title / Role</Form.Label>
                                             <Form.Control
-                                                type="text"
-                                                {...register('jobtitle')}
-                                                defaultValue={updatePage ? clinicDataToUpdate?.name : ''}
-                                                placeholder="Job Title/Role" />
-                                            {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
+                                                type='text'
+                                                value={data?.role}
+                                                placeholder='Job Title / Role'
+                                                onChange={(e) => handlePOSInputChange(e, 'role', index)}
+                                            />
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Phone Number</Form.Label>
+                                            <Form.Label className="mb-1">Phone Number</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                {...register('phonenumner')}
-                                                defaultValue={updatePage ? clinicDataToUpdate?.name : ''}
-                                                placeholder="Phone Number" />
-                                            {/* {errors.clinicname && <span className="text-danger">{errors.clinicname.message}</span>} */}
+                                                value={data.contact}
+                                                onChange={(e) => handlePOSInputChange(e, 'contact', index)}
+                                                placeholder="Phone Number"
+                                                maxLength={10}
+                                            />
                                         </Form.Group>
                                     </Col>
-
-                                </Row>
-                            </Col>
+                                </React.Fragment>
+                            ))}
                         </Row>
                     </Col>
                     <hr />
@@ -816,14 +924,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Button variant="primary" className='custom-buttons' onClick={() => setSmShow(true)}>
                             Reset Password
                         </Button>
-                        <Button variant="primary" type='submit' className='custom-buttons'>
+                        {/* <Button variant="primary" type='submit' className='custom-buttons'>
                             Add Multiple
-                        </Button>
+                        </Button> */}
                         <Button variant="primary" type="submit" disabled={store?.createClinicsReducer?.loading} onClick={() => setNextClicked(true)} className='custom-buttons'>
                             {store?.createClinicsReducer?.loading ?
                                 <Spinner className="spinner-border-sm" />
                                 :
-                                'Next'
+                                'Save'
                             }
                         </Button>
                     </Col>
@@ -865,18 +973,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Col>
                 </Row >
             </Form >
-            <Row className={`${clinicsList?.length > 0 ? '' : 'd-none'}`}>
+            {/* <Row className={`${clinicsList?.length > 0 ? '' : 'd-none'}`}>
                 <Col>
                     <Table responsive className="mt-3 table-centered border border-muted table-nowrap mb-0 ">
                         <thead>
                             <tr>
-                                <th>Clinic Name</th>
-                                <th>Location</th>
-                                <th>Specialist</th>
-                                <th>Email</th>
-                                <th>Contact</th>
-                                <th>Tax / EIN Id</th>
-                                <th>Action</th>
+                                <th className='text-white'>Clinic Name</th>
+                                <th className='text-white'>Location</th>
+                                <th className='text-white'>Specialist</th>
+                                <th className='text-white'>Email</th>
+                                <th className='text-white'>Contact</th>
+                                <th className='text-white'>Tax / EIN Id</th>
+                                <th className='text-white'>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -916,7 +1024,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         </tbody>
                     </Table>
                 </Col>
-            </Row>
+            </Row> */}
 
         </>
     );
