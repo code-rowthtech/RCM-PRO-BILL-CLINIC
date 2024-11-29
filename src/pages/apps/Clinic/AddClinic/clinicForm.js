@@ -69,9 +69,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     ]);
 
 
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState(null);
+
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -127,9 +125,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [dispatch, updateId, createResponse === 200]);
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.data?.cities;
-    console.log(cities,'cities')
     const handleStateSelection = (e) => {
-        console.log(e.target.value,'e.target.valuee.target.value')
         setSelectedState(e.target.value)
         try {
             const selectedState = JSON.parse(e.target.value);
@@ -142,8 +138,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     const handleCitySelection = (e) => {
-        // const citySelected = JSON.parse(e.target.value);
-        setSelectedCity(e.target.value)
+        const citySelected = JSON.parse(e.target.value);
+        setSelectedCity(citySelected)
     }
     useEffect(() => {
         dispatch(getClinicAction());
@@ -164,8 +160,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('zip', clinicsDataGet?.userId?.address?.zip);
         setField('latitude', clinicsDataGet?.userId?.address?.latitude);
         setField('longitude', clinicsDataGet?.userId?.address?.longitude);
-        setField('stateName', clinicsDataGet?.userId?.address?.state?._id);
-        setField('city', clinicsDataGet?.userId?.address?.city?._id);
 
 
         if (clinicsDataGet?.accreditationDetails) {
@@ -199,7 +193,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             }
         }
     }, [clinicsDataGet, statesData, setValue]);
-    const onSubmit = (data) => {
+    const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
             setError('confirmPassword', {
                 type: 'manual',
@@ -222,26 +216,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
             pos: posDetails,
-            logo: logo?.url.split('?')[0],
+            logo:logo?.url?.split('?')[0],
+            // logo:{
+            //     url:logo?.url?.split('?')[0],
+            //     fileName:logoName,
+            // },
             address: {
                 address1: data?.address,
-                city: selectedCity,
-                state: JSON.parse(selectedState)?._id||stateToSelect?._id,
+                city: selectedCity?._id,
+                state: JSON.parse(selectedState)?._id,
                 street: data?.street,
                 zip: data?.zip,
-                latitude: latitude,
-                longitude: longitude,
+                latitude: selectedCity?.latitude,
+                longitude: selectedCity?.longitude,
             }
         };
         console.log(newPayload, 'newPayloadnewPayload')
-        console.log(selectedState, 'newPayloadnewPayload')
-
-        // Dispatch appropriate action based on whether this is an update or creation
-        if (updatePage) {
-            // dispatch(updateClinicAction({ key: encryptMessage(newPayload) }));
-        } else {
-            dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        }
+        dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
 
 
@@ -496,7 +487,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }
             });
     }
-   
+    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [stateToSelect, setStateToSelect] = useState(null);
     useEffect(() => {
         if (latitude && longitude) {
             setFocused(false);
@@ -504,7 +497,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [latitude, longitude])
 
     const stateGeoLocation = watch('stateName');
-    console.log(stateGeoLocation,'state geoLocation')
     useEffect(() => {
         if (stateGeoLocation) {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
@@ -513,7 +505,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
     useEffect(() => {
         if (stateToSelect) {
-            console.log(stateToSelect,'called')
+            console.log('called')
             dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
         }
     }, [stateToSelect])
@@ -521,7 +513,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     return (
         <>
             {/* <UploadToS3 /> */}
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form onSubmit={handleSubmit(SubmitData)}>
                 <Row>
                     <Col sm={6}>
                         <Form.Group className="mb-2">
@@ -601,12 +593,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Label>Upload Logo</Form.Label>
                         <div
                             onClick={handleLogoClick}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
+                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
+                                }`}
                         >
-                            {logoName
+                            {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
+                            {typeof logoName === 'string' && logoName
                                 ? logoName.split('/').pop()
                                 : 'Upload Logo'}
-                            <p className="mb-0"><FiDownloadCloud /></p>
+                            <p className="mb-0">
+                                <FiDownloadCloud />
+                            </p>
                         </div>
                         <Form.Control
                             type="file"
@@ -616,8 +612,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             accept=".png, .jpg, .jpeg, .svg"
                             onChange={handleFileChange}
                         />
-                        {/* {errors.logoimage && <span className="text-danger">{errors.logoimage.message}</span>} */}
                     </Col>
+
 
                     <hr />
                     <Col sm={12}>
@@ -828,7 +824,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         top: '100%',
                                                         left: 0,
                                                         width: '100%',
-                                                        maxHeight: 'auto',
+                                                        maxHeight: '150px',
                                                         zIndex: 111,
                                                         backgroundColor: '#fff',
                                                         border: '1px solid #ced4da',
@@ -901,7 +897,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <option
                                                         key={data?.state_code} // Unique key for each option
                                                         // defau={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id }) || data?.state_code}
-                                                        value={data?._id}
+                                                        value={data?.state_code}
                                                     >
                                                         {data?.name}
                                                     </option>
@@ -928,7 +924,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
-                                                    <option key={data?._id} value={data?._id}>
+                                                    <option key={data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
                                                         {data?.name}
                                                     </option>
                                                 ))}

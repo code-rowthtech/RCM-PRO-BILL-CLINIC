@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import ToastHandle from '../../helpers/ToastMessage';
 //actions
-import { resetAuth, forgotPasswordChange, verifyToken, setPassword } from '../../redux/actions';
+import { resetAuth, forgotPasswordChange, verifyToken, setPassword, loginUser } from '../../redux/actions';
 
 // components
 import { VerticalForm, FormInput } from '../../components/';
@@ -69,42 +69,63 @@ const SetPassword = (): React$Element<any> => {
     }
     const schemaResolver = yupResolver(
         yup.object().shape({
-            password: yup.string().required(t('Please enter Password')),
+            password: yup
+                .string()
+                .required(t('Password is required.'))
+                .min(8, t('Password must be at least 8 characters long.'))
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                    t('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.')
+                ), // Strong password validation
             confirmPassword: yup
                 .string()
                 .oneOf([yup.ref('password'), null], t('Passwords must match'))
-                .required(t('Please confirm your Password')),
+                .required(t('Password is required.')),
         })
     );
-
+    
+const [loginPassword,setLoginPassword]=useState(null);
+console.log(loginPassword,'login password');
     const onSubmit = (formData) => {
+    
+        setPassword(formData.password)
         dispatch(setPassword({ token, newPassword: formData.password }));
+        setLoginPassword(formData.password)
     };
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (changeSetPassword) {
+        if (changePasswordSuccess) {
             ToastHandle('Password generated successfully', 'success');
-            navigate('/account/login');
+            dispatch(loginUser({ email: 'rahul@yopmail.com', password: loginPassword }));
         }
-        if (verifyResponse?.status !== 200 && verifyResponse) {
+        if (!changePasswordSuccess) {
             ToastHandle('The token is not valid, please request new token.', 'danger')
             navigate('/account/login');
         }
-    }, [changeSetPassword, navigate, verifyResponse]);
+    }, [changePasswordSuccess]);
     return (
         <AccountLayout bottomLinks={<BottomLink />}>
             <div className="text-center m-auto">
                 <h4 className="text-dark-50 text-center mt-0 font-weight-bold">{t('Set Password')}</h4>
                 <p className="text-muted mb-4">
-                Hey {verifyResponse?.data?.email}, enter your new password, and we'll update your password and log you in.
+                    Hey enter your new password, and we'll update your password and log you in.
                 </p>
             </div>
 
             {!passwordChange && (
                 <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
-                   
+                    <FormInput
+                        label={t('Email')}
+                        type="email"
+                        name="email"
+                        value={verifyResponse?.data?.email || ''}
+                        disabled
+                        placeholder={t('Your Email')}
+                        containerClass={'mb-3'}
+                    />
+
                     <FormInput
                         label='New Password'
                         type="password"

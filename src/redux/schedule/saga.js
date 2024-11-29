@@ -18,7 +18,6 @@ function* createScheduleFunction(data) {
         });
         const response = yield call(createScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
             yield put({
                 type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
@@ -47,12 +46,11 @@ function* getDoctorListFunction(data) {
         });
         const response = yield call(getDoctorsListApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'saga of doctor list');
 
         if (response.status === 200) {
             yield put({
                 type: ScheduleActionTypes.GET_DOCTORS_LIST_SUCCESS,
-                payload: { response },
+                payload: { ...decryptedData },
             });
         } else {
             yield put({

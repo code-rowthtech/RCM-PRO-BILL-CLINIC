@@ -9,39 +9,34 @@ const AddHoliday = () => {
     const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const doctorLists = store?.getDoctorsListReducer?.data?.response?.data
-    console.log(doctorLists, 'doctor list');
+    const doctorLists = store?.getDoctorsListReducer?.data?.result;
 
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId 
-    const doctor_id = JSON.parse(sessionStorage.getItem('hyper_user'))
-   
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+
     const {
         register,
         handleSubmit,
         reset,
         formState: { errors },
     } = useForm();
-    const doctor_Id = "6748316e08b1a41d733d1a02";
-    const reason = 'Weekly availability setup';
 
     const onSubmit = (data) => {
         const payload = {
             ...data,
             clinic_id,
-            doctor_Id,
-            reason,
         };
         dispatch(createScheduleAction(payload));
+        console.log(payload, "payload");
     };
 
-    useEffect(()=>{
-dispatch(getDoctorsListAction());
-    },[dispatch])
+    useEffect(() => {
+        dispatch(getDoctorsListAction());
+    }, [dispatch]);
 
     return (
         <div className="background_Color pt-1 pb-2">
             <div className="container-fluid mt-4">
-                <Card className="px-3 py-2 " style={{ height: "85vh" }}>
+                <Card className="px-3 py-2" style={{ height: "85vh" }}>
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
@@ -63,12 +58,19 @@ dispatch(getDoctorsListAction());
                                             })}
                                         >
                                             <option value="">Select doctor</option>
-                                          {/* {doctorLists?.map((doctor)=>(
-                                             <option key={doctor._id} value={doctor._id}>{doctor.name}</option>
-                                          ))} */}
+                                            {doctorLists &&
+                                                doctorLists.map((data, index) => (
+                                                    <option
+                                                        className="text-capitalize"
+                                                        value={data?.userId?.firstName}
+                                                        key={index}
+                                                    >
+                                                        {data?.userId?.firstName}
+                                                    </option>
+                                                ))}
                                         </Form.Select>
                                         {errors.doctorName && (
-                                            <small className="text-danger">{errors.doctorName.message}</small>
+                                            <span className="text-danger">{errors.doctorName.message}</span>
                                         )}
                                     </Form.Group>
 
@@ -103,14 +105,27 @@ dispatch(getDoctorsListAction());
                                             <small className="text-danger">{errors.fromDate.message}</small>
                                         )}
                                     </Form.Group>
+
+                                    <Form.Group className="mb-3">
+                                        <Form.Label className="mb-1">
+                                            Reason<span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            as="textarea"
+                                            rows={3}
+                                            {...register("reason", {
+                                                required: "Reason is required",
+                                            })}
+                                        />
+                                        {errors.reason && (
+                                            <small className="text-danger">{errors.reason.message}</small>
+                                        )}
+                                    </Form.Group>
                                 </div>
                             </div>
 
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button
-                                    variant="secondary"
-                                    type="button"
-                                >
+                                <Button variant="secondary" type="button">
                                     Cancel
                                 </Button>
                                 <Button variant="primary" type="submit">
