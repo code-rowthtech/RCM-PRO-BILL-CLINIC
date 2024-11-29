@@ -11,13 +11,14 @@ const DepartmentDetails = ({ docId }) => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result
+  const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch,
+    setValue,
   } = useForm();
   const id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
   console.log(id, '12345678998765432')
@@ -29,8 +30,40 @@ const DepartmentDetails = ({ docId }) => {
       departmentId: data?.department,
     }
     console.log('Form Submitted:', payload);
-    dispatch(createDoctorDetailAction({ key: encryptMessage(payload) })); // Dispatch with payload
+    // dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
+
+  useEffect(() => {
+    if (doctorDetails) {
+        setValue('TIN_SSN', doctorDetails?.TIN_SSN)
+        setValue('NPI', doctorDetails?.NPI)
+        setValue('NPIUsername', doctorDetails?.NPIUsername)
+        setValue('CAQH_ID', doctorDetails?.CAQH_ID)
+        setValue('CAQHUsername', doctorDetails?.CAQHUsername)
+        setValue('medicarePTAN', doctorDetails?.medicarePTAN)
+        setValue('medicaidID', doctorDetails?.medicaidID)
+        setValue('department', doctorDetails?.departmentId?._id)
+        setValue('Medicare_SPOT_Logins', doctorDetails?.Medicare_SPOT_Logins)
+        setValue('Medicare_PECOS_Logins', doctorDetails?.Medicare_PECOS_Logins)
+        setValue('DEA', doctorDetails?.DEA)
+        setValue('CLIA', doctorDetails?.CLIA)
+
+        // if (data?.joiningDate) {
+        //     const formattedJoiningDate = new Date(data.joiningDate)
+        //         .toISOString()
+        //         .split('T')[0]; // Format as YYYY-MM-DD
+        //     setValue('joiningDate', formattedJoiningDate);
+        // }
+
+        // setValue('designation', data?.designation)
+        // setValue('role', data?.role?._id)
+        const formattedDEAIssueDate = doctorDetails?.DEA_IssueDate
+            ? new Date(doctorDetails?.DEA_IssueDate).toISOString().split('T')[0]
+            : '';
+
+        setValue('DEA_IssueDate', formattedDEAIssueDate);
+    }
+}, [doctorDetails, setValue])
 
   useEffect(() => {
     dispatch(
@@ -405,7 +438,7 @@ const DepartmentDetails = ({ docId }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="row mt-3">
             <div className="col-6">
               <div>

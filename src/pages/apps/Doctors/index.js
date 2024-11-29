@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import { FormInput } from '../../../components';
-import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
-import { FiFilter } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import { getDoctorsAction } from '../../../redux/actions';
+import { FiEdit, FiTrash } from "react-icons/fi";
+import { RxCross2 } from "react-icons/rx";
+import { createDoctorAction, getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
+import Spinner from '../../../constants/Spinner';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const Doctors = () => {
     const [detailsModal, setDetailsModal] = useState(false);
-    const [selectedDetails, setSelectedDetails] = useState(null);
+    const [statusModal, setStatusModal] = useState(false);  // Modal to confirm status change
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
-
 
     const dispatch = useDispatch();
 
@@ -21,23 +22,33 @@ const Doctors = () => {
         const payload = { status: status, search: search }
         dispatch(
             getDoctorsAction({ key: encryptMessage(payload) })
+            
         );
     }, [dispatch, status, search]);
-
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
+    // console.log(doctorDetails)
 
-    console.log(doctorDetails);
-
-    const closeDetailsModal = () => {
-        setDetailsModal(false);
-        setSelectedDetails(null);
-    };
+   
+    const closeStatusModal = () => setStatusModal(false);  // Close status change modal
 
     const filteredDoctors = doctorDetails.filter((doctor) =>
         doctor.userDetails?.status === status &&
         doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
+
+    const handleStatusChange = () => {
+        // Here, you would handle the API call or state update for changing the user's status
+        const payload={
+            id:selectedDoctor?.userId,
+            status:!selectedDoctor?.userDetails?.status,
+        }
+        // console.log(payload)
+        dispatch(createDoctorAction({ key: encryptMessage(payload) }));
+
+        closeStatusModal(); // Close modal after the action is confirmed
+    };
+
     return (
         <>
             <Row className='mt-2'>
@@ -47,14 +58,13 @@ const Doctors = () => {
                             <Row className="mb-2">
                                 <Col sm={6}>
                                     <Button
-                                        onClick={() => setStatus(true)} // Active filter
+                                        onClick={() => setStatus(true)}
                                         className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Active
                                     </Button>
-
                                     <Button
-                                        onClick={() => setStatus(false)} // Inactive filter
+                                        onClick={() => setStatus(false)}
                                         className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Inactive
@@ -85,13 +95,11 @@ const Doctors = () => {
                                 </Col>
                             </Row>
 
-
                             <Row>
-
                                 <Col>
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead className="text-white">
-                                            <tr className=''>
+                                            <tr>
                                                 <th className='text-white'>S.No.</th>
                                                 <th className='text-white'>Doctor Name</th>
                                                 <th className='text-white'>Specialist</th>
@@ -100,41 +108,56 @@ const Doctors = () => {
                                                 <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            {filteredDoctors.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={6} className='text-center'>
-                                                        <h3 className='my-5'>No Data Found</h3>
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                filteredDoctors.map((data, index) => (
-                                                    <tr key={index}>
-                                                        <td>{index + 1}</td>
-                                                        <td className='text-capitalise'>
-                                                            {data?.userDetails?.firstName} {data?.userDetails?.lastName}
-                                                        </td>
-                                                        <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
-                                                        <td>
-                                                            <span className='text-truncate text-capitalise cursor-pointer'>
-                                                                {data?.departmentDetails?.name}
-                                                            </span>
-                                                        </td>
-                                                        <td><Form.Switch checked /></td>
-                                                        <td>
-                                                            <div className='d-flex gap-2'>
-                                                                <div onClick={() => { setDetailsModal(true); setSelectedDetails(data?.userDetails); }}>
-                                                                    <FiEdit className="fs-4 cursor-pointer" />
-                                                                </div>
-                                                                <div>
-                                                                    <FiTrash className="fs-4" />
-                                                                </div>
-                                                            </div>
+                                        {store?.getDoctorsReducer?.loading ? (
+                                            <tr>
+                                                <td className='text-center' colSpan={9}>
+                                                    <Spinner className="spinner-border-lg my-5 " />
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            <tbody>
+                                                {filteredDoctors.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={6} className='text-center'>
+                                                            <h3 className='my-5'>No Data Found</h3>
                                                         </td>
                                                     </tr>
-                                                ))
-                                            )}
-                                        </tbody>
+                                                ) : (
+                                                    filteredDoctors.map((data, index) => (
+                                                        <tr key={index}>
+                                                            <td>{index + 1}</td>
+                                                            <td className='text-capitalise'>
+                                                                {data?.userDetails?.firstName} {data?.userDetails?.lastName}
+                                                            </td>
+                                                            <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
+                                                            <td>
+                                                                {data?.departmentDetails?.name}
+                                                            </td>
+                                                            <td>
+                                                                <Form.Switch
+                                                                    // className='cursor-pointer'
+                                                                    checked={data?.userDetails?.status}
+                                                                    onChange={() => {
+                                                                        setSelectedDoctor(data);
+                                                                        setStatusModal(true); // Open status modal
+                                                                    }}
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <div className='d-flex gap-2'>
+                                                                    <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer'>
+                                                                        <FiEdit className="fs-4 cursor-pointer" />
+                                                                    </Link>
+                                                                    <div>
+                                                                        <FiTrash className="fs-4" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )}
+                                            </tbody>
+                                        )}
                                     </Table>
                                 </Col>
                             </Row>
@@ -143,20 +166,43 @@ const Doctors = () => {
                 </Col>
             </Row>
 
-            <Modal show={detailsModal} onHide={closeDetailsModal}>
-                <Modal.Header
-                    onHide={closeDetailsModal}
-                    closeButton
-                    className={'modal-colored-header pb-0 border-0 text-center'}>
-                </Modal.Header>
+            {/* Status Change Modal */}
+            <Modal show={statusModal} onHide={closeStatusModal} centered size="md">
                 <Modal.Body>
-                    <h4 className="mt-0 text-center">Doctor Details</h4>
-                    <Row>
-                        <Col className='light-border-bottom d-flex justify-content-between align-items-center'>
-                            <Col sm={6}><h5>Name</h5></Col>
-                            <Col sm={6}><p className='mb-0 text-start'>{selectedDetails?.firstName + ' ' + selectedDetails?.lastName}</p></Col>
-                        </Col>
-                    </Row>
+                    <div>
+                        <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
+                            <Col sm={1}></Col>
+                            <Col sm={10}>
+                                <h4 className="mb-0  d-flex align-items-center justify-content-center">
+                                    <span className='text-danger'>{selectedDoctor?.status ? 'Deactivate' : 'Activate'} Doctor</span>
+                                </h4>
+                            </Col>
+                            <Col sm={1}>
+                                <RxCross2 className="fs-4 cursor-pointer" onClick={closeStatusModal} />
+                            </Col>
+                        </Row>
+                        <Row className="">
+                            {selectedDoctor?.status ? (
+                                <Col sm={12}>
+                                    <p className=' my-3'>
+                                        Once deactivated, the doctor will lose access to their account and services.
+                                    </p>
+                                </Col>
+                            ) : (
+                                <Col>
+                                    <p className=' my-3'>
+                                        After activation, the doctor will regain full access to their account and services.
+                                    </p>
+                                </Col>
+                            )}
+                        </Row>
+                        <Modal.Footer className="d-flex justify-content-end gap-2">
+                            <Button className="custom-buttons" onClick={closeStatusModal}>Cancel</Button>
+                            <Button className="custom-buttons" onClick={handleStatusChange}>
+                                Confirm
+                            </Button>
+                        </Modal.Footer>
+                    </div>
                 </Modal.Body>
             </Modal>
         </>
