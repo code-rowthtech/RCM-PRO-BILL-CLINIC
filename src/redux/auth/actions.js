@@ -51,4 +51,8 @@ export const setPassword = (data): AuthAction => ({
     type: AuthActionTypes.SET_PASSWORD,
     payload: data,
 });
+export const confirmPasswordAction = (data):AuthAction => ({
+type: AuthActionTypes.CONFIRMPASSWORD,
+payload: data,
+});
 

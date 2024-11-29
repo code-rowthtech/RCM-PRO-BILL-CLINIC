@@ -222,7 +222,7 @@ function* getCitiesFunction(data) {
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_SUCCESS,
-                payload: { ...decryptedData },
+                payload: { data: decryptedData },
             });
         } else {
             yield put({

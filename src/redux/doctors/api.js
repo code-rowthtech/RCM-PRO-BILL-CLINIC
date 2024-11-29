@@ -5,12 +5,12 @@ const api = new APICore();
 
 export function getDoctorsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getDoctor}?status=${data?.status}&search=${data?.search}`);
+    return api.create(URL.getDoctor,data);
 }
 
 export function getDoctorsRolesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getDoctorRoles}`);
+    return api.get(`${URL.getDoctorRoles}?search=${data?.search}`);
 }
 
 export function createDoctorApi(params: any): any {

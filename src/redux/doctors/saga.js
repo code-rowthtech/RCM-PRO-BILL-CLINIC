@@ -64,7 +64,6 @@ function* getDoctorsRoleFunction(data) {
 }
 
 function* createDoctorsFunction(data) {
-    console.log(data)
     try {
         yield put({
             type: DoctorsActionTypes.GET_DOCTORS_LOADING,
@@ -72,7 +71,10 @@ function* createDoctorsFunction(data) {
         });
         const response = yield call(createDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
+            ToastHandle(decryptedData.message, 'success')
+
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
                 payload: { ...decryptedData },
@@ -84,6 +86,7 @@ function* createDoctorsFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,
             payload: error,
@@ -92,7 +95,6 @@ function* createDoctorsFunction(data) {
 }
 
 function* createDoctorsDetailFunction(data) {
-    console.log(data)
     try {
         yield put({
             type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_LOADING,
@@ -112,6 +114,7 @@ function* createDoctorsDetailFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR,
             payload: error,

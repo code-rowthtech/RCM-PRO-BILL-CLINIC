@@ -12,6 +12,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicTypeAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
+import { getCitiesAction, getClinicTypeAction, getStatesByCountryAction } from '../../../redux/actions';
 
 
 
@@ -25,6 +26,8 @@ const NewClinic = () => {
     const [logoName, setLogoName] = useState('');
     const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
+    // const [focused, setFocused] = useState(false);
+
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
@@ -39,11 +42,134 @@ const NewClinic = () => {
     const accreditationFileInputRef = useRef([]);
     const medicalFileInputRef = useRef(null);
     const stateFileInputRef = useRef(null);
-    const statesData = ['hello']
     const store = useSelector((state) => state)
-    const clinectypes = store?.getSubClinicTypeReducer?.data?.result
+    const clinectypes = store?.getClinicTypeReducer?.data?.result
+    const statesData = store?.getStatesReducer?.data;
+    const cities = store?.getCitiesReducer?.data?.cities || [];
+    console.log("Cities in Store:", cities);
+        const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
+
     console.log(clinectypes, 'clinic')
-    const response = store?.getDoctorsRolesReducer?.data?.result?._id
+    console.log(statesData, 'state')
+
+    console.log(cities, 'city')
+    const [updatePage, setUpdatePage] = useState(false);
+
+    const [searchedLocations, setSearchedLocations] = useState([]);
+    const [focused, setFocused] = useState(false);
+    const [latitude, setLatitude] = useState('');
+    const [street, setStreet] = useState('');
+
+    const [longitude, setLongitude] = useState('');
+    const [stateToSelect, setStateToSelect] = useState('');
+    const [selectedCity, setSelectedCity] = useState('');
+    useEffect(() => {
+        // Auto close dropdown when latitude and longitude are set
+        if (latitude && longitude) {
+            setFocused(false);
+        }
+    }, [latitude, longitude]);
+
+    const getGeolocation = async (e) => {
+        const addressToSearch = e.target.value;
+    
+        if (!addressToSearch) {
+          setSearchedLocations([]);
+          return;
+        }
+    
+        const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+          addressToSearch
+        )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+    
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Error fetching data: ${response.status}`);
+          }
+          const data = await response.json();
+          console.log(data,'address data')
+          setSearchedLocations(data.results || []);
+        } catch (error) {
+          console.error('Failed to fetch geocode data:', error);
+        }
+      };
+    
+      const handleAddressSelection = (location) => {
+        setValue('address', location.formatted);
+        setValue('zip', location.components.postcode || '');
+        setValue('stateName', location.components.state || '');
+        setValue('city', location.components.city || location.components.town || '');
+        setValue('street', location.components.road || location.components.street || ''); // Set the street
+    
+        setLatitude(location.geometry.lat);
+        setLongitude(location.geometry.lng);
+    
+        setStreet(location.components.road || location.components.street || '');
+    
+        const stateCode = statesData?.states?.find(
+          (state) => state.name === location.components.state
+        )?.state_code;
+
+        const city = cities?.states?.find(
+            (city) => city.name === location.components.city
+          )?.state_code;
+    
+        if (stateCode) {
+          setStateToSelect(stateCode);
+          dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
+        }
+        if (city) {
+            setSelectedCity(city);
+            dispatch(getCitiesAction({ state_code: city, name: '', limit: 25, skip: '' }));
+          }
+        setSelectedCity(location.components.city || location.components.town || '');
+        setFocused(false); // Close dropdown
+      };
+    
+
+    useEffect(() => {
+        if (stateToSelect) {
+            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+        }
+    }, [stateToSelect])
+
+      const handleStateSelection = (e) => {
+        const stateCode = e.target.value;
+        if (stateCode) {
+            setStateToSelect(stateCode);
+            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: 1 }));
+                    }
+    };
+    
+
+    const handleCitySelection = (e) => {
+        const value = e.target.value;
+        if (value) {
+            try {
+                const citySelected = JSON.parse(value);
+                setSelectedCity(citySelected);
+            } catch (error) {
+
+            }
+        }
+    };
+
+
+    const stateGeoLocation = 'stateName';
+    useEffect(() => {
+        if (stateGeoLocation) {
+            setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
+        }
+    }, [stateGeoLocation])
+
+    useEffect(() => {
+        if (stateToSelect) {
+            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+        }
+    }, [stateToSelect])
+    // const response = store?.getDoctorsRolesReducer?.data?.result?._id
 
     const {
         register,
@@ -64,12 +190,14 @@ const NewClinic = () => {
     const closeModal = () => {
         setShow(false);
     };
-    const closepassModal = ()=>{
+    const closepassModal = () => {
         setPassShow(false);
     }
 
     useEffect(() => {
-        dispatch(getSubClinicTypeAction())
+        dispatch(getClinicTypeAction())
+        dispatch(getStatesByCountryAction())
+
     }, [dispatch])
 
     const handleNewDoctor = () => {
@@ -87,6 +215,17 @@ const NewClinic = () => {
             return updatedDetails;
         });
     };
+    // const handleCitySelection = (e) => {
+    //     const value = e.target.value;
+    //     if (value) {
+    //         try {
+    //             const citySelected = JSON.parse(value);
+    //             setSelectedCity(citySelected);
+    //         } catch (error) {
+    //             console.error('Invalid JSON:', value);
+    //         }
+    //     }
+    // };
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
@@ -101,7 +240,6 @@ const NewClinic = () => {
                 return updatedDetails;
             });
         } catch (error) {
-            console.error('Error during file upload:', error);
         }
     };
     const handleAddMedical = () => {
@@ -167,7 +305,6 @@ const NewClinic = () => {
                 return updatedDetails;
             });
         } catch (error) {
-            console.error('Error during file upload:', error);
         }
     };
 
@@ -189,36 +326,48 @@ const NewClinic = () => {
             console.error('Error during file upload:', error);
         }
     };
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))
-    console.log(clinic_id,'id')
+
+  
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
+
+    console.log(clinic_id, 'id')
 
     const submitData = (data) => {
-      
+
         const payload = {
-                     parentClinic: 'clinicId' ,
-                    name: data?.clinicname,
-                    email: data?.email,
-                    role: clinic_id?.role,
-                    phone: data?.contact,
-                    clinicType: data?.clinicType,
-                    taxIdOrEIN: data?.taxId,
-                    npiNumber: data?.npi,
-                    medicalLicenses: medicalDetails,
-                    stateOfLicensing: stateDetails,
-                    accreditationDetails: accreditationDetails,
-                    logo: logo?.url.split('?')[0],
-                    address: {
-                        address1: data?.address,
-                        city: data?.city,
-                        state: data?.state,
-                        street: data?.street,
-                        zip: data?.zip,
-                        latitude: data?.latitude,
-                        longitude: data?.longitude,
-                    }
-                }
+            parentClinic: clinic_id,
+            name: data?.clinicname,
+            email: data?.email,
+            role: clinic_role,
+            phone: data?.contactPerson,
+            clinicType: data?.clinicType,
+            taxIdOrEIN: data?.taxId,
+            npiNumber: data?.npiNumber,
+            medicalLicenses: medicalDetails,
+            stateOfLicensing: stateDetails,
+            accreditationDetails: accreditationDetails,
+            logo: logo?.url.split('?')[0],
+            address: {
+                address1: data?.address,
+                city: '672d9989ebc7107ff1d3831a',
+                state: '67299cc8d39489e58e672463',
+                street: data?.street,
+                zip: data?.zip,
+                latitude: data?.latitude,
+                longitude: data?.longitude,
+            },
+            pos:
+                [{
+                    name: data?.fullName,
+                    email: data?.contactEmail,
+                    role: data?.jobTitle,
+                    contact: data?.phone,
+                },]
+
+        }
         console.log('Form Submitted:', payload);
-        dispatch(createSubClinicAction({key:encryptMessage(payload)}))
+        dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
         reset(); // Reset form after submission
     };
     const handleFileUpload = (index, file) => {
@@ -307,9 +456,9 @@ const NewClinic = () => {
                                                 <Form.Label className='mb-1'>Clinic Name</Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    {...register('clinicName', { required: 'Clinic Name is required' })}
+                                                    {...register('clinicname', { required: 'Clinic Name is required' })}
                                                     placeholder="Clinic name" />
-                                                {errors.clinicName && <p className="text-danger">{errors.clinicName.message}</p>}
+                                                {errors.clinicname && <p className="text-danger">{errors.clinicname.message}</p>}
 
                                             </Form.Group>
                                         </Col>
@@ -317,11 +466,10 @@ const NewClinic = () => {
                                             <Form.Group className="mb-2">
                                                 <Form.Label className='mb-1'>Clinic type</Form.Label>
                                                 <Form.Select {...register('clinicType', { required: 'Clinic Type is required' })}>
-                                                    <option value="">Select Clinic Type</option>
-                                                    {/* {clinectypes?.map((data) => (
+                                                    <option>Select Clinic type</option>
+                                                    {clinectypes?.map((data) => (
                                                         <option key={data?._id} value={data?.name}>{data?.name}</option>
-                                                    ))} */}
-                                                    <option value='sd'>sdf</option>
+                                                    ))}
                                                 </Form.Select>
                                                 {errors.clinicType && <p className="text-danger">{errors.clinicType.message}</p>}
 
@@ -349,9 +497,9 @@ const NewClinic = () => {
                                                 <Form.Label className='mb-1'>Tax ID / EIN</Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    {...register('taxId', { required: 'Tax ID is required' })}
+                                                    // {...register('taxId', { required: 'Tax ID is required' })}
                                                     placeholder="Tax ID / EIN" />
-                                                {errors.taxId && <p className="text-danger">{errors.taxId.message}</p>}
+                                                {/* {errors.taxId && <p className="text-danger">{errors.taxId.message}</p>} */}
 
                                             </Form.Group>
                                         </Col>
@@ -380,9 +528,9 @@ const NewClinic = () => {
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="NPI Number"
-                                                    {...register('npiNumber', { required: 'NPI Number is required' })}
+                                                // {...register('npiNumber', { required: 'NPI Number is required' })}
                                                 />
-                                                {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>}
+                                                {/* {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>} */}
                                             </Form.Group>
                                         </Col>
                                         <Col sm={6} className='mb-2 d-flex flex-column position-relative'>
@@ -395,7 +543,7 @@ const NewClinic = () => {
                                                         type="text"
                                                         className="w-100 input ps-2 py-1"
                                                         placeholder="Upload logo"
-                                                        {...register('profileImage', { required: 'Profile Image is required' })}
+                                                        // {...register('profileImage', { required: 'Profile Image is required' })}
                                                         style={{
                                                             border: "1px solid #444141",
                                                             fontSize: "14px",
@@ -415,7 +563,7 @@ const NewClinic = () => {
                                                         }}
                                                     />
                                                 </div>
-                                                {errors.profileImage && <p className="text-danger">{errors.profileImage.message}</p>}
+                                                {/* {errors.profileImage && <p className="text-danger">{errors.profileImage.message}</p>} */}
                                             </div>
                                         </Col>
                                         <hr />
@@ -435,10 +583,10 @@ const NewClinic = () => {
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Name"
-                                                        {...register(`accreditations.${index}.name`, { required: "Name field is required" })}
+                                                        // {...register(`accreditations.${index}.name`, { required: "Name field is required" })}
                                                         onChange={(e) => handleAccreditationInputChange(e, "name", index)}
                                                     />
-                                                    {errors.accreditations && <span className="text-danger">{errors.accreditations.message}</span>}
+                                                    {/* {errors.accreditations && <span className="text-danger">{errors.accreditations.message}</span>} */}
 
                                                 </Col>
                                                 <Col sm={4}>
@@ -446,10 +594,10 @@ const NewClinic = () => {
                                                         type="text"
                                                         value={accreditation.number}
                                                         placeholder="Document Number"
-                                                        {...register(`accreditations.${index}.number`, { required: 'Name field is required' })}
+                                                        // {...register(`accreditations.${index}.number`, { required: 'Name field is required' })}
                                                         onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
                                                     />
-                                                    {errors.accreditations && <span className="text-danger">{errors.accreditations.message}</span>}
+                                                    {/* {errors.accreditations && <span className="text-danger">{errors.accreditations.message}</span>} */}
 
                                                 </Col>
                                                 <Col sm={4} key={index} className="mb-2 position-relative">
@@ -479,7 +627,7 @@ const NewClinic = () => {
 
                                             </React.Fragment>
                                         ))}
-                                          <hr />
+                                        <hr />
                                         <Col sm={12}>
                                             <Form.Label>
                                                 Medical Licenses&nbsp;
@@ -529,7 +677,7 @@ const NewClinic = () => {
 
                                             </React.Fragment>
                                         ))}
-                                          <hr />
+                                        <hr />
                                         <Col sm={12}>
                                             <Form.Label>
                                                 State of Licensing&nbsp;
@@ -588,137 +736,141 @@ const NewClinic = () => {
 
                                         <hr />
                                         <Col sm={12}>
-                <Row>
-                    <Col sm={12} className="mb-2">
-                        <span className="text-black fw-semibold">Address Details</span>
-                    </Col>
-
-                    <Col sm={6}>
-                        <Form.Group className="mb-2">
-                            <Form.Label className="mb-1">Address 1</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={8}
-                                placeholder="Address 1"
-                                {...register('address1', { required: 'Address 1 is required' })}
-                            />
-                            {errors.address1 && (
-                                <span className="text-danger">{errors.address1.message}</span>
-                            )}
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={6}>
-                        <Row>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">State</Form.Label>
-                                    <Form.Select
-                                        {...register('state', { required: 'State is required' })}
-                                    >
-                                        <option value="">Select State</option>
-                                        <option value="dc">DC</option>
-                                        <option value="ny">NY</option>
-                                    </Form.Select>
-                                    {errors.state && (
-                                        <span className="text-danger">{errors.state.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">City</Form.Label>
-                                    <Form.Select
-                                        {...register('city', { required: 'City is required' })}
-                                    >
-                                        <option value="">Select City</option>
-                                        <option value="washington">Washington</option>
-                                        <option value="newyork">New York</option>
-                                    </Form.Select>
-                                    {errors.city && (
-                                        <span className="text-danger">{errors.city.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">Street</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Street"
-                                        {...register('street', { required: 'Street is required' })}
-                                    />
-                                    {errors.street && (
-                                        <span className="text-danger">{errors.street.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">Zip</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Zip"
-                                        {...register('zip', {
-                                            required: 'Zip code is required',
-                                            pattern: {
-                                                value: /^[0-9]{5}$/,
-                                                message: 'Zip code must be 5 digits',
-                                            },
-                                        })}
-                                    />
-                                    {errors.zip && (
-                                        <span className="text-danger">{errors.zip.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">Latitude</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Latitude"
-                                        {...register('latitude', {
-                                            required: 'Latitude is required',
-                                            pattern: {
-                                                value: /^-?\d+(\.\d+)?$/,
-                                                message: 'Enter a valid latitude',
-                                            },
-                                        })}
-                                    />
-                                    {errors.latitude && (
-                                        <span className="text-danger">{errors.latitude.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">Longitude</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Longitude"
-                                        {...register('longitude', {
-                                            required: 'Longitude is required',
-                                            pattern: {
-                                                value: /^-?\d+(\.\d+)?$/,
-                                                message: 'Enter a valid longitude',
-                                            },
-                                        })}
-                                    />
-                                    {errors.longitude && (
-                                        <span className="text-danger">{errors.longitude.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </Col>
+                                            <Row>
+                                                <Col sm={12} className="mb-2">
+                                                    <span className="text-black fw-semibold form-label">Address Details</span>
+                                                </Col>
+                                                <Col sm={6}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className="mb-1">Address</Form.Label>
+                                                        <div style={{ position: 'relative' }}>
+                                                            <Form.Control
+                                                                type="text"
+                                                                {...register('address')}
+                                                                onChange={getGeolocation}
+                                                                onFocus={() => setFocused(true)}
+                                                                placeholder="Search for address"
+                                                                autoComplete="off"
+                                                            />
+                                                            {focused && searchedLocations.length > 0 && (
+                                                                <div
+                                                                    style={{
+                                                                        position: 'absolute',
+                                                                        top: '100%',
+                                                                        left: 0,
+                                                                        width: '100%',
+                                                                        maxHeight: '150px',
+                                                                        overflowY: 'auto',
+                                                                        backgroundColor: '#fff',
+                                                                        border: '1px solid #ced4da',
+                                                                        zIndex: 1111,
+                                                                    }}
+                                                                >
+                                                                    {searchedLocations.map((location, index) => (
+                                                                        <p
+                                                                            key={index}
+                                                                            style={{
+                                                                                margin: 0,
+                                                                                padding: '8px 12px',
+                                                                                cursor: 'pointer',
+                                                                            }}
+                                                                            onClick={() => handleAddressSelection(location)}
+                                                                        >
+                                                                            {location.formatted}
+                                                                        </p>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={6}>
+                                                    <Row>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label>State</Form.Label>
+                                                                <Form.Select
+                                                                    {...register('stateName')}
+                                                                    value={stateToSelect}
+                                                                    onChange={(e) => handleStateSelection(e)}
+                                                                >
+                                                                    <option value="">Select State</option>
+                                                                    {statesData?.states?.map((data) => (
+                                                                        <option key={data?.state_code} value={data?.state_code}>
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label>City</Form.Label>
+                                                                <Form.Select
+                                                                    {...register('city')}
+                                                                    value={selectedCity}
+                                                                    onChange={(e) => handleCitySelection(e)}
+                                                                >
+                                                                    <option value="">Select City</option>
+                                                                    {cities?.map((data) => (
+                                                                        <option
+                                                                            key={data?._id}
+                                                                            value={JSON.stringify({
+                                                                                _id: data?._id,
+                                                                                name: data?.name,
+                                                                                latitude: data?.latitude,
+                                                                                longitude: data?.longitude,
+                                                                            })}
+                                                                        >
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+                                                <Col sm={6}>
+                                                    <Row>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Latitude</Form.Label>
+                                                                <Form.Control type="text" value={latitude} placeholder="Latitude"  />
+                                                            </Form.Group>
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Longitude</Form.Label>
+                                                                <Form.Control type="text" value={longitude} placeholder="Longitude"  />
+                                                            </Form.Group>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+                                                <Col sm={6}>
+                                                    <Row>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Zip</Form.Label>
+                                                                <Form.Control type="text" {...register('zip')} placeholder="Zip" />
+                                                            </Form.Group>
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label>Street</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            {...register('street')}
+                                                            value={street}
+                                                            onChange={(e) => setStreet(e.target.value)}
+                                                            placeholder="Street"
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                                    </Row>
+                                                </Col>
+                                          
+                                            </Row>
+                                        </Col>
 
                                         <hr />
                                         <Col sm={12}>
@@ -780,7 +932,7 @@ const NewClinic = () => {
                                                                 <Form.Control
                                                                     type="text"
                                                                     placeholder="Phone Number"
-                                                                    {...register('phoneNumber', {
+                                                                    {...register('phone', {
                                                                         required: 'Phone Number is required',
                                                                         pattern: {
                                                                             value: /^[0-9]+$/,
@@ -788,8 +940,8 @@ const NewClinic = () => {
                                                                         },
                                                                     })}
                                                                 />
-                                                                {errors.phoneNumber && (
-                                                                    <span className="text-danger">{errors.phoneNumber.message}</span>
+                                                                {errors.phone && (
+                                                                    <span className="text-danger">{errors.phone.message}</span>
                                                                 )}
                                                             </Form.Group>
                                                         </Col>
@@ -807,7 +959,7 @@ const NewClinic = () => {
                                                 Next
                                             </Button>
                                         </Col>
-                                     
+
                                     </Row >
                                 </Form >
                             )}
@@ -817,7 +969,7 @@ const NewClinic = () => {
                     </Card>
                 </div>
                 <EmailToDoctorModal closeModal={closeModal} show={show} />
-                <ResetPassword closeModal={closepassModal} show={passShow}/>
+                <ResetPassword closeModal={closepassModal} show={passShow} />
             </div>
         </>
     );

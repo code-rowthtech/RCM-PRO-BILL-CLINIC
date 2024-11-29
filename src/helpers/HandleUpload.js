@@ -10,7 +10,7 @@ export const handleUpload = async (file) => {
     }
 
     try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}api/v1/admin/s3/get-presigned-url`, {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}api/v1/clinic/s3/get-presigned-url`, {
             params: {
                 fileName: file.name,
                 fileType: file.type,

@@ -23,14 +23,14 @@ export function getClinicByIdApi(params: any): any {
 }
 
 export function getStateByCountry(params: any): any {
-    const { data } = params;
-    return api.get(URL.getStatedByCountry, data);
+    return api.get(URL.getStatedByCountry);
 }
 
 export function getCityByStateApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.getCityByState}${data?.state_code}?name=${data?.name}&page=${data?.skip}&limit=${data?.limit}`);
 }
+
 
 export function getClinicApi(params: any): any {
     const { data } = params;

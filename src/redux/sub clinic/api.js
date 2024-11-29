@@ -9,8 +9,7 @@ export function createSubClinicApi(params: any): any {
 }
 
 export function getSubClinicApi(params: any): any {
-    const { data } = params;
-    return api.get(URL.getSubClinic, data);
+    return api.get(URL.getSubClinic);
 }
 
 export function getSubClinicTypeApi(params: any): any {

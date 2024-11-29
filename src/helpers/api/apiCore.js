@@ -2,43 +2,79 @@ import jwtDecode from 'jwt-decode';
 import axios from 'axios';
 
 import config from '../../config';
-import { encryptMessage } from '../../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../../cryptoUtils';
 
 // content type
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.baseURL = config.API_URL;
 
 // intercepting to capture errors
+// axios.interceptors.response.use(
+//     (response) => {
+//         return response;
+//     },
+//     (error) => {
+//         // Any status codes that falls outside the range of 2xx cause this function to trigger
+//         let message;
+
+//         if (error && error.response && error.response.status === 404) {
+//             // window.location.href = '/not-found';
+//         } else if (error && error.response && error.response.status === 403) {
+//             // window.location.href = '/access-denied';
+//         } else {
+//             switch (error.response.status) {
+//                 case 401:
+//                     message = 'Invalid credentials';
+//                     break;
+//                 case 403:
+//                     message = 'Access Forbidden';
+//                     break;
+//                 case 404:
+//                     message = 'Sorry! the data you are looking for could not be found';
+//                     break;
+//                 default: {
+//                     message =
+//                         error.response && error.response.data ? error.response.data['message'] : error.message || error;
+//                 }
+//             }
+//             return Promise.reject(message);
+//         }
+//     }
+// );
+
 axios.interceptors.response.use(
     (response) => {
-        return response;
+        return response; // Directly return the response if successful
     },
     (error) => {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        let message;
+        // Decrypt and log the error message
+        const decryptedData = error?.response?.data?.data
+            ? JSON.parse(decryptMessage(error.response.data.data))
+            : null;
+        console.log('API Core Error:', decryptedData);
 
-        if (error && error.response && error.response.status === 404) {
-            // window.location.href = '/not-found';
-        } else if (error && error.response && error.response.status === 403) {
-            // window.location.href = '/access-denied';
-        } else {
+        // Default error message
+        let message = 'An error occurred. Please try again later.';
+
+        // Check for specific status codes
+        if (error.response) {
             switch (error.response.status) {
                 case 401:
-                    message = 'Invalid credentials';
+                    message = decryptedData?.message || 'Invalid credentials';
                     break;
                 case 403:
-                    message = 'Access Forbidden';
+                    message = decryptedData?.message || 'Access Forbidden';
                     break;
                 case 404:
-                    message = 'Sorry! the data you are looking for could not be found';
+                    message = decryptedData?.message || 'Sorry! The data you are looking for could not be found';
                     break;
-                default: {
-                    message =
-                        error.response && error.response.data ? error.response.data['message'] : error.message || error;
-                }
+                default:
+                    message = decryptedData?.message || error.message || 'Unexpected error occurred.';
             }
-            return Promise.reject(message);
         }
+
+        // Reject the promise with the specific message
+        return Promise.reject(message);
     }
 );
 
