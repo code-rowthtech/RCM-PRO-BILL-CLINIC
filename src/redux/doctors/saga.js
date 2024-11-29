@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsRolesApi } from './api';
+import { createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsDetailApi, getDoctorsRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -17,6 +17,8 @@ function* getDoctorsFunction(data) {
         });
         const response = yield call(getDoctorsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'decryptedData get apiii')
+
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.GET_DOCTORS_SUCCESS,
@@ -122,6 +124,33 @@ function* createDoctorsDetailFunction(data) {
     }
 }
 
+function* getDoctorDetailsFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.GET_DOCTORS_DETAILS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getDoctorsDetailApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.GET_DOCTORS_DETAILS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.GET_DOCTORS_DETAILS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.GET_DOCTORS_DETAILS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -147,6 +176,9 @@ export function* watchCreateDoctorsDeatil() {
     yield takeEvery(DoctorsActionTypes.CREATE_DOCTORS_DETAIL, createDoctorsDetailFunction);
 }
 
+export function* watchGetDoctorDetails() {
+    yield takeEvery(DoctorsActionTypes.GET_DOCTORS_DETAILS, getDoctorDetailsFunction);
+}
 
 
 export function* watchresetState() {
@@ -160,6 +192,7 @@ function* doctorsSaga() {
         fork(watchCreateDoctors),
         fork(watchGetDoctorsRoles),
         fork(watchCreateDoctorsDeatil),
+        fork(watchGetDoctorDetails),
     ]);
 }
 export default doctorsSaga;
