@@ -23,11 +23,11 @@ export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => 
                 data: action.payload,
                 loading: false
             }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+        // case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        //     return {
+        //         data: [],
+        //         loading: false
+        //     }
         default: return state
     }
 }
@@ -101,11 +101,11 @@ export const getDoctorDetailsReducer = (state = GET_DOCTORS_INITIAL_STATE, actio
                 data: action.payload,
                 loading: false
             }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+        // case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        //     return {
+        //         data: [],
+        //         loading: false
+        //     }
         default: return state
     }
 }

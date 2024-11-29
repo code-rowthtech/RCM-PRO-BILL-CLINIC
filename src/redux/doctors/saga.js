@@ -17,6 +17,8 @@ function* getDoctorsFunction(data) {
         });
         const response = yield call(getDoctorsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'decryptedData get apiii')
+
         if (response.status === 200) {
             yield put({
                 type: DoctorsActionTypes.GET_DOCTORS_SUCCESS,

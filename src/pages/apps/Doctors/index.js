@@ -4,7 +4,7 @@ import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
-import { createDoctorAction, getDoctorsAction } from '../../../redux/actions';
+import { createDoctorAction, getDoctorsAction, stateEmptydAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -27,7 +27,8 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
-    // console.log(doctorDetails)
+    const updateStatus = useSelector((state) => state?.createtDoctorsReducer?.data?.status) || [];
+    console.log({updateStatus})
 
    
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
@@ -45,9 +46,24 @@ const Doctors = () => {
         }
         // console.log(payload)
         dispatch(createDoctorAction({ key: encryptMessage(payload) }));
-
         closeStatusModal(); // Close modal after the action is confirmed
+        dispatch(stateEmptydAction());
     };
+
+    console.log({selectedDoctor})
+    
+    useEffect(() => {
+        const payload={
+            id:selectedDoctor?.userId,
+            status:status,
+        }
+        if(updateStatus === 200){
+            dispatch(
+                getDoctorsAction({ key: encryptMessage(payload) })
+                
+            );
+        }
+    }, [updateStatus]);
 
     return (
         <>
@@ -110,7 +126,7 @@ const Doctors = () => {
                                         </thead>
                                         {store?.getDoctorsReducer?.loading ? (
                                             <tr>
-                                                <td className='text-center' colSpan={9}>
+                                                <td className='text-center' colSpan={6}>
                                                     <Spinner className="spinner-border-lg my-5 " />
                                                 </td>
                                             </tr>
@@ -119,14 +135,14 @@ const Doctors = () => {
                                                 {filteredDoctors.length === 0 ? (
                                                     <tr>
                                                         <td colSpan={6} className='text-center'>
-                                                            <h3 className='my-5'>No Data Found</h3>
+                                                            <h3 className='my-5'>No Data Found  for {status === true ? 'Active':'Inactive'}</h3>
                                                         </td>
                                                     </tr>
                                                 ) : (
                                                     filteredDoctors.map((data, index) => (
                                                         <tr key={index}>
                                                             <td>{index + 1}</td>
-                                                            <td className='text-capitalise'>
+                                                            <td className='text-capitalize'>
                                                                 {data?.userDetails?.firstName} {data?.userDetails?.lastName}
                                                             </td>
                                                             <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
@@ -145,12 +161,12 @@ const Doctors = () => {
                                                             </td>
                                                             <td>
                                                                 <div className='d-flex gap-2'>
-                                                                    <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer'>
+                                                                    <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />
                                                                     </Link>
-                                                                    <div>
+                                                                    {/* <div>
                                                                         <FiTrash className="fs-4" />
-                                                                    </div>
+                                                                    </div> */}
                                                                 </div>
                                                             </td>
                                                         </tr>
