@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Table } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSubscriptionsAction } from '../../../../redux/subscriptions/actions'
@@ -24,8 +24,11 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
     const subscriptionsData = store?.getSubscriptionsReducer?.data?.result;
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
 
-
-
+    const billingData=store?.getClinicsReducer?.data?.clinic?.userId?.subscription
+const billingDone=  store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
+if(activeTab==='billing'){
+    console.log(billingDone,'billingDonebillingDonebillingDone')
+}
     useEffect(() => {
         if (activeTab === 'billing') {
             dispatch(getSubscriptionsAction());
@@ -54,7 +57,53 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
         }
     }, [billingAddResponse]);
     return (
-        <Form onSubmit={handleSubmit(onSubmit)}>
+       <>
+       {billingDone?
+       <>
+         <>
+                    <Row>
+                        <Col>
+                            <h5 className=''>
+                                There is already a subscription attached to this account. Below are the details of the current subscription:
+                            </h5>
+                        </Col>
+                    </Row>
+                    <Table responsive className="table-centered border border-muted table-nowrap mb-0">
+                        <thead>
+                            <tr>
+                                <th className='text-white'>Subscription Name</th>
+                                <th className='text-white'>Renewal Date</th>
+                                <th className='text-white'>Start Date</th>
+                                <th className='text-white'>Amount</th>
+                                <th className='text-white'>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{billingData?.name}</td>
+                                <td>
+                                    {billingData?.subscriptionRenewalDate ?
+                                        new Date(billingData.subscriptionRenewalDate).toLocaleDateString('en-GB') :
+                                        'N/A'}
+                                </td>
+                                <td>
+                                    {billingData?.subscriptionStartDate ?
+                                        new Date(billingData.subscriptionStartDate).toLocaleDateString('en-GB') :
+                                        'N/A'}
+                                </td>
+                                <td>
+                                    {billingData?.totalAmount}
+                                </td>
+                                <td>
+                                    <Form.Switch checked={billingData?.isActive} />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table>
+                </>
+       </>
+       :
+       <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
                 <Col sm={6}>
                     <Form.Group className="mb-2">
@@ -214,6 +263,8 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
             </Row>
 
         </Form>
+       }
+       </>
     )
 }
 export default BillingForm;

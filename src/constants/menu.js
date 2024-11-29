@@ -24,17 +24,18 @@ const MENU_ITEMS = [
     //     icon: 'uil-money-withdrawal',
     //     url: '/apps/transaction/transaction-list',
     // },
-    {
-        key: 'schedule',
-        label: 'Schedule',
-        icon: 'uil-clock',
-        url: '/apps/schedule/list',
-    },
+  
     {
         key: 'doctors',
         label: 'Doctor',
         icon: 'dripicons-medical',
         url: '/apps/doctors/list',
+    },
+    {
+        key: 'schedule',
+        label: 'Schedule',
+        icon: 'uil-clock',
+        url: '/apps/schedule/list',
     },
     {
         key: 'patients',
@@ -54,6 +55,7 @@ const MENU_ITEMS = [
         url: '/apps/role-management/list',
         icon: 'uil uil-users-alt',
     },
+ 
     {
         key: 'apps-crm',
         label: 'Profile',

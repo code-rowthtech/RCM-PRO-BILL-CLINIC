@@ -62,8 +62,10 @@ const SetPassword = (): React$Element<any> => {
     }));
 
     const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
+    console.log(tokenResponse, 'tokenResponse');
     if (tokenResponse) {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
+        console.log(verifyResponse, 'decrypted verify');
     }
     const schemaResolver = yupResolver(
         yup.object().shape({
@@ -96,12 +98,13 @@ const SetPassword = (): React$Element<any> => {
             <div className="text-center m-auto">
                 <h4 className="text-dark-50 text-center mt-0 font-weight-bold">{t('Set Password')}</h4>
                 <p className="text-muted mb-4">
-                    {t("Enter your new password, and we'll update your password.")}
+                Hey {verifyResponse?.data?.email}, enter your new password, and we'll update your password and log you in.
                 </p>
             </div>
 
             {!passwordChange && (
                 <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
+                   
                     <FormInput
                         label='New Password'
                         type="password"
