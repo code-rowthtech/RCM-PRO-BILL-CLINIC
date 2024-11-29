@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import ToastHandle from '../../helpers/ToastMessage';
 //actions
-import { resetAuth, forgotPasswordChange, verifyToken, setPassword, loginUser } from '../../redux/actions';
+import { resetAuth, forgotPasswordChange, verifyToken, setPassword } from '../../redux/actions';
 
 // components
 import { VerticalForm, FormInput } from '../../components/';
@@ -67,44 +67,40 @@ const SetPassword = (): React$Element<any> => {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
         console.log(verifyResponse, 'decrypted verify');
     }
-    const schemaResolver = yupResolver(
-        yup.object().shape({
-            password: yup
-                .string()
-                .required(t('Password is required.'))
-                .min(8, t('Password must be at least 8 characters long.'))
-                .matches(
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-                    t('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.')
-                ), // Strong password validation
-            confirmPassword: yup
-                .string()
-                .oneOf([yup.ref('password'), null], t('Passwords must match'))
-                .required(t('Password is required.')),
-        })
-    );
-    
-const [loginPassword,setLoginPassword]=useState(null);
-console.log(loginPassword,'login password');
+   const schemaResolver = yupResolver(
+    yup.object().shape({
+        password: yup
+            .string()
+            .required(t('Password is required.'))
+            .min(8, t('Password must be at least 8 characters long.'))
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                t('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.')
+            ), // Strong password validation
+        confirmPassword: yup
+            .string()
+            .oneOf([yup.ref('password'), null], t('Passwords must match'))
+            .required(t('Password is required.')),
+    })
+);
+
+
     const onSubmit = (formData) => {
-    
-        setPassword(formData.password)
         dispatch(setPassword({ token, newPassword: formData.password }));
-        setLoginPassword(formData.password)
     };
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (changePasswordSuccess) {
+        if (changeSetPassword) {
             ToastHandle('Password generated successfully', 'success');
-            dispatch(loginUser({ email: 'rahul@yopmail.com', password: loginPassword }));
+            navigate('/account/login');
         }
-        if (!changePasswordSuccess) {
+        if (verifyResponse?.status !== 200 && verifyResponse) {
             ToastHandle('The token is not valid, please request new token.', 'danger')
             navigate('/account/login');
         }
-    }, [changePasswordSuccess]);
+    }, [changeSetPassword, navigate, verifyResponse]);
     return (
         <AccountLayout bottomLinks={<BottomLink />}>
             <div className="text-center m-auto">

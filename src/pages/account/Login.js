@@ -63,8 +63,19 @@ const Login = (): React$Element<any> => {
 
     const schemaResolver = yupResolver(
         yup.object().shape({
-            username: yup.string().required(t('Please enter Username')),
-            password: yup.string().required(t('Please enter Password')),
+            username: yup
+                .string()
+                .required(t('Please enter email'))
+                .email(t('Please enter a valid email')), // Email format validation
+    
+            password: yup
+                .string()
+                .required(t('Password is required'))
+                .min(8, t('Password must be at least 8 characters')) 
+                .matches(/[a-z]/, t('Password must contain at least one lowercase letter'))
+                .matches(/[A-Z]/, t('Password must contain at least one uppercase letter')) 
+                .matches(/[0-9]/, t('Password must contain at least one number'))
+                .matches(/[@$!%*?&]/, t('Password must contain at least one special character')) 
         })
     );
 
@@ -99,10 +110,10 @@ const Login = (): React$Element<any> => {
                 // defaultValues={{ username: 'test', password: 'test' }}
                 >
                     <FormInput
-                        label={t('Username')}
-                        type="text"
+                        label={t('Email')}
+                        type="email"
                         name="username"
-                        placeholder={t('Enter your Username')}
+                        placeholder={t('Enter your Email')}
                         containerClass={'mb-3'}
                     />
                     <FormInput
