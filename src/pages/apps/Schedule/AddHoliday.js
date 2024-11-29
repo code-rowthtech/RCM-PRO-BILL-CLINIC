@@ -9,13 +9,12 @@ const AddHoliday = () => {
     const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const doctorLists = store?.getDoctorsListReducer
+    const doctorLists = store?.getDoctorsListReducer?.data?.response?.data
     console.log(doctorLists, 'doctor list');
 
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId 
     const doctor_id = JSON.parse(sessionStorage.getItem('hyper_user'))
-    console.log(doctor_id,'doctor_id')
-    console.log(clinic_id,'clinic_id')
+   
     const {
         register,
         handleSubmit,
@@ -27,7 +26,7 @@ const AddHoliday = () => {
 
     const onSubmit = (data) => {
         const payload = {
-            ...data, // Spread form data
+            ...data,
             clinic_id,
             doctor_Id,
             reason,

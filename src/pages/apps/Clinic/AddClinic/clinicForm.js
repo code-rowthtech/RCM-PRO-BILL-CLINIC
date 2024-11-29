@@ -69,7 +69,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     ]);
 
 
-
+    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+    const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -125,7 +127,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [dispatch, updateId, createResponse === 200]);
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.data?.cities;
+    console.log(cities,'cities')
     const handleStateSelection = (e) => {
+        console.log(e.target.value,'e.target.valuee.target.value')
         setSelectedState(e.target.value)
         try {
             const selectedState = JSON.parse(e.target.value);
@@ -138,8 +142,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     const handleCitySelection = (e) => {
-        const citySelected = JSON.parse(e.target.value);
-        setSelectedCity(citySelected)
+        // const citySelected = JSON.parse(e.target.value);
+        setSelectedCity(e.target.value)
     }
     useEffect(() => {
         dispatch(getClinicAction());
@@ -160,6 +164,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('zip', clinicsDataGet?.userId?.address?.zip);
         setField('latitude', clinicsDataGet?.userId?.address?.latitude);
         setField('longitude', clinicsDataGet?.userId?.address?.longitude);
+        setField('stateName', clinicsDataGet?.userId?.address?.state?._id);
+        setField('city', clinicsDataGet?.userId?.address?.city?._id);
 
 
         if (clinicsDataGet?.accreditationDetails) {
@@ -219,15 +225,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             logo: logo?.url.split('?')[0],
             address: {
                 address1: data?.address,
-                city: selectedCity?._id,
-                state: JSON.parse(selectedState)?._id,
+                city: selectedCity,
+                state: JSON.parse(selectedState)?._id||stateToSelect?._id,
                 street: data?.street,
                 zip: data?.zip,
-                latitude: selectedCity?.latitude,
-                longitude: selectedCity?.longitude,
+                latitude: latitude,
+                longitude: longitude,
             }
         };
         console.log(newPayload, 'newPayloadnewPayload')
+        console.log(selectedState, 'newPayloadnewPayload')
 
         // Dispatch appropriate action based on whether this is an update or creation
         if (updatePage) {
@@ -489,9 +496,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }
             });
     }
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState(null);
+   
     useEffect(() => {
         if (latitude && longitude) {
             setFocused(false);
@@ -499,6 +504,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [latitude, longitude])
 
     const stateGeoLocation = watch('stateName');
+    console.log(stateGeoLocation,'state geoLocation')
     useEffect(() => {
         if (stateGeoLocation) {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
@@ -507,7 +513,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
     useEffect(() => {
         if (stateToSelect) {
-            console.log('called')
+            console.log(stateToSelect,'called')
             dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
         }
     }, [stateToSelect])
@@ -822,7 +828,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         top: '100%',
                                                         left: 0,
                                                         width: '100%',
-                                                        maxHeight: '150px',
+                                                        maxHeight: 'auto',
                                                         zIndex: 111,
                                                         backgroundColor: '#fff',
                                                         border: '1px solid #ced4da',
@@ -895,7 +901,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <option
                                                         key={data?.state_code} // Unique key for each option
                                                         // defau={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id }) || data?.state_code}
-                                                        value={data?.state_code}
+                                                        value={data?._id}
                                                     >
                                                         {data?.name}
                                                     </option>
@@ -922,7 +928,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
-                                                    <option key={data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
+                                                    <option key={data?._id} value={data?._id}>
                                                         {data?.name}
                                                     </option>
                                                 ))}
