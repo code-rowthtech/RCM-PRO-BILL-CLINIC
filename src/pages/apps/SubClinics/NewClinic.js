@@ -46,8 +46,10 @@ const NewClinic = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.data?.cities || [];
-    console.log("Cities in Store:", cities);
-        const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
+    console.log("Cities in Store:", statesData);
+    const statecode = statesData?.states?.state_code
+    console.log(statecode,'sttecode')
+    const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
 
     console.log(clinectypes, 'clinic')
     console.log(statesData, 'state')
@@ -72,62 +74,62 @@ const NewClinic = () => {
 
     const getGeolocation = async (e) => {
         const addressToSearch = e.target.value;
-    
+
         if (!addressToSearch) {
-          setSearchedLocations([]);
-          return;
+            setSearchedLocations([]);
+            return;
         }
-    
+
         const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
         const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-          addressToSearch
+            addressToSearch
         )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-    
+
         try {
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`Error fetching data: ${response.status}`);
-          }
-          const data = await response.json();
-          console.log(data,'address data')
-          setSearchedLocations(data.results || []);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Error fetching data: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log(data, 'address data')
+            setSearchedLocations(data.results || []);
         } catch (error) {
-          console.error('Failed to fetch geocode data:', error);
+            console.error('Failed to fetch geocode data:', error);
         }
-      };
-    
-      const handleAddressSelection = (location) => {
+    };
+
+    const handleAddressSelection = (location) => {
         setValue('address', location.formatted);
         setValue('zip', location.components.postcode || '');
         setValue('stateName', location.components.state || '');
         setValue('city', location.components.city || location.components.town || '');
         setValue('street', location.components.road || location.components.street || ''); // Set the street
-    
+
         setLatitude(location.geometry.lat);
         setLongitude(location.geometry.lng);
-    
+
         setStreet(location.components.road || location.components.street || '');
-    
+
         const stateCode = statesData?.states?.find(
-          (state) => state.name === location.components.state
+            (state) => state.name === location.components.state
         )?.state_code;
 
         const city = cities?.states?.find(
             (city) => city.name === location.components.city
-          )?.state_code;
-    
+        )?.state_code;
+
         if (stateCode) {
-          setStateToSelect(stateCode);
-          dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
+            setStateToSelect(stateCode);
+            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
         }
         if (city) {
             setSelectedCity(city);
             dispatch(getCitiesAction({ state_code: city, name: '', limit: 25, skip: '' }));
-          }
+        }
         setSelectedCity(location.components.city || location.components.town || '');
         setFocused(false); // Close dropdown
-      };
-    
+    };
+
 
     useEffect(() => {
         if (stateToSelect) {
@@ -135,14 +137,15 @@ const NewClinic = () => {
         }
     }, [stateToSelect])
 
-      const handleStateSelection = (e) => {
+    const handleStateSelection = (e) => {
         const stateCode = e.target.value;
         if (stateCode) {
             setStateToSelect(stateCode);
+            console.log(stateCode,'code')
             dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: 1 }));
-                    }
+        }
     };
-    
+
 
     const handleCitySelection = (e) => {
         const value = e.target.value;
@@ -327,7 +330,7 @@ const NewClinic = () => {
         }
     };
 
-  
+
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
 
@@ -835,13 +838,13 @@ const NewClinic = () => {
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">Latitude</Form.Label>
-                                                                <Form.Control type="text" value={latitude} placeholder="Latitude"  />
+                                                                <Form.Control type="text" value={latitude} placeholder="Latitude" />
                                                             </Form.Group>
                                                         </Col>
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">Longitude</Form.Label>
-                                                                <Form.Control type="text" value={longitude} placeholder="Longitude"  />
+                                                                <Form.Control type="text" value={longitude} placeholder="Longitude" />
                                                             </Form.Group>
                                                         </Col>
                                                     </Row>
@@ -855,20 +858,20 @@ const NewClinic = () => {
                                                             </Form.Group>
                                                         </Col>
                                                         <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label>Street</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            {...register('street')}
-                                                            value={street}
-                                                            onChange={(e) => setStreet(e.target.value)}
-                                                            placeholder="Street"
-                                                        />
-                                                    </Form.Group>
-                                                </Col>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label>Street</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('street')}
+                                                                    value={street}
+                                                                    onChange={(e) => setStreet(e.target.value)}
+                                                                    placeholder="Street"
+                                                                />
+                                                            </Form.Group>
+                                                        </Col>
                                                     </Row>
                                                 </Col>
-                                          
+
                                             </Row>
                                         </Col>
 
