@@ -92,7 +92,10 @@ const setAuthorization = (token) => {
 
 const getUserFromSession = () => {
     const user = sessionStorage.getItem(AUTH_SESSION_KEY);
+    console.log(user,'user1')
+
     return user ? (typeof user == 'object' ? user : JSON.parse(user)) : null;
+    
 };
 class APICore {
     /**
@@ -222,7 +225,9 @@ class APICore {
         } else {
             return true;
         }
+        
     };
+
 
     setLoggedInUser = (session) => {
         if (session) sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));

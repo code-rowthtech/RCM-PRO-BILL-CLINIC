@@ -72,6 +72,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
+    console.log(clinectypes, 'clinic2')
     const createResponse = store?.createClinicsReducer?.data?.status;
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
