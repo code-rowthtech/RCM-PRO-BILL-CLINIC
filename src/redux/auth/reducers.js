@@ -3,6 +3,7 @@ import { AuthActionTypes } from './constants';
 
 import { APICore } from '../../helpers/api/apiCore';
 import { verifyToken } from './actions';
+import { decryptMessage } from '../../cryptoUtils';
 
 const api = new APICore();
 
@@ -76,6 +77,7 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                         changeSetPasswordSuccess: action?.payload?.data,
                         loading: false,
                         changeSetPassword: true,
+                        // changeSetPasswordStatus: ,
                     };
                 }
                 case AuthActionTypes.CONFIRMPASSWORD: {
