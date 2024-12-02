@@ -49,7 +49,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                     {/* <img src={profilePic} className="rounded-circle" alt="user" /> */}
                     <FaUserCircle className="rounded-circle fs-1  text-dark" />
                 </span>
-                <span>
+                <span className='text-capitalize'>
                     <OverlayTrigger
                         placement="bottom"
                         overlay={<Tooltip>{userName}</Tooltip>}

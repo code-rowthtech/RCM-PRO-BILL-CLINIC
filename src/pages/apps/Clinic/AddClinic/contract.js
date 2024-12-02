@@ -49,7 +49,14 @@ const Contract = ({ billingId, activeTab, contractId }) => {
                                 <Spinner />
                             </td>
                         </tr>
-                    ) : (
+                    ) :
+                     !contract ? (
+                        <tr>
+                          <td colSpan={5} className="text-center">
+                            <h3 className="my-5">No Contract Found</h3>
+                          </td>
+                        </tr>
+                      ) :  (
                         contract && (
                             <tr>
                                 <td className='text-black'>{contract?.contractName}</td>
