@@ -14,6 +14,7 @@ import ProfileDropdown from '../components/ProfileDropdown';
 import profilePic from '../assets/images/users/avatar-1.jpg';
 import logoSmDark from '../assets/images/logo_sm_dark.png';
 import logoSmLight from '../assets/images/logo_sm.png';
+import { FaUserCircle } from 'react-icons/fa';
 import logo from '../assets/images/logo-light.png';
 
 //constants
@@ -120,10 +121,12 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     {!hideLogo && (
                         <Link to="/" className="topnav-logo">
                             <span className="topnav-logo-lg">
-                                <img src={logo} alt="logo" height="16" />
+                                {/* <img src={logo} alt="logo" height="16" /> */}
+                                <FaUserCircle className="rounded-circle fs-1  text-dark" />
                             </span>
                             <span className="topnav-logo-sm">
-                                <img src={topbarDark ? logoSmLight : logoSmDark} alt="logo" height="16" />
+                                {/* <img src={topbarDark ? logoSmLight : logoSmDark} alt="logo" height="16" /> */}
+                                <FaUserCircle className="rounded-circle fs-1  text-dark" />
                             </span>
                         </Link>
                     )}

@@ -14,6 +14,7 @@ import { authApiResponseSuccess, authApiResponseError } from './actions';
 import { AuthActionTypes } from './constants';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
 import {  confirmPasswordApi, setPasswordApi } from '../../helpers/api/auth';
+import ToastHandle from '../../helpers/ToastMessage';
 const api = new APICore();
 
 /**
@@ -134,6 +135,7 @@ function* setPasswordChange({ payload }) {
         const response = yield call(setPasswordApi, encryptedNewPassword);
         yield put(authApiResponseSuccess(AuthActionTypes.SET_PASSWORD, response.data));
     } catch (error) {
+        ToastHandle(error,'danger')
         yield put(authApiResponseError(AuthActionTypes.SET_PASSWORD, error));
     }
 }
@@ -150,7 +152,6 @@ function* setChangePasswordChange({ payload }) {
 
     try {
         const response = yield call(confirmPasswordApi, payload);
-        console.log(response,'sagaresponseofconfirmPasswrod')
         yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));

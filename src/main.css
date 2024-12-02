@@ -54,20 +54,8 @@
 }
 .form-control,
 .form-select {
-    color: #a9a9a9; /* Default color for placeholder or unselected */
+    color: black !important;
     font-weight: 550 !important;
-}
-
-.form-control:focus,
-.form-select:focus {
-    color: black !important; /* Change to black when focused/selected */
-}
-
-.form-control[data-has-value="true"],
-.form-select[data-has-value="true"],
-.form-control:not(:placeholder-shown),
-.form-select:not(:placeholder-shown) {
-    color: black !important; /* Change to black when a value is entered */
 }
 
 /* .form-select.empty {

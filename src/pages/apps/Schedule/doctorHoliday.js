@@ -1,17 +1,19 @@
-import React from 'react';
-import { Table } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { useDispatch, useSelector } from 'react-redux';
+import { getScheduleAction } from '../../../redux/schedule/action';
 
 const DoctorHoliday = () => {
-  // Sample data for the table
-  const holidays = [
-    { id: 1, doctorName: "Dr. John Doe", reason: "Vacation", date: "25/12/2023" },
-    { id: 2, doctorName: "Dr. Jane Smith", reason: "Conference", date: "15/01/2024" },
-    { id: 3, doctorName: "Dr. Emily Brown", reason: "Family Emergency", date: "10/02/2024" },
-    { id: 4, doctorName: "Dr. Michael Green", reason: "Health Issues", date: "05/03/2024" },
-    { id: 5, doctorName: "Dr. Sarah White", reason: "Training", date: "20/03/2024" },
-    { id: 6, doctorName: "Dr. David Black", reason: "Research", date: "30/03/2024" },
-  ];
+  const dispatch = useDispatch();
+  const store = useSelector((state) => state);
+
+  const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
+  const isLoading = store?.getScheduleReducer?.loading;
+
+  useEffect(() => {
+    dispatch(getScheduleAction({ flag: "Schedule" }));
+  }, [dispatch]);
 
   return (
     <div>
@@ -26,21 +28,35 @@ const DoctorHoliday = () => {
           </tr>
         </thead>
         <tbody>
-          {holidays.map((holiday, index) => (
-            <tr key={holiday.id}>
-              <td>{index + 1}</td>
-              <td>{holiday.doctorName}</td>
-              <td>{holiday.reason}</td>
-              <td>
-                <span className="px-1 py-1 text-white bg-secondary rounded-2">
-                  {holiday.date}
-                </span>
-              </td>
-              <td>
-                <RiDeleteBin5Line className="fs-4 ms-2" />
+          {isLoading ? (
+            <tr>
+              <td colSpan={5} className="text-center">
+                <Spinner animation="border" role="status" />
               </td>
             </tr>
-          ))}
+          ) : scheduleResponse.length === 0 ? (
+            <tr>
+              <td colSpan={5} className="text-center">
+                <h3 className="my-5">No Data Found</h3>
+              </td>
+            </tr>
+          ) : (
+            scheduleResponse.map((holiday, index) => (
+              <tr key={holiday.id || index}>
+                <td>{index + 1}</td>
+                <td>{holiday.doctorName}</td>
+                <td>{holiday.reason}</td>
+                <td>
+                  <span className="px-2 py-1 text-white bg-secondary rounded-2">
+                    {new Date(holiday.date).toLocaleDateString()}
+                  </span>
+                </td>
+                <td>
+                  <RiDeleteBin5Line className="fs-4 text-danger ms-2 cursor-pointer" />
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </Table>
     </div>

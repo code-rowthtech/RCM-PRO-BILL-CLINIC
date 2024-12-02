@@ -51,6 +51,7 @@ function* getClinicTypeFunction() {
         const response = yield call(getClinicTypeApi);
         if (response.status === 200) {
             const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
             yield put({
                 type: ClinicsActionTypes.GET_CLINIC_TYPE_SUCCESS,
                 payload: decryptedData,
@@ -108,6 +109,7 @@ function* getClinicByIdFunction(data) {
         const response = yield call(getClinicByIdApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
+
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CLINIC_BY_ID_SUCCESS,
@@ -135,7 +137,6 @@ function* getClinicByParentFunction(data) {
         });
         const response = yield call(getClinicsByParentIdApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CLINIC_BY_PARENT_SUCCESS,

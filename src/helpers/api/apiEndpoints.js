@@ -41,6 +41,7 @@ export const getDoctor = '/api/v1/doctors/getClinicDoctors';
 export const createDoctor = '/api/v1/clinics/createOrUpdateUser';
 export const getDoctorRoles = '/api/v1/clinic/getRoles';
 export const createDoctorDetail = '/api/v1/clinics/createOrUpdateDoctor';
+export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
 
 // PATIENTS
 export const getPatients = '/api/v1/clinics/patient/all';
@@ -57,3 +58,4 @@ export const addSubscriptionPlan='/api/v1/clinic/addSubscriptionPlan';
 // SCHEDULE
 export const createSchedule = '/api/v1/clinic/addOrUpdateSchedule';
 export const getDoctorsList = 'api/v1/clinic/getDoctorsList';
+export const getSchedule = '/api/v1/clinic/getSchedule';

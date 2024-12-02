@@ -13,6 +13,11 @@ export function getDoctorsRolesApi(params: any): any {
     return api.get(`${URL.getDoctorRoles}?search=${data?.search}`);
 }
 
+export function getDoctorsDetailApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.getDoctorDetails,data);
+}
+
 export function createDoctorApi(params: any): any {
     const { data } = params;
     return api.create(URL.createDoctor,data);
