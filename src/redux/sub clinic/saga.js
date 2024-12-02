@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { SubClinicsActionTypes } from './constants';
-import { createSubClinicApi, getSubClinicApi, getSubClinicTypeApi } from './api';
+import { createSubClinicApi, createUpgradeApi, getSubClinicApi, getSubClinicTypeApi, getSubscriptionApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -31,6 +31,35 @@ function* createSubClinicsFunction(data) {
     } catch (error) {
         yield put({
             type: SubClinicsActionTypes.CREATE_SUBCLINIC_ERROR,
+            payload: error,
+        });
+    }
+}
+
+
+function* createUpgradeFunction(data) {
+    try {
+        yield put({
+            type: SubClinicsActionTypes.CREATE_UOGRADE_LOADING,
+            payload: {},
+        });
+        const response = yield call(createUpgradeApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            yield put({
+                type: SubClinicsActionTypes.CREATE_UOGRADE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: SubClinicsActionTypes.CREATE_UOGRADE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SubClinicsActionTypes.CREATE_UOGRADE_ERROR,
             payload: error,
         });
     }
@@ -85,6 +114,61 @@ function* getSubClinicTypeFunction() {
     } catch (error) {
         yield put({
             type: SubClinicsActionTypes.GET_SUBCLINICTYPE_ERROR,
+            payload: error.message || 'Network error',
+        });
+    }
+}
+
+function* getSubClinicCityFunction() {
+    try {
+        yield put({
+            type: SubClinicsActionTypes.GET_CITIES_LOADING,
+        });
+
+        const response = yield call(getSubClinicTypeApi);
+        if (response.status === 200) {
+            const decryptedData = JSON.parse(decryptMessage(response.data.data));
+            yield put({
+                type: SubClinicsActionTypes.GET_CITIES_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: SubClinicsActionTypes.GET_CITIES_ERROR,
+                payload: response.data.message || 'Error fetching clinic types',
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SubClinicsActionTypes.GET_CITIES_ERROR,
+            payload: error.message || 'Network error',
+        });
+    }
+}
+
+function* getSubscriptionFunction() {
+    try {
+        yield put({
+            type: SubClinicsActionTypes.GET_SUBSCRIPTION_LOADING,
+        });
+
+        const response = yield call(getSubscriptionApi);
+        console.log(response,'subs')
+        if (response.status === 200) {
+            const decryptedData = JSON.parse(decryptMessage(response.data.data));
+            yield put({
+                type: SubClinicsActionTypes.GET_SUBSCRIPTION_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: SubClinicsActionTypes.GET_SUBSCRIPTION_ERROR,
+                payload: response.data.message || 'Error fetching clinic types',
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SubClinicsActionTypes.GET_SUBSCRIPTION_ERROR,
             payload: error.message || 'Network error',
         });
     }
@@ -326,11 +410,22 @@ function* getSubClinicTypeFunction() {
 export function* watchCreateClinics() {
     yield takeEvery(SubClinicsActionTypes.CREATE_SUBCLINIC, createSubClinicsFunction);
 }
+
+export function* watchUpgrade() {
+    yield takeEvery(SubClinicsActionTypes.CREATE_UOGRADE, createUpgradeFunction);
+}
 export function* watchGetClinics() {
     yield takeEvery(SubClinicsActionTypes.GET_SUBCLINIC, getSubClinicsFunction);
 }
 export function* watchgetClinicsTypeState() {
     yield takeEvery(SubClinicsActionTypes.GET_SUBCLINICTYPE, getSubClinicTypeFunction);
+}
+
+export function* watchgetCityState() {
+    yield takeEvery(SubClinicsActionTypes.GET_CITIES, getSubClinicCityFunction);
+}
+export function* watchgetSubscription() {
+    yield takeEvery(SubClinicsActionTypes.GET_SUBSCRIPTION, getSubscriptionFunction);
 }
 // export function* watchUpdateClinics() {
 //     yield takeEvery(SubClinicsActionTypes.UPDATE_CLINIC, updateClinicsFunction);
@@ -376,7 +471,9 @@ function* subclinicsSaga() {
         // fork(watchGetClinicByParent),fork(watchgetClinicsTypeState)
          fork(watchCreateClinics),
          fork(watchGetClinics),
-         fork(watchgetClinicsTypeState)
+         fork(watchgetClinicsTypeState),
+         fork(watchgetCityState),
+         fork(watchUpgrade)
     ]);
 }
 export default subclinicsSaga;

@@ -2,8 +2,12 @@ import React from 'react'
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import { useForm } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
+import { encryptMessage } from '../../../cryptoUtils';
+import { createSubClinicAction } from '../../../redux/actions';
+import { useDispatch } from 'react-redux';
 
-const EmailToDoctorModal = ({show, closeModal}) => {
+const EmailToDoctorModal = ({show, closeModal,formData}) => {
+  const dispatch = useDispatch()
 
     const {
         register,
@@ -13,6 +17,16 @@ const EmailToDoctorModal = ({show, closeModal}) => {
     } = useForm();
 
     const onSubmit = () => {
+        const payload = {
+            name: formData?.clinicname,
+            email: formData?.email,
+            phone: formData?.contactPerson,
+            clinicType: formData?.clinicType,
+        }
+        console.log('Form Submitted:', payload);
+        dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+        closeModal(false)
+        reset();
 
     }
 
@@ -38,6 +52,7 @@ const EmailToDoctorModal = ({show, closeModal}) => {
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
+                                        defaultValue={formData?.email}
                                     />
                                     {errors.name && <span className="text-danger">{errors.name.message}</span>}
                                 </Form.Group>

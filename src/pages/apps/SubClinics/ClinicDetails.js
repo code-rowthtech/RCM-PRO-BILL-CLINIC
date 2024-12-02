@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row } from 'react-bootstrap';
-import { useDispatch } from "react-redux";
+import { Button, Col, Form, Row, Table } from 'react-bootstrap';
+import { useDispatch, useSelector } from "react-redux";
 import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
+import { createUpgradeAction, getSubscriptionAction } from "../../../redux/sub clinic/actions";
+import { getSubclinicSubscriptionsAction } from "../../../redux/actions";
+import { FiEdit, FiTrash } from "react-icons/fi";
 
 const ClinicDetails = () => {
-
+  const store = useSelector((state) => state)
+  const subscriptions = [store?.getSubSubscriptionReducer?.data?.subscriptionDetails] || [];
+  console.log(subscriptions, 'subs')
   const dispatch = useDispatch();
+  const [totalAmount,setTotalAmount]= useState()
 
   const {
     register,
@@ -15,19 +21,93 @@ const ClinicDetails = () => {
     reset,
     watch,
   } = useForm();
+  const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))
+
+
+  useEffect(() => {
+    const payload = {
+      userId: clinic_id?._id
+    }
+    dispatch(getSubclinicSubscriptionsAction({ key: encryptMessage(payload) }))
+  }, [getSubclinicSubscriptionsAction])
 
   const onsubmit = (data) => {
     const payload = {
-      ...data,
-
-    }
-    console.log('Form Submitted:', payload);
-    reset(); // Reset form after submission
+      userId: clinic_id?._id,
+      amount: totalAmount,
+      billingContactName: data.billingcontact,
+      billingContactemail: data.billingcontactemail,
+      billingContactPhone: data.billingContactPhone
   }
+    console.log('Form Submitted:', payload);
+    dispatch(createUpgradeAction({ key: encryptMessage(payload) }))
+    reset(); 
+  }
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US');
+  };
+  const calculateDiscountedAmount = (totalAmount, discount) => {
+    return discount === 1 ? totalAmount - (totalAmount * (discount / 100)) : totalAmount;
+  };
+  useEffect(() => {
+    const calculateTotalAmount = () => {
+      let sum = 0;
+      subscriptions.forEach((subscription) => {
+        if (subscription?.totalAmount && subscription?.subscriptionId?.discount) {
+          const discountedAmount = calculateDiscountedAmount(subscription.totalAmount, subscription.subscriptionId.discount);
+          sum += discountedAmount;
+        }
+      });
+      setTotalAmount(sum);
+    };
+
+    calculateTotalAmount();
+  }, [subscriptions]);
   return (
     <>
+
+      <Row>
+
+        <Col>
+          <h5>Current Plan</h5>
+          <Table responsive className="table-centered table-nowrap mb-0">
+            <thead className="text-white">
+              <tr className=''>
+                <th className='text-white'>Subscription Name</th>
+                <th className='text-white'>Start Date</th>
+                <th className='text-white'>Renewal Date</th>
+                <th className="text-white">Clinic Count</th>
+                <th className='text-white'>Amount </th>
+
+                <th className='text-white'>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subscriptions && subscriptions?.length > 0 ? (
+                subscriptions?.map((item, index) => (
+
+                  <tr key={index}>
+                    <td>{item?.name}</td>
+                    <td>{formatDate(item?.subscriptionStartDate)}</td> {/* Format Start Date */}
+                    <td>{formatDate(item?.subscriptionRenewalDate)}</td> {/* Format Renewal Date */}
+                    <td className="">{item?.clinicCount}</td>
+                    <td>{item?.totalAmount}</td>
+                    <td>{item?.isActive ? "Active" : "Inactive"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">No subscriptions found</td>
+                </tr>
+              )}
+            </tbody>
+
+
+          </Table>
+        </Col>
+      </Row>
       <Form className="mt-2" onSubmit={handleSubmit(onsubmit)}>
-        <Row>
+        {/* <Row>
           <Col sm={6}>
             <Form.Group className="mb-2">
               <Form.Label className='mb-1'>Subscription Plan</Form.Label>
@@ -136,7 +216,13 @@ const ClinicDetails = () => {
 
             </Row>
           </Col>
-        </Row>
+        </Row> */}
+           <Row>
+        <Col sm={12}>
+          <h5>Upgrade</h5>
+          <p>Amount to be paid: {totalAmount ? totalAmount.toFixed(2) : 'N/A'}</p>
+          </Col>
+      </Row>
         <Row className="mt-2">
           <Col sm={6} className='border-top border-dark border-end'>
             <Row className="mt-2">
@@ -145,14 +231,14 @@ const ClinicDetails = () => {
                 <Form.Group className="mb-2">
                   <Form.Label className='mb-1'>Payment Method</Form.Label>
                   <Form.Select
-                    {...register('paymentmethod', { required: 'Payment Method field is required' })}
+                    // {...register('paymentmethod', { required: 'Payment Method field is required' })}
 
                   >
                     <option>Select Payment Method</option>
                     <option value='1'>Monthly</option>
 
                   </Form.Select>
-                  {errors.paymentmethod && <span className="text-danger">{errors.paymentmethod.message}</span>}
+                  {/* {errors.paymentmethod && <span className="text-danger">{errors.paymentmethod.message}</span>} */}
 
                 </Form.Group>
               </Col>
@@ -161,9 +247,9 @@ const ClinicDetails = () => {
                   <Form.Label className='mb-1'>Billing Address</Form.Label>
                   <Form.Control
                     type='text'
-                    {...register('billingaddress', { required: 'Billing Address field is required' })}
+                    // {...register('billingaddress', { required: 'Billing Address field is required' })}
                     placeholder='Billing Address' />
-                  {errors.billingaddress && <span className="text-danger">{errors.billingaddress.message}</span>}
+                  {/* {errors.billingaddress && <span className="text-danger">{errors.billingaddress.message}</span>} */}
 
                 </Form.Group>
               </Col>
@@ -173,9 +259,9 @@ const ClinicDetails = () => {
                   <Form.Label className='mb-1'>Cardholder Name</Form.Label>
                   <Form.Control
                     type='text'
-                    {...register('cardholdername', { required: 'Cardholder Name field is required' })}
+                    // {...register('cardholdername', { required: 'Cardholder Name field is required' })}
                     placeholder='Cardholder Name' />
-                  {errors.cardholdername && <span className="text-danger">{errors.cardholdername.message}</span>}
+                  {/* {errors.cardholdername && <span className="text-danger">{errors.cardholdername.message}</span>} */}
 
                 </Form.Group>
               </Col>
@@ -184,9 +270,9 @@ const ClinicDetails = () => {
                   <Form.Label className='mb-1'>Credit/Debit Card Number</Form.Label>
                   <Form.Control
                     type='text'
-                    {...register('cardnumber', { required: 'Credit/Debit Card Number field is required' })}
+                    // {...register('cardnumber', { required: 'Credit/Debit Card Number field is required' })}
                     placeholder='Credit/Debit Card Number' />
-                  {errors.cardnumber && <span className="text-danger">{errors.cardnumber.message}</span>}
+                  {/* {errors.cardnumber && <span className="text-danger">{errors.cardnumber.message}</span>} */}
 
                 </Form.Group>
               </Col>
@@ -195,9 +281,9 @@ const ClinicDetails = () => {
                   <Form.Label className='mb-1'>CVV(Security Code)</Form.Label>
                   <Form.Control
                     type='text'
-                    {...register('cvvcode', { required: 'CVV(Security Code) field is required' })}
+                    // {...register('cvvcode', { required: 'CVV(Security Code) field is required' })}
                     placeholder='CVV(Security Code)' />
-                  {errors.cvvcode && <span className="text-danger">{errors.cvvcode.message}</span>}
+                  {/* {errors.cvvcode && <span className="text-danger">{errors.cvvcode.message}</span>} */}
 
                 </Form.Group>
               </Col>
@@ -206,9 +292,9 @@ const ClinicDetails = () => {
                   <Form.Label className='mb-1'>Expiration Date</Form.Label>
                   <Form.Control
                     type='date'
-                    {...register('expirationdate', { required: 'Expiration Date field is required' })}
+                    // {...register('expirationdate', { required: 'Expiration Date field is required' })}
                     placeholder='Expiration Date' />
-                  {errors.expirationdate && <span className="text-danger">{errors.expirationdate.message}</span>}
+                  {/* {errors.expirationdate && <span className="text-danger">{errors.expirationdate.message}</span>} */}
 
                 </Form.Group>
               </Col>

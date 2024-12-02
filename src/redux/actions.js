@@ -3,6 +3,7 @@ export * from './layout/actions';
 export * from './permissions/actions';
 export * from './roles/actions';
 export * from './clinics/actions';
+export * from './sub clinic/actions'
 export * from './dashboard/actions';
 export * from './doctors/actions';
 export * from './patients/actions';

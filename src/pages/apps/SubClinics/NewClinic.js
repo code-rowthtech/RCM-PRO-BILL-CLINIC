@@ -10,7 +10,7 @@ import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
-import { createSubClinicAction, getSubClinicTypeAction } from '../../../redux/sub clinic/actions';
+import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
 import { getCitiesAction, getClinicTypeAction, getStatesByCountryAction } from '../../../redux/actions';
 
@@ -26,7 +26,8 @@ const NewClinic = () => {
     const [logoName, setLogoName] = useState('');
     const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
-    // const [focused, setFocused] = useState(false);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
 
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
@@ -45,28 +46,33 @@ const NewClinic = () => {
     const store = useSelector((state) => state)
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
-    const cities = store?.getCitiesReducer?.data?.cities || [];
-    console.log("Cities in Store:", statesData);
+    const citiesData = [store?.getSubClinicCityReducer];
+    console.log("Cities in Store:", citiesData);
     const statecode = statesData?.states?.state_code
-    console.log(statecode,'sttecode')
+    console.log(statecode, 'sttecode')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
 
     console.log(clinectypes, 'clinic')
     console.log(statesData, 'state')
 
-    console.log(cities, 'city')
     const [updatePage, setUpdatePage] = useState(false);
 
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [focused, setFocused] = useState(false);
     const [latitude, setLatitude] = useState('');
-    const [street, setStreet] = useState('');
-
     const [longitude, setLongitude] = useState('');
+    const [street, setStreet] = useState('');
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
+    console.log(selectedCity, 'getcity')
     useEffect(() => {
-        // Auto close dropdown when latitude and longitude are set
+        // Dispatch the action to fetch states and cities initially
+        dispatch(getStatesByCountryAction());
+        dispatch(getSubClinicCitiesAction())
+    }, [dispatch]);
+
+    useEffect(() => {
+        // Auto-close dropdown when latitude and longitude are set
         if (latitude && longitude) {
             setFocused(false);
         }
@@ -81,9 +87,7 @@ const NewClinic = () => {
         }
 
         const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-            addressToSearch
-        )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(addressToSearch)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
         try {
             const response = await fetch(url);
@@ -91,71 +95,69 @@ const NewClinic = () => {
                 throw new Error(`Error fetching data: ${response.status}`);
             }
             const data = await response.json();
-            console.log(data, 'address data')
             setSearchedLocations(data.results || []);
         } catch (error) {
             console.error('Failed to fetch geocode data:', error);
         }
     };
 
+
     const handleAddressSelection = (location) => {
+        console.log(location, 'getloc')
         setValue('address', location.formatted);
         setValue('zip', location.components.postcode || '');
         setValue('stateName', location.components.state || '');
         setValue('city', location.components.city || location.components.town || '');
-        setValue('street', location.components.road || location.components.street || ''); // Set the street
+        setValue('street', location.components.road || location.components.street || '');
 
         setLatitude(location.geometry.lat);
         setLongitude(location.geometry.lng);
-
         setStreet(location.components.road || location.components.street || '');
+        dispatch(getSubClinicCitiesAction({ state_code: location?.components?.state_code, name: '', limit: 25, skip: '' }));
 
+        // Update the selected state and city based on the address selection
         const stateCode = statesData?.states?.find(
             (state) => state.name === location.components.state
         )?.state_code;
 
-        const city = cities?.states?.find(
+        const city = citiesData?.find(
             (city) => city.name === location.components.city
         )?.state_code;
+        setSelectedCity(location.components.city)
 
         if (stateCode) {
             setStateToSelect(stateCode);
-            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
+            dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
         }
+
         if (city) {
             setSelectedCity(city);
-            dispatch(getCitiesAction({ state_code: city, name: '', limit: 25, skip: '' }));
+            dispatch(getSubClinicCitiesAction({ state_code: city, name: '', limit: 25, skip: '' }));
         }
-        setSelectedCity(location.components.city || location.components.town || '');
+
         setFocused(false); // Close dropdown
     };
 
 
     useEffect(() => {
         if (stateToSelect) {
-            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+            dispatch(getSubClinicCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
         }
-    }, [stateToSelect])
+    }, [stateToSelect]);
+
 
     const handleStateSelection = (e) => {
         const stateCode = e.target.value;
         if (stateCode) {
             setStateToSelect(stateCode);
-            console.log(stateCode,'code')
-            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: 1 }));
+            dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
         }
     };
 
-
     const handleCitySelection = (e) => {
-        const value = e.target.value;
-        if (value) {
-            try {
-                const citySelected = JSON.parse(value);
-                setSelectedCity(citySelected);
-            } catch (error) {
-
-            }
+        const city = JSON.parse(e.target.value);
+        if (city) {
+            setSelectedCity(city);
         }
     };
 
@@ -168,10 +170,11 @@ const NewClinic = () => {
     }, [stateGeoLocation])
 
     useEffect(() => {
+        // Fetch cities based on selected state
         if (stateToSelect) {
-            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+            dispatch(getSubClinicCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
         }
-    }, [stateToSelect])
+    }, [stateToSelect, dispatch]);
     // const response = store?.getDoctorsRolesReducer?.data?.result?._id
 
     const {
@@ -192,6 +195,7 @@ const NewClinic = () => {
 
     const closeModal = () => {
         setShow(false);
+        setFormData('')
     };
     const closepassModal = () => {
         setPassShow(false);
@@ -335,7 +339,26 @@ const NewClinic = () => {
     const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
 
     console.log(clinic_id, 'id')
+    const [formData, setFormData] = useState({
+        clinicname: '',
+        clinicType: '',
+        email: '',
+        contactPerson: '',
+    });
+    const formDataChange = (field, value) => {
+        const updatedFormData = { ...formData, [field]: value.trim() }; // Trim the value to remove extra spaces
+        setFormData(updatedFormData);
 
+        // Check if all fields are filled
+        const areAllFieldsFilled =
+            updatedFormData.clinicname &&
+            updatedFormData.clinicType &&
+            updatedFormData.email &&
+            updatedFormData.contactPerson;
+
+        // Enable or disable the button
+        setIsButtonDisabled(!areAllFieldsFilled);
+    };
     const submitData = (data) => {
 
         const payload = {
@@ -371,6 +394,11 @@ const NewClinic = () => {
         }
         console.log('Form Submitted:', payload);
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+        if (activeTab === "departmentDetails") {
+            setActiveTab('departmentDetails'); // Change to the next tab
+        } else {
+            // Logic for other tabs (if needed)
+        }
         reset(); // Reset form after submission
     };
     const handleFileUpload = (index, file) => {
@@ -445,7 +473,7 @@ const NewClinic = () => {
                                 </div>
                                 <div className='d-flex gap-2'>
                                     {btnShow && <>
-                                        <Button onClick={() => setShow(true)}>Email to Sub Clinic</Button>
+                                        <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>Email to Sub Clinic</Button>
                                         <Button onClick={handleNewDoctor}>Back</Button>
                                     </>}
                                 </div>
@@ -460,6 +488,8 @@ const NewClinic = () => {
                                                 <Form.Control
                                                     type="text"
                                                     {...register('clinicname', { required: 'Clinic Name is required' })}
+                                                    onChange={(e) => formDataChange('clinicname', e.target.value)}
+                                                    value={formData.clinicname}
                                                     placeholder="Clinic name" />
                                                 {errors.clinicname && <p className="text-danger">{errors.clinicname.message}</p>}
 
@@ -468,7 +498,9 @@ const NewClinic = () => {
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
                                                 <Form.Label className='mb-1'>Clinic type</Form.Label>
-                                                <Form.Select {...register('clinicType', { required: 'Clinic Type is required' })}>
+                                                <Form.Select {...register('clinicType', { required: 'Clinic Type is required' })}
+                                                    value={formData.clinicType} onChange={(e) => formDataChange('clinicType', e.target.value)}
+                                                >
                                                     <option>Select Clinic type</option>
                                                     {clinectypes?.map((data) => (
                                                         <option key={data?._id} value={data?.name}>{data?.name}</option>
@@ -480,17 +512,14 @@ const NewClinic = () => {
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Email</Form.Label>
+                                                <Form.Label className="mb-1">Email</Form.Label>
                                                 <Form.Control
                                                     type="email"
-                                                    {...register('email', {
-                                                        required: 'Email is required',
-                                                        pattern: {
-                                                            value: /^\S+@\S+$/i,
-                                                            message: 'Invalid email address'
-                                                        }
-                                                    })}
-                                                    placeholder="Email" />
+                                                    placeholder="Email"
+                                                    value={formData.email}
+                                                    {...register('email', { required: 'Email is required' })}
+                                                    onChange={(e) => formDataChange('email', e.target.value)}
+                                                />
                                                 {errors.email && <p className="text-danger">{errors.email.message}</p>}
 
                                             </Form.Group>
@@ -508,21 +537,22 @@ const NewClinic = () => {
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2 position-relative">
-                                                <Form.Label className='mb-1'>Contact Person</Form.Label>
+                                                <Form.Label className="mb-1">Contact Person</Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="+1 1234-234-234"
+                                                    value={formData.contactPerson}
+                                                    {...register('contactPerson', { required: 'contactPerson is required' })}
+                                                    onChange={(e) => formDataChange('contactPerson', e.target.value)}
                                                     style={{ paddingLeft: '5%' }}
-                                                    {...register('contactPerson', { required: 'Contact Person is required' })}
                                                 />
                                                 <img
                                                     src={us}
                                                     alt="country code flag"
                                                     style={{ top: '60%', left: '1%' }}
-                                                    className='position-absolute'
+                                                    className="position-absolute"
                                                     width={20}
                                                 />
-                                                {errors.contactPerson && <p className="text-danger">{errors.contactPerson.message}</p>}
                                             </Form.Group>
                                         </Col>
                                         <Col sm={6}>
@@ -743,6 +773,7 @@ const NewClinic = () => {
                                                 <Col sm={12} className="mb-2">
                                                     <span className="text-black fw-semibold form-label">Address Details</span>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
                                                         <Form.Label className="mb-1">Address</Form.Label>
@@ -787,6 +818,7 @@ const NewClinic = () => {
                                                         </div>
                                                     </Form.Group>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Row>
                                                         <Col sm={6}>
@@ -795,7 +827,7 @@ const NewClinic = () => {
                                                                 <Form.Select
                                                                     {...register('stateName')}
                                                                     value={stateToSelect}
-                                                                    onChange={(e) => handleStateSelection(e)}
+                                                                    onChange={handleStateSelection}
                                                                 >
                                                                     <option value="">Select State</option>
                                                                     {statesData?.states?.map((data) => (
@@ -806,16 +838,17 @@ const NewClinic = () => {
                                                                 </Form.Select>
                                                             </Form.Group>
                                                         </Col>
+
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label>City</Form.Label>
                                                                 <Form.Select
                                                                     {...register('city')}
                                                                     value={selectedCity}
-                                                                    onChange={(e) => handleCitySelection(e)}
+                                                                    onChange={handleCitySelection}
                                                                 >
                                                                     <option value="">Select City</option>
-                                                                    {cities?.map((data) => (
+                                                                    {citiesData?.map((data) => (
                                                                         <option
                                                                             key={data?._id}
                                                                             value={JSON.stringify({
@@ -833,6 +866,7 @@ const NewClinic = () => {
                                                         </Col>
                                                     </Row>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Row>
                                                         <Col sm={6}>
@@ -841,6 +875,7 @@ const NewClinic = () => {
                                                                 <Form.Control type="text" value={latitude} placeholder="Latitude" />
                                                             </Form.Group>
                                                         </Col>
+
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">Longitude</Form.Label>
@@ -849,6 +884,7 @@ const NewClinic = () => {
                                                         </Col>
                                                     </Row>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Row>
                                                         <Col sm={6}>
@@ -857,6 +893,7 @@ const NewClinic = () => {
                                                                 <Form.Control type="text" {...register('zip')} placeholder="Zip" />
                                                             </Form.Group>
                                                         </Col>
+
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label>Street</Form.Label>
@@ -871,9 +908,9 @@ const NewClinic = () => {
                                                         </Col>
                                                     </Row>
                                                 </Col>
-
                                             </Row>
                                         </Col>
+
 
                                         <hr />
                                         <Col sm={12}>
@@ -890,11 +927,11 @@ const NewClinic = () => {
                                                                 <Form.Control
                                                                     type="text"
                                                                     placeholder="Full name"
-                                                                    {...register('fullName', { required: 'Full Name is required' })}
+                                                                // {...register('fullName', { required: 'Full Name is required' })}
                                                                 />
-                                                                {errors.fullName && (
+                                                                {/* {errors.fullName && (
                                                                     <span className="text-danger">{errors.fullName.message}</span>
-                                                                )}
+                                                                )} */}
                                                             </Form.Group>
                                                         </Col>
                                                         <Col sm={6}>
@@ -971,7 +1008,7 @@ const NewClinic = () => {
                         </div>
                     </Card>
                 </div>
-                <EmailToDoctorModal closeModal={closeModal} show={show} />
+                <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} />
                 <ResetPassword closeModal={closepassModal} show={passShow} />
             </div>
         </>

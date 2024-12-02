@@ -24,7 +24,10 @@ export const getClinicType = '/api/v1/clinic/getClinicTypes';
 // SUB CLINIC
 export const createSubClinic = '/api/v1/clinic/createSubClinics'
 export const getSubClinic = ''
+export const getSubClinicCityByState = '/api/v1/clinic/cities/';
+export const createUpgrade = '/api/v1/clinic/upgradeSubscription'
 export const getSubClinicType = '/api/v1/clinic/getClinicTypes'
+export const getSubscription = '/api/v1/clinic/getSubscription/history'
 
 
 
@@ -53,6 +56,7 @@ export const getAnalytics = '/api/v1/admin/';
 
 // SUBSCRIPTIONS
 export const getSubscriptions = '/api/v1/clinic/getSubscriptionsList';
+export const getSubSubscriptions = '/api/v1/clinic/getSubscription/history'
 export const addSubscriptionPlan='/api/v1/clinic/addSubscriptionPlan';
 
 // SCHEDULE
