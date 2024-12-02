@@ -62,7 +62,6 @@ const SetPassword = (): React$Element<any> => {
     }));
 
     const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
-    console.log(tokenResponse, 'tokenResponse');
     if (tokenResponse) {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
         console.log(verifyResponse, 'decrypted verify');
@@ -76,7 +75,7 @@ const SetPassword = (): React$Element<any> => {
             .matches(
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
                 t('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.')
-            ), // Strong password validation
+            ), 
         confirmPassword: yup
             .string()
             .oneOf([yup.ref('password'), null], t('Passwords must match'))
@@ -94,7 +93,7 @@ const SetPassword = (): React$Element<any> => {
     useEffect(() => {
         if (changeSetPassword) {
             ToastHandle('Password generated successfully', 'success');
-            navigate('/account/login');
+            navigate('/apps/crm/addclinic');
         }
         if (verifyResponse?.status !== 200 && verifyResponse) {
             ToastHandle('The token is not valid, please request new token.', 'danger')

@@ -10,6 +10,7 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
+    console.log(doctorLists, 'id get')
 
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
@@ -20,14 +21,22 @@ const AddHoliday = () => {
         formState: { errors },
     } = useForm();
 
-    const onSubmit = (data) => {
-        const payload = {
-            ...data,
-            clinic_id,
-        };
-        dispatch(createScheduleAction(payload));
-        console.log(payload, "payload");
+   const onSubmit = (data) => {
+    const doctorInfo = JSON.parse(data.doctorInfo);
+
+    const payload = {
+        doctorId: doctorInfo.id,
+        name: doctorInfo.name,
+        clinicId: clinic_id,
+        reason: data.reason,
+        fromDate:data.fromDate,
+        tillDate: data.tillDate,
     };
+
+    dispatch(createScheduleAction(payload));
+    reset();
+    console.log(payload, "payload");
+};
 
     useEffect(() => {
         dispatch(getDoctorsListAction());
@@ -53,19 +62,21 @@ const AddHoliday = () => {
                                             Doctor Name<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Select
-                                            {...register("doctorName", {
-                                                required: "Doctor name is required",
+                                            {...register("doctorInfo", {
+                                                required: "Doctor selection is required",
                                             })}
                                         >
                                             <option value="">Select doctor</option>
                                             {doctorLists &&
-                                                doctorLists.map((data, index) => (
+                                                doctorLists.map((doctor, index) => (
                                                     <option
-                                                        className="text-capitalize"
-                                                        value={data?.userId?.firstName}
                                                         key={index}
+                                                        value={JSON.stringify({
+                                                            id: doctor?.userId?._id,
+                                                            name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
+                                                        })}
                                                     >
-                                                        {data?.userId?.firstName}
+                                                        {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
                                                     </option>
                                                 ))}
                                         </Form.Select>

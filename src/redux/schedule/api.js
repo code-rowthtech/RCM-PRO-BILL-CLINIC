@@ -12,3 +12,8 @@ export function getDoctorsListApi(params: any): any {
     const { data } = params;
     return api.get(URL.getDoctorsList,data);
 }
+
+export function getScheduleApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getSchedule}?flag=${data?.flag}&search=${data?.search}&startDate=${data?.startDate}&endDate=${data?.endDate}` );
+}
