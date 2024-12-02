@@ -62,20 +62,27 @@ const SetPassword = (): React$Element<any> => {
     }));
 
     const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
-    console.log(tokenResponse, 'tokenResponse');
     if (tokenResponse) {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
         console.log(verifyResponse, 'decrypted verify');
     }
-    const schemaResolver = yupResolver(
-        yup.object().shape({
-            password: yup.string().required(t('Please enter Password')),
-            confirmPassword: yup
-                .string()
-                .oneOf([yup.ref('password'), null], t('Passwords must match'))
-                .required(t('Please confirm your Password')),
-        })
-    );
+   const schemaResolver = yupResolver(
+    yup.object().shape({
+        password: yup
+            .string()
+            .required(t('Password is required.'))
+            .min(8, t('Password must be at least 8 characters long.'))
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                t('Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.')
+            ), 
+        confirmPassword: yup
+            .string()
+            .oneOf([yup.ref('password'), null], t('Passwords must match'))
+            .required(t('Password is required.')),
+    })
+);
+
 
     const onSubmit = (formData) => {
         dispatch(setPassword({ token, newPassword: formData.password }));
@@ -86,7 +93,7 @@ const SetPassword = (): React$Element<any> => {
     useEffect(() => {
         if (changeSetPassword) {
             ToastHandle('Password generated successfully', 'success');
-            navigate('/account/login');
+            navigate('/apps/crm/addclinic');
         }
         if (verifyResponse?.status !== 200 && verifyResponse) {
             ToastHandle('The token is not valid, please request new token.', 'danger')
@@ -98,13 +105,22 @@ const SetPassword = (): React$Element<any> => {
             <div className="text-center m-auto">
                 <h4 className="text-dark-50 text-center mt-0 font-weight-bold">{t('Set Password')}</h4>
                 <p className="text-muted mb-4">
-                Hey {verifyResponse?.data?.email}, enter your new password, and we'll update your password and log you in.
+                    Hey enter your new password, and we'll update your password and log you in.
                 </p>
             </div>
 
             {!passwordChange && (
                 <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
-                   
+                    <FormInput
+                        label={t('Email')}
+                        type="email"
+                        name="email"
+                        value={verifyResponse?.data?.email || ''}
+                        disabled
+                        placeholder={t('Your Email')}
+                        containerClass={'mb-3'}
+                    />
+
                     <FormInput
                         label='New Password'
                         type="password"

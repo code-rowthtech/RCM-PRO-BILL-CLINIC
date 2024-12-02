@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Col, Form, Row, Button, Table, Modal } from 'react-bootstrap';
+import { Col, Form, Row, Button, Table, Modal, InputGroup } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
@@ -61,7 +61,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         { name: '', number: '', url: null, fileName: '' }
     ]);
     const [posDetails, setPosDetails] = useState([
-        { name: '', email: '', role: '', contact: '', fileName: '' }
+        { name: '', email: '', role: '',  contact: '', fileName: '' }
     ])
 
     const [stateDetails, setStateDetails] = useState([
@@ -193,7 +193,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             }
         }
     }, [clinicsDataGet, statesData, setValue]);
-    const onSubmit = (data) => {
+    const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
             setError('confirmPassword', {
                 type: 'manual',
@@ -216,11 +216,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
             pos: posDetails,
-            logo: logo?.url.split('?')[0],
+            logo:logo?.url?.split('?')[0],
+            // logo:{
+            //     url:logo?.url?.split('?')[0],
+            //     fileName:logoName,
+            // },
             address: {
                 address1: data?.address,
-                city: selectedCity?._id,
-                state: JSON.parse(selectedState)?._id,
+                city: data?.name,
+                state: selectedState?._id,
                 street: data?.street,
                 zip: data?.zip,
                 latitude: selectedCity?.latitude,
@@ -228,13 +232,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             }
         };
         console.log(newPayload, 'newPayloadnewPayload')
-
-        // Dispatch appropriate action based on whether this is an update or creation
-        if (updatePage) {
-            // dispatch(updateClinicAction({ key: encryptMessage(newPayload) }));
-        } else {
-            dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        }
+        dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
 
 
@@ -338,7 +336,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
         setPosDetails([
             ...posDetails,
-            { name: '', email: '', role: null, contact: '' }
+            { name: '', email: '', role: '', contact: '' }
         ]);
     };
     const handleRemovePOS = (index) => {
@@ -504,18 +502,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
         }
     }, [stateGeoLocation])
+    const [citySearch, setCitySearch] = useState(null);
+    useEffect(() => {
+        if (citySearch) {
+            setValue('city', cities && cities.find((data) => data?.name === citySearch)?._id)
+        }
+    }, [citySearch, cities])
 
     useEffect(() => {
         if (stateToSelect) {
-            console.log('called')
-            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
+            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: citySearch ? citySearch : '', limit: 25, skip: '' }));
         }
-    }, [stateToSelect])
+    }, [stateToSelect, citySearch])
 
     return (
         <>
             {/* <UploadToS3 /> */}
-            <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form onSubmit={handleSubmit(SubmitData)}>
                 <Row>
                     <Col sm={6}>
                         <Form.Group className="mb-2">
@@ -561,15 +564,30 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     <Col sm={6}>
                         <Form.Group className="mb-2 position-relative">
                             <Form.Label className="mb-1">Contact Person</Form.Label>
-                            <Form.Control
-                                type="tel"
-                                style={{ paddingLeft: '5%' }}
-                                value={`+1 ${watch('contact', '').replace(/^\+1\s*/, '')}`} // Ensures `+1` is always present
-                                onChange={(e) =>
-                                    setValue('contact', e.target.value.replace(/^\+1\s*/, '')) // Updates only the number
-                                }
-                                placeholder="+1 1234-234-234"
-                            />
+                            <InputGroup>
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text> 
+                                    <Form.Control
+                                        type="tel"
+                                        {...register('contact', {
+                                            required: 'This field is required',
+                                            pattern: {
+                                                value: /^[0-9]*$/,
+                                                message: 'Contact must be a number'
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Contact must not exceed 10 digits'
+                                            },
+                                            minLength: {
+                                                value: 10,
+                                                message: 'Contact must not be less than 10 digits'
+                                            }
+                                        })}
+                                      
+                                        placeholder="1234-234-234"
+                                        maxLength={10}
+                                    />
+                                </InputGroup>
                             {/* {errors.contact1 && <span className="text-danger">{errors.contact1.message}</span>} */}
                             <img
                                 src={us}
@@ -579,6 +597,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 width={20}
                             />
                         </Form.Group>
+                    
                     </Col>
 
                     <Col sm={6}>
@@ -595,12 +614,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Form.Label>Upload Logo</Form.Label>
                         <div
                             onClick={handleLogoClick}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
+                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
+                                }`}
                         >
-                            {logoName
+                            {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
+                            {typeof logoName === 'string' && logoName
                                 ? logoName.split('/').pop()
                                 : 'Upload Logo'}
-                            <p className="mb-0"><FiDownloadCloud /></p>
+                            <p className="mb-0">
+                                <FiDownloadCloud />
+                            </p>
                         </div>
                         <Form.Control
                             type="file"
@@ -610,8 +633,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             accept=".png, .jpg, .jpeg, .svg"
                             onChange={handleFileChange}
                         />
-                        {/* {errors.logoimage && <span className="text-danger">{errors.logoimage.message}</span>} */}
                     </Col>
+
 
                     <hr />
                     <Col sm={12}>
@@ -834,11 +857,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                console.log(data)
+                                                                console.log(data,'setValue')
                                                                 setValue('zip', data?.components?.postcode)
                                                                 setValue('stateName', data?.components?.state_code)
                                                                 setLatitude(data?.bounds?.southwest?.lat);
                                                                 setLongitude(data?.bounds?.southwest?.lng);
+                                                                setCitySearch(data?.components?.county)
                                                                 setValue('address', data?.formatted)
                                                                 setFocused(false); // Close dropdown after selection
                                                             }}
@@ -922,7 +946,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
-                                                    <option key={data?._id} value={JSON.stringify({ _id: data?._id, name: data?.name, latitude: data?.latitude, longitude: data?.longitude })}>
+                                                    <option key={data?._id} value={data?._id}>
                                                         {data?.name}
                                                     </option>
                                                 ))}

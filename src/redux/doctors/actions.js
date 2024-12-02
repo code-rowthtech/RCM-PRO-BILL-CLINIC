@@ -28,3 +28,8 @@ export const createDoctorDetailAction = (data): LayoutAction => ({
     type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL,
     data
 });
+
+export const getDoctorDetailsAction = (data): AuthAction => ({
+    type: DoctorsActionTypes.GET_DOCTORS_DETAILS,
+    data
+});

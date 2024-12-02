@@ -3,7 +3,7 @@ import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createScheduleApi, getDoctorsListApi } from './api';
+import { createScheduleApi, getDoctorsListApi, getScheduleApi } from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -13,26 +13,27 @@ import { createScheduleApi, getDoctorsListApi } from './api';
 function* createScheduleFunction(data) {
     try {
         yield put({
-            type: ScheduleActionTypes.GET_SCHEDULE_LOADING,
+            type: ScheduleActionTypes.CREATE_SCHEDULE_LOADING,
             payload: {},
         });
         const response = yield call(createScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
-                type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
+                type: ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS,
                 payload: { response },
             });
         } else {
             yield put({
-                type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+                type: ScheduleActionTypes.CREATE_SCHEDULE_ERROR,
                 payload: { ...decryptedData },
             });
         }
     } catch (error) {
+        ToastHandle(error?.message, 'danger');
         yield put({
-            type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+            type: ScheduleActionTypes.CREATE_SCHEDULE_ERROR,
             payload: error,
         });
     }
@@ -47,12 +48,11 @@ function* getDoctorListFunction(data) {
         });
         const response = yield call(getDoctorsListApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'saga of doctor list');
 
         if (response.status === 200) {
             yield put({
                 type: ScheduleActionTypes.GET_DOCTORS_LIST_SUCCESS,
-                payload: { response },
+                payload: { ...decryptedData },
             });
         } else {
             yield put({
@@ -68,18 +68,52 @@ function* getDoctorListFunction(data) {
     }
 }
 
+function* getScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.GET_SCHEDULE_LOADING,
+            payload: {},
+
+        });
+        const response = yield call(getScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData, 'schedule data')
+
+        if (response.status === 200) {
+            yield put({
+                type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
 
 export function* watchSchedule() {
-    yield takeEvery(ScheduleActionTypes.GET_SCHEDULE, createScheduleFunction);
+    yield takeEvery(ScheduleActionTypes.CREATE_SCHEDULE, createScheduleFunction);
 }
 export function* watchGetDoctorsList() {
     yield takeEvery(ScheduleActionTypes.GET_DOCTORS_LIST, getDoctorListFunction);
 }
 
+export function* watchGetSchedule() {
+    yield takeEvery(ScheduleActionTypes.GET_SCHEDULE, getScheduleFunction);
+}
+
 function* scheduleSaga() {
     yield all([
         fork(watchSchedule), 
-        fork(watchGetDoctorsList)
+        fork(watchGetDoctorsList),
+        fork(watchGetSchedule)
     ]);
 }
 export default scheduleSaga;

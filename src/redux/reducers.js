@@ -7,11 +7,11 @@ import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissi
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer } from './roles/reducers';
 import { createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer} from './settings/reducers';
 import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer,getStatesReducer,getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer } from './clinics/reducers';
-import { getDoctorsReducer, getDoctorsRolesReducer,createtDoctorsDetailReducer, createtDoctorsReducer } from './doctors/reducers';
+import { getDoctorsReducer, getDoctorsRolesReducer,createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer } from './patients/reducers';
 import { getSubscriptionsReducer } from './subscriptions/reducers';
-import { createScheduleReducer, getDoctorsListReducer } from './schedule/reducers';
+import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer } from './schedule/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -22,8 +22,8 @@ export default (combineReducers({
     getDoctorsReducer,getClinicTypeReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer,getStatesReducer,getCitiesReducer,
     getAnalyticsReducer,createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer,createSubscriptionPlanReducer,
-    getDoctorsReducer,createtDoctorsDetailReducer,createtDoctorsReducer,
-    createPatientsReducer,updatePatientsReducer,createtDoctorsReducer,getDoctorsListReducer,createScheduleReducer,
+    getDoctorsReducer,createtDoctorsDetailReducer,createtDoctorsReducer,getDoctorDetailsReducer,
+    createPatientsReducer,updatePatientsReducer,createtDoctorsReducer,getDoctorsListReducer,createScheduleReducer,getScheduleReducer,
     getDoctorsRolesReducer,
     getPatientsReducer,
     getSubscriptionsReducer,

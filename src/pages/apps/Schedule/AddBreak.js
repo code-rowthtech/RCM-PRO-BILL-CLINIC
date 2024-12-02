@@ -1,39 +1,45 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Form, Dropdown } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { createScheduleAction } from "../../../redux/schedule/action";
+import { useDispatch, useSelector } from "react-redux";
+import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
 
 const AddBreak = () => {
+    const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [breakDay, setbreakDay] = useState("option1");
     const [selectedDays, setSelectedDays] = useState([]);
-    const [selectedDoctor, setSelectedDoctor] = useState("");
     const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const doctorLists = store?.getDoctorsListReducer?.data?.result;
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const {
         register,
         handleSubmit,
+        setValue,
+        reset,
+        watch,
         formState: { errors },
     } = useForm();
 
-    const clinicId = "673c2af0bb78fd313f4a752c";
-    const doctorId = "6737353f66b5859c2182146a";
+    const breakDay = watch("breakDay", "Every Day"); // Watch breakDay and set default value
 
-    // Handle Radio Option Change
+    useEffect(() => {
+        dispatch(getDoctorsListAction());
+    }, [dispatch]);
+
     const handleRadioChange = (e) => {
-        setbreakDay(e.target.value);
-        if (e.target.value === "option1") {
-            setSelectedDays(daysOfWeek); // Automatically select all days for "Every Day"
+        const value = e.target.value;
+        setValue("breakDay", value);
+        if (value === "Every Day") {
+            setSelectedDays(daysOfWeek);
         } else {
-            setSelectedDays([]); // Clear selection for "Single Day"
+            setSelectedDays([]);
         }
     };
 
-    // Toggle Single Day Selection
     const toggleDaySelection = (day) => {
         setSelectedDays((prevSelectedDays) =>
             prevSelectedDays.includes(day)
@@ -42,18 +48,20 @@ const AddBreak = () => {
         );
     };
 
-    // Submit Handler
     const onSubmit = (data) => {
+        const doctorInfo = JSON.parse(data.doctorInfo);
         const payload = {
-            ...data,
-            clinicId,
-            doctorId,
-            breakDay,
-            // selectedDays,
+            doctorId: doctorInfo.id,
+            name: doctorInfo.name,
+            clinicId: clinic_id,
+            breakDay: data.breakDay === "Every Day" ? "Every Day" : selectedDays.join(", "),
+            breakFrom: data.breakFrom,
+            breakTo: data.breakTo,
         };
 
         dispatch(createScheduleAction(payload));
-        console.log("Payload Submitted:", payload);
+        reset();
+        console.log(payload, "payload");
     };
 
     return (
@@ -64,29 +72,32 @@ const AddBreak = () => {
                         <p style={{ fontWeight: 600 }}>ADD BREAK</p>
                         <Button onClick={() => navigate(-1)}>Back</Button>
                     </div>
-
                     <div className="px-2">
-                        {/* Form Section */}
                         <Form onSubmit={handleSubmit(onSubmit)}>
                             <div className="row pb-4 mt-3">
-                                {/* Left Column */}
                                 <div className="col-6">
-                                <Form.Group className="mb-3">
-                                        <Form.Label className="mb-1">
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>
                                             Doctor Name<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Select
-                                            {...register("doctorName", {
-                                                required: "Doctor name is required",
-                                            })}
+                                            {...register("doctorInfo", { required: "Doctor selection is required" })}
                                         >
                                             <option value="">Select doctor</option>
-                                            <option value="Doctor A">Doctor A</option>
-                                            <option value="Doctor B">Doctor B</option>
-                                            <option value="Doctor C">Doctor C</option>
+                                            {doctorLists?.map((doctor, index) => (
+                                                <option
+                                                    key={index}
+                                                    value={JSON.stringify({
+                                                        id: doctor?.userId?._id,
+                                                        name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
+                                                    })}
+                                                >
+                                                    {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
+                                                </option>
+                                            ))}
                                         </Form.Select>
-                                        {errors.doctorName && (
-                                            <small className="text-danger">{errors.doctorName.message}</small>
+                                        {errors.doctorInfo && (
+                                            <span className="text-danger">{errors.doctorInfo.message}</span>
                                         )}
                                     </Form.Group>
 
@@ -98,36 +109,34 @@ const AddBreak = () => {
                                             type="time"
                                             {...register("breakFrom", { required: "Please select a start time" })}
                                         />
-                                        {errors.breakFrom && <p className="text-danger">{errors.breakFrom.message}</p>}
+                                        {errors.breakFrom && (
+                                            <p className="text-danger">{errors.breakFrom.message}</p>
+                                        )}
                                     </Form.Group>
                                 </div>
 
-                                {/* Right Column */}
                                 <div className="col-6">
                                     <Form.Group className="mb-3 mt-4 pb-1">
                                         <div className="d-flex gap-5">
                                             <Form.Check
                                                 type="radio"
-                                                id="option1"
                                                 label="Every Day"
-                                                name="scheduleType"
                                                 value="Every Day"
-                                                checked={breakDay === "Every Day"}
+                                                {...register("breakDay", { required: "Please select a break type" })}
                                                 onChange={handleRadioChange}
+                                                checked={breakDay === "Every Day"}
                                             />
                                             <Form.Check
                                                 type="radio"
-                                                id="option2"
                                                 label="Single Day"
-                                                name="scheduleType"
                                                 value="Single Day"
-                                                checked={breakDay === "Single Day"}
+                                                {...register("breakDay")}
                                                 onChange={handleRadioChange}
+                                                checked={breakDay === "Single Day"}
                                             />
                                         </div>
                                     </Form.Group>
 
-                                    {/* Dropdown for Single Day */}
                                     {breakDay === "Single Day" && (
                                         <Form.Group className="mb-3">
                                             <Form.Label>
@@ -136,10 +145,9 @@ const AddBreak = () => {
                                             <Dropdown>
                                                 <Dropdown.Toggle variant="outline-primary">
                                                     {selectedDays.length > 0
-                                                        ? `Selected Days: ${selectedDays.join(", ")}`
+                                                        ? selectedDays.join(", ")
                                                         : "Select Days"}
                                                 </Dropdown.Toggle>
-
                                                 <Dropdown.Menu>
                                                     {daysOfWeek.map((day) => (
                                                         <Dropdown.Item key={day}>
@@ -164,14 +172,15 @@ const AddBreak = () => {
                                             type="time"
                                             {...register("breakTo", { required: "Please select an end time" })}
                                         />
-                                        {errors.breakTo && <p className="text-danger">{errors.breakTo.message}</p>}
+                                        {errors.breakTo && (
+                                            <p className="text-danger">{errors.breakTo.message}</p>
+                                        )}
                                     </Form.Group>
                                 </div>
                             </div>
 
-                            {/* Buttons */}
-                            <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="secondary" type="button" onClick={() => navigate(-1)}>
+                            <div className="d-flex justify-content-end gap-2">
+                                <Button variant="secondary" onClick={() => navigate(-1)}>
                                     Cancel
                                 </Button>
                                 <Button variant="primary" type="submit">
