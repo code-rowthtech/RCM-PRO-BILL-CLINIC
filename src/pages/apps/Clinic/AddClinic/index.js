@@ -4,7 +4,7 @@ import PageTitle from '../../../../components/PageTitle';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getRolesAction } from '../../../../redux/actions';
-import { stateEmptydAction } from '../../../../redux/clinics/actions';
+import { getClinicTypeAction, stateEmptydAction } from '../../../../redux/clinics/actions';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import ClinicForm from './clinicForm';
 import BillingForm from './billing';
@@ -23,9 +23,9 @@ const Index = () => {
 
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     dispatch(getRolesAction({ limit: '', skip: '', search: '' }));
-    // }, [dispatch]);
+    useEffect(() => {
+        dispatch(getClinicTypeAction())
+    }, [dispatch]);
 
     const handleActiveTab = (data) => {
         setActiveTab(data);

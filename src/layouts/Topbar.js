@@ -56,7 +56,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/doctors/list': 'Doctors',
         '/apps/clinics/list': 'Sub Clinic',
         '/apps/clinics/new-clinic': 'New Sub Clinic',
-        '/apps/doctors/new-doctor': 'New Doctors',
+        '/apps/doctors/new-doctor': 'Doctor',
         '/apps/patients/list': 'Patients',
         '/apps/patients/new-patient': 'New Patients',
         '/apps/role-management/list': 'Role Management',

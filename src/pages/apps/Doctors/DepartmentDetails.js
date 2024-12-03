@@ -13,7 +13,7 @@ const DepartmentDetails = ({ docId }) => {
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-
+  console.log(doctorDetails,'123456789876543')
   const {
     register,
     handleSubmit,
@@ -30,12 +30,43 @@ const DepartmentDetails = ({ docId }) => {
   const onsubmit = (data) => {
     const payload = {
       ...(updateId ? { id: updateId } : {}), // Conditionally add `id` if `updateId` exists
-      ...data,
+      TIN_SSN: data?.TIN_SSN,
+      NPI: data?.NPI,
+      NPIUsername: data?.NPIUsername,
+      NPIPassword: data?.NPIPassword,
+      CAQH_ID: data?.CAQH_ID,
+      CAQHUsername: data?.CAQHUsername,
+      CAQHPassword: data?.CAQHPassword,
+      medicarePTAN: data?.medicarePTAN,
+      medicaidID: data?.medicaidID,
+      Medicare_SPOT_Logins: data?.Medicare_SPOT_Logins,
+      Medicare_PECOS_Logins: data?.Medicare_PECOS_Logins,
+      DEA_IssueDate: data?.DEA_IssueDate,
+      DEA: data?.DEA,
+      CLIA: data?.CLIA,
+      LicensingInformation: [
+        {
+          stateLicense: data?.stateLicense,
+          stateLicenseProvider: data?.stateLicenseProvider,
+          stateLicenseObtained: data?.stateLicenseObtained,
+          uploadedDocument: data?.uploadedDocument,
+          stateLicenseIssueDate: data?.stateLicenseIssueDate,
+          licenseExpirationDate: data?.licenseExpirationDate,
+        }
+      ],
+      AccreditationDetails: [
+        {
+          documentName: data?.documentName,
+          documentNumber: data?.documentNumber,
+          uploadedDocument: data?.uploadedDocument,
+
+        }
+      ],
       clinicId: id,
       userId: docId,
       departmentId: data?.department,
     }
-    console.log('Form Submitted:', payload);
+    // console.log('Form Submitted:', payload);
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
 
@@ -51,23 +82,25 @@ const DepartmentDetails = ({ docId }) => {
       setValue('department', doctorDetails?.departmentId?._id)
       setValue('Medicare_SPOT_Logins', doctorDetails?.Medicare_SPOT_Logins)
       setValue('Medicare_PECOS_Logins', doctorDetails?.Medicare_PECOS_Logins)
+      setValue('stateLicense', doctorDetails?.LicensingInformation?.[0]?.stateLicense)
+      setValue('stateLicenseProvider', doctorDetails?.LicensingInformation?.[0]?.stateLicenseProvider)
+      setValue('stateLicenseObtained', doctorDetails?.LicensingInformation?.[0]?.stateLicenseObtained)
       setValue('DEA', doctorDetails?.DEA)
       setValue('CLIA', doctorDetails?.CLIA)
 
-      // if (data?.joiningDate) {
-      //     const formattedJoiningDate = new Date(data.joiningDate)
-      //         .toISOString()
-      //         .split('T')[0]; // Format as YYYY-MM-DD
-      //     setValue('joiningDate', formattedJoiningDate);
-      // }
-
-      // setValue('designation', data?.designation)
-      // setValue('role', data?.role?._id)
       const formattedDEAIssueDate = doctorDetails?.DEA_IssueDate
         ? new Date(doctorDetails?.DEA_IssueDate).toISOString().split('T')[0]
         : '';
+      const formattedStateLicenseIssueDate = doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate
+        ? new Date(doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate).toISOString().split('T')[0]
+        : '';
+      const formattedLicenseExpirationDate = doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate
+        ? new Date(doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate).toISOString().split('T')[0]
+        : '';
 
       setValue('DEA_IssueDate', formattedDEAIssueDate);
+      setValue('stateLicenseIssueDate', formattedStateLicenseIssueDate);
+      setValue('licenseExpirationDate', formattedLicenseExpirationDate);
     }
   }, [doctorDetails, setValue])
 
