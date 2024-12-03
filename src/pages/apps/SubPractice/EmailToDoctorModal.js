@@ -14,6 +14,7 @@ const EmailToDoctorModal = ({show, closeModal,formData}) => {
         handleSubmit,
         formState: { errors },
         reset,
+        setValue
     } = useForm();
 
     const onSubmit = () => {
@@ -26,7 +27,9 @@ const EmailToDoctorModal = ({show, closeModal,formData}) => {
         console.log('Form Submitted:', payload);
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
         closeModal(false)
+        setValue('')
         reset();
+        formData('')
 
     }
 

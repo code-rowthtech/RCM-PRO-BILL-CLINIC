@@ -7,7 +7,7 @@ import { FiFilter } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction } from '../../../redux/actions';
 
-const Clinic = () => {
+const Practice = () => {
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
     const [status, setStatus] = useState(true);
@@ -138,8 +138,8 @@ const Clinic = () => {
                                             <Button className="custom-buttons ">
                                                 <FiFileText className='fs-4' />
                                             </Button> */}
-                                            <Button as={Link} to='/apps/clinics/new-clinic' className="custom-buttons">
-                                                New Sub Clinic
+                                            <Button as={Link} to='/apps/Practice/new-practice' className="custom-buttons">
+                                                New Sub Practice
                                             </Button>
                                         </Col>
                                     </Row>
@@ -155,9 +155,9 @@ const Clinic = () => {
                                         <thead className="text-white">
                                             <tr className=''>
                                                 <th className='text-white'>S.No.</th>
-                                                <th className='text-white'>CLINIC NAME</th>
+                                                <th className='text-white'>PRACTICE NAME</th>
                                                 <th className='text-white'>LOCATION</th>
-                                                <th className='text-white'>CLINIC TYPE</th>
+                                                <th className='text-white'>PRACTICE TYPE</th>
                                                 <th className='text-white'>END DATE</th>
                                                 <th className='text-white'>COUNTDOWN</th>
                                                 <th className='text-white'>CONTRACT</th>
@@ -228,4 +228,4 @@ const Clinic = () => {
     );
 }
 
-export default Clinic;
+export default Practice;

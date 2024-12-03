@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row, Table } from 'react-bootstrap';
+import { Button, Col, Form, Row, Spinner, Table } from 'react-bootstrap';
 import { useDispatch, useSelector } from "react-redux";
 import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
@@ -7,12 +7,14 @@ import { createUpgradeAction, getSubscriptionAction } from "../../../redux/sub c
 import { getSubclinicSubscriptionsAction } from "../../../redux/actions";
 import { FiEdit, FiTrash } from "react-icons/fi";
 
-const ClinicDetails = () => {
+const PracticeDetails = () => {
   const store = useSelector((state) => state)
   const subscriptions = [store?.getSubSubscriptionReducer?.data?.subscriptionDetails] || [];
+  const createLoading = store?.createUpgradeReducer?.loading
+
   console.log(subscriptions, 'subs')
   const dispatch = useDispatch();
-  const [totalAmount,setTotalAmount]= useState()
+  const [totalAmount, setTotalAmount] = useState()
 
   const {
     register,
@@ -38,10 +40,10 @@ const ClinicDetails = () => {
       billingContactName: data.billingcontact,
       billingContactemail: data.billingcontactemail,
       billingContactPhone: data.billingContactPhone
-  }
+    }
     console.log('Form Submitted:', payload);
     dispatch(createUpgradeAction({ key: encryptMessage(payload) }))
-    reset(); 
+    reset();
   }
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US');
@@ -217,12 +219,12 @@ const ClinicDetails = () => {
             </Row>
           </Col>
         </Row> */}
-           <Row>
-        <Col sm={12}>
-          <h5>Upgrade</h5>
-          <p>Amount to be paid: {totalAmount ? totalAmount.toFixed(2) : 'N/A'}</p>
+        <Row>
+          <Col sm={12}>
+            <h5>Upgrade</h5>
+            <p>Amount to be paid: {totalAmount ? totalAmount.toFixed(2) : 'N/A'}</p>
           </Col>
-      </Row>
+        </Row>
         <Row className="mt-2">
           <Col sm={6} className='border-top border-dark border-end'>
             <Row className="mt-2">
@@ -231,7 +233,7 @@ const ClinicDetails = () => {
                 <Form.Group className="mb-2">
                   <Form.Label className='mb-1'>Payment Method</Form.Label>
                   <Form.Select
-                    // {...register('paymentmethod', { required: 'Payment Method field is required' })}
+                  // {...register('paymentmethod', { required: 'Payment Method field is required' })}
 
                   >
                     <option>Select Payment Method</option>
@@ -341,9 +343,17 @@ const ClinicDetails = () => {
         </Row>
         <Row className='mt-2'>
           <Col sm={12} className='text-end'>
-            <Button type='submit' className='custom-button' >
-
-              Generate Contract
+            <Button
+              variant="primary"
+              type="submit"
+              className='custom-buttons'
+              disabled={createLoading}  // Disable button when loading
+            >
+              {createLoading ? (
+                <Spinner animation="border" size="sm" />  // Show spinner when loading
+              ) : (
+                'Next'
+              )}
             </Button>
           </Col>
         </Row>
@@ -353,4 +363,4 @@ const ClinicDetails = () => {
   );
 };
 
-export default ClinicDetails;
+export default PracticeDetails;

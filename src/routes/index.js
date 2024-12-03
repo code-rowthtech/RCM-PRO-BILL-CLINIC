@@ -65,9 +65,9 @@ const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
 const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'));
 
 
-const NewClinic = React.lazy(() => import('../pages/apps/SubClinics/NewClinic'));
-const Clinic = React.lazy(() => import('../pages/apps/SubClinics/index'));
-const ClinincDetails = React.lazy(() => import('../pages/apps/SubClinics/ClinicDetails'));
+const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
+const Practice = React.lazy(() => import('../pages/apps/SubPractice/index'));
+const PracticeDetails = React.lazy(() => import('../pages/apps/SubPractice/PracticeDetails'));
 
 
 
@@ -345,19 +345,19 @@ const AllRoutes = () => {
                             ],
                         },
                         {
-                            path: 'clinics',
+                            path: 'Practice',
                             children: [
                                 {
                                     path: 'list',
-                                    element: <LoadComponent component={Clinic} />,
+                                    element: <LoadComponent component={Practice} />,
                                 },
                                 {
-                                    path: 'new-clinic',
-                                    element: <LoadComponent component={NewClinic} />,
+                                    path: 'new-practice',
+                                    element: <LoadComponent component={NewPractice} />,
                                 },
                                 {
-                                    path: 'clinicDetails',
-                                    element: <LoadComponent component={ClinincDetails} />,
+                                    path: 'practiceDetails',
+                                    element: <LoadComponent component={PracticeDetails} />,
                                 },
                                 
                             ],

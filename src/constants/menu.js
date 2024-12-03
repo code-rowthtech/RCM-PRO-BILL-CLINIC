@@ -26,10 +26,10 @@ const MENU_ITEMS = [
     // },
   
     {
-        key: 'clinics',
-        label: 'Sub  Clinic',
-        icon: 'dripicons-medical',
-        url: '/apps/clinics/list',
+        key: 'Practice',
+        label: 'Sub  Practice',
+        icon: 'bi bi-heart-pulse',
+        url: '/apps/Practice/list',
     },
     {
         key: 'doctors',
