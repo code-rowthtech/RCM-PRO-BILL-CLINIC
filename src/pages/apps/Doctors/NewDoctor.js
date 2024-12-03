@@ -531,7 +531,7 @@ const NewDoctor = () => {
                                                                                 top: '100%',
                                                                                 left: 0,
                                                                                 width: '100%',
-                                                                                maxHeight: '150px',
+                                                                                maxHeight: 'auto',
                                                                                 zIndex: 111,
                                                                                 backgroundColor: '#fff',
                                                                                 border: '1px solid #ced4da',

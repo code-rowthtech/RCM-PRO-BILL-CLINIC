@@ -10,9 +10,8 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    console.log(doctorLists, 'id get')
-
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    console.log(clinic_id,'clinic_id')
 
     const {
         register,

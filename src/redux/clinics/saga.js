@@ -35,6 +35,7 @@ function* createClinicsFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error,'danger')
         yield put({
             type: ClinicsActionTypes.CREATE_CLINIC_ERROR,
             payload: error,

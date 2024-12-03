@@ -9,10 +9,11 @@ const DoctorHoliday = () => {
   const store = useSelector((state) => state);
 
   const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
+  console.log(scheduleResponse,' scheduleResponse')
   const isLoading = store?.getScheduleReducer?.loading;
 
   useEffect(() => {
-    dispatch(getScheduleAction({ flag: "Schedule" }));
+    dispatch(getScheduleAction({ flag: "Holiday" }));
   }, [dispatch]);
 
   return (
@@ -44,11 +45,11 @@ const DoctorHoliday = () => {
             scheduleResponse.map((holiday, index) => (
               <tr key={holiday.id || index}>
                 <td>{index + 1}</td>
-                <td>{holiday.doctorName}</td>
+                <td>{holiday.name}</td>
                 <td>{holiday.reason}</td>
                 <td>
                   <span className="px-2 py-1 text-white bg-secondary rounded-2">
-                    {new Date(holiday.date).toLocaleDateString()}
+                    {new Date(holiday.fromDate).toLocaleDateString()}
                   </span>
                 </td>
                 <td>
