@@ -7,4 +7,9 @@ export function getSubscriptionsApi(params: any): any {
     const { data } = params;
     return api.get(URL.getSubscriptions, data);
 }
+export function getSubSubscriptionsApi(params: any): any {
+    const { data } = params;
+    console.log({data})
+    return api.create(`${URL.getSubSubscriptions }`, data);
+}
 

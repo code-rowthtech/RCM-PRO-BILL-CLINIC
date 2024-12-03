@@ -25,7 +25,8 @@ export const getStatesByCountryAction = (data): AuthAction => ({
 
 export const getCitiesAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_CITIES,
-    data
+    data,
+  
 });
 
 export const updateClinicAction = (data): AuthAction => ({

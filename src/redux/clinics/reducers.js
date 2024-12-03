@@ -16,9 +16,11 @@ const GET_STATES_INITIAL_STATE = {
 }
 
 const GET_CITIES_INITIAL_STATE = {
-    data: [],
-    loading: false
-}
+    data: { cities: [] }, // Make data an object
+    loading: false,
+};
+
+
 
 const GET_CLINIC_TYPE_INITIAL_STATE = {
     data: [],
@@ -182,32 +184,38 @@ export const getStatesReducer = (state = GET_STATES_INITIAL_STATE, action) => {
         default: return state
     }
 }
-
 export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     switch (action.type) {
         case ClinicsActionTypes.GET_CITIES_LOADING:
             return {
-                data: state.data,
-                loading: true
-            }
+                ...state, // Keep the existing state
+                loading: true, // Indicate loading is in progress
+            };
+
         case ClinicsActionTypes.GET_CITIES_SUCCESS:
             return {
-                data: action.payload,
-                loading: false
-            }
+                data: {
+                    ...state.data, // Retain existing state data if needed
+                    cities: action.payload.cities || [], // Update cities with API response
+                },
+                loading: false,
+            };
+
         case ClinicsActionTypes.GET_CITIES_ERROR:
             return {
-                data: action.payload,
-                loading: false
-            }
+                ...state,
+                loading: false, // Set loading to false
+                error: action.payload, // Optionally store the error
+            };
+
         case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
-        default: return state
+            return GET_CITIES_INITIAL_STATE; // Reset state to the initial structure
+
+        default:
+            return state; // Return unchanged state for unknown actions
     }
-}
+};
+
 
 export const getClinicTypeReducer = (state = GET_CLINIC_TYPE_INITIAL_STATE, action) => {
     switch (action.type) {

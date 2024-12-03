@@ -219,8 +219,9 @@ function* getCitiesFunction(data) {
             type: ClinicsActionTypes.GET_CITIES_LOADING,
             payload: {},
         });
-        const response = yield call(getCityByStateApi, data);
+        const response = yield call(getCityByStateApi , data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'decryptedData')
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_SUCCESS,

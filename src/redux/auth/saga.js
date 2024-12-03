@@ -27,6 +27,7 @@ function* login({ payload }) {
             key: encryptMessage(payload)
         }
         const response = yield call(loginApi, encryptedPayload);
+
         const user = JSON.parse(decryptMessage(response?.data?.data));
         const userData = {
             name: user?.name,
@@ -36,6 +37,7 @@ function* login({ payload }) {
             _id: user?.userId,
             clinicId: user?.clinicId
         }
+
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);
         // setAuthorization(user['token']);

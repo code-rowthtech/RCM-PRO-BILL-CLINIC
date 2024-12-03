@@ -50,7 +50,8 @@ const Login = (): React$Element<any> => {
         error: state.Auth.error,
         userLoggedIn: state.Auth.userLoggedIn,
     }));
-    
+  
+    console.log(user,'iddd')
 
     useEffect(() => {
         if (error) {

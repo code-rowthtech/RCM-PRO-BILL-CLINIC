@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,8 @@ import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
+import us from '../../../assets/images/flags/us.jpg'
+import { handleFirstSpace } from '../../../helpers/noSpace';
 
 
 const NewDoctor = () => {
@@ -30,8 +32,11 @@ const NewDoctor = () => {
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const store = useSelector((state) => state);
-    const statesData = store?.getStatesReducer?.data;
+    const [stateId, setStateId] = useState(null);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
+    const statesData = store?.getStatesReducer?.data;
+    // console.log({stateToSelect})
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -71,14 +76,12 @@ const NewDoctor = () => {
     const cities = store?.getCitiesReducer?.data?.cities;
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-    console.log(doctorDetails, 'doctorDetails')
+    console.log(doctorDetails, 'doctorDetailsdoctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     // console.log(store?.createtDoctorsReducer?.data, '12345678')
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id
     // console.log(doctorRoleId, 'newDoctorId')
-    // const doctorRoleId=doctorRole&&doctorRole.find((data=>data?.name==='doctor')?._id)
-    // console.log(doctorRoleId, 'id')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     useEffect(() => {
@@ -94,19 +97,21 @@ const NewDoctor = () => {
 
     useEffect(() => {
         if (doctorDetails && updateId) {
+            const cityName = doctorDetails?.userId?.address?.city?.name || ''; // Fallback to an empty string if name is missing
+            setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
             setValue('firstName', doctorDetails?.userId?.firstName)
             setValue('lastName', doctorDetails?.userId?.lastName)
             setValue('email', doctorDetails?.userId?.email)
             setValue('phone', doctorDetails?.userId?.phone)
             setValue('gender', doctorDetails?.userId?.gender)
-            setValue('city', doctorDetails?.userId?.address?.city?.name)
-            setValue('state', doctorDetails?.userId?.address?.state?.name)
+            setValue('city', cityName)
             setValue('zip', doctorDetails?.userId?.address?.zip)
+            setValue('street', doctorDetails?.userId?.address?.street)
             setValue('longitude', doctorDetails?.userId?.address?.longitude)
             setValue('latitude', doctorDetails?.userId?.address?.latitude)
-            // setValue('dateOfBirth', doctorDetails?.userId?.dateOfBirth)
             setValue('profileImage', doctorDetails?.userId?.profileImage)
             setValue('degree', doctorDetails?.userId?.degree)
+            setValue('address1', doctorDetails?.userId?.address?.address1)
 
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
@@ -130,7 +135,7 @@ const NewDoctor = () => {
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
-            console.error('Error during file upload:', error);
+            // console.error('Error during file upload:', error);
         }
     };
     const handleFileChangeDegree = async (e) => {
@@ -140,7 +145,7 @@ const NewDoctor = () => {
             setDegree(url);
             setDegreeName(selectedFile?.name)
         } catch (error) {
-            console.error('Error during file upload:', error);
+            // console.error('Error during file upload:', error);
         }
     };
     // console.log(logo)
@@ -163,17 +168,17 @@ const NewDoctor = () => {
                 address1: data?.address1,
                 street: data?.address2,
                 city: selectedCity || data?.city,
-                state: JSON.parse(selectedState)?._id || stateToSelect?._id,
+                state: JSON.parse(selectedState)?._id || stateToSelect?._id || stateId,
                 zip: data?.zip,
                 latitude: latitude,
                 longitude: longitude
             }
         };
-    console.log(payload,'payload')
+        // console.log(payload,'payload')
         // Encrypt and dispatch the payload
         dispatch(createDoctorAction({ key: encryptMessage(payload) }));
     };
-    
+
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -210,45 +215,60 @@ const NewDoctor = () => {
                 }
             });
     }
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    useEffect(() => {
+        if (selectedLocation) {
+            setLatitude(selectedLocation?.bounds?.southwest?.lat);
+            setLongitude(selectedLocation?.bounds?.southwest?.lng);
+            setValue('address', selectedLocation?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            setValue('stateName', selectedState)
+            const countyName = selectedLocation?.components?.county;
+            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation, setValue, statesData, dispatch])
+    useEffect(() => {
+        if (cities) {
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
+            setValue('city', selectedCounty)
+        }
+    }, [cities])
 
     const handleStateSelection = (e) => {
-        setSelectedState(e.target.value)
-        try {
-            const selectedState = JSON.parse(e.target.value);
-            if (selectedState?.state_code) {
-                dispatch(getCitiesAction({ state_code: selectedState.id, name: '', limit: 25 }));
-            }
-        } catch (error) {
-            console.error('Error parsing selected state:', error);
-        }
+        const selectedOption = e.target.selectedOptions[0]; // Get the selected <option>
+        const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        console.log(key)
+
+        dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
+
     const handleCitySelection = (e) => {
-        const citySelected =e.target.value;
-        setSelectedCity(citySelected)
+        // const citySelected = JSON.parse(e.target.value);
+        setSelectedCity(e.target.value)
     }
 
-    useEffect(() => {
-        if (latitude && longitude) {
-            setFocused(false);
-        }
-    }, [latitude, longitude])
+    const [formData, setFormData] = useState({
+        firstName: '',
+        email: '',
+        phone: '',
+        lastName: '',
+    });
 
-    const stateGeoLocation = watch('stateName');
-    useEffect(() => {
-        if (stateGeoLocation) {
-            setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
-        }
-    }, [stateGeoLocation])
+    const formDataChange = (field, value) => {
+        const updatedFormData = { ...formData, [field]: value.trim() }; // Trim the value to remove extra spaces
+        setFormData(updatedFormData);
 
-    useEffect(() => {
-        if (stateToSelect) {
-            console.log('called')
-            dispatch(getCitiesAction({ state_code: stateToSelect?.id, name: '', limit: 25, skip: '' }));
-        }
-    }, [stateToSelect])
+        // Check if all fields are filled
+        const areAllFieldsFilled =
+            updatedFormData.firstName &&
+            updatedFormData.email &&
+            updatedFormData.phone &&
+            updatedFormData.lastName;
 
-
-
+        // Enable or disable the button
+        setIsButtonDisabled(!areAllFieldsFilled);
+    };
 
     return (
         <>
@@ -258,12 +278,19 @@ const NewDoctor = () => {
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <p className="fw-bold" style={{ fontWeight: '600' }}>
-                                    NEW DOCTOR
+                                    {!id ? 'NEW DOCTOR' : 'UPDATE DOCTOR'}
                                 </p>
-                                <div className='d-flex gap-2'>
-                                    <Button onClick={() => setShow(true)}>Email to Doctor</Button>
-                                    <Button onClick={handleNewDoctor}>Back</Button>
-                                </div>
+
+                                {activeTab === "personalDetails" && (
+                                    <div className='d-flex gap-2'>
+                                        {!id && (
+                                            <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>Email to Doctor</Button>
+                                        )}
+
+                                        <Button onClick={handleNewDoctor}>Back</Button>
+                                    </div>
+                                )}
+
                             </div>
                             <div>
                                 <ul className="nav nav-underline">
@@ -303,6 +330,8 @@ const NewDoctor = () => {
                                                     <Form.Control
                                                         type="text"
                                                         {...register('firstName', !id ? { required: 'First name is required' } : {})}
+                                                        onChange={(e) => formDataChange('firstName', e.target.value)}
+                                                        // value={formData.firstName}
                                                         placeholder="Enter first name"
                                                     />
                                                     {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
@@ -312,19 +341,59 @@ const NewDoctor = () => {
                                                     <Form.Control
                                                         type="email"
                                                         {...register('email', !id && { required: 'Email is required' })}
+                                                        onChange={(e) => formDataChange('email', e.target.value)}
+                                                        // value={formData.email}
                                                         placeholder="Enter email"
                                                     />
                                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                 </Form.Group>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        {...register('phone', !id ? { required: 'Phone is required' } : {})}
-                                                        placeholder="Enter phone number"
-                                                    />
-                                                    {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
-                                                </Form.Group>
+
+                                                <div className='mb-3'>
+                                                    <Form.Group className="mb-0 position-relative">
+                                                        <Form.Label className='mb-1'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                        <Form.Group>
+                                                            <InputGroup>
+                                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                                <Form.Control
+                                                                    type="tel"
+                                                                    {...register('phone', !id ? {
+                                                                        required: 'This field is required',
+                                                                        pattern: {
+                                                                            value: /^[0-9]*$/,
+                                                                            message: 'Contact must be a number'
+                                                                        },
+                                                                        maxLength: {
+                                                                            value: 10,
+                                                                            message: 'Contact must not exceed 10 digits'
+                                                                        },
+                                                                        minLength: {
+                                                                            value: 10,
+                                                                            message: 'Contact must not be less than 10 digits'
+                                                                        }
+                                                                    } : {}
+                                                                    )}
+                                                                    onChange={(e) => formDataChange('phone', e.target.value)}
+                                                                    // value={formData.phone}
+                                                                    placeholder="1234-234-234"
+                                                                    maxLength={10}
+                                                                // onKeyPress={(event) => handleFirstSpace(event, 0)}
+                                                                />
+                                                            </InputGroup>
+                                                        </Form.Group>
+
+                                                        <div
+                                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                                        >
+                                                            <img
+                                                                src={us}
+                                                                alt="country code flag"
+                                                                width={20} />
+                                                        </div>
+
+
+                                                    </Form.Group>
+                                                    {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                </div>
 
                                                 <div className="mb-3 d-flex flex-column position-relative">
                                                     <Form.Label>Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
@@ -350,6 +419,7 @@ const NewDoctor = () => {
                                                         <p className="text-danger">{errors.profileImage.message}</p>
                                                     )}
                                                 </div>
+
                                                 <div className="mb-3 d-flex flex-column position-relative">
                                                     <Form.Label>Degree{!id && <span className='text-danger'>*</span>}</Form.Label>
                                                     <div
@@ -381,6 +451,8 @@ const NewDoctor = () => {
                                                     <Form.Control
                                                         type="text"
                                                         {...register('lastName', { required: 'Last name is required' })}
+                                                        onChange={(e) => formDataChange('lastName', e.target.value)}
+                                                        // value={formData.lastName}
                                                         placeholder="Enter last name"
                                                     />
                                                     {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
@@ -420,7 +492,7 @@ const NewDoctor = () => {
 
                                                 <div className='row '>
                                                     <div className='col-6 '>
-                                                        <Form.Group className="mb-3 mt-2 ">
+                                                        <Form.Group className="mb-3 mt-1 ">
                                                             <Form.Label>Password{!id && <span className='text-danger'>*</span>}</Form.Label>
                                                             <Form.Control
                                                                 type="password"
@@ -431,7 +503,7 @@ const NewDoctor = () => {
                                                         </Form.Group>
                                                     </div>
                                                     <div className='col-6'>
-                                                        <Form.Group className="mb-3 mt-2">
+                                                        <Form.Group className="mb-3 mt-1">
                                                             <Form.Label>
                                                                 Confirm Password {!id && <span className="text-danger">*</span>}
                                                             </Form.Label>
@@ -454,167 +526,122 @@ const NewDoctor = () => {
                                             </div>
                                         </div>
                                         <div className='row mt-2'>
-                                            {/* <div className='col-6'>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label>Address 1<span className='text-danger'>*</span></Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        {...register('address1', { required: 'Address 1 is required' })}
-                                                        placeholder="Enter address line 1"
-                                                    />
-                                                    {errors.address1 && <span className="text-danger">{errors.address1.message}</span>}
-                                                </Form.Group>
-                                                <div className='row'>
-                                                    <div className='col-6'>
-                                                        <Form.Group className="mb-3">
-                                                            <Form.Label>City<span className='text-danger'>*</span></Form.Label>
-                                                            <Form.Control
-                                                                type="text"
-                                                                {...register('city', { required: 'City is required' })}
-                                                                placeholder="Enter city"
-                                                            />
-                                                            {errors.city && <span className="text-danger">{errors.city.message}</span>}
-                                                        </Form.Group>
-                                                    </div>
-                                                    <div className='col-6'>
-                                                        <Form.Group className="mb-3">
-                                                            <Form.Label>Zip Code<span className='text-danger'>*</span></Form.Label>
-                                                            <Form.Control
-                                                                type="text"
-                                                                {...register('zip', { required: 'Zip code is required' })}
-                                                                placeholder="Enter zip code"
-                                                            />
-                                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                                        </Form.Group>
-                                                    </div>
+
+                                        <Col sm={12}>
+                        <Row>
+                            <Col sm={12} className='mb-2'>
+                                <span className='text-black fw-semibold form-label'>Address Details</span>
+                            </Col>
+                            <Col sm={6}>
+                                <Row className='position-relative'>
+                                    <Col sm={12}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Address</Form.Label>
+                                            <div style={{ position: 'relative' }}>
+                                                <Form.Control
+                                                    type="text"
+                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
+                                                    {...register('address')}
+                                                    onChange={(e) => {
+                                                        getGeolocation(e);
+                                                        setFocused(true); // Open dropdown on input
+                                                    }}
+                                                    onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                    onBlur={() => {
+                                                        setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                    }}
+                                                    placeholder="Search for address"
+                                                    autoComplete="off"
+                                                />
+                                                {/* {/ Dropdown suggestions /} */}
+                                                <div
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        left: 0,
+                                                        width: '100%',
+                                                        maxHeight: '150px',
+                                                        overflow: 'auto',
+                                                        zIndex: 111,
+                                                        backgroundColor: '#fff',
+                                                        border: '1px solid #ced4da',
+                                                        borderTop: 'none',
+                                                    }}
+                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                >
+                                                    {searchedLocations?.map((data, index) => (
+                                                        <p
+                                                            key={index}
+                                                            onClick={() => {
+                                                               setSelectedLocation(data)
+                                                                setFocused(false); // Close dropdown after selection
+                                                            }}
+                                                            style={{
+                                                                margin: 0,
+                                                                padding: '8px 12px',
+                                                                cursor: 'pointer',
+                                                            }}
+                                                            className="hover-bg-change text-black"
+                                                        >
+                                                            {data?.formatted}
+                                                        </p>
+                                                    ))}
+                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                                 </div>
                                             </div>
-                                            <div className='col-6'>
-                                                <Form.Group className="mb-3">
-                                                    <Form.Label>Address 2</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        {...register('address2')}
-                                                        placeholder="Enter address line 2"
-                                                    />
-                                                </Form.Group>
-                                            </div> */}
-                                            <Col sm={12}>
-                                                <Row>
-                                                    <Col sm={12} className='mb-2'>
-                                                        <span className='text-black fw-semibold form-label'>Address Details</span>
-                                                    </Col>
-                                                    <Col sm={6}>
-                                                        <Row className='position-relative'>
-                                                            <Col sm={12}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className="mb-1">Address{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                                    <div style={{ position: 'relative' }}>
-                                                                        <Form.Control
-                                                                            type="text"
-                                                                            defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
-                                                                            {...register('address')}
-                                                                            onChange={(e) => {
-                                                                                getGeolocation(e);
-                                                                                setFocused(true); // Open dropdown on input
-                                                                            }}
-                                                                            onFocus={() => setFocused(true)} // Open dropdown when the field is focused
-                                                                            onBlur={() => {
-                                                                                setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
-                                                                            }}
-                                                                            placeholder="Search for address"
-                                                                            autoComplete="off"
-                                                                        />
-                                                                        <div
-                                                                            style={{
-                                                                                position: 'absolute',
-                                                                                top: '100%',
-                                                                                left: 0,
-                                                                                width: '100%',
-                                                                                maxHeight: 'auto',
-                                                                                zIndex: 111,
-                                                                                backgroundColor: '#fff',
-                                                                                border: '1px solid #ced4da',
-                                                                                borderTop: 'none',
-                                                                            }}
-                                                                            className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                                        >
-                                                                            {searchedLocations?.map((data, index) => (
-                                                                                <p
-                                                                                    key={index}
-                                                                                    onClick={() => {
-                                                                                        console.log(data)
-                                                                                        setValue('zip', data?.components?.postcode)
-                                                                                        setValue('stateName', data?.components?.state_code)
-                                                                                        setLatitude(data?.bounds?.southwest?.lat);
-                                                                                        setLongitude(data?.bounds?.southwest?.lng);
-                                                                                        setValue('address', data?.formatted)
-                                                                                        setFocused(false); // Close dropdown after selection
-                                                                                    }}
-                                                                                    style={{
-                                                                                        margin: 0,
-                                                                                        padding: '8px 12px',
-                                                                                        cursor: 'pointer',
-                                                                                    }}
-                                                                                    className="hover-bg-change text-black"
-                                                                                >
-                                                                                    {data?.formatted}
-                                                                                </p>
-                                                                            ))}
-                                                                            {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                        </div>
-                                                                    </div>
-                                                                </Form.Group>
-                                                            </Col>
+                                        </Form.Group>
+                                    </Col>
 
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>Latitude</Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        defaultValue={latitude}
-                                                                        placeholder="Latitude"
-                                                                    />
-                                                                </Form.Group>
-                                                            </Col>
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>Longitude</Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        defaultValue={longitude}
-                                                                        placeholder="Longitude" />
-                                                                </Form.Group>
-                                                            </Col>
-                                                        </Row>
-                                                    </Col>
-                                                    <Col sm={6}>
-                                                        <Row>
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>State{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                                    <Form.Select
-                                                                        {...register('stateName')}
-                                                                        onChange={(e) => handleStateSelection(e)}
-                                                                    >
-                                                                        <option>State</option>
-                                                                        {statesData?.states?.map((data) => (
-                                                                            <option
-                                                                                key={data?.state_code} // Unique key for each option
-                                                                                // defau={JSON.stringify({ name: data?.name, state_code: data?.state_code, id: data?.id, _id: data?._id }) || data?.state_code}
-                                                                                value={data?.state_code}
-                                                                            >
-                                                                                {data?.name}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Form.Select>
-                                                                </Form.Group>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Latitude</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                defaultValue={latitude}
+                                                placeholder="Latitude"
+                                            />
+                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Longitude</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                defaultValue={longitude}
+                                                placeholder="Longitude" />
+                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </Col>
+                            <Col sm={6}>
+                                <Row>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1' >State</Form.Label>
+                                            <Form.Select
+                                                {...register('stateName')}
+                                                onChange={(e) => handleStateSelection(e)}
+                                            >
+                                                <option>State</option>
+                                                {statesData?.states?.map((data) => (
+                                                    <option
+                                                        key={data?.id} // Unique key for each option
+                                                        data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                        value={data?._id}
+                                                    >
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </Form.Group>
 
-                                                            </Col>
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>City{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                                    {/* {
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>City</Form.Label>
+                                            {/* {
                                                 store?.getCitiesReducer?.loading ?
                                                     <Row>
                                                         <Col sm={12}>
@@ -622,45 +649,62 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </Row>
                                                     : */}
-                                                                    <Form.Select
-                                                                        disabled={store?.getCitiesReducer?.loading}
-                                                                        {...register('city')}
-                                                                        onChange={(e) => handleCitySelection(e)}
-                                                                    >
-                                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                        {cities?.map((data) => (
-                                                                            <option key={data?._id} value={data?._id}>
-                                                                                {data?.name}
-                                                                            </option>
-                                                                        ))}
-                                                                    </Form.Select>
-                                                                </Form.Group>
-                                                            </Col>
+                                            <Form.Select
+                                                disabled={store?.getCitiesReducer?.loading}
+                                                {...register('city')}
+                                                onChange={(e) => handleCitySelection(e)}
+                                            >
+                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                {cities?.map((data) => (
+                                                    <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>Street{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                                    <Form.Control
-                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.street : ''}
-                                                                        type="text"
-                                                                        {...register('street')}
-                                                                        placeholder="Street" />
-                                                                </Form.Group>
-                                                            </Col>
-                                                            <Col sm={6}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className='mb-1'>Zip{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                                    <Form.Control
-                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
-                                                                        type="text"
-                                                                        {...register('zip')}
-                                                                        placeholder="Zip" />
-                                                                </Form.Group>
-                                                            </Col>
-                                                        </Row>
-                                                    </Col>
-                                                </Row>
-                                            </Col>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {/* {/ } /} */}
+                                        </Form.Group>
+                                    </Col>
+
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Street</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                {...register('street')}
+                                                onKeyPress={handleFirstSpace}
+                                                placeholder="Street" />
+
+                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className='mb-1'>Zip</Form.Label>
+                                            <Form.Control
+                                                defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
+                                                type="text"
+                                                {...register('zip', {
+                                                    minLength: {
+                                                        value: 5,
+                                                        message: 'ZIP code must be at least 5 characters long',
+                                                    },
+                                                    pattern: {
+                                                        value: /^[0-9]+$/,
+                                                        message: 'ZIP code must contain numbers only',
+                                                    },
+                                                })}
+                                                onKeyPress={handleFirstSpace}
+                                                placeholder="Zip"
+                                                maxLength={5}
+                                            />
+                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                    </Col>
                                         </div>
                                     </div>
                                     <div className="col-12 d-flex justify-content-end gap-2 mt-3">
@@ -669,7 +713,7 @@ const NewDoctor = () => {
                                             {store?.createtDoctorsDetailReducer?.loading ?
                                                 <Spinner color='white' className='spinner-border-sm' />
                                                 :
-                                                'Save'
+                                                'Next'
                                             }
                                         </Button>
                                     </div>
@@ -680,7 +724,7 @@ const NewDoctor = () => {
                         </div>
                     </Card>
                 </div>
-                <EmailToDoctorModal closeModal={closeModal} show={show} />
+                <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} />
             </div>
         </>
     );

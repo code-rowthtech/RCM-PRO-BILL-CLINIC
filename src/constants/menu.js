@@ -26,6 +26,12 @@ const MENU_ITEMS = [
     // },
   
     {
+        key: 'clinics',
+        label: 'Sub  Clinic',
+        icon: 'dripicons-medical',
+        url: '/apps/clinics/list',
+    },
+    {
         key: 'doctors',
         label: 'Doctor',
         icon: 'dripicons-medical',
@@ -65,6 +71,7 @@ const MENU_ITEMS = [
         icon: 'uil-user',
 
     },
+  
     {
         key: 'setting',
         label: 'Setting',

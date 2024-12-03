@@ -8,6 +8,10 @@ export const getSubscriptionsAction = (data): AuthAction => ({
     type: SubscriptionsActionTypes.GET_SUBSCRIPTIONS,
     data
 });
+export const getSubclinicSubscriptionsAction = (data): AuthAction => ({
+    type: SubscriptionsActionTypes.GET_SUB_SUBSCRIPTIONS,
+    data
+});
 
 export const stateEmptydAction = (): LayoutAction => ({
     type: SubscriptionsActionTypes.STATE_EMPTY_INTIAL_STATE,
