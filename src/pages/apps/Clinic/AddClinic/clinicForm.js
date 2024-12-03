@@ -575,6 +575,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         message: 'Please enter a valid email address'
                                     }
                                 })}
+                                onKeyPress={handleFirstSpace}
                                 placeholder="Email ID"
                                 onKeyPress={(event) => handleFirstSpace(event, 0)}
                             />
