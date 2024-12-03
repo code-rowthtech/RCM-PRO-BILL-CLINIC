@@ -3,7 +3,7 @@ import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import { useForm } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
 
-const EmailToDoctorModal = ({show, closeModal}) => {
+const EmailToDoctorModal = ({show, closeModal, formData}) => {
 
     const {
         register,
@@ -35,9 +35,11 @@ const EmailToDoctorModal = ({show, closeModal}) => {
                                 <Form.Group className="my-2 mx-3">
 
                                     <Form.Control
+                                    className='text-center'
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
+                                        defaultValue={formData.email}
                                     />
                                     {errors.name && <span className="text-danger">{errors.name.message}</span>}
                                 </Form.Group>

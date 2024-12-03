@@ -22,7 +22,7 @@ export default (combineReducers({
     getAnalyticsReducer,createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer,createSubscriptionPlanReducer,createContractReducer,
     getDoctorsReducer,getClinicTypeReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer,getStatesReducer,getCitiesReducer,
-    getAnalyticsReducer,createMastersDataReducer,getMastersDataReducer,updateMastersDataReducer,createSubscriptionPlanReducer,
+    getAnalyticsReducer,createMastersDataReducer,updateMastersDataReducer,createSubscriptionPlanReducer,
     getDoctorsReducer,createtDoctorsDetailReducer,createtDoctorsReducer,getDoctorDetailsReducer,
     createPatientsReducer,updatePatientsReducer,createtDoctorsReducer,getDoctorsListReducer,createScheduleReducer,getScheduleReducer,
     getDoctorsRolesReducer,

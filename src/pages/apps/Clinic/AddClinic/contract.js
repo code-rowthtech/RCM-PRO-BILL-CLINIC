@@ -20,6 +20,7 @@ const Contract = ({ billingId, activeTab, contractId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const contract = store?.createContractReducer?.data?.contract;
+    console.log(contract, 'new contract');
 
     useEffect(() => {
         if (activeTab === 'contract') {
@@ -29,7 +30,11 @@ const Contract = ({ billingId, activeTab, contractId }) => {
             dispatch(createContractAction({ key: encryptMessage(payload) }));
         } 
     }, [activeTab, store?.createContractReducer?.data?.status]);
-
+    const handleDownload = (fileUrl) => {
+        if (fileUrl) {
+            window.open(fileUrl, '_blank');
+        }
+    };
     return (
         <>
             <Table responsive className="table-centered border border-muted table-nowrap mb-0">
@@ -78,10 +83,10 @@ const Contract = ({ billingId, activeTab, contractId }) => {
                                         {contract?.adminSignStatus ? 'Signed' : 'Pending'}
                                     </span>
                                 </td>
-                                <td>8:00 AM 26th Sep, 2024</td>
+                                <td>{contract?.sentDate}</td>
                                 <td>
-                                    <i className="fs-5 mdi mdi-eye"></i>
-                                    <i className="fs-5 mdi mdi-download"></i>
+                                    <i className="fs-5 mdi mdi-eye cursor-pointer" onClick={()=>handleDownload(contract?.certificateFileUrl)}></i>
+                                    <i className="fs-5 mdi mdi-download cursor-pointer" onClick={()=>handleDownload(contract?.certificateFileUrl)}></i>
                                 </td>
                             </tr>
                         )

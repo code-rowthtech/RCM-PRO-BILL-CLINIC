@@ -35,6 +35,7 @@ function* createClinicsFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error,'danger')
         yield put({
             type: ClinicsActionTypes.CREATE_CLINIC_ERROR,
             payload: error,
@@ -220,10 +221,11 @@ function* getCitiesFunction(data) {
         });
         const response = yield call(getCityByStateApi , data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'decryptedData')
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_SUCCESS,
-                payload: { data: decryptedData },
+                payload: { ...decryptedData },
             });
         } else {
             yield put({
