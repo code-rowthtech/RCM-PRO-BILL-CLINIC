@@ -527,121 +527,121 @@ const NewDoctor = () => {
                                         </div>
                                         <div className='row mt-2'>
 
-                                        <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className='mb-2'>
-                                <span className='text-black fw-semibold form-label'>Address Details</span>
-                            </Col>
-                            <Col sm={6}>
-                                <Row className='position-relative'>
-                                    <Col sm={12}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
-                                                <Form.Control
-                                                    type="text"
-                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
-                                                    {...register('address')}
-                                                    onChange={(e) => {
-                                                        getGeolocation(e);
-                                                        setFocused(true); // Open dropdown on input
-                                                    }}
-                                                    onFocus={() => setFocused(true)} // Open dropdown when the field is focused
-                                                    onBlur={() => {
-                                                        setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
-                                                />
-                                                {/* {/ Dropdown suggestions /} */}
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        overflow: 'auto',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                >
-                                                    {searchedLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                               setSelectedLocation(data)
-                                                                setFocused(false); // Close dropdown after selection
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black"
-                                                        >
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                </div>
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={12} className='mb-2'>
+                                                        <span className='text-black fw-semibold form-label'>Address Details</span>
+                                                    </Col>
+                                                    <Col sm={6}>
+                                                        <Row className='position-relative'>
+                                                            <Col sm={12}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className="mb-1">Address</Form.Label>
+                                                                    <div style={{ position: 'relative' }}>
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
+                                                                            {...register('address')}
+                                                                            onChange={(e) => {
+                                                                                getGeolocation(e);
+                                                                                setFocused(true); // Open dropdown on input
+                                                                            }}
+                                                                            onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                                            onBlur={() => {
+                                                                                setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                                            }}
+                                                                            placeholder="Search for address"
+                                                                            autoComplete="off"
+                                                                        />
+                                                                        {/* {/ Dropdown suggestions /} */}
+                                                                        <div
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: '100%',
+                                                                                left: 0,
+                                                                                width: '100%',
+                                                                                maxHeight: '150px',
+                                                                                overflow: 'auto',
+                                                                                zIndex: 111,
+                                                                                backgroundColor: '#fff',
+                                                                                border: '1px solid #ced4da',
+                                                                                borderTop: 'none',
+                                                                            }}
+                                                                            className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                                        >
+                                                                            {searchedLocations?.map((data, index) => (
+                                                                                <p
+                                                                                    key={index}
+                                                                                    onClick={() => {
+                                                                                        setSelectedLocation(data)
+                                                                                        setFocused(false); // Close dropdown after selection
+                                                                                    }}
+                                                                                    style={{
+                                                                                        margin: 0,
+                                                                                        padding: '8px 12px',
+                                                                                        cursor: 'pointer',
+                                                                                    }}
+                                                                                    className="hover-bg-change text-black"
+                                                                                >
+                                                                                    {data?.formatted}
+                                                                                </p>
+                                                                            ))}
+                                                                            {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                        </div>
+                                                                    </div>
+                                                                </Form.Group>
+                                                            </Col>
 
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={latitude}
-                                                placeholder="Latitude"
-                                            />
-                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={longitude}
-                                                placeholder="Longitude" />
-                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1' >State</Form.Label>
-                                            <Form.Select
-                                                {...register('stateName')}
-                                                onChange={(e) => handleStateSelection(e)}
-                                            >
-                                                <option>State</option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.id} // Unique key for each option
-                                                        data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                        value={data?._id}
-                                                    >
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        defaultValue={latitude}
+                                                                        placeholder="Latitude"
+                                                                    />
+                                                                    {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        defaultValue={longitude}
+                                                                        placeholder="Longitude" />
+                                                                    {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                    <Col sm={6}>
+                                                        <Row>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1' >State</Form.Label>
+                                                                    <Form.Select
+                                                                        {...register('stateName')}
+                                                                        onChange={(e) => handleStateSelection(e)}
+                                                                    >
+                                                                        <option>State</option>
+                                                                        {statesData?.states?.map((data) => (
+                                                                            <option
+                                                                                key={data?.id} // Unique key for each option
+                                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                                value={data?._id}
+                                                                            >
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                </Form.Group>
 
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>City</Form.Label>
-                                            {/* {
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1'>City</Form.Label>
+                                                                    {/* {
                                                 store?.getCitiesReducer?.loading ?
                                                     <Row>
                                                         <Col sm={12}>
@@ -649,62 +649,62 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </Row>
                                                     : */}
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('city')}
-                                                onChange={(e) => handleCitySelection(e)}
-                                            >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities?.map((data) => (
-                                                    <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
+                                                                    <Form.Select
+                                                                        disabled={store?.getCitiesReducer?.loading}
+                                                                        {...register('city')}
+                                                                        onChange={(e) => handleCitySelection(e)}
+                                                                    >
+                                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                                        {cities?.map((data) => (
+                                                                            <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {/* {/ } /} */}
-                                        </Form.Group>
-                                    </Col>
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                    {/* {/ } /} */}
+                                                                </Form.Group>
+                                                            </Col>
 
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('street')}
-                                                onKeyPress={handleFirstSpace}
-                                                placeholder="Street" />
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1'>Street</Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        {...register('street')}
+                                                                        onKeyPress={handleFirstSpace}
+                                                                        placeholder="Street" />
 
-                                            {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className='mb-1'>Zip</Form.Label>
-                                            <Form.Control
-                                                defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
-                                                type="text"
-                                                {...register('zip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                onKeyPress={handleFirstSpace}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Col>
+                                                                    {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                    <Form.Control
+                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
+                                                                        type="text"
+                                                                        {...register('zip', {
+                                                                            minLength: {
+                                                                                value: 5,
+                                                                                message: 'ZIP code must be at least 5 characters long',
+                                                                            },
+                                                                            pattern: {
+                                                                                value: /^[0-9]+$/,
+                                                                                message: 'ZIP code must contain numbers only',
+                                                                            },
+                                                                        })}
+                                                                        onKeyPress={handleFirstSpace}
+                                                                        placeholder="Zip"
+                                                                        maxLength={5}
+                                                                    />
+                                                                    {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
                                         </div>
                                     </div>
                                     <div className="col-12 d-flex justify-content-end gap-2 mt-3">

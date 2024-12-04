@@ -35,9 +35,9 @@ export const getSubscription = '/api/v1/clinic/getSubscription/history'
 export const createContract = '/api/v1/clinic/getContractDetails';
 
 // SETTING
-export const addMastersData = '/api/v1/clinic/masterdata';
+export const addMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 export const getMastersData = '/api/v1/clinic/getmasterData';
-export const updateMastersData = '/api/v1/clinic/masterdata';
+export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 
 // DOCTORS
 export const getDoctor = '/api/v1/doctors/getClinicDoctors';

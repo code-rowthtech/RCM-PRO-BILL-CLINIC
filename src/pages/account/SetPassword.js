@@ -15,6 +15,7 @@ import { resetAuth, forgotPasswordChange, verifyToken, setPassword, loginUser } 
 import { VerticalForm, FormInput } from '../../components/';
 import AccountLayout from './AccountLayout';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
+import { handleFirstSpace } from '../../helpers/noSpace';
 
 /* bottom link */
 const BottomLink = () => {
@@ -128,6 +129,8 @@ const[loginPassword,setLoginPassword]=useState(null)
                         disabled
                         placeholder={t('Your Email')}
                         containerClass={'mb-3'}
+                        onKeyPress={handleFirstSpace}
+
                     />
 
                     <FormInput
@@ -136,6 +139,8 @@ const[loginPassword,setLoginPassword]=useState(null)
                         name="password"
                         placeholder={t('Enter your Password')}
                         containerClass={'mb-3'}
+                        onKeyPress={handleFirstSpace}
+
                     />
                     <FormInput
                         label='Confirm Password'
@@ -143,6 +148,8 @@ const[loginPassword,setLoginPassword]=useState(null)
                         name="confirmPassword"
                         placeholder={t('Confirm your Password')}
                         containerClass={'mb-3'}
+                        onKeyPress={handleFirstSpace}
+
                     />
                     <div className="mb-3 mb-0 text-center">
                         <Button variant="primary" className='custom-buttons' type="submit" disabled={loading}>

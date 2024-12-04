@@ -15,5 +15,5 @@ export function getMastersDataApi(params: any): any {
 
 export function updateMastersDataApi(params: any): any {
     const { data } = params;
-    return api.update(URL.updateMastersData, data)
+    return api.create(URL.updateMastersData, data)
 }
