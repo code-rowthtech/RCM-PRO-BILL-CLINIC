@@ -874,7 +874,7 @@ const NewPractice = () => {
                                             </React.Fragment>
                                         ))}
                                         <hr />
-                                        {/* <Col sm={12}>
+                                        <Col sm={12}>
                                             <Form.Label>
                                                 State of Licensing&nbsp;
                                                 <span
@@ -962,7 +962,7 @@ const NewPractice = () => {
                                                     ></span>
                                                 </Col>
                                             </React.Fragment>
-                                        ))} */}
+                                        ))}
 
 
 

@@ -12,7 +12,6 @@ const AddHoliday = () => {
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    console.log(clinic_id,'clinic_id')
 
     const {
         register,
@@ -35,7 +34,6 @@ const AddHoliday = () => {
 
     dispatch(createScheduleAction({ key: encryptMessage(payload) }));
     reset();
-    console.log(payload, "payload");
 };
 
     useEffect(() => {

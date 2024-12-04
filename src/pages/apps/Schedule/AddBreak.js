@@ -4,6 +4,7 @@ import { Button, Card, Form, Dropdown } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
+import { encryptMessage } from "../../../cryptoUtils";
 
 const AddBreak = () => {
     const store = useSelector((state) => state);
@@ -11,7 +12,8 @@ const AddBreak = () => {
     const dispatch = useDispatch();
 
     const [selectedDays, setSelectedDays] = useState([]);
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    console.log(selectedDays, 'day');
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
@@ -34,19 +36,13 @@ const AddBreak = () => {
         const value = e.target.value;
         setValue("breakDay", value);
         if (value === "Every Day") {
-            setSelectedDays(daysOfWeek);
+            setSelectedDays(daysOfWeek); // Select all days if "Every Day" is chosen
         } else {
-            setSelectedDays([]);
+            setSelectedDays([]); // Clear selected days if not "Every Day"
         }
     };
 
-    const toggleDaySelection = (day) => {
-        setSelectedDays((prevSelectedDays) =>
-            prevSelectedDays.includes(day)
-                ? prevSelectedDays.filter((selectedDay) => selectedDay !== day)
-                : [...prevSelectedDays, day]
-        );
-    };
+   
 
     const onSubmit = (data) => {
         const doctorInfo = JSON.parse(data.doctorInfo);
@@ -59,7 +55,7 @@ const AddBreak = () => {
             breakTo: data.breakTo,
         };
 
-        dispatch(createScheduleAction(payload));
+        dispatch(createScheduleAction({ key: encryptMessage(payload) }));
         reset();
         console.log(payload, "payload");
     };
@@ -101,7 +97,7 @@ const AddBreak = () => {
                                         )}
                                     </Form.Group>
 
-                                    <Form.Group className="mb-3">
+                                    <Form.Group className="mt-4">
                                         <Form.Label>
                                             From<span className="text-danger">*</span>
                                         </Form.Label>
@@ -125,44 +121,21 @@ const AddBreak = () => {
                                                 {...register("breakDay", { required: "Please select a break type" })}
                                                 onChange={handleRadioChange}
                                                 checked={breakDay === "Every Day"}
+                                                className="mt-1"
                                             />
-                                            <Form.Check
-                                                type="radio"
-                                                label="Single Day"
-                                                value="Single Day"
-                                                {...register("breakDay")}
-                                                onChange={handleRadioChange}
-                                                checked={breakDay === "Single Day"}
-                                            />
+                                            <Form.Select {...register("breakDay")} onChange={handleRadioChange} className="border-0  w-25">
+                                                <option value="">Single Day</option>
+                                                {daysOfWeek.map((day) => (
+                                                    <option key={day} value={day} selected={selectedDays.includes(day)}>
+                                                        {day}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
                                         </div>
                                     </Form.Group>
 
-                                    {breakDay === "Single Day" && (
-                                        <Form.Group className="mb-3">
-                                            <Form.Label>
-                                                Select Days<span className="text-danger">*</span>
-                                            </Form.Label>
-                                            <Dropdown>
-                                                <Dropdown.Toggle variant="outline-primary">
-                                                    {selectedDays.length > 0
-                                                        ? selectedDays.join(", ")
-                                                        : "Select Days"}
-                                                </Dropdown.Toggle>
-                                                <Dropdown.Menu>
-                                                    {daysOfWeek.map((day) => (
-                                                        <Dropdown.Item key={day}>
-                                                            <Form.Check
-                                                                type="checkbox"
-                                                                label={day}
-                                                                checked={selectedDays.includes(day)}
-                                                                onChange={() => toggleDaySelection(day)}
-                                                            />
-                                                        </Dropdown.Item>
-                                                    ))}
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        </Form.Group>
-                                    )}
+                                
+
 
                                     <Form.Group className="mb-3">
                                         <Form.Label>
