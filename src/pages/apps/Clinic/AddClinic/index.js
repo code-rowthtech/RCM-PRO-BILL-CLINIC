@@ -17,6 +17,7 @@ const Index = () => {
     const [activeTab, setActiveTab] = useState('clinic');
     const [clinicId, setClinicId] = useState(null);
     const [billingId, setBillingId] = useState(null);
+    
     // const [showModal, setShowModal] = useState(false); // Modal visibility state
     // const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
     const store = useSelector((state) => state);

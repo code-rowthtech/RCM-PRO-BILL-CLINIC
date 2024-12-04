@@ -44,7 +44,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [selectedCity, setSelectedCity] = useState(null);
     console.log(selectedCity, 'selectedCity')
     const [focused, setFocused] = useState(false);
-
+    const [subClinic, setSubClinic] = useState('');
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
@@ -53,7 +53,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [showModal, setShowModal] = useState(false);
 
     const closeModal = () => setShowModal(false);
-
+const handleMultipleAdd =()=>{
+    setSubClinic('Adding Sub Clinic')
+    navigate('/apps/clinics/list')
+}
     // const [clinicId, setClinicId] = useState(null);
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
@@ -181,7 +184,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (clinicsDataGet?.stateOfLicensing) {
             setStateDetails(clinicsDataGet?.stateOfLicensing)
         }
-      
+
     }, [clinicsDataGet, statesData, setValue]);
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -206,11 +209,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
             pos: posDetails,
-            logo: logo?.url?.split('?')[0],
-            // logo: {
-            //     url: logo?.url?.split('?')[0],
-            //     fileName: logoName,
-            // },
+            // logo: logo?.url?.split('?')[0],
+            logo: {
+                url: logo?.url?.split('?')[0],
+                fileName: logoName,
+            },
             address: {
                 address1: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
@@ -469,7 +472,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
-            setValue('clinicType', clinicsDataGet.clinicType); 
+            setValue('clinicType', clinicsDataGet.clinicType);
         }
     }, [clinicsDataGet, setValue]);
     const [searchedLocations, setSearchedLocations] = useState(null)
@@ -526,7 +529,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         <>
             {/* <UploadToS3 /> */}
             <Form onSubmit={handleSubmit(SubmitData)}>
+
                 <Row>
+                    <Col sm={12} className='mb-3'><b>{subClinic}</b></Col>
                     <Col sm={6}>
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>Practice Name <span className='text-danger'>*</span></Form.Label>
@@ -703,8 +708,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
                                 }`}
                         >
-                    {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
-                    {typeof logoName === 'string' && logoName
+                            {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
+                            {typeof logoName === 'string' && logoName
                                 ? logoName.split('/').pop()
                                 : 'Upload Logo'}
                             <p className="mb-0">
@@ -969,7 +974,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                               setSelectedLocation(data)
+                                                                setSelectedLocation(data)
                                                                 setFocused(false); // Close dropdown after selection
                                                             }}
                                                             style={{
@@ -1173,7 +1178,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Control
                                                     type="tel"
                                                     value={data.contact}
-                                                    onChange={(e) => handlePOSInputChange(e, 'contact', index)} // Retain original functionality
+                                                    onChange={(e) => handlePOSInputChange(e, 'contact', index)} 
                                                     placeholder="1234-234-234"
                                                     onKeyPress={handleFirstSpace}
                                                     maxLength={10}
@@ -1197,6 +1202,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Col>
                     <hr />
                     <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
+                        <Button onClick={()=>handleMultipleAdd()} variant="primary" className='custom-buttons'>
+                            Multiple Add
+                        </Button>
                         <Button variant="primary" className='custom-buttons' onClick={() => setShowModal(true)}>
                             Change Password
                         </Button>
