@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import { useForm } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
+import { createDoctorAction } from '../../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { encryptMessage } from '../../../cryptoUtils';
+import Spinner from '../../../constants/Spinner';
 
-const EmailToDoctorModal = ({show, closeModal, formData}) => {
+const EmailToDoctorModal = ({show, closeModal, formData,setFormData}) => {
 
     const {
         register,
@@ -11,11 +15,20 @@ const EmailToDoctorModal = ({show, closeModal, formData}) => {
         formState: { errors },
         reset,
     } = useForm();
-
+const dispatch=useDispatch();
     const onSubmit = () => {
+console.log(formData,'pppp')
+dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }
-
+    const store=useSelector((state)=>state);
+    const createResponse = store?.createtDoctorsReducer?.data?.status
+useEffect(()=>{
+if(createResponse===200){
+    closeModal();
+    setFormData({});
+}
+})
   return (
     <div>
          <Modal centered show={show} onHide={closeModal}>
@@ -49,11 +62,14 @@ const EmailToDoctorModal = ({show, closeModal, formData}) => {
                                     <p > "xyz.com"</p>
                                 </div>
                             </Col>
-
                         </Row>
                         <Modal.Footer className='d-flex justify-content-center'>
-                            <Button type="submit" className="custom-buttons">
-                                Send
+                            <Button type="submit" className="custom-buttons" disabled={store?.createDoctorsReducer?.loading}>
+                                {store?.createtDoctorsReducer?.loading?
+                                <Spinner color='white' className='spinner-border-sm'/>
+                                :
+                                'Send'
+                                }
                             </Button>
                         </Modal.Footer>
                     </Form>
