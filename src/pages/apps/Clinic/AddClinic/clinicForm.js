@@ -92,6 +92,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const deleteClinicResponse = store?.deleteClinicOnboardingReducer?.data?.status;
     useEffect(() => {
         if (createResponse === 200) {
+           
             if (clinicsList?.length > 0) {
                 const payload = {
                     parentClinic: clinicId,
@@ -207,8 +208,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 message: 'Passwords do not match',
             });
             return;
-
-
+        }
+        if(logo){
+            sessionStorage.setItem('logo',logo?.url?.split('?')[0]);
         }
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
@@ -241,7 +243,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
 
-    console.log({ stateToSelect })
 
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
