@@ -1,34 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { Button, Table } from 'react-bootstrap';
 import { FiEdit } from "react-icons/fi";
+import { useDispatch, useSelector } from 'react-redux';
+import { getDoctorsListAction } from '../../../redux/schedule/action';
 
 const ScheduleTab = () => {
     const [time, setTime] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState('');
-    const [schedules, setSchedules] = useState([
-        { id: 1, availableOn: 'Monday', availableFrom: '08:00', availableTo: '17:00', doctorName: 'Dr. John Doe', reason: 'Vacation' },
-        { id: 2, availableOn: 'Tuesday', availableFrom: '09:00', availableTo: '18:00', doctorName: 'Dr. Jane Smith', reason: 'Conference' },
-        { id: 3, availableOn: 'Wednesday', availableFrom: '08:30', availableTo: '17:30', doctorName: 'Dr. Alex Johnson', reason: 'Checkup' },
-        { id: 4, availableOn: 'Thursday', availableFrom: '10:00', availableTo: '19:00', doctorName: 'Dr. Emma Williams', reason: 'Research' },
-        { id: 5, availableOn: 'Friday', availableFrom: '08:00', availableTo: '16:00', doctorName: 'Dr. Mike Davis', reason: 'Clinic' },
-        { id: 6, availableOn: 'Saturday', availableFrom: '09:00', availableTo: '14:00', doctorName: 'Dr. Sarah Lee', reason: 'Routine Check' },
-        { id: 7, availableOn: 'Sunday', availableFrom: '10:00', availableTo: '15:00', doctorName: 'Dr. Linda White', reason: 'Emergency' },
-        // Add more data as needed
-    ]);
+    const store = useSelector((state)=>state)
+    const dispatch = useDispatch()
+    const doctorLists = store?.getDoctorsListReducer?.data?.result;
+
+    const { control, handleSubmit, setValue, watch } = useForm({
+        defaultValues: {
+            schedules: [
+                { id: 1, availableOn: 'Monday', availableFrom: '08:00', availableTo: '17:00', doctorName: 'Dr. John Doe', reason: 'Vacation' },
+                { id: 2, availableOn: 'Tuesday', availableFrom: '09:00', availableTo: '18:00', doctorName: 'Dr. Jane Smith', reason: 'Conference' },
+                { id: 3, availableOn: 'Wednesday', availableFrom: '08:30', availableTo: '17:30', doctorName: 'Dr. Alex Johnson', reason: 'Checkup' },
+                { id: 4, availableOn: 'Thursday', availableFrom: '10:00', availableTo: '19:00', doctorName: 'Dr. Emma Williams', reason: 'Research' },
+                { id: 5, availableOn: 'Friday', availableFrom: '08:00', availableTo: '16:00', doctorName: 'Dr. Mike Davis', reason: 'Clinic' },
+                { id: 6, availableOn: 'Saturday', availableFrom: '09:00', availableTo: '14:00', doctorName: 'Dr. Sarah Lee', reason: 'Routine Check' },
+                { id: 7, availableOn: 'Sunday', availableFrom: '10:00', availableTo: '15:00', doctorName: 'Dr. Linda White', reason: 'Emergency' },
+            ],
+        },
+    });
+
+    const schedules = watch('schedules');
 
     const handleDoctorChange = (event) => {
         setSelectedDoctor(event.target.value);
     };
+    useEffect(() => {
+        dispatch(getDoctorsListAction());
+    }, [dispatch]);
 
-    const handleTimeChange = (event, id, field) => {
-        const updatedSchedules = schedules.map((schedule) =>
-            schedule.id === id ? { ...schedule, [field]: event.target.value } : schedule
-        );
-        setSchedules(updatedSchedules);
+    const onSubmit = (data) => {
+        console.log('Form Data:', data); // Logs all data, including updated schedules
     };
 
     return (
-        <div>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <h4>Edit Schedule</h4>
             <div className='my-3'>
                 <label htmlFor="doctorName" style={{ fontWeight: 'bold' }}>
@@ -65,11 +77,18 @@ const ScheduleTab = () => {
                     }}
                 >
                     <option value="">Select a doctor</option>
-                    <option value="dr_john">Dr. John Doe</option>
-                    <option value="dr_jane">Dr. Jane Smith</option>
-                    <option value="dr_alex">Dr. Alex Johnson</option>
-                    <option value="dr_emma">Dr. Emma Williams</option>
-                    <option value="dr_mike">Dr. Mike Davis</option>
+                    {doctorLists &&
+                        doctorLists.map((doctor, index) => (
+                            <option
+                                key={index}
+                                value={JSON.stringify({
+                                    id: doctor?.userId?._id,
+                                    name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
+                                })}
+                            >
+                                {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
+                            </option>
+                        ))}
                 </select>
             </div>
 
@@ -84,23 +103,33 @@ const ScheduleTab = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {schedules.map((schedule) => (
+                        {schedules.map((schedule, index) => (
                             <tr key={schedule.id}>
                                 <td className='fw-bold'>{schedule.availableOn}</td>
                                 <td>
-                                    <input
-                                        type="time"
-                                        className='w-100 px-2 py-1 rounded'
-                                        value={schedule.availableFrom}
-                                        onChange={(e) => handleTimeChange(e, schedule.id, 'availableFrom')}
+                                    <Controller
+                                        name={`schedules.${index}.availableFrom`}
+                                        control={control}
+                                        render={({ field }) => (
+                                            <input
+                                                type="time"
+                                                className='w-100 px-2 py-1 rounded'
+                                                {...field}
+                                            />
+                                        )}
                                     />
                                 </td>
                                 <td>
-                                    <input
-                                        type="time"
-                                        className='w-100 px-2 py-1 rounded'
-                                        value={schedule.availableTo}
-                                        onChange={(e) => handleTimeChange(e, schedule.id, 'availableTo')}
+                                    <Controller
+                                        name={`schedules.${index}.availableTo`}
+                                        control={control}
+                                        render={({ field }) => (
+                                            <input
+                                                type="time"
+                                                className='w-100 px-2 py-1 rounded'
+                                                {...field}
+                                            />
+                                        )}
                                     />
                                 </td>
                                 <td className='text-center'>
@@ -112,9 +141,9 @@ const ScheduleTab = () => {
                 </Table>
             </div>
             <div className='d-flex justify-content-end mt-3'>
-                <Button className='custom-buttons'>Save</Button>
+                <Button type="submit" className='custom-buttons'>Save</Button>
             </div>
-        </div>
+        </form>
     );
 };
 

@@ -4,6 +4,7 @@ import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
+import { encryptMessage } from "../../../cryptoUtils";
 
 const AddHoliday = () => {
     const store = useSelector((state) => state);
@@ -32,7 +33,7 @@ const AddHoliday = () => {
         tillDate: data.tillDate,
     };
 
-    dispatch(createScheduleAction(payload));
+    dispatch(createScheduleAction({ key: encryptMessage(payload) }));
     reset();
     console.log(payload, "payload");
 };
