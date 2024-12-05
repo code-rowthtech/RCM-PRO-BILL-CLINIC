@@ -18,7 +18,6 @@ function* createScheduleFunction(data) {
         });
         const response = yield call(createScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -78,7 +77,6 @@ function* getScheduleFunction(data) {
         });
         const response = yield call(getScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'schedule data')
 
         if (response.status === 200) {
             yield put({

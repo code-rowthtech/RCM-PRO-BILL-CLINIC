@@ -66,6 +66,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',
+        
     };
 
     // Get the title for the current path or use a default value

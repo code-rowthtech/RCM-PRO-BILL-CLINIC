@@ -9,11 +9,16 @@ const DoctorHoliday = () => {
   const store = useSelector((state) => state);
 
   const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-  console.log(scheduleResponse,' scheduleResponse')
   const isLoading = store?.getScheduleReducer?.loading;
 
   useEffect(() => {
-    dispatch(getScheduleAction({ flag: "Holiday" }));
+    const payload = {
+      startDate: '',
+      endDate: '',
+      flag: "Holiday",
+      search : ''
+    };
+    dispatch(getScheduleAction(payload));
   }, [dispatch]);
 
   return (
@@ -46,11 +51,11 @@ const DoctorHoliday = () => {
               <tr key={holiday.id || index}>
                 <td>{index + 1}</td>
                 <td>{holiday.name}</td>
-                <td>{holiday.reason}</td>
+                <td>{holiday.reason ? holiday.reason : 'NAN'}</td>
                 <td>
-                  <span className="px-2 py-1 text-white bg-secondary rounded-2">
+                  <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{width:'100px'}}>
                     {new Date(holiday.fromDate).toLocaleDateString()}
-                  </span>
+                  </div>
                 </td>
                 <td>
                   <RiDeleteBin5Line className="fs-4 text-danger ms-2 cursor-pointer" />

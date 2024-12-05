@@ -5,6 +5,7 @@ const api = new APICore();
 
 export function createScheduleApi(params: any): any {
     const { data } = params;
+    console.log(data,'datatime')
     return api.create(URL.createSchedule, data);
 }
 

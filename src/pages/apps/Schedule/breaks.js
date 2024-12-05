@@ -8,10 +8,17 @@ const Breaks = () => {
     const store = useSelector((state) => state);
 
     const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
+    console.log(scheduleResponse, 'break')
     const isLoading = store?.getScheduleReducer?.loading;
 
     useEffect(() => {
-        dispatch(getScheduleAction({ flag: "Break" }));
+        const payload = {
+            startDate: '',
+            endDate: '',
+            flag: "Break",
+            search: ''
+        };
+        dispatch(getScheduleAction(payload));
     }, [dispatch]);
 
     return (
@@ -23,7 +30,7 @@ const Breaks = () => {
                         <th className="text-white">Doctor Name</th>
                         <th className="text-white">Break From</th>
                         <th className="text-white">Break To</th>
-                        <th className="text-white">Date</th>
+                        <th className="text-white">Day</th>
                         <th className="text-white">Action</th>
                     </tr>
                 </thead>
@@ -44,13 +51,12 @@ const Breaks = () => {
                         scheduleResponse.map((breakItem, index) => (
                             <tr key={breakItem.id}>
                                 <td>{index + 1}</td>
-                                <td>{breakItem.doctorName}</td>
+                                <td>{breakItem.name}</td>
                                 <td>{breakItem.breakFrom}</td>
                                 <td>{breakItem.breakTo}</td>
                                 <td>
-                                    <span className="px-1 py-1 text-white bg-secondary rounded-2">
-                                        {breakItem.date}
-                                    </span></td>
+                                    {breakItem.breakDay}
+                                </td>
                                 <td>
                                     <RiDeleteBin5Line className="fs-4 ms-2" />
                                 </td>
