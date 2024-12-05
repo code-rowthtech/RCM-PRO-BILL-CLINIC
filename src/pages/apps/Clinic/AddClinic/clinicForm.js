@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Col, Form, Row, Button, Table, Modal, InputGroup } from 'react-bootstrap';
+import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,10 +7,10 @@ import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
 import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
-import { FiDownloadCloud, FiEdit, FiEye, FiMinus } from 'react-icons/fi';
+import { FiDownloadCloud, FiEdit, FiEye, FiMinus, FiTrash } from 'react-icons/fi';
 import UploadToS3 from '../../../../helpers/uploads3';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -18,6 +18,9 @@ import ToastHandle from '../../../../helpers/ToastMessage';
 import { FiUploadCloud } from "react-icons/fi";
 import ChangePasswordModal from '../../../../components/ChangePasswordModal';
 import { handleFirstSpace } from '../../../../helpers/noSpace';
+import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions';
+import { FormInput } from '../../../../components';
+import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
@@ -52,11 +55,20 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
 
+    // table data
+    const [detailsModal, setDetailsModal] = useState(false);
+    const [selectedDetails, setSelectedDetails] = useState(null);
+    const [status, setStatus] = useState(true);
+    const [search, setSearch] = useState('');
+
+    const handleStatusChange = (isActive) => {
+        setStatus(isActive);
+    };
+
     const closeModal = () => setShowModal(false);
-const handleMultipleAdd =()=>{
-    setSubClinic('Adding Sub Clinic')
-    navigate('/apps/clinics/list')
-}
+    const handleMultipleAdd = () => {
+        navigate('/apps/Practice/new-practice')
+    }
     // const [clinicId, setClinicId] = useState(null);
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
@@ -99,6 +111,7 @@ const handleMultipleAdd =()=>{
     const deleteClinicResponse = store?.deleteClinicOnboardingReducer?.data?.status;
     useEffect(() => {
         if (createResponse === 200) {
+
             if (clinicsList?.length > 0) {
                 const payload = {
                     parentClinic: clinicId,
@@ -119,9 +132,7 @@ const handleMultipleAdd =()=>{
             dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
         }
     }, [createResponse, deleteClinicResponse])
-    // useEffect(() => {
-    //     dispatch(getClinicTypeAction())
-    // }, [dispatch]);
+
 
 
     useEffect(() => {
@@ -145,6 +156,7 @@ const handleMultipleAdd =()=>{
     }
     useEffect(() => {
         dispatch(getClinicAction());
+        dispatch(getSubClinicAction());
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     console.log(clinicsDataGet, 'clinicsDataGet')
@@ -179,7 +191,7 @@ const handleMultipleAdd =()=>{
             setPosDetails(clinicsDataGet?.pos)
         }
         if (clinicsDataGet?.logo) {
-            setLogoName(clinicsDataGet?.logo)
+            setLogoName(clinicsDataGet?.logo?.fileName)
         }
         if (clinicsDataGet?.stateOfLicensing) {
             setStateDetails(clinicsDataGet?.stateOfLicensing)
@@ -193,8 +205,9 @@ const handleMultipleAdd =()=>{
                 message: 'Passwords do not match',
             });
             return;
-
-
+        }
+        if (logo) {
+            sessionStorage.setItem('logo', logo?.url?.split('?')[0]);
         }
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
@@ -210,10 +223,14 @@ const handleMultipleAdd =()=>{
             accreditationDetails: accreditationDetails,
             pos: posDetails,
             // logo: logo?.url?.split('?')[0],
-            logo: {
-                url: logo?.url?.split('?')[0],
-                fileName: logoName,
-            },
+            ...(logo ?
+                {
+                    logo: {
+                        url: logo?.url?.split('?')[0],
+                        fileName: logoName,
+                    }
+                }
+                : ''),
             address: {
                 address1: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
@@ -229,7 +246,6 @@ const handleMultipleAdd =()=>{
         console.log(newPayload, 'Practice');
     };
 
-    console.log({ stateToSelect })
 
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
@@ -293,24 +309,24 @@ const handleMultipleAdd =()=>{
         }
     };
 
-    const handleStateChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile);
-            setStateDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
+    // const handleStateChange = async (e, index) => {
+    //     const selectedFile = e.target.files[0];
+    //     try {
+    //         const url = await handleUpload(selectedFile);
+    //         setStateDetails((prevDetails) => {
+    //             const updatedDetails = [...prevDetails];
+    //             updatedDetails[index] = {
+    //                 ...updatedDetails[index],
+    //                 url: url?.url?.split('?')[0],
+    //                 fileName: selectedFile.name,
 
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
-    };
+    //             };
+    //             return updatedDetails;
+    //         });
+    //     } catch (error) {
+    //         console.error('Error during file upload:', error);
+    //     }
+    // };
 
     const handleMedicalChange = async (e, index) => {
         const selectedFile = e.target.files[0];
@@ -391,17 +407,17 @@ const handleMultipleAdd =()=>{
         });
     };
 
-    const handleStateInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setStateDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value
-            };
-            return updatedDetails;
-        });
-    };
+    // const handleStateInputChange = (e, field, index) => {
+    //     const value = e.target.value;
+    //     setStateDetails((prevDetails) => {
+    //         const updatedDetails = [...prevDetails];
+    //         updatedDetails[index] = {
+    //             ...updatedDetails[index],
+    //             [field]: value
+    //         };
+    //         return updatedDetails;
+    //     });
+    // };
 
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
@@ -464,12 +480,12 @@ const handleMultipleAdd =()=>{
         ]);
     };
 
-    const handleRemoveState = (index) => {
-        setStateDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            return updatedDetails;
-        });
-    };
+    // const handleRemoveState = (index) => {
+    //     setStateDetails((prevDetails) => {
+    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
+    //         return updatedDetails;
+    //     });
+    // };
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
             setValue('clinicType', clinicsDataGet.clinicType);
@@ -524,7 +540,83 @@ const handleMultipleAdd =()=>{
             setValue('city', selectedCounty)
         }
     }, [cities])
+    // for table view
+    const getTableData = store.getSubClinicsReducer?.data?.clinics
 
+    const [selectedStates, setSelectedStates] = useState([]);
+    const [statesMenu, setStatesMenu] = useState(false);
+    const handleCheckboxChange = (stateName) => {
+        setSelectedStates((prev) => {
+            const updatedStates = prev.includes(stateName)
+                ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+                : [...prev, stateName]; // Add state if checked
+
+            // Sync stateDetails with selected states
+            setStateDetails((prevDetails) => {
+                const newDetails = updatedStates.map((state) =>
+                    prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }
+                );
+                return newDetails;
+            });
+
+            return updatedStates;
+        });
+    };
+
+    const handleStateInputChange = (e, field, index) => {
+        const value = e.target.value;
+        setStateDetails((prevDetails) => {
+            const updatedDetails = [...prevDetails];
+            updatedDetails[index] = {
+                ...updatedDetails[index],
+                [field]: value,
+            };
+            return updatedDetails;
+        });
+    };
+
+    const handleStateChange = async (e, index) => {
+        const selectedFile = e.target.files[0];
+        try {
+            const url = await handleUpload(selectedFile);
+            setStateDetails((prevDetails) => {
+                const updatedDetails = [...prevDetails];
+                updatedDetails[index] = {
+                    ...updatedDetails[index],
+                    url: url?.url?.split('?')[0],
+                    fileName: selectedFile.name,
+                };
+                return updatedDetails;
+            });
+        } catch (error) {
+            console.error('Error during file upload:', error);
+        }
+    };
+
+    const handleRemoveState = (index) => {
+        setStateDetails((prevDetails) => {
+            const updatedDetails = prevDetails.filter((_, i) => i !== index);
+            setSelectedStates(updatedDetails.map((detail) => detail.name)); // Update selectedStates as well
+            return updatedDetails;
+        });
+    };
+    const menuRef = useRef(null); // Reference for the menu
+    const containerRef = useRef(null); // Reference for the container
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setStatesMenu(false);
+            }
+        };
+
+        // Add event listener to detect clicks outside the menu
+        document.addEventListener('mousedown', handleClickOutside);
+
+        // Clean up the event listener on component unmount
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
     return (
         <>
             {/* <UploadToS3 /> */}
@@ -569,7 +661,7 @@ const handleMultipleAdd =()=>{
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-2">
-                            <Form.Label className='mb-1'>Email ID<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className='mb-1'>Email ID <span className='text-danger'>*</span></Form.Label>
                             <Form.Control
                                 type="text"
                                 // defaultValue={updatePage ? clinicDataToUpdate?.email : ''}
@@ -581,7 +673,6 @@ const handleMultipleAdd =()=>{
                                     }
                                 })}
                                 placeholder="Email ID"
-                                onKeyPress={(event) => handleFirstSpace(event, 0)}
                             />
 
                             {errors.email && <span className="text-danger">{errors.email.message}</span>}
@@ -589,11 +680,10 @@ const handleMultipleAdd =()=>{
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-2">
-                            <Form.Label className='mb-1'>Tax ID / EIN</Form.Label>
+                            <Form.Label className='mb-1'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                             <Form.Control
                                 type="text"
                                 {...register('taxId')}
-                                onKeyPress={(event) => handleFirstSpace(event, 0)}
                                 maxLength={9}
                                 placeholder="Tax ID / EIN" />
                             {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
@@ -601,7 +691,7 @@ const handleMultipleAdd =()=>{
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-2 position-relative">
-                            <Form.Label className="mb-1">Contact Person</Form.Label>
+                            <Form.Label className="mb-1">Contact Person <span className='text-danger'>*</span></Form.Label>
                             <InputGroup>
                                 <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                 <Form.Control
@@ -624,10 +714,9 @@ const handleMultipleAdd =()=>{
 
                                     placeholder="1234-234-234"
                                     maxLength={10}
-                                    onKeyPress={(event) => handleFirstSpace(event, 0)}
                                 />
                             </InputGroup>
-                            {errors.contact1 && <span className="text-danger">{errors.contact1.message}</span>}
+                            {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
                             <img
                                 src={us}
                                 alt="country code flag"
@@ -641,7 +730,7 @@ const handleMultipleAdd =()=>{
 
                     <Col sm={6}>
                         <Form.Group className="mb-2">
-                            <Form.Label className='mb-1'>NPI Number</Form.Label>
+                            <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
                             <Form.Control
                                 type="text"
                                 {...register('npi', {
@@ -658,9 +747,9 @@ const handleMultipleAdd =()=>{
                                         message: 'NPI must contain numbers only', // Error message
                                     },
                                 })}
-                                placeholder="NPI Number"
+                                placeholder="NPI Type 2 Number"
                                 maxLength={10}
-                                onKeyPress={(event) => handleFirstSpace(event, 0)} />
+                            />
                             {errors.npi && <span className="text-danger">{errors.npi.message}</span>}
                         </Form.Group>
                     </Col>
@@ -760,7 +849,7 @@ const handleMultipleAdd =()=>{
                                     })}
                                     placeholder="Document Number"
                                     onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
-                                    onKeyPress={(event) => handleFirstSpace(event, 0)}
+                                    onKeyPress={(event) => handleFirstSpace(0)}
                                 />
                                 {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                             </Col>
@@ -857,73 +946,79 @@ const handleMultipleAdd =()=>{
                         </React.Fragment>
                     ))}
                     <hr />
-                    <Col sm={12}>
-                        <Form.Label>
-                            State of Licensing&nbsp;
+                    <Col sm={12} className="position-relative">
+                        <Form.Label ref={containerRef}>
+                            State of Licensure&nbsp;
                             <span
-                                onClick={handleAddState}
-                                className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
-                            </span>
+                                onClick={() => setStatesMenu(!statesMenu)}
+                                className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
+                            ></span>
+                            <div
+                                ref={menuRef}
+                                className={`scroll-container ${statesMenu ? '' : 'd-none'} bg-white border border-secondary position-absolute ps-1 py-1`}
+                                style={{ height: '14rem', width: '12em', zIndex: '111' }}
+                            >
+                                {statesData?.states?.map((data, index) => (
+                                    <div className='d-flex align-items-center px-1' key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }} onClick={() => handleCheckboxChange(data?.name)}
+                                    >
+                                        {selectedStates.includes(data?.name) ?
+                                            <MdOutlineRadioButtonChecked />
+                                            :
+                                            <MdOutlineRadioButtonUnchecked />
+                                        }
+                                        <span className='ps-1'>
+                                            {data?.name}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
                         </Form.Label>
                     </Col>
                     {stateDetails.map((data, index) => (
                         <React.Fragment key={index}>
                             <Col sm={4}>
-                                <Form.Select
-                                    onChange={(e) => handleStateInputChange(e, 'name', index)}
-                                >
-                                    <option style={{ color: 'red !important' }}>State</option>
-                                    {statesData?.states?.map((data, i) => (
-
-                                        <option key={i} selected={data?.name === clinicsDataGet?.stateOfLicensing[index]?.name
-                                        }
-                                        >
-                                            {data?.name}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                <Form.Control
+                                    type="text"
+                                    value={data.name}
+                                    readOnly // Display selected state name
+                                    placeholder="State"
+                                />
                             </Col>
                             <Col sm={4}>
                                 <Form.Control
                                     type="text"
                                     value={data.number}
                                     placeholder="Document Number"
-                                    {...register('stateDocno', {
-                                        pattern: {
-                                            value: /^[0-9]*$/,
-                                            message: 'Document no must be a number'
-                                        },
-                                    })}
                                     onChange={(e) => handleStateInputChange(e, 'number', index)}
-                                    onKeyPress={(event) => handleFirstSpace(event, 0)}
                                 />
-                                {errors.stateDocno && <span className="text-danger">{errors.stateDocno.message}</span>}
                             </Col>
                             <Col sm={4} className="mb-2 position-relative">
                                 <div
-                                    onClick={() => stateFileInputRef.current.click()}
-                                    className="custom-file-upload justify-content-between cursor-pointer"
+                                    onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'
+                                        }`}
                                 >
-                                    {data.url
-                                        ? data.url.split('/').pop()
-                                        : data?.fileName || 'Upload Document'}
-                                    <p className="mb-0"><FiDownloadCloud /></p>
+                                    {data.fileName
+                                        ? data?.fileName?.length > 30
+                                            ? data?.fileName?.slice(0, 25) + '...'
+                                            : data?.fileName
+                                        : 'Upload Document'}
+                                    <p className="mb-0">
+                                        <FiDownloadCloud />
+                                    </p>
                                 </div>
-
                                 <Form.Control
                                     type="file"
-                                    className="rounded-circle"
+                                    id={`fileInput-state=${index}`}
                                     style={{ display: 'none' }}
-                                    ref={stateFileInputRef}
                                     onChange={(e) => handleStateChange(e, index)}
                                 />
-
                                 <span
                                     onClick={() => handleRemoveState(index)}
+                                    className={`${stateDetails.length <= 1 ? 'd-none' : ''
+                                        } uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                     style={{ right: '-2%', top: '20%' }}
-                                    className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
-                                >
-                                </span>
+                                ></span>
                             </Col>
                         </React.Fragment>
                     ))}
@@ -1111,7 +1206,7 @@ const handleMultipleAdd =()=>{
                         <Row>
                             <Col sm={12} className="mb-2">
                                 <span className="text-black fw-semibold form-label">
-                                    POC (Point of contact)
+                                    Primary contact
                                     <span
                                         onClick={handleAddPOS}
                                         className="plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer">
@@ -1134,7 +1229,7 @@ const handleMultipleAdd =()=>{
                                                 type="text"
                                                 value={data.name}
                                                 onChange={(e) => handlePOSInputChange(e, 'name', index)}
-                                                onKeyPress={handleFirstSpace}
+                                                onKeyPress={(event) => handleFirstSpace(event, 0)}
                                                 placeholder="Full Name"
                                             />
                                         </Form.Group>
@@ -1145,7 +1240,6 @@ const handleMultipleAdd =()=>{
                                             <Form.Control
                                                 type="email"
                                                 value={data.email}
-                                                onKeyPress={handleFirstSpace}
                                                 {...register('contactemail', {
                                                     pattern: {
                                                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
@@ -1178,7 +1272,7 @@ const handleMultipleAdd =()=>{
                                                 <Form.Control
                                                     type="tel"
                                                     value={data.contact}
-                                                    onChange={(e) => handlePOSInputChange(e, 'contact', index)} 
+                                                    onChange={(e) => handlePOSInputChange(e, 'contact', index)}
                                                     placeholder="1234-234-234"
                                                     onKeyPress={handleFirstSpace}
                                                     maxLength={10}
@@ -1202,19 +1296,16 @@ const handleMultipleAdd =()=>{
                     </Col>
                     <hr />
                     <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
-                        <Button onClick={()=>handleMultipleAdd()} variant="primary" className='custom-buttons'>
-                            Multiple Add
+                        <Button as={Link} to={'/apps/Practice/new-practice'} variant="primary" className='custom-buttons'>
+                            Add Multiple
                         </Button>
                         <Button variant="primary" className='custom-buttons' onClick={() => setShowModal(true)}>
                             Change Password
                         </Button>
-                        {/* <Button variant="primary" type='submit' className='custom-buttons'>
-                            Add Multiple
-                        </Button> */}
+
                         <Button variant="primary" type="submit" disabled={store?.createClinicsReducer?.loading} onClick={() => setNextClicked(true)} className='custom-buttons'>
                             {store?.createClinicsReducer?.loading ?
-                                <Spinner className="spinner-border-sm" />
-                                :
+                                <Spinner color='white' className='spinner-border-sm' /> :
                                 'Save'
                             }
                         </Button>
@@ -1224,58 +1315,108 @@ const handleMultipleAdd =()=>{
                     </Col>
                 </Row >
             </Form >
-            {/* <Row className={`${clinicsList?.length > 0 ? '' : 'd-none'}`}>
-                <Col>
-                    <Table responsive className="mt-3 table-centered border border-muted table-nowrap mb-0 ">
-                        <thead>
-                            <tr>
-                                <th className='text-white'>Clinic Name</th>
-                                <th className='text-white'>Location</th>
-                                <th className='text-white'>Specialist</th>
-                                <th className='text-white'>Email</th>
-                                <th className='text-white'>Contact</th>
-                                <th className='text-white'>Tax / EIN Id</th>
-                                <th className='text-white'>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {store?.getClinicsByParentReducer?.loading ?
-                                <Spinner />
-                                :
+            <Row className='mt-2'>
+                <Col xs={12}>
+                    <Card>
+                        <Card.Body>
+                            <Row className="mb-2">
+                                <Col sm={6}>
+                                    <Button
+                                        onClick={() => setStatus(true)}
+                                        className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                    >
+                                        Active
+                                    </Button>
+                                    <Button
+                                        onClick={() => setStatus(false)}
+                                        className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                    >
+                                        Inactive
+                                    </Button>
+                                </Col>
 
-                                clinicsList?.map((multipleData, index) => (
-                                    <tr key={multipleData?._id}>
-                                        <td>{index}</td>
-                                        <td className='text-capitalize'>{multipleData?.name}</td>
-                                        <td>{multipleData?.address?.city?.state_code + ' / ' + multipleData?.address?.city?.name}</td>
-                                        <td>{multipleData?.clinicType}</td>
-                                        <td className='text-lowercase'>{multipleData?.email}</td>
-                                        <td>{multipleData?.phone}</td>
-                                        <td>{multipleData?.taxIdOrEIN}</td>
-                                        <td className='fs-4 d-flex gap-1'>
-                                            <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
-                                            <i
-                                                className="mdi mdi-delete cursor-pointer"
-                                                onClick={() => {
-                                                    if (index === 0) {
-                                                        ToastHandle('The parent clinic cannot be deleted before deleting the subclinics added under it.', 'danger')
-                                                        return;
-                                                    }
-                                                    const payload = {
-                                                        id: multipleData?._id,
-                                                    };
-                                                    dispatch(deleteClinicAction({ key: encryptMessage(payload) }));
-                                                    dispatch(stateEmptydAction());
-                                                }}
-                                            ></i>
-                                        </td>
-                                    </tr>
-                                )
-                                )}
-                        </tbody>
-                    </Table>
+                                <Col sm={6} className='text-end'>
+                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between ">
+                                        <Col xs="auto" className='d-flex gap-2'>
+                                            <FormInput
+                                                type="text"
+                                                value={search}
+                                                onChange={(e) => setSearch(e.target.value)}
+                                                // onChange={(e) => setName(e.target.value)}
+                                                placeholder="Search..." />
+                                            {/* <Button className="custom-buttons ">
+                                                <FiFilter className='fs-4' />
+                                            </Button>
+                                            <Button className="custom-buttons ">
+                                                <FiFileText className='fs-4' />
+                                            </Button> */}
+                                            {/* <Button as={Link} to='/apps/Practice/new-practice' className="custom-buttons">
+                                                New Sub Practice
+                                            </Button> */}
+                                        </Col>
+                                    </Row>
+
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col>
+                                    <Table responsive className="table-centered table-nowrap mb-0">
+                                        <thead className="text-white">
+                                            <tr className=''>
+                                                <th className='text-white'>S.No.</th>
+                                                <th className='text-white'>PRACTICE NAME</th>
+                                                {/* <th className='text-white'>LOCATION</th> */}
+                                                <th className='text-white'>PRACTICE TYPE</th>
+                                                {/* <th className='text-white'>END DATE</th> */}
+                                                {/* <th className='text-white'>COUNTDOWN</th> */}
+                                                {/* <th className='text-white'>CONTRACT</th> */}
+                                                <th className='text-white'>STATUS</th>
+                                                <th className='text-white'>ACTION</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {getTableData && getTableData?.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={9} className="text-center">
+                                                        <h5 className="my-3">No Data Found</h5>
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                getTableData && getTableData?.map((patient, index) => (
+                                                    <tr key={patient.id}>
+                                                        <td>{index + 1}</td>
+                                                        <td>{patient.name}</td>
+                                                        {/* <td>{patient.location}</td> */}
+                                                        <td>{patient.clinicType}</td>
+                                                        {/* <td>{patient.endDate}</td> */}
+                                                        {/* <td>{patient.countDown}</td> */}
+                                                        {/* <td>{patient.contract}</td> */}
+                                                        <td>
+                                                            <Form.Switch
+                                                                checked={patient.status === patient.status}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <div className="d-flex gap-2">
+                                                                <FiEdit
+                                                                    className="fs-5 cursor-pointer"
+                                                                // onClick={() => openDetailsModal(patient)}
+                                                                />
+                                                                <FiTrash className="fs-5 cursor-pointer" />
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </Table>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
                 </Col>
-            </Row> */}
+            </Row>
 
         </>
     );

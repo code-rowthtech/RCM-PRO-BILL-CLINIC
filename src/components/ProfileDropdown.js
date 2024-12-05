@@ -35,6 +35,9 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
 
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name || '';
+    const changedLogo=sessionStorage.getItem('logo');
+    console.log({changedLogo});
+    const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
 
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>
@@ -46,8 +49,14 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                 onClick={toggleDropdown}
                 className="nav-link  border-0 dropdown-toggle nav-user arrow-none me-0">
                 <span className="account-user-avatar">
-                    {/* <img src={profilePic} className="rounded-circle" alt="user" /> */}
+                    {changedLogo?
+                     <img src={changedLogo} className="rounded-circle" alt="user" />
+                    :
+                    logo?
+                    <img src={logo} className="rounded-circle" alt="user" />
+                    :
                     <FaUserCircle className="rounded-circle fs-1  text-dark" />
+                    }
                 </span>
                 <span className='text-capitalize'>
                     <OverlayTrigger
