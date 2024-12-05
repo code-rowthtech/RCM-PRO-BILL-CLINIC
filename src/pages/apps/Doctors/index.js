@@ -147,7 +147,7 @@ const Doctors = () => {
                                                             </td>
                                                             <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
                                                             <td>
-                                                                {data?.departmentDetails?.name}
+                                                                {data?.departmentDetails?.name || 'N/A'}
                                                             </td>
                                                             <td>
                                                                 <Form.Switch

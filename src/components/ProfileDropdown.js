@@ -36,7 +36,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name || '';
     const changedLogo=sessionStorage.getItem('logo');
-    console.log({changedLogo});
+    // console.log({changedLogo});
     const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
 
     return (

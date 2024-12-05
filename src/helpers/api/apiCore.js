@@ -51,7 +51,7 @@ axios.interceptors.response.use(
         const decryptedData = error?.response?.data?.data
             ? JSON.parse(decryptMessage(error.response.data.data))
             : null;
-        console.log('API Core Error:', decryptedData);
+        console.error('API Core Error:', decryptedData);
 
         // Default error message
         let message = 'An error occurred. Please try again later.';
@@ -92,7 +92,7 @@ const setAuthorization = (token) => {
 
 const getUserFromSession = () => {
     const user = sessionStorage.getItem(AUTH_SESSION_KEY);
-    console.log(user,'user1')
+    // console.log(user,'user1')
 
     return user ? (typeof user == 'object' ? user : JSON.parse(user)) : null;
     
