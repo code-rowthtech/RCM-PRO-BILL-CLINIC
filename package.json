@@ -30,7 +30,7 @@
     "react-big-calendar": "^1.15.0",
     "react-bootstrap": "^2.1.2",
     "react-bootstrap-typeahead": "^6.0.0-alpha.9",
-    "react-datepicker": "^4.7.0",
+    "react-datepicker": "^4.25.0",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.27.1",
     "react-i18next": "^11.15.5",

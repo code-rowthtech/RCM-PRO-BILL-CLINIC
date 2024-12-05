@@ -18,6 +18,7 @@ function* createSubClinicsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
+            ToastHandle("Email sent successfully",'success');
             yield put({
                 type: SubClinicsActionTypes.CREATE_SUBCLINIC_SUCCESS,
                 payload: { ...decryptedData },
@@ -72,6 +73,7 @@ function* getSubClinicsFunction(data) {
         });
         const response = yield call(getSubClinicApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'decryptedData')
 
         if (response.status === 200) {
             yield put({

@@ -51,7 +51,7 @@ const Contract = ({ billingId, activeTab, contractId }) => {
                     {store?.createContractReducer?.loading ? (
                         <tr>
                             <td className="text-center" colSpan={5}>
-                                <Spinner />
+                            <Spinner color='white' className='spinner-border-sm'/>
                             </td>
                         </tr>
                     ) :

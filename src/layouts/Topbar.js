@@ -60,12 +60,13 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/patients/list': 'Patients',
         '/apps/patients/new-patient': 'New Patients',
         '/apps/role-management/list': 'Role Management',
-        '/apps/crm/addclinic': 'Profile',
+        '/apps/crm/addclinic': 'Practice',
         '/apps/settings/department': 'Settings',
         '/apps/settings/desigination': 'Settings',
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',
+        
     };
 
     // Get the title for the current path or use a default value

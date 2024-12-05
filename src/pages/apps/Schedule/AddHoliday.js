@@ -4,6 +4,7 @@ import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
+import { encryptMessage } from "../../../cryptoUtils";
 
 const AddHoliday = () => {
     const store = useSelector((state) => state);
@@ -11,7 +12,6 @@ const AddHoliday = () => {
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    console.log(clinic_id,'clinic_id')
 
     const {
         register,
@@ -32,9 +32,8 @@ const AddHoliday = () => {
         tillDate: data.tillDate,
     };
 
-    dispatch(createScheduleAction(payload));
+    dispatch(createScheduleAction({ key: encryptMessage(payload) }));
     reset();
-    console.log(payload, "payload");
 };
 
     useEffect(() => {

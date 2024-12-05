@@ -29,12 +29,14 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
+        // console.log(user,'user')
         const userData = {
             name: user?.name,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
             _id: user?.userId,
+            logo:user?.profileImage,
             clinicId: user?.clinicId
         }
 
@@ -59,6 +61,7 @@ function* logout() {
         yield call(logoutApi);
         api.setLoggedInUser(null);
         setAuthorization(null);
+        sessionStorage.clear();
         yield put(authApiResponseSuccess(AuthActionTypes.LOGOUT_USER, {}));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.LOGOUT_USER, error));

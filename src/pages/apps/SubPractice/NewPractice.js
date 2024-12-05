@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
@@ -12,9 +12,10 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
-import { getCitiesAction, getClinicTypeAction, getStatesByCountryAction } from '../../../redux/actions';
+import { getCitiesAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
-// import { handleFirstSpace } from '../../../helpers/noSpace';
+import { handleFirstSpace } from '../../../helpers/noSpace';
+import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
 
 
 
@@ -30,7 +31,7 @@ const NewPractice = () => {
     const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
- 
+
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
     };
@@ -89,6 +90,8 @@ const NewPractice = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
+    const cities = store?.getCitiesReducer?.data?.cities;
+
     console.log("Cities in Store:", citiesData);
     const statecode = statesData?.states?.state_code
     console.log(statecode, 'sttecode')
@@ -241,9 +244,7 @@ const NewPractice = () => {
 
     }, [dispatch])
 
-    const handleNewDoctor = () => {
-        navigate('/apps/Practice/list');
-    };
+
 
     const handleAccreditationInputChange = (e, field, index) => {
         const value = e.target.value;
@@ -322,41 +323,6 @@ const NewPractice = () => {
 
     };
 
-
-    const handleRemoveState = (index) => {
-        setStateDetails((prevDetails) => prevDetails.filter((_, i) => i !== index));
-    };
-
-    const handleStateInputChange = (e, field) => {
-        const { value, checked } = e.target;
-
-        if (field === "name") {
-            setStateDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-
-                if (checked) {
-                    if (!updatedDetails.some(item => item.name === value)) {
-                        updatedDetails.push({
-                            name: value,
-                            number: "",
-                            url: null,
-                            fileName: "",
-                        });
-                    }
-                } else {
-                    const filteredDetails = updatedDetails.filter(item => item.name !== value);
-                    return filteredDetails;
-                }
-                return updatedDetails;
-            });
-        }
-        setOpenSelect(false);
-    };
-
-
-
-
-
     const handleMedicalChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
@@ -376,16 +342,8 @@ const NewPractice = () => {
     };
 
 
-    const handleStateChange = (e, index) => {
-        // Handle file upload change here, based on your logic
-        const updatedDetails = [...stateDetails];
-        updatedDetails[index].url = URL.createObjectURL(e.target.files[0]);
-        updatedDetails[index].fileName = e.target.files[0].name;
-        setStateDetails(updatedDetails);
-    };
-
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-    const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
+    // const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
 
     console.log(clinic_id, 'id')
     const [formData, setFormData] = useState({
@@ -395,7 +353,7 @@ const NewPractice = () => {
         contactPerson: '',
     });
     const formDataChange = (field, value) => {
-        const updatedFormData = { ...formData, [field]: value.trim() }; // Trim the value to remove extra spaces
+        const updatedFormData = { ...formData, [field]: value }; 
         setFormData(updatedFormData);
 
         // Check if all fields are filled
@@ -408,7 +366,7 @@ const NewPractice = () => {
         // Enable or disable the button
         setIsButtonDisabled(!areAllFieldsFilled);
     };
-  
+
     const handleFileUpload = (index, file) => {
         if (file) {
             const reader = new FileReader();
@@ -419,7 +377,6 @@ const NewPractice = () => {
             reader.readAsDataURL(file);
         }
     };
-
 
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
@@ -455,7 +412,7 @@ const NewPractice = () => {
     const [posDetails, setPosDetails] = useState([
         { name: '', email: '', role: '', contact: '', fileName: '' }
     ])
-    console.log(posDetails,'pppp')
+    console.log(posDetails, 'pppp')
     const handleAddPOS = () => {
         const isIncomplete = posDetails.some(
             (pos) =>
@@ -490,20 +447,26 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+    useEffect(() => {
+        dispatch(
+            getDoctorsrolesAction({ search: 'clinic' })
+        );
+    }, [dispatch]);
+    const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
+    console.log(getRoleId, 'getRoleId')
 
-    const submitData = (data) => {
+    const submitSubData = (data) => {
 
         const payload = {
-            parentClinic: clinic_id,
             name: data?.clinicname,
             email: data?.email,
-            role: clinic_role,
+            role: getRoleId,
             phone: data?.contactPerson,
             clinicType: data?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npiNumber,
             medicalLicenses: medicalDetails,
-            stateOfLicensing: stateDetails,
+            // stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
             logo: logo?.url.split('?')[0],
             address: {
@@ -515,7 +478,7 @@ const NewPractice = () => {
                 latitude: data?.latitude,
                 longitude: data?.longitude,
             },
-            pos:posDetails
+            pos: posDetails
 
         }
         console.log('Form Submitted:', payload);
@@ -527,6 +490,99 @@ const NewPractice = () => {
         }
         reset(); // Reset form after submission
     };
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    useEffect(() => {
+        if (selectedLocation) {
+            setLatitude(selectedLocation?.bounds?.southwest?.lat);
+            setLongitude(selectedLocation?.bounds?.southwest?.lng);
+            setValue('address', selectedLocation?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            setValue('stateName', selectedState)
+            const countyName = selectedLocation?.components?.county;
+            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation, setValue, statesData, dispatch])
+    useEffect(() => {
+        if (cities) {
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
+            setValue('city', selectedCounty)
+        }
+    }, [cities])
+    const [selectedStates, setSelectedStates] = useState([]);
+const [statesMenu, setStatesMenu] = useState(false);
+const handleCheckboxChange = (stateName) => {
+    setSelectedStates((prev) => {
+        const updatedStates = prev.includes(stateName)
+            ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+            : [...prev, stateName]; // Add state if checked
+
+        // Sync stateDetails with selected states
+        setStateDetails((prevDetails) => {
+            const newDetails = updatedStates.map((state) =>
+                prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }
+            );
+            return newDetails;
+        });
+
+        return updatedStates;
+    });
+};
+
+const handleStateInputChange = (e, field, index) => {
+    const value = e.target.value;
+    setStateDetails((prevDetails) => {
+        const updatedDetails = [...prevDetails];
+        updatedDetails[index] = {
+            ...updatedDetails[index],
+            [field]: value,
+        };
+        return updatedDetails;
+    });
+};
+
+const handleStateChange = async (e, index) => {
+    const selectedFile = e.target.files[0];
+    try {
+        const url = await handleUpload(selectedFile);
+        setStateDetails((prevDetails) => {
+            const updatedDetails = [...prevDetails];
+            updatedDetails[index] = {
+                ...updatedDetails[index],
+                url: url?.url?.split('?')[0],
+                fileName: selectedFile.name,
+            };
+            return updatedDetails;
+        });
+    } catch (error) {
+        console.error('Error during file upload:', error);
+    }
+};
+
+const handleRemoveState = (index) => {
+    setStateDetails((prevDetails) => {
+        const updatedDetails = prevDetails.filter((_, i) => i !== index);
+        setSelectedStates(updatedDetails.map((detail) => detail.name)); // Update selectedStates as well
+        return updatedDetails;
+    });
+};
+const menuRef = useRef(null); // Reference for the menu
+const containerRef = useRef(null); // Reference for the container
+useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (containerRef.current && !containerRef.current.contains(event.target)) {
+            setStatesMenu(false);
+        }
+    };
+
+    // Add event listener to detect clicks outside the menu
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Clean up the event listener on component unmount
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+}, []);
     return (
         <>
             <div className='pt-1 pb-2'>
@@ -565,24 +621,24 @@ const NewPractice = () => {
                                 <div className='d-flex gap-2'>
                                     {btnShow && <>
                                         <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>Email to Sub Practice</Button>
-                                        <Button onClick={handleNewDoctor}>Back</Button>
+                                        <Button as={Link} to={'/apps/crm/addclinic'}>Back</Button>
                                     </>}
                                 </div>
                             </div>
 
                             {activeTab === "personalDetails" && (
-                                <Form className='mt-3' onSubmit={handleSubmit(submitData)} >
+                                <Form className='mt-3' onSubmit={handleSubmit(submitSubData)} >
                                     <Row >
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Practice Name</Form.Label>
+                                                <Form.Label className='mb-1'>Practice Name <span className='text-danger'>*</span></Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     {...register('clinicname', { required: 'Practice Name is required' })}
                                                     onChange={(e) => formDataChange('clinicname', e.target.value)}
                                                     value={formData.clinicname}
                                                     placeholder="Practice name"
-                                                // onKeyPress={handleFirstSpace}
+                                                    
 
 
                                                 />
@@ -592,22 +648,28 @@ const NewPractice = () => {
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Practice type</Form.Label>
-                                                <Form.Select {...register('clinicType', { required: 'Practice Type is required' })}
-                                                    value={formData.clinicType} onChange={(e) => formDataChange('clinicType', e.target.value)}
+                                                <Form.Label className="mb-1">
+                                                    Practice type <span className="text-danger">*</span>
+                                                </Form.Label>
+                                                <Form.Select
+                                                    {...register('clinicType', { required: 'Practice Type is required' })}
+                                                    defaultValue="" // Ensures initial validation fails if not selected
                                                 >
-                                                    <option>Select Clinic type</option>
+                                                    <option value="">Select Clinic type</option>
                                                     {clinectypes?.map((data) => (
-                                                        <option key={data?._id} value={data?.name}>{data?.name}</option>
+                                                        <option key={data?._id} value={data?.name}>
+                                                            {data?.name}
+                                                        </option>
                                                     ))}
                                                 </Form.Select>
-                                                {errors.clinicType && <p className="text-danger">{errors.clinicType.message}</p>}
-
+                                                {errors.clinicType && (
+                                                    <p className="text-danger">{errors.clinicType.message}</p>
+                                                )}
                                             </Form.Group>
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className="mb-1">Email</Form.Label>
+                                                <Form.Label className="mb-1">Email <span className='text-danger'>*</span></Form.Label>
                                                 <Form.Control
                                                     type="email"
                                                     placeholder="Email"
@@ -642,17 +704,21 @@ const NewPractice = () => {
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2 position-relative">
-                                                <Form.Label className="mb-1">Contact Person</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="+1 1234-234-234"
-                                                    value={formData.contactPerson}
-                                                    {...register('contactPerson', { required: 'contactPerson is required' })}
-                                                    onChange={(e) => formDataChange('contactPerson', e.target.value)}
-                                                    style={{ paddingLeft: '5%' }}
-                                                // onKeyPress={handleFirstSpace}
+                                                <Form.Label className="mb-1">Contact Person <span className='text-danger'>*</span></Form.Label>
+                                                <InputGroup>
+                                                    <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
 
-                                                />
+                                                    <Form.Control
+                                                        type="tel"
+                                                        placeholder="+1 1234-234-234"
+                                                        value={formData.contactPerson}
+                                                        {...register('contactPerson', { required: 'contactPerson is required' })}
+                                                        onChange={(e) => formDataChange('contactPerson', e.target.value)}
+                                                        onKeyPress={handleFirstSpace}
+
+                                                    />
+
+                                                </InputGroup>
                                                 {errors.contactPerson && <p className="text-danger">{errors.contactPerson.message}</p>}
 
                                                 <img
@@ -664,6 +730,7 @@ const NewPractice = () => {
                                                 />
                                             </Form.Group>
                                         </Col>
+
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
                                                 <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
@@ -874,254 +941,264 @@ const NewPractice = () => {
                                             </React.Fragment>
                                         ))}
                                         <hr />
-                                        {/* <Col sm={12}>
-                                            <Form.Label>
-                                                State of Licensing&nbsp;
+                                        <Col sm={12} className="position-relative">
+                                            <Form.Label ref={containerRef}>
+                                                State of Licensure&nbsp;
                                                 <span
-                                                    onClick={handleAddState}
-                                                    className="text-black fs-5 uil-plus-circle fw-bold cursor-pointer"
+                                                    onClick={() => setStatesMenu(!statesMenu)}
+                                                    className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
                                                 ></span>
+                                                <div
+                                                    ref={menuRef}
+                                                    className={`scroll-container ${statesMenu ? '' : 'd-none'} bg-white border border-secondary position-absolute ps-1 py-1`}
+                                                    style={{ height: '14rem', width: '12em', zIndex: '111' }}
+                                                >
+                                                    {statesData?.states?.map((data, index) => (
+                                                        <div className='d-flex align-items-center px-1' key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }} onClick={() => handleCheckboxChange(data?.name)}
+                                                        >
+                                                            {selectedStates.includes(data?.name) ?
+                                                                <MdOutlineRadioButtonChecked />
+                                                                :
+                                                                <MdOutlineRadioButtonUnchecked />
+                                                            }
+                                                            <span className='ps-1'>
+                                                                {data?.name}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </Form.Label>
                                         </Col>
-
-                                        {stateDetails && stateDetails?.map((data, index) => (
+                                        {stateDetails.map((data, index) => (
                                             <React.Fragment key={index}>
-                                                {!openSelect && (
-                                                    <Col sm={4}>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={data.name}
-                                                            placeholder="Name"
-
-                                                        />
-                                                    </Col>
-                                                )}
-                                                {openSelect && (
-                                                    <Col sm={4}>
-                                                        <div
-                                                            style={{
-                                                                maxHeight: "100px",
-                                                                overflowY: "auto",
-                                                                border: "1px solid #ccc",
-                                                                padding: "10px",
-                                                            }}
-                                                        >
-                                                            {statesData?.states?.map((state) => (
-                                                                <Form.Check
-                                                                    key={state?._id}
-                                                                    type="checkbox"
-                                                                    label={state?.name}
-                                                                    value={state?.name}
-                                                                    checked={stateDetails.some((item) => item.name === state.name)}
-                                                                    onChange={(e) => handleStateInputChange(e, "name")}
-                                                                />
-                                                            ))}
-                                                        </div>
-                                                    </Col>
-                                                )}
-
+                                                <Col sm={4}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        value={data.name}
+                                                        readOnly // Display selected state name
+                                                        placeholder="State"
+                                                    />
+                                                </Col>
                                                 <Col sm={4}>
                                                     <Form.Control
                                                         type="text"
                                                         value={data.number}
                                                         placeholder="Document Number"
-                                                        {...register('stateDocno', {
-                                                            pattern: {
-                                                                value: /^[0-9]*$/,
-                                                                message: 'Document no must be a number'
-                                                            },
-                                                        })}
                                                         onChange={(e) => handleStateInputChange(e, 'number', index)}
                                                     />
-                                                    {errors.stateDocno && <span className="text-danger">{errors.stateDocno.message}</span>}
                                                 </Col>
-
                                                 <Col sm={4} className="mb-2 position-relative">
                                                     <div
-                                                        onClick={() => document.getElementById(`state-file-input-${index}`).click()}
-                                                        className="custom-file-upload justify-content-between cursor-pointer"
+                                                        onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'
+                                                            }`}
                                                     >
-                                                        {data.url
-                                                            ? data.url.split('/').pop()
-                                                            : data?.fileName || 'Upload Document'}
-                                                        <p className="mb-0"><FiDownloadCloud /></p>
+                                                        {data.fileName
+                                                            ? data?.fileName?.length > 30
+                                                                ? data?.fileName?.slice(0, 25) + '...'
+                                                                : data?.fileName
+                                                            : 'Upload Document'}
+                                                        <p className="mb-0">
+                                                            <FiDownloadCloud />
+                                                        </p>
                                                     </div>
-
                                                     <Form.Control
-                                                        id={`state-file-input-${index}`}
                                                         type="file"
-                                                        className="rounded-circle"
+                                                        id={`fileInput-state=${index}`}
                                                         style={{ display: 'none' }}
                                                         onChange={(e) => handleStateChange(e, index)}
                                                     />
-
                                                     <span
                                                         onClick={() => handleRemoveState(index)}
+                                                        className={`${stateDetails.length <= 1 ? 'd-none' : ''
+                                                            } uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                                         style={{ right: '-2%', top: '20%' }}
-                                                        className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                                     ></span>
                                                 </Col>
                                             </React.Fragment>
-                                        ))} */}
+                                        ))}
 
 
 
                                         <hr />
                                         <Col sm={12}>
                                             <Row>
-                                                <Col sm={12} className="mb-2">
-                                                    <span className="text-black fw-semibold form-label">Address Details</span>
+                                                <Col sm={12} className='mb-2'>
+                                                    <span className='text-black fw-semibold form-label'>Address Details</span>
                                                 </Col>
-
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className="mb-1">Address</Form.Label>
-                                                        <div style={{ position: 'relative' }}>
-                                                            <Form.Control
-                                                                type="text"
-                                                                {...register('address')}
-                                                                onChange={getGeolocation}
-                                                                onFocus={() => setFocused(true)}
-                                                                placeholder="Search for address"
-                                                                autoComplete="off"
-                                                            // onKeyPress={handleFirstSpace}
-
-                                                            />
-                                                            {focused && searchedLocations.length > 0 && (
-                                                                <div
-                                                                    style={{
-                                                                        position: 'absolute',
-                                                                        top: '100%',
-                                                                        left: 0,
-                                                                        width: '100%',
-                                                                        maxHeight: '150px',
-                                                                        overflowY: 'auto',
-                                                                        backgroundColor: '#fff',
-                                                                        border: '1px solid #ced4da',
-                                                                        zIndex: 1111,
-                                                                    }}
-                                                                >
-                                                                    {searchedLocations.map((location, index) => (
-                                                                        <p
-                                                                            key={index}
-                                                                            style={{
-                                                                                margin: 0,
-                                                                                padding: '8px 12px',
-                                                                                cursor: 'pointer',
-                                                                            }}
-                                                                            onClick={() => handleAddressSelection(location)}
-                                                                        >
-                                                                            {location.formatted}
-                                                                        </p>
-                                                                    ))}
+                                                    <Row className='position-relative'>
+                                                        <Col sm={12}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                <div style={{ position: 'relative' }}>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
+                                                                        {...register('address')}
+                                                                        onChange={(e) => {
+                                                                            getGeolocation(e);
+                                                                            setFocused(true); // Open dropdown on input
+                                                                        }}
+                                                                        onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                                        onBlur={() => {
+                                                                            setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                                        }}
+                                                                        placeholder="Search for address"
+                                                                        autoComplete="off"
+                                                                    />
+                                                                    {/* Dropdown suggestions */}
+                                                                    <div
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '100%',
+                                                                            left: 0,
+                                                                            width: '100%',
+                                                                            maxHeight: '150px',
+                                                                            overflow: 'auto',
+                                                                            zIndex: 111,
+                                                                            backgroundColor: '#fff',
+                                                                            border: '1px solid #ced4da',
+                                                                            borderTop: 'none',
+                                                                        }}
+                                                                        className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                                    >
+                                                                        {searchedLocations?.map((data, index) => (
+                                                                            <p
+                                                                                key={index}
+                                                                                onClick={() => {
+                                                                                    setSelectedLocation(data)
+                                                                                    setFocused(false); // Close dropdown after selection
+                                                                                }}
+                                                                                style={{
+                                                                                    margin: 0,
+                                                                                    padding: '8px 12px',
+                                                                                    cursor: 'pointer',
+                                                                                }}
+                                                                                className="hover-bg-change text-black"
+                                                                            >
+                                                                                {data?.formatted}
+                                                                            </p>
+                                                                        ))}
+                                                                        {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                    </div>
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    </Form.Group>
-                                                </Col>
+                                                            </Form.Group>
+                                                        </Col>
 
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    defaultValue={latitude}
+                                                                    placeholder="Latitude"
+                                                                />
+                                                                {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                            </Form.Group>
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    defaultValue={longitude}
+                                                                    placeholder="Longitude" />
+                                                                {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                            </Form.Group>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
                                                 <Col sm={6}>
                                                     <Row>
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
-                                                                <Form.Label>State</Form.Label>
+                                                                <Form.Label className='mb-1' >State</Form.Label>
                                                                 <Form.Select
                                                                     {...register('stateName')}
-                                                                    value={stateToSelect}
-                                                                    onChange={handleStateSelection}
+                                                                    onChange={(e) => handleStateSelection(e)}
                                                                 >
-                                                                    <option value="">Select State</option>
+                                                                    <option>State</option>
                                                                     {statesData?.states?.map((data) => (
-                                                                        <option key={data?.state_code} value={data?.state_code}>
-                                                                            {data?.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
-                                                            </Form.Group>
-                                                        </Col>
-
-                                                        <Col sm={6}>
-                                                            <Form.Group className="mb-2">
-                                                                <Form.Label>City</Form.Label>
-                                                                <Form.Select
-                                                                    {...register('city')}
-                                                                    value={selectedCity}
-                                                                    onChange={handleCitySelection}
-                                                                >
-                                                                    <option value="">Select City</option>
-                                                                    {citiesData?.map((data) => (
                                                                         <option
-                                                                            key={data?._id}
-                                                                            value={JSON.stringify({
-                                                                                _id: data?._id,
-                                                                                name: data?.name,
-                                                                                latitude: data?.latitude,
-                                                                                longitude: data?.longitude,
-                                                                            })}
+                                                                            key={data?.id} // Unique key for each option
+                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                            value={data?._id}
                                                                         >
                                                                             {data?.name}
                                                                         </option>
                                                                     ))}
                                                                 </Form.Select>
                                                             </Form.Group>
+
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className='mb-1'>City</Form.Label>
+                                                                {/* {
+                                                store?.getCitiesReducer?.loading ?
+                                                    <Row>
+                                                        <Col sm={12}>
+                                                            <Spinner className='fs-5' />
                                                         </Col>
                                                     </Row>
-                                                </Col>
+                                                    : */}
+                                                                <Form.Select
+                                                                    disabled={store?.getCitiesReducer?.loading}
+                                                                    {...register('city')}
+                                                                    onChange={(e) => handleCitySelection(e)}
+                                                                >
+                                                                    <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                                    {cities?.map((data) => (
+                                                                        <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
-                                                <Col sm={6}>
-                                                    <Row>
-                                                        <Col sm={6}>
-                                                            <Form.Group className="mb-2">
-                                                                <Form.Label className="mb-1">Latitude</Form.Label>
-                                                                <Form.Control type="text" value={latitude} placeholder="Latitude"
-                                                                //  onKeyPress={handleFirstSpace}
-                                                                />
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                                {/* } */}
                                                             </Form.Group>
                                                         </Col>
 
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
-                                                                <Form.Label className="mb-1">Longitude</Form.Label>
-                                                                <Form.Control type="text" value={longitude} placeholder="Longitude"
-                                                                //  onKeyPress={handleFirstSpace}
-                                                                />
-                                                            </Form.Group>
-                                                        </Col>
-                                                    </Row>
-                                                </Col>
-
-                                                <Col sm={6}>
-                                                    <Row>
-                                                        <Col sm={6}>
-                                                            <Form.Group className="mb-2">
-                                                                <Form.Label className="mb-1">Zip</Form.Label>
-                                                                <Form.Control type="text" {...register('zip')} placeholder="Zip"
-                                                                // onKeyPress={handleFirstSpace}
-
-                                                                />
-                                                            </Form.Group>
-                                                        </Col>
-
-                                                        <Col sm={6}>
-                                                            <Form.Group className="mb-2">
-                                                                <Form.Label>Street</Form.Label>
+                                                                <Form.Label className='mb-1'>Street</Form.Label>
                                                                 <Form.Control
                                                                     type="text"
                                                                     {...register('street')}
-                                                                    value={street}
-                                                                    onChange={(e) => setStreet(e.target.value)}
-                                                                    placeholder="Street"
-                                                                // onKeyPress={handleFirstSpace}
+                                                                    onKeyPress={handleFirstSpace}
+                                                                    placeholder="Street" />
 
+                                                                {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                            </Form.Group>
+                                                        </Col>
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                <Form.Control
+                                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
+                                                                    type="text"
+                                                                    {...register('zip', {
+                                                                        minLength: {
+                                                                            value: 5,
+                                                                            message: 'ZIP code must be at least 5 characters long',
+                                                                        },
+                                                                        pattern: {
+                                                                            value: /^[0-9]+$/,
+                                                                            message: 'ZIP code must contain numbers only',
+                                                                        },
+                                                                    })}
+                                                                    onKeyPress={handleFirstSpace}
+                                                                    placeholder="Zip"
+                                                                    maxLength={5}
                                                                 />
+                                                                {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
                                                             </Form.Group>
                                                         </Col>
                                                     </Row>
                                                 </Col>
                                             </Row>
                                         </Col>
-
-
                                         <hr />
                                         <Col sm={12}>
                                             <Row>
@@ -1216,9 +1293,9 @@ const NewPractice = () => {
                                         </Col>
                                         <hr />
                                         <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
-                                            <Button variant="primary" className='custom-buttons' onClick={() => setPassShow(true)} >
+                                            {/* <Button variant="primary" className='custom-buttons' onClick={() => setPassShow(true)} >
                                                 Reset Password
-                                            </Button>
+                                            </Button> */}
 
                                             <Button
                                                 variant="primary"

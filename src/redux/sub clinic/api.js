@@ -13,7 +13,7 @@ export function createUpgradeApi(params: any): any {
 }
 
 export function getSubClinicApi(params: any): any {
-    return api.get(URL.getSubClinic);
+    return api.create(URL.getSubClinic);
 }
 export function getCityByStateApi(params: any): any {
     const { data } = params;

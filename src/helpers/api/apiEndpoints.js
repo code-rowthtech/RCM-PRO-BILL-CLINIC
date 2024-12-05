@@ -23,11 +23,12 @@ export const getClinicType = '/api/v1/clinic/getClinicTypes';
 
 // SUB CLINIC
 export const createSubClinic = '/api/v1/clinic/createSubClinics'
-export const getSubClinic = ''
+export const getSubClinic = '/api/v1/clinic/getSubClinics'
 export const getSubClinicCityByState = '/api/v1/clinic/cities/';
 export const createUpgrade = '/api/v1/clinic/upgradeSubscription'
 export const getSubClinicType = '/api/v1/clinic/getClinicTypes'
 export const getSubscription = '/api/v1/clinic/getSubscription/history'
+
 
 
 

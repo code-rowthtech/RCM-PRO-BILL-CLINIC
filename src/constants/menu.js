@@ -25,12 +25,12 @@ const MENU_ITEMS = [
     //     url: '/apps/transaction/transaction-list',
     // },
   
-    {
-        key: 'Practice',
-        label: 'Sub  Practice',
-        icon: 'bi bi-heart-pulse',
-        url: '/apps/Practice/list',
-    },
+    // {
+    //     key: 'Practice',
+    //     label: 'Sub  Practice',
+    //     icon: 'bi bi-heart-pulse',
+    //     url: '/apps/Practice/list',
+    // },
     {
         key: 'doctors',
         label: 'Doctor',
@@ -64,7 +64,7 @@ const MENU_ITEMS = [
  
     {
         key: 'apps-crm',
-        label: 'Profile',
+        label: 'Practice',
         url: '/apps/crm/addclinic',
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },
