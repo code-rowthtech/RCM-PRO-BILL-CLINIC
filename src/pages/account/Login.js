@@ -15,7 +15,6 @@ import { decryptMessage, encryptMessage } from '../../cryptoUtils';
 import Loader from '../../components/Loader';
 import Spinner from '../../constants/Spinner';
 import ToastHandle from '../../helpers/ToastMessage';
-import { handleFirstSpace } from '../../helpers/noSpace';
 
 /* bottom link of account pages */
 const BottomLink = () => {
