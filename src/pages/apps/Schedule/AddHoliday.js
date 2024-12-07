@@ -11,7 +11,7 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const {
         register,
@@ -25,8 +25,8 @@ const AddHoliday = () => {
 
     const payload = {
         doctorId: doctorInfo.id,
+        type : 'Holiday',
         name: doctorInfo.name,
-        clinicId: clinic_id,
         reason: data.reason,
         fromDate:data.fromDate,
         tillDate: data.tillDate,

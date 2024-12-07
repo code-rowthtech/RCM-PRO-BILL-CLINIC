@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
-import { getScheduleAction } from '../../../redux/schedule/action';
+import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 const Breaks = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -15,11 +15,22 @@ const Breaks = () => {
         const payload = {
             startDate: '',
             endDate: '',
-            flag: "Break",
+            type: "Break",
             search: ''
         };
         dispatch(getScheduleAction(payload));
     }, [dispatch]);
+
+    const deleteHandle = (id) => {
+        dispatch(deleteScheduleAction(id))
+        const payload = {
+          startDate: '',
+          endDate: '',
+          type: "Break",
+          search : ''
+        };
+        dispatch(getScheduleAction(payload));
+      }
 
     return (
         <div>
@@ -58,7 +69,7 @@ const Breaks = () => {
                                     {breakItem.breakDay}
                                 </td>
                                 <td>
-                                    <RiDeleteBin5Line className="fs-4 ms-2" />
+                                <RiDeleteBin5Line onClick={()=>deleteHandle(breakItem?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                                 </td>
                             </tr>
                         ))

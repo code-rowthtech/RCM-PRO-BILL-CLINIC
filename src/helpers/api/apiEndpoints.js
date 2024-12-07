@@ -63,4 +63,5 @@ export const addSubscriptionPlan='/api/v1/clinic/addSubscriptionPlan';
 // SCHEDULE
 export const createSchedule = '/api/v1/clinic/addOrUpdateSchedule';
 export const getDoctorsList = 'api/v1/clinic/getDoctorsList';
+export const deleteSchedule = '/api/v1/clinic/removeSchedule'
 export const getSchedule = '/api/v1/clinic/getSchedule';

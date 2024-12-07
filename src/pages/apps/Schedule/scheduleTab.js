@@ -14,79 +14,154 @@ const ScheduleTab = () => {
     const [name, setName] = useState('');
     const doctorLists = store?.getDoctorsListReducer?.data?.result || [];
     const scheduleList = store?.getScheduleReducer?.data?.result || [];
+    console.log({scheduleList})
     const isLoading = store?.getScheduleReducer?.loading;
-
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const { control, handleSubmit, setValue, register } = useForm();
 
     useEffect(() => {
         dispatch(getDoctorsListAction());
-        dispatch(getScheduleAction({ flag: 'Schedule' }));
-        if (scheduleList.length > 0) {
-            const firstSchedule = scheduleList[0];
-            setTime(firstSchedule.perPatientTime || "");
-            setName(firstSchedule.name || "");
-        }
+        dispatch(getScheduleAction({ type: 'Schedule', search: '', startDate: '', endDate: '' }));
     }, [dispatch]);
+
+    const filteredScheduleList = scheduleList.filter(schedule => {
+        const doctorInfo = JSON.parse(selectedDoctor || '{}');
+        return schedule?.doctorId === doctorInfo?.id;
+    });
+
+    useEffect(() => {
+        if (selectedDoctor) {
+            const doctorInfo = JSON.parse(selectedDoctor || '{}');
+            const filteredScheduleList = scheduleList.filter(schedule => schedule?.doctorId === doctorInfo?.id);
+
+            if (filteredScheduleList.length > 0) {
+                const firstSchedule = filteredScheduleList[0];
+                setTime(firstSchedule.perPatientTime || '');
+                setName(firstSchedule.name || '');
+
+                firstSchedule?.availability?.forEach((schedule, index) => {
+                    setValue(`schedules.${schedule._id}.${index}.availableOn`, schedule.availableOn || "Not Available");
+                    setValue(`schedules.${schedule._id}.${index}.availableFrom`, schedule.availableFrom || '');
+                    setValue(`schedules.${schedule._id}.${index}.availableTo`, schedule.availableTo || '');
+                });
+            } else {
+                setTime('');
+                setName('');
+
+                scheduleList.forEach((schedule, index) => {
+                    setValue(`schedules.${schedule._id}.${index}.availableOn`, '');
+                    setValue(`schedules.${schedule._id}.${index}.availableFrom`, '');
+                    setValue(`schedules.${schedule._id}.${index}.availableTo`, '');
+                });
+            }
+        } else {
+            setTime('');
+            setName('');
+            scheduleList.forEach((schedule, index) => {
+                setValue(`schedules.${schedule._id}.${index}.availableOn`, '');
+                setValue(`schedules.${schedule._id}.${index}.availableFrom`, '');
+                setValue(`schedules.${schedule._id}.${index}.availableTo`, '');
+            });
+        }
+    }, [selectedDoctor, scheduleList, setValue]);
 
     const onSubmit = (data) => {
         const doctorInfo = JSON.parse(selectedDoctor || '{}');
-        const availability = Array.isArray(data.schedules) 
-            ? data.schedules.map((schedule) => ({
-                  availableOn: schedule.availableOn,
-                  availableFrom: schedule.availableFrom,
-                  availableTo: schedule.availableTo,
-            }))
-            : [];  
-    
+
+        const formatTime = (time) => {
+            const [hours, minutes] = time.split(':');
+            return `${hours}:${minutes}:00`; // Append seconds as `00`
+        };
+
+        const availability = data.schedules
+            ? Object.values(data.schedules).map((schedule) =>
+                Object.values(schedule).map((availability) => ({
+                    availableOn: availability?.availableOn || "Unknown",
+                    availableFrom: availability?.availableFrom ? formatTime(availability?.availableFrom) : "00:00:00",
+                    availableTo: availability?.availableTo ? formatTime(availability?.availableTo) : "00:00:00",
+                })))
+            : [];
+
         const payload = {
             doctorId: doctorInfo.id,
+            type: 'Schedule',
             name: doctorInfo.name,
-            clinicId: clinic_id,
             perPatientTime: time,
-            availability: availability,
+            availability: availability.flat(),
         };
-    
+
         dispatch(createScheduleAction({ key: encryptMessage(payload) }));
-        dispatch(getScheduleAction({ flag: 'Schedule' }));
+
+        if (payload.availability.length > 0) {
+            dispatch(getScheduleAction({
+                type: 'Schedule',
+                search: '',
+                startDate: '',
+                endDate: '',
+            }));
+        }
     };
-    
+const days = [
+    { day: 'Monday' },
+    { day: 'Tuesday' },
+    { day: 'Wednesday' },
+    { day: 'Thursday' },
+    { day: 'Friday' },
+    { day: 'Saturday' },
+    { day: 'Sunday' },
+];
+
+const renderEmptyScheduleData = () => {
+    return (
+        <>
+            {days?.map((day, index) => (
+                <tr key={index}>
+                    <td>
+                        <input
+                            type="text"
+                            {...register(`schedules.newSchedule.${index}.availableOn`)}
+                            className="form-control"
+                            defaultValue={day.day}
+                        />
+                    </td>
+                    <td>
+                        <Controller
+                            name={`schedules.newSchedule.${index}.availableFrom`}
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => <input type="time" className="form-control" placeholder="00:00:00" {...field} />}
+                        />
+                    </td>
+                    <td>
+                        <Controller
+                            name={`schedules.newSchedule.${index}.availableTo`}
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => <input type="time" className="form-control" {...field} />}
+                        />
+                    </td>
+                    <td className="text-center">
+                        <FiEdit className="fs-4 ms-2" />
+                    </td>
+                </tr>
+            ))}
+        </>
+    );
+};
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <h4>Edit Schedule</h4>
 
-            {/* Per Patient Time */}
-            <div className="my-3">
-                <label htmlFor="perPatientTime" style={{ fontWeight: 'bold' }}>
-                    Per Patient Time<span className="text-danger">*</span>
-                </label>
-                <input
-                    type="time"
-                    id="perPatientTime"
-                    value={time} 
-                    defaultValue={time}
-                    onChange={(e) => setTime(e.target.value)} // Update state when value changes
-                    style={{
-                        padding: '8px',
-                        borderRadius: '4px',
-                        border: '1px solid #ccc',
-                        width: '100%',
-                        marginTop: '10px',
-                    }}
-                />
-            </div>
-
             {/* Select Doctor */}
-            <div className="mb-3">
+            <div className="mb-3 w-50">
                 <label htmlFor="doctorName" style={{ fontWeight: 'bold' }}>
                     Doctor Name<span className="text-danger">*</span>
                 </label>
                 <select
                     id="doctorName"
-                    value={selectedDoctor} // Use selectedDoctor state here
-                    onChange={(e) => setSelectedDoctor(e.target.value)} // Update state when value changes
+                    value={selectedDoctor}
+                    onChange={(e) => setSelectedDoctor(e.target.value)}
                     style={{
                         padding: '8px',
                         borderRadius: '4px',
@@ -110,6 +185,26 @@ const ScheduleTab = () => {
                 </select>
             </div>
 
+            {/* Per Patient Time */}
+            <div className="my-3 w-50">
+                <label htmlFor="perPatientTime" style={{ fontWeight: 'bold' }}>
+                    Per Patient Time<span className="text-danger">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="perPatientTime"
+                    value={time}
+                    placeholder='00:00:00'
+                    onChange={(e) => setTime(e.target.value)}
+                    style={{
+                        padding: '8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                        width: '100%',
+                        marginTop: '10px',
+                    }}
+                />
+            </div>
 
             {/* Schedule Table */}
             <div>
@@ -128,15 +223,14 @@ const ScheduleTab = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {scheduleList?.map((schedule) =>
-                                schedule?.availability?.length > 0 ? (
+                            {filteredScheduleList?.length > 0 ? (
+                                filteredScheduleList?.map((schedule) =>
                                     schedule?.availability?.map((day, index) => (
                                         <tr key={`${schedule._id}-${day._id}`}>
                                             <td>
                                                 <input
                                                     type="text"
-                                                    disabled
-                                                    defaultValue={day.availableOn || ""}
+                                                    defaultValue={day.availableOn || "Not Available"}
                                                     {...register(`schedules.${schedule._id}.${index}.availableOn`)}
                                                     className="form-control"
                                                 />
@@ -146,9 +240,7 @@ const ScheduleTab = () => {
                                                     name={`schedules.${schedule._id}.${index}.availableFrom`}
                                                     control={control}
                                                     defaultValue={day.availableFrom || ""}
-                                                    render={({ field }) => (
-                                                        <input type="time" className="form-control" {...field} />
-                                                    )}
+                                                    render={({ field }) => <input type="time" className="form-control" placeholder="00:00:00" {...field} />}
                                                 />
                                             </td>
                                             <td>
@@ -156,9 +248,7 @@ const ScheduleTab = () => {
                                                     name={`schedules.${schedule._id}.${index}.availableTo`}
                                                     control={control}
                                                     defaultValue={day.availableTo || ""}
-                                                    render={({ field }) => (
-                                                        <input type="time" className="form-control" {...field} />
-                                                    )}
+                                                    render={({ field }) => <input type="time" className="form-control" {...field} />}
                                                 />
                                             </td>
                                             <td className="text-center">
@@ -166,18 +256,19 @@ const ScheduleTab = () => {
                                             </td>
                                         </tr>
                                     ))
-                                ) : null
+                                )
+                            ) : (
+                                renderEmptyScheduleData()
                             )}
                         </tbody>
-
                     </Table>
                 )}
             </div>
 
-            {/* Save Button */}
-            <div className="d-flex justify-content-end mt-3">
+            {/* Submit Button */}
+            <div className="text-center">
                 <Button type="submit" className="btn btn-primary">
-                    Save
+                    {isLoading ? "Saving..." : "Save Schedule"}
                 </Button>
             </div>
         </form>
