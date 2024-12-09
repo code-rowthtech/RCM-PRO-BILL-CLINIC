@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Form, Dropdown } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
@@ -11,11 +11,9 @@ const AddBreak = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [selectedDays, setSelectedDays] = useState([]);
-    console.log(selectedDays, 'day');
+    const [selectedDays, setSelectedDays] = useState([]); // Array for selected days
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    // const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const {
         register,
@@ -35,14 +33,21 @@ const AddBreak = () => {
     const handleRadioChange = (e) => {
         const value = e.target.value;
         setValue("breakDay", value);
+
         if (value === "Every Day") {
             setSelectedDays(daysOfWeek); // Select all days if "Every Day" is chosen
         } else {
-            setSelectedDays([]); // Clear selected days if not "Every Day"
+            setSelectedDays([]); // Clear selected days for "Break Day"
         }
     };
 
-
+    const handleDayChange = (e) => {
+        const selectedDay = e.target.value;
+        if (selectedDay) {
+            setSelectedDays([selectedDay]); // Only keep the newly selected day
+            setValue("breakDay", selectedDay); // Update breakDay with the selected day
+        }
+    };
 
     const onSubmit = (data) => {
         const formattedBreakFrom = `${data.breakFrom}:00`;
@@ -50,7 +55,7 @@ const AddBreak = () => {
         const doctorInfo = JSON.parse(data.doctorInfo);
         const payload = {
             doctorId: doctorInfo.id,
-            type:'Break',
+            type: "Break",
             name: doctorInfo.name,
             breakDay: data.breakDay === "Every Day" ? "Every Day" : selectedDays.join(", "),
             breakFrom: formattedBreakFrom,
@@ -105,7 +110,6 @@ const AddBreak = () => {
                                         <Form.Control
                                             type="time"
                                             {...register("breakFrom", { required: "Please select a start time" })}
-                                            placeholder="000000"
                                         />
                                         {errors.breakFrom && (
                                             <p className="text-danger">{errors.breakFrom.message}</p>
@@ -128,25 +132,16 @@ const AddBreak = () => {
                                             <div className="d-flex">
                                                 <Form.Check
                                                     type="radio"
-                                                    label="Break Day"
-                                                    value="Break Day"
+                                                    label={!selectedDays.length > 0 ? 'Break Day' : selectedDays}
+                                                    value= "Break Day"
                                                     {...register("breakDay", { required: "Please select a break type" })}
-                                                    onChange={(e) => {
-                                                        handleRadioChange(e); // Set the value of breakDay
-                                                        setSelectedDays([]); // Clear selected days when switching to "Break Day"
-                                                    }}
-                                                    checked={breakDay === "Break Day"} // Check if the selected option is "Break Day"
+                                                    onChange={handleRadioChange}
+                                                    checked={breakDay !== "Every Day"}
                                                     className="mt-1"
                                                 />
                                                 <Form.Select
-                                                    onChange={(e) => {
-                                                        const day = e.target.value;
-                                                        if (day) {
-                                                            setSelectedDays([day]); // Allow only one day to be selected
-                                                            console.log(day, "Selected Day"); // Log the selected day
-                                                        }
-                                                    }}
-                                                    disabled={breakDay !== "Break Day"} // Disable the dropdown if "Break Day" isn't selected
+                                                    onChange={handleDayChange}
+                                                    disabled={breakDay === "Every Day"}
                                                     className="border-0 w-25"
                                                 >
                                                     <option value="">Select a Day</option>
@@ -157,13 +152,8 @@ const AddBreak = () => {
                                                     ))}
                                                 </Form.Select>
                                             </div>
-
                                         </div>
                                     </Form.Group>
-
-
-
-
                                     <Form.Group className="mb-3">
                                         <Form.Label>
                                             To<span className="text-danger">*</span>

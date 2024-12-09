@@ -1,20 +1,41 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import ProfileDummy from "../../../assets/images/profileDummy.png";
-import { Button, Card, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Card, Col, Form, Modal, Row, InputGroup } from "react-bootstrap";
 import { FiUploadCloud } from "react-icons/fi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createPatientsAction, updatePatientsAction } from "../../../redux/patients/actions";
+import { useForm } from "react-hook-form";
+import us from '../../../assets/images/flags/us.jpg';
+import { encryptMessage } from "../../../cryptoUtils";
+import { handleUpload } from '../../../helpers/HandleUpload';
+
 
 const NewPatient = () => {
+    const store = useSelector((state) => state);
+    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
+    const dispatch = useDispatch();
+
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState("");
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
+    const [formData, setFormData] = useState({
+        role: doctorRoleId,
+    });
+    const logoFileInputRef = useRef(null);
+    const [logoName, setLogoName] = useState('');
+    const [logo, setLogo] = useState(null);
+
+
+
 
     const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -26,17 +47,64 @@ const NewPatient = () => {
             const id = setTimeout(() => {
                 setIsPasswordCorrect(false);
                 setIsVisible(false);
-            }, 300000); 
+            }, 300000);
 
             setTimeoutId(id);
-        } else {
-   }
+        }
     };
-    const dispatch = useDispatch('');
-    useEffect(()=>{
-       dispatch(createPatientsAction());
-    },[dispatch])
+    const handleFileChange = async (e) => {
+        const selectedFile = e.target.files[0];
+        try {
+            const url = await handleUpload(selectedFile);
+            setLogo(url);
+            setLogoName(selectedFile?.name)
+        } catch (error) {
+            // console.error('Error during file upload:', error);
+        }
+    };
 
+ 
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+
+    const onSubmit = (data) => {
+        const payload = {
+            clinicId: clinicId,
+            profile: {
+                url: logo?.url?.split('?')[0],
+                fileName: logoName
+            },
+            gender: data?.gender,
+            title: data?.title,
+            fullName: data?.fullName,
+            chartNumber: data?.chartNumber,
+            responsiblePartyName: data?.responsiblePartyName,
+            address: {
+                // street: data?.street,
+                city: data?.city,
+                state: data?.state,
+                zipCode: data?.zipCode,
+            },
+            email: data?.email,
+            contactNumber: data?.contactNumber,
+            note: data?.note,
+            maritalStatus: data?.maritalStatus,
+            dateOfBirth: data?.dateOfBirth,
+            deceased: data?.deceased,
+            ssn: data?.ssn,
+            additionalMRN: data?.additionalMRN,
+            financialClass: data?.financialClass,
+            providerProfile: data?.providerProfile,
+            employer: data?.employer,
+            relationship: data?.relationship,
+            preferredLanguage: data?.preferredLanguage,
+            pcp: data?.pcp,
+            raceEthnicity: data?.raceEthnicity,
+
+        }
+        console.log({ payload });
+        reset();
+        dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+    };
 
     return (
         <div className="background_Color pt-1 pb-2">
@@ -63,149 +131,308 @@ const NewPatient = () => {
                         </ul>
 
                         {/* Form Section */}
-                        <Form>
-                            <div className="row pb-4 mt-3" style={{ borderBottom: "1px solid #444141" }}>
+                        <Form onSubmit={handleSubmit(onSubmit)}>
+                            <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
                                 <div className="col-6">
-                                    <div>
-                                        <p>First Name*</p>
-                                        <input
-                                            placeholder="First Name"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="mt-3">
-                                        <p>Email*</p>
-                                        <input
-                                            placeholder="Email"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="mt-3">
-                                        <p>Phone*</p>
-                                        <input
-                                            placeholder="0987654321"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="mt-3" style={{ position: "relative" }}>
-                                        <label htmlFor="profileImage" className="form-label ">
-                                            Profile Image*
-                                        </label>
+                                    <div className="mb-3 d-flex flex-column position-relative">
+                                        <Form.Label>Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
                                         <div
-                                            style={{
-                                                position: "relative",
-                                                display: "flex",
-                                                alignItems: "center",
-                                            }}
+                                            onClick={() => logoFileInputRef.current.click()}
+                                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
                                         >
-                                            <input
-                                                type="text"
-                                                className="w-100 input ps-2 py-1"
-                                                placeholder="Upload Image"
-                                                style={{
-                                                    border: "1px solid #444141",
-                                                    fontSize: "14px",
-                                                    color: "#444141",
-                                                    paddingTop: "10px",
-                                                    paddingBottom: "10px",
-                                                    paddingRight: "35px",
-                                                }}
-                                            />
-                                            <FiUploadCloud
-                                                style={{
-                                                    position: "absolute",
-                                                    right: "10px",
-                                                    color: "#444141",
-                                                    fontSize: "20px",
-                                                    cursor: "pointer",
-                                                }}
-                                            />
+                                            {logoName ? logoName : 'Upload Profile Image'}
+                                            <p className="mb-0">
+                                                <FiUploadCloud />
+                                            </p>
                                         </div>
+                                        <Form.Control
+                                            type="file"
+                                            className="d-none "
+                                            {...register('profileImage', {
+                                            })}
+                                            ref={logoFileInputRef}
+                                            onChange={handleFileChange}
+                                       
+                                        />
+                                        {errors.profileImage && (
+                                            <p className="text-danger">{errors.profileImage.message}</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="col-6">
                                     <div>
-                                        <p>Last Name*</p>
-                                        <input
-                                            placeholder="Last Name"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="mt-3">
-                                        <p>Date Of Birth*</p>
-                                        <input
-                                            placeholder="Date Of Birth"
-                                            className="w-100 input ps-2 py-1"
-                                        />
-                                    </div>
-                                    <div className="mt-3">
-                                        <p>Gender*</p>
+                                        <Form.Label htmlFor="gender">Gender*</Form.Label>
                                         <div className="d-flex gap-2">
-                                            <Form.Check type="radio" name="gender" label="Male" />
-                                            <Form.Check type="radio" name="gender" label="Female" />
-                                            <Form.Check type="radio" name="gender" label="Others" />
+                                            <Form.Check
+                                                type="radio"
+                                                label="Male"
+                                                value="Male"
+                                                {...register('gender', { required: "Gender is required" })}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="Female"
+                                                value="Female"
+                                                {...register('gender', { required: "Gender is required" })}
+                                            />
+                                            <Form.Check
+                                                type="radio"
+                                                label="Others"
+                                                value="Others"
+                                                {...register('gender', { required: "Gender is required" })}
+                                            />
+
                                         </div>
+                                        {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+
                                     </div>
-                                    <div className="row mt-3 pt-1">
-                                        <div className="col-6">
-                                            <p>Password*</p>
-                                            <input
-                                                placeholder="Password"
-                                                className="w-100 input ps-2 py-1"
-                                            />
-                                        </div>
-                                        <div className="col-6">
-                                            <p>Confirm Password*</p>
-                                            <input
-                                                placeholder="Confirm Password"
-                                                className="w-100 input ps-2 py-1"
-                                            />
-                                        </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="mt-3">
+                                        <Form.Label htmlFor="title">Title</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Title"
+                                            {...register('title')}
+                                        />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Address Section */}
-                            <div className="row pb-4">
-                                <p className="my-3">Address Details</p>
-                                <div className="col-6">
-                                    <p>Address 1*</p>
-                                    <input
-                                        placeholder="Address 1"
-                                        className="w-100 input ps-2 py-1"
+                            <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="fileName">Full Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Full Name"
+                                        {...register('fullName', { required: "Full name is required" })}
                                     />
-                                    <div className="row mt-3">
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="chartNumber">Chart Number</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Chart Number"
+                                        {...register('chartNumber', { required: "Chart number is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="responsibleParty">Responsible Party Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Responsible party name"
+                                        {...register('responsiblePartyName', { required: "Responsible party name is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="address">Address</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Address"
+                                        {...register('address', { required: "Address is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 ">
+                                    <Form.Label htmlFor="state">State</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="State"
+                                        {...register('state', { required: "State is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 ">
+                                    <div className="row">
                                         <div className="col-6">
-                                            <p>City*</p>
-                                            <input
+                                            <Form.Label htmlFor="city">City</Form.Label>
+                                            <Form.Control
+                                                type="text"
                                                 placeholder="City"
-                                                className="w-100 input ps-2 py-1"
+                                                {...register('city', { required: "City is required" })}
                                             />
                                         </div>
                                         <div className="col-6">
-                                            <p>Zip*</p>
-                                            <input
-                                                placeholder="Zip"
-                                                className="w-100 input ps-2 py-1"
+                                            <Form.Label htmlFor="zipCode">Zip Code</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Zip Code"
+                                                {...register('zipCode', { required: "Zip code is required" })}
                                             />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-6">
-                                    <p>Address 2*</p>
-                                    <input
-                                        placeholder="Address 2"
-                                        className="w-100 input ps-2 py-1"
+                            </div>
+
+                            {/* Email and Phone Section */}
+                            <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="email">Email ID</Form.Label>
+                                    <Form.Control
+                                        type="email"
+                                        placeholder="Email ID"
+                                        {...register('email', { required: "Email is required", pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
+                                    />
+                                </div>
+                                <div className='mb-3 col-6'>
+                                    <Form.Group className="mb-0 position-relative">
+                                        <Form.Label className='mb-1'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                        <Form.Group>
+                                            <InputGroup>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <Form.Control
+                                                    type="tel"
+                                                    {...register('contactNumber', !id ? {
+                                                        required: 'This field is required',
+                                                        pattern: {
+                                                            value: /^[0-9]*$/,
+                                                            message: 'Contact must be a number'
+                                                        },
+                                                        maxLength: {
+                                                            value: 10,
+                                                            message: 'Contact must not exceed 10 digits'
+                                                        },
+                                                        minLength: {
+                                                            value: 10,
+                                                            message: 'Contact must not be less than 10 digits'
+                                                        }
+                                                    } : {}
+                                                    )}
+                                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}                                                                                // value={formData.phone}
+                                                    placeholder="1234-234-234"
+                                                    maxLength={10}
+                                                // onKeyPress={(event) => handleFirstSpace(event, 0)}
+                                                />
+                                            </InputGroup>
+                                        </Form.Group>
+
+                                        <div
+                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                        >
+                                            <img
+                                                src={us}
+                                                alt="country code flag"
+                                                width={20} />
+                                        </div>
+
+
+                                    </Form.Group>
+                                </div>
+                                <div className="col-12 ">
+                                    <Form.Label htmlFor="note">Note (Text)</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Note"
+                                        {...register('note')}
                                     />
                                 </div>
                             </div>
-                        </Form>
+                            <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="marital">Marital status</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Marital statu"
+                                        {...register('maritalStatus', { required: "Marital is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Date of Birth"
+                                        {...register('dateOfBirth', { required: "Date of Birth is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="deceased">Deceased</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Deceased"
+                                        {...register('deceased', { required: "Deceased is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="SSN">SSN#</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="SSN#"
+                                        {...register('ssn', { required: "SSN# is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 ">
+                                    <Form.Label htmlFor="additional">Additional MRN</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Additional MRN"
+                                        {...register('additionalMRN', { required: "Additional MRN is required" })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="row pb-3 mt-3" >
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="financial">Financial Class</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Financial Class"
+                                        {...register('financialClass', { required: "Financial Class is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="provider">Provider Profile</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Provider Profile"
+                                        {...register('providerProfile', { required: "Provider Profile is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="employer">Employer</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Employer"
+                                        {...register('employer', { required: "Employer is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="relationship">Relationship</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Relationship"
+                                        {...register('relationship', { required: "Relationship is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Preferred Language"
+                                        {...register('preferredLanguage', { required: "Preferred Language is required" })}
+                                    />
+                                </div>
+                                <div className="col-6 mb-3">
+                                    <Form.Label htmlFor="PCP">PCP</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="PCP"
+                                        {...register('pcp', { required: "PCP is required" })}
+                                    />
+                                </div>
+                                <div className="col-12">
+                                    <Form.Label htmlFor="race">Race & Ethnicity</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Race & Ethnicity"
+                                        {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
+                                    />
+                                </div>
+                            </div>
 
-                        {/* Buttons */}
-                        <div className="d-flex gap-2 justify-content-end mb-2">
-                            <Button variant="secondary">Cancel</Button>
-                            <Button variant="primary">Save</Button>
-                        </div>
+                            {/* Buttons */}
+                            <div className="d-flex gap-2 justify-content-end mb-2">
+                                <Button variant="secondary">Cancel</Button>
+                                <Button variant="primary" type="submit">Save</Button>
+                            </div>
+                        </Form>
                     </div>
                 </Card>
             </div>

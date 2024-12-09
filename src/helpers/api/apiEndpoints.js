@@ -49,7 +49,7 @@ export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
 
 // PATIENTS
 export const getPatients = '/api/v1/clinics/patient/all';
-export const createPatients = '/api/v1/clinics/patient';
+export const createPatients = '/api/v1/clinics/patient-onboard';
 export const updatePatients = '/api/v1/clinics/patient';
 
 // DASHBOARD
