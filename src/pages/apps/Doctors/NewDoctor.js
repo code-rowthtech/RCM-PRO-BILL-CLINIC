@@ -4,7 +4,7 @@ import { Button, Card, Col, Form, InputGroup, OverlayTrigger, Row, Spinner, Tool
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import { createDoctorAction, getCitiesAction, getDoctorDetailsAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
+import { createDoctorAction, getCities2Action, getCitiesAction, getDoctorDetailsAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import EmailToDoctorModal from './EmailToDoctorModal';
 import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
@@ -40,6 +40,8 @@ const NewDoctor = () => {
     const [docId, setDocId] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
+    const [mailingLongitude, setMailingLongitude] = useState(null);
+    const [mailingLatitude, setMailingLatitude] = useState(null);
     const [stateToSelect, setStateToSelect] = useState(null);
     const [focused, setFocused] = useState(false);
     const [mailingFocused, setMailingFocused] = useState(false);
@@ -80,6 +82,8 @@ const NewDoctor = () => {
 
 
     const cities = store?.getCitiesReducer?.data?.cities;
+    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
     console.log(doctorDetails, 'doctorDetailsdoctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
@@ -114,16 +118,20 @@ const NewDoctor = () => {
             setValue('email', doctorDetails?.userId?.email)
             setValue('phone', doctorDetails?.userId?.phone)
             setValue('gender', doctorDetails?.userId?.gender)
-            setValue('city', cityName)
-            setValue('zip', doctorDetails?.userId?.address?.zip)
-            setValue('street', doctorDetails?.userId?.address?.street)
-            setValue('longitude', doctorDetails?.userId?.address?.longitude)
-            setValue('latitude', doctorDetails?.userId?.address?.latitude)
+            // setValue('city', cityName)
+            setValue('zip1', doctorDetails?.userId?.primaryAddress?.zip)
+            setValue('zip2', doctorDetails?.userId?.mailingAddress?.zip)
+            setValue('street1', doctorDetails?.userId?.primaryAddress?.street)
+            setValue('street2', doctorDetails?.userId?.mailingAddress?.street)
+            setValue('longitude', doctorDetails?.userId?.primaryAddress?.longitude)
+            setValue('latitude', doctorDetails?.userId?.primaryAddress?.latitude)
             setValue('profileImage', doctorDetails?.userId?.profileImage)
             setValue('degreeDoc', doctorDetails?.userId?.degreeDoc)
             setValue('degreeName', doctorDetails?.userId?.degreeName)
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
-            setValue('city', doctorDetails?.userId?.primaryAddress?.city)
+            setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
+            setValue('city1', doctorDetails?.userId?.primaryAddress?.city)
+            setValue('city2', doctorDetails?.userId?.mailingAddress?.city)
 
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
@@ -135,8 +143,12 @@ const NewDoctor = () => {
                 dispatch(getCitiesAction({ state_code: doctorDetails?.userId?.primaryAddress?.state?.id, name: doctorDetails?.userId?.primaryAddress?.city?.name, skip: '', limit: '' }))
             }
             setValue('state1', state);
+            const state2 = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.mailingAddress?.state?._id)?._id;
+            if (state) {
+                dispatch(getCitiesAction({ state_code: doctorDetails?.userId?.primaryAddress?.state?.id, name: doctorDetails?.userId?.mailingAddress?.city?.name, skip: '', limit: '' }))
+            }
+            setValue('state2', state2);
         }
-
     }, [doctorDetails, setValue])
 
 
@@ -178,12 +190,16 @@ const NewDoctor = () => {
             dob: data?.dateOfBirth,
             gender: data?.gender,
             ...(!id ? { password: data?.password } : {}),
-            // password: data?.password,
             phone: data?.phone,
-            // confirmPassword: data?.confirmPassword,
             degreeName: data?.degreeName,
-            profileImage: logo?.url?.split('?')[0], // Extract URL up to `?`
-            degreeDoc: degree?.url?.split('?')[0],    // Extract URL up to `?`
+            profileImage: {
+                url: logo?.url?.split('?')[0],
+                fileName: logoName,
+            },
+            degreeDoc: {
+                url: degree?.url?.split('?')[0],
+                fileName: degreeName,
+            },
             role: doctorRoleId,
             primaryAddress: {
                 address: data?.address1,
@@ -194,15 +210,15 @@ const NewDoctor = () => {
                 latitude: latitude,
                 longitude: longitude
             },
-            // mailingAddress: {
-            //     address: data?.address2,
-            //     street: data?.street,
-            //     city: selectedCity || data?.city,
-            //     state: data?.state,
-            //     zip: data?.zip,
-            //     latitude: latitude,
-            //     longitude: longitude
-            // }
+            mailingAddress: {
+                address: data?.address2,
+                street: data?.street2,
+                city: selectedCity || data?.city2,
+                state: data?.state2,
+                zip: data?.zip2,
+                latitude: mailingLatitude,
+                longitude: mailingLongitude
+            }
         };
         console.log(payload, 'payload')
         // Encrypt and dispatch the payload
@@ -246,7 +262,7 @@ const NewDoctor = () => {
                 }
             });
     }
-   
+
     const getMailingGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
@@ -278,7 +294,7 @@ const NewDoctor = () => {
     }
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedMailingLocation, setSelectedMailingLocation] = useState(null);
-    console.log(statesData, 'statesDatastatesData')
+    console.log(selectedLocation, 'selectedLocationselectedLocation')
     useEffect(() => {
         if (selectedLocation) {
             setLatitude(selectedLocation?.bounds?.southwest?.lat);
@@ -286,39 +302,46 @@ const NewDoctor = () => {
             setValue('address1', selectedLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
             const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            // console.log(selectedState, 'selectedStateselectedState')
             setValue('state1', selectedState)
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
         if (selectedMailingLocation) {
-            setLatitude(selectedMailingLocation?.bounds?.southwest?.lat);
-            setLongitude(selectedMailingLocation?.bounds?.southwest?.lng);
+            setMailingLatitude(selectedMailingLocation?.bounds?.southwest?.lat);
+            setMailingLongitude(selectedMailingLocation?.bounds?.southwest?.lng);
             setValue('address2', selectedMailingLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?.id;
             const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?._id;
-            // console.log(selectedState, 'selectedStateselectedState')
-            setValue('state1', selectedState)
+            setValue('state2', selectedState)
             const countyName = selectedMailingLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation,selectedMailingLocation, setValue, statesData, dispatch])
+    }, [selectedLocation, selectedMailingLocation, setValue, statesData, dispatch])
+    console.log({ cities1 })
     useEffect(() => {
-        if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
+        if (cities1) {
+            const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city1', selectedCounty)
         }
-    }, [cities])
+        if (cities2) {
+            const selectedCounty = cities2 && cities2.find((data) => data?.name === selectedMailingLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
+            setValue('city2', selectedCounty)
+        }
+    }, [cities1, cities2])
 
     const handleStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0]; // Get the selected <option>
+        const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
         dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
+    const handleMailingStateSelection = (e) => {
+        const selectedOption = e.target.selectedOptions[0];
+        const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        dispatch(getCities2Action({ state_code: key?.id, name: '', limit: 25, skip: '' }))
+    };
 
     const handleCitySelection = (e) => {
-        // const citySelected = JSON.parse(e.target.value);
-        setSelectedCity(e.target.value)
+        // setSelectedCity(e.target.value)
     }
 
     const [formData, setFormData] = useState({
@@ -541,7 +564,7 @@ const NewDoctor = () => {
                                                                     type="file"
                                                                     className="d-none "
                                                                     {...register('profileImage', {
-                                                                        required: 'Profile image is required',
+                                                                        // required: 'Profile image is required',
                                                                     })}
                                                                     accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                                                                     ref={logoFileInputRef}
@@ -551,7 +574,7 @@ const NewDoctor = () => {
                                                                 //     handleFileChange
                                                                 // }
                                                                 />
-                                                                {errors.profileImage && 
+                                                                {errors.profileImage &&
                                                                     <p className="text-danger">{errors.profileImage.message}</p>
                                                                 }
                                                             </div>
@@ -559,7 +582,9 @@ const NewDoctor = () => {
                                                                 <Form.Label>Degree Name{!id && <span className='text-danger'>*</span>}</Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    {...register('degreeName', !id && { required: 'Degree Name is required' })}
+                                                                    {...register('degreeName',
+                                                                        !id && { required: 'Degree Name is required' }
+                                                                    )}
                                                                     onChange={(e) => setFormData({ ...formData, degreeName: e.target.value })}
                                                                     // value={formData.Degree Name}
                                                                     placeholder="Enter Degree Name"
@@ -722,7 +747,7 @@ const NewDoctor = () => {
                                                                         type="file"
                                                                         className="d-none "
                                                                         {...register('degreeDoc', {
-                                                                            required: 'Degree is required',
+                                                                            // required: 'Degree is required',
                                                                         })}
                                                                         ref={degreeFileInputRef}
                                                                         onChange={handleFileChangeDegree}
@@ -832,29 +857,6 @@ const NewDoctor = () => {
                                                                     <Row>
                                                                         <Col sm={6}>
                                                                             <Form.Group className="mb-2">
-                                                                                {/* <Form.Label className='mb-1' >State</Form.Label>
-                                                                                <Form.Select
-                                                                                    {...register('state1')}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData({ ...formData, state: e.target.value });
-                                                                                        handleStateSelection(e);
-                                                                                    }}
-                                                                                    style={{
-                                                                                        color: getValues('state1')?.length===0 ? "#a9a9a9" : "black", // Black if state is selected, gray otherwise
-                                                                                    }}
-                                                                                >
-                                                                                    <option>State</option>
-                                                                                    {statesData?.states?.map((data) => (
-                                                                                        <option
-                                                                                            key={data?.id} // Unique key for each option
-                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                                                            value={data?._id}
-                                                                                        >
-                                                                                            {data?.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-                                                                                </Form.Group> */}
                                                                                 <label htmlFor="state-select" className='fw-bold' style={{ display: "block", marginBottom: "6px" }}>
                                                                                     State
                                                                                 </label>
@@ -863,8 +865,8 @@ const NewDoctor = () => {
                                                                                     {...register("state1")}
                                                                                     onChange={(e) => {
                                                                                         const selectedValue = e.target.value;
-                                                                                        setFormData({ ...formData, state: selectedValue }); // Update formData.state
-                                                                                        handleStateSelection(e); // Handle additional logic
+                                                                                        setFormData({ ...formData, state: selectedValue });
+                                                                                        handleStateSelection(e);
                                                                                     }}
                                                                                     style={{
                                                                                         width: "100%",
@@ -907,11 +909,11 @@ const NewDoctor = () => {
                                                                                         padding: "7px ",
                                                                                         borderRadius: "4px",
                                                                                         border: "1px solid #ccc",
-                                                                                        color: getValues('city1')?.length === 0 ? "#a9a9a9" : "black", 
+                                                                                        color: getValues('city1')?.length === 0 ? "#a9a9a9" : "black",
                                                                                     }}
                                                                                 >
                                                                                     <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                                    {cities?.map((data) => (
+                                                                                    {cities1?.map((data) => (
                                                                                         <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
                                                                                             {data?.name}
                                                                                         </option>
@@ -1007,14 +1009,14 @@ const NewDoctor = () => {
                                                                                             border: '1px solid #ced4da',
                                                                                             borderTop: 'none',
                                                                                         }}
-                                                                                        className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                                                        className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !mailingFocused ? 'd-none' : ''}`}
                                                                                     >
                                                                                         {searchedMailingLocations?.map((data, index) => (
                                                                                             <p
                                                                                                 key={index}
                                                                                                 onClick={() => {
-                                                                                                    setSelectedLocation(data)
-                                                                                                    setFocused(false); // Close dropdown after selection
+                                                                                                    setSelectedMailingLocation(data)
+                                                                                                    setMailingFocused(false); // Close dropdown after selection
                                                                                                 }}
                                                                                                 style={{
                                                                                                     margin: 0,
@@ -1037,7 +1039,7 @@ const NewDoctor = () => {
                                                                                 <Form.Label className='mb-1'>Latitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
-                                                                                    defaultValue={latitude}
+                                                                                    defaultValue={mailingLatitude}
                                                                                     onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                                                                                     placeholder="Latitude"
                                                                                 />
@@ -1048,7 +1050,7 @@ const NewDoctor = () => {
                                                                                 <Form.Label className='mb-1'>Longitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
-                                                                                    defaultValue={longitude}
+                                                                                    defaultValue={mailingLongitude}
                                                                                     onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                                                                                     placeholder="Longitude" />
                                                                             </Form.Group>
@@ -1061,10 +1063,10 @@ const NewDoctor = () => {
                                                                             <Form.Group className="mb-2">
                                                                                 <Form.Label className='mb-1' >State</Form.Label>
                                                                                 <Form.Select
-                                                                                    {...register('state')}
+                                                                                    {...register('state2')}
                                                                                     onChange={(e) => {
                                                                                         setFormData({ ...formData, state: e.target.value });
-                                                                                        handleStateSelection(e);
+                                                                                        handleMailingStateSelection(e);
                                                                                     }}
                                                                                 >
                                                                                     <option>State</option>
@@ -1087,16 +1089,15 @@ const NewDoctor = () => {
 
                                                                                 <Form.Select
                                                                                     disabled={store?.getCitiesReducer?.loading}
-                                                                                    {...register('city')}
+                                                                                    {...register('city2')}
                                                                                     onChange={(e) => {
                                                                                         setFormData({ ...formData, city: e.target.value })
-                                                                                        handleCitySelection(e);
+                                                                                        // handleCitySelection(e);
                                                                                     }}
                                                                                 >
                                                                                     <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                                    {cities?.map((data) => (
+                                                                                    {cities2?.map((data) => (
                                                                                         <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
-
                                                                                             {data?.name}
                                                                                         </option>
                                                                                     ))}
@@ -1110,7 +1111,7 @@ const NewDoctor = () => {
                                                                                 <Form.Label className='mb-1'>Street</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
-                                                                                    {...register('street')}
+                                                                                    {...register('street2')}
                                                                                     onKeyPress={handleFirstSpace}
                                                                                     onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                                                                                     placeholder="Street" />
@@ -1124,7 +1125,7 @@ const NewDoctor = () => {
                                                                                 <Form.Control
                                                                                     defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.zip : ''}
                                                                                     type="text"
-                                                                                    {...register('zip', {
+                                                                                    {...register('zip2', {
                                                                                         minLength: {
                                                                                             value: 5,
                                                                                             message: 'ZIP code must be at least 5 characters long',
