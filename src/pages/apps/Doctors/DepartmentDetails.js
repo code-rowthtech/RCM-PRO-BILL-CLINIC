@@ -6,15 +6,18 @@ import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useSearchParams } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const DepartmentDetails = ({ docId }) => {
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCAQHPassword, setShowCAQHPassword] = useState(false);
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
   const id = doctorDetails?._id
-  // console.log(id, 'id')
+  // console.log(departmentId, 'departmentId')
   // console.log(doctorDetails,'123456789876543')
   const {
     register,
@@ -31,7 +34,7 @@ const DepartmentDetails = ({ docId }) => {
 
   const onsubmit = (data) => {
     const payload = {
-      ...(updateId ? { id: id } : {id: store?.createtDoctorsReducer?.data?.doctor?._id}),
+      ...(updateId ? { id: id } : { id: store?.createtDoctorsReducer?.data?.doctor?._id }),
       TIN_SSN: data?.TIN_SSN,
       NPI: data?.NPI,
       NPIUsername: data?.NPIUsername,
@@ -112,6 +115,13 @@ const DepartmentDetails = ({ docId }) => {
       getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' })
     );
   }, [dispatch]);
+
+  useEffect(() => {
+    if (updateId) {
+      setValue('NPIPassword', '********')
+      setValue('CAQHPassword', '********')
+    }
+  }, [updateId]);
 
   return (
     <>
@@ -214,28 +224,31 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* NPI Password Field */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
-                      NPI Password  {!updateId && <span className='text-danger'>*</span>}
-                    </Form.Label>
-                    <Form.Control
-                      type="password"
-                      {...register('NPIPassword', {
-                        ...(!updateId ? {
-                          required: 'NPI Password is required',
-                          minLength: {
-                            value: 6,
-                            message: 'Password must be at least 6 characters long',
+                  <Form.Group className='mb-3 '>
+                    <Form.Label>NPI Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
+                    <div className="position-relative">
+                      <Form.Control
+                        type={showPassword ? "text" : "password"}
+                        placeholder={updateId ? '' : 'NPI Password'}
+                        readOnly={updateId}
+                        // onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        {...register('NPIPassword', {
+                          required: !updateId ? 'NPIPassword is required' : false,
+                          pattern: {
+                            value: updateId ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                            message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
                           },
-                        } : {}),
-                      })}
-                      placeholder="Enter NPI Password"
-                    />
-                    {errors.NPIPassword && (
-                      <span className="text-danger">{errors.NPIPassword.message}</span>
-                    )}
+                        })}
+                      />
+                      <span
+                        className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                      {errors.password && <span className="text-danger">{errors.NPIPassword.message}</span>}
+                    </div>
                   </Form.Group>
-
                   <div className="row">
                     {/* CAQH Username Field */}
                     <div className="col-6">
@@ -260,28 +273,30 @@ const DepartmentDetails = ({ docId }) => {
 
                     {/* CAQH Password Field */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
-                          CAQH Password {!updateId && <span className="text-danger">*</span>}
-                        </Form.Label>
-                        <Form.Control
-                          type="password"
-                          {...register('CAQHPassword',
-                            !updateId
-                              ? {
-                                required: 'CAQH Password is required',
-                                minLength: {
-                                  value: 6,
-                                  message: 'Password must be at least 6 characters long',
-                                },
-                              }
-                              : {}
-                          )}
-                          placeholder="Enter CAQH Password"
-                        />
-                        {errors.CAQHPassword && (
-                          <span className="text-danger">{errors.CAQHPassword.message}</span>
-                        )}
+                      <Form.Group className='mb-3 '>
+                        <Form.Label>CAQH Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
+                        <div className="position-relative">
+                          <Form.Control
+                            type={showCAQHPassword ? "text" : "password"}
+                            placeholder={updateId ? '' : 'CAQH Password'}
+                            readOnly={updateId}
+                            // onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            {...register('CAQHPassword', {
+                              required: !updateId ? 'CAQHPassword is required' : false,
+                              pattern: {
+                                value: updateId ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
+                              },
+                            })}
+                          />
+                          <span
+                            className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                            onClick={() => setShowCAQHPassword(!showCAQHPassword)}
+                          >
+                            {showCAQHPassword ? <FaEyeSlash /> : <FaEye />}
+                          </span>
+                          {errors.password && <span className="text-danger">{errors.CAQHPassword.message}</span>}
+                        </div>
                       </Form.Group>
 
                     </div>
