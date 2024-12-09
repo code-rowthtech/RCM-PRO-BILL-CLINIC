@@ -24,6 +24,8 @@ function* createClinicsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
+            ToastHandle("updating data created successfully", 'success')
+
             yield put({
                 type: ClinicsActionTypes.CREATE_CLINIC_SUCCESS,
                 payload: { ...decryptedData },
@@ -221,7 +223,6 @@ function* getCitiesFunction(data) {
         });
         const response = yield call(getCityByStateApi , data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'decryptedData')
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_SUCCESS,

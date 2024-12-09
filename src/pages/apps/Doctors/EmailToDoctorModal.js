@@ -28,7 +28,7 @@ if(createResponse===200){
     closeModal();
     setFormData({});
 }
-})
+},[createResponse])
   return (
     <div>
          <Modal centered show={show} onHide={closeModal}>
@@ -59,7 +59,7 @@ if(createResponse===200){
 
                                 <div className='text-center'>
                                     <p className='mb-0'>The Doctor will receive an onboarding email on</p>
-                                    <p > "xyz.com"</p>
+                                    <p className='fw-bold'> "{formData.email}"</p>
                                 </div>
                             </Col>
                         </Row>

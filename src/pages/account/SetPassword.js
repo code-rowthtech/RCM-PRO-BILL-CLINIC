@@ -70,22 +70,25 @@ const SetPassword = (): React$Element<any> => {
     if (tokenResponse) {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
     }
-    const schemaResolver = yupResolver(
-        yup.object().shape({
-            password: yup
-                .string()
-                .required(t('Password is required.'))
-                .min(8, t('Password must be at least 8 characters long.'))
-                .matches(
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                    t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character.')
-                ),
-            confirmPassword: yup
-                .string()
-                .oneOf([yup.ref('password'), null], t('Passwords must match'))
-                .required(t('Password is required.')),
-        })
-    );
+   const schemaResolver = yupResolver(
+    yup.object().shape({
+        password: yup
+            .string()
+            .required(t('Password is required.'))
+            .min(8, t('Password must be at least 8 characters long.'))
+            .matches(
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character but space are not allowed.')
+            )
+            .matches(/^(?!.*\s).*$/, t('Spaces are not allowed in the password.')),
+
+        confirmPassword: yup
+            .string()
+            .oneOf([yup.ref('password'), null], t('Passwords must match'))
+            .required(t('Password is required.')),
+    })
+);
+
 
 
     const [loginPassword, setLoginPassword] = useState(null)
