@@ -329,13 +329,11 @@ const NewDoctor = () => {
         phone: '',
         password: '',
     });
-
     useEffect(() => {
         if (logo) {
             setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
         }
     }, [logo])
-
     const passwordValue = watch('password', '');
     React.useEffect(() => {
         setFormData((prev) => ({ ...prev, password: passwordValue }));

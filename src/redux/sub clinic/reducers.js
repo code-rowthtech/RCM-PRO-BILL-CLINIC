@@ -14,6 +14,10 @@ const GET_SUBCLINICS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const UPDATE_SUB_CLINICS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 const GET_SUBCLINIC_TYPE_INITIAL_STATE = {
     data: [],
     loading: false
@@ -149,8 +153,33 @@ export const getSubClinicsReducer = (state = GET_SUBCLINICS_INITIAL_STATE, actio
     }
 }
 
+export const updateSubClinicReducer = (state = UPDATE_SUB_CLINICS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case SubClinicsActionTypes.UPDATE_SUBCLINIC_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case SubClinicsActionTypes.UPDATE_SUBCLINIC_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case SubClinicsActionTypes.UPDATE_SUBCLINIC_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case SubClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
 export const getSubClinicTypeReducer = (state = GET_SUBCLINIC_TYPE_INITIAL_STATE, action) => {
-    console.log(GET_SUBCLINIC_TYPE_INITIAL_STATE,'GET_SUBCLINIC_TYPE_INITIAL_STATE')
     switch (action.type) {
         case SubClinicsActionTypes.GET_SUBCLINICTYPE_LOADING:
             return {
@@ -175,7 +204,6 @@ export const getSubClinicTypeReducer = (state = GET_SUBCLINIC_TYPE_INITIAL_STATE
 };
 
 export const getSubClinicCityReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
-    console.log(GET_CITIES_INITIAL_STATE,'GET_CITIES_INITIAL_STATE')
     switch (action.type) {
         case SubClinicsActionTypes.GET_CITIES_LOADING:
             return {
