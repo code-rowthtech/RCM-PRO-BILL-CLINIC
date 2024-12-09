@@ -10,6 +10,7 @@ export function getPatientsApi(params: any): any {
 
 export function createPatientsApi(params: any): any {
     const { data } = params;
+    console.log(data,'apidata')
     return api.create(URL.createPatients, data);
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Form, Dropdown } from "react-bootstrap";
+import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
@@ -11,11 +11,9 @@ const AddBreak = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [selectedDays, setSelectedDays] = useState([]);
-    console.log(selectedDays, 'day');
+    const [selectedDays, setSelectedDays] = useState([]); // Array for selected days
     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const doctorLists = store?.getDoctorsListReducer?.data?.result;
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const {
         register,
@@ -35,24 +33,33 @@ const AddBreak = () => {
     const handleRadioChange = (e) => {
         const value = e.target.value;
         setValue("breakDay", value);
+
         if (value === "Every Day") {
             setSelectedDays(daysOfWeek); // Select all days if "Every Day" is chosen
         } else {
-            setSelectedDays([]); // Clear selected days if not "Every Day"
+            setSelectedDays([]); // Clear selected days for "Break Day"
         }
     };
 
-   
+    const handleDayChange = (e) => {
+        const selectedDay = e.target.value;
+        if (selectedDay) {
+            setSelectedDays([selectedDay]); // Only keep the newly selected day
+            setValue("breakDay", selectedDay); // Update breakDay with the selected day
+        }
+    };
 
     const onSubmit = (data) => {
+        const formattedBreakFrom = `${data.breakFrom}:00`;
+        const formattedBreakTo = `${data.breakTo}:00`;
         const doctorInfo = JSON.parse(data.doctorInfo);
         const payload = {
             doctorId: doctorInfo.id,
+            type: "Break",
             name: doctorInfo.name,
-            clinicId: clinic_id,
             breakDay: data.breakDay === "Every Day" ? "Every Day" : selectedDays.join(", "),
-            breakFrom: data.breakFrom,
-            breakTo: data.breakTo,
+            breakFrom: formattedBreakFrom,
+            breakTo: formattedBreakTo,
         };
 
         dispatch(createScheduleAction({ key: encryptMessage(payload) }));
@@ -96,7 +103,6 @@ const AddBreak = () => {
                                             <span className="text-danger">{errors.doctorInfo.message}</span>
                                         )}
                                     </Form.Group>
-
                                     <Form.Group className="mt-4">
                                         <Form.Label>
                                             From<span className="text-danger">*</span>
@@ -123,20 +129,31 @@ const AddBreak = () => {
                                                 checked={breakDay === "Every Day"}
                                                 className="mt-1"
                                             />
-                                            <Form.Select {...register("breakDay")} onChange={handleRadioChange} className="border-0  w-25">
-                                                <option value="">Single Day</option>
-                                                {daysOfWeek.map((day) => (
-                                                    <option key={day} value={day} selected={selectedDays.includes(day)}>
-                                                        {day}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
+                                            <div className="d-flex">
+                                                <Form.Check
+                                                    type="radio"
+                                                    label={!selectedDays.length > 0 ? 'Break Day' : selectedDays}
+                                                    value= "Break Day"
+                                                    {...register("breakDay", { required: "Please select a break type" })}
+                                                    onChange={handleRadioChange}
+                                                    checked={breakDay !== "Every Day"}
+                                                    className="mt-1"
+                                                />
+                                                <Form.Select
+                                                    onChange={handleDayChange}
+                                                    disabled={breakDay === "Every Day"}
+                                                    className="border-0 w-25"
+                                                >
+                                                    <option value="">Select a Day</option>
+                                                    {daysOfWeek.map((day) => (
+                                                        <option key={day} value={day}>
+                                                            {day}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </div>
                                         </div>
                                     </Form.Group>
-
-                                
-
-
                                     <Form.Group className="mb-3">
                                         <Form.Label>
                                             To<span className="text-danger">*</span>
