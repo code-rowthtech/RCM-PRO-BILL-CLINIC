@@ -23,10 +23,14 @@ export const getStatesByCountryAction = (data): AuthAction => ({
     data
 });
 
-export const getCitiesAction = (data): AuthAction => ({
+export const getCitiesAction = (data) => ({
     type: ClinicsActionTypes.GET_CITIES,
-    data,
-  
+    data
+});
+
+export const getCities2Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES2,
+    data
 });
 
 export const updateClinicAction = (data): AuthAction => ({

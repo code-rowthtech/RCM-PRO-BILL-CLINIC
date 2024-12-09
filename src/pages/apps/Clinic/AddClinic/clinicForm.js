@@ -47,6 +47,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [focused, setFocused] = useState(false);
+    const [focused2, setFocused2] = useState(false);
+
     const [subClinic, setSubClinic] = useState('');
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
@@ -93,7 +95,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
-    const cities = store?.getCitiesReducer?.data?.cities;
+    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     useEffect(() => {
         if (clinicId) {
             const payload = {
@@ -157,7 +160,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getSubClinicAction());
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log('Clinics',clinicsDataGet)
+    console.log('Clinics', clinicsDataGet)
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -197,7 +200,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
 
     }, [clinicsDataGet, statesData, setValue]);
-    
+
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
             setError('confirmPassword', {
@@ -213,7 +216,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...(clinicsList && { parentClinic: clinicId }),
             ...(updateId && { id: updateId }),
             name: data?.clinicname || clinicsDataGet?.name,
-            practiceSpecialty:data?.practiceSpecialty || clinicsDataGet?.practiceSpecialty,
+            practiceSpecialty: data?.practiceSpecialty || clinicsDataGet?.practiceSpecialty,
             email: data?.email || clinicsDataGet?.userId?.email,
             phone: '+1' + data?.contact || '+1' + clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
@@ -504,6 +507,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [clinicsDataGet, setValue]);
     const [searchedLocations, setSearchedLocations] = useState(null)
+    const [searchedLocations2, setSearchedLocations2] = useState(null)
+
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
@@ -533,6 +538,36 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }
             });
     }
+
+    const getGeolocation2 = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data; // Return the geocoding data
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null; // Return null in case of error
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedLocations2(data?.results)
+                } else {
+                    console.log("No data returned.");
+                }
+            });
+    }
     const [selectedLocation, setSelectedLocation] = useState(null);
     useEffect(() => {
         if (selectedLocation) {
@@ -547,14 +582,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [selectedLocation, setValue, statesData, dispatch])
     useEffect(() => {
-        if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
+        if (cities1) {
+            const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city', selectedCounty)
         }
-    }, [cities])
+    }, [cities1])
     // for table view
     const getTableData = store.getSubClinicsReducer?.data?.clinics
-    console.log(getTableData,'getTableData')
+    console.log(getTableData, 'getTableData')
 
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
@@ -1172,21 +1207,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={6}>
                                         <Form.Group className="mb-2">
                                             <Form.Label className='mb-1'>City</Form.Label>
-                                            {/* {
-                                                store?.getCitiesReducer?.loading ?
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <Spinner className='fs-5' />
-                                                        </Col>
-                                                    </Row>
-                                                    : */}
                                             <Form.Select
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('city')}
                                                 onChange={(e) => handleCitySelection(e)}
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities?.map((data) => (
+                                                {cities1?.map((data) => (
                                                     <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
                                                         {data?.name}
@@ -1246,7 +1273,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Col sm={12} className="mb-2">
                                 <Form.Check
                                     type="checkbox"
-                                    style={{cursor:"pointer"}}
+                                    style={{ cursor: "pointer" }}
                                     label="Use primary address as mailing address"
                                     checked={usePrimaryAsMailing}
                                     onChange={(e) => {
@@ -1274,14 +1301,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onChange={(e) => {
                                                         if (!usePrimaryAsMailing) {
                                                             setValue('mailingAddress', e.target.value);
-                                                            getGeolocation(e);
+                                                            getGeolocation2(e);
+                                                            setFocused2(true);
                                                         }
                                                     }}
-                                                    onFocus={() => setFocused(true)}
-                                                    onBlur={() => setTimeout(() => setFocused(false), 200)}
+                                                    onFocus={() => setFocused2(true)}
+                                                    onBlur={() => setTimeout(() => setFocused2(false), 200)}
                                                     placeholder="Search for mailing address"
                                                     autoComplete="off"
-                                                    disabled={usePrimaryAsMailing} 
+                                                    disabled={usePrimaryAsMailing}
                                                 />
                                                 <div
                                                     style={{
@@ -1296,15 +1324,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                    className={`scroll-container hover-bg-change ${searchedLocations2?.length === 0 || !focused2 ? 'd-none' : ''}`}
                                                 >
-                                                    {searchedLocations?.map((data, index) => (
+                                                    {searchedLocations2?.map((data, index) => (
                                                         <p
                                                             key={index}
                                                             onClick={() => {
                                                                 setSelectedLocation(data);
                                                                 setValue('mailingAddress', data?.formatted);
-                                                                setFocused(false);
+                                                                setFocused2(false);
                                                             }}
                                                             style={{
                                                                 margin: 0,
@@ -1316,7 +1344,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {data?.formatted}
                                                         </p>
                                                     ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                    {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                                 </div>
                                             </div>
                                         </Form.Group>
@@ -1382,7 +1410,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <option value="">
                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                 </option>
-                                                {cities?.map((data) => (
+                                                {cities2?.map((data) => (
                                                     <option key={data?._id} value={data?._id}>
                                                         {data?.name}
                                                     </option>
