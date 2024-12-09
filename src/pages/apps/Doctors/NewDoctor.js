@@ -22,12 +22,13 @@ const NewDoctor = () => {
         handleSubmit,
         formState: { errors },
         reset,
-        watch,
+        watch, getValues,
         setValue,
     } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-
+    // const daaa=watch('state1')
+    // console.log(,'daa')
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
     const logoFileInputRef = useRef(null);
@@ -169,7 +170,7 @@ const NewDoctor = () => {
     const submitData = (data) => {
         const payload = {
             ...(updateId ? { id: updateId } : {}), // Conditionally add `id` if `updateId` exists
-            clinicId: clinicId,
+            // clinicId: clinicId,
             firstName: data?.firstName,
             lastName: data?.lastName,
             email: data?.email,
@@ -202,7 +203,7 @@ const NewDoctor = () => {
             //     longitude: longitude
             // }
         };
-        // console.log(payload, 'payload')
+        console.log(payload, 'payload')
         // Encrypt and dispatch the payload
         dispatch(createDoctorAction({ key: encryptMessage(payload) }));
     };
@@ -244,6 +245,7 @@ const NewDoctor = () => {
             });
     }
     const [selectedLocation, setSelectedLocation] = useState(null);
+    console.log(statesData, 'statesDatastatesData')
     useEffect(() => {
         if (selectedLocation) {
             setLatitude(selectedLocation?.bounds?.southwest?.lat);
@@ -251,6 +253,7 @@ const NewDoctor = () => {
             setValue('address1', selectedLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
             const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            console.log(selectedState, 'selectedStateselectedState')
             setValue('state1', selectedState)
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
@@ -506,9 +509,9 @@ const NewDoctor = () => {
                                                                 //     handleFileChange
                                                                 // }
                                                                 />
-                                                                {errors.profileImage && (
+                                                                {errors.profileImage && 
                                                                     <p className="text-danger">{errors.profileImage.message}</p>
-                                                                )}
+                                                                }
                                                             </div>
                                                             <Form.Group className="mb-3">
                                                                 <Form.Label>Degree Name{!id && <span className='text-danger'>*</span>}</Form.Label>
@@ -601,7 +604,7 @@ const NewDoctor = () => {
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showPassword ? "text" : "password"}
-                                                                                onKeyDown={(event)=>handleFirstSpace(event,0)}
+                                                                                onKeyDown={(event) => handleFirstSpace(event, 0)}
                                                                                 placeholder={id ? "********" : "Password"}
                                                                                 readOnly={id}
                                                                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -787,12 +790,15 @@ const NewDoctor = () => {
                                                                     <Row>
                                                                         <Col sm={6}>
                                                                             <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1' >State</Form.Label>
+                                                                                {/* <Form.Label className='mb-1' >State</Form.Label>
                                                                                 <Form.Select
                                                                                     {...register('state1')}
                                                                                     onChange={(e) => {
                                                                                         setFormData({ ...formData, state: e.target.value });
                                                                                         handleStateSelection(e);
+                                                                                    }}
+                                                                                    style={{
+                                                                                        color: getValues('state1')?.length===0 ? "#a9a9a9" : "black", // Black if state is selected, gray otherwise
                                                                                     }}
                                                                                 >
                                                                                     <option>State</option>
@@ -806,6 +812,40 @@ const NewDoctor = () => {
                                                                                         </option>
                                                                                     ))}
                                                                                 </Form.Select>
+                                                                                </Form.Group> */}
+                                                                                <label htmlFor="state-select" className='fw-bold' style={{ display: "block", marginBottom: "6px" }}>
+                                                                                    State
+                                                                                </label>
+                                                                                <select
+                                                                                    id="state-select"
+                                                                                    {...register("state1")}
+                                                                                    onChange={(e) => {
+                                                                                        const selectedValue = e.target.value;
+                                                                                        setFormData({ ...formData, state: selectedValue }); // Update formData.state
+                                                                                        handleStateSelection(e); // Handle additional logic
+                                                                                    }}
+                                                                                    style={{
+                                                                                        width: "100%",
+                                                                                        padding: "7px ",
+                                                                                        borderRadius: "4px",
+                                                                                        border: "1px solid #ccc",
+                                                                                        color: getValues('state1')?.length === 0 ? "#a9a9a9" : "black", // Black if state is selected, gray otherwise
+                                                                                    }}
+                                                                                >
+                                                                                    <option value="" disabled>
+                                                                                        Select state
+                                                                                    </option>
+                                                                                    {statesData?.states?.map((data) => (
+                                                                                        <option
+                                                                                            key={data?.id} // Unique key for each option
+                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                                            value={data?._id}
+                                                                                        >
+                                                                                            {data?.name}
+                                                                                        </option>
+                                                                                    ))}
+                                                                                </select>
+
                                                                             </Form.Group>
 
                                                                         </Col>
@@ -813,12 +853,19 @@ const NewDoctor = () => {
                                                                             <Form.Group className="mb-2">
                                                                                 <Form.Label className='mb-1'>City</Form.Label>
 
-                                                                                <Form.Select
+                                                                                <select
                                                                                     disabled={store?.getCitiesReducer?.loading}
                                                                                     {...register('city1')}
                                                                                     onChange={(e) => {
                                                                                         setFormData({ ...formData, city: e.target.value })
                                                                                         handleCitySelection(e);
+                                                                                    }}
+                                                                                    style={{
+                                                                                        width: "100%",
+                                                                                        padding: "7px ",
+                                                                                        borderRadius: "4px",
+                                                                                        border: "1px solid #ccc",
+                                                                                        color: getValues('city1')?.length === 0 ? "#a9a9a9" : "black", 
                                                                                     }}
                                                                                 >
                                                                                     <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
@@ -827,7 +874,7 @@ const NewDoctor = () => {
                                                                                             {data?.name}
                                                                                         </option>
                                                                                     ))}
-                                                                                </Form.Select>
+                                                                                </select>
 
                                                                             </Form.Group>
                                                                         </Col>
@@ -1078,10 +1125,10 @@ const NewDoctor = () => {
                                 {activeTab === "documents" && <Documents />}
                             </div>
                         </Card.Body>
-                    </Card>
-                </div>
+                    </Card >
+                </div >
                 <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} setFormData={setFormData} />
-            </div>
+            </div >
         </>
     );
 };
