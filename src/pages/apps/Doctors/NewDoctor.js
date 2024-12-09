@@ -42,6 +42,7 @@ const NewDoctor = () => {
     const [latitude, setLatitude] = useState(null);
     const [stateToSelect, setStateToSelect] = useState(null);
     const [focused, setFocused] = useState(false);
+    const [mailingFocused, setMailingFocused] = useState(false);
     const [updatePage, setUpdatePage] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
@@ -214,6 +215,7 @@ const NewDoctor = () => {
     };
 
     const [searchedLocations, setSearchedLocations] = useState(null)
+    const [searchedMailingLocations, setSearchedMailingLocations] = useState(null)
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -244,7 +246,38 @@ const NewDoctor = () => {
                 }
             });
     }
+   
+    const getMailingGeolocation = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data; // Return the geocoding data
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null; // Return null in case of error
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedMailingLocations(data?.results)
+                } else {
+                    console.log("No data returned.");
+                }
+            });
+    }
     const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedMailingLocation, setSelectedMailingLocation] = useState(null);
     console.log(statesData, 'statesDatastatesData')
     useEffect(() => {
         if (selectedLocation) {
@@ -253,12 +286,23 @@ const NewDoctor = () => {
             setValue('address1', selectedLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
             const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            console.log(selectedState, 'selectedStateselectedState')
+            // console.log(selectedState, 'selectedStateselectedState')
             setValue('state1', selectedState)
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation, setValue, statesData, dispatch])
+        if (selectedMailingLocation) {
+            setLatitude(selectedMailingLocation?.bounds?.southwest?.lat);
+            setLongitude(selectedMailingLocation?.bounds?.southwest?.lng);
+            setValue('address2', selectedMailingLocation?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?._id;
+            // console.log(selectedState, 'selectedStateselectedState')
+            setValue('state1', selectedState)
+            const countyName = selectedMailingLocation?.components?.county;
+            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation,selectedMailingLocation, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
             const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
@@ -896,7 +940,7 @@ const NewDoctor = () => {
                                                                             <Form.Group className="mb-2">
                                                                                 <Form.Label className='mb-1'>Zip</Form.Label>
                                                                                 <Form.Control
-                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
+                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.zip : ''}
                                                                                     type="text"
                                                                                     {...register('zip1', {
                                                                                         minLength: {
@@ -937,18 +981,18 @@ const NewDoctor = () => {
                                                                                 <div style={{ position: 'relative' }}>
                                                                                     <Form.Control
                                                                                         type="text"
-                                                                                        defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.address : ''}
+                                                                                        defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.address : ''}
                                                                                         {...register('address2')}
                                                                                         onChange={(e) => {
                                                                                             setFormData({ ...formData, address: e.target.value });
-                                                                                            getGeolocation(e);
-                                                                                            setFocused(true); // Open dropdown on input
+                                                                                            getMailingGeolocation(e);
+                                                                                            setMailingFocused(true); // Open dropdown on input
                                                                                         }}
-                                                                                        onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                                                        onFocus={() => setMailingFocused(true)} // Open dropdown when the field is focused
                                                                                         onBlur={() => {
-                                                                                            setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                                                            setTimeout(() => setMailingFocused(false), 200); // Delay to allow selection before hiding dropdown
                                                                                         }}
-                                                                                        placeholder="Search for address"
+                                                                                        placeholder="Search for mailing address"
                                                                                         autoComplete="off"
                                                                                     />
                                                                                     {/* {/ Dropdown suggestions /} */}
@@ -965,9 +1009,9 @@ const NewDoctor = () => {
                                                                                             border: '1px solid #ced4da',
                                                                                             borderTop: 'none',
                                                                                         }}
-                                                                                        className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                                                        className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !focused ? 'd-none' : ''}`}
                                                                                     >
-                                                                                        {searchedLocations?.map((data, index) => (
+                                                                                        {searchedMailingLocations?.map((data, index) => (
                                                                                             <p
                                                                                                 key={index}
                                                                                                 onClick={() => {
@@ -984,7 +1028,7 @@ const NewDoctor = () => {
                                                                                                 {data?.formatted}
                                                                                             </p>
                                                                                         ))}
-                                                                                        {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                                        {searchedMailingLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                                                                     </div>
                                                                                 </div>
                                                                             </Form.Group>
@@ -1080,7 +1124,7 @@ const NewDoctor = () => {
                                                                             <Form.Group className="mb-2">
                                                                                 <Form.Label className='mb-1'>Zip</Form.Label>
                                                                                 <Form.Control
-                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
+                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.zip : ''}
                                                                                     type="text"
                                                                                     {...register('zip', {
                                                                                         minLength: {
