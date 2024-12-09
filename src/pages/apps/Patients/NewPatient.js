@@ -10,15 +10,23 @@ import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
+import { getCitiesAction, getClinicById, getStatesByCountryAction } from "../../../redux/actions";
 
 
 const NewPatient = () => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-    const dispatch = useDispatch();
+    const createResponse = store?.createClinicsReducer?.data?.status;
 
+    const statesData = store?.getStatesReducer?.data;
+    const cities = store?.getCitiesReducer?.data?.cities;
+    console.log({cities})
+    const dispatch = useDispatch();
+    const [focused, setFocused] = useState(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
+    const updateId = searchParams.get('updateid');
+
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState("");
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -30,13 +38,33 @@ const NewPatient = () => {
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
+    const [searchedLocations, setSearchedLocations] = useState(null)
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedCity, setSelectedCity] = useState(null);
+    const [updatePage, setUpdatePage] = useState(false);
+
 
 
 
 
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
-
+    useEffect(() => {
+        if (selectedLocation) {
+            setValue('address', selectedLocation?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            setValue('stateName', selectedState)
+            const countyName = selectedLocation?.components?.county;
+            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation, setValue, statesData, dispatch])
+    useEffect(() => {
+        if (cities) {
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county);
+            setValue('city', selectedCounty)
+        }
+    }, [cities])
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         if (password === "1234") {
@@ -62,8 +90,51 @@ const NewPatient = () => {
             // console.error('Error during file upload:', error);
         }
     };
+    const getGeolocation = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
- 
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data; // Return the geocoding data
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null; // Return null in case of error
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedLocations(data?.results)
+                } else {
+                    console.log("No data returned.");
+                }
+            });
+    }
+    const handleCitySelection = (e) => {
+        setSelectedCity(e.target.value)
+    }
+    useEffect(() => {
+        if (updateId) {
+            dispatch(getClinicById({ key: encryptMessage({ id: updateId }) }))
+            setUpdatePage(true)
+        }
+        dispatch(getStatesByCountryAction());
+    }, [dispatch, updateId, createResponse === 200]);
+    const handleStateSelection = (e) => {
+        const selectedOption = e.target.selectedOptions[0]; // Get the selected <option>
+        const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
+    };
+
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
 
     const onSubmit = (data) => {
@@ -79,7 +150,7 @@ const NewPatient = () => {
             chartNumber: data?.chartNumber,
             responsiblePartyName: data?.responsiblePartyName,
             address: {
-                // street: data?.street,
+                street: data?.street,
                 city: data?.city,
                 state: data?.state,
                 zipCode: data?.zipCode,
@@ -93,11 +164,11 @@ const NewPatient = () => {
             ssn: data?.ssn,
             additionalMRN: data?.additionalMRN,
             financialClass: data?.financialClass,
-            providerProfile: data?.providerProfile,
+            providerProfile: '67568bcf922eec0848016d5a',
             employer: data?.employer,
             relationship: data?.relationship,
             preferredLanguage: data?.preferredLanguage,
-            pcp: data?.pcp,
+            pcp: '67568bcf922eec0848016d5a',
             raceEthnicity: data?.raceEthnicity,
 
         }
@@ -152,16 +223,15 @@ const NewPatient = () => {
                                             })}
                                             ref={logoFileInputRef}
                                             onChange={handleFileChange}
-                                       
+
                                         />
-                                        {errors.profileImage && (
-                                            <p className="text-danger">{errors.profileImage.message}</p>
+                                        {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
                                         )}
                                     </div>
                                 </div>
                                 <div className="col-6">
                                     <div>
-                                        <Form.Label htmlFor="gender">Gender*</Form.Label>
+                                        <Form.Label htmlFor="gender">Gender<span className='text-danger'>*</span></Form.Label>
                                         <div className="d-flex gap-2">
                                             <Form.Check
                                                 type="radio"
@@ -178,7 +248,7 @@ const NewPatient = () => {
                                             <Form.Check
                                                 type="radio"
                                                 label="Others"
-                                                value="Others"
+                                                value="Other"
                                                 {...register('gender', { required: "Gender is required" })}
                                             />
 
@@ -188,14 +258,21 @@ const NewPatient = () => {
                                     </div>
                                 </div>
                                 <div className="col-12">
-                                    <div className="mt-3">
+                                    <div className=" mb-3">
                                         <Form.Label htmlFor="title">Title</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="Title"
-                                            {...register('title')}
-                                        />
+                                        <Form.Select
+                                            {...register('title', { required: "Title is required" })}
+                                            aria-label="Select Title"
+                                        >
+                                            <option value="">Select Title</option>
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Dr.">Dr.</option>
+                                            <option value="Other">Other</option>
+                                        </Form.Select>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -226,30 +303,100 @@ const NewPatient = () => {
                                     />
                                 </div>
                                 <div className="col-6 mb-3">
-                                    <Form.Label htmlFor="address">Address</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Address"
-                                        {...register('address', { required: "Address is required" })}
-                                    />
+                                    <Form.Group className="mb-2">
+                                        <Form.Label className="mb-1"> Address</Form.Label>
+                                        <div style={{ position: 'relative' }}>
+                                            <Form.Control
+                                                type="text"
+                                                {...register('address')}
+                                                onChange={(e) => {
+                                                    getGeolocation(e);
+                                                    setFocused(true);
+                                                }}
+                                                onFocus={() => setFocused(true)}
+                                                onBlur={() => {
+                                                    setTimeout(() => setFocused(false), 200);
+                                                }}
+                                                placeholder="Search for address"
+                                                autoComplete="off"
+                                            />
+                                            <div
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '100%',
+                                                    left: 0,
+                                                    width: '100%',
+                                                    maxHeight: '150px',
+                                                    overflow: 'auto',
+                                                    zIndex: 111,
+                                                    backgroundColor: '#fff',
+                                                    border: '1px solid #ced4da',
+                                                    borderTop: 'none',
+                                                }}
+                                                className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                            >
+                                                {searchedLocations?.map((data, index) => (
+                                                    <p
+                                                        key={index}
+                                                        onClick={() => {
+                                                            setSelectedLocation(data)
+                                                            setFocused(false); // Close dropdown after selection
+                                                        }}
+                                                        style={{
+                                                            margin: 0,
+                                                            padding: '8px 12px',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        className="hover-bg-change text-black"
+                                                    >
+                                                        {data?.formatted}
+                                                    </p>
+                                                ))}
+                                                {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                            </div>
+                                        </div>
+                                    </Form.Group>
                                 </div>
                                 <div className="col-6 ">
-                                    <Form.Label htmlFor="state">State</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="State"
-                                        {...register('state', { required: "State is required" })}
-                                    />
+                                    <Form.Group className="mb-2">
+                                        <Form.Label className='mb-1' >State</Form.Label>
+                                        <Form.Select
+                                            {...register('stateName')}
+                                            onChange={(e) => handleStateSelection(e)}
+                                        >
+                                            <option>State</option>
+                                            {statesData?.states?.map((data) => (
+                                                <option
+                                                    key={data?.id} // Unique key for each option
+                                                    data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                    value={data?._id}
+                                                >
+                                                    {data?.name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
                                 </div>
                                 <div className="col-6 ">
                                     <div className="row">
                                         <div className="col-6">
-                                            <Form.Label htmlFor="city">City</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="City"
-                                                {...register('city', { required: "City is required" })}
-                                            />
+                                            <Form.Group className="mb-2">
+                                                <Form.Label className='mb-1'>City</Form.Label>
+                                                <Form.Select
+                                                    disabled={store?.getCitiesReducer?.loading}
+                                                    {...register('city')}
+                                                    onChange={(e) => handleCitySelection(e)}
+                                                >
+                                                    <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                    {cities?.map((data) => (
+                                                        <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?._id}>
+
+                                                            {data?.name}
+                                                        </option>
+                                                    ))}
+                                                    {console.log(cities,'city')}
+                                                </Form.Select>
+                                            </Form.Group>
                                         </div>
                                         <div className="col-6">
                                             <Form.Label htmlFor="zipCode">Zip Code</Form.Label>
@@ -288,7 +435,7 @@ const NewPatient = () => {
                                                             message: 'Contact must be a number'
                                                         },
                                                         maxLength: {
-                                                            value: 10,
+                                                            value: 15,
                                                             message: 'Contact must not exceed 10 digits'
                                                         },
                                                         minLength: {
@@ -328,37 +475,62 @@ const NewPatient = () => {
                             </div>
                             <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
                                 <div className="col-6 mb-3">
-                                    <Form.Label htmlFor="marital">Marital status</Form.Label>
+                                    <Form.Label htmlFor="marital">Marital Status</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        placeholder="Marital statu"
-                                        {...register('maritalStatus', { required: "Marital is required" })}
-                                    />
+                                        as="select"  // Use 'select' to make it a dropdown
+                                        id="marital"
+                                        {...register('maritalStatus', { required: "Marital status is required" })}
+                                    >
+                                        <option value="">Select marital status</option>  {/* Default option */}
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Divorced">Divorced</option>
+                                        <option value="Widowed">Widowed</option>
+                                        <option value="Other">Other</option>
+                                    </Form.Control>
+
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
                                     <Form.Control
-                                        type="text"
+                                        type="date"  // Change type to "date" for date input
                                         placeholder="Date of Birth"
                                         {...register('dateOfBirth', { required: "Date of Birth is required" })}
                                     />
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="deceased">Deceased</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        placeholder="Deceased"
+                                        as="select"  // Use 'select' to create a dropdown
+                                        id="deceased"
                                         {...register('deceased', { required: "Deceased is required" })}
-                                    />
+                                    >
+                                        <option value="">Select Deceased</option>  {/* Default option */}
+                                        <option value="true">Yes</option>
+                                        <option value="false">No</option>
+                                    </Form.Control>
+
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="SSN">SSN#</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="SSN#"
-                                        {...register('ssn', { required: "SSN# is required" })}
+                                        {...register('ssn', {
+                                            required: "SSN# is required", // Ensure it's not empty
+                                            pattern: {
+                                                value: /^\d{3}-\d{2}-\d{4}$/, // Regex pattern for SSN format
+                                                message: 'SSN must be in format XXX-XX-XXXX' // Custom error message
+                                            }
+                                        })}
                                     />
+                                    {/* Display error message */}
+                                    {errors.ssn && <span className="text-danger">{errors.ssn.message}</span>}
                                 </div>
+
                                 <div className="col-6 ">
                                     <Form.Label htmlFor="additional">Additional MRN</Form.Label>
                                     <Form.Control
@@ -372,11 +544,20 @@ const NewPatient = () => {
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="financial">Financial Class</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        placeholder="Financial Class"
+                                        as="select"  // Use 'select' to create a dropdown
+                                        id="financial"
                                         {...register('financialClass', { required: "Financial Class is required" })}
-                                    />
+                                    >
+                                        <option value="">Select Financial Class</option>  {/* Default option */}
+                                        <option value="Self-Pay">Self-Pay</option>
+                                        <option value="Insurance">Insurance</option>
+                                        <option value="Medicaid">Medicaid</option>
+                                        <option value="Medicare">Medicare</option>
+                                        <option value="Other">Other</option>
+                                    </Form.Control>
+
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="provider">Provider Profile</Form.Label>
                                     <Form.Control
@@ -396,19 +577,34 @@ const NewPatient = () => {
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="relationship">Relationship</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        placeholder="Relationship"
+                                        as="select"  // Use 'select' to create a dropdown
+                                        id="relationship"
                                         {...register('relationship', { required: "Relationship is required" })}
-                                    />
+                                    >
+                                        <option value="">Select Relationship</option>  {/* Default option */}
+                                        <option value="Self">Self</option>
+                                        <option value="Spouse">Spouse</option>
+                                        <option value="Child">Child</option>
+                                        <option value="Other">Other</option>
+                                    </Form.Control>
+
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
                                     <Form.Control
-                                        type="text"
-                                        placeholder="Preferred Language"
+                                        as="select"  // Use 'select' to create a dropdown
+                                        id="preferred"
                                         {...register('preferredLanguage', { required: "Preferred Language is required" })}
-                                    />
+                                    >
+                                        <option value="">Select Preferred Language</option>  {/* Default option */}
+                                        <option value="English">English</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="Other">Other</option>
+                                    </Form.Control>
+
                                 </div>
+
                                 <div className="col-6 mb-3">
                                     <Form.Label htmlFor="PCP">PCP</Form.Label>
                                     <Form.Control
