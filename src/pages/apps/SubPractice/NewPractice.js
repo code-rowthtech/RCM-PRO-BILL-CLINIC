@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
@@ -10,7 +10,7 @@ import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
-import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction } from '../../../redux/sub clinic/actions';
+import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
 import { getCitiesAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
@@ -20,13 +20,15 @@ import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'reac
 
 
 const NewPractice = () => {
+    const location = useLocation();
+    const { data } = location.state || {};
+    console.log('Received ID:', data);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
     const [passShow, setPassShow] = useState(false);
     const logoFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo, 'logo')
     const [logoName, setLogoName] = useState('');
     const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
@@ -47,20 +49,6 @@ const NewPractice = () => {
         }
     };
 
-    // const handleFileChange = async (e) => {
-    //     const selectedFile = e.target.files[0];
-    //     if (selectedFile) {
-    //         try {
-    //             const objectURL = URL.createObjectURL(selectedFile);
-    //             setLogo(objectURL); 
-    //             setLogoName(selectedFile.name); 
-    //             console.log("Image URL set: ", objectURL); 
-    //         } catch (error) {
-    //             console.error("Error during file upload:", error);
-    //         }
-    //     }
-    // };
-
     const handleViewImage = () => {
         if (logo) {
             console.log("Opening image at: ", logo);
@@ -74,9 +62,9 @@ const NewPractice = () => {
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
-    const [medicalDetails, setMedicalDetails] = useState([
-        { name: '', number: '', url: null, fileName: '' }
-    ]);
+    // const [medicalDetails, setMedicalDetails] = useState([
+    //     { name: '', number: '', url: null, fileName: '' }
+    // ]);
     const [stateDetails, setStateDetails] = useState([
         { name: [], number: "", url: null, fileName: "" }
     ]);
@@ -91,18 +79,10 @@ const NewPractice = () => {
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
     const cities = store?.getCitiesReducer?.data?.cities;
-
-    console.log("Cities in Store:", citiesData);
     const statecode = statesData?.states?.state_code
-    console.log(statecode, 'sttecode')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading
-
-    console.log(clinectypes, 'clinic')
-    console.log(statesData, 'state')
-
     const [updatePage, setUpdatePage] = useState(false);
-
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [focused, setFocused] = useState(false);
     const [latitude, setLatitude] = useState('');
@@ -111,16 +91,12 @@ const NewPractice = () => {
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
     const [openSelect, setOpenSelect] = useState(false);
-
-    console.log(selectedCity, 'getcity')
     useEffect(() => {
-        // Dispatch the action to fetch states and cities initially
         dispatch(getStatesByCountryAction());
         dispatch(getSubClinicCitiesAction())
     }, [dispatch]);
 
     useEffect(() => {
-        // Auto-close dropdown when latitude and longitude are set
         if (latitude && longitude) {
             setFocused(false);
         }
@@ -148,11 +124,10 @@ const NewPractice = () => {
             console.error('Failed to fetch geocode data:', error);
         }
     };
+
     const [stateCode, setStateCode] = useState()
-    console.log(stateCode, 'codecode')
 
     const handleAddressSelection = (location) => {
-        console.log(location, 'getloc')
         setValue('address', location.formatted);
         setValue('zip', location.components.postcode || '');
         setValue('stateName', location.components.state || '');
@@ -164,7 +139,6 @@ const NewPractice = () => {
         setStreet(location.components.road || location.components.street || '');
         dispatch(getSubClinicCitiesAction({ state_code: location?.components?.state_code, name: '', limit: 25, skip: '' }));
 
-        // Update the selected state and city based on the address selection
         const stateCode = statesData?.states?.find(
             (state) => state.name === location.components.state
         )?.state_code;
@@ -176,9 +150,8 @@ const NewPractice = () => {
             dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
         }
 
-        setFocused(false); // Close dropdown
+        setFocused(false);
     };
-
 
     useEffect(() => {
         if (stateToSelect) {
@@ -202,15 +175,12 @@ const NewPractice = () => {
         }
     };
 
-
     const stateGeoLocation = 'stateName';
     useEffect(() => {
         if (stateGeoLocation) {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
         }
     }, [stateGeoLocation])
-
-
 
     const {
         register,
@@ -244,8 +214,6 @@ const NewPractice = () => {
 
     }, [dispatch])
 
-
-
     const handleAccreditationInputChange = (e, field, index) => {
         const value = e.target.value;
         setAccreditationDetails((prevDetails) => {
@@ -257,17 +225,7 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
-    // const handleCitySelection = (e) => {
-    //     const value = e.target.value;
-    //     if (value) {
-    //         try {
-    //             const citySelected = JSON.parse(value);
-    //             setSelectedCity(citySelected);
-    //         } catch (error) {
-    //             console.error('Invalid JSON:', value);
-    //         }
-    //     }
-    // };
+
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
@@ -284,86 +242,124 @@ const NewPractice = () => {
         } catch (error) {
         }
     };
-    const handleAddMedical = () => {
-        const isIncomplete = medicalDetails.some(
-            (medical) =>
-                !medical.name || !medical.number || !medical.url
-        );
-        if (isIncomplete) {
-            // Show a toast message if any field is incomplete
-            ToastHandle('Please fill all the fields before adding a new one', 'danger');
-            return;
-        }
-        setMedicalDetails([
-            ...medicalDetails,
-            { name: '', number: '', url: null }
-        ]);
-    };
+    // const handleAddMedical = () => {
+    //     const isIncomplete = medicalDetails.some(
+    //         (medical) =>
+    //             !medical.name || !medical.number || !medical.url
+    //     );
+    //     if (isIncomplete) {
+    //         ToastHandle('Please fill all the fields before adding a new one', 'danger');
+    //         return;
+    //     }
+    //     setMedicalDetails([
+    //         ...medicalDetails,
+    //         { name: '', number: '', url: null }
+    //     ]);
+    // };
 
-    const handleMedicalInputChange = (e, field, index) => {
-        const value = e.target.value;
-        setMedicalDetails((prevDetails) => {
-            const updatedDetails = [...prevDetails];
-            updatedDetails[index] = {
-                ...updatedDetails[index],
-                [field]: value
-            };
-            return updatedDetails;
-        });
-    };
-    const handleRemoveMedical = (index) => {
-        setMedicalDetails((prevDetails) => {
-            const updatedDetails = prevDetails.filter((_, i) => i !== index);
-            return updatedDetails;
-        });
-    };
+    // const handleMedicalInputChange = (e, field, index) => {
+    //     const value = e.target.value;
+    //     setMedicalDetails((prevDetails) => {
+    //         const updatedDetails = [...prevDetails];
+    //         updatedDetails[index] = {
+    //             ...updatedDetails[index],
+    //             [field]: value
+    //         };
+    //         return updatedDetails;
+    //     });
+    // };
+    // const handleRemoveMedical = (index) => {
+    //     setMedicalDetails((prevDetails) => {
+    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
+    //         return updatedDetails;
+    //     });
+    // };
 
     const handleAddState = () => {
         setOpenSelect(true);
 
     };
 
-    const handleMedicalChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile);
-            setMedicalDetails((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    url: url?.url?.split('?')[0],
-                    fileName: selectedFile.name,
+    // const handleMedicalChange = async (e, index) => {
+    //     const selectedFile = e.target.files[0];
+    //     try {
+    //         const url = await handleUpload(selectedFile);
+    //         setMedicalDetails((prevDetails) => {
+    //             const updatedDetails = [...prevDetails];
+    //             updatedDetails[index] = {
+    //                 ...updatedDetails[index],
+    //                 url: url?.url?.split('?')[0],
+    //                 fileName: selectedFile.name,
 
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-        }
-    };
+    //             };
+    //             return updatedDetails;
+    //         });
+    //     } catch (error) {
+    //     }
+    // };
 
 
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     // const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
 
-    console.log(clinic_id, 'id')
     const [formData, setFormData] = useState({
         clinicname: '',
         clinicType: '',
         email: '',
         contactPerson: '',
     });
+
+    const setField = (key, value) => value && setValue(key, value);
+    useEffect(() => {
+        if (data) {
+            setFormData(data);
+            setValue('clinicname', data?.name);
+            setValue('clinicType', data?.clinicType);
+            setValue('email', data?.userId?.email);
+            setValue('taxId', data?.taxIdOrEIN);
+            setValue('practiceSpecialty', data?.practiceSpecialty);
+            setField('contactPerson', data?.userId?.phone?.startsWith("+1")
+                ? data.userId.phone.substring(2)
+                : data?.userId?.phone);
+            setValue('npiNumber', data?.npiNumber);
+            setValue('logo', data?.logo);
+            setField('address', data?.userId?.primaryAddress?.address);
+            setField('street', data?.userId?.primaryAddress?.street);
+            setField('zip', data?.userId?.primaryAddress?.zip);
+            setLatitude(data?.userId?.primaryAddress?.latitude)
+            setLongitude(data?.userId?.primaryAddress?.longitude)
+            setField('stateName', data?.userId?.primaryAddress?.state?._id)
+            if (data?.userId?.primaryAddress?.city) {
+                dispatch(getCitiesAction({ state_code: data?.userId?.primaryAddress?.state?.id, name: data?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+            }
+            if (data?.accreditationDetails) {
+                setAccreditationDetails(data?.accreditationDetails)
+            }
+            // if (data?.medicalLicenses) {
+            //     setMedicalDetails(data?.medicalLicenses)
+            // }
+            if (data?.pos) {
+                setPosDetails(data?.pos)
+            }
+            if (data?.logo) {
+                setLogoName(data?.logo?.fileName)
+            }
+            if (data?.stateOfLicensing) {
+                setStateDetails(data?.stateOfLicensing)
+            }
+        }
+    }, [data, statesData, setValue]);
+
     const formDataChange = (field, value) => {
-        const updatedFormData = { ...formData, [field]: value }; 
+        const updatedFormData = { ...formData, [field]: value };
         setFormData(updatedFormData);
 
-        // Check if all fields are filled
         const areAllFieldsFilled =
             updatedFormData.clinicname &&
             updatedFormData.clinicType &&
             updatedFormData.email &&
             updatedFormData.contactPerson;
 
-        // Enable or disable the button
         setIsButtonDisabled(!areAllFieldsFilled);
     };
 
@@ -412,7 +408,7 @@ const NewPractice = () => {
     const [posDetails, setPosDetails] = useState([
         { name: '', email: '', role: '', contact: '', fileName: '' }
     ])
-    console.log(posDetails, 'pppp')
+
     const handleAddPOS = () => {
         const isIncomplete = posDetails.some(
             (pos) =>
@@ -420,7 +416,6 @@ const NewPractice = () => {
         );
 
         if (isIncomplete) {
-            // Show a toast message if any field is incomplete
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
         }
@@ -453,42 +448,49 @@ const NewPractice = () => {
         );
     }, [dispatch]);
     const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-    console.log(getRoleId, 'getRoleId')
 
-    const submitSubData = (data) => {
-
+    const submitSubData = (formData) => {
         const payload = {
-            name: data?.clinicname,
-            email: data?.email,
+            name: formData?.clinicname,
+            email: formData?.email,
             role: getRoleId,
-            phone: data?.contactPerson,
-            clinicType: data?.clinicType,
-            taxIdOrEIN: data?.taxId,
-            npiNumber: data?.npiNumber,
-            medicalLicenses: medicalDetails,
-            // stateOfLicensing: stateDetails,
+            phone: formData?.contactPerson,
+            practiceSpecialty: formData?.practiceSpecialty,
+            clinicType: formData?.clinicType,
+            taxIdOrEIN: formData?.taxId,
+            npiNumber: formData?.npiNumber,
+            // medicalLicenses: medicalDetails,
+            flag: 'subClinic',
+            stateOfLicensing: stateDetails,
             accreditationDetails: accreditationDetails,
-            logo: logo?.url.split('?')[0],
-            address: {
-                address1: data?.address,
-                city: '672d9989ebc7107ff1d3831a',
-                state: '67299cc8d39489e58e672463',
-                street: data?.street,
-                zip: data?.zip,
-                latitude: data?.latitude,
-                longitude: data?.longitude,
+            ...(logo ?
+                {
+                    logo: {
+                        url: logo?.url?.split('?')[0],
+                        fileName: logoName,
+                    }
+                }
+                : ''),
+            primaryAddress: {
+                address: formData?.address,
+                ...(formData?.city ? { city: formData?.city } : ''),
+                ...(formData?.stateName ? { state: formData?.stateName } : ''),
+                street: formData?.street,
+                zip: formData?.zip,
+                ...(latitude ? { latitude: latitude, } : ''),
+                ...(longitude ? { longitude: longitude, } : '')
             },
             pos: posDetails
 
         }
         console.log('Form Submitted:', payload);
-        dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-        if (activeTab === "departmentDetails") {
-            setActiveTab('departmentDetails'); // Change to the next tab
+        if (data) {
+            dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
         } else {
-            // Logic for other tabs (if needed)
+            dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+            navigate('/apps/crm/addclinic');
         }
-        reset(); // Reset form after submission
+        reset();
     };
     const [selectedLocation, setSelectedLocation] = useState(null);
     useEffect(() => {
@@ -510,79 +512,78 @@ const NewPractice = () => {
         }
     }, [cities])
     const [selectedStates, setSelectedStates] = useState([]);
-const [statesMenu, setStatesMenu] = useState(false);
-const handleCheckboxChange = (stateName) => {
-    setSelectedStates((prev) => {
-        const updatedStates = prev.includes(stateName)
-            ? prev.filter((name) => name !== stateName) // Remove state if unchecked
-            : [...prev, stateName]; // Add state if checked
+    const [statesMenu, setStatesMenu] = useState(false);
+    const handleCheckboxChange = (stateName) => {
+        setSelectedStates((prev) => {
+            const updatedStates = prev.includes(stateName)
+                ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+                : [...prev, stateName]; // Add state if checked
 
-        // Sync stateDetails with selected states
-        setStateDetails((prevDetails) => {
-            const newDetails = updatedStates.map((state) =>
-                prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }
-            );
-            return newDetails;
+            // Sync stateDetails with selected states
+            setStateDetails((prevDetails) => {
+                const newDetails = updatedStates.map((state) =>
+                    prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }
+                );
+                return newDetails;
+            });
+
+            return updatedStates;
         });
+    };
 
-        return updatedStates;
-    });
-};
-
-const handleStateInputChange = (e, field, index) => {
-    const value = e.target.value;
-    setStateDetails((prevDetails) => {
-        const updatedDetails = [...prevDetails];
-        updatedDetails[index] = {
-            ...updatedDetails[index],
-            [field]: value,
-        };
-        return updatedDetails;
-    });
-};
-
-const handleStateChange = async (e, index) => {
-    const selectedFile = e.target.files[0];
-    try {
-        const url = await handleUpload(selectedFile);
+    const handleStateInputChange = (e, field, index) => {
+        const value = e.target.value;
         setStateDetails((prevDetails) => {
             const updatedDetails = [...prevDetails];
             updatedDetails[index] = {
                 ...updatedDetails[index],
-                url: url?.url?.split('?')[0],
-                fileName: selectedFile.name,
+                [field]: value,
             };
             return updatedDetails;
         });
-    } catch (error) {
-        console.error('Error during file upload:', error);
-    }
-};
+    };
 
-const handleRemoveState = (index) => {
-    setStateDetails((prevDetails) => {
-        const updatedDetails = prevDetails.filter((_, i) => i !== index);
-        setSelectedStates(updatedDetails.map((detail) => detail.name)); // Update selectedStates as well
-        return updatedDetails;
-    });
-};
-const menuRef = useRef(null); // Reference for the menu
-const containerRef = useRef(null); // Reference for the container
-useEffect(() => {
-    const handleClickOutside = (event) => {
-        if (containerRef.current && !containerRef.current.contains(event.target)) {
-            setStatesMenu(false);
+    const handleStateChange = async (e, index) => {
+        const selectedFile = e.target.files[0];
+        try {
+            const url = await handleUpload(selectedFile);
+            setStateDetails((prevDetails) => {
+                const updatedDetails = [...prevDetails];
+                updatedDetails[index] = {
+                    ...updatedDetails[index],
+                    url: url?.url?.split('?')[0],
+                    fileName: selectedFile.name,
+                };
+                return updatedDetails;
+            });
+        } catch (error) {
+            console.error('Error during file upload:', error);
         }
     };
 
-    // Add event listener to detect clicks outside the menu
-    document.addEventListener('mousedown', handleClickOutside);
-
-    // Clean up the event listener on component unmount
-    return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
+    const handleRemoveState = (index) => {
+        setStateDetails((prevDetails) => {
+            const updatedDetails = prevDetails.filter((_, i) => i !== index);
+            setSelectedStates(updatedDetails.map((detail) => detail.name)); // Update selectedStates as well
+            return updatedDetails;
+        });
     };
-}, []);
+    const menuRef = useRef(null);
+    const containerRef = useRef(null);
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setStatesMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+
     return (
         <>
             <div className='pt-1 pb-2'>
@@ -597,32 +598,40 @@ useEffect(() => {
                                                 className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
                                                 onClick={() => handleTabChange("personalDetails")}
                                             >
-                                                Practice Information
+                                                Practice Sub Information
                                             </button>
                                         </li>
-                                        <li className="nav-item">
+                                        {/* <li className="nav-item">
                                             <button
                                                 className={`text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
                                                 onClick={() => handleTabChange("departmentDetails")}
                                             >
                                                 Billing & Subscription
                                             </button>
-                                        </li>
-                                        <li className="nav-item">
+                                        </li> */}
+                                        {/* <li className="nav-item">
                                             <button
                                                 className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
                                                 onClick={() => handleTabChange("documents")}
                                             >
                                                 Contract
                                             </button>
-                                        </li>
+                                        </li> */}
                                     </ul>
                                 </div>
                                 <div className='d-flex gap-2'>
-                                    {btnShow && <>
-                                        <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>Email to Sub Practice</Button>
-                                        <Button as={Link} to={'/apps/crm/addclinic'}>Back</Button>
-                                    </>}
+                                    {btnShow && (
+                                        <>
+                                            {!data && ( // Only show this button if not updating and no data
+                                                <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>
+                                                    Email to Sub Practice
+                                                </Button>
+                                            )}
+                                            <Button as={Link} to={'/apps/crm/addclinic'}>
+                                                Back
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
 
@@ -638,9 +647,6 @@ useEffect(() => {
                                                     onChange={(e) => formDataChange('clinicname', e.target.value)}
                                                     value={formData.clinicname}
                                                     placeholder="Practice name"
-                                                    
-
-
                                                 />
                                                 {errors.clinicname && <p className="text-danger">{errors.clinicname.message}</p>}
 
@@ -653,7 +659,8 @@ useEffect(() => {
                                                 </Form.Label>
                                                 <Form.Select
                                                     {...register('clinicType', { required: 'Practice Type is required' })}
-                                                    defaultValue="" // Ensures initial validation fails if not selected
+                                                    onChange={(e) => formDataChange('clinicType', e.target.value)}
+                                                    defaultValue=""
                                                 >
                                                     <option value="">Select Clinic type</option>
                                                     {clinectypes?.map((data) => (
@@ -682,8 +689,6 @@ useEffect(() => {
                                                         }
                                                     })}
                                                     onChange={(e) => formDataChange('email', e.target.value)}
-                                                // onKeyPress={handleFirstSpace}
-
                                                 />
                                                 {errors.email && <p className="text-danger">{errors.email.message}</p>}
 
@@ -691,14 +696,13 @@ useEffect(() => {
                                         </Col>
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Tax ID / EIN</Form.Label>
+                                                <Form.Label className='mb-1'>Tax ID / EIN <span className='text-danger'>*</span></Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     {...register('taxId', { required: 'Tax ID is required' })}
-                                                    // onKeyPress={handleFirstSpace}
-
+                                                    maxLength={9}
                                                     placeholder="Tax ID / EIN" />
-                                                {/* {errors.taxId && <p className="text-danger">{errors.taxId.message}</p>} */}
+                                                {errors.taxId && <p className="text-danger">{errors.taxId.message}</p>}
 
                                             </Form.Group>
                                         </Col>
@@ -706,21 +710,31 @@ useEffect(() => {
                                             <Form.Group className="mb-2 position-relative">
                                                 <Form.Label className="mb-1">Contact Person <span className='text-danger'>*</span></Form.Label>
                                                 <InputGroup>
-                                                    <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
-
+                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                     <Form.Control
                                                         type="tel"
-                                                        placeholder="+1 1234-234-234"
                                                         value={formData.contactPerson}
-                                                        {...register('contactPerson', { required: 'contactPerson is required' })}
+                                                        {...register('contactPerson', {
+                                                            required: 'This field is required',
+                                                            pattern: {
+                                                                value: /^[0-9]*$/,
+                                                                message: 'Contact must be a number'
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: 'Contact must not exceed 10 digits'
+                                                            },
+                                                            minLength: {
+                                                                value: 9,
+                                                                message: 'Contact must not be less than 9 digits'
+                                                            }
+                                                        })}
                                                         onChange={(e) => formDataChange('contactPerson', e.target.value)}
-                                                        onKeyPress={handleFirstSpace}
-
+                                                        placeholder="+1 1234-234-234"
+                                                        maxLength={10}
                                                     />
-
                                                 </InputGroup>
-                                                {errors.contactPerson && <p className="text-danger">{errors.contactPerson.message}</p>}
-
+                                                {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
                                                 <img
                                                     src={us}
                                                     alt="country code flag"
@@ -733,15 +747,30 @@ useEffect(() => {
 
                                         <Col sm={6}>
                                             <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
+                                                <Form.Label className='mb-1'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
                                                 <Form.Control
                                                     type="text"
                                                     placeholder="NPI Type 2 Number"
-                                                    // onKeyPress={handleFirstSpace}
+                                                    maxLength={9}
 
-                                                    {...register('npiNumber', { required: 'NPI Type 2 Number is required' })}
+                                                    {...register('npiNumber', {
+                                                        minLength: {
+                                                            value: 9,
+                                                            message: 'NPI must be at least 9 characters long',
+                                                        },
+                                                        maxLength: {
+                                                            value: 10,
+                                                            message: 'NPI cannot exceed 10 characters',
+                                                        },
+                                                        pattern: {
+                                                            value: /^[0-9]+$/,
+                                                            message: 'NPI must contain numbers only',
+                                                        },
+                                                        required: 'NPI Type 2 Number is required'
+                                                    })}
                                                 />
-                                                {/* {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>} */}
+
+                                                {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>}
                                             </Form.Group>
                                         </Col>
                                         {/* <Col sm={6} className="mb-2 d-flex flex-column position-relative">
@@ -806,6 +835,25 @@ useEffect(() => {
                                                 accept=".png, .jpg, .jpeg, .svg"
                                                 onChange={handleFileChange}
                                             />
+                                        </Col>
+                                        <Col sm={6}>
+                                            <Form.Group className="mb-2">
+                                                <Form.Label className='mb-1'>Practice Speciality Description <span className='text-danger'>*</span></Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    {...register('practiceSpecialty', {
+                                                        required: 'This field is required',
+                                                        validate: (value) =>
+                                                            !value.startsWith(' ') || 'First character cannot be a space',
+                                                    })}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                    }}
+                                                    placeholder="Practice Specialty Description"
+                                                />
+                                                {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
+
+                                            </Form.Group>
                                         </Col>
                                         <hr />
                                         <Col sm={12}>
@@ -875,7 +923,7 @@ useEffect(() => {
                                             </React.Fragment>
                                         ))}
                                         <hr />
-                                        <Col sm={12}>
+                                        {/* <Col sm={12}>
                                             <Form.Label>
                                                 Medical Licenses&nbsp;
                                                 <span
@@ -939,8 +987,8 @@ useEffect(() => {
                                                     </span>
                                                 </Col>
                                             </React.Fragment>
-                                        ))}
-                                        <hr />
+                                        ))} */}
+                                        {/* <hr /> */}
                                         <Col sm={12} className="position-relative">
                                             <Form.Label ref={containerRef}>
                                                 State of Licensure&nbsp;
@@ -1034,7 +1082,7 @@ useEffect(() => {
                                                                 <div style={{ position: 'relative' }}>
                                                                     <Form.Control
                                                                         type="text"
-                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.address1 : ''}
+                                                                        defaultValue={updatePage ? clinicDataToUpdate?.address?.address : ''}
                                                                         {...register('address')}
                                                                         onChange={(e) => {
                                                                             getGeolocation(e);
@@ -1304,9 +1352,9 @@ useEffect(() => {
                                                 disabled={createLoading}  // Disable button when loading
                                             >
                                                 {createLoading ? (
-                                                    <Spinner animation="border" size="sm" />  // Show spinner when loading
+                                                    <Spinner color='white' className='spinner-border-sm' />
                                                 ) : (
-                                                    'Next'
+                                                    data ? 'Update' : 'Next'
                                                 )}
                                             </Button>
                                         </Col>

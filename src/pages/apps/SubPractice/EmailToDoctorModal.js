@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 const EmailToDoctorModal = ({ show, closeModal, formData }) => {
     const store = useSelector((state) => state)
     const dispatch = useDispatch()
+    const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
 
     const {
         register,
@@ -22,6 +23,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData }) => {
         const payload = {
             name: formData?.clinicname,
             email: formData?.email,
+            role:getRoleId,
             phone: formData?.contactPerson,
             clinicType: formData?.clinicType,
         }

@@ -73,10 +73,10 @@ const Login = (): React$Element<any> => {
                 .string()
                 .required(t('Password is required'))
                 .min(8, t('Password must be at least 8 characters')) 
-                .matches(/[a-z]/, t('Password must contain at least one lowercase letter'))
-                .matches(/[A-Z]/, t('Password must contain at least one uppercase letter')) 
-                .matches(/[0-9]/, t('Password must contain at least one number'))
-                .matches(/[@$!%*?&]/, t('Password must contain at least one special character')) 
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                    t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character.')
+                ) 
         })
     );
 

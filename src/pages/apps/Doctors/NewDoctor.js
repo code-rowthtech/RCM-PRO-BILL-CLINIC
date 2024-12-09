@@ -81,8 +81,8 @@ const NewDoctor = () => {
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
     console.log(doctorDetails, 'doctorDetailsdoctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
-    const createData=store?.createtDoctorsReducer?.data?.doctor?._id;
-    console.log(createData,'createData')
+    const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
+    console.log(createData, 'createData')
     // console.log(store?.createtDoctorsReducer?.data, '12345678')
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id
@@ -263,19 +263,19 @@ const NewDoctor = () => {
     const [formData, setFormData] = useState({
         role: doctorRoleId,
     });
-console.log(formData,'formData')
-useEffect(()=>{
-if(logo){
-    setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] }) 
-}
-},[logo])
-const passwordValue = watch('password', '');
-React.useEffect(() => {
-  setFormData((prev) => ({ ...prev, password: passwordValue }));
-  if(doctorRoleId){
-      setFormData((prev) => ({ ...prev, role: doctorRoleId }));
-  }
-}, [passwordValue,doctorRoleId]);
+    console.log(formData, 'formData')
+    useEffect(() => {
+        if (logo) {
+            setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
+        }
+    }, [logo])
+    const passwordValue = watch('password', '');
+    React.useEffect(() => {
+        setFormData((prev) => ({ ...prev, password: passwordValue }));
+        if (doctorRoleId) {
+            setFormData((prev) => ({ ...prev, role: doctorRoleId }));
+        }
+    }, [passwordValue, doctorRoleId]);
     return (
         <>
             <div className='pt-1 pb-2'>
@@ -429,10 +429,10 @@ React.useEffect(() => {
                                                                     })}
                                                                     ref={logoFileInputRef}
                                                                     onChange={handleFileChange}
-                                                                    // onChange={()
-                                                                    //     // setFormData({ ...formData, profileImage: e.target.value });
-                                                                    //     handleFileChange
-                                                                    // }
+                                                                // onChange={()
+                                                                //     // setFormData({ ...formData, profileImage: e.target.value });
+                                                                //     handleFileChange
+                                                                // }
                                                                 />
                                                                 {errors.profileImage && (
                                                                     <p className="text-danger">{errors.profileImage.message}</p>
@@ -533,7 +533,7 @@ React.useEffect(() => {
 
                                                                 </div>
                                                                 <div className='col-6'>
-                                                                  
+
                                                                     <Form.Group className='mb-3 mt-1'>
                                                                         <Form.Label>Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
                                                                         <div className="position-relative">
@@ -579,7 +579,7 @@ React.useEffect(() => {
                                                                             // required: 'Profile image is required',
                                                                         })}
                                                                         ref={degreeFileInputRef}
-                                                                       onChange={handleFileChangeDegree}
+                                                                        onChange={handleFileChangeDegree}
                                                                     />
                                                                     {errors.profileImage && (
                                                                         <p className="text-danger">{errors.degree.message}</p>

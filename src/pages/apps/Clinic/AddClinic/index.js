@@ -58,7 +58,7 @@ const Index = () => {
                                                 activeTab === tab ? 'border-bottom border-2 border-dark text-black fw-bold' : ''
                                             }`}>
                                             {tab === 'clinic'
-                                                ? 'Clinic Information'
+                                                ? 'Practice Information'
                                                 : tab === 'billing'
                                                 ? 'Billing and Subscription Information'
                                                 : 'Contract'}
