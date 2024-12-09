@@ -144,7 +144,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [dispatch, updateId, createResponse === 200]);
 
     const handleStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0]; 
+        const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
         dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
@@ -251,28 +251,28 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             },
-            mailingAddress: 
-            usePrimaryAsMailing?
-            {
-                address: data?.address,
-                ...(data?.city ? { city: data?.city } : ''),
-                ...(data?.stateName ? { state: data?.stateName } : ''),
-                // state: stateToSelect?._id,
-                street: data?.street,
-                zip: data?.zip,
-                ...(latitude ? { latitude: latitude, } : ''),
-                ...(longitude ? { longitude: longitude, } : '')
-            }
-                :
-                {
-                address: data?.mailingAddress,
-                ...(data?.mailingCity ? { city: data?.mailingCity } : ''),
-                ...(data?.mailingStateName ? { state: data?.mailingStateName } : ''),
-                street: data?.mailingStreet,
-                zip: data?.mailingZip,
-                ...(latitude1 ? { latitude: latitude1, } : ''),
-                ...(longitude1 ? { longitude: longitude1, } : '')
-            }
+            mailingAddress:
+                usePrimaryAsMailing ?
+                    {
+                        address: data?.address,
+                        ...(data?.city ? { city: data?.city } : ''),
+                        ...(data?.stateName ? { state: data?.stateName } : ''),
+                        // state: stateToSelect?._id,
+                        street: data?.street,
+                        zip: data?.zip,
+                        ...(latitude ? { latitude: latitude, } : ''),
+                        ...(longitude ? { longitude: longitude, } : '')
+                    }
+                    :
+                    {
+                        address: data?.mailingAddress,
+                        ...(data?.mailingCity ? { city: data?.mailingCity } : ''),
+                        ...(data?.mailingStateName ? { state: data?.mailingStateName } : ''),
+                        street: data?.mailingStreet,
+                        zip: data?.mailingZip,
+                        ...(latitude1 ? { latitude: latitude1, } : ''),
+                        ...(longitude1 ? { longitude: longitude1, } : '')
+                    }
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
         console.log(newPayload, 'Practice');
@@ -606,7 +606,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             const countyName = selectedLocation2?.components?.county;
             dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation,selectedLocation2, setValue, statesData, dispatch])
+    }, [selectedLocation, selectedLocation2, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
@@ -616,7 +616,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
             setValue('mailingCity', selectedCounty1)
         }
-    }, [cities1,cities2]);
+    }, [cities1, cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
     console.log(getTableData, 'getTableData')
 

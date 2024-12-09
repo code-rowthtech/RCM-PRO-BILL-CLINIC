@@ -19,7 +19,7 @@ const NewPatient = () => {
     const createResponse = store?.createClinicsReducer?.data?.status;
 
     const statesData = store?.getStatesReducer?.data;
-    const cities = store?.getCitiesReducer?.data?.cities;
+    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     console.log({cities})
     const dispatch = useDispatch();
     const [focused, setFocused] = useState(false);
