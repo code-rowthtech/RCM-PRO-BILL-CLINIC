@@ -5,7 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { createClinicAction, deleteClinicAction, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, deleteClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -48,7 +48,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [selectedCity, setSelectedCity] = useState(null);
     const [focused, setFocused] = useState(false);
     const [focused2, setFocused2] = useState(false);
-
     const [subClinic, setSubClinic] = useState('');
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
@@ -56,7 +55,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
-
     // table data
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
@@ -87,7 +85,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     ]);
 
     const [longitude, setLongitude] = useState(null);
+    const [longitude1, setLongitude1] = useState(null);
     const [latitude, setLatitude] = useState(null);
+    const [latitude1, setLatitude1] = useState(null);
     const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
@@ -135,8 +135,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [createResponse, deleteClinicResponse])
 
-
-
     useEffect(() => {
         if (updateId) {
             dispatch(getClinicById({ key: encryptMessage({ id: updateId }) }))
@@ -146,11 +144,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [dispatch, updateId, createResponse === 200]);
 
     const handleStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0]; // Get the selected <option>
+        const selectedOption = e.target.selectedOptions[0]; 
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
         dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
-
     const handleCitySelection = (e) => {
         // const citySelected = JSON.parse(e.target.value);
         setSelectedCity(e.target.value)
@@ -175,13 +172,20 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
         setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
-        // setField('latitude', clinicsDataGet?.userId?.address?.latitude);
-        // setField('longitude', clinicsDataGet?.userId?.address?.longitude);
         setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
         setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
         setField('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
         if (clinicsDataGet?.userId?.primaryAddress?.city) {
             dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.primaryAddress?.state?.id, name: clinicsDataGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+        }
+        setField('mailingAddress', clinicsDataGet?.userId?.mailingAddress?.address);
+        setField('mailingStreet', clinicsDataGet?.userId?.mailingAddress?.street);
+        setField('mailingZip', clinicsDataGet?.userId?.mailingAddress?.zip);
+        setLatitude1(clinicsDataGet?.userId?.mailingAddress?.latitude)
+        setLongitude1(clinicsDataGet?.userId?.mailingAddress?.longitude)
+        setField('mailingStateName', clinicsDataGet?.userId?.mailingAddress?.state?._id)
+        if (clinicsDataGet?.userId?.mailingAddress?.mailingCity) {
+            dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.mailingAddress?.state?.id, name: clinicsDataGet?.userId?.mailingAddress?.mailingCity?.name, limit: '', skip: '' }))
         }
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
@@ -247,20 +251,32 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             },
-            mailingAddress: {
+            mailingAddress: 
+            usePrimaryAsMailing?
+            {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
-                ...(data?.state ? { state: data?.state } : ''),
+                ...(data?.stateName ? { state: data?.stateName } : ''),
+                // state: stateToSelect?._id,
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             }
+                :
+                {
+                address: data?.mailingAddress,
+                ...(data?.mailingCity ? { city: data?.mailingCity } : ''),
+                ...(data?.mailingStateName ? { state: data?.mailingStateName } : ''),
+                street: data?.mailingStreet,
+                zip: data?.mailingZip,
+                ...(latitude1 ? { latitude: latitude1, } : ''),
+                ...(longitude1 ? { longitude: longitude1, } : '')
+            }
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
         console.log(newPayload, 'Practice');
     };
-
 
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
@@ -440,7 +456,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 !data.name || !data.number || !data.url
         );
         if (isIncomplete) {
-            // Show a toast message if any field is incomplete
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
         }
@@ -484,7 +499,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             (state) =>
                 !state.name || !state.number || !state.url
         );
-
         if (isIncomplete) {
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
@@ -569,6 +583,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             });
     }
     const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedLocation2, setSelectedLocation2] = useState(null);
+
     useEffect(() => {
         if (selectedLocation) {
             setLatitude(selectedLocation?.bounds?.southwest?.lat);
@@ -580,14 +596,27 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation, setValue, statesData, dispatch])
+        if (selectedLocation2) {
+            setLatitude1(selectedLocation2?.bounds?.southwest?.lat);
+            setLongitude1(selectedLocation2?.bounds?.southwest?.lng);
+            setValue('mailingAddress', selectedLocation2?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?._id;
+            setValue('mailingStateName', selectedState)
+            const countyName = selectedLocation2?.components?.county;
+            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation,selectedLocation2, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city', selectedCounty)
         }
-    }, [cities1])
-    // for table view
+        if (cities2) {
+            const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
+            setValue('mailingCity', selectedCounty1)
+        }
+    }, [cities1,cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
     console.log(getTableData, 'getTableData')
 
@@ -781,7 +810,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         </Form.Group>
 
                     </Col>
-
                     <Col sm={6}>
                         <Form.Group className="mb-2">
                             <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
@@ -1330,7 +1358,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                setSelectedLocation(data);
+                                                                setSelectedLocation2(data);
                                                                 setValue('mailingAddress', data?.formatted);
                                                                 setFocused2(false);
                                                             }}
@@ -1356,7 +1384,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label className="mb-1">Latitude</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                value={latitude}
+                                                value={latitude1}
                                                 placeholder="Latitude"
                                                 readOnly
                                             />
@@ -1368,7 +1396,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label className="mb-1">Longitude</Form.Label>
                                             <Form.Control
                                                 type="text"
-                                                value={longitude}
+                                                value={longitude1}
                                                 placeholder="Longitude"
                                                 readOnly
                                             />

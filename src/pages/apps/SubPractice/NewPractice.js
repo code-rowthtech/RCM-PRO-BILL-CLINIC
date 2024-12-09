@@ -78,7 +78,7 @@ const NewPractice = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
-    const cities = store?.getCitiesReducer?.data?.cities;
+   const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const statecode = statesData?.states?.state_code
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading
