@@ -78,7 +78,7 @@ const NewPractice = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
-   const cities = store?.getCitiesReducer?.cities1?.data?.cities;
+    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const statecode = statesData?.states?.state_code
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading
@@ -181,7 +181,6 @@ const NewPractice = () => {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
         }
     }, [stateGeoLocation])
-
     const {
         register,
         handleSubmit,
@@ -519,7 +518,6 @@ const NewPractice = () => {
                 ? prev.filter((name) => name !== stateName) // Remove state if unchecked
                 : [...prev, stateName]; // Add state if checked
 
-            // Sync stateDetails with selected states
             setStateDetails((prevDetails) => {
                 const newDetails = updatedStates.map((state) =>
                     prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }

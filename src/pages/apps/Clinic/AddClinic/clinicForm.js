@@ -142,7 +142,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
         dispatch(getStatesByCountryAction());
     }, [dispatch, updateId, createResponse === 200]);
-
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -184,8 +183,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setLatitude1(clinicsDataGet?.userId?.mailingAddress?.latitude)
         setLongitude1(clinicsDataGet?.userId?.mailingAddress?.longitude)
         setField('mailingStateName', clinicsDataGet?.userId?.mailingAddress?.state?._id)
-        if (clinicsDataGet?.userId?.mailingAddress?.mailingCity) {
-            dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.mailingAddress?.state?.id, name: clinicsDataGet?.userId?.mailingAddress?.mailingCity?.name, limit: '', skip: '' }))
+        if (clinicsDataGet?.userId?.mailingAddress?.city) {
+            dispatch(getCities2Action({ state_code: clinicsDataGet?.userId?.mailingAddress?.state?.id, name: clinicsDataGet?.userId?.mailingAddress?.city?.name, limit: '', skip: '' }))
         }
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
@@ -613,7 +612,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setValue('city', selectedCounty)
         }
         if (cities2) {
-            const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
+            const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || clinicsDataGet?.userId?.mailingAddress?.city?.name)?._id;
             setValue('mailingCity', selectedCounty1)
         }
     }, [cities1, cities2]);
