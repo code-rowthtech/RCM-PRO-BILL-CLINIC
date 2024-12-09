@@ -15,6 +15,10 @@ export const getSubClinicAction = (data): AuthAction => ({
     type: SubClinicsActionTypes.GET_SUBCLINIC,
     data
 });
+export const updateSubClinicAction = (data): AuthAction => ({
+    type: SubClinicsActionTypes.UPDATE_SUBCLINIC,
+    data
+});
 export const getSubClinicTypeAction = (data): AuthAction => ({
     type: SubClinicsActionTypes.GET_SUBCLINICTYPE,
     data

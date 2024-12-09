@@ -94,7 +94,9 @@ border-radius: 4px !important;
 tbody tr:nth-child(even) {
     background-color: #efefef !important;
 }
-
+/* option{
+    color: black;
+} */
 thead {
     background-color: #313a46 !important;
     color: white !important;
