@@ -146,7 +146,7 @@ const Doctors = () => {
                                                                 {data?.userDetails?.firstName} {data?.userDetails?.lastName}
                                                             </td>
                                                             <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
-                                                            <td>
+                                                            <td className='text-uppercase'>
                                                                 {data?.departmentDetails?.name || 'N/A'}
                                                             </td>
                                                             <td>
