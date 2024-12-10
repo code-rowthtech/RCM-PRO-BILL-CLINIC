@@ -1356,9 +1356,7 @@ const NewPractice = () => {
                                                                 setValue('mailingCity', getValues('city'));
                                                                 setValue('mailingZip', getValues('zip'));
                                                                 setValue('mailingStreet', getValues('street'));
-                                                            } else {
-                                                                setValue('mailingAddress', '');
-                                                            }
+                                                            } 
                                                         }}
                                                     />
                                                 </Col>
