@@ -2,25 +2,37 @@ import React, { useEffect } from 'react';
 import { Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
-import { getScheduleAction } from '../../../redux/schedule/action';
+import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 
 const DoctorHoliday = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
 
   const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
+  console.log(scheduleResponse,'iddd')
   const isLoading = store?.getScheduleReducer?.loading;
 
   useEffect(() => {
     const payload = {
       startDate: '',
       endDate: '',
-      flag: "Holiday",
+      type: "Holiday",
       search : ''
     };
     dispatch(getScheduleAction(payload));
   }, [dispatch]);
 
+
+  const deleteHandle = (id) => {
+    dispatch(deleteScheduleAction(id))
+    const payload = {
+      startDate: '',
+      endDate: '',
+      type: "Holiday",
+      search : ''
+    };
+    dispatch(getScheduleAction(payload));
+  }
   return (
     <div>
       <Table responsive className="table-centered table-nowrap mb-0">
@@ -58,7 +70,7 @@ const DoctorHoliday = () => {
                   </div>
                 </td>
                 <td>
-                  <RiDeleteBin5Line className="fs-4 text-danger ms-2 cursor-pointer" />
+                  <RiDeleteBin5Line onClick={()=>deleteHandle(holiday?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                 </td>
               </tr>
             ))
