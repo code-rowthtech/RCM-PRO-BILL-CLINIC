@@ -66,7 +66,7 @@ const NewPractice = () => {
     //     { name: '', number: '', url: null, fileName: '' }
     // ]);
     const [stateDetails, setStateDetails] = useState([
-        { name: [], number: "", url: null, fileName: "" }
+        { name: '', number: "", url: null, fileName: "" }
     ]);
     const [stateName, setStateName] = useState()
     const dispatch = useDispatch();
@@ -75,7 +75,6 @@ const NewPractice = () => {
     const medicalFileInputRef = useRef(null);
     const stateFileInputRef = useRef(null);
     const [usePrimaryAsMailing, setUsePrimaryAsMailing] = useState('');
-    console.log(usePrimaryAsMailing,'window.reload()');
     const store = useSelector((state) => state)
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
@@ -84,7 +83,10 @@ const NewPractice = () => {
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
-    const createLoading = store?.createSubClinicsReducer?.loading
+    const createLoading = store?.createSubClinicsReducer?.loading;
+    const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
+    const updateSubClinicsNavigate = store?.updateSubClinicReducer;
+    console.log(updateSubClinicsNavigate,'updateSubClinicsNaviagte');
     const [updatePage, setUpdatePage] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null)
@@ -247,7 +249,6 @@ const NewPractice = () => {
     useEffect(() => {
         dispatch(getClinicTypeAction())
         dispatch(getStatesByCountryAction())
-
     }, [dispatch])
 
     const handleAccreditationInputChange = (e, field, index) => {
@@ -506,8 +507,8 @@ const NewPractice = () => {
             npiNumber: formData?.npiNumber,
             // medicalLicenses: medicalDetails,
             flag: 'subClinic',
-            stateOfLicensing: stateDetails,
-            accreditationDetails: accreditationDetails,
+            ...stateDetails && { stateOfLicensing: stateDetails },
+            ...accreditationDetails && { accreditationDetails: accreditationDetails },
             ...(logo ?
                 {
                     logo: {
@@ -526,40 +527,46 @@ const NewPractice = () => {
                 ...(longitude ? { longitude: longitude, } : '')
             },
             mailingAddress:
-            usePrimaryAsMailing ?
-                {
-                    address: formData?.address,
-                    ...(formData?.city ? { city: formData?.city } : ''),
-                    ...(formData?.stateName ? { state: formData?.stateName } : ''),
-                    // state: stateToSelect?._id,
-                    street: formData?.street,
-                    zip: formData?.zip,
-                    ...(latitude ? { latitude: latitude, } : ''),
-                    ...(longitude ? { longitude: longitude, } : '')
-                }
-                :
-                {
-                    address: formData?.mailingAddress,
-                    ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
-                    ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
-                    street: formData?.mailingStreet,
-                    zip: formData?.mailingZip,
-                    ...(latitude1 ? { latitude: latitude1, } : ''),
-                    ...(longitude1 ? { longitude: longitude1, } : '')
-                },
-            pos: posDetails
-
+                usePrimaryAsMailing ?
+                    {
+                        address: formData?.address,
+                        ...(formData?.city ? { city: formData?.city } : ''),
+                        ...(formData?.stateName ? { state: formData?.stateName } : ''),
+                        // state: stateToSelect?._id,
+                        street: formData?.street,
+                        zip: formData?.zip,
+                        ...(latitude ? { latitude: latitude, } : ''),
+                        ...(longitude ? { longitude: longitude, } : '')
+                    }
+                    :
+                    {
+                        address: formData?.mailingAddress,
+                        ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
+                        ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
+                        street: formData?.mailingStreet,
+                        zip: formData?.mailingZip,
+                        ...(latitude1 ? { latitude: latitude1, } : ''),
+                        ...(longitude1 ? { longitude: longitude1, } : '')
+                    },
+                    ...posDetails && { pos: posDetails },
         }
-        console.log('Form Submitted:', payload);
         if (data) {
             dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
-            console.log('Submitted:', payload);
+           
         } else {
             dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-            navigate('/apps/crm/addclinic');
         }
         reset();
     };
+    useEffect(()=>{
+        if (createResponseOfSubClinics === 200 ) {
+            navigate('/apps/crm/addclinic');
+        }
+        if(updateSubClinicsNavigate === 200){
+            navigate('/apps/crm/addclinic');
+        }
+        
+    },[createResponseOfSubClinics,updateSubClinicsNavigate]);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedLocation2, setSelectedLocation2] = useState(null);
 
@@ -584,23 +591,23 @@ const NewPractice = () => {
             const countyName = selectedLocation2?.components?.county;
             dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation,selectedLocation2, setValue, statesData, dispatch])
+    }, [selectedLocation, selectedLocation2, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
+            const selectedCounty = cities && cities.find((event) => event?.name === selectedLocation?.components?.county || data?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city', selectedCounty)
         }
         if (cities2) {
-            const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || data?.userId?.mailingAddress?.city?.name)?._id;
+            const selectedCounty1 = cities2 && cities2.find((event) => event?.name === selectedLocation2?.components?.county || data?.userId?.mailingAddress?.city?.name)?._id;
             setValue('mailingCity', selectedCounty1)
         }
-    }, [cities,cities2])
+    }, [cities, cities2, setValue])
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
         setSelectedStates((prev) => {
             const updatedStates = prev.includes(stateName)
-                ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+                ? prev.filter((name) => name !== stateName)
                 : [...prev, stateName]; // Add state if checked
 
             setStateDetails((prevDetails) => {
@@ -1249,7 +1256,7 @@ const NewPractice = () => {
                                                                     {...register('stateName')}
                                                                     onChange={(e) => handleStateSelection(e)}
                                                                 >
-                                                                    <option>State</option>
+                                                                    <option value={''}>State</option>
                                                                     {statesData?.states?.map((data) => (
                                                                         <option
                                                                             key={data?.id} // Unique key for each option
@@ -1356,7 +1363,7 @@ const NewPractice = () => {
                                                                 setValue('mailingCity', getValues('city'));
                                                                 setValue('mailingZip', getValues('zip'));
                                                                 setValue('mailingStreet', getValues('street'));
-                                                            } 
+                                                            }
                                                         }}
                                                     />
                                                 </Col>
@@ -1429,13 +1436,6 @@ const NewPractice = () => {
                                                                 <Form.Control
                                                                     type="text"
                                                                     value={latitude1}
-                                                                    onChange={(e) => {
-                                                                        if (!usePrimaryAsMailing) {
-                                                                            setValue('latitude1', e.target.value);
-                                                                            setFocused2(true);
-                                                                        }
-                                                                    }}
-                                                                    {...register('latitude1')}
                                                                     placeholder="Latitude"
                                                                     disabled={usePrimaryAsMailing}
                                                                 />
@@ -1448,7 +1448,6 @@ const NewPractice = () => {
                                                                 <Form.Control
                                                                     type="text"
                                                                     value={longitude1}
-                                                                    {...register('longitude1')}
                                                                     placeholder="Longitude"
                                                                     disabled={usePrimaryAsMailing}
                                                                 />
@@ -1468,13 +1467,14 @@ const NewPractice = () => {
                                                                     onChange={(e) => handleStateSelection(e)}
                                                                     disabled={usePrimaryAsMailing}
                                                                 >
-                                                                    <option>State</option>
+                                                                    <option value={''}>State</option>
                                                                     {statesData?.states?.map((data) => (
                                                                         <option key={data?.id} value={data?._id}
-                                                                        onChange={(e) => {
-                                                                            if (!usePrimaryAsMailing) {
-                                                                                setValue('mailingStateName', e.target.value);
-                                                                            }}}
+                                                                            onChange={(e) => {
+                                                                                if (!usePrimaryAsMailing) {
+                                                                                    setValue('mailingStateName', e.target.value);
+                                                                                }
+                                                                            }}
                                                                         >
                                                                             {data?.name}
                                                                         </option>
@@ -1496,11 +1496,12 @@ const NewPractice = () => {
                                                                         {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                                     </option>
                                                                     {cities2?.map((data) => (
-                                                                        <option key={data?._id}   value={data?._id}
-                                                                        onChange={(e) => {
-                                                                            if (!usePrimaryAsMailing) {
-                                                                                setValue('mailingCity', e.target.value);
-                                                                            }}}>
+                                                                        <option key={data?._id} value={data?._id}
+                                                                            onChange={(e) => {
+                                                                                if (!usePrimaryAsMailing) {
+                                                                                    setValue('mailingCity', e.target.value);
+                                                                                }
+                                                                            }}>
                                                                             {data?.name}
                                                                         </option>
                                                                     ))}

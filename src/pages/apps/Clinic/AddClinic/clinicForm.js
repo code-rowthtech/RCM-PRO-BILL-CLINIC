@@ -147,10 +147,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
         dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
-    const handleCitySelection = (e) => {
-        // const citySelected = JSON.parse(e.target.value);
-        setSelectedCity(e.target.value)
-    }
+
     useEffect(() => {
         dispatch(getClinicAction());
         dispatch(getSubClinicAction());
@@ -1237,7 +1234,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Select
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('city')}
-                                                onChange={(e) => handleCitySelection(e)}
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities1?.map((data) => (
@@ -1432,7 +1428,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Select
                                                 disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
                                                 {...register('mailingCity')}
-                                                onChange={(e) => handleCitySelection(e)}
                                             >
                                                 <option value="">
                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
