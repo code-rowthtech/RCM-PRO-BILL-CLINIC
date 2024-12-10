@@ -817,15 +817,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 {...register('npi', {
                                     minLength: {
                                         value: 10,
-                                        message: 'NPI must be at least 10 characters long', // Error message
+                                        message: 'NPI must be at least 10 characters long',
                                     },
                                     maxLength: {
                                         value: 10,
-                                        message: 'NPI cannot exceed 10 characters', // Error message
+                                        message: 'NPI cannot exceed 10 characters', 
                                     },
                                     pattern: {
-                                        value: /^[0-9]+$/, // Pattern for numbers only
-                                        message: 'NPI must contain numbers only', // Error message
+                                        value: /^[0-9]+$/, 
+                                        message: 'NPI must contain numbers only',
                                     },
                                 })}
                                 placeholder="NPI Type 2 Number"
@@ -1167,7 +1167,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             key={index}
                                                             onClick={() => {
                                                                 setSelectedLocation(data)
-                                                                setFocused(false); // Close dropdown after selection
+                                                                setFocused(false);
                                                             }}
                                                             style={{
                                                                 margin: 0,
@@ -1220,8 +1220,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <option>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
-                                                        key={data?.id} // Unique key for each option
-                                                        data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                        key={data?.id}
+                                                        data-key={JSON.stringify({ id: data?.id, _id: data?._id })}
                                                         value={data?._id}
                                                     >
                                                         {data?.name}
@@ -1308,9 +1308,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         setUsePrimaryAsMailing(isChecked);
 
                                         if (isChecked) {
-                                            setValue('mailingAddress', getValues('address')); // Copy primary address to mailing
+                                            setValue('mailingAddress', getValues('address'));
                                         } else {
-                                            setValue('mailingAddress', ''); // Clear mailing address when unchecked
+                                            setValue('mailingAddress', '');
                                         }
                                     }}
                                 />
@@ -1644,22 +1644,29 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Col>
                             <Table responsive className="table-centered table-nowrap mb-0">
                                 <thead className="text-white">
-                                    <tr className=''>
-                                        <th className='text-white'>S.No.</th>
-                                        <th className='text-white'>PRACTICE NAME</th>
+                                    <tr>
+                                        <th className="text-white">S.No.</th>
+                                        <th className="text-white">PRACTICE NAME</th>
                                         {/* <th className='text-white'>LOCATION</th> */}
-                                        <th className='text-white'>PRACTICE TYPE</th>
+                                        <th className="text-white">PRACTICE TYPE</th>
                                         {/* <th className='text-white'>END DATE</th> */}
                                         {/* <th className='text-white'>COUNTDOWN</th> */}
                                         {/* <th className='text-white'>CONTRACT</th> */}
-                                        <th className='text-white'>STATUS</th>
-                                        <th className='text-white'>ACTION</th>
+                                        <th className="text-white">STATUS</th>
+                                        <th className="text-white">ACTION</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {getTableData && getTableData?.length === 0 ? (
+                                    {store?.getSubClinicsReducer?.loading ? (
                                         <tr>
-                                            <td colSpan={9} className="text-center">
+                                            <td colSpan={5} className="text-center">
+                                                <Spinner/>
+                                                
+                                            </td>
+                                        </tr>
+                                    ) : getTableData && getTableData.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={5} className="text-center">
                                                 <h5 className="my-3">No Data Found</h5>
                                             </td>
                                         </tr>
@@ -1674,9 +1681,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 {/* <td>{patient.countDown}</td> */}
                                                 {/* <td>{patient.contract}</td> */}
                                                 <td>
-                                                    <Form.Switch
-                                                        checked={patient.status === patient.status}
-                                                    />
+                                                    <Form.Switch checked={patient.status === patient.status} />
                                                 </td>
                                                 <td>
                                                     <div className="text-center">
