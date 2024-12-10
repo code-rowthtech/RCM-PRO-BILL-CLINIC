@@ -11,6 +11,7 @@ import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { getCitiesAction, getClinicById, getStatesByCountryAction } from "../../../redux/actions";
+import Responsiblle from "./Responsible";
 
 
 const NewPatient = () => {
@@ -20,7 +21,7 @@ const NewPatient = () => {
 
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log({cities})
+    console.log({ cities })
     const dispatch = useDispatch();
     const [focused, setFocused] = useState(false);
     const [searchParams] = useSearchParams();
@@ -42,10 +43,21 @@ const NewPatient = () => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
     const [updatePage, setUpdatePage] = useState(false);
+    const [activeTab, setActiveTab] = useState("personalDetails");
+    const [btnShow, setBtnShow] = useState(true);
+
+    const [inputValue, setInputValue] = useState('');
+    console.log({ inputValue })
 
 
-
-
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        if (tab === "personalDetails") {
+            setBtnShow(true);
+        } else {
+            setBtnShow(false);
+        }
+    };
 
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
@@ -92,33 +104,31 @@ const NewPatient = () => {
     };
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
+        setInputValue(addressToSearch); // Update input value
         async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
             const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
-
                 if (!response.ok) {
                     throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
                 }
-
                 const data = await response.json();
-                return data; // Return the geocoding data
+                setSearchedLocations(data.results || []); // Update search results
             } catch (error) {
                 console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
+                setSearchedLocations([]); // Clear results on error
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedLocations(data?.results)
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
+
+        if (addressToSearch) {
+            fetchGeocodeData(addressToSearch);
+        } else {
+            setSearchedLocations([]); // Clear results when input is empty
+        }
+    };
+
     const handleCitySelection = (e) => {
         setSelectedCity(e.target.value)
     }
@@ -150,7 +160,7 @@ const NewPatient = () => {
             chartNumber: data?.chartNumber,
             responsiblePartyName: data?.responsiblePartyName,
             address: {
-                street: data?.street,
+                street: inputValue,
                 city: data?.city,
                 state: data?.state,
                 zipCode: data?.zipCode,
@@ -195,14 +205,27 @@ const NewPatient = () => {
                         {/* Navigation Tabs */}
                         <ul className="nav nav-underline">
                             <li className="nav-item">
-                                <a className="nav-link active fw-medium" href="#">
+
+                                <button
+                                    className={`text-black  fw-medium nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                    onClick={() => handleTabChange("personalDetails")}
+                                >
                                     Personal Details
-                                </a>
+                                </button>
+                            </li>
+                            <li className="nav-item">
+                                <button
+                                    className={`text-black fw-medium nav-link ${activeTab === "responsible" ? "active" : ""}`}
+                                    onClick={() => handleTabChange("responsible")}
+                                >
+                                    Responsible party
+                                </button>
                             </li>
                         </ul>
 
                         {/* Form Section */}
-                        <Form onSubmit={handleSubmit(onSubmit)}>
+                        
+                        {activeTab === "personalDetails" && (     <Form onSubmit={handleSubmit(onSubmit)}>
                             <div className="row pb-3 mt-3" style={{ borderBottom: "1px solid #444141" }}>
                                 <div className="col-6">
                                     <div className="mb-3 d-flex flex-column position-relative">
@@ -304,12 +327,14 @@ const NewPatient = () => {
                                 </div>
                                 <div className="col-6 mb-3">
                                     <Form.Group className="mb-2">
-                                        <Form.Label className="mb-1"> Address</Form.Label>
+                                        <Form.Label className="mb-1">Address</Form.Label>
                                         <div style={{ position: 'relative' }}>
                                             <Form.Control
                                                 type="text"
-                                                {...register('address')}
+                                                {...register('street')}
+                                                value={selectedLocation || inputValue} // Use selected location or input value
                                                 onChange={(e) => {
+                                                    setSelectedLocation(null); // Clear selected location on typing
                                                     getGeolocation(e);
                                                     setFocused(true);
                                                 }}
@@ -320,6 +345,7 @@ const NewPatient = () => {
                                                 placeholder="Search for address"
                                                 autoComplete="off"
                                             />
+
                                             <div
                                                 style={{
                                                     position: 'absolute',
@@ -335,12 +361,14 @@ const NewPatient = () => {
                                                 }}
                                                 className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
                                             >
-                                                {searchedLocations?.map((data, index) => (
+                                                {searchedLocations && searchedLocations.map((data, index) => (
                                                     <p
                                                         key={index}
                                                         onClick={() => {
-                                                            setSelectedLocation(data)
-                                                            setFocused(false); // Close dropdown after selection
+                                                            console.log("Selected Address:", data?.formatted);
+                                                            setSelectedLocation(data?.formatted); // Set selected location
+                                                            setInputValue(data?.formatted); // Update input value with selected address
+                                                            setFocused(false);
                                                         }}
                                                         style={{
                                                             margin: 0,
@@ -349,9 +377,10 @@ const NewPatient = () => {
                                                         }}
                                                         className="hover-bg-change text-black"
                                                     >
-                                                        {data?.formatted}
+                                                        {data?.formatted || "No Address Available"}
                                                     </p>
                                                 ))}
+
                                                 {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                             </div>
                                         </div>
@@ -361,7 +390,7 @@ const NewPatient = () => {
                                     <Form.Group className="mb-2">
                                         <Form.Label className='mb-1' >State</Form.Label>
                                         <Form.Select
-                                            {...register('stateName')}
+                                            {...register('state')}
                                             onChange={(e) => handleStateSelection(e)}
                                         >
                                             <option>State</option>
@@ -394,7 +423,6 @@ const NewPatient = () => {
                                                             {data?.name}
                                                         </option>
                                                     ))}
-                                                    {console.log(cities,'city')}
                                                 </Form.Select>
                                             </Form.Group>
                                         </div>
@@ -628,7 +656,8 @@ const NewPatient = () => {
                                 <Button variant="secondary">Cancel</Button>
                                 <Button variant="primary" type="submit">Save</Button>
                             </div>
-                        </Form>
+                        </Form>)}
+                        {activeTab === "responsible" && <Responsiblle />}
                     </div>
                 </Card>
             </div>
