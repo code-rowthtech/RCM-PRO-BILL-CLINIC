@@ -45,7 +45,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const [isopen, setIsopen] = useState(false);
 
     const location = useLocation(); // Get the current location object
-    const { pathname } = location; // Extract pathname
+    const { pathname, search } = location;
 
     // Define a mapping of paths to titles
     const pathToTitleMap = {
@@ -66,22 +66,25 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',
-        
     };
 
-    // Get the title for the current path or use a default value
-    const getPageTitle = (path) => {
-        const keys = Object.keys(pathToTitleMap);
-        // Match the full path or prefixes
-        for (const key of keys) {
-            if (path.startsWith(key)) {
-                return pathToTitleMap[key];
+    const getPageTitle = (pathToTitleMap, pathname, search) => {
+        const queryParams = new URLSearchParams(search);
+
+        if (pathname === '/apps/doctors/new-doctor' && queryParams.has('id')) {
+            return 'Update Doctors';
+        }
+
+        for (const [key, value] of Object.entries(pathToTitleMap)) {
+            if (pathname.startsWith(key)) {
+                return value;
             }
         }
-        return 'Page Not Found'; // Fallback title
+
+        return 'Page Not Found';
     };
 
-    const pageTitle = getPageTitle(pathname);
+    const pageTitle = getPageTitle(pathToTitleMap, pathname, search);
 
     const navbarCssClasses = navCssClasses || '';
     const containerCssClasses = !hideLogo ? 'container-fluid' : '';

@@ -59,7 +59,6 @@ const NewDoctor = () => {
     // console.log({stateToSelect})
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
     // If you want to remove any prefix (like "check")
     const updateId = id?.replace(/^check/, '');
 
@@ -123,15 +122,13 @@ const NewDoctor = () => {
             setValue('zip2', doctorDetails?.userId?.mailingAddress?.zip)
             setValue('street1', doctorDetails?.userId?.primaryAddress?.street)
             setValue('street2', doctorDetails?.userId?.mailingAddress?.street)
-            setValue('longitude', doctorDetails?.userId?.primaryAddress?.longitude)
-            setValue('latitude', doctorDetails?.userId?.primaryAddress?.latitude)
-            setValue('profileImage', doctorDetails?.userId?.profileImage)
-            setValue('degreeDoc', doctorDetails?.userId?.degreeDoc)
+            setLongitude( doctorDetails?.userId?.primaryAddress?.longitude)
+            setLatitude( doctorDetails?.userId?.primaryAddress?.latitude)
+            setMailingLatitude( doctorDetails?.userId?.mailingAddress?.latitude)
+            setMailingLongitude( doctorDetails?.userId?.mailingAddress?.longitude)
             setValue('degreeName', doctorDetails?.userId?.degreeName)
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
             setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
-            setValue('city1', doctorDetails?.userId?.primaryAddress?.city)
-            setValue('city2', doctorDetails?.userId?.mailingAddress?.city)
 
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
@@ -144,10 +141,16 @@ const NewDoctor = () => {
             }
             setValue('state1', state);
             const state2 = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.mailingAddress?.state?._id)?._id;
-            if (state) {
-                dispatch(getCitiesAction({ state_code: doctorDetails?.userId?.primaryAddress?.state?.id, name: doctorDetails?.userId?.mailingAddress?.city?.name, skip: '', limit: '' }))
+            if (state2) {
+                dispatch(getCities2Action({ state_code: doctorDetails?.userId?.mailingAddress?.state?.id, name: doctorDetails?.userId?.mailingAddress?.city?.name, skip: '', limit: '' }))
             }
             setValue('state2', state2);
+            if (doctorDetails?.userId?.profileImage) {
+                setLogoName( doctorDetails?.userId?.profileImage?.fileName)
+            }
+            if (doctorDetails?.userId?.degreeDoc) {
+                setDegreeName(  doctorDetails?.userId?.degreeDoc?.fileName)
+            }
         }
     }, [doctorDetails, setValue])
 
@@ -339,10 +342,6 @@ const NewDoctor = () => {
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
         dispatch(getCities2Action({ state_code: key?.id, name: '', limit: 25, skip: '' }))
     };
-
-    const handleCitySelection = (e) => {
-        // setSelectedCity(e.target.value)
-    }
 
     const [formData, setFormData] = useState({
         role: doctorRoleId,
@@ -652,8 +651,8 @@ const NewDoctor = () => {
                                                                     />
                                                                     <Form.Check
                                                                         type="radio"
-                                                                        label="Transgender"
-                                                                        value="Transgender"
+                                                                        label="Other"
+                                                                        value="Other"
                                                                         {...register('gender')}
                                                                         onChange={(e) => setFormData({ ...formData, gender: e.target.value })} // Update formData on change
                                                                     />
@@ -902,7 +901,7 @@ const NewDoctor = () => {
                                                                                     {...register('city1')}
                                                                                     onChange={(e) => {
                                                                                         setFormData({ ...formData, city: e.target.value })
-                                                                                        handleCitySelection(e);
+                                                                                        // handleCitySelection(e);
                                                                                     }}
                                                                                     style={{
                                                                                         width: "100%",
@@ -1155,7 +1154,7 @@ const NewDoctor = () => {
                                                         {store?.createtDoctorsDetailReducer?.loading ?
                                                             <Spinner color='white' className='spinner-border-sm' />
                                                             :
-                                                            'Next'
+                                                             id ? "Update" : "Next"
                                                         }
                                                     </Button>
                                                 </div>
