@@ -3,7 +3,7 @@ import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createScheduleApi, getDoctorsListApi, getScheduleApi } from './api';
+import { createScheduleApi, deleteScheduleApi, getDoctorsListApi, getScheduleApi } from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -97,6 +97,35 @@ function* getScheduleFunction(data) {
     }
 }
 
+
+function* deleteScheduleFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.DELETE_SCHEDULE_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteScheduleApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ScheduleActionTypes.DELETE_SCHEDULE_SUCCESS,
+                payload: { response },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.DELETE_SCHEDULE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error?.message, 'danger');
+        yield put({
+            type: ScheduleActionTypes.DELETE_SCHEDULE_ERROR,
+            payload: error,
+        });
+    }
+}
 export function* watchSchedule() {
     yield takeEvery(ScheduleActionTypes.CREATE_SCHEDULE, createScheduleFunction);
 }
@@ -108,11 +137,16 @@ export function* watchGetSchedule() {
     yield takeEvery(ScheduleActionTypes.GET_SCHEDULE, getScheduleFunction);
 }
 
+export function* watchdeleteSchedule() {
+    yield takeEvery(ScheduleActionTypes.DELETE_SCHEDULE, deleteScheduleFunction);
+}
+
 function* scheduleSaga() {
     yield all([
         fork(watchSchedule), 
         fork(watchGetDoctorsList),
-        fork(watchGetSchedule)
+        fork(watchGetSchedule),
+        fork(watchdeleteSchedule),
     ]);
 }
 export default scheduleSaga;

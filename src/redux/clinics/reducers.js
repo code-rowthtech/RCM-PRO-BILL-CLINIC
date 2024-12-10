@@ -16,11 +16,15 @@ const GET_STATES_INITIAL_STATE = {
 }
 
 const GET_CITIES_INITIAL_STATE = {
-    data: { cities: [] }, // Make data an object
-    loading: false,
+    cities1: {
+        data: [],
+        loading: false,
+    },
+    cities2: {
+        data: [],
+        loading: false,
+    }
 };
-
-
 
 const GET_CLINIC_TYPE_INITIAL_STATE = {
     data: [],
@@ -188,33 +192,57 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     switch (action.type) {
         case ClinicsActionTypes.GET_CITIES_LOADING:
             return {
-                ...state, // Keep the existing state
-                loading: true, // Indicate loading is in progress
+                ...state,
+                cities1: {
+                    ...state.cities1,
+                    loading: true
+                }
             };
-
         case ClinicsActionTypes.GET_CITIES_SUCCESS:
             return {
-                data: {
-                    ...state.data, // Retain existing state data if needed
-                    cities: action.payload.cities || [], // Update cities with API response
-                },
-                loading: false,
+                ...state,
+                cities1: {
+                    data: action.payload,
+                    loading: false
+                }
             };
-
         case ClinicsActionTypes.GET_CITIES_ERROR:
             return {
                 ...state,
-                loading: false, // Set loading to false
-                error: action.payload, // Optionally store the error
+                cities1: {
+                    data: [],
+                    loading: false
+                }
             };
-
-        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return GET_CITIES_INITIAL_STATE; // Reset state to the initial structure
-
+        case ClinicsActionTypes.GET_CITIES2_LOADING:
+            return {
+                ...state,
+                cities2: {
+                    ...state.cities2,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES2_SUCCESS:
+            return {
+                ...state,
+                cities2: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES2_ERROR:
+            return {
+                ...state,
+                cities2: {
+                    data: [],
+                    loading: false
+                }
+            };
         default:
-            return state; // Return unchanged state for unknown actions
+            return state;
     }
 };
+
 
 
 export const getClinicTypeReducer = (state = GET_CLINIC_TYPE_INITIAL_STATE, action) => {

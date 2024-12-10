@@ -33,7 +33,7 @@ const Schedule = () => {
         const payload = {
             startDate: '',  // Add actual startDate if needed
             endDate: '',    // Add actual endDate if needed
-            flag: "Holiday",
+            type: "Holiday",
             search: searchQuery, // Pass the search query to the payload
         };
         dispatch(getScheduleAction(payload));
@@ -41,7 +41,7 @@ const Schedule = () => {
         const breakPayload = {
             startDate: '',
             endDate: '',
-            flag: "Break",
+            type: "Break",
             search: searchQuery
         };
         dispatch(getScheduleAction(breakPayload));

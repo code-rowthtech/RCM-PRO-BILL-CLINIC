@@ -12,7 +12,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
-import { getCitiesAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
+import { getCities2Action, getCitiesAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
@@ -74,19 +74,26 @@ const NewPractice = () => {
     const accreditationFileInputRef = useRef([]);
     const medicalFileInputRef = useRef(null);
     const stateFileInputRef = useRef(null);
+    const [usePrimaryAsMailing, setUsePrimaryAsMailing] = useState('');
+    console.log(usePrimaryAsMailing,'window.reload()');
     const store = useSelector((state) => state)
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
-    const cities = store?.getCitiesReducer?.data?.cities;
+    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
+    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading
     const [updatePage, setUpdatePage] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
+    const [searchedLocations2, setSearchedLocations2] = useState(null)
     const [focused, setFocused] = useState(false);
+    const [focused2, setFocused2] = useState(false);
     const [latitude, setLatitude] = useState('');
+    const [latitude1, setLatitude1] = useState(null);
     const [longitude, setLongitude] = useState('');
+    const [longitude1, setLongitude1] = useState(null);
     const [street, setStreet] = useState('');
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
@@ -124,6 +131,35 @@ const NewPractice = () => {
             console.error('Failed to fetch geocode data:', error);
         }
     };
+    const getGeolocation2 = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data; // Return the geocoding data
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null; // Return null in case of error
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedLocations2(data?.results)
+                } else {
+                    console.log("No data returned.");
+                }
+            });
+    }
 
     const [stateCode, setStateCode] = useState()
 
@@ -181,7 +217,6 @@ const NewPractice = () => {
             setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
         }
     }, [stateGeoLocation])
-
     const {
         register,
         handleSubmit,
@@ -189,6 +224,7 @@ const NewPractice = () => {
         formState: { errors },
         reset,
         setValue,
+        getValues,
         watch,
     } = useForm({
         defaultValues: {
@@ -331,6 +367,15 @@ const NewPractice = () => {
             setField('stateName', data?.userId?.primaryAddress?.state?._id)
             if (data?.userId?.primaryAddress?.city) {
                 dispatch(getCitiesAction({ state_code: data?.userId?.primaryAddress?.state?.id, name: data?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+            }
+            setField('mailingAddress', data?.userId?.mailingAddress?.address);
+            setField('mailingStreet', data?.userId?.mailingAddress?.street);
+            setField('mailingZip', data?.userId?.mailingAddress?.zip);
+            setLatitude1(data?.userId?.mailingAddress?.latitude)
+            setLongitude1(data?.userId?.mailingAddress?.longitude)
+            setField('mailingStateName', data?.userId?.mailingAddress?.state?._id)
+            if (data?.userId?.mailingAddress?.city) {
+                dispatch(getCities2Action({ state_code: data?.userId?.mailingAddress?.state?.id, name: data?.userId?.mailingAddress?.city?.name, limit: '', skip: '' }))
             }
             if (data?.accreditationDetails) {
                 setAccreditationDetails(data?.accreditationDetails)
@@ -480,12 +525,35 @@ const NewPractice = () => {
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             },
+            mailingAddress:
+            usePrimaryAsMailing ?
+                {
+                    address: formData?.address,
+                    ...(formData?.city ? { city: formData?.city } : ''),
+                    ...(formData?.stateName ? { state: formData?.stateName } : ''),
+                    // state: stateToSelect?._id,
+                    street: formData?.street,
+                    zip: formData?.zip,
+                    ...(latitude ? { latitude: latitude, } : ''),
+                    ...(longitude ? { longitude: longitude, } : '')
+                }
+                :
+                {
+                    address: formData?.mailingAddress,
+                    ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
+                    ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
+                    street: formData?.mailingStreet,
+                    zip: formData?.mailingZip,
+                    ...(latitude1 ? { latitude: latitude1, } : ''),
+                    ...(longitude1 ? { longitude: longitude1, } : '')
+                },
             pos: posDetails
 
         }
         console.log('Form Submitted:', payload);
         if (data) {
             dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
+            console.log('Submitted:', payload);
         } else {
             dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
             navigate('/apps/crm/addclinic');
@@ -493,6 +561,8 @@ const NewPractice = () => {
         reset();
     };
     const [selectedLocation, setSelectedLocation] = useState(null);
+    const [selectedLocation2, setSelectedLocation2] = useState(null);
+
     useEffect(() => {
         if (selectedLocation) {
             setLatitude(selectedLocation?.bounds?.southwest?.lat);
@@ -504,13 +574,27 @@ const NewPractice = () => {
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
-    }, [selectedLocation, setValue, statesData, dispatch])
+        if (selectedLocation2) {
+            setLatitude1(selectedLocation2?.bounds?.southwest?.lat);
+            setLongitude1(selectedLocation2?.bounds?.southwest?.lng);
+            setValue('mailingAddress', selectedLocation2?.formatted)
+            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?.id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?._id;
+            setValue('mailingStateName', selectedState)
+            const countyName = selectedLocation2?.components?.county;
+            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
+        }
+    }, [selectedLocation,selectedLocation2, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
             const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
             setValue('city', selectedCounty)
         }
-    }, [cities])
+        if (cities2) {
+            const selectedCounty1 = cities2 && cities2.find((data) => data?.name === selectedLocation2?.components?.county || data?.userId?.mailingAddress?.city?.name)?._id;
+            setValue('mailingCity', selectedCounty1)
+        }
+    }, [cities,cities2])
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
@@ -519,7 +603,6 @@ const NewPractice = () => {
                 ? prev.filter((name) => name !== stateName) // Remove state if unchecked
                 : [...prev, stateName]; // Add state if checked
 
-            // Sync stateDetails with selected states
             setStateDetails((prevDetails) => {
                 const newDetails = updatedStates.map((state) =>
                     prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }
@@ -1241,6 +1324,218 @@ const NewPractice = () => {
                                                                     maxLength={5}
                                                                 />
                                                                 {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
+                                                            </Form.Group>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+                                            </Row>
+                                        </Col>
+
+                                        <Col sm={12}>
+                                            <Row>
+                                                <Col sm={12} className="mb-2">
+                                                    <span className="text-black fw-semibold form-label">Mailing Address Details</span>
+                                                </Col>
+
+                                                {/* Checkbox for using primary address */}
+                                                <Col sm={12} className="mb-2">
+                                                    <Form.Check
+                                                        type="checkbox"
+                                                        style={{ cursor: "pointer" }}
+                                                        label="Use primary address as mailing address"
+                                                        checked={usePrimaryAsMailing}
+                                                        onChange={(e) => {
+                                                            const isChecked = e.target.checked;
+                                                            setUsePrimaryAsMailing(isChecked);
+
+                                                            if (isChecked) {
+                                                                setValue('mailingAddress', getValues('address'));
+                                                                setValue('mailingStateName', getValues('stateName'));
+                                                                setLatitude1(latitude);
+                                                                setLongitude1(longitude);
+                                                                setValue('mailingCity', getValues('city'));
+                                                                setValue('mailingZip', getValues('zip'));
+                                                                setValue('mailingStreet', getValues('street'));
+                                                            } 
+                                                        }}
+                                                    />
+                                                </Col>
+                                                <Col sm={6}>
+                                                    <Row className="position-relative">
+                                                        <Col sm={12}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Mailing Address</Form.Label>
+                                                                <div style={{ position: 'relative' }}>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        value={watch('mailingAddress')}
+                                                                        {...register('mailingAddress')}
+                                                                        onChange={(e) => {
+                                                                            if (!usePrimaryAsMailing) {
+                                                                                setValue('mailingAddress', e.target.value);
+                                                                                getGeolocation2(e);
+                                                                                setFocused2(true);
+                                                                            }
+                                                                        }}
+                                                                        onFocus={() => setFocused2(true)}
+                                                                        onBlur={() => setTimeout(() => setFocused2(false), 200)}
+                                                                        placeholder="Search for mailing address"
+                                                                        autoComplete="off"
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    />
+                                                                    <div
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '100%',
+                                                                            left: 0,
+                                                                            width: '100%',
+                                                                            maxHeight: '150px',
+                                                                            overflow: 'auto',
+                                                                            zIndex: 111,
+                                                                            backgroundColor: '#fff',
+                                                                            border: '1px solid #ced4da',
+                                                                            borderTop: 'none',
+                                                                        }}
+                                                                        className={`scroll-container hover-bg-change ${searchedLocations2?.length === 0 || !focused2 ? 'd-none' : ''}`}
+                                                                    >
+                                                                        {searchedLocations2?.map((data, index) => (
+                                                                            <p
+                                                                                key={index}
+                                                                                onClick={() => {
+                                                                                    setSelectedLocation2(data);
+                                                                                    setValue('mailingAddress', data?.formatted);
+                                                                                    setFocused2(false);
+                                                                                }}
+                                                                                style={{
+                                                                                    margin: 0,
+                                                                                    padding: '8px 12px',
+                                                                                    cursor: 'pointer',
+                                                                                }}
+                                                                                className="hover-bg-change text-black"
+                                                                            >
+                                                                                {data?.formatted}
+                                                                            </p>
+                                                                        ))}
+                                                                        {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                    </div>
+                                                                </div>
+                                                            </Form.Group>
+                                                        </Col>
+
+                                                        {/* Latitude and Longitude */}
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Latitude</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    value={latitude1}
+                                                                    onChange={(e) => {
+                                                                        if (!usePrimaryAsMailing) {
+                                                                            setValue('latitude1', e.target.value);
+                                                                            setFocused2(true);
+                                                                        }
+                                                                    }}
+                                                                    {...register('latitude1')}
+                                                                    placeholder="Latitude"
+                                                                    disabled={usePrimaryAsMailing}
+                                                                />
+                                                            </Form.Group>
+                                                        </Col>
+
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Longitude</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    value={longitude1}
+                                                                    {...register('longitude1')}
+                                                                    placeholder="Longitude"
+                                                                    disabled={usePrimaryAsMailing}
+                                                                />
+                                                            </Form.Group>
+                                                        </Col>
+                                                    </Row>
+                                                </Col>
+
+                                                <Col sm={6}>
+                                                    <Row>
+                                                        {/* State */}
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">State</Form.Label>
+                                                                <Form.Select
+                                                                    {...register('mailingStateName')}
+                                                                    onChange={(e) => handleStateSelection(e)}
+                                                                    disabled={usePrimaryAsMailing}
+                                                                >
+                                                                    <option>State</option>
+                                                                    {statesData?.states?.map((data) => (
+                                                                        <option key={data?.id} value={data?._id}
+                                                                        onChange={(e) => {
+                                                                            if (!usePrimaryAsMailing) {
+                                                                                setValue('mailingStateName', e.target.value);
+                                                                            }}}
+                                                                        >
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                        </Col>
+
+                                                        {/* City */}
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">City</Form.Label>
+                                                                <Form.Select
+                                                                    disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
+                                                                    {...register('mailingCity')}
+                                                                    onChange={(e) => handleCitySelection(e)}
+                                                                >
+                                                                    <option value="">
+                                                                        {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                                    </option>
+                                                                    {cities2?.map((data) => (
+                                                                        <option key={data?._id}   value={data?._id}
+                                                                        onChange={(e) => {
+                                                                            if (!usePrimaryAsMailing) {
+                                                                                setValue('mailingCity', e.target.value);
+                                                                            }}}>
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Form.Group>
+                                                        </Col>
+
+                                                        {/* Street */}
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Street</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('mailingStreet')}
+                                                                    placeholder="Street"
+                                                                    disabled={usePrimaryAsMailing}
+                                                                />
+                                                            </Form.Group>
+                                                        </Col>
+
+                                                        {/* ZIP */}
+                                                        <Col sm={6}>
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-1">Zip</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('mailingZip', {
+                                                                        minLength: { value: 5, message: 'ZIP must be 5 characters long' },
+                                                                        pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
+                                                                    })}
+                                                                    maxLength={5}
+                                                                    placeholder="Zip"
+                                                                    disabled={usePrimaryAsMailing}
+                                                                />
+                                                                {errors.mailingZip && <span className="text-danger">{errors.mailingZip.message}</span>}
                                                             </Form.Group>
                                                         </Col>
                                                     </Row>
