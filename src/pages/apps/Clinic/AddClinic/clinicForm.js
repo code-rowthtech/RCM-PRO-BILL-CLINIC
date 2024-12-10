@@ -818,10 +818,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     },
                                     maxLength: {
                                         value: 10,
-                                        message: 'NPI cannot exceed 10 characters', 
+                                        message: 'NPI cannot exceed 10 characters',
                                     },
                                     pattern: {
-                                        value: /^[0-9]+$/, 
+                                        value: /^[0-9]+$/,
                                         message: 'NPI must contain numbers only',
                                     },
                                 })}
@@ -1286,6 +1286,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                         </Row>
                     </Col>
+                    <hr />
                     <Col sm={12}>
                         <Row>
                             <Col sm={12} className="mb-2">
@@ -1637,44 +1638,32 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                     <Row>
                         <Col>
-                            <Table responsive className="table-centered table-nowrap mb-0">
-                                <thead className="text-white">
-                                    <tr>
-                                        <th className="text-white">S.No.</th>
-                                        <th className="text-white">PRACTICE NAME</th>
-                                        {/* <th className='text-white'>LOCATION</th> */}
-                                        <th className="text-white">PRACTICE TYPE</th>
-                                        {/* <th className='text-white'>END DATE</th> */}
-                                        {/* <th className='text-white'>COUNTDOWN</th> */}
-                                        {/* <th className='text-white'>CONTRACT</th> */}
-                                        <th className="text-white">STATUS</th>
-                                        <th className="text-white">ACTION</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {store?.getSubClinicsReducer?.loading ? (
+                            {store?.getSubClinicsReducer?.loading ? (
+                                <div className="text-center my-3">
+                                    <Spinner />
+                                </div>
+                            ) : getTableData && getTableData.length === 0 ? (
+                                <div className="text-center my-3">
+                                    <h5>No Subclinics Available</h5>
+                                    <p>Create a new subclinic to get started.</p>
+                                </div>
+                            ) : (
+                                <Table responsive className="table-centered table-nowrap mb-0">
+                                    <thead className="text-white">
                                         <tr>
-                                            <td colSpan={5} className="text-center">
-                                                <Spinner/>
-                                                
-                                            </td>
+                                            <th className="text-white">S.No.</th>
+                                            <th className="text-white">PRACTICE NAME</th>
+                                            <th className="text-white">PRACTICE TYPE</th>
+                                            <th className="text-white">STATUS</th>
+                                            <th className="text-white">ACTION</th>
                                         </tr>
-                                    ) : getTableData && getTableData.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={5} className="text-center">
-                                                <h5 className="my-3">No Data Found</h5>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        getTableData && getTableData?.map((patient, index) => (
+                                    </thead>
+                                    <tbody>
+                                        {getTableData?.map((patient, index) => (
                                             <tr key={patient.id}>
                                                 <td>{index + 1}</td>
                                                 <td>{patient.name}</td>
-                                                {/* <td>{patient.location}</td> */}
                                                 <td>{patient.clinicType}</td>
-                                                {/* <td>{patient.endDate}</td> */}
-                                                {/* <td>{patient.countDown}</td> */}
-                                                {/* <td>{patient.contract}</td> */}
                                                 <td>
                                                     <Form.Switch checked={patient.status === patient.status} />
                                                 </td>
@@ -1684,16 +1673,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             className="fs-5 cursor-pointer"
                                                             onClick={() => handleUpdateSubClinics(patient)}
                                                         />
-                                                        {/* <FiTrash className="fs-5 cursor-pointer" /> */}
                                                     </div>
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </Table>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            )}
                         </Col>
                     </Row>
+
                     {/* </Card.Body> */}
                     {/* </Card> */}
                 </Col>

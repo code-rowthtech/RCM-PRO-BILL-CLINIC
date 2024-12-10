@@ -12,7 +12,6 @@ import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
 import Responsiblle from "./Responsible";
-import Practices from "./Practices";
 
 
 const NewPatient = () => {
@@ -262,14 +261,7 @@ const NewPatient = () => {
                                     Responsible party
                                 </button>
                             </li>
-                            <li className="nav-item">
-                                <button
-                                    className={`text-black fw-medium nav-link ${activeTab === "practice" ? "active" : ""}`}
-                                    onClick={() => handleTabChange("practice")}
-                                >
-                                    Responsible party
-                                </button>
-                            </li>
+                       
                         </ul>
 
                         {/* Form Section */}
@@ -719,7 +711,6 @@ const NewPatient = () => {
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle />}
-                        {activeTab === "practice" && <Practices />}
                     </div>
                 </Card>
             </div>
