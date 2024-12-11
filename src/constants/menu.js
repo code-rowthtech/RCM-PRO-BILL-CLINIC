@@ -90,6 +90,12 @@ const MENU_ITEMS = [
                 url: '/apps/settings/desigination',
                 parentKey: 'setting',
             },
+            {
+                key: 'rolesetting',
+                label: 'Role',
+                url: '/apps/settings/role',
+                parentKey: 'setting',
+            },
         ]
     },
     

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap'
-import Spinner from '../../../constants/Spinner'
-import { FormInput } from '../../../components'
-import { FiEdit, FiFileText, FiFilter, FiTrash } from 'react-icons/fi'
-import { IoMdClose } from 'react-icons/io'
+import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import Spinner from '../../../constants/Spinner';
+import { FormInput } from '../../../components';
+import { FiEdit, FiFileText, FiFilter, FiTrash } from 'react-icons/fi';
+import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash, FaStarOfLife } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
-
-
+import { encryptMessage } from '../../../cryptoUtils';
+import { createRolesAction, getRolesAction } from '../../../redux/actions';
+import AddRole from './AddRole';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -23,38 +24,34 @@ function formatDate(dateString) {
 }
 
 const RoleManagement = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
     const [timeoutId, setTimeoutId] = useState(null);
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [addDepartmentModal, setAddDepartmentModal] = useState(false);
-    const [status, setStatus] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
-    const [editMode, setEditMode] = useState(false);
-    const handleShowDetails = () => {
-        setSmShow(true);
-    };
+    const [status, setStatus] = useState(true)
+    const [skip, setSkip] = useState(1)
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
 
+useEffect(()=>{
+    dispatch(getRolesAction({ clinicId:clinicId,limit: 10, search: '',page:skip, status: status }));
+},[])
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         if (password === '1234') {
             setIsPasswordCorrect(true);
             setSmShow(false);
-            setIsVisible(true);
-            ToastHandle("password success", "success");
+            ToastHandle("Password success", "success");
 
             const id = setTimeout(() => {
                 setIsPasswordCorrect(false);
-                setIsVisible(false);
             }, 300000);
-            setPassword();
 
             setTimeoutId(id);
         } else {
-            ToastHandle("password incorrect", "danger");
+            ToastHandle("Password incorrect", "danger");
         }
     };
 
@@ -66,55 +63,22 @@ const RoleManagement = () => {
         };
     }, [timeoutId]);
 
-    const toggleVisibility = () => {
-        if (isPasswordCorrect) {
-            setIsVisible(!isVisible);
-        } else {
-            handleShowDetails();
-        }
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(prevState => !prevState);
-    };
-
     const openEditModal = (user) => {
-        setEditMode(true);
         setCurrentUser(user);
         setAddDepartmentModal(true);
-        reset(user);  // Populate form fields with user details
     };
+
     const closeAddModal = () => {
         setAddDepartmentModal(false);
-        setEditMode(false);
         setCurrentUser(null);
-        reset();
-    }; const [clinicTypeData] = useState([
+    };
+
+    const [clinicTypeData] = useState([
         { name: "Clinic A", phone: "987-3468-334", userName: "x24@probillRCm" },
         { name: "Clinic B", phone: "987-3468-334", userName: "x24@probillRCm" }
     ]);
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset
-    } = useForm();
-    const store = useSelector((state) => state);
+
     const dispatch = useDispatch();
-    const onSubmit = (formData) => {
-        const payload = {
-            name: formData?.name,
-            price: formData?.amount,
-            billingFrequency: formData?.tenure,
-            description: formData?.description,
-            doctorLimit: formData?.doctorcount,
-            patientLimit: formData?.patientcount,
-            implimentFrom: formData?.date,
-        }
-        // dispatch(createSubscriptionsAction({ key: encryptMessage(payload) }));
-
-    };
-
 
     return (
         <Row className='mt-2'>
@@ -134,12 +98,6 @@ const RoleManagement = () => {
                                             type="text"
                                             placeholder="Search..."
                                         />
-                                        {/* <Button className="custom-buttons">
-                                            <FiFilter className='fs-4' />
-                                        </Button>
-                                        <Button className="custom-buttons">
-                                            <FiFileText className='fs-4' />
-                                        </Button> */}
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
                                             New Receptionist
                                         </Button>
@@ -190,7 +148,6 @@ const RoleManagement = () => {
                                         )}
                                     </tbody>
                                 </Table>
-
                             </Col>
                         </Row>
                     </Card.Body>
@@ -222,246 +179,14 @@ const RoleManagement = () => {
                                 </Button>
 
                                 <p className='fw-bold mt-2'>Show the number for 5 min only</p>
-
                             </Col>
                         </Row>
                     </Form>
                 </Modal.Body>
             </Modal>
-            <Modal centered show={addDepartmentModal} size="md" onHide={closeAddModal}>
-                <Modal.Body>
-                    <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
-                        <Col sm={1}></Col>
-                        <Col sm={10}>
-                            <h4 className="mb-0 text-center">{editMode ? "Edit New User" : "Add New User"}</h4>
-                        </Col>
-                        <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} />
-                        </Col>
-                    </Row>
-                    <Form onSubmit={handleSubmit(onSubmit)}>
-                        <Row>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Name</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter name"
-                                        {...register('name', {
-                                            required: 'Name is required',
-                                            pattern: {
-                                                value: /^(?! )[A-Za-z0-9 ]*$/,
-                                                message: 'Special characters and leading spaces are not allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.name && <span className="text-danger fs-6">{errors.name.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Email ID</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter email"
-                                        {...register('email', {
-                                            required: 'Email is required',
-                                            pattern: {
-                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                message: 'Invalid email format',
-                                            },
-                                        })}
-                                    />
-                                    {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Contact No.</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter contact number"
-                                        {...register('contact', {
-                                            required: 'Contact number is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="Enter password"
-                                        {...register('password', {
-                                            required: 'Password is required',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'Password must be at least 6 characters',
-                                            },
-                                        })}
-                                    />
-                                    <span
-                                        className="position-absolute"
-                                        style={{ top: '35px', right: '10px', cursor: 'pointer' }}
-                                        onClick={togglePasswordVisibility}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.password && (
-                                        <span className="text-danger fs-6">
-                                            {errors.password.message}
-                                        </span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label>Confirm Password</Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="Confirm password"
-                                        {...register('confirmPassword', {
-                                            required: 'Confirm password is required',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'Password must be at least 6 characters',
-                                            },
-                                        })}
-                                    />
-                                    <span
-                                        className="position-absolute"
-                                        style={{ top: '35px', right: '10px', cursor: 'pointer' }}
-                                        onClick={togglePasswordVisibility}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.confirmPassword && (
-                                        <span className="text-danger fs-6">
-                                            {errors.confirmPassword.message}
-                                        </span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Date of Joining</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        {...register('joiningDate', { required: 'Joining date is required' })}
-                                    />
-                                    {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Date of Leaving</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        {...register('leavingDate', { required: 'Leaving date is required' })}
-                                    />
-                                    {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
-                                </Form.Group>
-                            </Col>
-                        
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Designation</Form.Label>
-                                    <Form.Select
-                                        {...register('designation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        <option value="doctor">Doctor</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="maker">Maker</option>
-                                    </Form.Select>
-                                    {errors.designation && <span className="text-danger fs-6">{errors.designation.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Re- Enter Designation</Form.Label>
-                                    <Form.Select
-                                        {...register('designation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        <option value="doctor">Doctor</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="maker">Maker</option>
-                                    </Form.Select>
-                                    {errors.designation && <span className="text-danger fs-6">{errors.designation.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Re-designation</Form.Label>
-                                    <Form.Select
-                                        {...register('reDesignation', { required: 'Re-designation is required' })}
-                                    >
-                                        <option value="">Select re-designation</option>
-                                        <option value="doctor">Doctor</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="maker">Maker</option>
-                                    </Form.Select>
-                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
-                                </Form.Group>
-                            </Col> */}
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Phone No.</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter phone number"
-                                        {...register('phone', {
-                                            required: 'Phone number is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Reporting</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter Reporting"
-                                        {...register('Reporting', {
-                                            required: 'Reporting is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                // message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
-                                </Form.Group>
-                            </Col>
-                           
-                        </Row>
-                        <Modal.Footer className="border-0">
-                            <Button type="submit" className="custom-buttons">
-                                Cancel
-                            </Button>
-                            <Button type="submit" variant="primary" className="ms-2">
-                                {editMode ? 'Update' : 'Add'} User
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal.Body>
-            </Modal>
+            <AddRole show={addDepartmentModal} close={closeAddModal} />
         </Row>
-    )
-}
+    );
+};
 
-export default RoleManagement
+export default RoleManagement;

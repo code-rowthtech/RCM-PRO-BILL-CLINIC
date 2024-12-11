@@ -13,6 +13,7 @@ import { createPatientsReducer, getPatientsReducer, updatePatientsReducer } from
 import { getSubscriptionReducer,getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer,getSubscriptionsReducer,createUpgradeReducer,getSubClinicCityReducer } from './sub clinic/reducers';
 import { createScheduleReducer, getDoctorsListReducer,getScheduleReducer ,deleteScheduleReducer} from './schedule/reducers';
+import { createRoleDataReducer,updateRoleDataReducer,getRoleDataReducer } from './settings/rolesetting/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -28,5 +29,6 @@ export default (combineReducers({
     getDoctorsRolesReducer,
     getPatientsReducer,
     getSubscriptionReducer,getSubSubscriptionReducer,
+    createRoleDataReducer,updateRoleDataReducer,getRoleDataReducer,
     createSubClinicsReducer,getSubClinicsReducer,getSubClinicTypeReducer,getSubscriptionsReducer,createUpgradeReducer,getSubClinicCityReducer,
 }): any);
