@@ -239,7 +239,7 @@ const Responsiblle = () => {
 
                         <Form.Group className="mb-2">
                             <Form.Label className="mb-1">Address</Form.Label>
-                            <div >
+                            <div style={{ position: 'relative' }}>
                                 <Form.Control
                                     type="text"
                                     {...register('address')}
@@ -564,7 +564,7 @@ const Responsiblle = () => {
 
                 </div>
                 <div className="row pb-3 mt-3" >
-                 
+
 
                     <div className="col-6 mb-3">
                         <Form.Label htmlFor="Account">Account type</Form.Label>
@@ -590,15 +590,15 @@ const Responsiblle = () => {
                             {...register('stateMent', { required: "stateMent formate is required" })}
                         />
                     </div>
-                 
 
-                  
 
-                 
 
-                
 
-              
+
+
+
+
+
                 </div>
 
                 {/* Buttons */}

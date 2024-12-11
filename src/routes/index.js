@@ -77,6 +77,9 @@ const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation
 
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
+const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
+
+
 
 
 
@@ -376,6 +379,10 @@ const AllRoutes = () => {
                                 {
                                     path: 'desigination',
                                     element: <LoadComponent component={Desigination} />,
+                                },
+                                {
+                                    path: 'role',
+                                    element: <LoadComponent component={RoleSetting} />,
                                 },
                             ],
                         },

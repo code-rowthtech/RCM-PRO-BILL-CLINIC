@@ -63,6 +63,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/crm/addclinic': 'Practice',
         '/apps/settings/department': 'Settings',
         '/apps/settings/desigination': 'Settings',
+        '/apps/settings/role/rolesetting': 'Settings',
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',

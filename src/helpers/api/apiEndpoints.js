@@ -1,12 +1,12 @@
 export const addPermissions = '/api/v1/permisssions';
-export const getPermissions = '/api/v1/permisssions';
+export const getPermissions = '/api/v1/clinic/permisssions';
 export const deletePermissions = '/api/v1/permisssions/delete';
 export const updatePermissions = '/api/v1/permisssions';
 export const deleteClinicOnboarding= "";
 export const getClinicsByParentId = '';
 
 // ROLES
-export const createRoles = '/api/v1/roles/create';
+export const createRoles = '/api/v1/clinic/sub-users/create';
 export const updateRoles = '/api/v1/roles/edit';
 export const getRoles = '/api/v1/roles';
 
@@ -37,6 +37,10 @@ export const createContract = '/api/v1/clinic/getContractDetails';
 export const addMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 export const getMastersData = '/api/v1/clinic/getmasterData';
 export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
+
+export const addRoleData = '/api/v1/clinic/roles/create';
+export const getRoleData = '/api/v1/clinic/roles';
+export const updateRoleData = '/api/v1/clinic/roles/edit';
 
 // DOCTORS
 export const getDoctor = '/api/v1/doctors/getClinicDoctors';

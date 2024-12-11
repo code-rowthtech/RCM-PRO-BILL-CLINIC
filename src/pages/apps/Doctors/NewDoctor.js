@@ -53,7 +53,8 @@ const NewDoctor = () => {
     const password = watch('password');
 
     const statesData = store?.getStatesReducer?.data;
-    // console.log({stateToSelect})
+    const role = store?.getDoctorsRolesReducer?.data
+    console.log({role})
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
