@@ -117,6 +117,7 @@ function* verifyTokenFunction({ payload }) {
     try {
         setAuthorization(token)
         const response = yield call(verifyToken);
+        console.log(response, 'verifyToken')
         yield put(authApiResponseSuccess(AuthActionTypes.VERIFY_TOKEN, response.data));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.VERIFY_TOKEN, error));
@@ -135,6 +136,7 @@ function* setPasswordChange({ payload }) {
     try {
         setAuthorization(token)
         const response = yield call(setPasswordApi, encryptedNewPassword);
+        console.log(response,'setPasswordChange')
         yield put(authApiResponseSuccess(AuthActionTypes.SET_PASSWORD, response.data));
     } catch (error) {
         ToastHandle(error,'danger')
@@ -154,6 +156,7 @@ function* setChangePasswordChange({ payload }) {
 
     try {
         const response = yield call(confirmPasswordApi, payload);
+        console.log(response, 'setChangePasswordChange');
         yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
     } catch (error) {
         yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));

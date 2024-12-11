@@ -58,6 +58,21 @@
     font-weight: 550 !important;
 }
 
+.form-select {
+    color: #a9a9a9 !important;
+    font-weight: 550 !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: black !important;
+}
+
+.form-select[data-has-value='true'] {
+    color: black !important;
+}
+
+
 /* .form-select.empty {
     color: red !important;
 } */
