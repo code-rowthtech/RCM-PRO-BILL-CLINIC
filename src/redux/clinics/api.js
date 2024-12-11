@@ -34,7 +34,7 @@ export function getCityByStateApi(params: any): any {
 
 export function getClinicApi(params: any): any {
     const { data } = params;
-    return api.create(`${URL.getClinic}`);
+    return api.create(URL.getClinic,data);
 }
 
 export function addSubscriptionPlanApi(params: any): any {

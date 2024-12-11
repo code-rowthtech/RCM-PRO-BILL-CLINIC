@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
@@ -10,9 +10,9 @@ import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
-import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
+import { createSubClinicAction, getSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
 import ResetPassword from './ResetPassword';
-import { getCities2Action, getCitiesAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
+import { getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
@@ -20,9 +20,11 @@ import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'reac
 
 
 const NewPractice = () => {
+    const [searchParams] = useSearchParams();
     const location = useLocation();
     const { data } = location.state || {};
-    console.log(data,'new practice')
+    console.log(data, 'new practice')
+    const idUpdateDataSubClinics = searchParams.get('id');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
@@ -78,8 +80,8 @@ const NewPractice = () => {
     const store = useSelector((state) => state)
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesDatastatesData')
     const citiesData = [store?.getSubClinicCityReducer];
+    const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -244,9 +246,9 @@ const NewPractice = () => {
     const closepassModal = () => {
         setPassShow(false);
     }
-
     useEffect(() => {
         dispatch(getClinicTypeAction())
+        dispatch(getClinicAction({ key: encryptMessage({ userId: idUpdateDataSubClinics }) }));
         dispatch(getStatesByCountryAction())
     }, [dispatch])
 
@@ -347,53 +349,53 @@ const NewPractice = () => {
 
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
-        if (data) {
-            setFormData(data);
-            setValue('clinicname', data?.name);
-            setValue('clinicType', data?.clinicType);
-            setValue('email', data?.userId?.email);
-            setValue('taxId', data?.taxIdOrEIN);
-            setValue('practiceSpecialty', data?.practiceSpecialty);
-            setField('contactPerson', data?.userId?.phone?.startsWith("+1")
-                ? data.userId.phone.substring(2)
-                : data?.userId?.phone);
-            setValue('npiNumber', data?.npiNumber);
-            setValue('logo', data?.logo);
-            setField('address', data?.userId?.primaryAddress?.address);
-            setField('street', data?.userId?.primaryAddress?.street);
-            setField('zip', data?.userId?.primaryAddress?.zip);
-            setLatitude(data?.userId?.primaryAddress?.latitude)
-            setLongitude(data?.userId?.primaryAddress?.longitude)
-            setField('stateName', data?.userId?.primaryAddress?.state?._id)
-            if (data?.userId?.primaryAddress?.city) {
-                dispatch(getCitiesAction({ state_code: data?.userId?.primaryAddress?.state?.id, name: data?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+        if (subClinicsDetailsGet) {
+            setFormData(subClinicsDetailsGet);
+            setValue('clinicname', subClinicsDetailsGet?.name);
+            setValue('clinicType', subClinicsDetailsGet?.clinicType);
+            setValue('email', subClinicsDetailsGet?.userId?.email);
+            setValue('taxId', subClinicsDetailsGet?.taxIdOrEIN);
+            setValue('practiceSpecialty', subClinicsDetailsGet?.practiceSpecialty);
+            setField('contactPerson', subClinicsDetailsGet?.userId?.phone?.startsWith("+1")
+                ? subClinicsDetailsGet.userId.phone.substring(2)
+                : subClinicsDetailsGet?.userId?.phone);
+            setValue('npiNumber', subClinicsDetailsGet?.npiNumber);
+            setValue('logo', subClinicsDetailsGet?.logo);
+            setField('address', subClinicsDetailsGet?.userId?.primaryAddress?.address);
+            setField('street', subClinicsDetailsGet?.userId?.primaryAddress?.street);
+            setField('zip', subClinicsDetailsGet?.userId?.primaryAddress?.zip);
+            setLatitude(subClinicsDetailsGet?.userId?.primaryAddress?.latitude)
+            setLongitude(subClinicsDetailsGet?.userId?.primaryAddress?.longitude)
+            setField('stateName', subClinicsDetailsGet?.userId?.primaryAddress?.state?._id)
+            if (subClinicsDetailsGet?.userId?.primaryAddress?.city) {
+                dispatch(getCitiesAction({ state_code: subClinicsDetailsGet?.userId?.primaryAddress?.state?.id, name: subClinicsDetailsGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
             }
-            setField('mailingAddress', data?.userId?.mailingAddress?.address);
-            setField('mailingStreet', data?.userId?.mailingAddress?.street);
-            setField('mailingZip', data?.userId?.mailingAddress?.zip);
-            setLatitude1(data?.userId?.mailingAddress?.latitude)
-            setLongitude1(data?.userId?.mailingAddress?.longitude)
-            setField('mailingStateName', data?.userId?.mailingAddress?.state?._id)
-            if (data?.userId?.mailingAddress?.city) {
-                dispatch(getCities2Action({ state_code: data?.userId?.mailingAddress?.state?.id, name: data?.userId?.mailingAddress?.city?.name, limit: '', skip: '' }))
+            setField('mailingAddress', subClinicsDetailsGet?.userId?.mailingAddress?.address);
+            setField('mailingStreet', subClinicsDetailsGet?.userId?.mailingAddress?.street);
+            setField('mailingZip', subClinicsDetailsGet?.userId?.mailingAddress?.zip);
+            setLatitude1(subClinicsDetailsGet?.userId?.mailingAddress?.latitude)
+            setLongitude1(subClinicsDetailsGet?.userId?.mailingAddress?.longitude)
+            setField('mailingStateName', subClinicsDetailsGet?.userId?.mailingAddress?.state?._id)
+            if (subClinicsDetailsGet?.userId?.mailingAddress?.city) {
+                dispatch(getCities2Action({ state_code: subClinicsDetailsGet?.userId?.mailingAddress?.state?.id, name: subClinicsDetailsGet?.userId?.mailingAddress?.city?.name, limit: '', skip: '' }))
             }
-            if (data?.accreditationDetails) {
-                setAccreditationDetails(data?.accreditationDetails)
+            if (subClinicsDetailsGet?.accreditationDetails) {
+                setAccreditationDetails(subClinicsDetailsGet?.accreditationDetails)
             }
             // if (data?.medicalLicenses) {
             //     setMedicalDetails(data?.medicalLicenses)
             // }
-            if (data?.pos) {
-                setPosDetails(data?.pos)
+            if (subClinicsDetailsGet?.pos) {
+                setPosDetails(subClinicsDetailsGet?.pos)
             }
-            if (data?.logo) {
-                setLogoName(data?.logo?.fileName)
+            if (subClinicsDetailsGet?.logo) {
+                setLogoName(subClinicsDetailsGet?.logo?.fileName)
             }
-            if (data?.stateOfLicensing) {
-                setStateDetails(data?.stateOfLicensing)
+            if (subClinicsDetailsGet?.stateOfLicensing) {
+                setStateDetails(subClinicsDetailsGet?.stateOfLicensing)
             }
         }
-    }, [data, statesData, setValue]);
+    }, [subClinicsDetailsGet, statesData, setValue]);
 
     const formDataChange = (field, value) => {
         const updatedFormData = { ...formData, [field]: value };
@@ -421,11 +423,10 @@ const NewPractice = () => {
 
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
-            (data) =>
-                !data.name || !data.number || !data.url
+            (subClinicsDetailsGet) =>
+                !subClinicsDetailsGet.name || !subClinicsDetailsGet.number || !subClinicsDetailsGet.url
         );
         if (isIncomplete) {
-            // Show a toast message if any field is incomplete
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
         }
@@ -505,7 +506,7 @@ const NewPractice = () => {
             taxIdOrEIN: formData?.taxId,
             npiNumber: formData?.npiNumber,
             // medicalLicenses: medicalDetails,
-            ...usePrimaryAsMailing && {isPrimaryAndMailingAddressSame: usePrimaryAsMailing},
+            ...usePrimaryAsMailing && { isPrimaryAndMailingAddressSame: usePrimaryAsMailing },
 
             flag: 'subClinic',
             ...stateDetails && { stateOfLicensing: stateDetails },
@@ -551,10 +552,9 @@ const NewPractice = () => {
                     },
             ...posDetails && { pos: posDetails },
         }
-        if (data) {
+        if (subClinicsDetailsGet) {
             dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
             console.log('updateData', payload)
-            navigate('/apps/crm/addclinic')
 
         } else {
             dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
@@ -715,7 +715,7 @@ const NewPractice = () => {
                                 <div className='d-flex gap-2'>
                                     {btnShow && (
                                         <>
-                                            {!data && ( // Only show this button if not updating and no data
+                                            {!subClinicsDetailsGet && ( // Only show this button if not updating and no data
                                                 <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>
                                                     Email to Sub Practice
                                                 </Button>
@@ -1673,7 +1673,7 @@ const NewPractice = () => {
                                                 {createLoading ? (
                                                     <Spinner color='white' className='spinner-border-sm' />
                                                 ) : (
-                                                    data ? 'Update' : 'Next'
+                                                    subClinicsDetailsGet ? 'Update' : 'Next'
                                                 )}
                                             </Button>
                                         </Col>

@@ -43,4 +43,5 @@ function confirmPasswordApi(params: any): any {
     const baseUrl = 'api/v1/clinic/changePassword';
     return api.create(`${baseUrl}`, params);
 }
+
 export { login, logout, signup, forgotPassword, forgotPasswordConfirm, verifyToken, setPasswordApi,confirmPasswordApi };
