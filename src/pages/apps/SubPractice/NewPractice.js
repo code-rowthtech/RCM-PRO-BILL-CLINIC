@@ -22,7 +22,7 @@ import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'reac
 const NewPractice = () => {
     const location = useLocation();
     const { data } = location.state || {};
-    console.log('Received ID:', data);
+    console.log(data,'new practice')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
@@ -78,6 +78,7 @@ const NewPractice = () => {
     const store = useSelector((state) => state)
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const statesData = store?.getStatesReducer?.data;
+    console.log(statesData, 'statesDatastatesData')
     const citiesData = [store?.getSubClinicCityReducer];
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
@@ -85,8 +86,6 @@ const NewPractice = () => {
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
-    const updateSubClinicsNavigate = store?.updateSubClinicReducer;
-    console.log(updateSubClinicsNavigate,'updateSubClinicsNaviagte');
     const [updatePage, setUpdatePage] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null)
@@ -165,31 +164,31 @@ const NewPractice = () => {
 
     const [stateCode, setStateCode] = useState()
 
-    const handleAddressSelection = (location) => {
-        setValue('address', location.formatted);
-        setValue('zip', location.components.postcode || '');
-        setValue('stateName', location.components.state || '');
-        setValue('city', location.components.city || location.components.town || '');
-        setValue('street', location.components.road || location.components.street || '');
-        setStateCode(location?.components?.state_code)
-        setLatitude(location.geometry.lat);
-        setLongitude(location.geometry.lng);
-        setStreet(location.components.road || location.components.street || '');
-        dispatch(getSubClinicCitiesAction({ state_code: location?.components?.state_code, name: '', limit: 25, skip: '' }));
+    // const handleAddressSelection = (location) => {
+    //     setValue('address', location.formatted);
+    //     setValue('zip', location.components.postcode || '');
+    //     setValue('stateName', location.components.state || '');
+    //     setValue('city', location.components.city || location.components.town || '');
+    //     setValue('street', location.components.road || location.components.street || '');
+    //     setStateCode(location?.components?.state_code)
+    //     setLatitude(location.geometry.lat);
+    //     setLongitude(location.geometry.lng);
+    //     setStreet(location.components.road || location.components.street || '');
+    //     dispatch(getSubClinicCitiesAction({ state_code: location?.components?.state_code, name: '', limit: 25, skip: '' }));
 
-        const stateCode = statesData?.states?.find(
-            (state) => state.name === location.components.state
-        )?.state_code;
+    //     const stateCode = statesData?.states?.find(
+    //         (state) => state.name === location.components.state
+    //     )?.state_code;
 
-        setSelectedCity(location.components.city)
+    //     setSelectedCity(location.components.city)
 
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
+    //     if (stateCode) {
+    //         setStateToSelect(stateCode);
+    //         dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
+    //     }
 
-        setFocused(false);
-    };
+    //     setFocused(false);
+    // };
 
     useEffect(() => {
         if (stateToSelect) {
@@ -506,6 +505,8 @@ const NewPractice = () => {
             taxIdOrEIN: formData?.taxId,
             npiNumber: formData?.npiNumber,
             // medicalLicenses: medicalDetails,
+            ...usePrimaryAsMailing && {isPrimaryAndMailingAddressSame: usePrimaryAsMailing},
+
             flag: 'subClinic',
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
@@ -548,25 +549,27 @@ const NewPractice = () => {
                         ...(latitude1 ? { latitude: latitude1, } : ''),
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     },
-                    ...posDetails && { pos: posDetails },
+            ...posDetails && { pos: posDetails },
         }
         if (data) {
             dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
-           
+            console.log('updateData', payload)
+            navigate('/apps/crm/addclinic')
+
         } else {
             dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+            console.log('createData', payload)
+
         }
         reset();
     };
-    useEffect(()=>{
-        if (createResponseOfSubClinics === 200 ) {
+    useEffect(() => {
+        if (createResponseOfSubClinics === 200) {
             navigate('/apps/crm/addclinic');
         }
-        if(updateSubClinicsNavigate === 200){
-            navigate('/apps/crm/addclinic');
-        }
-        
-    },[createResponseOfSubClinics,updateSubClinicsNavigate]);
+
+
+    }, [createResponseOfSubClinics]);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedLocation2, setSelectedLocation2] = useState(null);
 
@@ -1337,7 +1340,7 @@ const NewPractice = () => {
                                                 </Col>
                                             </Row>
                                         </Col>
-
+                                        <hr />
                                         <Col sm={12}>
                                             <Row>
                                                 <Col sm={12} className="mb-2">
@@ -1357,12 +1360,21 @@ const NewPractice = () => {
 
                                                             if (isChecked) {
                                                                 setValue('mailingAddress', getValues('address'));
-                                                                setValue('mailingStateName', getValues('stateName'));
+                                                                // setValue('mailingStateName', getValues('stateName'));
                                                                 setLatitude1(latitude);
                                                                 setLongitude1(longitude);
-                                                                setValue('mailingCity', getValues('city'));
+                                                                // setValue('mailingCity', getValues('city'));
                                                                 setValue('mailingZip', getValues('zip'));
                                                                 setValue('mailingStreet', getValues('street'));
+                                                            }
+                                                            else {
+                                                                setValue('mailingAddress', '');
+                                                                setValue('mailingStateName', '');
+                                                                setLatitude1('');
+                                                                setLongitude1('');
+                                                                setValue('mailingCity', '');
+                                                                setValue('mailingZip', '');
+                                                                setValue('mailingStreet', '');
                                                             }
                                                         }}
                                                     />
@@ -1462,50 +1474,61 @@ const NewPractice = () => {
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">State</Form.Label>
-                                                                <Form.Select
-                                                                    {...register('mailingStateName')}
-                                                                    onChange={(e) => handleStateSelection(e)}
-                                                                    disabled={usePrimaryAsMailing}
-                                                                >
-                                                                    <option value={''}>State</option>
-                                                                    {statesData?.states?.map((data) => (
-                                                                        <option key={data?.id} value={data?._id}
-                                                                            onChange={(e) => {
-                                                                                if (!usePrimaryAsMailing) {
-                                                                                    setValue('mailingStateName', e.target.value);
-                                                                                }
-                                                                            }}
-                                                                        >
-                                                                            {data?.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
+                                                                {usePrimaryAsMailing ? (
+                                                                    <Form.Control
+                                                                        readOnly
+                                                                        value={
+                                                                            statesData?.states?.find(
+                                                                                (data) => data?._id === getValues('stateName')
+                                                                            )?.name || 'N/A'
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    <Form.Select
+                                                                        {...register('mailingStateName')}
+                                                                        onChange={(e) => handleStateSelection(e)}
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    >
+                                                                        <option value={''}>State</option>
+                                                                        {statesData?.states?.map((data) => (
+                                                                            <option key={data?.id} value={data?._id}>
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                )}
                                                             </Form.Group>
                                                         </Col>
+
 
                                                         {/* City */}
                                                         <Col sm={6}>
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">City</Form.Label>
-                                                                <Form.Select
-                                                                    disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
-                                                                    {...register('mailingCity')}
-                                                                    onChange={(e) => handleCitySelection(e)}
-                                                                >
-                                                                    <option value="">
-                                                                        {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
-                                                                    </option>
-                                                                    {cities2?.map((data) => (
-                                                                        <option key={data?._id} value={data?._id}
-                                                                            onChange={(e) => {
-                                                                                if (!usePrimaryAsMailing) {
-                                                                                    setValue('mailingCity', e.target.value);
-                                                                                }
-                                                                            }}>
-                                                                            {data?.name}
+                                                                {usePrimaryAsMailing ?
+                                                                    <Form.Control readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
+                                                                    :
+                                                                    <Form.Select
+                                                                        disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
+                                                                        {...register('mailingCity')}
+                                                                        onChange={(e) => handleCitySelection(e)}
+                                                                    >
+                                                                        <option value="">
+                                                                            {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                                         </option>
-                                                                    ))}
-                                                                </Form.Select>
+                                                                        {cities2?.map((data) => (
+                                                                            <option key={data?._id} value={data?._id}
+                                                                                onChange={(e) => {
+                                                                                    if (!usePrimaryAsMailing) {
+                                                                                        setValue('mailingCity', e.target.value);
+                                                                                    }
+                                                                                }}>
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                }
+
                                                             </Form.Group>
                                                         </Col>
 
