@@ -24,8 +24,7 @@ function* createClinicsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle("updating data created successfully", 'success')
-
+         ToastHandle(decryptedData.message,'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_CLINIC_SUCCESS,
                 payload: { ...decryptedData },
@@ -219,19 +218,18 @@ function* getCitiesFunction(data) {
     try {
         yield put({
             type: ClinicsActionTypes.GET_CITIES_LOADING,
-            payload: {},
         });
-        const response = yield call(getCityByStateApi , data);
+        const response = yield call(getCityByStateApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_SUCCESS,
-                payload: { ...decryptedData },
+                payload: decryptedData,
             });
         } else {
             yield put({
                 type: ClinicsActionTypes.GET_CITIES_ERROR,
-                payload: { ...decryptedData },
+                payload: decryptedData,
             });
         }
     } catch (error) {
@@ -242,6 +240,33 @@ function* getCitiesFunction(data) {
     }
 }
 
+function* getCities2Function(data) {
+    try {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES2_LOADING,
+        });
+        const response = yield call(getCityByStateApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES2_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES2_ERROR,
+                payload: decryptedData,
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES2_ERROR,
+            payload: error,
+        });
+    }
+}
+
+
 function* createSubscriptionPlanFunction(data) {
     try {
         yield put({
@@ -250,8 +275,8 @@ function* createSubscriptionPlanFunction(data) {
         });
         const response = yield call(addSubscriptionPlanApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
+            ToastHandle(decryptedData.message,'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_SUBSCRIPTION_SUCCESS,
                 payload: { ...decryptedData },
@@ -263,6 +288,7 @@ function* createSubscriptionPlanFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error,'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR,
             payload: error,
@@ -279,6 +305,7 @@ function* createContractFunction(data) {
         const response = yield call(createContract, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
+            ToastHandle(decryptedData.message,'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_CONTRACT_SUCCESS,
                 payload: { ...decryptedData },
@@ -290,6 +317,7 @@ function* createContractFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error,'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_CONTRACT_ERROR,
             payload: error,
@@ -351,6 +379,10 @@ export function* watchGetCities() {
     yield takeEvery(ClinicsActionTypes.GET_CITIES, getCitiesFunction);
 }
 
+export function* watchGetCities2() {
+    yield takeEvery(ClinicsActionTypes.GET_CITIES2, getCities2Function);
+}
+
 export function* watchGetClinicById() {
     yield takeEvery(ClinicsActionTypes.GET_CLINIC_BY_ID, getClinicByIdFunction);
 }
@@ -380,7 +412,7 @@ export function* watchresetState() {
 function* clinicsSaga() {
     yield all([
         fork(watchCreateClinics), fork(watchGetClinicById), fork(watchGetClinics),
-        fork(watchresetState), fork(watchGetStates), fork(watchGetCities), fork(watchCreateSubscriptions),fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
+        fork(watchresetState), fork(watchGetStates), fork(watchGetCities),fork(watchGetCities2), fork(watchCreateSubscriptions),fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
         fork(watchGetClinicByParent),fork(watchgetClinicsTypeState)
     ]);
 }

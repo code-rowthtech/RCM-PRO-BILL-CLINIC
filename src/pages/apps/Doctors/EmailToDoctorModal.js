@@ -26,7 +26,8 @@ dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 useEffect(()=>{
 if(createResponse===200){
     closeModal();
-    setFormData({});
+    setFormData();
+    reset();
 }
 },[createResponse])
   return (
@@ -52,14 +53,14 @@ if(createResponse===200){
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
-                                        defaultValue={formData.email}
+                                        defaultValue={formData?.email}
                                     />
                                     {errors.name && <span className="text-danger">{errors.name.message}</span>}
                                 </Form.Group>
 
                                 <div className='text-center'>
                                     <p className='mb-0'>The Doctor will receive an onboarding email on</p>
-                                    <p className='fw-bold'> "{formData.email}"</p>
+                                    <p className='fw-bold'> "{formData?.email}"</p>
                                 </div>
                             </Col>
                         </Row>

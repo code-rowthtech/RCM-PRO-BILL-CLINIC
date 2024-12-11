@@ -68,15 +68,20 @@ const ResetPassword = (): React$Element<any> => {
 ) );
 
 
-    const schemaResolver = yupResolver(
-        yup.object().shape({
-            password: yup.string().required(t('Please enter Password')),
-            confirmPassword: yup
-                .string()
-                .oneOf([yup.ref('password'), null], t('Passwords must match'))
-                .required(t('Please confirm your Password')),
-        })
-    );
+const schemaResolver = yupResolver(
+    yup.object().shape({
+        password: yup
+            .string()
+            .required(t('Please enter Password'))
+            .min(8, t('Password must be at least 8 characters long'))
+            .matches(/[!@#$%^&*(),.?":{}|<>]/, t('Password must contain at least one special character'))
+            .matches(/^\S*$/, t('Password cannot contain spaces')), // Ensures no spaces
+        confirmPassword: yup
+            .string()
+            .oneOf([yup.ref('password'), null], t('Passwords must match'))
+            .required(t('Please confirm your Password')),
+    })
+);
 
     const onSubmit = (formData) => {
         dispatch(forgotPasswordChange({ token, newPassword: formData.password }));

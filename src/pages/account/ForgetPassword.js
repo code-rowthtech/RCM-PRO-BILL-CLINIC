@@ -53,7 +53,11 @@ const ForgetPassword = (): React$Element<any> => {
      */
     const schemaResolver = yupResolver(
         yup.object().shape({
-            username: yup.string().required(t('Please enter Username')),
+            username: yup
+                .string()
+                .email(t('Please enter a valid email address')) // Validates email format
+                .matches(/^\S+$/, t('Email cannot contain spaces')) // Disallows spaces
+                .required(t('Please enter your email address')), // Ensures input is not empty
         })
     );
 

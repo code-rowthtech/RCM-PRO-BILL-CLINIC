@@ -64,7 +64,7 @@ const MENU_ITEMS = [
  
     {
         key: 'apps-crm',
-        label: 'Practice',
+        label: 'Profile',
         url: '/apps/crm/addclinic',
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },

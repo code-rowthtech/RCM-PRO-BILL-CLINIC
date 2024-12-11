@@ -271,7 +271,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
                                 {store?.store?.createSubscriptionPlanReducer?.loading ?
                                     <Spinner />
                                     :
-                                    'Generate Contract'
+                                    'Next'
                                 }
                             </Button>
                         </Col>

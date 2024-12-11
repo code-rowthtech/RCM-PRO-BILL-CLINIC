@@ -619,13 +619,19 @@ const DepartmentDetails = ({ docId }) => {
                 {/* <Button className="" type="submit">
               Save
             </Button> */}
-                <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsDetailReducer?.loading} >
-                  {store?.createtDoctorsDetailReducer?.loading ?
-                    <Spinner color='white' className='spinner-border-sm' />
-                    :
-                    'Save'
-                  }
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="custom-buttons"
+                  disabled={store?.createtDoctorsDetailReducer?.loading}
+                >
+                  {store?.createtDoctorsDetailReducer?.loading ? (
+                    <Spinner color="white" className="spinner-border-sm" />
+                  ) : (
+                    updateId ? "Update" : "Save"
+                  )}
                 </Button>
+
               </div>
             </>
           }
