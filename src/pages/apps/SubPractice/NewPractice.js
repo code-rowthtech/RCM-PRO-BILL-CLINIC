@@ -22,8 +22,8 @@ import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'reac
 const NewPractice = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
-    const { data } = location.state || {};
-    console.log(data, 'new practice')
+    // const { data } = location.state || {};
+    // console.log(data, 'new practice')
     const idUpdateDataSubClinics = searchParams.get('id');
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [activeTab, setActiveTab] = useState("personalDetails");
@@ -720,7 +720,7 @@ const NewPractice = () => {
                                     <div className='d-flex gap-2'>
                                         {btnShow && (
                                             <>
-                                                {!subClinicsDetailsGet && ( // Only show this button if not updating and no data
+                                                {!idUpdateDataSubClinics &&  ( // Only show this button if not updating and no data
                                                     <Button onClick={() => setShow(true)} disabled={isButtonDisabled}>
                                                         Email to Sub Practice
                                                     </Button>
