@@ -13,7 +13,8 @@ export function createUpgradeApi(params: any): any {
 }
 
 export function getSubClinicApi(params: any): any {
-    return api.create(URL.getSubClinic);
+    const { data } = params;
+    return api.create(URL.getSubClinic,data);
 }
 export function updateSubClinicApi(params: any): any {
     const { data } = params;
