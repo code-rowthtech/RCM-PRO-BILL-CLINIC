@@ -50,6 +50,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [focused, setFocused] = useState(false);
     const [focused2, setFocused2] = useState(false);
     const [subClinic, setSubClinic] = useState('');
+    const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
@@ -136,6 +137,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     //     }
     // }, [createResponse, deleteClinicResponse])
 
+
+    const handleAddTaxonomy = () => {
+        const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
+
+        if (lastCode) {
+            const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
+            setTaxonomyCodes([...validCodes, '']);
+        } else {
+            ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
+        }
+    };
+    // Function to handle field changes
+    const handleTaxonomyChange = (index, value) => {
+        const updatedCodes = [...taxonomyCodes];
+        updatedCodes[index] = value;
+        setTaxonomyCodes(updatedCodes);
+    };
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -161,6 +179,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
         setField('npi', clinicsDataGet?.npiNumber);
         setField('email', clinicsDataGet?.userId?.email);
+        setField('medicare' ,clinicsDataGet?.medicareNumber);
+        setField('medicaid' ,clinicsDataGet?.medicaidNumber);
+        setField('clia', clinicsDataGet?.CLIA_Number);
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
         setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
@@ -186,6 +207,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         // if (clinicsDataGet?.medicalLicenses) {
         //     setMedicalDetails(clinicsDataGet?.medicalLicenses)
         // }
+        if (clinicsDataGet?.taxonomyCodes) {
+            setTaxonomyCodes(clinicsDataGet?.taxonomyCodes)
+        }
         if (clinicsDataGet?.pos) {
             setPosDetails(clinicsDataGet?.pos)
         }
@@ -219,10 +243,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
-            CLIA_Number: '',
-            medicareNumber: '',
-            medicaidNumber: '',
-            taxonomyCodes: [''],
+            CLIA_Number: data?.clia,
+            medicareNumber: data?.medicare,
+            medicaidNumber: data?.medicaid,
+            taxonomyCodes: taxonomyCodes,
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'Clinic',
             // medicalLicenses: medicalDetails,
@@ -773,7 +797,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         width={20}
                                     />
                                 </Form.Group>
-
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
@@ -878,6 +901,115 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
 
+                                </Form.Group>
+                            </Col>
+                            {taxonomyCodes.map((code, index) => (
+                                <Col sm={6} key={index}>
+                                    <Form.Group className="mb-2">
+                                        <Form.Label className="mb-1">
+                                            Taxonomy Code(s)
+                                            {index === taxonomyCodes.length - 1 && (
+                                                <span
+                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                    onClick={handleAddTaxonomy}
+                                                >
+                                                </span>
+                                            )}
+                                            <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            {...register(`taxonomyCode[${index}]`, { required: 'This field is required' })}
+                                            value={code}
+                                            placeholder="Taxonomy Code"
+                                            maxLength={10}
+                                            onKeyPress={(event) => handleFirstSpace(event, index)}
+                                            onChange={(e) => handleTaxonomyChange(index, e.target.value)}
+                                        />
+                                        {errors.taxonomyCode?.[index] && (
+                                            <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            ))}
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>CLIA  Number</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('clia', {
+                                            minLength: {
+                                                value: 10,
+                                                message: 'CLIA  number must be at least 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'CLIA  number cannot exceed 10 characters',
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]+$/,
+                                                message: 'CLIA  number must contain numbers only',
+                                            },
+                                        })}
+                                        placeholder="CLIA Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.clia && <span className="text-danger">{errors.clia.message}</span>}
+                                </Form.Group>
+                            </Col>
+
+                            
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>Medicare Number</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('medicare', {
+                                            minLength: {
+                                                value: 10,
+                                                message: 'Medicare  number must be at least 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Medicare Number  number cannot exceed 10 characters',
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]+$/,
+                                                message: 'Medicare  number must contain numbers only',
+                                            },
+                                        })}
+                                        placeholder="Medicare Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.medicare && <span className="text-danger">{errors.medicare.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            
+                            
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>Medicaid Number</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('medicaid', {
+                                            minLength: {
+                                                value: 10,
+                                                message: 'Medicaid  number must be at least 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Medicaid  number cannot exceed 10 characters',
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]+$/,
+                                                message: 'Medicaid  number must contain numbers only',
+                                            },
+                                        })}
+                                        placeholder="Medicaid Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
                                 </Form.Group>
                             </Col>
                             <hr />
