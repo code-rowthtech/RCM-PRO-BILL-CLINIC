@@ -5,7 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { createClinicAction, deleteClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -57,19 +57,19 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
     // table data
-    const [detailsModal, setDetailsModal] = useState(false);
-    const [selectedDetails, setSelectedDetails] = useState(null);
-    const [status, setStatus] = useState(true);
-    const [search, setSearch] = useState('');
+    // const [detailsModal, setDetailsModal] = useState(false);
+    // const [selectedDetails, setSelectedDetails] = useState(null);
+    // const [status, setStatus] = useState(true);
+    // const [search, setSearch] = useState('');
 
-    const handleStatusChange = (isActive) => {
-        setStatus(isActive);
-    };
+    // const handleStatusChange = (isActive) => {
+    //     setStatus(isActive);
+    // };
 
     const closeModal = () => setShowModal(false);
-    const handleMultipleAdd = () => {
-        navigate('/apps/Practice/new-practice')
-    }
+    // const handleMultipleAdd = () => {
+    //     navigate('/apps/Practice/new-practice')
+    // }
     // const [clinicId, setClinicId] = useState(null);
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
@@ -89,7 +89,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [longitude1, setLongitude1] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [latitude1, setLatitude1] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState(null);
+    // const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -143,13 +143,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     useEffect(() => {
-        dispatch(getClinicAction({key:encryptMessage({userId:clinic_id?._id})}));
+        dispatch(getClinicAction({ key: encryptMessage({ userId: clinic_id?._id }) }));
         dispatch(getSubClinicAction());
         dispatch(getStatesByCountryAction())
     }, [dispatch])
 
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet,'new practic')
+    console.log(clinicsDataGet, 'newpractic')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -196,7 +196,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setStateDetails(clinicsDataGet?.stateOfLicensing)
         }
 
-    }, [clinicsDataGet, statesData, setValue]);
+    }, [dispatch, clinicsDataGet, statesData, setValue]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -219,8 +219,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
-            ...usePrimaryAsMailing && { isPrimaryAndMailingAddressSame: usePrimaryAsMailing },
-
+            CLIA_Number: '',
+            medicareNumber: '',
+            medicaidNumber: '',
+            taxonomyCodes: [''],
+            isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'Clinic',
             // medicalLicenses: medicalDetails,
             // stateOfLicensing: stateDetails,
@@ -271,9 +274,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     }
         };
+        console.log(newPayload, 'new payload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
+        console.log(newPayload, 'new update')
     };
-
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
     const medicalFileInputRef = useRef(null);
@@ -292,7 +296,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             console.error('Error during file upload:', error);
         }
     };
- 
+
 
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
@@ -312,7 +316,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     };
 
-  
+
     // const handleMedicalChange = async (e, index) => {
     //     const selectedFile = e.target.files[0];
     //     try {
@@ -720,9 +724,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-1'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
-                                        {...register('taxId')}
-                                        maxLength={9}
-                                        placeholder="Tax ID / EIN" />
+                                        {...register('taxId', {
+                                            required: 'Tax ID / EIN is required',
+                                            pattern: {
+                                                value: /^\d{2}-\d{7}$/,
+                                                message: 'Tax ID / EIN must be in the format 12-3456789',
+                                            },
+                                        })}
+                                        maxLength={10} // Includes the hyphen
+                                        placeholder="Tax ID / EIN"
+                                    />
                                     {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
                                 </Form.Group>
                             </Col>
@@ -1580,48 +1591,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Form >
                     <Row className='mt-2'>
                         <Col xs={12}>
-                            {/* <Card> */}
-                            {/* <Card.Body> */}
-                            {/* <Row className="mb-2"> */}
-                            {/* <Col sm={6}>
-                                      <Button
-                                          onClick={() => setStatus(true)}
-                                          className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                      >
-                                          Active
-                                      </Button>
-                                      <Button
-                                          onClick={() => setStatus(false)}
-                                          className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                      >
-                                          Inactive
-                                      </Button>
-                                  </Col> */}
-
-                            {/* <Col sm={6} className='text-end'>
-                                      <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between ">
-                                          <Col xs="auto" className='d-flex gap-2'>
-                                              <FormInput
-                                                  type="text"
-                                                  value={search}
-                                                  onChange={(e) => setSearch(e.target.value)} */}
-                            {/* // onChange={(e) => setName(e.target.value)}
-                                                  placeholder="Search..." /> */}
-                            {/* <Button className="custom-buttons ">
-                                                  <FiFilter className='fs-4' />
-                                              </Button>
-                                              <Button className="custom-buttons ">
-                                                  <FiFileText className='fs-4' />
-                                              </Button> */}
-                            {/* <Button as={Link} to='/apps/Practice/new-practice' className="custom-buttons">
-                                                  New Sub Practice
-                                              </Button> */}
-                            {/* </Col> */}
-                            {/* </Row> */}
-
-                            {/* </Col> */}
-                            {/* </Row> */}
-
                             <Row>
                                 <Col>
                                     {store?.getSubClinicsReducer?.loading ? (
@@ -1666,9 +1635,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     )}
                                 </Col>
                             </Row>
-
-                            {/* </Card.Body> */}
-                            {/* </Card> */}
                         </Col>
                     </Row>
                 </>

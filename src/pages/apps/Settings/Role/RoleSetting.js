@@ -11,7 +11,7 @@ import CreateRoleSetting from './CreateRoleSetting'
 import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
-import { getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
+import {  getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
 
 const RoleSetting = () => {
     const [showModal, setShowModal] = useState(false);
