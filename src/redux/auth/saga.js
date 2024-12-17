@@ -158,9 +158,11 @@ function* setChangePasswordChange({ payload }) {
 
     try {
         const response = yield call(confirmPasswordApi, payload);
+
         console.log(response, 'setChangePasswordChange');
         yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
     } catch (error) {
+        ToastHandle(error,'danger')
         yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));
     }
 }

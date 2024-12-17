@@ -90,7 +90,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [longitude1, setLongitude1] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [latitude1, setLatitude1] = useState(null);
-    // const [stateToSelect, setStateToSelect] = useState(null);
+    const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
     const clinectypes = store?.getClinicTypeReducer?.data?.result
     const createResponse = store?.createClinicsReducer?.data?.status;
@@ -270,7 +270,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
-                // state: stateToSelect?._id,
+                state: stateToSelect?._id,
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
@@ -282,7 +282,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         address: data?.address,
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
-                        // state: stateToSelect?._id,
+                        state: stateToSelect?._id,
                         street: data?.street,
                         zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
@@ -720,7 +720,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
+                                    <Form.Label className='mb-1'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('npi', {
@@ -736,6 +736,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 value: /^[0-9]+$/,
                                                 message: 'NPI must contain numbers only',
                                             },
+                                            required: 'NPI Type 2 Number is required'
+
                                         })}
                                         placeholder="NPI Type 2 Number"
                                         maxLength={10}
@@ -743,6 +745,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.npi && <span className="text-danger">{errors.npi.message}</span>}
                                 </Form.Group>
                             </Col>
+
+
                             {/* <Col sm={6} className="mb-2 d-flex flex-column position-relative">
                      <Form.Label>Upload Logo</Form.Label>
                      <div
@@ -857,17 +861,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             ))}
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>CLIA  Number</Form.Label>
+                                    <Form.Label className='mb-1'>CLIA Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('clia', {
+                                            required: 'CLIA Number is required',
                                             minLength: {
                                                 value: 10,
-                                                message: 'CLIA  number must be at least 10 characters long',
+                                                message: 'CLIA Number must be 10 characters long',
                                             },
                                             maxLength: {
                                                 value: 10,
-                                                message: 'CLIA  number cannot exceed 10 characters',
+                                                message: 'CLIA Number must be 10 characters long',
                                             },
                                             pattern: {
                                                 value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
@@ -884,21 +889,22 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>Medicare Number</Form.Label>
+                                    <Form.Label className='mb-1'>Medicare Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('medicare', {
+                                            required: 'Medicare Number is required',
                                             minLength: {
                                                 value: 10,
-                                                message: 'Medicare  number must be at least 10 characters long',
+                                                message: 'Medicare Number must be 10 characters long',
                                             },
                                             maxLength: {
                                                 value: 10,
-                                                message: 'Medicare Number  number cannot exceed 10 characters',
+                                                message: 'Medicare Number must be 10 characters long',
                                             },
                                             pattern: {
                                                 value: /^[0-9]+$/,
-                                                message: 'Medicare  number must contain numbers only',
+                                                message: 'Medicare Number must contain numbers only',
                                             },
                                         })}
                                         placeholder="Medicare Number"
@@ -911,21 +917,22 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>Medicaid Number</Form.Label>
+                                    <Form.Label className='mb-1'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('medicaid', {
+                                            required: 'Medicaid Number is required',
                                             minLength: {
                                                 value: 10,
-                                                message: 'Medicaid  number must be at least 10 characters long',
+                                                message: 'Medicaid Number must be 10 characters long',
                                             },
                                             maxLength: {
                                                 value: 10,
-                                                message: 'Medicaid  number cannot exceed 10 characters',
+                                                message: 'Medicaid Number must be 10 characters long',
                                             },
                                             pattern: {
                                                 value: /^[0-9]+$/,
-                                                message: 'Medicaid  number must contain numbers only',
+                                                message: 'Medicaid Number must contain numbers only',
                                             },
                                         })}
                                         placeholder="Medicaid Number"
@@ -934,6 +941,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
                                 </Form.Group>
                             </Col>
+
                             <hr />
                             <Col sm={12}>
                                 <Form.Label>
