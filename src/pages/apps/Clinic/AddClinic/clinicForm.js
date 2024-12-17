@@ -165,9 +165,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getSubClinicAction());
         dispatch(getStatesByCountryAction())
     }, [dispatch])
-
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'newpractic')
+    console.log(clinicsDataGet, 'clinicDataGet')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -179,8 +178,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
         setField('npi', clinicsDataGet?.npiNumber);
         setField('email', clinicsDataGet?.userId?.email);
-        setField('medicare' ,clinicsDataGet?.medicareNumber);
-        setField('medicaid' ,clinicsDataGet?.medicaidNumber);
+        setField('medicare', clinicsDataGet?.medicareNumber);
+        setField('medicaid', clinicsDataGet?.medicaidNumber);
         setField('clia', clinicsDataGet?.CLIA_Number);
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
@@ -204,11 +203,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
         }
-        // if (clinicsDataGet?.medicalLicenses) {
-        //     setMedicalDetails(clinicsDataGet?.medicalLicenses)
-        // }
+
         if (clinicsDataGet?.taxonomyCodes) {
-            setTaxonomyCodes(clinicsDataGet?.taxonomyCodes)
+            setTaxonomyCodes(clinicsDataGet?.taxonomyCodes);
+            clinicsDataGet?.taxonomyCodes?.forEach((code, index) => {
+                setValue(`taxonomyCode[${index}]`, code);
+            });
         }
         if (clinicsDataGet?.pos) {
             setPosDetails(clinicsDataGet?.pos)
@@ -246,7 +246,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             CLIA_Number: data?.clia,
             medicareNumber: data?.medicare,
             medicaidNumber: data?.medicaid,
-            taxonomyCodes: taxonomyCodes,
+            // taxonomyCodes: taxonomyCodes,
+            taxonomyCodes: taxonomyCodes.filter(code => code), // Filter out empty taxonomy codes
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'Clinic',
             // medicalLicenses: medicalDetails,
@@ -300,7 +301,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         };
         console.log(newPayload, 'new payload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload, 'new update')
     };
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
@@ -340,26 +340,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     };
 
-
-    // const handleMedicalChange = async (e, index) => {
-    //     const selectedFile = e.target.files[0];
-    //     try {
-    //         const url = await handleUpload(selectedFile);
-    //         setMedicalDetails((prevDetails) => {
-    //             const updatedDetails = [...prevDetails];
-    //             updatedDetails[index] = {
-    //                 ...updatedDetails[index],
-    //                 url: url?.url?.split('?')[0],
-    //                 fileName: selectedFile.name,
-
-    //             };
-    //             return updatedDetails;
-    //         });
-    //     } catch (error) {
-    //         console.error('Error during file upload:', error);
-    //     }
-    // };
-
     // Handle accreditation input changes
     const handleAccreditationInputChange = (e, field, index) => {
         const value = e.target.value;
@@ -379,7 +359,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         );
 
         if (isIncomplete) {
-            // Show a toast message if any field is incomplete
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
         }
@@ -407,31 +386,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-
-    // const handleMedicalInputChange = (e, field, index) => {
-    //     const value = e.target.value;
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = [...prevDetails];
-    //         updatedDetails[index] = {
-    //             ...updatedDetails[index],
-    //             [field]: value
-    //         };
-    //         return updatedDetails;
-    //     });
-    // };
-
-    // const handleStateInputChange = (e, field, index) => {
-    //     const value = e.target.value;
-    //     setStateDetails((prevDetails) => {
-    //         const updatedDetails = [...prevDetails];
-    //         updatedDetails[index] = {
-    //             ...updatedDetails[index],
-    //             [field]: value
-    //         };
-    //         return updatedDetails;
-    //     });
-    // };
-
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
             (data) =>
@@ -453,28 +407,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-    // const handleAddMedical = () => {
-    //     const isIncomplete = medicalDetails.some(
-    //         (medical) =>
-    //             !medical.name || !medical.number || !medical.url
-    //     );
-    //     if (isIncomplete) {
-    //         // Show a toast message if any field is incomplete
-    //         ToastHandle('Please fill all the fields before adding a new one', 'danger');
-    //         return;
-    //     }
-    //     setMedicalDetails([
-    //         ...medicalDetails,
-    //         { name: '', number: '', url: null }
-    //     ]);
-    // };
-
-    // const handleRemoveMedical = (index) => {
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
-    //         return updatedDetails;
-    //     });
-    // };
 
     const handleAddState = () => {
         const isIncomplete = stateDetails.some(
@@ -491,12 +423,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         ]);
     };
 
-    // const handleRemoveState = (index) => {
-    //     setStateDetails((prevDetails) => {
-    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
-    //         return updatedDetails;
-    //     });
-    // };
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
             setValue('clinicType', clinicsDataGet.clinicType);
@@ -529,8 +455,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             .then((data) => {
                 if (data) {
                     setSearchedLocations(data?.results)
-                } else {
-                    console.log("No data returned.");
                 }
             });
     }
@@ -665,11 +589,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 setStatesMenu(false);
             }
         };
-
-        // Add event listener to detect clicks outside the menu
         document.addEventListener('mousedown', handleClickOutside);
-
-        // Clean up the event listener on component unmount
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -903,7 +823,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                 </Form.Group>
                             </Col>
-                            {taxonomyCodes.map((code, index) => (
+                            {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                 <Col sm={6} key={index}>
                                     <Form.Group className="mb-2">
                                         <Form.Label className="mb-1">
@@ -919,12 +839,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         </Form.Label>
                                         <Form.Control
                                             type="text"
-                                            {...register(`taxonomyCode[${index}]`, { required: 'This field is required' })}
-                                            value={code}
+                                            {...register(`taxonomyCode[${index}]`, {
+                                                required: 'This field is required',
+                                            })}
                                             placeholder="Taxonomy Code"
                                             maxLength={10}
-                                            onKeyPress={(event) => handleFirstSpace(event, index)}
-                                            onChange={(e) => handleTaxonomyChange(index, e.target.value)}
+                                            onKeyUp={(event) => handleFirstSpace(event, index)}
+                                            onChange={(e) => {
+                                                handleTaxonomyChange(index, e.target.value)
+                                            }}
                                         />
                                         {errors.taxonomyCode?.[index] && (
                                             <span className="text-danger">{errors.taxonomyCode[index].message}</span>
@@ -932,7 +855,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Group>
                                 </Col>
                             ))}
-
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className='mb-1'>CLIA  Number</Form.Label>
@@ -948,8 +870,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 message: 'CLIA  number cannot exceed 10 characters',
                                             },
                                             pattern: {
-                                                value: /^[0-9]+$/,
-                                                message: 'CLIA  number must contain numbers only',
+                                                value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
                                             },
                                         })}
                                         placeholder="CLIA Number"
@@ -959,7 +881,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Form.Group>
                             </Col>
 
-                            
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className='mb-1'>Medicare Number</Form.Label>
@@ -985,8 +907,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.medicare && <span className="text-danger">{errors.medicare.message}</span>}
                                 </Form.Group>
                             </Col>
-                            
-                            
+
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className='mb-1'>Medicaid Number</Form.Label>
@@ -1027,7 +949,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4}>
                                         <Form.Control
                                             type="text"
-                                            value={accreditation.name}
+                                            value={accreditation?.name || ''}
                                             placeholder="Name"
                                             onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
                                         />
@@ -1036,7 +958,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4}>
                                         <Form.Control
                                             type="text"
-                                            value={accreditation.number}
+                                            value={accreditation?.number || ''}
                                             {...register('accDocno', {
                                                 pattern: {
                                                     value: /^[0-9]*$/,
@@ -1045,13 +967,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             })}
                                             placeholder="Document Number"
                                             onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
-                                            onKeyPress={(event) => handleFirstSpace(0)}
+                                            onKeyUp={(event) => handleFirstSpace(event, 0)}
                                         />
                                         {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                                     </Col>
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
-                                            onClick={() => accreditationFileInputRef.current.click()}
+                                            onClick={() => document.getElementById(`fileInput-accreditation=${index}`).click()}
                                             className="custom-file-upload justify-content-between cursor-pointer"
                                         >
                                             {accreditation.loading ? 'Loading...'
@@ -1064,6 +986,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Control
                                             type="file"
                                             className="rounded-circle"
+                                            id={`fileInput-accreditation=${index}`}
                                             style={{ display: 'none' }}
                                             ref={accreditationFileInputRef}
                                             onChange={(e) => handleAccreditationChange(e, index)}

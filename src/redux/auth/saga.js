@@ -13,7 +13,7 @@ import { APICore, setAuthorization } from '../../helpers/api/apiCore';
 import { authApiResponseSuccess, authApiResponseError } from './actions';
 import { AuthActionTypes } from './constants';
 import { decryptMessage, encryptMessage } from '../../cryptoUtils';
-import {  confirmPasswordApi, setPasswordApi } from '../../helpers/api/auth';
+import { confirmPasswordApi, setPasswordApi } from '../../helpers/api/auth';
 import ToastHandle from '../../helpers/ToastMessage';
 const api = new APICore();
 
@@ -29,14 +29,14 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log(user,'usernammmmmmmmmm');
+        console.log(user, 'usernammmmmmmmmm');
         const userData = {
             name: user?.name,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
             _id: user?.userId,
-            logo:user?.logo?.url,
+            logo: user?.logo?.url,
             clinicId: user?.clinicId
         }
 
@@ -47,6 +47,8 @@ function* login({ payload }) {
 
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, userData));
     } catch (error) {
+        console.log(error, 'error')
+        ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, error));
         api.setLoggedInUser(null);
         setAuthorization(null);
@@ -136,16 +138,16 @@ function* setPasswordChange({ payload }) {
     try {
         setAuthorization(token)
         const response = yield call(setPasswordApi, encryptedNewPassword);
-        console.log(response,'setPasswordChange')
+        console.log(response, 'setPasswordChange')
         yield put(authApiResponseSuccess(AuthActionTypes.SET_PASSWORD, response.data));
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.SET_PASSWORD, error));
     }
 }
 
 function* setChangePasswordChange({ payload }) {
-    const { oldPassword,token, newPassword } = payload;
+    const { oldPassword, token, newPassword } = payload;
     const confirmpasswordPayload = {
         newPassword: newPassword,
         oldPassword: oldPassword,
