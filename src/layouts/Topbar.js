@@ -21,11 +21,11 @@ import logo from '../assets/images/logo-light.png';
 import * as layoutConstants from '../constants/layout';
 
 const ProfileMenus = [
-    {
-        label: 'Lock Screen',
-        icon: 'mdi mdi-lock-outline',
-        redirectTo: '/account/lock-screen',
-    },
+    // {
+    //     label: 'Lock Screen',
+    //     icon: 'mdi mdi-lock-outline',
+    //     redirectTo: '/account/lock-screen',
+    // },
     {
         label: 'Logout',
         icon: 'mdi mdi-logout',

@@ -84,7 +84,7 @@ const SetPassword = (): React$Element<any> => {
 
         confirmPassword: yup
             .string()
-            .oneOf([yup.ref('password'), null], t('Passwords must match'))
+            .oneOf([yup.ref('password'), null], t('Password must match'))
             .required(t('Password is required.')),
     })
 );

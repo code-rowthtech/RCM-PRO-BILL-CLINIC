@@ -261,7 +261,7 @@ const NewPatient = () => {
                                     Responsible party
                                 </button>
                             </li>
-                       
+
                         </ul>
 
                         {/* Form Section */}

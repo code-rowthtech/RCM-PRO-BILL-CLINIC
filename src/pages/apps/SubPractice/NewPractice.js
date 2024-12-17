@@ -256,6 +256,8 @@ const NewPractice = () => {
     useEffect(() => {
         if (idUpdateDataSubClinics) {
             dispatch(getClinicAction({ key: encryptMessage({ userId: idUpdateDataSubClinics }) }));
+        } else {
+            dispatch(getClinicAction({ key: encryptMessage({ userId: clinic_MainId?._id }) }));
         }
     }, [idUpdateDataSubClinics])
 
@@ -345,6 +347,9 @@ const NewPractice = () => {
 
 
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
+    const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(clinicsDataGet, 'clinicsDataGetclinicsDataGet')
     // const clinic_role = JSON.parse(sessionStorage.getItem('hyper_user'))?.role
 
     const [formData, setFormData] = useState({
@@ -359,7 +364,7 @@ const NewPractice = () => {
     useEffect(() => {
         if (subClinicsDetailsGet && idUpdateDataSubClinics) {
             setFormData(subClinicsDetailsGet);
-            setValue('clinicname', subClinicsDetailsGet?.name);
+            setValue('clinicname', subClinicsDetailsGet?.name || '');
             setValue('clinicType', subClinicsDetailsGet?.clinicType);
             setValue('email', subClinicsDetailsGet?.userId?.email);
             setValue('taxId', subClinicsDetailsGet?.taxIdOrEIN);
@@ -369,8 +374,8 @@ const NewPractice = () => {
                 : subClinicsDetailsGet?.userId?.phone);
             setValue('npiNumber', subClinicsDetailsGet?.npiNumber);
             setValue('logo', subClinicsDetailsGet?.logo);
-            setField('medicare' ,subClinicsDetailsGet?.medicareNumber);
-            setField('medicaid' ,subClinicsDetailsGet?.medicaidNumber);
+            setField('medicare', subClinicsDetailsGet?.medicareNumber);
+            setField('medicaid', subClinicsDetailsGet?.medicaidNumber);
             setField('clia', subClinicsDetailsGet?.CLIA_Number);
             setField('address', subClinicsDetailsGet?.userId?.primaryAddress?.address);
             setField('street', subClinicsDetailsGet?.userId?.primaryAddress?.street);
@@ -394,8 +399,13 @@ const NewPractice = () => {
             if (subClinicsDetailsGet?.accreditationDetails) {
                 setAccreditationDetails(subClinicsDetailsGet?.accreditationDetails)
             }
-            if (subClinicsDetailsGet?.taxonomyCodes) {
-                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes)
+            if (subClinicsDetailsGet?.taxonomyCodes?.length === 0) {
+                setTaxonomyCodes([''])
+            } else {
+                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes);
+                subClinicsDetailsGet?.taxonomyCodes?.forEach((code, index) => {
+                    setValue(`taxonomyCode[${index}]`, code);
+                });
             }
             if (subClinicsDetailsGet?.pos) {
                 setPosDetails(subClinicsDetailsGet?.pos)
@@ -406,8 +416,62 @@ const NewPractice = () => {
             if (subClinicsDetailsGet?.stateOfLicensing) {
                 setStateDetails(subClinicsDetailsGet?.stateOfLicensing)
             }
+        } else if (clinicsDataGet && !idUpdateDataSubClinics) {
+            setFormData(clinicsDataGet);
+            setValue('clinicname', clinicsDataGet?.name);
+            setValue('clinicType', clinicsDataGet?.clinicType);
+            setValue('email', clinicsDataGet?.userId?.email);
+            setValue('taxId', clinicsDataGet?.taxIdOrEIN);
+            setValue('practiceSpecialty', clinicsDataGet?.practiceSpecialty);
+            setField('contactPerson', clinicsDataGet?.userId?.phone?.startsWith("+1")
+                ? clinicsDataGet.userId.phone.substring(2)
+                : clinicsDataGet?.userId?.phone);
+            setValue('npiNumber', clinicsDataGet?.npiNumber);
+            setValue('logo', clinicsDataGet?.logo);
+            setField('medicare', clinicsDataGet?.medicareNumber);
+            setField('medicaid', clinicsDataGet?.medicaidNumber);
+            setField('clia', clinicsDataGet?.CLIA_Number);
+            setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
+            setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
+            setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
+            setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
+            setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
+            setUsePrimaryAsMailing(clinicsDataGet?.userId?.isPrimaryAndMailingAddressSame)
+            setField('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
+            if (clinicsDataGet?.userId?.primaryAddress?.city) {
+                dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.primaryAddress?.state?.id, name: clinicsDataGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+            }
+            setField('mailingAddress', clinicsDataGet?.userId?.mailingAddress?.address);
+            setField('mailingStreet', clinicsDataGet?.userId?.mailingAddress?.street);
+            setField('mailingZip', clinicsDataGet?.userId?.mailingAddress?.zip);
+            setLatitude1(clinicsDataGet?.userId?.mailingAddress?.latitude)
+            setLongitude1(clinicsDataGet?.userId?.mailingAddress?.longitude)
+            setField('mailingStateName', clinicsDataGet?.userId?.mailingAddress?.state?._id)
+            if (clinicsDataGet?.userId?.mailingAddress?.city) {
+                dispatch(getCities2Action({ state_code: clinicsDataGet?.userId?.mailingAddress?.state?.id, name: clinicsDataGet?.userId?.mailingAddress?.city?.name, limit: '', skip: '' }))
+            }
+            if (clinicsDataGet?.accreditationDetails) {
+                setAccreditationDetails(clinicsDataGet?.accreditationDetails)
+            }
+            if (subClinicsDetailsGet?.taxonomyCodes?.length === 0) {
+                setTaxonomyCodes([''])
+            } else {
+                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes);
+                subClinicsDetailsGet?.taxonomyCodes?.forEach((code, index) => {
+                    setValue(`taxonomyCode[${index}]`, code);
+                });
+            }
+            if (clinicsDataGet?.pos) {
+                setPosDetails(clinicsDataGet?.pos)
+            }
+            if (clinicsDataGet?.logo) {
+                setLogoName(clinicsDataGet?.logo?.fileName)
+            }
+            if (clinicsDataGet?.stateOfLicensing) {
+                setStateDetails(clinicsDataGet?.stateOfLicensing)
+            }
         }
-    }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
+    }, [subClinicsDetailsGet, clinicsDataGet, idUpdateDataSubClinics, statesData, setValue]);
 
     const formDataChange = (field, value) => {
         const updatedFormData = { ...formData, [field]: value };
@@ -464,16 +528,12 @@ const NewPractice = () => {
         }
     };
 
-
     const handleAddTaxonomy = () => {
-        // Check if the last field has a value
         const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
 
         if (lastCode) {
-            // Filter out any empty values from the array
             const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
             setTaxonomyCodes([...validCodes, '']);
-            // setAddFieldError(false); // Clear error if the new field is added successfully
         } else {
             ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
         }
@@ -504,6 +564,7 @@ const NewPractice = () => {
             { name: '', email: '', role: '', contact: '' }
         ]);
     };
+
     const handleRemovePOS = (index) => {
         setPosDetails((prevDetails) => {
             const updatedDetails = prevDetails.filter((_, i) => i !== index);
@@ -526,8 +587,11 @@ const NewPractice = () => {
         dispatch(
             getDoctorsrolesAction({ search: 'clinic' })
         );
+
     }, [dispatch]);
     const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
+
+
 
     const submitSubData = (formData) => {
         const payload = {
@@ -542,7 +606,7 @@ const NewPractice = () => {
             CLIA_Number: formData?.clia,
             medicareNumber: formData?.medicare,
             medicaidNumber: formData?.medicaid,
-            taxonomyCodes: taxonomyCodes,
+            taxonomyCodes: taxonomyCodes.filter(code => code),
             // medicalLicenses: medicalDetails,
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'subClinic',
@@ -719,7 +783,6 @@ const NewPractice = () => {
 
     return (
         <>
-
             <div className='pt-1 pb-2'>
                 <div className="container-fluid mt-4">
                     <Card className='px-3 py-2'>
@@ -785,7 +848,7 @@ const NewPractice = () => {
                                                             type="text"
                                                             {...register('clinicname', { required: 'Practice Name is required' })}
                                                             onChange={(e) => formDataChange('clinicname', e.target.value)}
-                                                            value={formData.clinicname}
+                                                            value={formData?.clinicname}
                                                             placeholder="Practice name"
                                                         />
                                                         {errors.clinicname && <p className="text-danger">{errors.clinicname.message}</p>}
@@ -820,7 +883,7 @@ const NewPractice = () => {
                                                         <Form.Control
                                                             type="email"
                                                             placeholder="Email"
-                                                            value={formData.email}
+                                                            value={formData?.email}
                                                             {...register('email', {
                                                                 required: 'Email is required',
                                                                 pattern: {
@@ -859,7 +922,7 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
-                                                                value={formData.contactPerson}
+                                                                value={formData?.contactPerson}
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
                                                                     pattern: {
@@ -890,7 +953,6 @@ const NewPractice = () => {
                                                         />
                                                     </Form.Group>
                                                 </Col>
-
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
                                                         <Form.Label className='mb-1'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
@@ -984,7 +1046,7 @@ const NewPractice = () => {
                                                 </Col>
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Practice Speciality Description <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-1'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('practiceSpecialty', {
@@ -992,17 +1054,12 @@ const NewPractice = () => {
                                                                 validate: (value) =>
                                                                     !value.startsWith(' ') || 'First character cannot be a space',
                                                             })}
-                                                            onChange={(e) => {
-                                                                const value = e.target.value;
-                                                            }}
                                                             placeholder="Practice Specialty Description"
                                                         />
                                                         {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
-
                                                     </Form.Group>
                                                 </Col>
-
-                                                {taxonomyCodes.map((code, index) => (
+                                                {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                                     <Col sm={6} key={index}>
                                                         <Form.Group className="mb-2">
                                                             <Form.Label className="mb-1">
@@ -1018,12 +1075,15 @@ const NewPractice = () => {
                                                             </Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                {...register(`taxonomyCode[${index}]`, { required: 'This field is required' })}
-                                                                value={code}
+                                                                {...register(`taxonomyCode[${index}]`, {
+                                                                    required: 'This field is required',
+                                                                })}
                                                                 placeholder="Taxonomy Code"
                                                                 maxLength={10}
-                                                                onKeyPress={(event) => handleFirstSpace(event, index)}
-                                                                onChange={(e) => handleTaxonomyChange(index, e.target.value)}
+                                                                onKeyUp={(event) => handleFirstSpace(event, index)}
+                                                                onChange={(e) => {
+                                                                    handleTaxonomyChange(index, e.target.value)
+                                                                }}
                                                             />
                                                             {errors.taxonomyCode?.[index] && (
                                                                 <span className="text-danger">{errors.taxonomyCode[index].message}</span>
@@ -1031,24 +1091,24 @@ const NewPractice = () => {
                                                         </Form.Group>
                                                     </Col>
                                                 ))}
-
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>CLIA  Number</Form.Label>
+                                                        <Form.Label className='mb-1'>CLIA Number <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('clia', {
+                                                                required: 'CLIA Number is required',
                                                                 minLength: {
                                                                     value: 10,
-                                                                    message: 'CLIA  number must be at least 10 characters long',
+                                                                    message: 'CLIA Number must be 10 characters long',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,
-                                                                    message: 'CLIA  number cannot exceed 10 characters',
+                                                                    message: 'CLIA Number must be 10 characters long',
                                                                 },
                                                                 pattern: {
-                                                                    value: /^[0-9]+$/,
-                                                                    message: 'CLIA  number must contain numbers only',
+                                                                    value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                                    message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
                                                                 },
                                                             })}
                                                             placeholder="CLIA Number"
@@ -1058,24 +1118,24 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
 
-
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Medicare Number</Form.Label>
+                                                        <Form.Label className='mb-1'>Medicare Number <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicare', {
+                                                                required: 'Medicare Number is required',
                                                                 minLength: {
                                                                     value: 10,
-                                                                    message: 'Medicare  number must be at least 10 characters long',
+                                                                    message: 'Medicare number must be at least 10 characters long',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,
-                                                                    message: 'Medicare Number  number cannot exceed 10 characters',
+                                                                    message: 'Medicare number cannot exceed 10 characters',
                                                                 },
                                                                 pattern: {
                                                                     value: /^[0-9]+$/,
-                                                                    message: 'Medicare  number must contain numbers only',
+                                                                    message: 'Medicare number must contain numbers only',
                                                                 },
                                                             })}
                                                             placeholder="Medicare Number"
@@ -1085,24 +1145,24 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
 
-
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Medicaid Number</Form.Label>
+                                                        <Form.Label className='mb-1'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicaid', {
+                                                                required: 'Medicaid Number is required',
                                                                 minLength: {
                                                                     value: 10,
-                                                                    message: 'Medicaid  number must be at least 10 characters long',
+                                                                    message: 'Medicaid number must be at least 10 characters long',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,
-                                                                    message: 'Medicaid  number cannot exceed 10 characters',
+                                                                    message: 'Medicaid number cannot exceed 10 characters',
                                                                 },
                                                                 pattern: {
                                                                     value: /^[0-9]+$/,
-                                                                    message: 'Medicaid  number must contain numbers only',
+                                                                    message: 'Medicaid number must contain numbers only',
                                                                 },
                                                             })}
                                                             placeholder="Medicaid Number"
@@ -1111,6 +1171,7 @@ const NewPractice = () => {
                                                         {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
                                                     </Form.Group>
                                                 </Col>
+
                                                 <hr />
                                                 <Col sm={12}>
                                                     <Form.Label>
@@ -1334,12 +1395,14 @@ const NewPractice = () => {
                                                             <Row className='position-relative'>
                                                                 <Col sm={12}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Address</Form.Label>
+                                                                        <Form.Label className="mb-1">
+                                                                            Address <span className='text-danger'>&#42;</span> {/* Required field */}
+                                                                        </Form.Label>
                                                                         <div style={{ position: 'relative' }}>
                                                                             <Form.Control
                                                                                 type="text"
                                                                                 defaultValue={subClinicsDetailsGet?.address?.address || ''}
-                                                                                {...register('address')}
+                                                                                {...register('address', { required: true })} // Marked as required
                                                                                 onChange={(e) => {
                                                                                     getGeolocation(e);
                                                                                     setFocused(true); // Open dropdown on input
@@ -1392,23 +1455,25 @@ const NewPractice = () => {
 
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                        <Form.Label className='mb-1'>
+                                                                            Latitude
+                                                                        </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             defaultValue={latitude}
                                                                             placeholder="Latitude"
                                                                         />
-                                                                        {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                        <Form.Label className='mb-1'>
+                                                                            Longitude
+                                                                        </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             defaultValue={longitude}
                                                                             placeholder="Longitude" />
-                                                                        {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
                                                                     </Form.Group>
                                                                 </Col>
                                                             </Row>
@@ -1417,9 +1482,11 @@ const NewPractice = () => {
                                                             <Row>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1' >State</Form.Label>
+                                                                        <Form.Label className='mb-1'>
+                                                                            State <span className='text-danger'>&#42;</span> {/* Required field */}
+                                                                        </Form.Label>
                                                                         <Form.Select
-                                                                            {...register('stateName')}
+                                                                            {...register('stateName', { required: true })} // Marked as required
                                                                             onChange={(e) => handleStateSelection(e)}
                                                                         >
                                                                             <option value={''}>State</option>
@@ -1434,55 +1501,49 @@ const NewPractice = () => {
                                                                             ))}
                                                                         </Form.Select>
                                                                     </Form.Group>
-
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>City</Form.Label>
-                                                                        {/* {
-                                             store?.getCitiesReducer?.loading ?
-                                                 <Row>
-                                                     <Col sm={12}>
-                                                         <Spinner className='fs-5' />
-                                                     </Col>
-                                                 </Row>
-                                                 : */}
+                                                                        <Form.Label className='mb-1'>
+                                                                            City <span className='text-danger'>&#42;</span> {/* Required field */}
+                                                                        </Form.Label>
                                                                         <Form.Select
                                                                             disabled={store?.getCitiesReducer?.loading}
-                                                                            {...register('city')}
+                                                                            {...register('city', { required: true })} // Marked as required
                                                                             onChange={(e) => handleCitySelection(e)}
                                                                         >
                                                                             <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                                             {cities?.map((data) => (
                                                                                 <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
-
                                                                                     {data?.name}
                                                                                 </option>
                                                                             ))}
                                                                         </Form.Select>
-                                                                        {/* } */}
                                                                     </Form.Group>
                                                                 </Col>
 
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>Street</Form.Label>
+                                                                        <Form.Label className='mb-1'>
+                                                                            Street <span className='text-danger'>&#42;</span> {/* Required field */}
+                                                                        </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            {...register('street')}
+                                                                            {...register('street', { required: true })} // Marked as required
                                                                             onKeyPress={handleFirstSpace}
                                                                             placeholder="Street" />
-
-                                                                        {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                        <Form.Label className='mb-1'>
+                                                                            Zip <span className='text-danger'>&#42;</span> {/* Required field */}
+                                                                        </Form.Label>
                                                                         <Form.Control
                                                                             defaultValue={subClinicsDetailsGet?.address?.zip || ''}
                                                                             type="text"
                                                                             {...register('zip', {
+                                                                                required: true, // Marked as required
                                                                                 minLength: {
                                                                                     value: 5,
                                                                                     message: 'ZIP code must be at least 5 characters long',
@@ -1503,11 +1564,12 @@ const NewPractice = () => {
                                                         </Col>
                                                     </Row>
                                                 </Col>
+
                                                 <hr />
                                                 <Col sm={12}>
                                                     <Row>
                                                         <Col sm={12} className="mb-2">
-                                                            <span className="text-black fw-semibold form-label">Mailing Address Details</span>
+                                                            <span className="text-black fw-semibold form-label">Mailing Address Details<span className='text-danger'>*</span></span>
                                                         </Col>
 
                                                         {/* Checkbox for using primary address */}
@@ -1542,16 +1604,17 @@ const NewPractice = () => {
                                                                 }}
                                                             />
                                                         </Col>
+
                                                         <Col sm={6}>
                                                             <Row className="position-relative">
                                                                 <Col sm={12}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Mailing Address</Form.Label>
+                                                                        <Form.Label className="mb-1">Mailing Address <span className='text-danger'>*</span></Form.Label>
                                                                         <div style={{ position: 'relative' }}>
                                                                             <Form.Control
                                                                                 type="text"
                                                                                 value={watch('mailingAddress')}
-                                                                                {...register('mailingAddress')}
+                                                                                {...register('mailingAddress', { required: "Mailing Address is required" })}
                                                                                 onChange={(e) => {
                                                                                     if (!usePrimaryAsMailing) {
                                                                                         setValue('mailingAddress', e.target.value);
@@ -1636,7 +1699,7 @@ const NewPractice = () => {
                                                                 {/* State */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">State</Form.Label>
+                                                                        <Form.Label className="mb-1">State<span className='text-danger'>*</span></Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control
                                                                                 readOnly
@@ -1648,7 +1711,7 @@ const NewPractice = () => {
                                                                             />
                                                                         ) : (
                                                                             <Form.Select
-                                                                                {...register('mailingStateName')}
+                                                                                {...register('mailingStateName', { required: "State is required" })}
                                                                                 onChange={(e) => handleStateSelection(e)}
                                                                                 disabled={usePrimaryAsMailing}
                                                                             >
@@ -1663,45 +1726,38 @@ const NewPractice = () => {
                                                                     </Form.Group>
                                                                 </Col>
 
-
                                                                 {/* City */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">City</Form.Label>
-                                                                        {usePrimaryAsMailing ?
+                                                                        <Form.Label className="mb-1">City<span className='text-danger'>*</span></Form.Label>
+                                                                        {usePrimaryAsMailing ? (
                                                                             <Form.Control readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
-                                                                            :
+                                                                        ) : (
                                                                             <Form.Select
                                                                                 disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
-                                                                                {...register('mailingCity')}
+                                                                                {...register('mailingCity', { required: "City is required" })}
                                                                                 onChange={(e) => handleCitySelection(e)}
                                                                             >
                                                                                 <option value="">
                                                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                                                 </option>
                                                                                 {cities2?.map((data) => (
-                                                                                    <option key={data?._id} value={data?._id}
-                                                                                        onChange={(e) => {
-                                                                                            if (!usePrimaryAsMailing) {
-                                                                                                setValue('mailingCity', e.target.value);
-                                                                                            }
-                                                                                        }}>
+                                                                                    <option key={data?._id} value={data?._id}>
                                                                                         {data?.name}
                                                                                     </option>
                                                                                 ))}
                                                                             </Form.Select>
-                                                                        }
-
+                                                                        )}
                                                                     </Form.Group>
                                                                 </Col>
 
                                                                 {/* Street */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Street</Form.Label>
+                                                                        <Form.Label className="mb-1">Street<span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            {...register('mailingStreet')}
+                                                                            {...register('mailingStreet', { required: "Street is required" })}
                                                                             placeholder="Street"
                                                                             disabled={usePrimaryAsMailing}
                                                                         />
@@ -1711,10 +1767,11 @@ const NewPractice = () => {
                                                                 {/* ZIP */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Zip</Form.Label>
+                                                                        <Form.Label className="mb-1">Zip<span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register('mailingZip', {
+                                                                                required: "ZIP is required",
                                                                                 minLength: { value: 5, message: 'ZIP must be 5 characters long' },
                                                                                 pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
                                                                             })}
@@ -1729,6 +1786,7 @@ const NewPractice = () => {
                                                         </Col>
                                                     </Row>
                                                 </Col>
+
                                                 <hr />
                                                 <Col sm={12}>
                                                     <Row>
@@ -1752,14 +1810,23 @@ const NewPractice = () => {
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Full Name</Form.Label>
+                                                                        <Form.Label className="mb-1">Full Name <span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            value={data.name}
-                                                                            onChange={(e) => handlePOSInputChange(e, 'name', index)}
-                                                                            // onKeyPress={handleFirstSpace}
+                                                                            {...register(`name.${index}`, {
+                                                                                required: 'Full Name is required'
+                                                                            })}
+                                                                            value={data.name} // Initialize with the current value
+                                                                            onChange={(e) => {
+                                                                                handlePOSInputChange(e, 'name', index); // Keep existing functionality
+                                                                                setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
+                                                                            }}
+                                                                            onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                                             placeholder="Full Name"
                                                                         />
+                                                                        {errors.name?.[index] && (
+                                                                            <span className="text-danger">{errors.name[index].message}</span>
+                                                                        )}
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>

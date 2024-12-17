@@ -75,7 +75,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                     {/* <div className="dropdown-header noti-title">
                         <h6 className="text-overflow m-0">Welcome !</h6>
                     </div> */}
-                    <p className='mb-0 ps-3 text-start fw-bold'>Clinic</p>
+                    <p className='mb-0 ps-3 text-start fw-bold'>Practice</p>
                     <hr className='my-0' />
                     {props.menuItems.map((item, i) => {
                         return (
