@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
@@ -19,13 +19,16 @@ const ChangePasswordModal = ({ show, closeModal }) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+const store=useSelector((state)=>state);
+const changeData=store?.changePasswordSuccess;
+console.log(store,'changeData')
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
     dispatch(confirmPasswordAction({ key: encryptMessage(payload) }));
     closeModal();
     reset();
   };
+
 
   return (
     <Modal centered size="md" show={show} onHide={closeModal}>
@@ -48,7 +51,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 <Form.Control
                   type={showOldPassword ? 'text' : 'password'}
                   placeholder="Enter old password"
-                  onKeyPress={handleFirstSpace}
                   {...register('oldPassword', {
                     required: 'Old password is required',
                   })}
@@ -71,7 +73,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 <Form.Control
                   type={showNewPassword ? 'text' : 'password'}
                   placeholder="Enter new password"
-                  onKeyPress={handleFirstSpace}
                   {...register('newPassword', {
                     required: 'New password is required',
                     minLength: { value: 8, message: 'Password must be at least 8 characters long' },
@@ -101,7 +102,6 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                 <Form.Control
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
-                  onKeyPress={handleFirstSpace}
                   {...register('confirmPassword', {
                     required: 'Please confirm your new password',
                     validate: value => value === newPassword || 'Passwords do not match',
