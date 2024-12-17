@@ -6,9 +6,11 @@ export const deleteClinicOnboarding= "";
 export const getClinicsByParentId = '';
 
 // ROLES
-export const createRoles = '/api/v1/clinic/sub-users/create';
-export const updateRoles = '/api/v1/roles/edit';
-export const getRoles = '/api/v1/roles';
+export const createRoles = '/api/v1/clinic/createSubUser'; 
+export const updateRoles = '/api/v1/clinic/updateSubUser';
+export const getRoles = 'api/v1/clinic/listAllUsers';
+export const getUserId = '/api/v1/clinic/getUserDetails';
+export const deleterRoles = '/api/v1/clinic/removeUser'
 
 // CLINIC
 export const createClinic = '/api/v1/clinic/editClinicDetails';

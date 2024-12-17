@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { RolesActionTypes } from './constants';
-import { createRolesApi, getRolesApi, updateRolesApi } from './api';
+import { createRolesApi, deleteRoles, getRolesApi, getUser, updateRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -17,6 +17,8 @@ function* createRolesFunction(data) {
         const response = yield call(createRolesApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success')
+
 
             yield put({
                 type: RolesActionTypes.CREATE_ROLES_SUCCESS,
@@ -29,6 +31,8 @@ function* createRolesFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle('Something went wrong, please try again later', 'danger')
+
         yield put({
             type: RolesActionTypes.CREATE_ROLES_ERROR,
             payload: error,
@@ -93,6 +97,62 @@ function* getRolesFunction(data) {
     }
 }
 
+function* deleteRolesFunction(data) {
+    try {
+        yield put({
+            type: RolesActionTypes.DELETE_ROLES_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteRoles, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+
+            yield put({
+                type: RolesActionTypes.DELETE_ROLES_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: RolesActionTypes.DELETE_ROLES_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: RolesActionTypes.DELETE_ROLES_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getUserFunction(data) {
+    try {
+        yield put({
+            type: RolesActionTypes.GET_USER_LOADING,
+            payload: {},
+        });
+        const response = yield call(getUser, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+
+            yield put({
+                type: RolesActionTypes.GET_USER_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: RolesActionTypes.GET_USER_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: RolesActionTypes.GET_USER_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -111,13 +171,19 @@ export function* watchUpdateRoles() {
 export function* watchGetRoles() {
     yield takeEvery(RolesActionTypes.GET_ROLES, getRolesFunction);
 }
+export function* watchDeleteRoles() {
+    yield takeEvery(RolesActionTypes.DELETE_ROLES, deleteRolesFunction);
+}
 export function* watchresetState() {
     yield takeEvery(RolesActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+}
+export function* watchGetUser() {
+    yield takeEvery(RolesActionTypes.GET_USER, getUserFunction);
 }
 
 function* rolesSaga() {
     yield all([
-        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchresetState)
+        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchresetState), fork(watchGetUser),fork(watchDeleteRoles),
     ]);
 }
 export default rolesSaga;

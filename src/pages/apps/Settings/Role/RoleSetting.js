@@ -117,15 +117,15 @@ const RoleSetting = () => {
                             <Row>
                                 <Col>
                                     <Table responsive className="table-centered table-nowrap mb-0">
-                                        <thead className="">
+                                        <thead className=" text-white">
                                             <tr key={''}>
-                                                <th>
+                                                <th className='text-white'>
                                                     S.no
                                                 </th>
-                                                <th>Name</th>
-                                                <th>Description</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th className='text-white'>Name</th>
+                                                <th className='text-white'>Description</th>
+                                                <th className='text-white'>Status</th>
+                                                <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>

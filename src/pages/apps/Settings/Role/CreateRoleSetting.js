@@ -7,8 +7,8 @@ import Multiselect from "multiselect-react-dropdown";
 import { IoMdClose } from 'react-icons/io';
 import Spinner from '../../../../constants/Spinner';
 import { handleFirstSpace } from '../../../../helpers/noSpace';
-import {  getPermissionAction } from '../../../../redux/actions';
-import { createRoleDataAction } from '../../../../redux/settings/rolesetting/action';
+import { getPermissionAction } from '../../../../redux/actions';
+import { createRoleDataAction, getRoleDataAction } from '../../../../redux/settings/rolesetting/action';
 
 
 const CreateRoleSetting = ({ show, closeModal }) => {
@@ -54,6 +54,10 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 closeModal();
             }
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            reset();
+            closeModal();
+
         }
     };
 
