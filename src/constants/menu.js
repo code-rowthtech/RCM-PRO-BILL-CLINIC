@@ -24,7 +24,7 @@ const MENU_ITEMS = [
     //     icon: 'uil-money-withdrawal',
     //     url: '/apps/transaction/transaction-list',
     // },
-  
+
     // {
     //     key: 'Practice',
     //     label: 'Sub  Practice',
@@ -61,7 +61,7 @@ const MENU_ITEMS = [
         url: '/apps/role-management/list',
         icon: 'uil uil-users-alt',
     },
- 
+
     {
         key: 'apps-crm',
         label: 'Profile',
@@ -71,7 +71,7 @@ const MENU_ITEMS = [
         icon: 'uil-user',
 
     },
-  
+
     {
         key: 'setting',
         label: 'Setting',
@@ -98,14 +98,12 @@ const MENU_ITEMS = [
             },
         ]
     },
-    
     {
         key: 'logout',
         label: 'Logout',
         icon: 'uil uil-sign-out-alt',
         // url: '/apps/logout/logout-model',
     },
-
 ];
 
 export default MENU_ITEMS;
