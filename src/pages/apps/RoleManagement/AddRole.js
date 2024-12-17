@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Button, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
 import { createRolesAction, getRoleDataAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
+import { getMastersDataAction } from '../../../redux/settings/action';
 
 const AddRole = ({ show, close }) => {
     const dispatch = useDispatch();
@@ -13,32 +14,52 @@ const AddRole = ({ show, close }) => {
     const idFromStorage = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
+    const createLoading = store?.createRolesReducer?.loading
+    const createStatus = store?.createRolesReducer?.data
+    console.log({ createStatus })
+
+    const tableGetData = store?.getMastersDataReducer?.data?.result;
+
+    const userId = store?.getUserDataReducer?.data
+    console.log({ tableGetData })
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+    const { register, reset, handleSubmit, formState: { errors }, getValues } = useForm();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
-useEffect(()=>{
-    dispatch(getRoleDataAction({ clinicId:clinicId,limit: 10, search: '',page:1, status: true }));
+    useEffect(() => {
+        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
 
-},[getRoleDataAction])
+    }, [getRoleDataAction])
     const onSubmit = (data) => {
+        const formattedJoiningDate = new Date(data.joiningDate).toISOString();
+        // const formattedLeavingDate = new Date(data.leavingDate).toISOString();
         const payload = {
             firstName: data.name,
             email: data.email,
             password: data.password,
             phone: data?.phone,
             clinicId: clinicId,
-            createdById: idFromStorage?._id,
-            joiningDate: data.joiningDate,
+            reportingTo: '67595b464c94e64c5b916ed2',
+            joiningDate: formattedJoiningDate,
             designation: data.designation,
-            role: data.role,
+            role: '67592ebd321472d35c1698bb',
         };
         console.log('Form Data:', payload);
-        dispatch(createRolesAction({ key: encryptMessage(payload) }));
+
+        if (createStatus === 200) {
+            reset();
+            close()
+        }
+        dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));
+        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+        reset();
+        close()
+
 
     };
 
@@ -154,12 +175,22 @@ useEffect(()=>{
                                         })}
                                     />
                                     <span
-                                        className="position-absolute"
-                                        style={{ top: '35px', right: '10px', cursor: 'pointer' }}
+                                        className="position-absolute d-flex align-items-center justify-content-center"
+                                        style={{
+                                            top: '35px',
+                                            right: '10px',
+                                            cursor: 'pointer',
+                                            fontSize: '1.2rem',
+                                            color: '#666',
+                                            transition: 'color 0.3s ease-in-out',
+                                        }}
                                         onClick={togglePasswordVisibility}
+                                        onMouseEnter={(e) => (e.target.style.color = '#000')}
+                                        onMouseLeave={(e) => (e.target.style.color = '#666')}
                                     >
                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                     </span>
+
                                     {errors.confirmPassword && (
                                         <span className="text-danger fs-6">
                                             {errors.confirmPassword.message}
@@ -175,6 +206,23 @@ useEffect(()=>{
                                         {...register('joiningDate', { required: 'Joining date is required' })}
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Reporting</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter Reporting"
+                                        {...register('reportingTo', {
+                                            required: 'Reporting is required',
+                                            pattern: {
+                                                value: /^(?! )[A-Za-z0-9 ]*$/,
+                                                message: 'Special characters and leading spaces are not allowed',
+                                            },
+                                        })}
+                                    />
+                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
                                 </Form.Group>
                             </Col>
 
@@ -196,13 +244,18 @@ useEffect(()=>{
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
                                         <option value="">Select designation</option>
-                                        <option value="doctor">Doctor</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="maker">Maker</option>
+                                        {tableGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
                                     </Form.Select>
-                                    {errors.designation && <span className="text-danger fs-6">{errors.designation.message}</span>}
+                                    {errors.designation && (
+                                        <span className="text-danger fs-6">{errors.designation.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
+
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
@@ -211,9 +264,11 @@ useEffect(()=>{
                                         {...register('reDesignation', { required: 'Designation is required' })}
                                     >
                                         <option value="">Select designation</option>
-                                        <option value="doctor">Doctor</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="maker">Maker</option>
+                                        {tableGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
                                     </Form.Select>
                                     {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
                                 </Form.Group>
@@ -236,29 +291,32 @@ useEffect(()=>{
                                     {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
                                 </Form.Group>
                             </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Role</Form.Label>
-                                <Form.Select
-                                        {...register('role', { required: 'Role is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        {decryptedRolesData?.map((role,index)=>(
-                                      
-                                        <option key={index} value={role?.name}>{role?.name}</option>
-                                    ))}
-                                    </Form.Select>
-                                    {errors.role && <span className="text-danger fs-6">{errors.role.message}</span>}
-                                </Form.Group>
-                            </Col>
+
                         </Row>
                         <Modal.Footer className="border-0">
                             <Button type="button" className="custom-buttons" onClick={close}>
                                 Cancel
                             </Button>
-                            <Button type="submit" variant="primary" className="ms-2">
-                                Submit
+
+
+                            <Button type="submit" variant="primary" className="ms-2" disabled={createLoading}>
+                                {createLoading ? (
+                                    <>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            aria-hidden="true"
+                                            className="me-2"
+                                        />
+
+                                    </>
+                                ) : (
+                                    'Submit'
+                                )}
                             </Button>
+
                         </Modal.Footer>
                     </Form>
                 </Modal.Body>

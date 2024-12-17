@@ -17,6 +17,15 @@ export const getRolesAction = (data): AuthAction => ({
     type: RolesActionTypes.GET_ROLES,
     data
 });
+export const getUserAction = (id): AuthAction => ({
+    type: RolesActionTypes.GET_USER,
+    id
+});
+export const deleteRolesAction = (id): AuthAction => ({
+    type: RolesActionTypes.DELETE_ROLES,
+    id
+});
+
 
 export const stateEmptydAction = (): LayoutAction => ({
     type: RolesActionTypes.STATE_EMPTY_INTIAL_STATE,
