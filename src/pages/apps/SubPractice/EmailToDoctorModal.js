@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
 import { useForm } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
@@ -6,7 +6,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import { createSubClinicAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 
-const EmailToDoctorModal = ({ show, closeModal, formData }) => {
+const EmailToDoctorModal = ({ show, closeModal, formData, setIsModalRequest }) => {
     const store = useSelector((state) => state)
     const dispatch = useDispatch()
     const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
@@ -20,21 +20,24 @@ const EmailToDoctorModal = ({ show, closeModal, formData }) => {
     } = useForm();
 
     const onSubmit = () => {
+        setIsModalRequest(true)
         const payload = {
             name: formData?.clinicname,
             email: formData?.email,
-            role:getRoleId,
+            role: getRoleId,
             phone: formData?.contactPerson,
             clinicType: formData?.clinicType,
-        }
-        console.log('Form Submitted:', payload);
-        dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-        closeModal(false)
-        setValue('')
-        reset();
-        formData('')
+        };
 
-    }
+        console.log('Form Submitted:', payload);
+        dispatch(createSubClinicAction({ key: encryptMessage(payload) }));
+    };
+    const createResponse = store?.createSubClinicsReducer?.data?.status;
+    useEffect(() => {
+        if (createResponse === 200) {
+            closeModal();
+        }
+    }, [createResponse])
 
     return (
         <div>

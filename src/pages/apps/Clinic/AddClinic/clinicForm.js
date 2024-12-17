@@ -5,7 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { createClinicAction, deleteClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -50,6 +50,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [focused, setFocused] = useState(false);
     const [focused2, setFocused2] = useState(false);
     const [subClinic, setSubClinic] = useState('');
+    const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
     const [accreditationLogo, setAccreditationLogo] = useState(null);
@@ -57,23 +58,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
     // table data
-    const [detailsModal, setDetailsModal] = useState(false);
-    const [selectedDetails, setSelectedDetails] = useState(null);
-    const [status, setStatus] = useState(true);
-    const [search, setSearch] = useState('');
+    // const [detailsModal, setDetailsModal] = useState(false);
+    // const [selectedDetails, setSelectedDetails] = useState(null);
+    // const [status, setStatus] = useState(true);
+    // const [search, setSearch] = useState('');
 
-    const handleStatusChange = (isActive) => {
-        setStatus(isActive);
-    };
+    // const handleStatusChange = (isActive) => {
+    //     setStatus(isActive);
+    // };
 
     const closeModal = () => setShowModal(false);
-    const handleMultipleAdd = () => {
-        navigate('/apps/Practice/new-practice')
-    }
+    // const handleMultipleAdd = () => {
+    //     navigate('/apps/Practice/new-practice')
+    // }
     // const [clinicId, setClinicId] = useState(null);
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
+    console.log(accreditationDetails, 'accreditationDetails')
     // const [medicalDetails, setMedicalDetails] = useState([
     //     { name: '', number: '', url: null, fileName: '' }
     // ]);
@@ -136,6 +138,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     //     }
     // }, [createResponse, deleteClinicResponse])
 
+
+    const handleAddTaxonomy = () => {
+        const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
+
+        if (lastCode) {
+            const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
+            setTaxonomyCodes([...validCodes, '']);
+        } else {
+            ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
+        }
+    };
+    // Function to handle field changes
+    const handleTaxonomyChange = (index, value) => {
+        const updatedCodes = [...taxonomyCodes];
+        updatedCodes[index] = value;
+        setTaxonomyCodes(updatedCodes);
+    };
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -143,13 +162,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     useEffect(() => {
-        dispatch(getClinicAction({key:encryptMessage({userId:clinic_id?._id})}));
+        dispatch(getClinicAction({ key: encryptMessage({ userId: clinic_id?._id }) }));
         dispatch(getSubClinicAction());
         dispatch(getStatesByCountryAction())
     }, [dispatch])
-
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet,'new practic')
+    console.log(clinicsDataGet, 'clinicDataGet')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -161,6 +179,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
         setField('npi', clinicsDataGet?.npiNumber);
         setField('email', clinicsDataGet?.userId?.email);
+        setField('medicare', clinicsDataGet?.medicareNumber);
+        setField('medicaid', clinicsDataGet?.medicaidNumber);
+        setField('clia', clinicsDataGet?.CLIA_Number);
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
         setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
@@ -183,9 +204,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
         }
-        // if (clinicsDataGet?.medicalLicenses) {
-        //     setMedicalDetails(clinicsDataGet?.medicalLicenses)
+
+        // if (clinicsDataGet?.taxonomyCodes) {
+        //     setTaxonomyCodes(clinicsDataGet?.taxonomyCodes);
+        //     clinicsDataGet?.taxonomyCodes?.forEach((code, index) => {
+        //         setValue(`taxonomyCode[${index}]`, code);
+        //     });
         // }
+        if (clinicsDataGet?.taxonomyCodes?.length === 0) {
+            setTaxonomyCodes([''])
+        } else {
+            setTaxonomyCodes(clinicsDataGet?.taxonomyCodes);
+            clinicsDataGet?.taxonomyCodes?.forEach((code, index) => {
+                setValue(`taxonomyCode[${index}]`, code);
+            });
+        }
         if (clinicsDataGet?.pos) {
             setPosDetails(clinicsDataGet?.pos)
         }
@@ -196,7 +229,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setStateDetails(clinicsDataGet?.stateOfLicensing)
         }
 
-    }, [clinicsDataGet, statesData, setValue]);
+    }, [dispatch, clinicsDataGet, statesData, setValue]);
 
     const SubmitData = (data) => {
         if (data.Password !== data.confirmPassword) {
@@ -219,8 +252,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
-            ...usePrimaryAsMailing && { isPrimaryAndMailingAddressSame: usePrimaryAsMailing },
-
+            CLIA_Number: data?.clia,
+            medicareNumber: data?.medicare,
+            medicaidNumber: data?.medicaid,
+            // taxonomyCodes: taxonomyCodes,
+            taxonomyCodes: taxonomyCodes.filter(code => code), // Filter out empty taxonomy codes
+            isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'Clinic',
             // medicalLicenses: medicalDetails,
             // stateOfLicensing: stateDetails,
@@ -242,7 +279,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
-                // state: stateToSelect?._id,
+                ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
@@ -254,7 +291,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         address: data?.address,
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
-                        // state: stateToSelect?._id,
+                        ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                         street: data?.street,
                         zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
@@ -271,9 +308,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     }
         };
+        console.log(newPayload, 'new payload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
-
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
     const medicalFileInputRef = useRef(null);
@@ -292,7 +329,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             console.error('Error during file upload:', error);
         }
     };
- 
+
 
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
@@ -311,26 +348,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             console.error('Error during file upload:', error);
         }
     };
-
-  
-    // const handleMedicalChange = async (e, index) => {
-    //     const selectedFile = e.target.files[0];
-    //     try {
-    //         const url = await handleUpload(selectedFile);
-    //         setMedicalDetails((prevDetails) => {
-    //             const updatedDetails = [...prevDetails];
-    //             updatedDetails[index] = {
-    //                 ...updatedDetails[index],
-    //                 url: url?.url?.split('?')[0],
-    //                 fileName: selectedFile.name,
-
-    //             };
-    //             return updatedDetails;
-    //         });
-    //     } catch (error) {
-    //         console.error('Error during file upload:', error);
-    //     }
-    // };
 
     // Handle accreditation input changes
     const handleAccreditationInputChange = (e, field, index) => {
@@ -351,7 +368,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         );
 
         if (isIncomplete) {
-            // Show a toast message if any field is incomplete
             ToastHandle('Please fill all the fields before adding a new one', 'danger');
             return;
         }
@@ -379,31 +395,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-
-    // const handleMedicalInputChange = (e, field, index) => {
-    //     const value = e.target.value;
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = [...prevDetails];
-    //         updatedDetails[index] = {
-    //             ...updatedDetails[index],
-    //             [field]: value
-    //         };
-    //         return updatedDetails;
-    //     });
-    // };
-
-    // const handleStateInputChange = (e, field, index) => {
-    //     const value = e.target.value;
-    //     setStateDetails((prevDetails) => {
-    //         const updatedDetails = [...prevDetails];
-    //         updatedDetails[index] = {
-    //             ...updatedDetails[index],
-    //             [field]: value
-    //         };
-    //         return updatedDetails;
-    //     });
-    // };
-
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
             (data) =>
@@ -425,28 +416,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-    // const handleAddMedical = () => {
-    //     const isIncomplete = medicalDetails.some(
-    //         (medical) =>
-    //             !medical.name || !medical.number || !medical.url
-    //     );
-    //     if (isIncomplete) {
-    //         // Show a toast message if any field is incomplete
-    //         ToastHandle('Please fill all the fields before adding a new one', 'danger');
-    //         return;
-    //     }
-    //     setMedicalDetails([
-    //         ...medicalDetails,
-    //         { name: '', number: '', url: null }
-    //     ]);
-    // };
-
-    // const handleRemoveMedical = (index) => {
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
-    //         return updatedDetails;
-    //     });
-    // };
 
     const handleAddState = () => {
         const isIncomplete = stateDetails.some(
@@ -463,12 +432,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         ]);
     };
 
-    // const handleRemoveState = (index) => {
-    //     setStateDetails((prevDetails) => {
-    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
-    //         return updatedDetails;
-    //     });
-    // };
     useEffect(() => {
         if (clinicsDataGet?.clinicType) {
             setValue('clinicType', clinicsDataGet.clinicType);
@@ -501,8 +464,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             .then((data) => {
                 if (data) {
                     setSearchedLocations(data?.results)
-                } else {
-                    console.log("No data returned.");
                 }
             });
     }
@@ -577,7 +538,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const handleCheckboxChange = (stateName) => {
         setSelectedStates((prev) => {
             const updatedStates = prev.includes(stateName)
-                ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+                ? prev.filter((name) => name !== stateName)
                 : [...prev, stateName]; // Add state if checked
 
             // Sync stateDetails with selected states
@@ -637,11 +598,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 setStatesMenu(false);
             }
         };
-
-        // Add event listener to detect clicks outside the menu
         document.addEventListener('mousedown', handleClickOutside);
-
-        // Clean up the event listener on component unmount
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -720,9 +677,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-1'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
-                                        {...register('taxId')}
-                                        maxLength={9}
-                                        placeholder="Tax ID / EIN" />
+                                        {...register('taxId', {
+                                            required: 'Tax ID / EIN is required',
+                                            pattern: {
+                                                value: /^\d{2}-\d{7}$/,
+                                                message: 'Tax ID / EIN must be in the format 12-3456789',
+                                            },
+                                        })}
+                                        maxLength={10} // Includes the hyphen
+                                        placeholder="Tax ID / EIN"
+                                    />
                                     {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
                                 </Form.Group>
                             </Col>
@@ -762,11 +726,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         width={20}
                                     />
                                 </Form.Group>
-
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1'>NPI Type 2 Number</Form.Label>
+                                    <Form.Label className='mb-1'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('npi', {
@@ -782,6 +745,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 value: /^[0-9]+$/,
                                                 message: 'NPI must contain numbers only',
                                             },
+                                            required: 'NPI Type 2 Number is required'
+
                                         })}
                                         placeholder="NPI Type 2 Number"
                                         maxLength={10}
@@ -789,43 +754,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.npi && <span className="text-danger">{errors.npi.message}</span>}
                                 </Form.Group>
                             </Col>
-                            {/* <Col sm={6} className="mb-2 d-flex flex-column position-relative">
-                     <Form.Label>Upload Logo</Form.Label>
-                     <div
-                         onClick={handleLogoClick}
-                         className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? "" : "custom-form-fields"}`}
-                         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                     >
-                         <span>
-                             {typeof logoName === "string" && logoName
-                                 ? logoName.split("/").pop()
-                                 : "Upload Logo"}
-                         </span>
-                         <p className="mb-0 d-flex justify-content-around">
-                             <FiDownloadCloud />
-                             {logoName && (
-                                 <div className="d-flex ">
-                                     {logo && (
-                                         <FiEye
-                                             className="mr-3 ms-2 text-danger cursor-pointer"
-                                             onClick={handleViewImage}
-                                         />
-                                     )}
-                                     <FiEdit className="cursor-pointer ms-2" onClick={handleLogoClick} />
-                                 </div>
-                             )}
-                         </p>
-                     </div>
 
-                     <Form.Control
-                         type="file"
-                         className="rounded-circle"
-                         style={{ display: "none" }}
-                         ref={logoFileInputRef}
-                         accept=".png, .jpg, .jpeg, .svg"
-                         onChange={handleFileChange}
-                     />
-                 </Col> */}
                             <Col sm={6} className="mb-2 d-flex flex-column position-relative">
                                 <Form.Label>Upload Logo</Form.Label>
                                 <div
@@ -869,6 +798,119 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                 </Form.Group>
                             </Col>
+                            {taxonomyCodes && taxonomyCodes.map((code, index) => (
+                                <Col sm={6} key={index}>
+                                    <Form.Group className="mb-2">
+                                        <Form.Label className="mb-1">
+                                            Taxonomy Code(s)
+                                            {index === taxonomyCodes.length - 1 && (
+                                                <span
+                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                    onClick={handleAddTaxonomy}
+                                                >
+                                                </span>
+                                            )}
+                                            <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            {...register(`taxonomyCode[${index}]`, {
+                                                required: 'This field is required',
+                                            })}
+                                            placeholder="Taxonomy Code"
+                                            maxLength={10}
+                                            onKeyUp={(event) => handleFirstSpace(event, index)}
+                                            onChange={(e) => {
+                                                handleTaxonomyChange(index, e.target.value)
+                                            }}
+                                        />
+                                        {errors.taxonomyCode?.[index] && (
+                                            <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            ))}
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>CLIA Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('clia', {
+                                            required: 'CLIA Number is required',
+                                            minLength: {
+                                                value: 10,
+                                                message: 'CLIA Number must be 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'CLIA Number must be 10 characters long',
+                                            },
+                                            pattern: {
+                                                value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
+                                            },
+                                        })}
+                                        placeholder="CLIA Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.clia && <span className="text-danger">{errors.clia.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>Medicare Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('medicare', {
+                                            required: 'Medicare Number is required',
+                                            minLength: {
+                                                value: 10,
+                                                message: 'Medicare Number must be 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Medicare Number must be 10 characters long',
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]+$/,
+                                                message: 'Medicare Number must contain numbers only',
+                                            },
+                                        })}
+                                        placeholder="Medicare Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.medicare && <span className="text-danger">{errors.medicare.message}</span>}
+                                </Form.Group>
+                            </Col>
+
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className='mb-1'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        {...register('medicaid', {
+                                            required: 'Medicaid Number is required',
+                                            minLength: {
+                                                value: 10,
+                                                message: 'Medicaid Number must be 10 characters long',
+                                            },
+                                            maxLength: {
+                                                value: 10,
+                                                message: 'Medicaid Number must be 10 characters long',
+                                            },
+                                            pattern: {
+                                                value: /^[0-9]+$/,
+                                                message: 'Medicaid Number must contain numbers only',
+                                            },
+                                        })}
+                                        placeholder="Medicaid Number"
+                                        maxLength={10}
+                                    />
+                                    {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
+                                </Form.Group>
+                            </Col>
+
                             <hr />
                             <Col sm={12}>
                                 <Form.Label>
@@ -879,21 +921,20 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </span>
                                 </Form.Label>
                             </Col>
-                            {accreditationDetails.map((accreditation, index) => (
+                            {accreditationDetails && accreditationDetails?.map((accreditation, index) => (
                                 <React.Fragment key={index}>
                                     <Col sm={4}>
                                         <Form.Control
                                             type="text"
-                                            value={accreditation.name}
+                                            value={accreditation?.name || ''}
                                             placeholder="Name"
                                             onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
                                         />
                                     </Col>
-
                                     <Col sm={4}>
                                         <Form.Control
                                             type="text"
-                                            value={accreditation.number}
+                                            value={accreditation?.number}
                                             {...register('accDocno', {
                                                 pattern: {
                                                     value: /^[0-9]*$/,
@@ -902,13 +943,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             })}
                                             placeholder="Document Number"
                                             onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
-                                            onKeyPress={(event) => handleFirstSpace(0)}
+                                            onKeyUp={(event) => handleFirstSpace(event, 0)}
                                         />
                                         {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                                     </Col>
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
-                                            onClick={() => accreditationFileInputRef.current.click()}
+                                            onClick={() => document.getElementById(`fileInput-accreditation=${index}`).click()}
                                             className="custom-file-upload justify-content-between cursor-pointer"
                                         >
                                             {accreditation.loading ? 'Loading...'
@@ -921,6 +962,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Control
                                             type="file"
                                             className="rounded-circle"
+                                            id={`fileInput-accreditation=${index}`}
                                             style={{ display: 'none' }}
                                             ref={accreditationFileInputRef}
                                             onChange={(e) => handleAccreditationChange(e, index)}
@@ -934,70 +976,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </React.Fragment>
                             ))}
-                            <hr />
-                            {/* <Col sm={12}>
-                     <Form.Label>
-                         Medical Licenses&nbsp;
-                         <span
-                             onClick={handleAddMedical}
-                             className='plusicon fs-5 uil-plus-circle fw-bold cursor-pointer'>
-                         </span>
-                     </Form.Label>
-                 </Col>
-                 {medicalDetails.map((medical, index) => (
-                     <React.Fragment key={index}>
-                         <Col sm={4}>
-                             <Form.Control
-                                 type="text"
-                                 value={medical.name}
-                                 placeholder="Name"
-                                 onChange={(e) => handleMedicalInputChange(e, 'name', index)}
-                             />
-                         </Col>
-                         <Col sm={4}>
-                             <Form.Control
-                                 type="text"
-                                 value={medical.number}
-                                 placeholder="Document Number"
-                                 {...register('medDocno', {
-                                     pattern: {
-                                         value: /^[0-9]*$/,
-                                         message: 'Document no must be a number'
-                                     },
-                                 })}
-                                 onChange={(e) => handleMedicalInputChange(e, 'number', index)}
-                                 onKeyPress={(event) => handleFirstSpace(event, 0)}
-                             />
-                             {errors.medDocno && <span className="text-danger">{errors.medDocno.message}</span>}
-                         </Col>
-                         <Col sm={4} className="mb-2 position-relative">
-                             <div
-                                 onClick={() => medicalFileInputRef.current.click()}
-                                 className="custom-file-upload justify-content-between cursor-pointer"
-                             >
-                                 {medical.url
-                                     ? medical.url.split('/').pop()
-                                     : medical?.fileName || 'Upload Document'}
-                                 <p className="mb-0"><FiDownloadCloud /></p>
-                             </div>
-
-                             <Form.Control
-                                 type="file"
-                                 className="rounded-circle"
-                                 style={{ display: 'none' }}
-                                 ref={medicalFileInputRef}
-                                 onChange={(e) => handleMedicalChange(e, index)}
-                             />
-
-                             <span
-                                 onClick={() => handleRemoveMedical(index)}
-                                 style={{ right: '-2%', top: '20%' }}
-                                 className={`${medicalDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
-                             >
-                             </span>
-                         </Col>
-                     </React.Fragment>
-                 ))} */}
                             <hr />
                             <Col sm={12} className="position-relative">
                                 <Form.Label ref={containerRef}>
@@ -1484,18 +1462,29 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
                                                 </span>
                                             </Col>
+
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className="mb-1">Full Name</Form.Label>
+                                                    <Form.Label className="mb-1">Full Name <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        value={data.name}
-                                                        onChange={(e) => handlePOSInputChange(e, 'name', index)}
+                                                        {...register(`naem.${index}`, {
+                                                            required: 'Full Name is required'
+                                                        })}
+                                                        value={data.name} // Initialize with the current value
+                                                        onChange={(e) => {
+                                                            handlePOSInputChange(e, 'name', index); // Keep existing functionality
+                                                            setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
+                                                        }}
                                                         onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                         placeholder="Full Name"
                                                     />
+                                                    {errors.name?.[index] && (
+                                                        <span className="text-danger">{errors.name[index].message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
                                                     <Form.Label className="mb-1">Contact Email</Form.Label>
@@ -1580,48 +1569,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     </Form >
                     <Row className='mt-2'>
                         <Col xs={12}>
-                            {/* <Card> */}
-                            {/* <Card.Body> */}
-                            {/* <Row className="mb-2"> */}
-                            {/* <Col sm={6}>
-                                      <Button
-                                          onClick={() => setStatus(true)}
-                                          className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                      >
-                                          Active
-                                      </Button>
-                                      <Button
-                                          onClick={() => setStatus(false)}
-                                          className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                      >
-                                          Inactive
-                                      </Button>
-                                  </Col> */}
-
-                            {/* <Col sm={6} className='text-end'>
-                                      <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between ">
-                                          <Col xs="auto" className='d-flex gap-2'>
-                                              <FormInput
-                                                  type="text"
-                                                  value={search}
-                                                  onChange={(e) => setSearch(e.target.value)} */}
-                            {/* // onChange={(e) => setName(e.target.value)}
-                                                  placeholder="Search..." /> */}
-                            {/* <Button className="custom-buttons ">
-                                                  <FiFilter className='fs-4' />
-                                              </Button>
-                                              <Button className="custom-buttons ">
-                                                  <FiFileText className='fs-4' />
-                                              </Button> */}
-                            {/* <Button as={Link} to='/apps/Practice/new-practice' className="custom-buttons">
-                                                  New Sub Practice
-                                              </Button> */}
-                            {/* </Col> */}
-                            {/* </Row> */}
-
-                            {/* </Col> */}
-                            {/* </Row> */}
-
                             <Row>
                                 <Col>
                                     {store?.getSubClinicsReducer?.loading ? (
@@ -1666,9 +1613,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     )}
                                 </Col>
                             </Row>
-
-                            {/* </Card.Body> */}
-                            {/* </Card> */}
                         </Col>
                     </Row>
                 </>

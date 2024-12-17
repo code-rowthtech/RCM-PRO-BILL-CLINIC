@@ -37,7 +37,7 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/dashboard/project';
+    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/crm/addclinic';
 
     useEffect(() => {
         dispatch(resetAuth());
@@ -49,14 +49,7 @@ const Login = (): React$Element<any> => {
         error: state.Auth.error,
         userLoggedIn: state.Auth.userLoggedIn,
     }));
-  
-    console.log(user,'iddd')
 
-    useEffect(() => {
-        if (error) {
-            ToastHandle(error, 'danger')
-        }
-    }, [error]);
 
     /*
     form validation schema
@@ -68,15 +61,15 @@ const Login = (): React$Element<any> => {
                 .string()
                 .required(t('Please enter email'))
                 .email(t('Please enter a valid email')), // Email format validation
-    
+
             password: yup
                 .string()
                 .required(t('Password is required'))
-                .min(8, t('Password must be at least 8 characters')) 
+                .min(8, t('Password must be at least 8 characters'))
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
                     t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character.')
-                ) 
+                )
         })
     );
 
@@ -86,7 +79,7 @@ const Login = (): React$Element<any> => {
     const onSubmit = (formData) => {
         dispatch(loginUser({ email: formData.username, password: formData.password }));
     };
- 
+
 
     return (
         <>
@@ -132,7 +125,7 @@ const Login = (): React$Element<any> => {
                     <div className="mb-3 mb-0 text-center">
                         <Button className='custom-buttons' type="submit" disabled={loading}>
                             {loading ?
-                                <Spinner className="spinner-border-sm " />
+                                <Spinner color='white' className="spinner-border-sm " />
                                 :
                                 `${t('Log In')}`
                             }
@@ -141,7 +134,7 @@ const Login = (): React$Element<any> => {
                 </VerticalForm>
 
             </AccountLayout>
-           
+
         </>
     );
 };

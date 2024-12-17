@@ -42,17 +42,17 @@ const ResetPassword = (): React$Element<any> => {
         // Get the current URL
         const url = window.location.href;
         const tokenFromUrl = url.split('/').pop(); // Gets the last segment of the URL
-        console.log({tokenFromUrl})
+        console.log({ tokenFromUrl })
         setToken(tokenFromUrl);
-        dispatch(verifyToken({token:tokenFromUrl})); 
+        dispatch(verifyToken({ token: tokenFromUrl }));
 
     }, []);
 
     useEffect(() => {
         dispatch(resetAuth());
     }, [dispatch]);
- 
-    const store=useSelector((state)=>state);
+
+    const store = useSelector((state) => state);
     // console.log(store?.Auth?.verifyTokenSuccess?.data)
     // useEffect(()=>{
     //     if(store?.Auth?.verifyTokenSuccess?.data){
@@ -65,23 +65,26 @@ const ResetPassword = (): React$Element<any> => {
         changePasswordSuccess: state.Auth.changePasswordSuccess,
     }
 
-) );
+    ));
 
 
-const schemaResolver = yupResolver(
-    yup.object().shape({
-        password: yup
-            .string()
-            .required(t('Please enter Password'))
-            .min(8, t('Password must be at least 8 characters long'))
-            .matches(/[!@#$%^&*(),.?":{}|<>]/, t('Password must contain at least one special character'))
-            .matches(/^\S*$/, t('Password cannot contain spaces')), // Ensures no spaces
-        confirmPassword: yup
-            .string()
-            .oneOf([yup.ref('password'), null], t('Passwords must match'))
-            .required(t('Please confirm your Password')),
-    })
-);
+    const schemaResolver = yupResolver(
+        yup.object().shape({
+            password: yup
+                .string()
+                .required(t('Please enter Password'))
+                .min(8, t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.'))
+                .matches(/[A-Z]/, t('Password must contain at least one uppercase letter')) // Ensure at least one uppercase letter
+                .matches(/[0-9]/, t('Password must contain at least one number')) // Ensure at least one number
+                .matches(/[!@#$%^&*(),.?":{}|<>]/, t('Password must contain at least one special character')) // Ensure at least one special character
+                .matches(/^\S*$/, t('Password cannot contain spaces')), // Ensure no spaces
+            confirmPassword: yup
+                .string()
+                .oneOf([yup.ref('password'), null], t('Password must match'))
+                .required(t('Please confirm your Password')),
+        })
+    );
+    
 
     const onSubmit = (formData) => {
         dispatch(forgotPasswordChange({ token, newPassword: formData.password }));
