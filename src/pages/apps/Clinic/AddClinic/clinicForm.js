@@ -856,8 +856,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.clia && <span className="text-danger">{errors.clia.message}</span>}
                                 </Form.Group>
                             </Col>
-
-
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className='mb-1'>Medicare Number <span className='text-danger'>*</span></Form.Label>
@@ -1464,18 +1462,29 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
                                                 </span>
                                             </Col>
+
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className="mb-1">Full Name</Form.Label>
+                                                    <Form.Label className="mb-1">Full Name <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        value={data.name}
-                                                        onChange={(e) => handlePOSInputChange(e, 'name', index)}
+                                                        {...register(`naem.${index}`, {
+                                                            required: 'Full Name is required'
+                                                        })}
+                                                        value={data.name} // Initialize with the current value
+                                                        onChange={(e) => {
+                                                            handlePOSInputChange(e, 'name', index); // Keep existing functionality
+                                                            setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
+                                                        }}
                                                         onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                         placeholder="Full Name"
                                                     />
+                                                    {errors.name?.[index] && (
+                                                        <span className="text-danger">{errors.name[index].message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
                                                     <Form.Label className="mb-1">Contact Email</Form.Label>

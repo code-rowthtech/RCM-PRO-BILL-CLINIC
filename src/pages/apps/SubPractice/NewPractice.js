@@ -256,7 +256,7 @@ const NewPractice = () => {
     useEffect(() => {
         if (idUpdateDataSubClinics) {
             dispatch(getClinicAction({ key: encryptMessage({ userId: idUpdateDataSubClinics }) }));
-        }else{
+        } else {
             dispatch(getClinicAction({ key: encryptMessage({ userId: clinic_MainId?._id }) }));
         }
     }, [idUpdateDataSubClinics])
@@ -399,8 +399,13 @@ const NewPractice = () => {
             if (subClinicsDetailsGet?.accreditationDetails) {
                 setAccreditationDetails(subClinicsDetailsGet?.accreditationDetails)
             }
-            if (subClinicsDetailsGet?.taxonomyCodes) {
-                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes)
+            if (subClinicsDetailsGet?.taxonomyCodes?.length === 0) {
+                setTaxonomyCodes([''])
+            } else {
+                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes);
+                subClinicsDetailsGet?.taxonomyCodes?.forEach((code, index) => {
+                    setValue(`taxonomyCode[${index}]`, code);
+                });
             }
             if (subClinicsDetailsGet?.pos) {
                 setPosDetails(subClinicsDetailsGet?.pos)
@@ -411,7 +416,7 @@ const NewPractice = () => {
             if (subClinicsDetailsGet?.stateOfLicensing) {
                 setStateDetails(subClinicsDetailsGet?.stateOfLicensing)
             }
-        } else if(clinicsDataGet && !idUpdateDataSubClinics){
+        } else if (clinicsDataGet && !idUpdateDataSubClinics) {
             setFormData(clinicsDataGet);
             setValue('clinicname', clinicsDataGet?.name);
             setValue('clinicType', clinicsDataGet?.clinicType);
@@ -448,8 +453,13 @@ const NewPractice = () => {
             if (clinicsDataGet?.accreditationDetails) {
                 setAccreditationDetails(clinicsDataGet?.accreditationDetails)
             }
-            if (clinicsDataGet?.taxonomyCodes) {
-                setTaxonomyCodes(clinicsDataGet?.taxonomyCodes)
+            if (subClinicsDetailsGet?.taxonomyCodes?.length === 0) {
+                setTaxonomyCodes([''])
+            } else {
+                setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes);
+                subClinicsDetailsGet?.taxonomyCodes?.forEach((code, index) => {
+                    setValue(`taxonomyCode[${index}]`, code);
+                });
             }
             if (clinicsDataGet?.pos) {
                 setPosDetails(clinicsDataGet?.pos)
@@ -518,16 +528,12 @@ const NewPractice = () => {
         }
     };
 
-
     const handleAddTaxonomy = () => {
-        // Check if the last field has a value
         const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
 
         if (lastCode) {
-            // Filter out any empty values from the array
             const validCodes = taxonomyCodes.filter((code) => code.trim() !== '');
             setTaxonomyCodes([...validCodes, '']);
-            // setAddFieldError(false); // Clear error if the new field is added successfully
         } else {
             ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
         }
@@ -600,7 +606,7 @@ const NewPractice = () => {
             CLIA_Number: formData?.clia,
             medicareNumber: formData?.medicare,
             medicaidNumber: formData?.medicaid,
-            taxonomyCodes: taxonomyCodes,
+            taxonomyCodes: taxonomyCodes.filter(code => code),
             // medicalLicenses: medicalDetails,
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'subClinic',
@@ -1053,9 +1059,7 @@ const NewPractice = () => {
                                                         {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
                                                     </Form.Group>
                                                 </Col>
-
-
-                                                {taxonomyCodes?.map((code, index) => (
+                                                {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                                     <Col sm={6} key={index}>
                                                         <Form.Group className="mb-2">
                                                             <Form.Label className="mb-1">
@@ -1071,11 +1075,15 @@ const NewPractice = () => {
                                                             </Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                {...register(`taxonomyCode[${index}]`, { required: 'This field is required' })}
-                                                                value={code}
+                                                                {...register(`taxonomyCode[${index}]`, {
+                                                                    required: 'This field is required',
+                                                                })}
                                                                 placeholder="Taxonomy Code"
                                                                 maxLength={10}
-                                                                onChange={(e) => handleTaxonomyChange(index, e.target.value)}
+                                                                onKeyUp={(event) => handleFirstSpace(event, index)}
+                                                                onChange={(e) => {
+                                                                    handleTaxonomyChange(index, e.target.value)
+                                                                }}
                                                             />
                                                             {errors.taxonomyCode?.[index] && (
                                                                 <span className="text-danger">{errors.taxonomyCode[index].message}</span>
@@ -1083,25 +1091,24 @@ const NewPractice = () => {
                                                         </Form.Group>
                                                     </Col>
                                                 ))}
-
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>CLIA Number<span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-1'>CLIA Number <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('clia', {
                                                                 required: 'CLIA Number is required',
                                                                 minLength: {
                                                                     value: 10,
-                                                                    message: 'CLIA number must be at least 10 characters long',
+                                                                    message: 'CLIA Number must be 10 characters long',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,
-                                                                    message: 'CLIA number cannot exceed 10 characters',
+                                                                    message: 'CLIA Number must be 10 characters long',
                                                                 },
                                                                 pattern: {
-                                                                    value: /^[0-9]+$/,
-                                                                    message: 'CLIA number must contain numbers only',
+                                                                    value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                                    message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
                                                                 },
                                                             })}
                                                             placeholder="CLIA Number"
@@ -1803,14 +1810,23 @@ const NewPractice = () => {
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Full Name</Form.Label>
+                                                                        <Form.Label className="mb-1">Full Name <span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            value={data.name}
-                                                                            onChange={(e) => handlePOSInputChange(e, 'name', index)}
-                                                                            // onKeyPress={handleFirstSpace}
+                                                                            {...register(`name.${index}`, {
+                                                                                required: 'Full Name is required'
+                                                                            })}
+                                                                            value={data.name} // Initialize with the current value
+                                                                            onChange={(e) => {
+                                                                                handlePOSInputChange(e, 'name', index); // Keep existing functionality
+                                                                                setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
+                                                                            }}
+                                                                            onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                                             placeholder="Full Name"
                                                                         />
+                                                                        {errors.name?.[index] && (
+                                                                            <span className="text-danger">{errors.name[index].message}</span>
+                                                                        )}
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
