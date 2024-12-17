@@ -75,6 +75,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
+    console.log(accreditationDetails, 'accreditationDetails')
     // const [medicalDetails, setMedicalDetails] = useState([
     //     { name: '', number: '', url: null, fileName: '' }
     // ]);
@@ -204,7 +205,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
         }
 
-        if (clinicsDataGet?.taxonomyCodes) {
+        // if (clinicsDataGet?.taxonomyCodes) {
+        //     setTaxonomyCodes(clinicsDataGet?.taxonomyCodes);
+        //     clinicsDataGet?.taxonomyCodes?.forEach((code, index) => {
+        //         setValue(`taxonomyCode[${index}]`, code);
+        //     });
+        // }
+        if (clinicsDataGet?.taxonomyCodes?.length === 0) {
+            setTaxonomyCodes([''])
+        } else {
             setTaxonomyCodes(clinicsDataGet?.taxonomyCodes);
             clinicsDataGet?.taxonomyCodes?.forEach((code, index) => {
                 setValue(`taxonomyCode[${index}]`, code);
@@ -270,7 +279,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
-                state: stateToSelect?._id,
+                ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
@@ -282,7 +291,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         address: data?.address,
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
-                        state: stateToSelect?._id,
+                        ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                         street: data?.street,
                         zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
@@ -529,7 +538,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const handleCheckboxChange = (stateName) => {
         setSelectedStates((prev) => {
             const updatedStates = prev.includes(stateName)
-                ? prev.filter((name) => name !== stateName) // Remove state if unchecked
+                ? prev.filter((name) => name !== stateName)
                 : [...prev, stateName]; // Add state if checked
 
             // Sync stateDetails with selected states
@@ -746,44 +755,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Form.Group>
                             </Col>
 
-
-                            {/* <Col sm={6} className="mb-2 d-flex flex-column position-relative">
-                     <Form.Label>Upload Logo</Form.Label>
-                     <div
-                         onClick={handleLogoClick}
-                         className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? "" : "custom-form-fields"}`}
-                         style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-                     >
-                         <span>
-                             {typeof logoName === "string" && logoName
-                                 ? logoName.split("/").pop()
-                                 : "Upload Logo"}
-                         </span>
-                         <p className="mb-0 d-flex justify-content-around">
-                             <FiDownloadCloud />
-                             {logoName && (
-                                 <div className="d-flex ">
-                                     {logo && (
-                                         <FiEye
-                                             className="mr-3 ms-2 text-danger cursor-pointer"
-                                             onClick={handleViewImage}
-                                         />
-                                     )}
-                                     <FiEdit className="cursor-pointer ms-2" onClick={handleLogoClick} />
-                                 </div>
-                             )}
-                         </p>
-                     </div>
-
-                     <Form.Control
-                         type="file"
-                         className="rounded-circle"
-                         style={{ display: "none" }}
-                         ref={logoFileInputRef}
-                         accept=".png, .jpg, .jpeg, .svg"
-                         onChange={handleFileChange}
-                     />
-                 </Col> */}
                             <Col sm={6} className="mb-2 d-flex flex-column position-relative">
                                 <Form.Label>Upload Logo</Form.Label>
                                 <div
@@ -952,7 +923,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </span>
                                 </Form.Label>
                             </Col>
-                            {accreditationDetails.map((accreditation, index) => (
+                            {accreditationDetails && accreditationDetails?.map((accreditation, index) => (
                                 <React.Fragment key={index}>
                                     <Col sm={4}>
                                         <Form.Control
@@ -962,11 +933,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
                                         />
                                     </Col>
-
                                     <Col sm={4}>
                                         <Form.Control
                                             type="text"
-                                            value={accreditation?.number || ''}
+                                            value={accreditation?.number}
                                             {...register('accDocno', {
                                                 pattern: {
                                                     value: /^[0-9]*$/,
@@ -1008,70 +978,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </React.Fragment>
                             ))}
-                            <hr />
-                            {/* <Col sm={12}>
-                     <Form.Label>
-                         Medical Licenses&nbsp;
-                         <span
-                             onClick={handleAddMedical}
-                             className='plusicon fs-5 uil-plus-circle fw-bold cursor-pointer'>
-                         </span>
-                     </Form.Label>
-                 </Col>
-                 {medicalDetails.map((medical, index) => (
-                     <React.Fragment key={index}>
-                         <Col sm={4}>
-                             <Form.Control
-                                 type="text"
-                                 value={medical.name}
-                                 placeholder="Name"
-                                 onChange={(e) => handleMedicalInputChange(e, 'name', index)}
-                             />
-                         </Col>
-                         <Col sm={4}>
-                             <Form.Control
-                                 type="text"
-                                 value={medical.number}
-                                 placeholder="Document Number"
-                                 {...register('medDocno', {
-                                     pattern: {
-                                         value: /^[0-9]*$/,
-                                         message: 'Document no must be a number'
-                                     },
-                                 })}
-                                 onChange={(e) => handleMedicalInputChange(e, 'number', index)}
-                                 onKeyPress={(event) => handleFirstSpace(event, 0)}
-                             />
-                             {errors.medDocno && <span className="text-danger">{errors.medDocno.message}</span>}
-                         </Col>
-                         <Col sm={4} className="mb-2 position-relative">
-                             <div
-                                 onClick={() => medicalFileInputRef.current.click()}
-                                 className="custom-file-upload justify-content-between cursor-pointer"
-                             >
-                                 {medical.url
-                                     ? medical.url.split('/').pop()
-                                     : medical?.fileName || 'Upload Document'}
-                                 <p className="mb-0"><FiDownloadCloud /></p>
-                             </div>
-
-                             <Form.Control
-                                 type="file"
-                                 className="rounded-circle"
-                                 style={{ display: 'none' }}
-                                 ref={medicalFileInputRef}
-                                 onChange={(e) => handleMedicalChange(e, index)}
-                             />
-
-                             <span
-                                 onClick={() => handleRemoveMedical(index)}
-                                 style={{ right: '-2%', top: '20%' }}
-                                 className={`${medicalDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
-                             >
-                             </span>
-                         </Col>
-                     </React.Fragment>
-                 ))} */}
                             <hr />
                             <Col sm={12} className="position-relative">
                                 <Form.Label ref={containerRef}>
