@@ -24,6 +24,7 @@ const NewDoctor = () => {
         reset,
         watch, getValues,
         setValue,
+        clearErrors,
     } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -57,7 +58,7 @@ const NewDoctor = () => {
 
     const statesData = store?.getStatesReducer?.data;
     const role = store?.getDoctorsRolesReducer?.data
-    console.log({role})
+    console.log({ role })
     const dispatch = useDispatch();
     const navigate = useNavigate();
     // If you want to remove any prefix (like "check")
@@ -123,10 +124,10 @@ const NewDoctor = () => {
             setValue('zip2', doctorDetails?.userId?.mailingAddress?.zip)
             setValue('street1', doctorDetails?.userId?.primaryAddress?.street)
             setValue('street2', doctorDetails?.userId?.mailingAddress?.street)
-            setLongitude( doctorDetails?.userId?.primaryAddress?.longitude)
-            setLatitude( doctorDetails?.userId?.primaryAddress?.latitude)
-            setMailingLatitude( doctorDetails?.userId?.mailingAddress?.latitude)
-            setMailingLongitude( doctorDetails?.userId?.mailingAddress?.longitude)
+            setLongitude(doctorDetails?.userId?.primaryAddress?.longitude)
+            setLatitude(doctorDetails?.userId?.primaryAddress?.latitude)
+            setMailingLatitude(doctorDetails?.userId?.mailingAddress?.latitude)
+            setMailingLongitude(doctorDetails?.userId?.mailingAddress?.longitude)
             setValue('degreeName', doctorDetails?.userId?.degreeName)
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
             setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
@@ -147,10 +148,10 @@ const NewDoctor = () => {
             }
             setValue('state2', state2);
             if (doctorDetails?.userId?.profileImage) {
-                setLogoName( doctorDetails?.userId?.profileImage?.fileName)
+                setLogoName(doctorDetails?.userId?.profileImage?.fileName)
             }
             if (doctorDetails?.userId?.degreeDoc) {
-                setDegreeName(  doctorDetails?.userId?.degreeDoc?.fileName)
+                setDegreeName(doctorDetails?.userId?.degreeDoc?.fileName)
             }
         }
     }, [doctorDetails, setValue])
@@ -474,6 +475,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
                                                                     {...register('firstName', {
                                                                         required: 'First name is required',
                                                                         pattern: {
@@ -481,7 +483,10 @@ const NewDoctor = () => {
                                                                             message: 'First name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
-                                                                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('firstName'); // Clears validation errors for 'dateOfBirth'
+                                                                        setFormData({ ...formData, firstName: e.target.value });
+                                                                    }}
                                                                     placeholder="Enter first name"
                                                                 />
                                                                 {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
@@ -500,7 +505,10 @@ const NewDoctor = () => {
                                                                             message: 'Enter a valid email address',
                                                                         },
                                                                     })}
-                                                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('email');
+                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                    }}
                                                                     placeholder="Enter email"
                                                                 />
                                                                 {errors.email && <span className="text-danger">{errors.email.message}</span>}
@@ -534,7 +542,10 @@ const NewDoctor = () => {
                                                                                     },
                                                                                 } : {}
                                                                                 )}
-                                                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                                                onChange={(e) => {
+                                                                                    clearErrors('phone');
+                                                                                    setFormData({ ...formData, phone: e.target.value });
+                                                                                }}
                                                                                 placeholder="1234-234-234"
                                                                                 maxLength={10}
                                                                             />
@@ -550,7 +561,7 @@ const NewDoctor = () => {
                                                                 </Form.Group>
                                                             </div>
                                                             <div className="mb-3 d-flex flex-column position-relative">
-                                                                <Form.Label>Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                                <Form.Label>Profile Image</Form.Label>
                                                                 <div
                                                                     onClick={() => logoFileInputRef.current.click()}
                                                                     className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
@@ -564,7 +575,7 @@ const NewDoctor = () => {
                                                                     type="file"
                                                                     className="d-none "
                                                                     {...register('profileImage', {
-                                                                        // required: 'Profile image is required',
+                                                                        required: 'Profile image is required',
                                                                     })}
                                                                     accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                                                                     ref={logoFileInputRef}
@@ -579,17 +590,20 @@ const NewDoctor = () => {
                                                                 }
                                                             </div>
                                                             <Form.Group className="mb-3">
-                                                                <Form.Label>Degree Name{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                                <Form.Label>Degree Name</Form.Label>
                                                                 <Form.Control
                                                                     type="text"
                                                                     {...register('degreeName',
-                                                                        !id && { required: 'Degree Name is required' }
+                                                                        { required: 'Degree Name is required' }
                                                                     )}
-                                                                    onChange={(e) => setFormData({ ...formData, degreeName: e.target.value })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('degreeName');
+                                                                        setFormData({ ...formData, degreeName: e.target.value });
+                                                                    }}
                                                                     // value={formData.Degree Name}
                                                                     placeholder="Enter Degree Name"
                                                                 />
-                                                                {errors.email && <span className="text-danger">{errors.degreeName.message}</span>}
+                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
                                                             </Form.Group>
 
                                                         </div>
@@ -600,6 +614,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
                                                                     {...register('lastName', {
                                                                         required: 'Last name is required',
                                                                         pattern: {
@@ -607,33 +622,42 @@ const NewDoctor = () => {
                                                                             message: 'Last name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
-                                                                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('lastName');
+                                                                        setFormData({ ...formData, lastName: e.target.value })
+                                                                    }}
                                                                     placeholder="Enter last name"
                                                                 />
                                                                 {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                                             </Form.Group>
                                                             <Form.Group className="mb-3">
                                                                 <Form.Label>
-                                                                    Date of Birth {!id && <span className="text-danger">*</span>}
+                                                                    Date of Birth
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
+                                                                    max={new Date().toISOString().split('T')[0]} // Prevents future dates in date picker
                                                                     {...register('dateOfBirth', {
                                                                         required: 'Date of birth is required',
                                                                         validate: (value) => {
                                                                             const selectedDate = new Date(value);
                                                                             const today = new Date();
+                                                                            today.setHours(0, 0, 0, 0); // Reset hours to ensure clean comparison
                                                                             return selectedDate <= today || 'Date of birth cannot be in the future';
                                                                         },
                                                                     })}
-                                                                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('dateOfBirth');
+                                                                        setFormData({ ...formData, dateOfBirth: e.target.value })
+                                                                    }}
                                                                 />
+
                                                                 {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
 
                                                             <Form.Group className="mb-3">
                                                                 <Form.Label>
-                                                                    Gender {!id && <span className="text-danger">*</span>}
+                                                                    Gender
                                                                 </Form.Label>
                                                                 <div className="d-flex gap-2 mt-1">
                                                                     <Form.Check
@@ -641,22 +665,29 @@ const NewDoctor = () => {
                                                                         label="Male"
                                                                         value="Male"
                                                                         {...register('gender', { required: 'Gender is required' })}
-                                                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })} // Update formData on change
+                                                                        onChange={(e) => {
+                                                                            clearErrors('gender');
+                                                                            setFormData({ ...formData, gender: e.target.value })
+                                                                        }}
                                                                     />
                                                                     <Form.Check
                                                                         type="radio"
                                                                         label="Female"
                                                                         value="Female"
                                                                         {...register('gender')}
-                                                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })} // Update formData on change
-                                                                    />
+                                                                        onChange={(e) => {
+                                                                            clearErrors('gender');
+                                                                            setFormData({ ...formData, gender: e.target.value })
+                                                                        }} />
                                                                     <Form.Check
                                                                         type="radio"
                                                                         label="Other"
                                                                         value="Other"
                                                                         {...register('gender')}
-                                                                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })} // Update formData on change
-                                                                    />
+                                                                        onChange={(e) => {
+                                                                            clearErrors('gender');
+                                                                            setFormData({ ...formData, gender: e.target.value })
+                                                                        }} />
                                                                 </div>
                                                                 {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                                             </Form.Group>
@@ -671,21 +702,27 @@ const NewDoctor = () => {
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showPassword ? "text" : "password"}
-                                                                                onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                                // onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                                onKeyDown={(e) => {
+                                                                                    if (e.key === " ") {
+                                                                                        e.preventDefault();
+                                                                                    }
+                                                                                }}
                                                                                 placeholder={id ? "********" : "Password"}
                                                                                 readOnly={id}
-                                                                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                                                                onChange={(e) => {
+                                                                                    clearErrors('password');
+                                                                                    setFormData({ ...formData, password: e.target.value })
+                                                                                }}
                                                                                 {...register("password", {
                                                                                     required: !id ? "Password is required" : false,
                                                                                     pattern: {
-                                                                                        value: id
-                                                                                            ? ""
-                                                                                            : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
                                                                                         message:
                                                                                             "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
                                                                                     },
-                                                                                    validate: (value) =>
-                                                                                        !/\s/.test(value) || "Spaces are not allowed in the password.",
+                                                                                    // validate: (value) =>
+                                                                                    //     !/\s/.test(value) || "Spaces are not allowed in the password.",
                                                                                 })}
                                                                             />
                                                                             <span
@@ -711,7 +748,10 @@ const NewDoctor = () => {
                                                                                 type={showConfirmPassword ? "text" : "password"}
                                                                                 placeholder="Confirm Password"
                                                                                 readOnly={id}
-                                                                                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                                                                onChange={(e) => {
+                                                                                    clearErrors('confirmPassword');
+                                                                                    setFormData({ ...formData, confirmPassword: e.target.value })
+                                                                            }}
                                                                                 {...register('confirmPassword', {
                                                                                     ...(!id ? { required: 'Please confirm your password' } : {}),
                                                                                     pattern: {
@@ -733,7 +773,7 @@ const NewDoctor = () => {
                                                                     </Form.Group>
                                                                 </div>
                                                                 <div className="mb-3 d-flex flex-column position-relative">
-                                                                    <Form.Label>Degree{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                                    <Form.Label>Degree</Form.Label>
                                                                     <div
                                                                         onClick={() => degreeFileInputRef.current.click()}
                                                                         className={`custom-file-upload justify-content-between cursor-pointer ${degreeName ? '' : 'custom-form-fields'}`}
@@ -747,7 +787,7 @@ const NewDoctor = () => {
                                                                         type="file"
                                                                         className="d-none "
                                                                         {...register('degreeDoc', {
-                                                                            // required: 'Degree is required',
+                                                                            required: 'Degree is required',
                                                                         })}
                                                                         ref={degreeFileInputRef}
                                                                         onChange={handleFileChangeDegree}
@@ -1155,7 +1195,7 @@ const NewDoctor = () => {
                                                         {store?.createtDoctorsDetailReducer?.loading ?
                                                             <Spinner color='white' className='spinner-border-sm' />
                                                             :
-                                                             id ? "Update" : "Next"
+                                                            id ? "Update" : "Next"
                                                         }
                                                     </Button>
                                                 </div>

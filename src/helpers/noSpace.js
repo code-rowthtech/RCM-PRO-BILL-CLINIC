@@ -1,4 +1,4 @@
-export const handleFirstSpace = (event, maxSpaces = 12) => {
+export const handleFirstSpace = (event, maxSpaces ) => {
     const inputValue = event.target.value;
 
     // Prevent the first key from being a space

@@ -75,6 +75,9 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         if (pathname === '/apps/doctors/new-doctor' && queryParams.has('id')) {
             return 'Update Doctors';
         }
+        if (pathname === '/apps/Practice/new-practice' && queryParams.has('id')) {
+            return 'Update Sub Clinics';
+        }
 
         for (const [key, value] of Object.entries(pathToTitleMap)) {
             if (pathname.startsWith(key)) {
