@@ -90,6 +90,8 @@ const NewPractice = () => {
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
     const updateResponseOfSubClinics = store?.updateSubClinicReducer?.data?.status;
+    const updateLoading = store?.updateSubClinicReducer?.loading;
+
     console.log(updateResponseOfSubClinics, 'updateSubClinicReducer')
 
     // const [updatePage, setUpdatePage] = useState(false);
@@ -1895,9 +1897,9 @@ const NewPractice = () => {
                                                         variant="primary"
                                                         type="submit"
                                                         className='custom-buttons'
-                                                        disabled={createLoading}  // Disable button when loading
+                                                        disabled={createLoading || updateLoading}  // Disable button when loading
                                                     >
-                                                        {createLoading ? (
+                                                        {createLoading || updateLoading ? (
                                                             <Spinner color='white' className='spinner-border-sm' />
                                                         ) : (
                                                             subClinicsDetailsGet && idUpdateDataSubClinics ? 'Update' : 'Next'
