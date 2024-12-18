@@ -10,6 +10,7 @@ import ToastHandle from '../helpers/ToastMessage';
 import { handleFirstSpace } from '../helpers/noSpace';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
+  const store = useSelector((state) => state);
   const dispatch = useDispatch();
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
@@ -19,9 +20,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-const store=useSelector((state)=>state);
-const changeData=store?.changePasswordSuccess;
-console.log(store,'changeData')
+  const changeData = store?.changePasswordSuccess;
+  
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
     dispatch(confirmPasswordAction({ key: encryptMessage(payload) }));
