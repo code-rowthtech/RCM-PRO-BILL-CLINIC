@@ -190,7 +190,7 @@ const Doctors = () => {
                             <Col sm={1}></Col>
                             <Col sm={10}>
                                 <h4 className="mb-0  d-flex align-items-center justify-content-center">
-                                    <span className='text-danger'>{selectedDoctor?.status ? 'Deactivate' : 'Activate'} Doctor</span>
+                                    <span className={`${selectedDoctor?.userDetails?.status ? 'text-danger' : 'text-success'}`}>{selectedDoctor?.userDetails?.status ? 'Deactivate' : 'Activate'} Doctor</span>
                                 </h4>
                             </Col>
                             <Col sm={1}>
