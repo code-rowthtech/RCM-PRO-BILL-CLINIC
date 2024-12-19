@@ -44,10 +44,9 @@ const AddRole = ({ show, close }) => {
             password: data.password,
             phone: data?.phone,
             clinicId: clinicId,
-            reportingTo: '67595b464c94e64c5b916ed2',
+            reportingTo: data?.reportingTo,
             joiningDate: formattedJoiningDate,
-            designation: data.designation,
-            role: '67592ebd321472d35c1698bb',
+            role: data.role,
         };
         console.log('Form Data:', payload);
 
@@ -86,7 +85,7 @@ const AddRole = ({ show, close }) => {
                                     <Form.Label>Name</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter name"
+                                        placeholder=" Name"
                                         {...register('name', {
                                             required: 'Name is required',
                                             pattern: {
@@ -103,7 +102,7 @@ const AddRole = ({ show, close }) => {
                                     <Form.Label>Email ID</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter email"
+                                        placeholder=" Email"
                                         {...register('email', {
                                             required: 'Email is required',
                                             pattern: {
@@ -115,29 +114,13 @@ const AddRole = ({ show, close }) => {
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Contact No.</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter contact number"
-                                        {...register('contact', {
-                                            required: 'Contact number is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
-                                </Form.Group>
-                            </Col>
+                        
                             <Col sm={6}>
                                 <Form.Group className="mb-2 position-relative">
                                     <Form.Label>Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
-                                        placeholder="Enter password"
+                                        placeholder="Password"
                                         {...register('password', {
                                             required: 'Password is required',
                                             minLength: {
@@ -213,7 +196,7 @@ const AddRole = ({ show, close }) => {
                                     <Form.Label>Reporting</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter Reporting"
+                                        placeholder=" Reporting"
                                         {...register('reportingTo', {
                                             required: 'Reporting is required',
                                             pattern: {
@@ -225,63 +208,35 @@ const AddRole = ({ show, close }) => {
                                     {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
                                 </Form.Group>
                             </Col>
-
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label>Date of Leaving</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        {...register('leavingDate', { required: 'Leaving date is required' })}
-                                    />
-                                    {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Designation</Form.Label>
-                                    <Form.Select
-                                        {...register('designation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors.designation && (
-                                        <span className="text-danger fs-6">{errors.designation.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Re-Enter Designation</Form.Label>
-                                    <Form.Select
-                                        {...register('reDesignation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Phone No.</Form.Label>
+                                    <Form.Label>Contact No.</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Enter phone number"
+                                        placeholder=" contact number"
+                                        {...register('contact', {
+                                            required: 'Contact number is required',
+                                            pattern: {
+                                                value: /^[0-9]{10}$/,
+                                                message: 'Only 10-digit numbers are allowed',
+                                            },
+                                        })}
+                                    />
+                                    {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
+                                </Form.Group>
+                            </Col>
+                         
+
+                        
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Contact Number secondary  </Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder=" phone number"
                                         {...register('phone', {
-                                            required: 'Phone number is required',
+                                            required: 'Contact Number secondary   number is required',
                                             pattern: {
                                                 value: /^[0-9]{10}$/,
                                                 message: 'Only 10-digit numbers are allowed',
@@ -291,6 +246,27 @@ const AddRole = ({ show, close }) => {
                                     {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
                                 </Form.Group>
                             </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Role</Form.Label>
+                                    <Form.Select
+                                        {...register('role', { required: 'Role is required' })}
+                                    >
+                                        <option value="">Select Role</option>
+                                        {decryptedRolesData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.role && (
+                                        <span className="text-danger fs-6">{errors.role.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+
+
+                          
 
                         </Row>
                         <Modal.Footer className="border-0">

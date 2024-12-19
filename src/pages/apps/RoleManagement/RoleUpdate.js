@@ -16,7 +16,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const createLoading = store?.updateRolesReducer?.loading
     const createSuccess = store?.updateRolesReducer?.data?.status
-    console.log({createSuccess})
+    console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
 
 
@@ -35,14 +35,16 @@ const RoleUpdate = ({ show, close, currentUser }) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
         const formattedLeavingDate = new Date(data.leavingDate).toISOString();
         const payload = {
-            id: currentUser?._id,
             firstName: data.name,
+            email: data.email,
+            password: data.password,
             phone: data?.phone,
-            reportingTo: '67595b464c94e64c5b916ed2',
+            clinicId: clinicId,
+            reportingTo: data?.reportingTo,
             joiningDate: formattedJoiningDate,
             leavingDate: formattedLeavingDate,
-            designation: data.designation,
-            status: currentUser?.status,
+            role: data.role,
+            contact: data.contact
         };
         console.log('edit', payload);
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
@@ -55,7 +57,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
 
         } else {
-           
+
 
         }
         close()
@@ -71,7 +73,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                         <Col sm={1}></Col>
                         <Col sm={10}>
                             <h4 className="mb-0 text-center">
-                                Add New User
+                                Edit New User
                             </h4>
                         </Col>
                         <Col sm={1}>
@@ -117,24 +119,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Contact No.</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter contact number"
-                                        defaultValue={currentUser?.phone}
-                                        {...register('contact', {
-                                            required: 'Contact number is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
-                                </Form.Group>
-                            </Col>
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2 position-relative">
                                     <Form.Label>Password</Form.Label>
@@ -205,6 +190,42 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
+                                    <Form.Label>Contact No.</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter contact number"
+                                        defaultValue={currentUser?.phone}
+                                        {...register('contact', {
+                                            required: 'Contact number is required',
+                                            pattern: {
+                                                value: /^[0-9]{10}$/,
+                                                message: 'Only 10-digit numbers are allowed',
+                                            },
+                                        })}
+                                    />
+                                    {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Contact Number secondary</Form.Label>
+                                    <Form.Control
+                                        type="text"
+
+                                        placeholder="Contact Number secondary "
+                                        {...register('phone', {
+                                            required: 'Contact Number secondary is required',
+                                            pattern: {
+                                                value: /^[0-9]{10}$/,
+                                                message: 'Only 10-digit numbers are allowed',
+                                            },
+                                        })}
+                                    />
+                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
                                     <Form.Label>Date of Joining</Form.Label>
                                     <Form.Control
                                         type="date"
@@ -212,6 +233,77 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                         {...register('joiningDate', { required: 'Joining date is required' })}
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
+                                </Form.Group>
+                            </Col>
+                        
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Date of Leaving</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        defaultValue={currentUser?.joiningDate}
+                                        {...register('leavingDate', { required: 'Leaving date is required' })}
+                                    />
+                                    {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
+                                </Form.Group>
+                            </Col>
+
+                            {/* <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Designation</Form.Label>
+                                    <Form.Select
+                                        defaultValue={currentUser?.designation}
+                                        {...register('designation', { required: 'Designation is required' })}
+                                    >
+                                        <option value="">Select designation</option>
+                                        {tableGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.designation && (
+                                        <span className="text-danger fs-6">{errors.designation.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col> */}
+
+
+                            {/* <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Re-Enter Designation</Form.Label>
+                                    <Form.Select
+                                        defaultValue={currentUser?.designation}
+
+                                        {...register('reDesignation', { required: 'Designation is required' })}
+                                    >
+                                        <option value="">Select designation</option>
+                                        {tableGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
+                                </Form.Group>
+                            </Col> */}
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Role</Form.Label>
+                                    <Form.Select
+                                        {...register('role', { required: 'Role is required' })}
+                                    >
+                                        <option value="">Select Role</option>
+                                        {decryptedRolesData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.role && (
+                                        <span className="text-danger fs-6">{errors.role.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -232,76 +324,6 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
 
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Date of Leaving</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        defaultValue={currentUser?.joiningDate}
-                                        {...register('leavingDate', { required: 'Leaving date is required' })}
-                                    />
-                                    {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Designation</Form.Label>
-                                    <Form.Select
-                                        defaultValue={currentUser?.designation}
-                                        {...register('designation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors.designation && (
-                                        <span className="text-danger fs-6">{errors.designation.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Re-Enter Designation</Form.Label>
-                                    <Form.Select
-                                        defaultValue={currentUser?.designation}
-
-                                        {...register('reDesignation', { required: 'Designation is required' })}
-                                    >
-                                        <option value="">Select designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
-                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Phone No.</Form.Label>
-                                    <Form.Control
-                                        type="text"
-
-                                        placeholder="Enter phone number"
-                                        {...register('phone', {
-                                            required: 'Phone number is required',
-                                            pattern: {
-                                                value: /^[0-9]{10}$/,
-                                                message: 'Only 10-digit numbers are allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
-                                </Form.Group>
-                            </Col>
 
                         </Row>
                         <Modal.Footer className="border-0">
