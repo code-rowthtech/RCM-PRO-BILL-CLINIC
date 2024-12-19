@@ -231,7 +231,7 @@ const NewPatient = () => {
         { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
     ];
     return (
-        <div className="background_Color pt-1 pb-2">
+        <div className="background_Color pt-1 pb-2 px-0">
             <div className="container-fluid mt-2 px-0">
                 <Card className="px-3 py-2">
                     <div className="d-flex justify-content-between">
@@ -257,6 +257,16 @@ const NewPatient = () => {
 
                         </div>
                         <div>
+                            {activeTab === "responsible" && (
+                                <Button
+                                    className="me-2"
+                                    variant="primary"
+                                    onClick={() => handleTabChange("responsible")}
+                                >
+                                    Payment
+                                </Button>
+                            )}
+
                             <Button className="me-2">
                                 Save
                             </Button>
@@ -273,7 +283,7 @@ const NewPatient = () => {
                         {/* Form Section */}
 
                         {activeTab === "personalDetails" && (<Form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row  mt-1" style={{ borderBottom: "1px solid #444141" }}>
+                            <div className="row  mt-1" >
                                 <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
                                     <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
                                         <div className="col-4">
@@ -401,8 +411,8 @@ const NewPatient = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="row pb-2 mt-3">
-                                        <div className="col-6 mb-3">
+                                    <div className="row pb-2 mt-2" style={{ borderBottom: "1px solid #444141" }}>
+                                        <div className="col-6 mb-2">
                                             <Form.Label htmlFor="marital">Marital Status</Form.Label>
                                             <Form.Control
                                                 as="select"  // Use 'select' to make it a dropdown
@@ -419,7 +429,7 @@ const NewPatient = () => {
 
                                         </div>
 
-                                        <div className="col-6 mb-3">
+                                        <div className="col-6 mb-2">
                                             <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
                                             <Form.Control
                                                 type="date"  // Change type to "date" for date input
@@ -428,7 +438,7 @@ const NewPatient = () => {
                                             />
                                         </div>
 
-                                        <div className="col-6 mb-3">
+                                        <div className="col-6 mb-2">
                                             <Form.Label htmlFor="deceased">Deceased</Form.Label>
                                             <Form.Control
                                                 as="select"  // Use 'select' to create a dropdown
@@ -442,7 +452,7 @@ const NewPatient = () => {
 
                                         </div>
 
-                                        <div className="col-6 mb-3">
+                                        <div className="col-6 mb-2">
                                             <Form.Label htmlFor="SSN">SSN#</Form.Label>
                                             <Form.Control
                                                 type="text"
@@ -468,6 +478,76 @@ const NewPatient = () => {
                                             />
                                         </div>
                                     </div>
+                                    <div className="col-12">
+                                        <div>
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-2">
+                                                <thead className="text-white">
+                                                    <tr>
+                                                        <th className='text-white'>Seq</th>
+                                                        <th className='text-white'>Coverage</th>
+                                                        <th className='text-white'>Carrier</th>
+                                                        {/* <th className='text-white'>Email</th> */}
+                                                        {/* <th className='text-white'>Status</th> */}
+                                                        <th className='text-white'>Subscriber</th>
+                                                        <th className='text-white'>Id#</th>
+                                                        <th className='text-white'>Capay</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr >
+                                                        <td>1</td>
+                                                        <td>Primary</td>
+                                                        <td className="">Anthem</td>
+                                                        {/* <td>{data.email}</td> */}
+                                                        <td>Test</td>
+                                                        <td>2333</td>
+
+                                                        {/* <td>{data.status}</td> */}
+                                                        <td>
+                                                            0.00
+                                                        </td>
+                                                    </tr>
+
+
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                        <div>
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-2 pt-2">
+                                                <thead className="text-white">
+                                                    <tr>
+                                                        <th className="text-white"></th>
+                                                        <th className="text-white">0-30</th>
+                                                        <th className="text-white">31-60</th>
+                                                        <th className="text-white">61-90</th>
+                                                        <th className="text-white">91-120</th>
+                                                        <th className="text-white">121+</th>
+                                                        <th className="text-white">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {tableData.map((row, rowIndex) => (
+                                                        <tr key={rowIndex}>
+                                                            <td>{row.type}</td>
+                                                            {row.values.map((value, colIndex) => (
+                                                                <td key={colIndex}>
+                                                                    <Form.Group>
+                                                                        <InputGroup>
+                                                                            <Form.Control
+                                                                                type="tel"
+                                                                                placeholder={value}
+                                                                            />
+                                                                        </InputGroup>
+                                                                    </Form.Group>
+                                                                </td>
+                                                            ))}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <div className="col-6">
                                     <div className="row">
@@ -516,7 +596,7 @@ const NewPatient = () => {
                                                 {...register('chartNumber', { required: "Chart number is required" })}
                                             />
                                         </div>
-                                        <div className="">
+                                        <div className="" style={{ borderBottom: "1px solid #444141" }}>
 
                                             <Form.Group className="mb-2">
                                                 <Form.Label className="mb-1">Address</Form.Label>
@@ -572,8 +652,6 @@ const NewPatient = () => {
                                                     </div>
                                                 </div>
                                             </Form.Group>
-                                        </div>
-                                        <div className=" ">
                                             <div className="row">
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
@@ -618,170 +696,98 @@ const NewPatient = () => {
                                                 </Col>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                                    <div>
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-2">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className='text-white'>Seq</th>
-                                                    <th className='text-white'>Coverage</th>
-                                                    <th className='text-white'>Carrier</th>
-                                                    {/* <th className='text-white'>Email</th> */}
-                                                    {/* <th className='text-white'>Status</th> */}
-                                                    <th className='text-white'>Subscriber</th>
-                                                    <th className='text-white'>Id#</th>
-                                                    <th className='text-white'>Capay</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr >
-                                                    <td>1</td>
-                                                    <td>Primary</td>
-                                                    <td className="">Anthem</td>
-                                                    {/* <td>{data.email}</td> */}
-                                                    <td>Test</td>
-                                                    <td>2333</td>
 
-                                                    {/* <td>{data.status}</td> */}
-                                                    <td>
-                                                        0.00
-                                                    </td>
-                                                </tr>
+                                        <div className="col-12">
+                                            <div className="row pb-0 mt-2" >
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="financial">Financial Class</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="financial"
+                                                        {...register('financialClass', { required: "Financial Class is required" })}
+                                                    >
+                                                        <option value="">Select Financial Class</option>  {/* Default option */}
+                                                        <option value="Self-Pay">Self-Pay</option>
+                                                        <option value="Insurance">Insurance</option>
+                                                        <option value="Medicaid">Medicaid</option>
+                                                        <option value="Medicare">Medicare</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
+                                                </div>
 
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                    <div>
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-2 pt-2">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className="text-white"></th>
-                                                    <th className="text-white">0-30</th>
-                                                    <th className="text-white">31-60</th>
-                                                    <th className="text-white">61-90</th>
-                                                    <th className="text-white">91-120</th>
-                                                    <th className="text-white">121+</th>
-                                                    <th className="text-white">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tableData.map((row, rowIndex) => (
-                                                    <tr key={rowIndex}>
-                                                        <td>{row.type}</td>
-                                                        {row.values.map((value, colIndex) => (
-                                                            <td key={colIndex}>
-                                                                <Form.Group>
-                                                                    <InputGroup>
-                                                                        <Form.Control
-                                                                            type="tel"
-                                                                            placeholder={value}
-                                                                        />
-                                                                    </InputGroup>
-                                                                </Form.Group>
-                                                            </td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="row pb-0 mt-2" >
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="financial">Financial Class</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="financial"
-                                                {...register('financialClass', { required: "Financial Class is required" })}
-                                            >
-                                                <option value="">Select Financial Class</option>  {/* Default option */}
-                                                <option value="Self-Pay">Self-Pay</option>
-                                                <option value="Insurance">Insurance</option>
-                                                <option value="Medicaid">Medicaid</option>
-                                                <option value="Medicare">Medicare</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="provider">Provider Profile</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Provider Profile"
+                                                        {...register('providerProfile', { required: "Provider Profile is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="employer">Employer</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Employer"
+                                                        {...register('employer', { required: "Employer is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="relationship">Relationship</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="relationship"
+                                                        {...register('relationship', { required: "Relationship is required" })}
+                                                    >
+                                                        <option value="">Select Relationship</option>  {/* Default option */}
+                                                        <option value="Self">Self</option>
+                                                        <option value="Spouse">Spouse</option>
+                                                        <option value="Child">Child</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
-                                        </div>
+                                                </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="provider">Provider Profile</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Provider Profile"
-                                                {...register('providerProfile', { required: "Provider Profile is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="employer">Employer</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Employer"
-                                                {...register('employer', { required: "Employer is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="relationship">Relationship</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="relationship"
-                                                {...register('relationship', { required: "Relationship is required" })}
-                                            >
-                                                <option value="">Select Relationship</option>  {/* Default option */}
-                                                <option value="Self">Self</option>
-                                                <option value="Spouse">Spouse</option>
-                                                <option value="Child">Child</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="preferred"
+                                                        {...register('preferredLanguage', { required: "Preferred Language is required" })}
+                                                    >
+                                                        <option value="">Select Preferred Language</option>  {/* Default option */}
+                                                        <option value="English">English</option>
+                                                        <option value="Spanish">Spanish</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
-                                        </div>
+                                                </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="preferred"
-                                                {...register('preferredLanguage', { required: "Preferred Language is required" })}
-                                            >
-                                                <option value="">Select Preferred Language</option>  {/* Default option */}
-                                                <option value="English">English</option>
-                                                <option value="Spanish">Spanish</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
-
-                                        </div>
-
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="PCP">PCP</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="PCP"
-                                                {...register('pcp', { required: "PCP is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6">
-                                            <Form.Label htmlFor="race">Race & Ethnicity</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Race & Ethnicity"
-                                                {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
-                                            />
+                                                <div className="col-6 mb-2">
+                                                    <Form.Label htmlFor="PCP">PCP</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="PCP"
+                                                        {...register('pcp', { required: "PCP is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <Form.Label htmlFor="race">Race & Ethnicity</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Race & Ethnicity"
+                                                        {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
 
                             {/* Buttons */}
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="secondary">Delete</Button>
+                                <Button variant="danger">Delete</Button>
                                 <Button variant="secondary">Clear</Button>
                                 <Button variant="primary" type="submit">Next</Button>
                             </div>
