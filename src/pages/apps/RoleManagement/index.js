@@ -164,7 +164,7 @@ const RoleManagement = () => {
                                             onChange={handleSearchChange}
                                         />
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
-                                            New Receptionist
+                                           Add Users
                                         </Button>
                                     </Col>
                                 </Row>
