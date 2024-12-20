@@ -73,14 +73,14 @@ const AddBreak = () => {
                 <Card className="px-3 py-2" style={{ height: "85vh" }}>
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD BREAK</p>
-                        <Button onClick={() => navigate(-1)}>Back</Button>
+                        <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
                     </div>
                     <div className="px-2">
                         <Form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row pb-4 mt-3">
+                            <div className="row pb-2 mt-1">
                                 <div className="col-6">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             Doctor Name<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Select
@@ -103,8 +103,8 @@ const AddBreak = () => {
                                             <span className="text-danger">{errors.doctorInfo.message}</span>
                                         )}
                                     </Form.Group>
-                                    <Form.Group className="mt-4">
-                                        <Form.Label>
+                                    <Form.Group className="mt-1">
+                                        <Form.Label className="mb-0">
                                             From<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control
@@ -118,7 +118,7 @@ const AddBreak = () => {
                                 </div>
 
                                 <div className="col-6">
-                                    <Form.Group className="mb-3 mt-4 pb-1">
+                                    <Form.Group className="mb-1 mt-3">
                                         <div className="d-flex gap-5">
                                             <Form.Check
                                                 type="radio"
@@ -154,8 +154,8 @@ const AddBreak = () => {
                                             </div>
                                         </div>
                                     </Form.Group>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             To<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control

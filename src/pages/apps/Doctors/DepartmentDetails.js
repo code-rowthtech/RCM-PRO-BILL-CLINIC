@@ -14,7 +14,8 @@ const DepartmentDetails = ({ docId }) => {
   const [showCAQHPassword, setShowCAQHPassword] = useState(false);
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
-  const departmentId = store?.getMastersDataReducer?.data?.result
+  const departmentId = store?.getMastersDataReducer?.data?.result;
+  console.log(departmentId, 'departmentIddepartmentId')
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
   const id = doctorDetails?._id
   // console.log(departmentId, 'departmentId')
@@ -157,6 +158,7 @@ const DepartmentDetails = ({ docId }) => {
                         },
                       })}
                       placeholder="Enter TIN/SSN"
+                      maxLength={9}
                     />
                     {errors.TIN_SSN && (
                       <span className="text-danger">{errors.TIN_SSN.message}</span>
@@ -175,6 +177,7 @@ const DepartmentDetails = ({ docId }) => {
                       } : {}
                       )}
                       placeholder="Enter NPI Username"
+                      maxLength={10}
                     />
                     {errors.NPIUsername && (
                       <span className="text-danger">{errors.NPIUsername.message}</span>
@@ -193,6 +196,7 @@ const DepartmentDetails = ({ docId }) => {
                           required: 'CAQH ID is required'
                         } : {})
                       })}
+                      maxLength={10}
                       placeholder="Enter CAQH ID"
                     />
                     {errors.CAQH_ID && (
@@ -218,6 +222,7 @@ const DepartmentDetails = ({ docId }) => {
                           },
                         } : {}
                       )}
+                      maxLength={10}
                       placeholder="Enter NPI"
                     />
                     {errors.NPI && <span className="text-danger">{errors.NPI.message}</span>}
@@ -316,6 +321,7 @@ const DepartmentDetails = ({ docId }) => {
                     </Form.Label>
                     <Form.Control
                       type="text"
+                      maxLength={6}
                       {...register('medicarePTAN',
                         !updateId ? {
                           required: 'Medicare PTAN is required',

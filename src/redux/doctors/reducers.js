@@ -5,6 +5,18 @@ const GET_DOCTORS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const GET_DOCTORS_ROLES_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+const CREATE_DOCTORS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+const GET_DOCTORS_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -32,7 +44,7 @@ export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => 
     }
 }
 
-export const getDoctorsRolesReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
+export const getDoctorsRolesReducer = (state = GET_DOCTORS_ROLES_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.GET_DOCTORS_ROLES_LOADING:
             return {
@@ -58,7 +70,7 @@ export const getDoctorsRolesReducer = (state = GET_DOCTORS_INITIAL_STATE, action
     }
 }
 
-export const createtDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
+export const createtDoctorsReducer = (state = CREATE_DOCTORS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.CREATE_DOCTORS_LOADING:
             return {
@@ -84,7 +96,7 @@ export const createtDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action)
     }
 }
 
-export const getDoctorDetailsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
+export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.GET_DOCTORS_DETAILS_LOADING:
             return {

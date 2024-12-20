@@ -3,7 +3,7 @@
 }
 .btn:focus {
     outline: 0;
-    box-shadow: 0 ; 
+    box-shadow: 0;
 }
 .headers {
     background-color: #010101 !important;
@@ -15,7 +15,6 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
-
 
 .light-border-bottom {
     border-bottom: 1px solid #313a4615 !important;
@@ -46,7 +45,7 @@
     color: #a9a9a9 !important;
 }
 .file-input {
-    display: none; 
+    display: none;
 }
 .form-label {
     color: black;
@@ -71,7 +70,6 @@
 .form-select[data-has-value='true'] {
     color: black !important;
 }
-
 
 /* .form-select.empty {
     color: red !important;
@@ -102,8 +100,8 @@ textarea,
 select {
     border: 1px solid rgba(15, 13, 13, 0.473) !important;
 }
-.input{
-border-radius: 4px !important;
+.input {
+    border-radius: 4px !important;
 }
 
 tbody tr:nth-child(even) {
@@ -148,7 +146,7 @@ table {
 }
 
 .file-input {
-    display: none; 
+    display: none;
 }
 .custom-file-upload-icon {
     display: flex;
@@ -162,5 +160,6 @@ table {
     position: relative;
     border: 1px solid red !important;
 }
-
-
+.form-check-input {
+    cursor: pointer;
+}
