@@ -5,7 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -533,6 +533,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [cities1, cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
+    console.log(getTableData,'getTableDatagetTableData')
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
@@ -1601,7 +1602,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         </td>
                                                         <td>
                                                             <div className="text-center">
-                                                                <Link to={`/apps/Practice/new-practice?id=${patient?.userId?._id}`} className='text-black cursor-pointer ps-2'>
+                                                                <Link to={`/apps/Practice/updateSubClinic?id=${patient?.userId?._id}&clinicId=${patient?._id}`} className='text-black cursor-pointer ps-2'>
                                                                     <FiEdit className="fs-4 cursor-pointer" />
                                                                 </Link>
                                                             </div>
