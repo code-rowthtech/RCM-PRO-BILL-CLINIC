@@ -154,11 +154,11 @@ const DepartmentDetails = ({ docId }) => {
                         required: 'TIN/SSN is required',
                         pattern: {
                           value: /^\d{3}-\d{2}-\d{4}$/, // Example: TIN/SSN format
-                          message: 'Invalid TIN/SSN format',
+                          message: 'Invalid TIN/SSN format, valid format (XXX-XX-XXXX).',
                         },
                       })}
                       placeholder="Enter TIN/SSN"
-                      maxLength={9}
+                      maxLength={11}
                     />
                     {errors.TIN_SSN && (
                       <span className="text-danger">{errors.TIN_SSN.message}</span>
@@ -321,7 +321,7 @@ const DepartmentDetails = ({ docId }) => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      maxLength={6}
+                      maxLength={10}
                       {...register('medicarePTAN',
                         !updateId ? {
                           required: 'Medicare PTAN is required',
@@ -565,6 +565,7 @@ const DepartmentDetails = ({ docId }) => {
                             },
                           } : {}
                         )}
+                        maxLength={9}
                       />
                       {errors.DEA && <span className="text-danger">{errors.DEA.message}</span>}
                     </Form.Group>
@@ -604,6 +605,8 @@ const DepartmentDetails = ({ docId }) => {
                     id="CLIA"
                     className="w-100 input ps-2 py-1"
                     placeholder="Enter CLIA #"
+                    minLength={10}
+                    maxLength={15}
                     {...register('CLIA',
                       !updateId ? {
                         required: 'CLIA is required',

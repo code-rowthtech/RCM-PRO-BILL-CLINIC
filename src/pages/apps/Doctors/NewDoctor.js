@@ -194,7 +194,7 @@ const NewDoctor = () => {
             email: data?.email,
             dob: data?.dateOfBirth,
             gender: data?.gender,
-            ...(!id ? { password: data?.password } : {}),
+            ...(!updateId ? { password: data?.password } : {}),
             phone: data?.phone,
             degreeName: data?.degreeName,
             profileImage: {
@@ -729,21 +729,23 @@ const NewDoctor = () => {
                                                                             <Form.Control
                                                                                 type={showPassword ? "text" : "password"}
                                                                                 // onKeyDown={(event) => handleFirstSpace(event, 0)}
+
                                                                                 onKeyDown={(e) => {
                                                                                     if (e.key === " ") {
                                                                                         e.preventDefault();
                                                                                     }
                                                                                 }}
+                                                                                defaultValue={updateId ? '*********' : ''}
                                                                                 onCopy={(e) => e.preventDefault()}
                                                                                 onCut={(e) => e.preventDefault()}
-                                                                                placeholder={id ? "********" : "Password"}
-                                                                                readOnly={id}
+                                                                                placeholder={"Password"}
+                                                                                readOnly={updateId}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('password');
                                                                                     setFormData({ ...formData, password: e.target.value })
                                                                                 }}
                                                                                 {...register("password", {
-                                                                                    required: !id ? "Password is required" : false,
+                                                                                    required: !updateId ? "Password is required" : false,
                                                                                     pattern: {
                                                                                         value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
                                                                                         message:
