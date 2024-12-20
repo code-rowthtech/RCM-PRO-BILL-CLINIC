@@ -119,7 +119,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 Appointments
                                             </a>
                                         </li>
-                                        <li className="nav-item ms-3">
+                                        <li className="nav-item ms-2">
                                             <a
                                                 className={classNames("nav-link fw-bold text-black", { active: activeTab === 'transactions', 'fw-bold': activeTab === 'transactions' })}
                                                 href="#"

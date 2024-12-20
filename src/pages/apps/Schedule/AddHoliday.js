@@ -47,16 +47,16 @@ const AddHoliday = () => {
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
-                            <Button onClick={() => navigate(-1)}>Back</Button>
+                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
                     <div className="px-2">
                         <Form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row pb-4 mt-3">
+                            <div className="row pb-2 mt-1">
                                 <div className="col-6">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label className="mb-1">
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             Doctor Name<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Select
@@ -83,8 +83,8 @@ const AddHoliday = () => {
                                         )}
                                     </Form.Group>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label className="mb-1">
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             Till Date<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control
@@ -100,8 +100,8 @@ const AddHoliday = () => {
                                 </div>
 
                                 <div className="col-6">
-                                    <Form.Group className="mb-3">
-                                        <Form.Label className="mb-1">
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             From Date<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control
@@ -115,8 +115,8 @@ const AddHoliday = () => {
                                         )}
                                     </Form.Group>
 
-                                    <Form.Group className="mb-3">
-                                        <Form.Label className="mb-1">
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">
                                             Reason<span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control

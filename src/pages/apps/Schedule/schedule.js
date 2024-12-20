@@ -59,7 +59,7 @@ const Schedule = () => {
                                 <Col sm={4}>
                                     <ul className="nav nav-underline">
                                         {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
-                                            <li className="nav-item ms-3" key={index}>
+                                            <li className="nav-item " key={index}>
                                                 <a
                                                     className={classNames('nav-link fw-bold text-black', {
                                                         active: activeTab === tab,
@@ -137,7 +137,7 @@ const Schedule = () => {
                             </Row>
 
                             {/* Tab Content */}
-                            <div className="mt-3">{renderTabContent()}</div>
+                            <div className="mt-1">{renderTabContent()}</div>
                         </Card.Body>
                     </Card>
                 </Col>
