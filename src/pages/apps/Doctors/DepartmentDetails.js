@@ -138,14 +138,14 @@ const DepartmentDetails = ({ docId }) => {
 
             :
             <>
-              <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold">
+              <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
+                <p className="fw-bold mb-1">
                   Identification & Credentials  {!updateId && <span className='text-danger'>*</span>}
                 </p>
                 <div className="col-6">
                   {/* TIN/SSN Field */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       TIN/SSN {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -166,8 +166,8 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* NPI Username Field */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       NPI Username  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -185,8 +185,8 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* CAQH ID Field */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       CAQH ID  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -207,8 +207,8 @@ const DepartmentDetails = ({ docId }) => {
 
                 <div className="col-6">
                   {/* NPI Field */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       NPI (National Provider Identifier)  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -229,8 +229,8 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* NPI Password Field */}
-                  <Form.Group className='mb-3 '>
-                    <Form.Label>NPI Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
+                  <Form.Group className='mb-1'>
+                    <Form.Label className="mb-0">NPI Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
                     <div className="position-relative">
                       <Form.Control
                         type={showPassword ? "text" : "password"}
@@ -257,8 +257,8 @@ const DepartmentDetails = ({ docId }) => {
                   <div className="row">
                     {/* CAQH Username Field */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">
                           CAQH Username  {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Control
@@ -278,8 +278,8 @@ const DepartmentDetails = ({ docId }) => {
 
                     {/* CAQH Password Field */}
                     <div className="col-6">
-                      <Form.Group className='mb-3 '>
-                        <Form.Label>CAQH Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
+                      <Form.Group className='mb-2 '>
+                        <Form.Label className="mb-0">CAQH Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
                         <div className="position-relative">
                           <Form.Control
                             type={showCAQHPassword ? "text" : "password"}
@@ -309,14 +309,14 @@ const DepartmentDetails = ({ docId }) => {
                 </div>
               </div>
 
-              <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold">
+              <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
+                <p className="fw-bold mb-1">
                   Medicare & Medicaid Information  {!updateId && <span className='text-danger'>*</span>}
                 </p>
                 <div className="col-6">
                   {/* Medicare PTAN */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       Medicare PTAN  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -339,8 +339,8 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* Medicare SPOT Logins */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       Medicare SPOT Logins  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -362,8 +362,8 @@ const DepartmentDetails = ({ docId }) => {
                   <div className="row">
                     {/* Medicaid ID */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">
                           Medicaid ID  {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Control
@@ -383,8 +383,8 @@ const DepartmentDetails = ({ docId }) => {
 
                     {/* Department */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">
                           Department  {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Select
@@ -412,8 +412,8 @@ const DepartmentDetails = ({ docId }) => {
                   </div>
 
                   {/* Medicare PECOS Logins */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-2">
+                    <Form.Label className="mb-0">
                       Medicare PECOS Login  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -432,14 +432,14 @@ const DepartmentDetails = ({ docId }) => {
                 </div>
               </div>
 
-              <div className="row mt-3" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold">
+              <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
+                <p className="fw-bold mt-1 mb-1">
                   Licensing Information  {!updateId && <span className='text-danger'>*</span>}
                 </p>
                 <div className="col-6">
                   {/* State License */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       State License  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -455,8 +455,8 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
 
                   {/* State License Obtained */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       State License Obtained (state)  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -476,8 +476,8 @@ const DepartmentDetails = ({ docId }) => {
 
                 <div className="col-6">
                   {/* State License Provider */}
-                  <Form.Group className="mb-3">
-                    <Form.Label>
+                  <Form.Group className="mb-1">
+                    <Form.Label className="mb-0">
                       State License Provider (licensing authority name)  {!updateId && <span className='text-danger'>*</span>}
                     </Form.Label>
                     <Form.Control
@@ -497,8 +497,8 @@ const DepartmentDetails = ({ docId }) => {
                   <div className="row">
                     {/* State License Issue Date */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">
                           State License Issue Date  {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Control
@@ -520,8 +520,8 @@ const DepartmentDetails = ({ docId }) => {
 
                     {/* License Expiration Date */}
                     <div className="col-6">
-                      <Form.Group className="mb-3">
-                        <Form.Label>
+                      <Form.Group className="mb-2">
+                        <Form.Label className="mb-0">
                           License Expiration Date  {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Control
@@ -544,11 +544,11 @@ const DepartmentDetails = ({ docId }) => {
                 </div>
               </div>
 
-              <div className="row mt-3">
-                <div className="col-6">
+              <div className="row mt-1">
+                <div className="col-4">
                   <div>
-                    <Form.Group className="mb-3">
-                      <Form.Label htmlFor="DEA" className="form-label">
+                    <Form.Group className="mb-1">
+                      <Form.Label htmlFor="DEA" className="form-label mb-0">
                         DEA # (Drug Enforcement Administration number) {!updateId && <span className='text-danger'>*</span>}
                       </Form.Label>
                       <Form.Control
@@ -570,11 +570,11 @@ const DepartmentDetails = ({ docId }) => {
                     </Form.Group>
                   </div>
                 </div>
-                <div className="col-6">
+                <div className="col-4">
                   <div>
                     <div className="row">
-                      <Form.Group className="mb-3">
-                        <Form.Label htmlFor="DEA_IssueDate" className="form-label">
+                      <Form.Group className="mb-1">
+                        <Form.Label htmlFor="DEA_IssueDate" className="form-label mb-0">
                           DEA Issue Date {!updateId && <span className='text-danger'>*</span>}
                         </Form.Label>
                         <Form.Control
@@ -595,30 +595,32 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
                   </div>
                 </div>
-                <Form.Group className="mb-3">
-                  <Form.Label htmlFor="CLIA" className="form-label">
-                    CLIA # (Clinical Laboratory Improvement Amendments) {!updateId && <span className='text-danger'>*</span>}
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    id="CLIA"
-                    className="w-100 input ps-2 py-1"
-                    placeholder="Enter CLIA #"
-                    {...register('CLIA',
-                      !updateId ? {
-                        required: 'CLIA is required',
-                        pattern: {
-                          value: /^[A-Za-z0-9]{10,15}$/, // Example: CLIA # format (10-15 alphanumeric chars)
-                          message: 'CLIA # must be between 10 and 15 alphanumeric characters',
-                        },
-                      } : {}
-                    )}
-                  />
-                  {errors.CLIA && <span className="text-danger">{errors.CLIA.message}</span>}
-                </Form.Group>
+                <div className="col-4">
+                  <Form.Group className="mb-1">
+                    <Form.Label htmlFor="CLIA" className="form-label mb-0">
+                      CLIA # (Clinical Laboratory Improvement Amendments) {!updateId && <span className='text-danger'>*</span>}
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      id="CLIA"
+                      className="w-100 input ps-2 py-1"
+                      placeholder="Enter CLIA #"
+                      {...register('CLIA',
+                        !updateId ? {
+                          required: 'CLIA is required',
+                          pattern: {
+                            value: /^[A-Za-z0-9]{10,15}$/, // Example: CLIA # format (10-15 alphanumeric chars)
+                            message: 'CLIA # must be between 10 and 15 alphanumeric characters',
+                          },
+                        } : {}
+                      )}
+                    />
+                    {errors.CLIA && <span className="text-danger">{errors.CLIA.message}</span>}
+                  </Form.Group>
+                </div>
               </div>
 
-              <div className="d-flex justify-content-end gap-2 mt-2">
+              <div className="d-flex justify-content-end gap-2 mt-1">
                 <Button className="" variant="secondary">
                   Cancel
                 </Button>
