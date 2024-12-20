@@ -22,45 +22,37 @@ const Doctors = () => {
         const payload = { status: status, search: search }
         dispatch(
             getDoctorsAction({ key: encryptMessage(payload) })
-            
+
         );
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
     const updateStatus = useSelector((state) => state?.createtDoctorsReducer?.data?.status) || [];
-    console.log({updateStatus})
-
-   
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
-
     const filteredDoctors = doctorDetails.filter((doctor) =>
         doctor.userDetails?.status === status &&
         doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleStatusChange = () => {
-        // Here, you would handle the API call or state update for changing the user's status
-        const payload={
-            id:selectedDoctor?.userId,
-            status:!selectedDoctor?.userDetails?.status,
+        const payload = {
+            id: selectedDoctor?.userId,
+            status: !selectedDoctor?.userDetails?.status,
         }
-        // console.log(payload)
         dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         closeStatusModal(); // Close modal after the action is confirmed
         dispatch(stateEmptydAction());
     };
 
-    console.log({selectedDoctor})
-    
     useEffect(() => {
-        const payload={
-            id:selectedDoctor?.userId,
-            status:status,
+        const payload = {
+            id: selectedDoctor?.userId,
+            status: status,
         }
-        if(updateStatus === 200){
+        if (updateStatus === 200) {
             dispatch(
                 getDoctorsAction({ key: encryptMessage(payload) })
-                
+
             );
         }
     }, [updateStatus]);
@@ -96,12 +88,6 @@ const Doctors = () => {
                                                 onChange={(e) => setSearch(e.target.value)} // Update search query
                                                 placeholder="Search..."
                                             />
-                                            {/* <Button className="custom-buttons ">
-                                                <FiFilter className='fs-4' />
-                                            </Button>
-                                            <Button className="custom-buttons ">
-                                                <FiFileText className='fs-4' />
-                                            </Button> */}
                                             <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons">
                                                 New Doctor
                                             </Button>
@@ -135,7 +121,7 @@ const Doctors = () => {
                                                 {filteredDoctors.length === 0 ? (
                                                     <tr>
                                                         <td colSpan={6} className='text-center'>
-                                                            <h3 className='my-5'>No Data Found  for {status === true ? 'Active':'Inactive'}</h3>
+                                                            <h3 className='my-5'>No Data Found  for {status === true ? 'Active' : 'Inactive'}</h3>
                                                         </td>
                                                     </tr>
                                                 ) : (
@@ -151,11 +137,10 @@ const Doctors = () => {
                                                             </td>
                                                             <td>
                                                                 <Form.Switch
-                                                                    // className='cursor-pointer'
                                                                     checked={data?.userDetails?.status}
                                                                     onChange={() => {
                                                                         setSelectedDoctor(data);
-                                                                        setStatusModal(true); // Open status modal
+                                                                        setStatusModal(true);
                                                                     }}
                                                                 />
                                                             </td>
@@ -164,9 +149,6 @@ const Doctors = () => {
                                                                     <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />
                                                                     </Link>
-                                                                    {/* <div>
-                                                                        <FiTrash className="fs-4" />
-                                                                    </div> */}
                                                                 </div>
                                                             </td>
                                                         </tr>

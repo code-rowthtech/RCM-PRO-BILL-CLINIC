@@ -28,7 +28,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
 
     const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscription
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
-  
+
     useEffect(() => {
         if (activeTab === 'billing') {
             dispatch(getSubscriptionsAction());
@@ -225,7 +225,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
                                                     placeholder='Billing Contact Name' />
                                             </Form.Group>
                                         </Col>
-                                        
+
                                         <Col sm={12}>
                                             <Form.Group className="mb-2">
                                                 <Form.Label className='mb-1'>Billing Contact Email</Form.Label>
@@ -236,28 +236,28 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId }) => {
                                             </Form.Group>
                                         </Col>
                                         <Col sm={12}>
-                                        <Form.Group className="mb-2 position-relative">
-                                            <Form.Label className="mb-1">Billing Contact Phone Number</Form.Label>
-                                            <InputGroup>
-                                                <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
-                                                <Form.Control
-                                                    type="tel"
-                                                    {...register('contact')}
-                                                    placeholder='Billing Contact Name'
-                                                    maxLength={10}
-                                                    isInvalid={errors?.contact}
+                                            <Form.Group className="mb-2 position-relative">
+                                                <Form.Label className="mb-1">Billing Contact Phone Number</Form.Label>
+                                                <InputGroup>
+                                                    <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
+                                                    <Form.Control
+                                                        type="tel"
+                                                        {...register('contact')}
+                                                        placeholder='Billing Contact Name'
+                                                        maxLength={10}
+                                                        isInvalid={errors?.contact}
+                                                    />
+                                                </InputGroup>
+                                                {errors?.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                <img
+                                                    src={us}
+                                                    alt="country code flag"
+                                                    style={{ top: '60%', left: '1%' }}
+                                                    className="position-absolute"
+                                                    width={20}
                                                 />
-                                            </InputGroup>
-                                            {errors?.contact && <span className="text-danger">{errors.contact.message}</span>}
-                                            <img
-                                                src={us}
-                                                alt="country code flag"
-                                                style={{ top: '60%', left: '1%' }}
-                                                className="position-absolute"
-                                                width={20}
-                                            />
-                                        </Form.Group>
-                                    </Col>
+                                            </Form.Group>
+                                        </Col>
                                     </Row>
                                 </Col>
 

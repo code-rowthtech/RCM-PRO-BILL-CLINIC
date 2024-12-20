@@ -3,12 +3,12 @@ import axios from 'axios';
 import { decryptMessage } from '../cryptoUtils'
 
 
-export const handleUpload = async (file) => {
+export const handleUpload = async (file, setLoading) => {
     if (!file) {
         alert('Please select a file first');
         return null;
     }
-
+    setLoading(true);
     try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}api/v1/clinic/s3/get-presigned-url`, {
             params: {
@@ -62,6 +62,8 @@ export const handleUpload = async (file) => {
     } catch (error) {
         console.error('Error uploading file:', error);
         return null;
+    } finally {
+        setLoading(false)
     }
 };
 

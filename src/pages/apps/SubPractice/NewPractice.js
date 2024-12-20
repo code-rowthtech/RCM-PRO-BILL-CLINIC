@@ -109,7 +109,6 @@ const NewPractice = () => {
     // const [openSelect, setOpenSelect] = useState(false);
     useEffect(() => {
         dispatch(getStatesByCountryAction());
-        // dispatch(getCitiesAction())
     }, [dispatch]);
 
     useEffect(() => {
@@ -291,62 +290,6 @@ const NewPractice = () => {
         } catch (error) {
         }
     };
-    // const handleAddMedical = () => {
-    //     const isIncomplete = medicalDetails.some(
-    //         (medical) =>
-    //             !medical.name || !medical.number || !medical.url
-    //     );
-    //     if (isIncomplete) {
-    //         ToastHandle('Please fill all the fields before adding a new one', 'danger');
-    //         return;
-    //     }
-    //     setMedicalDetails([
-    //         ...medicalDetails,
-    //         { name: '', number: '', url: null }
-    //     ]);
-    // };
-
-    // const handleMedicalInputChange = (e, field, index) => {
-    //     const value = e.target.value;
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = [...prevDetails];
-    //         updatedDetails[index] = {
-    //             ...updatedDetails[index],
-    //             [field]: value
-    //         };
-    //         return updatedDetails;
-    //     });
-    // };
-    // const handleRemoveMedical = (index) => {
-    //     setMedicalDetails((prevDetails) => {
-    //         const updatedDetails = prevDetails.filter((_, i) => i !== index);
-    //         return updatedDetails;
-    //     });
-    // };
-
-    // const handleAddState = () => {
-    //     setOpenSelect(true);
-
-    // };
-
-    // const handleMedicalChange = async (e, index) => {
-    //     const selectedFile = e.target.files[0];
-    //     try {
-    //         const url = await handleUpload(selectedFile);
-    //         setMedicalDetails((prevDetails) => {
-    //             const updatedDetails = [...prevDetails];
-    //             updatedDetails[index] = {
-    //                 ...updatedDetails[index],
-    //                 url: url?.url?.split('?')[0],
-    //                 fileName: selectedFile.name,
-
-    //             };
-    //             return updatedDetails;
-    //         });
-    //     } catch (error) {
-    //     }
-    // };
-
 
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
@@ -366,7 +309,7 @@ const NewPractice = () => {
     useEffect(() => {
         if (subClinicsDetailsGet && idUpdateDataSubClinics) {
             setFormData(subClinicsDetailsGet);
-            setValue('clinicname', subClinicsDetailsGet?.name );
+            setValue('clinicname', subClinicsDetailsGet?.name);
             setValue('clinicType', subClinicsDetailsGet?.clinicType);
             setValue('email', subClinicsDetailsGet?.userId?.email);
             setValue('taxId', subClinicsDetailsGet?.taxIdOrEIN);
@@ -382,8 +325,12 @@ const NewPractice = () => {
             setValue('address', subClinicsDetailsGet?.userId?.primaryAddress?.address);
             setValue('street', subClinicsDetailsGet?.userId?.primaryAddress?.street);
             setValue('zip', subClinicsDetailsGet?.userId?.primaryAddress?.zip);
-            setLatitude(subClinicsDetailsGet?.userId?.primaryAddress?.latitude)
-            setLongitude(subClinicsDetailsGet?.userId?.primaryAddress?.longitude)
+            if (subClinicsDetailsGet?.userId?.primaryAddress?.latitude) {
+                setLatitude(subClinicsDetailsGet?.userId?.primaryAddress?.latitude)
+            }
+            if (subClinicsDetailsGet?.userId?.primaryAddress?.longitude) {
+                setLongitude(subClinicsDetailsGet?.userId?.primaryAddress?.longitude)
+            }
             setUsePrimaryAsMailing(subClinicsDetailsGet?.userId?.isPrimaryAndMailingAddressSame)
             setValue('stateName', subClinicsDetailsGet?.userId?.primaryAddress?.state?._id)
             if (subClinicsDetailsGet?.userId?.primaryAddress?.city) {
@@ -436,8 +383,8 @@ const NewPractice = () => {
             setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
             setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
             setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
-            setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
-            setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
+            // setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
+            // setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
             setUsePrimaryAsMailing(clinicsDataGet?.userId?.isPrimaryAndMailingAddressSame)
             setField('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
             if (clinicsDataGet?.userId?.primaryAddress?.city) {
@@ -597,7 +544,7 @@ const NewPractice = () => {
 
     const submitSubData = (formData) => {
         const payload = {
-            ...(idUpdateDataSubClinics?{_id:idUpdateDataSubClinics}:{}),
+            ...(idUpdateDataSubClinics ? { _id: idUpdateDataSubClinics } : {}),
             name: formData?.clinicname,
             email: formData?.email,
             role: getRoleId,
@@ -1508,7 +1455,7 @@ const NewPractice = () => {
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
                                                                         <Form.Label className='mb-1'>
-                                                                            City 
+                                                                            City
                                                                         </Form.Label>
                                                                         <Form.Select
                                                                             disabled={store?.getCitiesReducer?.loading}
@@ -1540,7 +1487,7 @@ const NewPractice = () => {
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
                                                                         <Form.Label className='mb-1'>
-                                                                            Zip 
+                                                                            Zip
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             defaultValue={subClinicsDetailsGet?.address?.zip || ''}
