@@ -164,7 +164,7 @@ const RoleManagement = () => {
                                             onChange={handleSearchChange}
                                         />
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
-                                            New Receptionist
+                                           Add Users
                                         </Button>
                                     </Col>
                                 </Row>
@@ -207,15 +207,15 @@ const RoleManagement = () => {
                                                     <td>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
-                                                                className="fs-5 cursor-pointer"
+                                                                className="fs-4 cursor-pointer"
                                                                 onClick={() => openEditModal(data)}
                                                             />
-                                                            <FiTrash
+                                                            {/* <FiTrash
                                                                 className="fs-5 cursor-pointer"
                                                                 onClick={() => deleteHandle(data?._id)}
-                                                            />
+                                                            /> */}
                                                              <IoMdEye
-                                                                className="fs-5 cursor-pointer"
+                                                                className="fs-4 cursor-pointer"
                                                                 onClick={() => handleDetail(data?._id)}
                                                             />
                                                         </div>

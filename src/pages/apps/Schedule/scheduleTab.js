@@ -16,8 +16,8 @@ const ScheduleTab = () => {
   const store = useSelector((state) => state);
   const [time, setTime] = useState("");
   const [name, setName] = useState("");
-  const doctorLists = store?.getDoctorsListReducer?.data?.result ;
-  console.log({doctorLists})
+  const doctorLists = store?.getDoctorsListReducer?.data?.result;
+  console.log({ doctorLists })
   const scheduleList = store?.getScheduleReducer?.data?.result || [];
   const isLoading = store?.getScheduleReducer?.loading;
 
@@ -180,68 +180,71 @@ const ScheduleTab = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <h4>Edit Schedule</h4>
+      <h4 className="mt-0">Edit Schedule</h4>
 
-      <div className="mb-3 w-50">
-        <label htmlFor="doctorName" style={{ fontWeight: "bold" }}>
-          Doctor Name<span className="text-danger">*</span>
-        </label>
-        <select
-          id="doctorName"
-          value={selectedDoctor}
-          onChange={(e) => setSelectedDoctor(e.target.value)}
-          style={{
-            padding: "8px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            width: "100%",
-            marginTop: "10px",
-          }}
-        >
-          <option value="">Select a doctor</option>
-          {doctorLists?.map((doctor, index) => (
-            <option
-              key={index}
-              value={JSON.stringify({
-                id: doctor?.userId?._id,
-                name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
-              })}
-            >
-              {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
-            </option>
-          ))}
-        </select>
+      <div className="row">
+        <div className="col-6 mb-1">
+          <label htmlFor="doctorName" style={{ fontWeight: "bold"}}>
+            Doctor Name<span className="text-danger">*</span>
+          </label>
+          <select
+            id="doctorName"
+            value={selectedDoctor}
+            onChange={(e) => setSelectedDoctor(e.target.value)}
+            style={{
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              width: "100%",
+            }}
+          >
+            <option value="">Select a doctor</option>
+            {doctorLists?.map((doctor, index) => (
+              <option
+                key={index}
+                value={JSON.stringify({
+                  id: doctor?.userId?._id,
+                  name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
+                })}
+              >
+                {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="col-6 mb-1">
+          <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
+            Per Patient Time<span className="text-danger">*</span>
+          </label>
+          <input
+            type="time"
+            id="perPatientTime"
+            className="form-control"
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="mb-3 w-50">
-        <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
-          Per Patient Time<span className="text-danger">*</span>
-        </label>
-        <input
-          type="time"
-          id="perPatientTime"
-          className="form-control"
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-        />
-      </div>
-
-      <Table striped bordered hover>
+      <Table striped  className="mt-2 ">
         <thead>
           <tr>
-            <th>Available On</th>
-            <th>Available From</th>
-            <th>Available To</th>
-            <th>Action</th>
+            <th className="text-white">Available On</th>
+            <th className="text-white">Available From</th>
+            <th className="text-white">Available To</th>
+            <th className="text-white">Action</th>
           </tr>
         </thead>
         <tbody>{renderEmptyScheduleData()}</tbody>
       </Table>
 
-      <Button type="submit" variant="primary">
-        Save Schedule
-      </Button>
-      {isLoading && <Spinner animation="border" />}
+      <div className="d-flex justify-content-end">
+        <Button type="submit" variant="primary">
+          Save Schedule
+          {/* {isLoading && <Spinner animation="border" />} */}
+        </Button>
+      </div>
     </form>
   );
 };

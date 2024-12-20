@@ -231,7 +231,7 @@ const NewPatient = () => {
         { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
     ];
     return (
-        <div className="background_Color pt-1 pb-2">
+        <div className="background_Color pt-1 pb-2 px-0">
             <div className="container-fluid mt-2 px-0">
                 <Card className="px-3 py-2">
                     <div className="d-flex justify-content-between">
@@ -257,6 +257,16 @@ const NewPatient = () => {
 
                         </div>
                         <div>
+                            {activeTab === "responsible" && (
+                                <Button
+                                    className="me-2"
+                                    variant="primary"
+                                    onClick={() => handleTabChange("responsible")}
+                                >
+                                    Payment
+                                </Button>
+                            )}
+
                             <Button className="me-2">
                                 Save
                             </Button>
@@ -273,75 +283,84 @@ const NewPatient = () => {
                         {/* Form Section */}
 
                         {activeTab === "personalDetails" && (<Form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row  mt-1" style={{ borderBottom: "1px solid #444141" }}>
-                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                                    <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                                        <div className="col-4">
-                                            <div className="mb-2 d-flex flex-column position-relative">
-                                                <Form.Label>Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                <div
-                                                    onClick={() => logoFileInputRef.current.click()}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
-                                                >
-                                                    {logoName ? logoName : 'Upload Profile Image'}
-                                                    <p className="mb-0">
-                                                        <FiUploadCloud />
-                                                    </p>
-                                                </div>
-                                                <Form.Control
-                                                    type="file"
-                                                    className="d-none "
-                                                    {...register('profileImage', {
-                                                    })}
-                                                    ref={logoFileInputRef}
-                                                    onChange={handleFileChange}
-
-                                                />
-                                                {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
-                                                )}
-                                            </div>
+                            <div className="row  mt-1" >
+                                <div className="row pb-1 pe-0" style={{ borderBottom: "1px solid #444141" }}>
+                                    <div className="col-3 mb-1">
+                                        <Form.Label htmlFor="fileName" className="mb-0">Full Name</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Full Name"
+                                            {...register('fullName', { required: "Full name is required" })}
+                                        />
+                                    </div>
+                                    <div className="col-3">
+                                        <div className=" mb-1">
+                                            <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
+                                            <Form.Select
+                                                {...register('title', { required: "Title is required" })}
+                                                aria-label="Select Title"
+                                            >
+                                                <option value="">Select Title</option>
+                                                <option value="Mr.">Mr.</option>
+                                                <option value="Mrs.">Mrs.</option>
+                                                <option value="Miss">Miss</option>
+                                                <option value="Dr.">Dr.</option>
+                                                <option value="Other">Other</option>
+                                            </Form.Select>
                                         </div>
-                                        <div className="col-4">
-                                            <div>
-                                                <Form.Label htmlFor="gender">Gender<span className='text-danger'>*</span></Form.Label>
-                                                <div className="d-flex gap-2">
-                                                    <Form.Select
-                                                        {...register('gender', { required: "Gender is required" })}
-                                                        aria-label="Select Gender"
-                                                    >
-                                                        <option value="">Select Gender</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
-                                                        <option value="Other">Other</option>
-
-                                                    </Form.Select>
-
-                                                </div>
-                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
-
-                                            </div>
-                                        </div>
-                                        <div className="col-4">
-                                            <div className=" mb-2">
-                                                <Form.Label htmlFor="title">Title</Form.Label>
+                                    </div>
+                                    <div className="col-3">
+                                        <div>
+                                            <Form.Label htmlFor="gender" className="mb-0">Gender<span className='text-danger'>*</span></Form.Label>
+                                            <div className="d-flex gap-2">
                                                 <Form.Select
-                                                    {...register('title', { required: "Title is required" })}
-                                                    aria-label="Select Title"
+                                                    {...register('gender', { required: "Gender is required" })}
+                                                    aria-label="Select Gender"
                                                 >
-                                                    <option value="">Select Title</option>
-                                                    <option value="Mr.">Mr.</option>
-                                                    <option value="Mrs.">Mrs.</option>
-                                                    <option value="Miss">Miss</option>
-                                                    <option value="Dr.">Dr.</option>
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
                                                     <option value="Other">Other</option>
+
                                                 </Form.Select>
+
                                             </div>
+                                            {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
 
                                         </div>
                                     </div>
-                                    <div className="row mb-2 mt-2 pb-2" style={{ borderBottom: "1px solid #444141" }}>
-                                        <div className="col-4 mb-1">
-                                            <Form.Label htmlFor="email">Email ID</Form.Label>
+
+                                    <div className="col-3 pe-0">
+                                        <div className="mb-1 d-flex flex-column position-relative">
+                                            <Form.Label className="mb-0">Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                            <div
+                                                onClick={() => logoFileInputRef.current.click()}
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
+                                            >
+                                                {logoName ? logoName : 'Upload Profile Image'}
+                                                <p className="mb-0">
+                                                    <FiUploadCloud />
+                                                </p>
+                                            </div>
+                                            <Form.Control
+                                                type="file"
+                                                className="d-none "
+                                                {...register('profileImage', {
+                                                })}
+                                                ref={logoFileInputRef}
+                                                onChange={handleFileChange}
+
+                                            />
+                                            {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
+
+                                    <div className="row my-1 pb-2" style={{ borderBottom: "1px solid #444141" }}>
+                                        <div className="col-4">
+                                            <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
                                             <Form.Control
                                                 type="email"
                                                 placeholder="Email ID"
@@ -350,7 +369,7 @@ const NewPatient = () => {
                                         </div>
                                         <div className=' col-4'>
                                             <Form.Group className="mb-0 position-relative">
-                                                <Form.Label className='mb-1'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                                 <Form.Group>
                                                     <InputGroup>
                                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -393,7 +412,7 @@ const NewPatient = () => {
                                             </Form.Group>
                                         </div>
                                         <div className="col-4 ">
-                                            <Form.Label htmlFor="note">Note (Text)</Form.Label>
+                                            <Form.Label htmlFor="note" className="mb-0">Note (Text)</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Note"
@@ -401,9 +420,9 @@ const NewPatient = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="row pb-2 mt-3">
-                                        <div className="col-6 mb-3">
-                                            <Form.Label htmlFor="marital">Marital Status</Form.Label>
+                                    <div className="row pb-2 mt-1" style={{ borderBottom: "1px solid #444141" }}>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="marital" className="mb-0">Marital Status</Form.Label>
                                             <Form.Control
                                                 as="select"  // Use 'select' to make it a dropdown
                                                 id="marital"
@@ -419,8 +438,8 @@ const NewPatient = () => {
 
                                         </div>
 
-                                        <div className="col-6 mb-3">
-                                            <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth</Form.Label>
                                             <Form.Control
                                                 type="date"  // Change type to "date" for date input
                                                 placeholder="Date of Birth"
@@ -428,8 +447,8 @@ const NewPatient = () => {
                                             />
                                         </div>
 
-                                        <div className="col-6 mb-3">
-                                            <Form.Label htmlFor="deceased">Deceased</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="deceased" className="mb-0">Deceased</Form.Label>
                                             <Form.Control
                                                 as="select"  // Use 'select' to create a dropdown
                                                 id="deceased"
@@ -442,8 +461,8 @@ const NewPatient = () => {
 
                                         </div>
 
-                                        <div className="col-6 mb-3">
-                                            <Form.Label htmlFor="SSN">SSN#</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="SSN" className="mb-0">SSN#</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="SSN#"
@@ -460,7 +479,7 @@ const NewPatient = () => {
                                         </div>
 
                                         <div className="col-12 ">
-                                            <Form.Label htmlFor="additional">Additional MRN</Form.Label>
+                                            <Form.Label htmlFor="additional" className="mb-0">Additional MRN</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Additional MRN"
@@ -468,58 +487,100 @@ const NewPatient = () => {
                                             />
                                         </div>
                                     </div>
+                                    <div className="col-12">
+                                        <div>
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-1">
+                                                <thead className="text-white">
+                                                    <tr>
+                                                        <th className='text-white'>Seq</th>
+                                                        <th className='text-white'>Coverage</th>
+                                                        <th className='text-white'>Carrier</th>
+                                                        {/* <th className='text-white'>Email</th> */}
+                                                        {/* <th className='text-white'>Status</th> */}
+                                                        <th className='text-white'>Subscriber</th>
+                                                        <th className='text-white'>Id#</th>
+                                                        <th className='text-white'>Capay</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr >
+                                                        <td>1</td>
+                                                        <td>Primary</td>
+                                                        <td className="">Anthem</td>
+                                                        {/* <td>{data.email}</td> */}
+                                                        <td>Test</td>
+                                                        <td>2333</td>
+
+                                                        {/* <td>{data.status}</td> */}
+                                                        <td>
+                                                            0.00
+                                                        </td>
+                                                    </tr>
+
+
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                        <div>
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
+                                                <thead className="text-white">
+                                                    <tr>
+                                                        <th className="text-white"></th>
+                                                        <th className="text-white">0-30</th>
+                                                        <th className="text-white">31-60</th>
+                                                        <th className="text-white">61-90</th>
+                                                        <th className="text-white">91-120</th>
+                                                        <th className="text-white">121+</th>
+                                                        <th className="text-white">Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {tableData.map((row, rowIndex) => (
+                                                        <tr key={rowIndex}>
+                                                            <td>{row.type}</td>
+                                                            {row.values.map((value, colIndex) => (
+                                                                <td key={colIndex}>
+                                                                    <Form.Group>
+                                                                        <InputGroup>
+                                                                            <Form.Control
+                                                                                type="tel"
+                                                                                placeholder={value}
+                                                                            />
+                                                                        </InputGroup>
+                                                                    </Form.Group>
+                                                                </td>
+                                                            ))}
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </Table>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <div className="col-6">
                                     <div className="row">
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="fileName">Full Name</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Full Name"
-                                                {...register('fullName', { required: "Full name is required" })}
-                                            />
-                                        </div>
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="responsibleParty">Responsible Party Name</Form.Label>
+                                        <div className="mb-1 mt-1">
+                                            <Form.Label htmlFor="responsibleParty" className="mb-0">Responsible Party Name</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Responsible party name"
                                                 {...register('responsiblePartyName', { required: "Responsible party name is required" })}
                                             />
                                         </div>
-                                        <div className="mb-2">
 
-                                            <Form.Group className="">
-                                                <Form.Label className='' >State</Form.Label>
-                                                <Form.Select
-                                                    {...register('stateName')}
-                                                    onChange={(e) => handleStateSelection(e)}
-                                                >
-                                                    <option>State</option>
-                                                    {statesData?.states?.map((data) => (
-                                                        <option
-                                                            key={data?.id} // Unique key for each option
-                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                            value={data?._id}
-                                                        >
-                                                            {data?.name}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </div>
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="chartNumber">Chart Number</Form.Label>
+                                        <div className="mb-1">
+                                            <Form.Label htmlFor="chartNumber" className="mb-0">Chart Number</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Chart Number"
                                                 {...register('chartNumber', { required: "Chart number is required" })}
                                             />
                                         </div>
-                                        <div className="">
+                                        <div className="" style={{ borderBottom: "1px solid #444141" }}>
 
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className="mb-1">Address</Form.Label>
+                                            <Form.Group className="mb-1">
+                                                <Form.Label className="mb-0">Address</Form.Label>
                                                 <div style={{ position: 'relative' }}>
                                                     <Form.Control
                                                         type="text"
@@ -572,12 +633,31 @@ const NewPatient = () => {
                                                     </div>
                                                 </div>
                                             </Form.Group>
-                                        </div>
-                                        <div className=" ">
+                                            <div className="mb-1">
+
+                                                <Form.Group className="">
+                                                    <Form.Label className='mb-0' >State</Form.Label>
+                                                    <Form.Select
+                                                        {...register('stateName')}
+                                                        onChange={(e) => handleStateSelection(e)}
+                                                    >
+                                                        <option>State</option>
+                                                        {statesData?.states?.map((data) => (
+                                                            <option
+                                                                key={data?.id} // Unique key for each option
+                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                value={data?._id}
+                                                            >
+                                                                {data?.name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </div>
                                             <div className="row">
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>City</Form.Label>
+                                                        <Form.Label className='mb-0'>City</Form.Label>
                                                         <Form.Select
                                                             disabled={store?.getCitiesReducer?.loading}
                                                             {...register('city')}
@@ -596,7 +676,7 @@ const NewPatient = () => {
                                                 </Col>
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Zip</Form.Label>
+                                                        <Form.Label className='mb-0'>Zip</Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('zip', {
@@ -618,170 +698,98 @@ const NewPatient = () => {
                                                 </Col>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="row">
-                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                                    <div>
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-2">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className='text-white'>Seq</th>
-                                                    <th className='text-white'>Coverage</th>
-                                                    <th className='text-white'>Carrier</th>
-                                                    {/* <th className='text-white'>Email</th> */}
-                                                    {/* <th className='text-white'>Status</th> */}
-                                                    <th className='text-white'>Subscriber</th>
-                                                    <th className='text-white'>Id#</th>
-                                                    <th className='text-white'>Capay</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr >
-                                                    <td>1</td>
-                                                    <td>Primary</td>
-                                                    <td className="">Anthem</td>
-                                                    {/* <td>{data.email}</td> */}
-                                                    <td>Test</td>
-                                                    <td>2333</td>
 
-                                                    {/* <td>{data.status}</td> */}
-                                                    <td>
-                                                        0.00
-                                                    </td>
-                                                </tr>
+                                        <div className="col-12">
+                                            <div className="row pb-0 mt-1" >
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="financial" className="mb-0">Financial Class</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="financial"
+                                                        {...register('financialClass', { required: "Financial Class is required" })}
+                                                    >
+                                                        <option value="">Select Financial Class</option>  {/* Default option */}
+                                                        <option value="Self-Pay">Self-Pay</option>
+                                                        <option value="Insurance">Insurance</option>
+                                                        <option value="Medicaid">Medicaid</option>
+                                                        <option value="Medicare">Medicare</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
+                                                </div>
 
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                    <div>
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-2 pt-2">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className="text-white"></th>
-                                                    <th className="text-white">0-30</th>
-                                                    <th className="text-white">31-60</th>
-                                                    <th className="text-white">61-90</th>
-                                                    <th className="text-white">91-120</th>
-                                                    <th className="text-white">121+</th>
-                                                    <th className="text-white">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tableData.map((row, rowIndex) => (
-                                                    <tr key={rowIndex}>
-                                                        <td>{row.type}</td>
-                                                        {row.values.map((value, colIndex) => (
-                                                            <td key={colIndex}>
-                                                                <Form.Group>
-                                                                    <InputGroup>
-                                                                        <Form.Control
-                                                                            type="tel"
-                                                                            placeholder={value}
-                                                                        />
-                                                                    </InputGroup>
-                                                                </Form.Group>
-                                                            </td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="row pb-0 mt-2" >
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="financial">Financial Class</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="financial"
-                                                {...register('financialClass', { required: "Financial Class is required" })}
-                                            >
-                                                <option value="">Select Financial Class</option>  {/* Default option */}
-                                                <option value="Self-Pay">Self-Pay</option>
-                                                <option value="Insurance">Insurance</option>
-                                                <option value="Medicaid">Medicaid</option>
-                                                <option value="Medicare">Medicare</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="provider" className="mb-0">Provider Profile</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Provider Profile"
+                                                        {...register('providerProfile', { required: "Provider Profile is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Employer"
+                                                        {...register('employer', { required: "Employer is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="relationship" className="mb-0">Relationship</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="relationship"
+                                                        {...register('relationship', { required: "Relationship is required" })}
+                                                    >
+                                                        <option value="">Select Relationship</option>  {/* Default option */}
+                                                        <option value="Self">Self</option>
+                                                        <option value="Spouse">Spouse</option>
+                                                        <option value="Child">Child</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
-                                        </div>
+                                                </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="provider">Provider Profile</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Provider Profile"
-                                                {...register('providerProfile', { required: "Provider Profile is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="employer">Employer</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Employer"
-                                                {...register('employer', { required: "Employer is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="relationship">Relationship</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="relationship"
-                                                {...register('relationship', { required: "Relationship is required" })}
-                                            >
-                                                <option value="">Select Relationship</option>  {/* Default option */}
-                                                <option value="Self">Self</option>
-                                                <option value="Spouse">Spouse</option>
-                                                <option value="Child">Child</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="preferred" className="mb-0">Preferred Language</Form.Label>
+                                                    <Form.Control
+                                                        as="select"  // Use 'select' to create a dropdown
+                                                        id="preferred"
+                                                        {...register('preferredLanguage', { required: "Preferred Language is required" })}
+                                                    >
+                                                        <option value="">Select Preferred Language</option>  {/* Default option */}
+                                                        <option value="English">English</option>
+                                                        <option value="Spanish">Spanish</option>
+                                                        <option value="Other">Other</option>
+                                                    </Form.Control>
 
-                                        </div>
+                                                </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="preferred"
-                                                {...register('preferredLanguage', { required: "Preferred Language is required" })}
-                                            >
-                                                <option value="">Select Preferred Language</option>  {/* Default option */}
-                                                <option value="English">English</option>
-                                                <option value="Spanish">Spanish</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
-
-                                        </div>
-
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="PCP">PCP</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="PCP"
-                                                {...register('pcp', { required: "PCP is required" })}
-                                            />
-                                        </div>
-                                        <div className="col-6">
-                                            <Form.Label htmlFor="race">Race & Ethnicity</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Race & Ethnicity"
-                                                {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
-                                            />
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="PCP" className="mb-0">PCP</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="PCP"
+                                                        {...register('pcp', { required: "PCP is required" })}
+                                                    />
+                                                </div>
+                                                <div className="col-6">
+                                                    <Form.Label htmlFor="race" className="mb-0">Race & Ethnicity</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="Race & Ethnicity"
+                                                        {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-
 
                             {/* Buttons */}
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="secondary">Delete</Button>
+                                {/* <Button variant="danger">Delete</Button> */}
                                 <Button variant="secondary">Clear</Button>
                                 <Button variant="primary" type="submit">Next</Button>
                             </div>
