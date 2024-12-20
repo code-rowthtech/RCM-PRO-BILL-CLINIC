@@ -42,7 +42,7 @@ const Index = () => {
 
     return (
         <>
-            <Row className="mt-4">
+            <Row className="mt-2">
                 <Col xs={12}>
                     <Card className="px-3 py-2">
                         <Row className="mb-3">
