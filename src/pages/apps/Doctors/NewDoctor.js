@@ -424,14 +424,42 @@ const NewDoctor = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-4">
-                    <Card className='px-3 py-2'>
-                        <Card.Body>
+                <div className="container-fluid mt-2">
+                    <Card className='px-2 py-2' style={{height:'87vh'}}>
+                        <Card.Body className='py-0'>
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-between align-items-center">
-                                    <p className="fw-bold" style={{ fontWeight: '600' }}>
+                                    {/* <p className="fw-bold" style={{ fontWeight: '600' }}>
                                         {!id ? 'NEW DOCTOR' : 'UPDATE DOCTOR'}
-                                    </p>
+                                    </p> */}
+                                    <div>
+                                        <ul className="nav nav-underline">
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("personalDetails")}
+                                                >
+                                                    Personal Details
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("departmentDetails")}
+                                                >
+                                                    Professional Information
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("documents")}
+                                                >
+                                                    Documents
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
 
                                     {activeTab === "personalDetails" && (
                                         <div className='d-flex gap-2'>
@@ -452,39 +480,12 @@ const NewDoctor = () => {
                                                 </OverlayTrigger>
                                             )}
 
-                                            <Button onClick={handleNewDoctor}>Back</Button>
+                                            <Button variant='secondary' onClick={handleNewDoctor}>Back</Button>
                                         </div>
                                     )}
 
                                 </div>
-                                <div>
-                                    <ul className="nav nav-underline">
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("personalDetails")}
-                                            >
-                                                Personal Details
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("departmentDetails")}
-                                            >
-                                                Professional Information
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("documents")}
-                                            >
-                                                Documents
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
+
                                 {activeTab === "personalDetails" && (
                                     <Form onSubmit={handleSubmit(submitData)}>
                                         {store?.getDoctorDetailsReducer?.loading ?
@@ -497,11 +498,11 @@ const NewDoctor = () => {
 
                                             :
                                             <>
-                                                <div className="col-12 mt-3">
+                                                <div className="col-12 mt-1">
                                                     <div className="row" style={{ borderBottom: '1px solid #444141' }}>
-                                                        <div className="col-6">
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
                                                                     First Name {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Control
@@ -522,32 +523,35 @@ const NewDoctor = () => {
                                                                 />
                                                                 {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                                                             </Form.Group>
-
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Email {!id && <span className="text-danger">*</span>}
+                                                        </div>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Last Name {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Control
-                                                                    type="email"
-                                                                    {...register('email', {
-                                                                        required: 'Email is required',
+                                                                    type="text"
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    {...register('lastName', {
+                                                                        required: 'Last name is required',
                                                                         pattern: {
-                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
-                                                                            message: 'Enter a valid email address',
+                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
+                                                                            message: 'Last name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
                                                                     onChange={(e) => {
-                                                                        clearErrors('email');
-                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                        clearErrors('lastName');
+                                                                        setFormData({ ...formData, lastName: e.target.value })
                                                                     }}
-                                                                    placeholder="Enter email"
+                                                                    placeholder="Enter last name"
                                                                 />
-                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                                             </Form.Group>
-
-                                                            <div className="mb-3">
+                                                        </div>
+                                                        <div className="col-3">
+                                                            <div className="mb-1">
                                                                 <Form.Group className="mb-0 position-relative">
-                                                                    <Form.Label className="mb-1">
+                                                                    <Form.Label className="mb-0">
                                                                         Phone {!id && <span className="text-danger">*</span>}
                                                                     </Form.Label>
                                                                     <Form.Group>
@@ -591,73 +595,10 @@ const NewDoctor = () => {
                                                                     </div>
                                                                 </Form.Group>
                                                             </div>
-                                                            <div className="mb-3 d-flex flex-column position-relative">
-                                                                <Form.Label>Profile Image</Form.Label>
-                                                                <div
-                                                                    onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
-                                                                >
-                                                                    {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
-                                                                    <p className="mb-0">
-                                                                        <FiUploadCloud />
-                                                                    </p>
-                                                                </div>
-                                                                <Form.Control
-                                                                    type="file"
-                                                                    className="d-none "
-                                                                    {...register('profileImage', {
-                                                                    })}
-                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
-                                                                    ref={logoFileInputRef}
-                                                                    onChange={handleFileChange}
-                                                                />
-                                                                {errors.profileImage &&
-                                                                    <p className="text-danger">{errors.profileImage.message}</p>
-                                                                }
-                                                            </div>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>Degree Name</Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    {...register('degreeName',
-                                                                        // { required: 'Degree Name is required' }
-                                                                    )}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('degreeName');
-                                                                        setFormData({ ...formData, degreeName: e.target.value });
-                                                                    }}
-                                                                    // value={formData.Degree Name}
-                                                                    placeholder="Enter Degree Name"
-                                                                />
-                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
-                                                            </Form.Group>
-
                                                         </div>
-                                                        <div className="col-6">
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Last Name {!id && <span className="text-danger">*</span>}
-                                                                </Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
-                                                                    {...register('lastName', {
-                                                                        required: 'Last name is required',
-                                                                        pattern: {
-                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
-                                                                            message: 'Last name must contain only letters and be at least 3 characters long',
-                                                                        },
-                                                                    })}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('lastName');
-                                                                        setFormData({ ...formData, lastName: e.target.value })
-                                                                    }}
-                                                                    placeholder="Enter last name"
-                                                                />
-                                                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
-                                                            </Form.Group>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
                                                                     Date of Birth <span className='text-danger'>*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
@@ -680,49 +621,76 @@ const NewDoctor = () => {
 
                                                                 {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
-
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Gender <span className='text-danger'>*</span>
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Email {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
-                                                                <div className="d-flex gap-2 mt-1">
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Male"
-                                                                        value="Male"
-                                                                        {...register('gender', { required: 'Gender is required' })}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }}
-                                                                    />
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Female"
-                                                                        value="Female"
-                                                                        {...register('gender')}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }} />
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Other"
-                                                                        value="Other"
-                                                                        {...register('gender')}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }} />
-                                                                </div>
-                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                                <Form.Control
+                                                                    type="email"
+                                                                    {...register('email', {
+                                                                        required: 'Email is required',
+                                                                        pattern: {
+                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
+                                                                            message: 'Enter a valid email address',
+                                                                        },
+                                                                    })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('email');
+                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                    }}
+                                                                    placeholder="Enter email"
+                                                                />
+                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                             </Form.Group>
 
-
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">Degree Name</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('degreeName',
+                                                                        // { required: 'Degree Name is required' }
+                                                                    )}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('degreeName');
+                                                                        setFormData({ ...formData, degreeName: e.target.value });
+                                                                    }}
+                                                                    // value={formData.Degree Name}
+                                                                    placeholder="Enter Degree Name"
+                                                                />
+                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
+                                                            </Form.Group>
+                                                            <div className="mb-2 d-flex flex-column position-relative">
+                                                                <Form.Label className="mb-0">Profile Image</Form.Label>
+                                                                <div
+                                                                    onClick={() => logoFileInputRef.current.click()}
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
+                                                                >
+                                                                    {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
+                                                                    <p className="mb-0">
+                                                                        <FiUploadCloud />
+                                                                    </p>
+                                                                </div>
+                                                                <Form.Control
+                                                                    type="file"
+                                                                    className="d-none "
+                                                                    {...register('profileImage', {
+                                                                    })}
+                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                                    ref={logoFileInputRef}
+                                                                    onChange={handleFileChange}
+                                                                />
+                                                                {errors.profileImage &&
+                                                                    <p className="text-danger">{errors.profileImage.message}</p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-6">
                                                             <div className='row '>
                                                                 <div className='col-6 '>
-                                                                    <Form.Group className="mb-3 mt-1">
-                                                                        <Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">
                                                                             Password {!id && <span className="text-danger">*</span>}
                                                                         </Form.Label>
                                                                         <div className="position-relative">
@@ -770,8 +738,8 @@ const NewDoctor = () => {
                                                                 </div>
                                                                 <div className='col-6'>
 
-                                                                    <Form.Group className='mb-3 mt-1'>
-                                                                        <Form.Label>Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
+                                                                    <Form.Group className='mb-1 '>
+                                                                        <Form.Label className="mb-0">Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showConfirmPassword ? "text" : "password"}
@@ -803,8 +771,8 @@ const NewDoctor = () => {
                                                                         </div>
                                                                     </Form.Group>
                                                                 </div>
-                                                                <div className="mb-3 d-flex flex-column position-relative">
-                                                                    <Form.Label>Degree</Form.Label>
+                                                                <div className="mb-1 d-flex flex-column position-relative">
+                                                                    <Form.Label className="mb-0">Degree</Form.Label>
                                                                     <div
                                                                         onClick={() => degreeFileInputRef.current.click()}
                                                                         className={`custom-file-upload justify-content-between cursor-pointer ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
@@ -828,20 +796,40 @@ const NewDoctor = () => {
                                                                 </div>
                                                             </div>
 
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Gender <span className="text-danger">*</span>
+                                                                </Form.Label>
+                                                                <Form.Control
+                                                                    as="select"
+                                                                    {...register("gender", { required: "Gender is required" })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors("gender");
+                                                                        setFormData((prev) => ({ ...prev, gender: e.target.value }));
+                                                                    }}
+                                                                    // className="mt-1"
+                                                                >
+                                                                    <option value="">Select Gender</option>
+                                                                    <option value="Male">Male</option>
+                                                                    <option value="Female">Female</option>
+                                                                    <option value="Other">Other</option>
+                                                                </Form.Control>
+                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                            </Form.Group>
                                                         </div>
                                                     </div>
-                                                    <div className='row mt-2'>
+                                                    <div className='row mt-1'>
 
-                                                        <Col sm={12} className='pb-2' style={{ borderBottom: '1px solid #444141' }}>
+                                                        <Col sm={12} className='pb-1' style={{ borderBottom: '1px solid #444141' }}>
                                                             <Row>
-                                                                <Col sm={12} className='mb-2'>
+                                                                <Col sm={12} className=''>
                                                                     <span className='text-black fw-semibold form-label'>Primary Address</span>
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Row className='position-relative'>
                                                                         <Col sm={12}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className="mb-0">Address</Form.Label>
                                                                                 <div style={{ position: 'relative' }}>
                                                                                     <Form.Control
                                                                                         type="text"
@@ -919,8 +907,8 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={latitude}
@@ -939,8 +927,8 @@ const NewDoctor = () => {
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={longitude}
@@ -961,8 +949,8 @@ const NewDoctor = () => {
                                                                 <Col sm={6}>
                                                                     <Row>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <label htmlFor="state-select" className='fw-bold' style={{ display: "block", marginBottom: "6px" }}>
+                                                                            <Form.Group className="mb-1">
+                                                                                <label htmlFor="state-select" className='fw-bold mb-0' style={{ display: "block", marginBottom: "6px" }}>
                                                                                     State
                                                                                 </label>
                                                                                 <select
@@ -1004,8 +992,8 @@ const NewDoctor = () => {
 
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>City</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>City</Form.Label>
 
                                                                                 <select
                                                                                     disabled={store?.getCitiesReducer?.loading}
@@ -1040,8 +1028,8 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Street</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Street</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     {...register('street1')}
@@ -1061,8 +1049,8 @@ const NewDoctor = () => {
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
                                                                                 <Form.Control
                                                                                     defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.zip : ''}
                                                                                     type="text"
@@ -1098,13 +1086,10 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </div>
 
-                                                    <div className='row mt-2'>
+                                                    <div className='row mt-1'>
 
                                                         <Col sm={12}>
                                                             <Row>
-                                                                <Col sm={12} className='mb-2'>
-                                                                    <span className='text-black fw-semibold form-label'>Mailing Address</span>
-                                                                </Col>
                                                                 <Col sm={12} className='mb-2'>
                                                                     <span className='text-black fw-semibold form-label'>Mailing Address</span>
                                                                     <Form.Check
@@ -1160,8 +1145,8 @@ const NewDoctor = () => {
                                                                 <Col sm={6}>
                                                                     <Row className='position-relative'>
                                                                         <Col sm={12}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className="mb-0">Address</Form.Label>
                                                                                 <div style={{ position: 'relative' }}>
                                                                                     <Form.Control
                                                                                         type="text"
@@ -1220,8 +1205,8 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={mailingLatitude}
@@ -1232,8 +1217,8 @@ const NewDoctor = () => {
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={mailingLongitude}
@@ -1247,8 +1232,8 @@ const NewDoctor = () => {
                                                                 <Col sm={6}>
                                                                     <Row>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1' >State</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0' >State</Form.Label>
                                                                                 {sameAsPrimary ?
                                                                                     <Form.Control readOnly={sameAsPrimary} value={statesData?.states.find((data) => data?._id === formData?.primaryAddress?.state)?.name} />
                                                                                     :
@@ -1276,8 +1261,8 @@ const NewDoctor = () => {
 
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>City</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>City</Form.Label>
                                                                                 {sameAsPrimary ?
                                                                                     <Form.Control readOnly={sameAsPrimary} value={cities1 && cities1.find((data) => data?._id === formData?.primaryAddress?.city)?.name} />
                                                                                     :
@@ -1300,8 +1285,8 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Street</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Street</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     {...register('street2')}
@@ -1314,8 +1299,8 @@ const NewDoctor = () => {
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
                                                                                 <Form.Control
                                                                                     readOnly={sameAsPrimary}
                                                                                     defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.zip : ''}
@@ -1344,7 +1329,7 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </div>
                                                 </div>
-                                                <div className="col-12 d-flex justify-content-end gap-2 mt-3">
+                                                <div className="col-12 d-flex justify-content-end gap-2 mt-1">
                                                     <Button variant="secondary">Cancel</Button>
                                                     <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading} >
                                                         {store?.createtDoctorsReducer?.loading ?
