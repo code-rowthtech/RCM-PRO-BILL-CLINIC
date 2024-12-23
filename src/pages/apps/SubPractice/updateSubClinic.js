@@ -31,11 +31,11 @@ const SubUpdateClinic = () => {
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
     };
-
+    const [logoUploading, setLogoUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
@@ -736,9 +736,16 @@ const SubUpdateClinic = () => {
                                                         }`}
                                                 >
                                                     {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
-                                                    {typeof logoName === 'string' && logoName
+                                                    {/* {typeof logoName === 'string' && logoName
                                                         ? logoName.split('/').pop()
-                                                        : 'Upload Logo'}
+                                                        : 'Upload Logo'} */}
+                                                    {
+                                                        logoUploading
+                                                            ? 'Uploading...'
+                                                            : typeof logoName === 'string' && logoName
+                                                                ? logoName.split('/').pop()
+                                                                : 'Upload Logo'
+                                                    }
                                                     <p className="mb-0">
                                                         <FiDownloadCloud />
                                                     </p>

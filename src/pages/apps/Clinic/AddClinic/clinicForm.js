@@ -331,11 +331,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     };
 
-
+    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -554,7 +554,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedStates;
         });
     };
-
     const handleStateInputChange = (e, field, index) => {
         const value = e.target.value;
         setStateDetails((prevDetails) => {
@@ -566,11 +565,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return updatedDetails;
         });
     };
-
+    const [stateLogoUpload, setStateLogoUpload] = useState(false);
     const handleStateChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setStateLogoUpload);
             setStateDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -961,10 +960,17 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onClick={() => document.getElementById(`fileInput-accreditation=${index}`).click()}
                                             className="custom-file-upload justify-content-between cursor-pointer"
                                         >
-                                            {accreditation.loading ? 'Loading...'
+                                            {/* {accreditation.loading ? 'Loading...'
                                                 : accreditation.url
                                                     ? accreditation.url.split('/').pop()
-                                                    : accreditation?.fileName || 'Upload Document'}
+                                                    : accreditation?.fileName || 'Upload Document'} */}
+                                            {
+                                                newaccreditationLogo
+                                                    ? 'Uploading...'
+                                                    : accreditation.url
+                                                        ? accreditation.url.split('/').pop()
+                                                        : accreditation?.fileName || 'Upload Document'
+                                            }
                                             <p className="mb-0"><FiDownloadCloud /></p>
                                         </div>
 
@@ -1035,14 +1041,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'
+                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName||stateLogoUpload ? 'form-control' : 'custom-form-fields'
                                                 }`}
                                         >
-                                            {data.fileName
+                                            {/* {data.fileName
                                                 ? data?.fileName?.length > 30
                                                     ? data?.fileName?.slice(0, 25) + '...'
                                                     : data?.fileName
-                                                : 'Upload Document'}
+                                                : 'Upload Document'} */}
+                                            {
+                                                stateLogoUpload
+                                                    ? 'Uploading...'
+                                                    : (data.fileName
+                                                        ? (data.fileName.length > 30
+                                                            ? data.fileName.slice(0, 25) + '...'
+                                                            : data.fileName)
+                                                        : 'Upload Document')
+                                            }
+
                                             <p className="mb-0">
                                                 <FiDownloadCloud />
                                             </p>
