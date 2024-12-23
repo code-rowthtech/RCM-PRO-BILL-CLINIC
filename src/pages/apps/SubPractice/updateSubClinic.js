@@ -59,7 +59,7 @@ const SubUpdateClinic = () => {
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(subClinicsDetailsGet,'subClinicsDetailsGet')
+    console.log(subClinicsDetailsGet, 'subClinicsDetailsGet')
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -488,7 +488,7 @@ const SubUpdateClinic = () => {
         setSelectedStates((prev) => {
             const updatedStates = prev.includes(stateName)
                 ? prev.filter((name) => name !== stateName)
-                : [...prev, stateName]; 
+                : [...prev, stateName];
 
             setStateDetails((prevDetails) => {
                 const newDetails = updatedStates.map((state) =>
