@@ -154,11 +154,11 @@ const DepartmentDetails = ({ docId }) => {
                         required: 'TIN/SSN is required',
                         pattern: {
                           value: /^\d{3}-\d{2}-\d{4}$/, // Example: TIN/SSN format
-                          message: 'Invalid TIN/SSN format',
+                          message: 'Invalid TIN/SSN format, valid format (XXX-XX-XXXX).',
                         },
                       })}
                       placeholder="Enter TIN/SSN"
-                      maxLength={9}
+                      maxLength={11}
                     />
                     {errors.TIN_SSN && (
                       <span className="text-danger">{errors.TIN_SSN.message}</span>
@@ -321,7 +321,7 @@ const DepartmentDetails = ({ docId }) => {
                     </Form.Label>
                     <Form.Control
                       type="text"
-                      maxLength={6}
+                      maxLength={10}
                       {...register('medicarePTAN',
                         !updateId ? {
                           required: 'Medicare PTAN is required',
@@ -565,6 +565,7 @@ const DepartmentDetails = ({ docId }) => {
                             },
                           } : {}
                         )}
+                        maxLength={9}
                       />
                       {errors.DEA && <span className="text-danger">{errors.DEA.message}</span>}
                     </Form.Group>
@@ -596,27 +597,33 @@ const DepartmentDetails = ({ docId }) => {
                   </div>
                 </div>
                 <div className="col-4">
-                  <Form.Group className="mb-1">
-                    <Form.Label htmlFor="CLIA" className="form-label mb-0">
-                      CLIA # (Clinical Laboratory Improvement Amendments) {!updateId && <span className='text-danger'>*</span>}
-                    </Form.Label>
-                    <Form.Control
-                      type="text"
-                      id="CLIA"
-                      className="w-100 input ps-2 py-1"
-                      placeholder="Enter CLIA #"
-                      {...register('CLIA',
-                        !updateId ? {
-                          required: 'CLIA is required',
-                          pattern: {
-                            value: /^[A-Za-z0-9]{10,15}$/, // Example: CLIA # format (10-15 alphanumeric chars)
-                            message: 'CLIA # must be between 10 and 15 alphanumeric characters',
-                          },
-                        } : {}
-                      )}
-                    />
-                    {errors.CLIA && <span className="text-danger">{errors.CLIA.message}</span>}
-                  </Form.Group>
+                  <div>
+                    <div className="row">
+                      <Form.Group className="mb-1">
+                        <Form.Label htmlFor="CLIA" className="form-label mb-0">
+                          CLIA # (Clinical Laboratory Improvement Amendments) {!updateId && <span className='text-danger'>*</span>}
+                        </Form.Label>
+                        <Form.Control
+                          type="text"
+                          id="CLIA"
+                          className="w-100 input ps-2 py-1"
+                          placeholder="Enter CLIA #"
+                          minLength={10}
+                          maxLength={15}
+                          {...register('CLIA',
+                            !updateId ? {
+                              required: 'CLIA is required',
+                              pattern: {
+                                value: /^[A-Za-z0-9]{10,15}$/, // Example: CLIA # format (10-15 alphanumeric chars)
+                                message: 'CLIA # must be between 10 and 15 alphanumeric characters',
+                              },
+                            } : {}
+                          )}
+                        />
+                        {errors.CLIA && <span className="text-danger">{errors.CLIA.message}</span>}
+                      </Form.Group>
+                    </div>
+                  </div>
                 </div>
               </div>
 
