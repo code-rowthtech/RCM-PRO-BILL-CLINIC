@@ -8,8 +8,18 @@ export const getPatientsAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_PATIENTS,
     data
 });
+
+export const getPatientByIdAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_PATIENTS_BY_ID,
+    data
+});
 export const createPatientsAction = (data): AuthAction => ({
     type: PatientsActionTypes.CREATE_PATIENTS,
+    data
+});
+
+export const createResponsiblePartyAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_RESPONSIBLE_PARTY,
     data
 });
 

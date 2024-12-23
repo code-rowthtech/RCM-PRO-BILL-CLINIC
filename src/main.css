@@ -163,3 +163,11 @@ table {
 .form-check-input {
     cursor: pointer;
 }
+.scroll-container {
+    overflow: auto; /* Allow scrolling */
+    -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+.offcanvas-family-history {
+    width: 28vw !important;
+}

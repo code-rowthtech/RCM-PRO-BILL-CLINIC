@@ -1550,7 +1550,6 @@ const NewPractice = () => {
                                                                             width={20}
                                                                         />
                                                                     </Form.Group>
-
                                                                 </Col>
                                                             </React.Fragment>
                                                         ))}
