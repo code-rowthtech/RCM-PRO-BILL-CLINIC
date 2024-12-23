@@ -1586,7 +1586,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <tr>
                                                     <th className="text-white">S.No.</th>
                                                     <th className="text-white">PRACTICE NAME</th>
+                                                    <th className="text-white">Location</th>
                                                     <th className="text-white">PRACTICE TYPE</th>
+                                                    <th className="text-white">Specialist</th>
                                                     <th className="text-white">STATUS</th>
                                                     <th className="text-white">ACTION</th>
                                                 </tr>
@@ -1596,7 +1598,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <tr key={patient.id}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient.name}</td>
+                                                        <td>{(patient?.userId?.primaryAddress?.city?.state_code || 'N/A') + ' / ' + (patient?.userId?.primaryAddress?.city?.name || 'N/A')}</td>
                                                         <td>{patient.clinicType}</td>
+                                                        <td>{patient.practiceSpecialty}</td>
                                                         <td>
                                                             <Form.Switch checked={patient.status === patient.status} />
                                                         </td>
