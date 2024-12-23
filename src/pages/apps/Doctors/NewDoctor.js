@@ -412,7 +412,7 @@ const NewDoctor = () => {
                 formData?.password?.trim()?.length >= 8 &&
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password)
             ));
-        setIsButtonDisabled(!isFormValid); // Disable button if the form is invalid
+        setIsButtonDisabled(!isFormValid);
     }, [formData]);
 
     const requiredFieldTooltip = (

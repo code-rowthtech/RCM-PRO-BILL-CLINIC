@@ -319,10 +319,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         logoFileInputRef.current.click();
     };
 
+    const [logoUploading, setLogoUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
@@ -533,7 +534,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [cities1, cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
-    console.log(getTableData,'getTableDatagetTableData')
+    console.log(getTableData, 'getTableDatagetTableData')
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
@@ -764,9 +765,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         }`}
                                 >
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
-                                    {typeof logoName === 'string' && logoName
+                                    {/* {typeof logoName === 'string' && logoName
                                         ? logoName.split('/').pop()
-                                        : 'Upload Logo'}
+                                        : 'Upload Logo'} */}
+                                    {
+                                        logoUploading
+                                            ? 'Uploading...'
+                                            : typeof logoName === 'string' && logoName
+                                                ? logoName.split('/').pop()
+                                                : 'Upload Logo'
+                                    }
                                     <p className="mb-0">
                                         <FiDownloadCloud />
                                     </p>
