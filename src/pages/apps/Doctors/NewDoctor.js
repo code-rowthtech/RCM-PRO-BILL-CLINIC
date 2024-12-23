@@ -425,7 +425,7 @@ const NewDoctor = () => {
         <>
             <div className='pt-1 pb-2'>
                 <div className="container-fluid mt-2">
-                    <Card className='px-2 py-2' style={{height:'87vh'}}>
+                    <Card className='px-2 py-2 '>
                         <Card.Body className='py-0'>
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-between align-items-center">
@@ -807,7 +807,7 @@ const NewDoctor = () => {
                                                                         clearErrors("gender");
                                                                         setFormData((prev) => ({ ...prev, gender: e.target.value }));
                                                                     }}
-                                                                    // className="mt-1"
+                                                                // className="mt-1"
                                                                 >
                                                                     <option value="">Select Gender</option>
                                                                     <option value="Male">Male</option>
