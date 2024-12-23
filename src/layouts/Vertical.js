@@ -107,6 +107,7 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
 
     return (
         <>
+
             <div className="wrapper">
                 <Suspense fallback={loading()}>
                     <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
@@ -120,13 +121,8 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                             <Outlet />
                         </Container>
                     </div>
-
-                    {/* <Suspense fallback={loading()}>
-                        <Footer />
-                    </Suspense> */}
                 </div>
             </div>
-
             <Suspense fallback={loading()}>
                 <RightSidebar>
                     <ThemeCustomizer />

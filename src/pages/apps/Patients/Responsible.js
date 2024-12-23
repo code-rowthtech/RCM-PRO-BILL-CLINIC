@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
+import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
 
 
 const Responsiblle = () => {
@@ -19,7 +19,6 @@ const Responsiblle = () => {
 
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log({ cities })
     const dispatch = useDispatch();
     const [focused, setFocused] = useState(false);
     const [searchParams] = useSearchParams();
@@ -208,7 +207,8 @@ const Responsiblle = () => {
         }
         console.log({ payload });
         reset();
-        // dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+        dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
+
     };
     const tableData = [
         { type: 'Patient', values: Array(6).fill("0.00") },
@@ -698,7 +698,7 @@ const Responsiblle = () => {
                                     {...register('holdReason', { required: "Last patient payment is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-1 " style={{marginTop:'21px'}}>
+                            <div className="col-3 mb-1 " style={{ marginTop: '21px' }}>
                                 {/* <Form.Label htmlFor="holdReason">Hold Reason</Form.Label> */}
                                 <Form.Control
                                     type="text"
@@ -714,7 +714,7 @@ const Responsiblle = () => {
                                     {...register('lastStatement', { required: "Last statement is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-1" style={{marginTop:'21px'}}>
+                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""
@@ -739,7 +739,7 @@ const Responsiblle = () => {
                                     {...register('expiry', { required: "expiry is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-1" style={{marginTop:'21px'}}>
+                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""
@@ -751,13 +751,124 @@ const Responsiblle = () => {
 
                 {/* Buttons */}
                 <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
-                    <Button variant="primary" >Collections</Button>
-                    <Button variant="primary" >Statement</Button>
-                    <Button variant="primary" >Family history</Button>
-                    <Button variant="primary" >Credit cards</Button>
+                    <Button className="custom-buttons" variant="primary" >Collections</Button>
+                    <Button className="custom-buttons" variant="primary" >Statement</Button>
+                    <Button
+                        className="custom-buttons "
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
+                        variant="primary"  >
+                        Family history
+                    </Button>
+                    <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                        <div class="offcanvas-header">
+                            <h5 id="offcanvasRightLabel">Family Financial History</h5>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <Form>
+                                <Row>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Date Type:
+                                            </Form.Label>
+                                            <Form.Select>
+                                                <option value=''>Select</option>
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Visit #:
+                                            </Form.Label>
+                                            <Form.Control type="text" placeholder="Enter visit number" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                From Date:
+                                            </Form.Label>
+                                            <Form.Control type="date" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                To:
+                                            </Form.Label>
+                                            <Form.Control type="date" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Provider:
+                                            </Form.Label>
+                                            <Form.Select>
+                                                <option value=''>Select</option>
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Label>Sort By:</Form.Label>
+                                        <div className="d-flex align-items-center gap-5">
+                                            <Form.Group>
+                                                <div className="">
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Newest First"
+                                                        name="sortOrder"
+                                                        value="newest"
+                                                        id="newest"
+                                                    />
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Oldest First"
+                                                        name="sortOrder"
+                                                        value="oldest"
+                                                        id="oldest"
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                            <Form.Group>
+                                                <div className="">
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Summary"
+                                                        name="Summary"
+                                                        value="summary"
+                                                    />
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Detail"
+                                                        name="Detail"
+                                                        value="detail"
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                        </div>
+                                    </Col>
+                                    <Col sm={12} className='mb-2 d-flex justify-content-end gap-2'>
+                                        <Button className="custom-buttons">Reset</Button>
+                                        <Button className="custom-buttons">Apply</Button>
+                                    </Col>
+                                </Row>
+
+                            </Form>
+                        </div>
+                    </div>
+                    <Button className="custom-buttons" variant="primary" >Credit cards</Button>
                     {/* <Button variant="danger">Delete</Button> */}
-                    <Button variant="secondary">Clear</Button>
-                    <Button variant="primary" > Previous </Button>
+                    <Button className="custom-buttons" variant="secondary">Clear</Button>
+                    <Button className="custom-buttons" variant="primary" > Previous </Button>
                 </div>
             </Form>
 
