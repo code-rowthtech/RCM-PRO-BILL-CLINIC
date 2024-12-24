@@ -2,32 +2,29 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import ProfileDummy from "../../../assets/images/profileDummy.png";
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bootstrap";
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from "react-bootstrap";
 import { FiEdit, FiTrash, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { createPatientsAction, updatePatientsAction } from "../../../redux/patients/actions";
+import { createPatientsAction, updatePatientsAction, getPatientByIdAction } from "../../../redux/patients/actions";
 import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
+import { getCitiesAction, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
 import Responsiblle from "./Responsible";
 
 
 const NewPatient = () => {
+    const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-    const createResponse = store?.createClinicsReducer?.data?.status;
-
+    const createResponse = store?.createPatientsReducer?.data?.status;
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log({ cities })
-    const dispatch = useDispatch();
+    const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const [focused, setFocused] = useState(false);
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
-    const updateId = searchParams.get('updateid');
-
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState("");
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -46,9 +43,7 @@ const NewPatient = () => {
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
-
     const [inputValue, setInputValue] = useState('');
-    console.log({ inputValue })
 
 
     const handleTabChange = (tab) => {
@@ -61,7 +56,56 @@ const NewPatient = () => {
     };
 
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    useEffect(() => {
+        if (createResponse === 201) {
+            reset();
+        }
+    }, [createResponse])
+    useEffect(() => {
+        if (id) {
+            const payload = {
+                id: id,
+            }
+            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+        }
+    }, [id])
+    useEffect(() => {
+        if (id && patientDetails) {
+            setValue('fullName', patientDetails?.fullName)
+            setValue('title', patientDetails?.title)
+            setValue('gender', patientDetails?.gender)
+            setValue('email', patientDetails?.email)
+            setValue('contactNumber', patientDetails?.contactNumber)
+            setValue('note', patientDetails?.note)
+            setValue('maritalStatus', patientDetails?.maritalStatus)
+            setValue('deceased', patientDetails?.deceased)
+            setValue('ssn', patientDetails?.ssn)
+            setValue('raceEthnicity', patientDetails?.raceEthnicity)
+            setValue('relationship', patientDetails?.relationship)
+            setValue('additionalMRN', patientDetails?.additionalMRN)
+            setValue('responsiblePartyName', patientDetails?.responsiblePartyName)
+            setValue('chartNumber', patientDetails?.chartNumber)
+            setValue('address', patientDetails?.address?.street);
+            setValue('zip', patientDetails?.address?.zip);
+            setValue('financialClass', patientDetails?.financialClass);
+            setValue('employer', patientDetails?.employer);
+            setValue('preferredLanguage', patientDetails?.preferredLanguage);
+            const formattedDateOfBirth = patientDetails?.dateOfBirth
+                ? new Date(patientDetails?.dateOfBirth).toISOString().split('T')[0]
+                : '';
+            setValue('dateOfBirth', formattedDateOfBirth);
+            const stateId = statesData?.states && statesData?.states.find((data) => data?._id === patientDetails?.address?.state?._id)?.id;
+            setValue('stateName', patientDetails?.address?.state?._id)
+            if (stateId) {
+                dispatch(getCitiesAction({ state_code: stateId, name: patientDetails?.address?.city?.name, limit: '', skip: '' }))
+            }
+            if (patientDetails?.profile?.fileName && patientDetails?.profile?.url) {
+                setLogoName(patientDetails?.profile?.fileName)
+                setLogo(patientDetails?.profile?.fileName)
+            }
+        }
+    }, [id, patientDetails, statesData])
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted)
@@ -74,7 +118,7 @@ const NewPatient = () => {
     }, [selectedLocation, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county);
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county || patientDetails?.address?.city?.name)?._id;
             setValue('city', selectedCounty)
         }
     }, [cities])
@@ -93,12 +137,14 @@ const NewPatient = () => {
             setTimeoutId(id);
         }
     };
+    const [profileUploading, setProfileUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setProfileUploading);
             setLogo(url);
-            setLogoName(selectedFile?.name)
+            setLogoName(selectedFile?.name);
+            clearErrors('profileImage')
         } catch (error) {
             // console.error('Error during file upload:', error);
         }
@@ -129,7 +175,6 @@ const NewPatient = () => {
             console.error('Failed to fetch geocode data:', error);
         }
     };
-
 
     const [stateCode, setStateCode] = useState()
 
@@ -186,9 +231,9 @@ const NewPatient = () => {
     }, [stateGeoLocation])
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-
     const onSubmit = (data) => {
         const payload = {
+            ...(id ? { id: id } : {}),
             clinicId: clinicId,
             profile: {
                 url: logo?.url?.split('?')[0],
@@ -197,39 +242,44 @@ const NewPatient = () => {
             gender: data?.gender,
             title: data?.title,
             fullName: data?.fullName,
-            chartNumber: data?.chartNumber,
-            responsiblePartyName: data?.responsiblePartyName,
+            ...(data?.chartNumber ? { chartNumber: data?.chartNumber } : {}),
+            ...(data?.responsiblePartyName ? { responsibleParty: data?.responsiblePartyName } : {}),
             address: {
-                street: inputValue,
-                city: data?.city,
-                state: data?.state,
-                zipCode: data?.zipCode,
+                ...(data?.address ? { street: data?.address } : {}),
+                ...(data?.city ? { city: data?.city } : {}),
+                ...(data?.stateName ? { state: data?.stateName } : {}),
+                ...(data?.zip ? { zip: data?.zip } : {}),
             },
             email: data?.email,
             contactNumber: data?.contactNumber,
-            note: data?.note,
+            ...(data?.note ? { note: data?.note } : {}),
             maritalStatus: data?.maritalStatus,
             dateOfBirth: data?.dateOfBirth,
-            deceased: data?.deceased,
-            ssn: data?.ssn,
-            additionalMRN: data?.additionalMRN,
-            financialClass: data?.financialClass,
-            providerProfile: '67568bcf922eec0848016d5a',
-            employer: data?.employer,
-            relationship: data?.relationship,
-            preferredLanguage: data?.preferredLanguage,
-            pcp: '67568bcf922eec0848016d5a',
-            raceEthnicity: data?.raceEthnicity,
-
+            ...(data?.deceased ? { deceased: data?.deceased } : {}),
+            ...(data?.ssn ? { ssn: data?.ssn } : {}),
+            ...(data?.additionalMRN ? { additionalMRN: data?.additionalMRN } : {}),
+            ...(data?.financialClass ? { financialClass: data?.financialClass } : {}),
+            ...(data?.providerProfile ? { providerProfile: data?.providerProfile } : {}),
+            ...(data?.employer ? { employer: data?.employer } : {}),
+            ...(data?.relationship ? { relationship: data?.relationship } : {}),
+            ...(data?.raceEthnicity ? { raceEthnicity: data?.raceEthnicity } : {}),
+            ...(data?.pcp ? { pcp: data?.pcp } : {}),
+            ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
         }
-        console.log({ payload });
-        reset();
-        dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+
+        // reset();
+        if (id) {
+            console.log(payload, 'pppppppppppppppppppppppppppppppppppppppp')
+            dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+        } else {
+            dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+        }
     };
     const tableData = [
         { type: 'Patient', values: Array(6).fill("0.00") },
         { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
     ];
+
     return (
         <div className="background_Color pt-1 pb-2 px-0">
             <div className="container-fluid mt-2 px-0">
@@ -284,83 +334,96 @@ const NewPatient = () => {
 
                         {activeTab === "personalDetails" && (<Form onSubmit={handleSubmit(onSubmit)}>
                             <div className="row  mt-1" >
-                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                                    <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                                        <div className="col-4">
-                                            <div className="mb-2 d-flex flex-column position-relative">
-                                                <Form.Label>Profile Image{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                <div
-                                                    onClick={() => logoFileInputRef.current.click()}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
-                                                >
-                                                    {logoName ? logoName : 'Upload Profile Image'}
-                                                    <p className="mb-0">
-                                                        <FiUploadCloud />
-                                                    </p>
-                                                </div>
-                                                <Form.Control
-                                                    type="file"
-                                                    className="d-none "
-                                                    {...register('profileImage', {
-                                                    })}
-                                                    ref={logoFileInputRef}
-                                                    onChange={handleFileChange}
-
-                                                />
-                                                {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
-                                                )}
-                                            </div>
+                                <div className="row pb-1 pe-0" style={{ borderBottom: "1px solid #444141" }}>
+                                    <div className="col-3 mb-1">
+                                        <Form.Label htmlFor="fileName" className="mb-0">Full Name <span className="text-danger">*</span></Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Full Name"
+                                            {...register('fullName', { required: "Full name is required" })}
+                                        />
+                                        {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
+                                    </div>
+                                    <div className="col-3">
+                                        <div className=" mb-1">
+                                            <Form.Label htmlFor="title" className="mb-0">Title <span className="text-danger">*</span></Form.Label>
+                                            <Form.Select
+                                                {...register('title', { required: "Title is required" })}
+                                                aria-label="Select Title"
+                                            >
+                                                <option value="">Select Title</option>
+                                                <option value="Mr.">Mr.</option>
+                                                <option value="Mrs.">Mrs.</option>
+                                                <option value="Miss">Miss</option>
+                                                <option value="Dr.">Dr.</option>
+                                                <option value="Other">Other</option>
+                                            </Form.Select>
+                                            {errors.title && <span className="text-danger">{errors.title.message}</span>}
                                         </div>
-                                        <div className="col-4">
-                                            <div>
-                                                <Form.Label htmlFor="gender">Gender<span className='text-danger'>*</span></Form.Label>
-                                                <div className="d-flex gap-2">
-                                                    <Form.Select
-                                                        {...register('gender', { required: "Gender is required" })}
-                                                        aria-label="Select Gender"
-                                                    >
-                                                        <option value="">Select Gender</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
-                                                        <option value="Other">Other</option>
-
-                                                    </Form.Select>
-
-                                                </div>
-                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
-
-                                            </div>
-                                        </div>
-                                        <div className="col-4">
-                                            <div className=" mb-2">
-                                                <Form.Label htmlFor="title">Title</Form.Label>
+                                    </div>
+                                    <div className="col-3">
+                                        <div>
+                                            <Form.Label htmlFor="gender" className="mb-0">Gender<span className='text-danger'>*</span></Form.Label>
+                                            <div className="d-flex gap-2">
                                                 <Form.Select
-                                                    {...register('title', { required: "Title is required" })}
-                                                    aria-label="Select Title"
+                                                    {...register('gender', { required: "Gender is required" })}
+                                                    aria-label="Select Gender"
                                                 >
-                                                    <option value="">Select Title</option>
-                                                    <option value="Mr.">Mr.</option>
-                                                    <option value="Mrs.">Mrs.</option>
-                                                    <option value="Miss">Miss</option>
-                                                    <option value="Dr.">Dr.</option>
+                                                    <option value="">Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
                                                     <option value="Other">Other</option>
+
                                                 </Form.Select>
+
                                             </div>
+                                            {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
 
                                         </div>
                                     </div>
-                                    <div className="row mb-2 mt-2 pb-2" style={{ borderBottom: "1px solid #444141" }}>
-                                        <div className="col-4 mb-1">
-                                            <Form.Label htmlFor="email">Email ID</Form.Label>
+
+                                    <div className="col-3 pe-0">
+                                        <div className="mb-1 d-flex flex-column position-relative">
+                                            <Form.Label className="mb-0">Profile Image</Form.Label>
+                                            <div
+                                                onClick={() => logoFileInputRef.current.click()}
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
+                                            >
+                                                {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Profile Image'}
+                                                <p className="mb-0">
+                                                    <FiUploadCloud />
+                                                </p>
+                                            </div>
+                                            <Form.Control
+                                                type="file"
+                                                className="d-none "
+                                                {...register('profileImage', {
+                                                    // required: 'This field is required'
+                                                })}
+                                                ref={logoFileInputRef}
+                                                onChange={handleFileChange}
+
+                                            />
+                                            {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
+
+                                    <div className="row my-1 pb-2" style={{ borderBottom: "1px solid #444141" }}>
+                                        <div className="col-4">
+                                            <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
                                             <Form.Control
                                                 type="email"
                                                 placeholder="Email ID"
                                                 {...register('email', { required: "Email is required", pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
                                             />
+                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                         </div>
                                         <div className=' col-4'>
                                             <Form.Group className="mb-0 position-relative">
-                                                <Form.Label className='mb-1'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                                <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                                 <Form.Group>
                                                     <InputGroup>
                                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -403,7 +466,7 @@ const NewPatient = () => {
                                             </Form.Group>
                                         </div>
                                         <div className="col-4 ">
-                                            <Form.Label htmlFor="note">Note (Text)</Form.Label>
+                                            <Form.Label htmlFor="note" className="mb-0">Note (Text)</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Note"
@@ -411,9 +474,9 @@ const NewPatient = () => {
                                             />
                                         </div>
                                     </div>
-                                    <div className="row pb-2 mt-2" style={{ borderBottom: "1px solid #444141" }}>
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="marital">Marital Status</Form.Label>
+                                    <div className="row pb-2 mt-1" style={{ borderBottom: "1px solid #444141" }}>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="marital" className="mb-0">Marital Status <span className="text-danger">*</span></Form.Label>
                                             <Form.Control
                                                 as="select"  // Use 'select' to make it a dropdown
                                                 id="marital"
@@ -426,34 +489,35 @@ const NewPatient = () => {
                                                 <option value="Widowed">Widowed</option>
                                                 <option value="Other">Other</option>
                                             </Form.Control>
-
+                                            {errors.maritalStatus && <span className="text-danger">{errors.maritalStatus.message}</span>}
                                         </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
                                             <Form.Control
                                                 type="date"  // Change type to "date" for date input
                                                 placeholder="Date of Birth"
                                                 {...register('dateOfBirth', { required: "Date of Birth is required" })}
                                             />
+                                            {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                         </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="deceased">Deceased</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="deceased" className="mb-0">Deceased</Form.Label>
                                             <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
+                                                as="select"
                                                 id="deceased"
-                                                {...register('deceased', { required: "Deceased is required" })}
+                                                {...register('deceased')}
                                             >
-                                                <option value="">Select Deceased</option>  {/* Default option */}
+                                                <option value="">Select Deceased</option>
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Control>
-
+                                            {errors.deceased && <span className="text-danger">{errors.deceased.message}</span>}
                                         </div>
 
-                                        <div className="col-6 mb-2">
-                                            <Form.Label htmlFor="SSN">SSN#</Form.Label>
+                                        <div className="col-6 mb-1">
+                                            <Form.Label htmlFor="SSN" className="mb-0">SSN# <span className="text-danger">*</span></Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="SSN#"
@@ -470,24 +534,24 @@ const NewPatient = () => {
                                         </div>
 
                                         <div className="col-12 ">
-                                            <Form.Label htmlFor="additional">Additional MRN</Form.Label>
+                                            <Form.Label htmlFor="additional" className="mb-0">Additional MRN</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Additional MRN"
-                                                {...register('additionalMRN', { required: "Additional MRN is required" })}
+                                                {...register('additionalMRN',
+                                                    // { required: "Additional MRN is required" }
+                                                )}
                                             />
                                         </div>
                                     </div>
                                     <div className="col-12">
                                         <div>
-                                            <Table responsive className="table-centered table-nowrap mb-0 mt-2">
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-1">
                                                 <thead className="text-white">
                                                     <tr>
                                                         <th className='text-white'>Seq</th>
                                                         <th className='text-white'>Coverage</th>
                                                         <th className='text-white'>Carrier</th>
-                                                        {/* <th className='text-white'>Email</th> */}
-                                                        {/* <th className='text-white'>Status</th> */}
                                                         <th className='text-white'>Subscriber</th>
                                                         <th className='text-white'>Id#</th>
                                                         <th className='text-white'>Capay</th>
@@ -513,7 +577,7 @@ const NewPatient = () => {
                                             </Table>
                                         </div>
                                         <div>
-                                            <Table responsive className="table-centered table-nowrap mb-0 mt-2 pt-2">
+                                            <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
                                                 <thead className="text-white">
                                                     <tr>
                                                         <th className="text-white"></th>
@@ -551,55 +615,32 @@ const NewPatient = () => {
                                 </div>
                                 <div className="col-6">
                                     <div className="row">
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="fileName">Full Name</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Full Name"
-                                                {...register('fullName', { required: "Full name is required" })}
-                                            />
-                                        </div>
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="responsibleParty">Responsible Party Name</Form.Label>
+                                        <div className="mb-1 mt-1">
+                                            <Form.Label htmlFor="responsibleParty" className="mb-0">Responsible Party Name</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Responsible party name"
-                                                {...register('responsiblePartyName', { required: "Responsible party name is required" })}
+                                                {...register('responsiblePartyName',
+                                                    // { required: "Responsible party name is required" }
+                                                )}
                                             />
                                         </div>
-                                        <div className="mb-2">
 
-                                            <Form.Group className="">
-                                                <Form.Label className='' >State</Form.Label>
-                                                <Form.Select
-                                                    {...register('stateName')}
-                                                    onChange={(e) => handleStateSelection(e)}
-                                                >
-                                                    <option>State</option>
-                                                    {statesData?.states?.map((data) => (
-                                                        <option
-                                                            key={data?.id} // Unique key for each option
-                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                            value={data?._id}
-                                                        >
-                                                            {data?.name}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </div>
-                                        <div className="mb-2">
-                                            <Form.Label htmlFor="chartNumber">Chart Number</Form.Label>
+                                        <div className="mb-1">
+                                            <Form.Label htmlFor="chartNumber" className="mb-0">Chart Number</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 placeholder="Chart Number"
-                                                {...register('chartNumber', { required: "Chart number is required" })}
+                                                {...register('chartNumber',
+                                                    //  { required: "Chart number is required" }
+                                                )}
+                                                maxLength={7}
                                             />
                                         </div>
                                         <div className="" style={{ borderBottom: "1px solid #444141" }}>
 
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className="mb-1">Address</Form.Label>
+                                            <Form.Group className="mb-1">
+                                                <Form.Label className="mb-0">Address</Form.Label>
                                                 <div style={{ position: 'relative' }}>
                                                     <Form.Control
                                                         type="text"
@@ -652,10 +693,30 @@ const NewPatient = () => {
                                                     </div>
                                                 </div>
                                             </Form.Group>
+                                            <div className="mb-1">
+
+                                                <Form.Group className="">
+                                                    <Form.Label className='mb-0' >State</Form.Label>
+                                                    <Form.Select
+                                                        {...register('stateName')}
+                                                        onChange={(e) => handleStateSelection(e)}>
+                                                        <option value=''>State</option>
+                                                        {statesData?.states?.map((data) => (
+                                                            <option
+                                                                key={data?.id} // Unique key for each option
+                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                value={data?._id}
+                                                            >
+                                                                {data?.name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                </Form.Group>
+                                            </div>
                                             <div className="row">
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>City</Form.Label>
+                                                        <Form.Label className='mb-0'>City</Form.Label>
                                                         <Form.Select
                                                             disabled={store?.getCitiesReducer?.loading}
                                                             {...register('city')}
@@ -664,7 +725,6 @@ const NewPatient = () => {
                                                             <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                             {cities?.map((data) => (
                                                                 <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?._id}>
-
                                                                     {data?.name}
                                                                 </option>
                                                             ))}
@@ -674,7 +734,7 @@ const NewPatient = () => {
                                                 </Col>
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Zip</Form.Label>
+                                                        <Form.Label className='mb-0'>Zip</Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('zip', {
@@ -698,13 +758,15 @@ const NewPatient = () => {
                                         </div>
 
                                         <div className="col-12">
-                                            <div className="row pb-0 mt-2" >
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="financial">Financial Class</Form.Label>
+                                            <div className="row pb-0 mt-1" >
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="financial" className="mb-0">Financial Class</Form.Label>
                                                     <Form.Control
                                                         as="select"  // Use 'select' to create a dropdown
                                                         id="financial"
-                                                        {...register('financialClass', { required: "Financial Class is required" })}
+                                                        {...register('financialClass',
+                                                            // { required: "Financial Class is required" }
+                                                        )}
                                                     >
                                                         <option value="">Select Financial Class</option>  {/* Default option */}
                                                         <option value="Self-Pay">Self-Pay</option>
@@ -716,28 +778,34 @@ const NewPatient = () => {
 
                                                 </div>
 
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="provider">Provider Profile</Form.Label>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="provider" className="mb-0">Provider Profile</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Provider Profile"
-                                                        {...register('providerProfile', { required: "Provider Profile is required" })}
+                                                        {...register('providerProfile',
+                                                            //  { required: "Provider Profile is required" }
+                                                        )}
                                                     />
                                                 </div>
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="employer">Employer</Form.Label>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Employer"
-                                                        {...register('employer', { required: "Employer is required" })}
+                                                        {...register('employer',
+                                                            //  { required: "Employer is required" }
+                                                        )}
                                                     />
                                                 </div>
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="relationship">Relationship</Form.Label>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="relationship" className="mb-0">Relationship</Form.Label>
                                                     <Form.Control
                                                         as="select"  // Use 'select' to create a dropdown
                                                         id="relationship"
-                                                        {...register('relationship', { required: "Relationship is required" })}
+                                                        {...register('relationship',
+                                                            // { required: "Relationship is required" }
+                                                        )}
                                                     >
                                                         <option value="">Select Relationship</option>  {/* Default option */}
                                                         <option value="Self">Self</option>
@@ -748,12 +816,14 @@ const NewPatient = () => {
 
                                                 </div>
 
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="preferred">Preferred Language</Form.Label>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="preferred" className="mb-0">Preferred Language</Form.Label>
                                                     <Form.Control
                                                         as="select"  // Use 'select' to create a dropdown
                                                         id="preferred"
-                                                        {...register('preferredLanguage', { required: "Preferred Language is required" })}
+                                                        {...register('preferredLanguage',
+                                                            //  { required: "Preferred Language is required" }
+                                                        )}
                                                     >
                                                         <option value="">Select Preferred Language</option>  {/* Default option */}
                                                         <option value="English">English</option>
@@ -763,20 +833,24 @@ const NewPatient = () => {
 
                                                 </div>
 
-                                                <div className="col-6 mb-2">
-                                                    <Form.Label htmlFor="PCP">PCP</Form.Label>
+                                                <div className="col-6 mb-1">
+                                                    <Form.Label htmlFor="PCP" className="mb-0">PCP</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="PCP"
-                                                        {...register('pcp', { required: "PCP is required" })}
+                                                        {...register('pcp',
+                                                            // { required: "PCP is required" }
+                                                        )}
                                                     />
                                                 </div>
                                                 <div className="col-6">
-                                                    <Form.Label htmlFor="race">Race & Ethnicity</Form.Label>
+                                                    <Form.Label htmlFor="race" className="mb-0">Race & Ethnicity</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         placeholder="Race & Ethnicity"
-                                                        {...register('raceEthnicity', { required: "Race & Ethnicity is required" })}
+                                                        {...register('raceEthnicity',
+                                                            //  { required: "Race & Ethnicity is required" }
+                                                        )}
                                                     />
                                                 </div>
                                             </div>
@@ -787,9 +861,15 @@ const NewPatient = () => {
 
                             {/* Buttons */}
                             <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="danger">Delete</Button>
+                                {/* <Button variant="danger">Delete</Button> */}
                                 <Button variant="secondary">Clear</Button>
-                                <Button variant="primary" type="submit">Next</Button>
+                                <Button variant="primary" disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                    {store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading ?
+                                        <Spinner color="white" className="spinner-border-sm" />
+                                        :
+                                        'Next'
+                                    }
+                                </Button>
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle />}

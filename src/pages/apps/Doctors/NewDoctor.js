@@ -28,6 +28,7 @@ const NewDoctor = () => {
     } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
+    const [sameAsPrimary, setSameAsPrimary] = useState(false);
     // const daaa=watch('state1')
     // console.log(,'daa')
     const [activeTab, setActiveTab] = useState("personalDetails");
@@ -58,7 +59,6 @@ const NewDoctor = () => {
 
     const statesData = store?.getStatesReducer?.data;
     const role = store?.getDoctorsRolesReducer?.data
-    console.log({ role })
     const dispatch = useDispatch();
     const navigate = useNavigate();
     // If you want to remove any prefix (like "check")
@@ -86,14 +86,11 @@ const NewDoctor = () => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-    console.log(doctorDetails, 'doctorDetailsdoctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
-    console.log(createData, 'createData')
-    // console.log(store?.createtDoctorsReducer?.data, '12345678')
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id
-    // console.log(doctorRoleId, 'newDoctorId')
+    console.log(doctorDetails, 'newDoctorIddoctorDetails')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
 
@@ -136,17 +133,18 @@ const NewDoctor = () => {
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
                 : '';
 
+            // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
             const state = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.primaryAddress?.state?._id)?._id;
             if (state) {
                 dispatch(getCitiesAction({ state_code: doctorDetails?.userId?.primaryAddress?.state?.id, name: doctorDetails?.userId?.primaryAddress?.city?.name, skip: '', limit: '' }))
             }
-            setValue('state1', state);
+            setValue('state1', doctorDetails?.userId?.primaryAddress?.state?._id);
             const state2 = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.mailingAddress?.state?._id)?._id;
             if (state2) {
                 dispatch(getCities2Action({ state_code: doctorDetails?.userId?.mailingAddress?.state?.id, name: doctorDetails?.userId?.mailingAddress?.city?.name, skip: '', limit: '' }))
             }
-            setValue('state2', state2);
+            setValue('state2', doctorDetails?.userId?.mailingAddress?.state?._id);
             if (doctorDetails?.userId?.profileImage) {
                 setLogoName(doctorDetails?.userId?.profileImage?.fileName)
             }
@@ -163,20 +161,22 @@ const NewDoctor = () => {
         reset()
     };
 
+    const [logoUploading, setLogoUploading] = useState(false)
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
             // console.error('Error during file upload:', error);
         }
     };
+    const [degreeUploading, setDegreeUploading] = useState(false);
     const handleFileChangeDegree = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setDegreeUploading);
             setDegree(url);
             setDegreeName(selectedFile?.name)
         } catch (error) {
@@ -194,7 +194,7 @@ const NewDoctor = () => {
             email: data?.email,
             dob: data?.dateOfBirth,
             gender: data?.gender,
-            ...(!id ? { password: data?.password } : {}),
+            ...(!updateId ? { password: data?.password } : {}),
             phone: data?.phone,
             degreeName: data?.degreeName,
             profileImage: {
@@ -207,23 +207,33 @@ const NewDoctor = () => {
             },
             role: doctorRoleId,
             primaryAddress: {
-                address: data?.address1,
-                street: data?.street1,
-                city: selectedCity || data?.city1,
-                state: data?.state1,
-                zip: data?.zip1,
-                latitude: latitude,
-                longitude: longitude
+                ...(data?.address1 ? { address: data?.address1 } : {}),
+                ...(data?.street1 ? { street: data?.street1 } : {}),
+                ...(data?.state1 ? { state: data?.state1 } : {}),
+                ...(data?.zip1 ? { zip: data?.zip1 } : {}),
+                ...(latitude ? { latitude: latitude } : {}),
+                ...(longitude ? { longitude: longitude } : {}),
+                ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
             },
-            mailingAddress: {
-                address: data?.address2,
-                street: data?.street2,
-                city: selectedCity || data?.city2,
-                state: data?.state2,
-                zip: data?.zip2,
-                latitude: mailingLatitude,
-                longitude: mailingLongitude
-            }
+            mailingAddress: sameAsPrimary ?
+                {
+                    ...(data?.address1 ? { address: data?.address1 } : {}),
+                    ...(data?.street1 ? { street: data?.street1 } : {}),
+                    ...(data?.state1 ? { state: data?.state1 } : {}),
+                    ...(data?.zip1 ? { zip: data?.zip1 } : {}),
+                    ...(latitude ? { latitude: latitude } : {}),
+                    ...(longitude ? { longitude: longitude } : {}),
+                    ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
+                }
+                : {
+                    ...(data?.address2 ? { address: data?.address2 } : {}),
+                    ...(data?.street2 ? { street: data?.street2 } : {}),
+                    ...(data?.state2 ? { state: data?.state2 } : {}),
+                    ...(data?.zip2 ? { zip: data?.zip2 } : {}),
+                    ...(mailingLatitude ? { latitude: mailingLatitude } : {}),
+                    ...(mailingLongitude ? { longitude: mailingLongitude } : {}),
+                    ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
+                }
         };
         console.log(payload, 'payload')
         // Encrypt and dispatch the payload
@@ -307,6 +317,13 @@ const NewDoctor = () => {
             setValue('address1', selectedLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
             const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            setFormData((prevState) => ({
+                ...prevState,
+                primaryAddress: {
+                    ...prevState.primaryAddress,
+                    state: selectedState,
+                }
+            }));
             setValue('state1', selectedState)
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
@@ -327,10 +344,24 @@ const NewDoctor = () => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city1', selectedCounty)
+            setFormData((prevState) => ({
+                ...prevState,
+                primaryAddress: {
+                    ...prevState.primaryAddress,
+                    city: selectedCounty,
+                }
+            }));
         }
         if (cities2) {
             const selectedCounty = cities2 && cities2.find((data) => data?.name === selectedMailingLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city2', selectedCounty)
+            setFormData((prevState) => ({
+                ...prevState,
+                mailingAddress: {
+                    ...prevState.mailingAddress,
+                    city: selectedCounty,
+                }
+            }));
         }
     }, [cities1, cities2])
 
@@ -353,6 +384,7 @@ const NewDoctor = () => {
         phone: '',
         password: '',
     });
+    console.log(formData, 'formDataformData')
     useEffect(() => {
         if (logo) {
             setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
@@ -370,7 +402,6 @@ const NewDoctor = () => {
         }
     }, [passwordValue, doctorRoleId, id]);
 
-    // Update button state based on form validity
     useEffect(() => {
         const isFormValid =
             formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
@@ -381,7 +412,7 @@ const NewDoctor = () => {
                 formData?.password?.trim()?.length >= 8 &&
                 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password)
             ));
-        setIsButtonDisabled(!isFormValid); // Disable button if the form is invalid
+        setIsButtonDisabled(!isFormValid);
     }, [formData]);
 
     const requiredFieldTooltip = (
@@ -393,14 +424,42 @@ const NewDoctor = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-4">
-                    <Card className='px-3 py-2'>
-                        <Card.Body>
+                <div className="container-fluid mt-2">
+                    <Card className='px-2 py-2 '>
+                        <Card.Body className='py-0'>
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-between align-items-center">
-                                    <p className="fw-bold" style={{ fontWeight: '600' }}>
+                                    {/* <p className="fw-bold" style={{ fontWeight: '600' }}>
                                         {!id ? 'NEW DOCTOR' : 'UPDATE DOCTOR'}
-                                    </p>
+                                    </p> */}
+                                    <div>
+                                        <ul className="nav nav-underline">
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("personalDetails")}
+                                                >
+                                                    Personal Details
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("departmentDetails")}
+                                                >
+                                                    Professional Information
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button
+                                                    className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
+                                                    onClick={() => handleTabChange("documents")}
+                                                >
+                                                    Documents
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
 
                                     {activeTab === "personalDetails" && (
                                         <div className='d-flex gap-2'>
@@ -421,39 +480,12 @@ const NewDoctor = () => {
                                                 </OverlayTrigger>
                                             )}
 
-                                            <Button onClick={handleNewDoctor}>Back</Button>
+                                            <Button variant='secondary' onClick={handleNewDoctor}>Back</Button>
                                         </div>
                                     )}
 
                                 </div>
-                                <div>
-                                    <ul className="nav nav-underline">
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("personalDetails")}
-                                            >
-                                                Personal Details
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("departmentDetails")}
-                                            >
-                                                Professional Information
-                                            </button>
-                                        </li>
-                                        <li className="nav-item">
-                                            <button
-                                                className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
-                                                onClick={() => handleTabChange("documents")}
-                                            >
-                                                Documents
-                                            </button>
-                                        </li>
-                                    </ul>
-                                </div>
+
                                 {activeTab === "personalDetails" && (
                                     <Form onSubmit={handleSubmit(submitData)}>
                                         {store?.getDoctorDetailsReducer?.loading ?
@@ -466,11 +498,11 @@ const NewDoctor = () => {
 
                                             :
                                             <>
-                                                <div className="col-12 mt-3">
+                                                <div className="col-12 mt-1">
                                                     <div className="row" style={{ borderBottom: '1px solid #444141' }}>
-                                                        <div className="col-6">
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
                                                                     First Name {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Control
@@ -491,32 +523,35 @@ const NewDoctor = () => {
                                                                 />
                                                                 {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                                                             </Form.Group>
-
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Email {!id && <span className="text-danger">*</span>}
+                                                        </div>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Last Name {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Control
-                                                                    type="email"
-                                                                    {...register('email', {
-                                                                        required: 'Email is required',
+                                                                    type="text"
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    {...register('lastName', {
+                                                                        required: 'Last name is required',
                                                                         pattern: {
-                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
-                                                                            message: 'Enter a valid email address',
+                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
+                                                                            message: 'Last name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
                                                                     onChange={(e) => {
-                                                                        clearErrors('email');
-                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                        clearErrors('lastName');
+                                                                        setFormData({ ...formData, lastName: e.target.value })
                                                                     }}
-                                                                    placeholder="Enter email"
+                                                                    placeholder="Enter last name"
                                                                 />
-                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                                             </Form.Group>
-
-                                                            <div className="mb-3">
+                                                        </div>
+                                                        <div className="col-3">
+                                                            <div className="mb-1">
                                                                 <Form.Group className="mb-0 position-relative">
-                                                                    <Form.Label className="mb-1">
+                                                                    <Form.Label className="mb-0">
                                                                         Phone {!id && <span className="text-danger">*</span>}
                                                                     </Form.Label>
                                                                     <Form.Group>
@@ -560,79 +595,11 @@ const NewDoctor = () => {
                                                                     </div>
                                                                 </Form.Group>
                                                             </div>
-                                                            <div className="mb-3 d-flex flex-column position-relative">
-                                                                <Form.Label>Profile Image</Form.Label>
-                                                                <div
-                                                                    onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
-                                                                >
-                                                                    {logoName ? logoName : 'Upload Profile Image'}
-                                                                    <p className="mb-0">
-                                                                        <FiUploadCloud />
-                                                                    </p>
-                                                                </div>
-                                                                <Form.Control
-                                                                    type="file"
-                                                                    className="d-none "
-                                                                    {...register('profileImage', {
-                                                                        required: 'Profile image is required',
-                                                                    })}
-                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
-                                                                    ref={logoFileInputRef}
-                                                                    onChange={handleFileChange}
-                                                                // onChange={()
-                                                                //     // setFormData({ ...formData, profileImage: e.target.value });
-                                                                //     handleFileChange
-                                                                // }
-                                                                />
-                                                                {errors.profileImage &&
-                                                                    <p className="text-danger">{errors.profileImage.message}</p>
-                                                                }
-                                                            </div>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>Degree Name</Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    {...register('degreeName',
-                                                                        { required: 'Degree Name is required' }
-                                                                    )}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('degreeName');
-                                                                        setFormData({ ...formData, degreeName: e.target.value });
-                                                                    }}
-                                                                    // value={formData.Degree Name}
-                                                                    placeholder="Enter Degree Name"
-                                                                />
-                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
-                                                            </Form.Group>
-
                                                         </div>
-                                                        <div className="col-6">
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Last Name {!id && <span className="text-danger">*</span>}
-                                                                </Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
-                                                                    {...register('lastName', {
-                                                                        required: 'Last name is required',
-                                                                        pattern: {
-                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
-                                                                            message: 'Last name must contain only letters and be at least 3 characters long',
-                                                                        },
-                                                                    })}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('lastName');
-                                                                        setFormData({ ...formData, lastName: e.target.value })
-                                                                    }}
-                                                                    placeholder="Enter last name"
-                                                                />
-                                                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
-                                                            </Form.Group>
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Date of Birth
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Date of Birth <span className='text-danger'>*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
@@ -654,75 +621,105 @@ const NewDoctor = () => {
 
                                                                 {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
-
-                                                            <Form.Group className="mb-3">
-                                                                <Form.Label>
-                                                                    Gender
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Email {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
-                                                                <div className="d-flex gap-2 mt-1">
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Male"
-                                                                        value="Male"
-                                                                        {...register('gender', { required: 'Gender is required' })}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }}
-                                                                    />
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Female"
-                                                                        value="Female"
-                                                                        {...register('gender')}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }} />
-                                                                    <Form.Check
-                                                                        type="radio"
-                                                                        label="Other"
-                                                                        value="Other"
-                                                                        {...register('gender')}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('gender');
-                                                                            setFormData({ ...formData, gender: e.target.value })
-                                                                        }} />
-                                                                </div>
-                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                                <Form.Control
+                                                                    type="email"
+                                                                    {...register('email', {
+                                                                        required: 'Email is required',
+                                                                        pattern: {
+                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
+                                                                            message: 'Enter a valid email address',
+                                                                        },
+                                                                    })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('email');
+                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                    }}
+                                                                    placeholder="Enter email"
+                                                                />
+                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                             </Form.Group>
 
-
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">Degree Name</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('degreeName',
+                                                                        // { required: 'Degree Name is required' }
+                                                                    )}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('degreeName');
+                                                                        setFormData({ ...formData, degreeName: e.target.value });
+                                                                    }}
+                                                                    // value={formData.Degree Name}
+                                                                    placeholder="Enter Degree Name"
+                                                                />
+                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
+                                                            </Form.Group>
+                                                            <div className="mb-2 d-flex flex-column position-relative">
+                                                                <Form.Label className="mb-0">Profile Image</Form.Label>
+                                                                <div
+                                                                    onClick={() => logoFileInputRef.current.click()}
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
+                                                                >
+                                                                    {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
+                                                                    <p className="mb-0">
+                                                                        <FiUploadCloud />
+                                                                    </p>
+                                                                </div>
+                                                                <Form.Control
+                                                                    type="file"
+                                                                    className="d-none "
+                                                                    {...register('profileImage', {
+                                                                    })}
+                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                                    ref={logoFileInputRef}
+                                                                    onChange={handleFileChange}
+                                                                />
+                                                                {errors.profileImage &&
+                                                                    <p className="text-danger">{errors.profileImage.message}</p>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-6">
                                                             <div className='row '>
                                                                 <div className='col-6 '>
-                                                                    <Form.Group className="mb-3 mt-1">
-                                                                        <Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">
                                                                             Password {!id && <span className="text-danger">*</span>}
                                                                         </Form.Label>
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showPassword ? "text" : "password"}
                                                                                 // onKeyDown={(event) => handleFirstSpace(event, 0)}
+
                                                                                 onKeyDown={(e) => {
                                                                                     if (e.key === " ") {
                                                                                         e.preventDefault();
                                                                                     }
                                                                                 }}
-                                                                                placeholder={id ? "********" : "Password"}
-                                                                                readOnly={id}
+                                                                                defaultValue={updateId ? '*********' : ''}
+                                                                                onCopy={(e) => e.preventDefault()}
+                                                                                onCut={(e) => e.preventDefault()}
+                                                                                placeholder={"Password"}
+                                                                                readOnly={updateId}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('password');
                                                                                     setFormData({ ...formData, password: e.target.value })
                                                                                 }}
                                                                                 {...register("password", {
-                                                                                    required: !id ? "Password is required" : false,
+                                                                                    required: !updateId ? "Password is required" : false,
                                                                                     pattern: {
                                                                                         value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
                                                                                         message:
                                                                                             "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
                                                                                     },
-                                                                                    // validate: (value) =>
-                                                                                    //     !/\s/.test(value) || "Spaces are not allowed in the password.",
+
                                                                                 })}
                                                                             />
                                                                             <span
@@ -741,17 +738,19 @@ const NewDoctor = () => {
                                                                 </div>
                                                                 <div className='col-6'>
 
-                                                                    <Form.Group className='mb-3 mt-1'>
-                                                                        <Form.Label>Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
+                                                                    <Form.Group className='mb-1 '>
+                                                                        <Form.Label className="mb-0">Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
                                                                         <div className="position-relative">
                                                                             <Form.Control
                                                                                 type={showConfirmPassword ? "text" : "password"}
                                                                                 placeholder="Confirm Password"
                                                                                 readOnly={id}
+                                                                                onCopy={(e) => e.preventDefault()}
+                                                                                onCut={(e) => e.preventDefault()}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('confirmPassword');
                                                                                     setFormData({ ...formData, confirmPassword: e.target.value })
-                                                                            }}
+                                                                                }}
                                                                                 {...register('confirmPassword', {
                                                                                     ...(!id ? { required: 'Please confirm your password' } : {}),
                                                                                     pattern: {
@@ -772,13 +771,13 @@ const NewDoctor = () => {
                                                                         </div>
                                                                     </Form.Group>
                                                                 </div>
-                                                                <div className="mb-3 d-flex flex-column position-relative">
-                                                                    <Form.Label>Degree</Form.Label>
+                                                                <div className="mb-1 d-flex flex-column position-relative">
+                                                                    <Form.Label className="mb-0">Degree</Form.Label>
                                                                     <div
                                                                         onClick={() => degreeFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${degreeName ? '' : 'custom-form-fields'}`}
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
                                                                     >
-                                                                        {degreeName ? degreeName : 'Upload Degree'}
+                                                                        {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
                                                                         <p className="mb-0">
                                                                             <FiUploadCloud />
                                                                         </p>
@@ -787,7 +786,6 @@ const NewDoctor = () => {
                                                                         type="file"
                                                                         className="d-none "
                                                                         {...register('degreeDoc', {
-                                                                            required: 'Degree is required',
                                                                         })}
                                                                         ref={degreeFileInputRef}
                                                                         onChange={handleFileChangeDegree}
@@ -798,27 +796,55 @@ const NewDoctor = () => {
                                                                 </div>
                                                             </div>
 
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Gender <span className="text-danger">*</span>
+                                                                </Form.Label>
+                                                                <Form.Control
+                                                                    as="select"
+                                                                    {...register("gender", { required: "Gender is required" })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors("gender");
+                                                                        setFormData((prev) => ({ ...prev, gender: e.target.value }));
+                                                                    }}
+                                                                // className="mt-1"
+                                                                >
+                                                                    <option value="">Select Gender</option>
+                                                                    <option value="Male">Male</option>
+                                                                    <option value="Female">Female</option>
+                                                                    <option value="Other">Other</option>
+                                                                </Form.Control>
+                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                            </Form.Group>
                                                         </div>
                                                     </div>
-                                                    <div className='row mt-2'>
+                                                    <div className='row mt-1'>
 
-                                                        <Col sm={12} className='pb-2' style={{ borderBottom: '1px solid #444141' }}>
+                                                        <Col sm={12} className='pb-1' style={{ borderBottom: '1px solid #444141' }}>
                                                             <Row>
-                                                                <Col sm={12} className='mb-2'>
+                                                                <Col sm={12} className=''>
                                                                     <span className='text-black fw-semibold form-label'>Primary Address</span>
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Row className='position-relative'>
                                                                         <Col sm={12}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className="mb-0">Address</Form.Label>
                                                                                 <div style={{ position: 'relative' }}>
                                                                                     <Form.Control
                                                                                         type="text"
                                                                                         defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.address : ''}
                                                                                         {...register('address1')}
                                                                                         onChange={(e) => {
-                                                                                            setFormData({ ...formData, address: e.target.value });
+                                                                                            // setFormData({ ...formData, address: e.target.value });
+
+                                                                                            setFormData((prevState) => ({
+                                                                                                ...prevState,
+                                                                                                primaryAddress: {
+                                                                                                    ...prevState.primaryAddress,
+                                                                                                    address: e.target.value,
+                                                                                                }
+                                                                                            }));
                                                                                             getGeolocation(e);
                                                                                             setFocused(true); // Open dropdown on input
                                                                                         }}
@@ -850,6 +876,18 @@ const NewDoctor = () => {
                                                                                                 key={index}
                                                                                                 onClick={() => {
                                                                                                     setSelectedLocation(data)
+                                                                                                    console.log(data, 'data202020');
+                                                                                                    setValue('zip1', data?.components?.postcode || '')    // Update only the address field
+                                                                                                    setFormData((prevState) => ({
+                                                                                                        ...prevState,
+                                                                                                        primaryAddress: {
+                                                                                                            ...prevState.primaryAddress,
+                                                                                                            address: data?.formatted,
+                                                                                                            ...(data?.bounds?.southwest?.lat ? { latitude: data?.bounds?.southwest?.lat } : {}),
+                                                                                                            ...(data?.bounds?.southwest?.lng ? { longitude: data?.bounds?.southwest?.lng } : {}),
+                                                                                                            ...(data?.components?.postcode ? { zip: data?.components?.postcode } : {}),     // Update only the address field
+                                                                                                        }
+                                                                                                    }));
                                                                                                     setFocused(false); // Close dropdown after selection
                                                                                                 }}
                                                                                                 style={{
@@ -869,25 +907,40 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={latitude}
-                                                                                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                                                                    onChange={(e) => {
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                latitude: e.target.value,
+                                                                                            }
+                                                                                        }));
+                                                                                    }}
                                                                                     placeholder="Latitude"
                                                                                 />
                                                                                 {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={longitude}
-                                                                                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                                                                    placeholder="Longitude" />
+                                                                                    onChange={(e) => {
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                longitude: e.target.value,
+                                                                                            }
+                                                                                        }));
+                                                                                    }} placeholder="Longitude" />
                                                                                 {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
                                                                             </Form.Group>
                                                                         </Col>
@@ -896,16 +949,21 @@ const NewDoctor = () => {
                                                                 <Col sm={6}>
                                                                     <Row>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <label htmlFor="state-select" className='fw-bold' style={{ display: "block", marginBottom: "6px" }}>
+                                                                            <Form.Group className="mb-1">
+                                                                                <label htmlFor="state-select" className='fw-bold mb-0' style={{ display: "block", marginBottom: "6px" }}>
                                                                                     State
                                                                                 </label>
                                                                                 <select
                                                                                     id="state-select"
                                                                                     {...register("state1")}
                                                                                     onChange={(e) => {
-                                                                                        const selectedValue = e.target.value;
-                                                                                        setFormData({ ...formData, state: selectedValue });
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                state: e.target.value,
+                                                                                            }
+                                                                                        }));
                                                                                         handleStateSelection(e);
                                                                                     }}
                                                                                     style={{
@@ -922,7 +980,7 @@ const NewDoctor = () => {
                                                                                     {statesData?.states?.map((data) => (
                                                                                         <option
                                                                                             key={data?.id} // Unique key for each option
-                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id, name: data?.name })} // Store the key as a data attribute
                                                                                             value={data?._id}
                                                                                         >
                                                                                             {data?.name}
@@ -934,15 +992,21 @@ const NewDoctor = () => {
 
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>City</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>City</Form.Label>
 
                                                                                 <select
                                                                                     disabled={store?.getCitiesReducer?.loading}
                                                                                     {...register('city1')}
                                                                                     onChange={(e) => {
-                                                                                        setFormData({ ...formData, city: e.target.value })
-                                                                                        // handleCitySelection(e);
+                                                                                        // setFormData({ ...formData, city: e.target.value })
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                city: e.target.value,
+                                                                                            }
+                                                                                        }));
                                                                                     }}
                                                                                     style={{
                                                                                         width: "100%",
@@ -964,21 +1028,29 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Street</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Street</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     {...register('street1')}
                                                                                     onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                                                                                    onChange={(e) => {
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                street: e.target.value,
+                                                                                            }
+                                                                                        }));
+                                                                                    }}
                                                                                     placeholder="Street" />
 
                                                                                 {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
                                                                                 <Form.Control
                                                                                     defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.zip : ''}
                                                                                     type="text"
@@ -993,7 +1065,15 @@ const NewDoctor = () => {
                                                                                         },
                                                                                     })}
                                                                                     onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+                                                                                    onChange={(e) => {
+                                                                                        setFormData((prevState) => ({
+                                                                                            ...prevState,
+                                                                                            primaryAddress: {
+                                                                                                ...prevState.primaryAddress,
+                                                                                                zip: e.target.value,
+                                                                                            }
+                                                                                        }));
+                                                                                    }}
                                                                                     placeholder="Zip"
                                                                                     maxLength={5}
                                                                                 />
@@ -1006,18 +1086,67 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </div>
 
-                                                    <div className='row mt-2'>
+                                                    <div className='row mt-1'>
 
                                                         <Col sm={12}>
                                                             <Row>
                                                                 <Col sm={12} className='mb-2'>
                                                                     <span className='text-black fw-semibold form-label'>Mailing Address</span>
+                                                                    <Form.Check
+                                                                        type="checkbox"
+                                                                        label="Same as Primary Address"
+                                                                        disabled={
+                                                                            !(
+                                                                                formData?.primaryAddress?.address && formData?.primaryAddress?.zip &&
+                                                                                formData?.primaryAddress?.state && formData?.primaryAddress?.city &&
+                                                                                formData?.primaryAddress?.street
+                                                                            )
+                                                                        }
+
+                                                                        // style={{ cursor: getValues('zip') === '' ? 'not-allowed' : '' }}
+                                                                        onChange={(e) => {
+
+                                                                            if (e.target.checked) {
+                                                                                setSameAsPrimary(true);
+                                                                                setValue('address2', getValues('address1'));
+                                                                                setValue('zip2', getValues('zip1'));
+                                                                                setValue('street2', getValues('street1'));
+                                                                                setMailingLatitude(latitude);
+                                                                                setMailingLongitude(longitude);
+                                                                                setFormData((prevState) => ({
+                                                                                    ...prevState,
+                                                                                    mailingAddress: {
+                                                                                        ...prevState.mailingAddress,
+                                                                                        address: formData?.primaryAddress?.address,
+                                                                                        state: formData?.primaryAddress?.state,
+                                                                                        city: formData?.primaryAddress?.city,
+                                                                                        latitude: formData?.primaryAddress?.latitude,
+                                                                                        longitude: formData?.primaryAddress?.longitude,
+                                                                                        street: formData?.primaryAddress?.street,
+                                                                                        zip: formData?.primaryAddress?.zip,
+                                                                                    }
+                                                                                }));
+                                                                            } else {
+                                                                                setSameAsPrimary(false)
+                                                                                setValue('address2', '');
+                                                                                setValue('zip2', '');
+                                                                                setValue('street2', '');
+                                                                                setMailingLatitude(null);
+                                                                                setMailingLongitude(null);
+                                                                                setFormData((prevState) => {
+                                                                                    const updatedState = { ...prevState };
+                                                                                    delete updatedState.mailingAddress; // Remove mailingAddress
+                                                                                    return updatedState;
+                                                                                });
+                                                                            }
+                                                                        }}
+                                                                    />
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Row className='position-relative'>
                                                                         <Col sm={12}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className="mb-0">Address</Form.Label>
                                                                                 <div style={{ position: 'relative' }}>
                                                                                     <Form.Control
                                                                                         type="text"
@@ -1028,6 +1157,7 @@ const NewDoctor = () => {
                                                                                             getMailingGeolocation(e);
                                                                                             setMailingFocused(true); // Open dropdown on input
                                                                                         }}
+                                                                                        readOnly={sameAsPrimary}
                                                                                         onFocus={() => setMailingFocused(true)} // Open dropdown when the field is focused
                                                                                         onBlur={() => {
                                                                                             setTimeout(() => setMailingFocused(false), 200); // Delay to allow selection before hiding dropdown
@@ -1075,22 +1205,24 @@ const NewDoctor = () => {
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Latitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={mailingLatitude}
+                                                                                    readOnly={sameAsPrimary}
                                                                                     onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
                                                                                     placeholder="Latitude"
                                                                                 />
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Longitude</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     defaultValue={mailingLongitude}
+                                                                                    readOnly={sameAsPrimary}
                                                                                     onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
                                                                                     placeholder="Longitude" />
                                                                             </Form.Group>
@@ -1100,58 +1232,65 @@ const NewDoctor = () => {
                                                                 <Col sm={6}>
                                                                     <Row>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1' >State</Form.Label>
-                                                                                <Form.Select
-                                                                                    {...register('state2')}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData({ ...formData, state: e.target.value });
-                                                                                        handleMailingStateSelection(e);
-                                                                                    }}
-                                                                                >
-                                                                                    <option>State</option>
-                                                                                    {statesData?.states?.map((data) => (
-                                                                                        <option
-                                                                                            key={data?.id} // Unique key for each option
-                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                                                            value={data?._id}
-                                                                                        >
-                                                                                            {data?.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0' >State</Form.Label>
+                                                                                {sameAsPrimary ?
+                                                                                    <Form.Control readOnly={sameAsPrimary} value={statesData?.states.find((data) => data?._id === formData?.primaryAddress?.state)?.name} />
+                                                                                    :
+                                                                                    <Form.Select
+                                                                                        {...register('state2')}
+                                                                                        onChange={(e) => {
+                                                                                            setFormData({ ...formData, state: e.target.value });
+                                                                                            handleMailingStateSelection(e);
+                                                                                        }}
+                                                                                    >
+                                                                                        <option value=''>State</option>
+                                                                                        {statesData?.states?.map((data) => (
+                                                                                            <option
+                                                                                                key={data?.id} // Unique key for each option
+                                                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                                                value={data?._id}
+                                                                                            >
+                                                                                                {data?.name}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                    </Form.Select>
+                                                                                }
+
                                                                             </Form.Group>
 
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>City</Form.Label>
-
-                                                                                <Form.Select
-                                                                                    disabled={store?.getCitiesReducer?.loading}
-                                                                                    {...register('city2')}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData({ ...formData, city: e.target.value })
-                                                                                        // handleCitySelection(e);
-                                                                                    }}
-                                                                                >
-                                                                                    <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                                    {cities2?.map((data) => (
-                                                                                        <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
-                                                                                            {data?.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>City</Form.Label>
+                                                                                {sameAsPrimary ?
+                                                                                    <Form.Control readOnly={sameAsPrimary} value={cities1 && cities1.find((data) => data?._id === formData?.primaryAddress?.city)?.name} />
+                                                                                    :
+                                                                                    <Form.Select
+                                                                                        disabled={store?.getCitiesReducer?.loading}
+                                                                                        {...register('city2')}
+                                                                                        onChange={(e) => {
+                                                                                            setFormData({ ...formData, city: e.target.value })
+                                                                                        }}
+                                                                                    >
+                                                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                                                        {cities2?.map((data) => (
+                                                                                            <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
+                                                                                                {data?.name}
+                                                                                            </option>
+                                                                                        ))}
+                                                                                    </Form.Select>
+                                                                                }
                                                                             </Form.Group>
                                                                         </Col>
 
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Street</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Street</Form.Label>
                                                                                 <Form.Control
                                                                                     type="text"
                                                                                     {...register('street2')}
+                                                                                    readOnly={sameAsPrimary}
                                                                                     onKeyPress={handleFirstSpace}
                                                                                     onChange={(e) => setFormData({ ...formData, street: e.target.value })}
                                                                                     placeholder="Street" />
@@ -1160,9 +1299,10 @@ const NewDoctor = () => {
                                                                             </Form.Group>
                                                                         </Col>
                                                                         <Col sm={6}>
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className='mb-1'>Zip</Form.Label>
+                                                                            <Form.Group className="mb-1">
+                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
                                                                                 <Form.Control
+                                                                                    readOnly={sameAsPrimary}
                                                                                     defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.zip : ''}
                                                                                     type="text"
                                                                                     {...register('zip2', {
@@ -1189,10 +1329,10 @@ const NewDoctor = () => {
                                                         </Col>
                                                     </div>
                                                 </div>
-                                                <div className="col-12 d-flex justify-content-end gap-2 mt-3">
+                                                <div className="col-12 d-flex justify-content-end gap-2 mt-1">
                                                     <Button variant="secondary">Cancel</Button>
                                                     <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading} >
-                                                        {store?.createtDoctorsDetailReducer?.loading ?
+                                                        {store?.createtDoctorsReducer?.loading ?
                                                             <Spinner color='white' className='spinner-border-sm' />
                                                             :
                                                             id ? "Update" : "Next"

@@ -39,7 +39,6 @@ const OrderList = (): React$Element<React$FragmentType> => {
             id: data?._id,
             status: !data?.status
         }
-
         dispatch(updateClinicAction({ key: encryptMessage(payload) }));
         dispatch(stateEmptydAction());
     }

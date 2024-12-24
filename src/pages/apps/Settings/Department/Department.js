@@ -44,8 +44,8 @@ const Department = () => {
 
   const addDepartment = (data) => {
     const payload = {
-    //   id: edit?._id,
-      ...(edit ? { id:edit?._id } : {}), 
+      //   id: edit?._id,
+      ...(edit ? { id: edit?._id } : {}),
       name: data?.name,
       description: data?.description,
       category: 'Department',
@@ -67,7 +67,8 @@ const Department = () => {
   const createResponse = store?.createMastersDataReducer?.data;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
   const updateResponse = store?.updateMastersDataReducer?.data;
-
+  console.log(createResponse, 'createResponse')
+  console.log(tableGetData, 'tableGetData')
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
     if (createResponse?.status === 201 || updateResponse === 200) {
@@ -122,7 +123,7 @@ const Department = () => {
                     />
                     <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
                     <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
-                    <Button onClick={() => {setAddDepartmentModal(true) ; setEdit(null)}} className="custom-buttons">
+                    <Button onClick={() => { setAddDepartmentModal(true); setEdit(null) }} className="custom-buttons">
                       New Department
                     </Button>
                   </Col>
@@ -144,7 +145,7 @@ const Department = () => {
                 {store?.getMastersDataReducer?.loading ? (
                   <tr><td colSpan={6} className='text-center'><Spinner /></td></tr>
                 ) : tableGetData?.length ? (
-                    tableGetData?.map((data, index) => (
+                  tableGetData?.map((data, index) => (
                     <tr key={data._id}>
                       <td>{index + 1}</td>
                       <td>{data.name}</td>

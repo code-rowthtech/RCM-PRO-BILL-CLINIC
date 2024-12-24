@@ -68,7 +68,7 @@ const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'))
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
 const Practice = React.lazy(() => import('../pages/apps/SubPractice/index'));
 const PracticeDetails = React.lazy(() => import('../pages/apps/SubPractice/PracticeDetails'));
-
+const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updateSubClinic'));
 
 
 const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
@@ -362,6 +362,10 @@ const AllRoutes = () => {
                                     path: 'practiceDetails',
                                     element: <LoadComponent component={PracticeDetails} />,
                                 },
+                                {
+                                    path:'updateSubClinic',
+                                    element: <LoadComponent component={UpdateSubClinic}/>,
+                                }
                                 
                             ],
                         },

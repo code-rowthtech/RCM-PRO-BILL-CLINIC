@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
+import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
 
 
 const Responsiblle = () => {
@@ -19,7 +19,6 @@ const Responsiblle = () => {
 
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log({ cities })
     const dispatch = useDispatch();
     const [focused, setFocused] = useState(false);
     const [searchParams] = useSearchParams();
@@ -208,7 +207,8 @@ const Responsiblle = () => {
         }
         console.log({ payload });
         reset();
-        // dispatch(createPatientsAction({ key: encryptMessage(payload) }))
+        dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
+
     };
     const tableData = [
         { type: 'Patient', values: Array(6).fill("0.00") },
@@ -222,77 +222,80 @@ const Responsiblle = () => {
 
             {/* Form Section */}
             <Form onSubmit={handleSubmit(onSubmit)}>
-                <div className="row px-0" >
+                <div className="row px-0 " >
+                    <div className="row  pb-2 pt-1 pe-0" style={{ borderBottom: "1px solid #444141" }}>
+                        <div className="col-3 ">
+                            <Form.Label htmlFor="fileName" className="mb-0">Full Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Full Name"
+                                {...register('fullName', { required: "Full name is required" })}
+                            />
+                        </div>
+                        <div className="col-3 pe-1">
+                            <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
+                            <Form.Select
+                                {...register('title', { required: "Title is required" })}
+                                aria-label="Select Title"
+                            >
+                                <option value="">Select Title</option>
+                                <option value="Mr.">Mr.</option>
+                                <option value="Mrs.">Mrs.</option>
+                                <option value="Miss">Miss</option>
+                                <option value="Dr.">Dr.</option>
+                                <option value="Other">Other</option>
+                            </Form.Select>
+                        </div>
+                        <div className="col-3">
+                            <Form.Label htmlFor="gender" className="mb-0">Gender<span className='text-danger'>*</span></Form.Label>
+                            <div className="d-flex gap-2">
+                                <Form.Select
+                                    {...register('gender', { required: "Gender is required" })}
+                                    aria-label="Select Gender"
+                                >
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+
+                                </Form.Select>
+
+                            </div>
+                            {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+
+                        </div>
+                        <div className="col-3 pe-0">
+                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth</Form.Label>
+                            <Form.Control
+                                type="date"  // Change type to "date" for date input
+                                placeholder="Date of Birth"
+                                {...register('dateOfBirth', { required: "Date of Birth is required" })}
+                            />
+                        </div>
+                    </div>
                     <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
                         <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-6 mb-2" >
-                                <Form.Label htmlFor="DOB">Date of Birth</Form.Label>
-                                <Form.Control
-                                    type="date"  // Change type to "date" for date input
-                                    placeholder="Date of Birth"
-                                    {...register('dateOfBirth', { required: "Date of Birth is required" })}
-                                />
-                            </div>
-                            <div className="col-6 mb-2">
-                                <div>
-                                    <Form.Label htmlFor="SSN">SSN<span className='text-danger'>*</span></Form.Label>
-                                    <div className="d-flex gap-2">
-                                        <Form.Select
-                                            {...register('SSN', { required: "SSN is required" })}
-                                            aria-label="Select SSN"
-                                        >
-                                            <option value="">Select SSN</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-
-                                        </Form.Select>
-
-                                    </div>
-                                    {errors.SSN && <span className="text-danger">{errors.SSN.message}</span>}
-
-                                </div>
-                            </div>
-                            <div className="col-6">
-                                <div className=" mb-2">
-                                    <Form.Label htmlFor="title">Title</Form.Label>
+                            <div className="py-1">
+                                <Form.Label htmlFor="SSN" className="mb-0">SSN<span className='text-danger'>*</span></Form.Label>
+                                <div className="d-flex gap-2">
                                     <Form.Select
-                                        {...register('title', { required: "Title is required" })}
-                                        aria-label="Select Title"
+                                        {...register('SSN', { required: "SSN is required" })}
+                                        aria-label="Select SSN"
                                     >
-                                        <option value="">Select Title</option>
-                                        <option value="Mr.">Mr.</option>
-                                        <option value="Mrs.">Mrs.</option>
-                                        <option value="Miss">Miss</option>
-                                        <option value="Dr.">Dr.</option>
-                                        <option value="Other">Other</option>
+                                        <option value="">Select SSN</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+
                                     </Form.Select>
-                                </div>
-                            </div>
-                            <div className="col-6">
-                                <div>
-                                    <Form.Label htmlFor="gender">Gender<span className='text-danger'>*</span></Form.Label>
-                                    <div className="d-flex gap-2">
-                                        <Form.Select
-                                            {...register('gender', { required: "Gender is required" })}
-                                            aria-label="Select Gender"
-                                        >
-                                            <option value="">Select Gender</option>
-                                            <option value="Male">Male</option>
-                                            <option value="Female">Female</option>
-                                            <option value="Other">Other</option>
-
-                                        </Form.Select>
-
-                                    </div>
-                                    {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
 
                                 </div>
+                                {errors.SSN && <span className="text-danger">{errors.SSN.message}</span>}
                             </div>
                         </div>
-                        <div className="row mb-2 mt-2 pb-2" style={{ borderBottom: "1px solid #444141" }}>
+                        <div className="row mb-1 mt-1 pb-1" style={{ borderBottom: "1px solid #444141" }}>
                             <div className="col-4 mb-1">
-                                <Form.Label htmlFor="email">Email ID</Form.Label>
+                                <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
                                 <Form.Control
                                     type="email"
                                     placeholder="Email ID"
@@ -301,7 +304,7 @@ const Responsiblle = () => {
                             </div>
                             <div className=' col-4'>
                                 <Form.Group className="mb-0 position-relative">
-                                    <Form.Label className='mb-1'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
+                                    <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                     <Form.Group>
                                         <InputGroup>
                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -342,7 +345,7 @@ const Responsiblle = () => {
                                 </Form.Group>
                             </div>
                             <div className="col-4 ">
-                                <Form.Label htmlFor="note">Note (Text)</Form.Label>
+                                <Form.Label htmlFor="note" className="mb-0">Note (Text)</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Note"
@@ -351,9 +354,9 @@ const Responsiblle = () => {
                             </div>
                         </div>
                         <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-6 mb-2">
+                            <div className="col-6 mb-1">
                                 <div>
-                                    <Form.Label htmlFor="employer">Employer</Form.Label>
+                                    <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
                                     <div className="d-flex gap-2">
                                         <Form.Select
                                             {...register('employer', { required: "employer is required" })}
@@ -371,9 +374,9 @@ const Responsiblle = () => {
 
                                 </div>
                             </div>
-                            <div className="col-6 mb-2">
+                            <div className="col-6 mb-1">
                                 <div>
-                                    <Form.Label htmlFor="status">Status<span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label htmlFor="status" className="mb-0">Status<span className='text-danger'>*</span></Form.Label>
                                     <div className="d-flex gap-2">
                                         <Form.Select
                                             {...register('status', { required: "status is required" })}
@@ -392,8 +395,8 @@ const Responsiblle = () => {
                                 </div>
                             </div>
                             <div className="col-6">
-                                <div className=" mb-2">
-                                    <Form.Label htmlFor="title">Chart</Form.Label>
+                                <div className=" mb-1">
+                                    <Form.Label htmlFor="title" className="mb-0">Chart</Form.Label>
                                     <Form.Select
                                         {...register('title', { required: "Title is required" })}
                                         aria-label="Select Title"
@@ -406,7 +409,7 @@ const Responsiblle = () => {
                                 </div>
                             </div>
                             <div className="col-6">
-                                <Form.Label htmlFor="patientName">Patient Name</Form.Label>
+                                <Form.Label htmlFor="patientName" className="mb-0">Patient Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="patientName"
@@ -417,7 +420,7 @@ const Responsiblle = () => {
                         <div className="row">
                             <div className="" >
                                 <div>
-                                    <Table responsive className="table-centered table-nowrap mb-0 mt-2">
+                                    <Table responsive className="table-centered table-nowrap mb-0 mt-1">
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Seq</th>
@@ -450,7 +453,7 @@ const Responsiblle = () => {
                                     </Table>
                                 </div>
                                 <div>
-                                    <Table responsive className="table-centered table-nowrap mb-0 mt-2 pt-2">
+                                    <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
                                         <thead className="text-white">
                                             <tr>
                                                 <th className="text-white"></th>
@@ -488,17 +491,10 @@ const Responsiblle = () => {
 
                     </div>
                     <div className="col-6">
-                        <div className="row pb-2  px-0" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className=" mb-2">
-                                <Form.Label htmlFor="fileName">Full Name</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Full Name"
-                                    {...register('fullName', { required: "Full name is required" })}
-                                />
-                            </div>
-                            <div className=" mb-2">
-                                <Form.Label htmlFor="fileName">Account</Form.Label>
+                        <div className="row pb-1  px-0" style={{ borderBottom: "1px solid #444141" }}>
+
+                            <div className=" my-1">
+                                <Form.Label htmlFor="fileName" className="mb-0">Account</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Account"
@@ -507,8 +503,8 @@ const Responsiblle = () => {
                             </div>
                             <Col sm={12}>
 
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-1">Address</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Address</Form.Label>
                                     <div style={{ position: 'relative' }}>
                                         <Form.Control
                                             type="text"
@@ -564,8 +560,8 @@ const Responsiblle = () => {
 
                             <Col sm={12}>
 
-                                <Form.Group className="mb-2">
-                                    <Form.Label className='mb-1' >State</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className='mb-0' >State</Form.Label>
                                     <Form.Select
                                         {...register('stateName')}
                                         onChange={(e) => handleStateSelection(e)}
@@ -587,7 +583,7 @@ const Responsiblle = () => {
                                 <div className="row">
                                     <Col sm={6}>
                                         <Form.Group className="mb-1">
-                                            <Form.Label className='mb-1'>City</Form.Label>
+                                            <Form.Label className='mb-0'>City</Form.Label>
                                             <Form.Select
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('city')}
@@ -606,7 +602,7 @@ const Responsiblle = () => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-1">
-                                            <Form.Label className='mb-1'>Zip</Form.Label>
+                                            <Form.Label className='mb-0'>Zip</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 {...register('zip', {
@@ -630,8 +626,8 @@ const Responsiblle = () => {
                             </div>
                         </div>
                         <div className="row mt-1">
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="Account">Account type</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="Account" className="mb-0">Account type</Form.Label>
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="Account"
@@ -642,16 +638,16 @@ const Responsiblle = () => {
                                     <option value="false">No</option>
                                 </Form.Control>
                             </div>
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="additional">Statement formate</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="additional" className="mb-0">Statement formate</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Statement formate"
                                     {...register('stateMent', { required: "stateMent formate is required" })}
                                 />
                             </div>
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="">Hold patient billing</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="" className="mb-0">Hold patient billing</Form.Label>
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="patientBilling"
@@ -662,16 +658,16 @@ const Responsiblle = () => {
                                     <option value="false">2</option>
                                 </Form.Control>
                             </div>
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="holdReason">Hold Reason</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="holdReason" className="mb-0">Hold Reason</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Hold Reason"
                                     {...register('holdReason', { required: "holdReason formate is required" })}
                                 />
                             </div>
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="">Statement billing</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="" className="mb-0">Statement billing</Form.Label>
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="statmentBilling"
@@ -682,8 +678,8 @@ const Responsiblle = () => {
                                     <option value="false">2</option>
                                 </Form.Control>
                             </div>
-                            <div className="col-6 mb-2">
-                                <Form.Label htmlFor="">Assess finance Charges</Form.Label>
+                            <div className="col-6 mb-1">
+                                <Form.Label htmlFor="" className="mb-0">Assess finance Charges</Form.Label>
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="financeCharges"
@@ -694,15 +690,15 @@ const Responsiblle = () => {
                                     <option value="false">2</option>
                                 </Form.Control>
                             </div>
-                            <div className="col-3 mb-2">
-                                <Form.Label htmlFor="" className="text-nowrap">Last patient payment</Form.Label>
+                            <div className="col-3 mb-1">
+                                <Form.Label htmlFor="" className="text-nowrap mb-0">Last patient payment</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Last patient payment"
                                     {...register('holdReason', { required: "Last patient payment is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-2 mt-3 pt-1">
+                            <div className="col-3 mb-1 " style={{ marginTop: '21px' }}>
                                 {/* <Form.Label htmlFor="holdReason">Hold Reason</Form.Label> */}
                                 <Form.Control
                                     type="text"
@@ -710,40 +706,40 @@ const Responsiblle = () => {
                                 // {...register('holdReason', { required: "holdReason formate is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-2">
-                                <Form.Label htmlFor="holdReason">Last statement</Form.Label>
+                            <div className="col-3 mb-1">
+                                <Form.Label htmlFor="holdReason" className="mb-0">Last statement</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Last statement"
                                     {...register('lastStatement', { required: "Last statement is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-2 mt-3 pt-1">
+                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""
                                 />
                             </div>
-                            <div className="col-3 mt-3 pt-2">
-                                <p className="text-nowrap " style={{fontWeight:600}}>Legacy credit card on file</p>
+                            <div className="col-3 mt-3 pt-1">
+                                <p className="text-nowrap " style={{ fontWeight: 600 }}>Legacy credit card on file</p>
                             </div>
-                            <div className="col-3 mb-2">
-                                <Form.Label htmlFor="holdReason">Card</Form.Label>
+                            <div className="col-3 mb-1">
+                                <Form.Label htmlFor="holdReason" className="mb-0">Card</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Card"
                                     {...register('card', { required: "card is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-2">
-                                <Form.Label htmlFor="holdReason">Expiry</Form.Label>
+                            <div className="col-3 mb-1">
+                                <Form.Label htmlFor="holdReason" className="mb-0">Expiry</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Expiry"
                                     {...register('expiry', { required: "expiry is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-2 mt-3 pt-1">
+                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""
@@ -754,14 +750,125 @@ const Responsiblle = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className="d-flex gap-2 justify-content-end mb-2">
-                    <Button variant="primary" >Collections</Button>
-                    <Button variant="primary" >Statement</Button>
-                    <Button variant="primary" >Family history</Button>
-                    <Button variant="primary" >Credit cards</Button>
-                    <Button variant="danger">Delete</Button>
-                    <Button variant="secondary">Clear</Button>
-                    <Button variant="primary" > Previous </Button>
+                <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
+                    <Button className="custom-buttons" variant="primary" >Collections</Button>
+                    <Button className="custom-buttons" variant="primary" >Statement</Button>
+                    <Button
+                        className="custom-buttons "
+                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
+                        variant="primary"  >
+                        Family history
+                    </Button>
+                    <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                        <div class="offcanvas-header">
+                            <h5 id="offcanvasRightLabel">Family Financial History</h5>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <Form>
+                                <Row>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Date Type:
+                                            </Form.Label>
+                                            <Form.Select>
+                                                <option value=''>Select</option>
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Visit #:
+                                            </Form.Label>
+                                            <Form.Control type="text" placeholder="Enter visit number" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                From Date:
+                                            </Form.Label>
+                                            <Form.Control type="date" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                To:
+                                            </Form.Label>
+                                            <Form.Control type="date" />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Group>
+                                            <Form.Label className='mb-0'>
+                                                Provider:
+                                            </Form.Label>
+                                            <Form.Select>
+                                                <option value=''>Select</option>
+                                                <option value='1'>1</option>
+                                                <option value='2'>2</option>
+                                                <option value='3'>3</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Label>Sort By:</Form.Label>
+                                        <div className="d-flex align-items-center gap-5">
+                                            <Form.Group>
+                                                <div className="">
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Newest First"
+                                                        name="sortOrder"
+                                                        value="newest"
+                                                        id="newest"
+                                                    />
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Oldest First"
+                                                        name="sortOrder"
+                                                        value="oldest"
+                                                        id="oldest"
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                            <Form.Group>
+                                                <div className="">
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Summary"
+                                                        name="Summary"
+                                                        value="summary"
+                                                    />
+                                                    <Form.Check
+                                                        type="radio"
+                                                        label="Detail"
+                                                        name="Detail"
+                                                        value="detail"
+                                                    />
+                                                </div>
+                                            </Form.Group>
+                                        </div>
+                                    </Col>
+                                    <Col sm={12} className='mb-2 d-flex justify-content-end gap-2'>
+                                        <Button className="custom-buttons">Reset</Button>
+                                        <Button className="custom-buttons">Apply</Button>
+                                    </Col>
+                                </Row>
+
+                            </Form>
+                        </div>
+                    </div>
+                    <Button className="custom-buttons" variant="primary" >Credit cards</Button>
+                    {/* <Button variant="danger">Delete</Button> */}
+                    <Button className="custom-buttons" variant="secondary">Clear</Button>
+                    <Button className="custom-buttons" variant="primary" > Previous </Button>
                 </div>
             </Form>
 

@@ -5,7 +5,7 @@ import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png'
 import us from '../../../../assets/images/flags/us.jpg'
-import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, stateEmptydAction, updateClinicAction } from '../../../../redux/clinics/actions';
+import { createClinicAction, getCities2Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction, getStatesByCountryAction, updateClinicAction } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
@@ -319,10 +319,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         logoFileInputRef.current.click();
     };
 
+    const [logoUploading, setLogoUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
@@ -533,6 +534,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [cities1, cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
+    console.log(getTableData, 'getTableDatagetTableData')
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
@@ -763,9 +765,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         }`}
                                 >
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
-                                    {typeof logoName === 'string' && logoName
+                                    {/* {typeof logoName === 'string' && logoName
                                         ? logoName.split('/').pop()
-                                        : 'Upload Logo'}
+                                        : 'Upload Logo'} */}
+                                    {
+                                        logoUploading
+                                            ? 'Uploading...'
+                                            : typeof logoName === 'string' && logoName
+                                                ? logoName.split('/').pop()
+                                                : 'Upload Logo'
+                                    }
                                     <p className="mb-0">
                                         <FiDownloadCloud />
                                     </p>
@@ -1585,7 +1594,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <tr>
                                                     <th className="text-white">S.No.</th>
                                                     <th className="text-white">PRACTICE NAME</th>
+                                                    <th className="text-white">Location</th>
                                                     <th className="text-white">PRACTICE TYPE</th>
+                                                    <th className="text-white">Specialist</th>
                                                     <th className="text-white">STATUS</th>
                                                     <th className="text-white">ACTION</th>
                                                 </tr>
@@ -1595,13 +1606,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <tr key={patient.id}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient.name}</td>
+                                                        <td>{(patient?.userId?.primaryAddress?.city?.state_code || 'N/A') + ' / ' + (patient?.userId?.primaryAddress?.city?.name || 'N/A')}</td>
                                                         <td>{patient.clinicType}</td>
+                                                        <td>{patient.practiceSpecialty}</td>
                                                         <td>
                                                             <Form.Switch checked={patient.status === patient.status} />
                                                         </td>
                                                         <td>
                                                             <div className="text-center">
-                                                                <Link to={`/apps/Practice/new-practice?id=${patient?.userId?._id}`} className='text-black cursor-pointer ps-2'>
+                                                                <Link to={`/apps/Practice/updateSubClinic?id=${patient?.userId?._id}&clinicId=${patient?._id}`} className='text-black cursor-pointer ps-2'>
                                                                     <FiEdit className="fs-4 cursor-pointer" />
                                                                 </Link>
                                                             </div>

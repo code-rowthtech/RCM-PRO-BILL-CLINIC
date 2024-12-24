@@ -68,12 +68,12 @@ function* getDoctorsRoleFunction(data) {
 function* createDoctorsFunction(data) {
     try {
         yield put({
-            type: DoctorsActionTypes.GET_DOCTORS_LOADING,
+            type: DoctorsActionTypes.CREATE_DOCTORS_LOADING,
             payload: {},
         });
         const response = yield call(createDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decryptedData')
+        // console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData.message, 'success')
 

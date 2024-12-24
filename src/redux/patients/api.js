@@ -5,19 +5,28 @@ const api = new APICore();
 
 export function getPatientsApi(params: any): any {
     const { data } = params;
-    return api.create(`${URL.getPatients}?page=${data?.payload?.page}&limit=${data?.payload?.limit}`);
+    return api.create(URL.getPatients, data);
+}
+
+export function getPatientByIdApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.getPatientById, data);
 }
 
 export function createPatientsApi(params: any): any {
     const { data } = params;
-    console.log(data,'apidata')
     return api.create(URL.createPatients, data);
+}
+
+export function createResponsiblePartyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createResponsibleParty, data);
 }
 
 
 export function updatePatientsApi(params: any): any {
     const { data } = params;
-    return api.update(URL.updatePatients, data);
+    return api.create(URL.updatePatients, data);
 
 }
 

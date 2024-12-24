@@ -89,8 +89,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                     <Form onSubmit={handleSubmit(onSubmit)}>
                         <Row>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Name</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Name</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter name"
@@ -107,8 +107,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Email ID</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Email ID</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter email"
@@ -126,8 +126,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                             </Col>
 
                             <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label>Password</Form.Label>
+                                <Form.Group className="mb-1 position-relative">
+                                    <Form.Label className="mb-0">Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Enter password"
@@ -155,8 +155,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label>Confirm Password</Form.Label>
+                                <Form.Group className="mb-1 position-relative">
+                                    <Form.Label className="mb-0">Confirm Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Confirm password"
@@ -194,8 +194,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Contact No.</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Contact No.</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter contact number"
@@ -212,8 +212,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Contact Number secondary</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Contact Number secondary</Form.Label>
                                     <Form.Control
                                         type="text"
 
@@ -230,8 +230,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Date of Joining</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Date of Joining</Form.Label>
                                     <Form.Control
                                         type="date"
                                         defaultValue={currentUser?.joiningDate}
@@ -243,8 +243,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
 
 
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Date of Leaving</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Date of Leaving</Form.Label>
                                     <Form.Control
                                         type="date"
                                         defaultValue={currentUser?.joiningDate}
@@ -295,8 +295,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Role</Form.Label>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Role</Form.Label>
                                     <Form.Select
                                         {...register('role', { required: 'Role is required' })}
                                     >
@@ -314,27 +314,26 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                             </Col>
                           
                             <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Reporting</Form.Label>
-                                    <Form.Select
-                                        {...register('reportingTo', { required: 'Reporting is required' })}
-                                    >
-                                        <option value="">Select Reporting</option>
-                                        {roleData && roleData?.users?.map((data) => (
-                                            <option key={data._id} value={data?._id}>
-                                                {data.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors.reportingTo && (
-                                        <span className="text-danger fs-6">{errors.reportingTo.message}</span>
-                                    )}
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Reporting</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Enter Reporting"
+                                        {...register('reportingTo', {
+                                            required: 'Reporting is required',
+                                            pattern: {
+                                                value: /^(?! )[A-Za-z0-9 ]*$/,
+                                                message: 'Special characters and leading spaces are not allowed',
+                                            },
+                                        })}
+                                    />
+                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
                                 </Form.Group>
                             </Col>
 
 
                         </Row>
-                        <Modal.Footer className="border-0">
+                        <Modal.Footer className="border-0 py-0">
                             <Button type="button" className="custom-buttons" onClick={close}>
                                 Cancel
                             </Button>

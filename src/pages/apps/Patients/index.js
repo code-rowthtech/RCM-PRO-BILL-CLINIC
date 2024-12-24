@@ -1,25 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import Spinner from '../../../constants/Spinner'
 import { Link } from 'react-router-dom';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
 import { FaEye, FaEyeSlash, FaStarOfLife } from 'react-icons/fa';
 import ToastHandle from '../../../helpers/ToastMessage';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getPatientsAction, updatePatientsAction } from '../../../redux/patients/actions';
+import { encryptMessage } from '../../../cryptoUtils';
+import Paginations from '../../../helpers/Paginations';
 
 const Patients = () => {
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
-    const [status, setStatus] = useState('Active');
+    const [status, setStatus] = useState(true);
     const [isVisible, setIsVisible] = useState(false);
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
     const [timeoutId, setTimeoutId] = useState(null);
+    const [search, setSearch] = useState('');
+    const [skip, setSkip] = useState(1)
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
+    const dispatch = useDispatch();
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const store = useSelector((state) => state);
 
+    useEffect(() => {
+        const data = {
+            clinicId: clinicId,
+            page: skip,
+            limit: 10,
+            search: search,
+        }
+        // console.log(data, 'dataaa')
+        dispatch(getPatientsAction({ key: encryptMessage(data) }));
+    }, [dispatch, skip, search]);
     const handleShowDetails = () => {
         setSmShow(true);
     };
@@ -43,13 +61,7 @@ const Patients = () => {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            if (timeoutId) {
-                clearTimeout(timeoutId);  // Clean up the timeout when component unmounts
-            }
-        };
-    }, [timeoutId]);
+
 
     const toggleVisibility = () => {
         if (isPasswordCorrect) {
@@ -58,69 +70,16 @@ const Patients = () => {
             handleShowDetails();
         }
     };
-   
-    const patientsData = [
-        {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'john.doe@example.com',
-            phone: '123-456-7890',
-            status: 'Active',
-            lastVisit: ' 26th sep, 2023',
-            nextVisit: ' 26th sep, 2024',
-            address: {
-                street: '123 Main St',
-                city: 'Springfield',
-                state: 'IL',
-                zipCode: '62701'
-            },
-            gender: 'Male',
-            insurancePlan: 'Premium',
-            insurancePolicyNumber: '123456789',
-            allergies: 'Pollen',
-            emergencyContacts: [{ phone: '987-654-3210' }]
-        },
-        {
-            id: 2,
-            firstName: 'Jane',
-            lastName: 'Smith',
-            insuranceProvider: 'HealthCare Inc.',
-            email: 'jane.smith@example.com',
-            phone: '987-654-3210',
-            status: 'Inactive',
-            lastVisit: ' 26th sep, 2023',
-            nextVisit: ' 26th sep, 2024',
-            address: {
-                street: '456 Elm St',
-                city: 'Shelbyville',
-                state: 'IL',
-                zipCode: '62702'
-            },
-            gender: 'Female',
-            insurancePlan: 'Basic',
-            insurancePolicyNumber: '987654321',
-            allergies: 'None',
-            emergencyContacts: [{ phone: '123-456-7890' }]
-        },
-    ];
 
+    const patientsData = store?.getPatientsReducer?.data?.patients;
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);
     };
 
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(getPatientsAction({ page: 1, limit: 10 }));
-        dispatch(updatePatientsAction());
-    }, [dispatch]);
-    // Filter patients based on selected status
-    const filteredPatients = patientsData.filter((patient) =>
-        status === 'Active' ? patient.status === 'Active' : patient.status === 'Inactive'
-    );
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
     return (
         <>
             <Row className='mt-2'>
@@ -129,32 +88,26 @@ const Patients = () => {
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={6}>
-                                    <Button
-                                        onClick={() => setStatus('Active')}
-                                        className={`me-2 ${status === 'Active' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                    {/* <Button
+                                        onClick={() => setStatus(true)}
+                                        className={`me-2 ${status === true ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Active
                                     </Button>
 
                                     <Button
-                                        onClick={() => setStatus('Inactive')}
-                                        className={`me-2 ${status === 'Inactive' ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                        onClick={() => setStatus(false)}
+                                        className={`me-2 ${status === false ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
                                     >
                                         Inactive
-                                    </Button>
+                                    </Button> */}
                                 </Col>
 
 
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" placeholder="Search..." />
-                                            {/* <Button className="custom-buttons">
-                                                <FiFilter className='fs-4' />
-                                            </Button> */}
-                                            {/* <Button className="custom-buttons">
-                                                <FiFileText className='fs-4' />
-                                            </Button> */}
+                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
                                             <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons">
                                                 New Patient
                                             </Button>
@@ -163,55 +116,61 @@ const Patients = () => {
                                 </Col>
                             </Row>
                             <Row>
-                                <Col>
+                                <Col sm={12}>
                                     <Table responsive className="table-centered table-nowrap mb-0">
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Sr.No.</th>
                                                 <th className='text-white'>Patients Name</th>
+                                                <th className='text-white'>Gender</th>
                                                 <th className='text-white'>Phone</th>
-                                                {/* <th className='text-white'>Email</th> */}
-                                                {/* <th className='text-white'>Status</th> */}
+                                                <th className='text-white'>Insurance Range</th>
                                                 <th className='text-white'>Last Visit</th>
                                                 <th className='text-white'>Next Visit</th>
                                                 <th className='text-white'>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredPatients.length === 0 ? (
-                                                <tr>
-                                                    <td colSpan={6} className='text-center'>
-                                                        <h3 className='my-5'>No Data Found</h3>
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                filteredPatients.map((data, index) => (
-                                                    <tr key={data.id}>
-                                                        <td>{index + 1}</td>
-                                                        <td>{data.firstName} {data.lastName}</td>
-                                                        <td className="">
-                                                            {data.phone}
-                                                        </td>
-                                                        {/* <td>{data.email}</td> */}
-                                                        <td>{data.lastVisit}</td>
-                                                        <td>{data.nextVisit}</td>
-
-                                                        {/* <td>{data.status}</td> */}
-                                                        <td>
-                                                            <div className='d-flex gap-2'>
-                                                                <div>
-                                                                    <FiEdit className='fs-5' />
-                                                                </div>
-                                                                <div>
-                                                                    <FiTrash className='fs-5' />
-                                                                </div>
-                                                            </div>
+                                            {store?.getPatientsReducer?.loading ?
+                                                <td colSpan={8} className='text-center'>
+                                                    <Spinner />
+                                                </td>
+                                                :
+                                                patientsData && patientsData?.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={8} className='text-center'>
+                                                            <h3 className='my-5'>No Data Found</h3>
                                                         </td>
                                                     </tr>
-                                                ))
-                                            )}
+                                                ) : (
+                                                    patientsData && patientsData?.map((data, index) => (
+                                                        <tr key={data?._id}>
+                                                            <td>{index + 1}</td>
+                                                            <td className='text-capitalize'>{data?.fullName}</td>
+                                                            <td className='text-capitalize'>{data?.gender}</td>
+                                                            <td>{data?.contactNumber}</td>
+                                                            <td>{data?.insuranceRange || 'N/A'}</td>
+                                                            <td>{data?.lastVisit || 'N/A'}</td>
+                                                            <td>{data?.nextVisit || 'N/A'}</td>
+                                                            <td>
+                                                                <Link to={`/apps/patients/new-patient?updateid=${data?._id}`} className="action-icon">
+                                                                    <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                                                </Link>
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                )
+                                            }
+
                                         </tbody>
                                     </Table>
+                                </Col>
+                                <Col className='mt-2 d-flex justify-content-end'>
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={store?.getPatientsReducer?.data?.pagination?.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
                                 </Col>
                             </Row>
                         </Card.Body>
