@@ -15,6 +15,7 @@ const findAllParent = (menuItems, menuItem) => {
     return parents;
 };
 
+
 const findMenuItem = (menuItems, menuItemKey) => {
     if (menuItems && menuItemKey) {
         for (var i = 0; i < menuItems.length; i++) {

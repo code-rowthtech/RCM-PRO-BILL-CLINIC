@@ -4,8 +4,6 @@ import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import DepartmentDetails from './PracticeDetails';
-import Documents from './Documents';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
@@ -14,7 +12,7 @@ import ResetPassword from './ResetPassword';
 import { getCities2Action, getCitiesAction, getClinicAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
-import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
+import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { stateEmptydAction } from '../../../redux/clinics/actions';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
@@ -203,11 +201,11 @@ const SubUpdateClinic = () => {
             return updatedDetails;
         });
     };
-
+    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -257,6 +255,9 @@ const SubUpdateClinic = () => {
             setValue('stateName', subClinicsDetailsGet?.userId?.primaryAddress?.state?._id)
             if (subClinicsDetailsGet?.userId?.primaryAddress?.city) {
                 dispatch(getCitiesAction({ state_code: subClinicsDetailsGet?.userId?.primaryAddress?.state?.id, name: subClinicsDetailsGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
+            }
+            if (subClinicsDetailsGet?.userId?.mailingAddress?.address) {
+                setValue('mailingAddress', subClinicsDetailsGet?.userId?.mailingAddress?.address);
             }
             setValue('mailingAddress', subClinicsDetailsGet?.userId?.mailingAddress?.address);
             setValue('mailingStreet', subClinicsDetailsGet?.userId?.mailingAddress?.street);
@@ -512,11 +513,12 @@ const SubUpdateClinic = () => {
             return updatedDetails;
         });
     };
+    const [stateLogoUpload, setStateLogoUpload] = useState(false);
 
     const handleStateChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setStateLogoUpload);
             setStateDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -629,7 +631,7 @@ const SubUpdateClinic = () => {
                                                 </Form.Group>
                                             </Col>
                                             <Col sm={3}>
-                                                <Form.Group className="mb-1">
+                                                <Form.Group className="mb-1 position-relative">
                                                     <Form.Label className="mb-0">Email <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="email"
@@ -643,6 +645,11 @@ const SubUpdateClinic = () => {
                                                             }
                                                         })}
                                                     />
+                                                    <span
+                                                        style={{ right: "2%", top: '43%' }}
+                                                        className={`${subClinicsDetailsGet?.userId?.email ? 'text-success position-absolute fs-4' : 'd-none'}`}>
+                                                        <MdVerified />
+                                                    </span>
                                                     {errors.email && <p className="text-danger">{errors.email.message}</p>}
 
                                                 </Form.Group>
@@ -890,7 +897,7 @@ const SubUpdateClinic = () => {
                                                 </Form.Group>
                                             </Col>
 
-                                            <hr className='mb-1'/>
+                                            <hr className='mb-1' />
                                             <Col sm={12}>
                                                 <Form.Label>
                                                     Accreditation Details&nbsp;
@@ -930,12 +937,19 @@ const SubUpdateClinic = () => {
                                                         <div
                                                             onClick={() => accreditationFileInputRef.current.click()}
                                                             className="custom-file-upload justify-content-between cursor-pointer"
-                                                            style={{paddingTop:'7px', paddingBottom:'7px'}}
+                                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                         >
-                                                            {accreditation.loading ? 'Loading...'
+                                                            {/* {accreditation.loading ? 'Loading...'
                                                                 : accreditation.url
                                                                     ? accreditation.url.split('/').pop()
-                                                                    : accreditation?.fileName || 'Upload Document'}
+                                                                    : accreditation?.fileName || 'Upload Document'} */}
+                                                            {
+                                                                newaccreditationLogo
+                                                                    ? 'Uploading...'
+                                                                    : accreditation.url
+                                                                        ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
+                                                                        : accreditation?.fileName || 'Upload Document'
+                                                            }
                                                             <p className="mb-0"><FiDownloadCloud /></p>
                                                         </div>
 
@@ -1005,14 +1019,23 @@ const SubUpdateClinic = () => {
                                                     <Col sm={4} className="mb-2 position-relative">
                                                         <div
                                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'}`}
-                                                            style={{paddingTop:'7px', paddingBottom:'7px'}}
+                                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
+                                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                         >
-                                                            {data.fileName
+                                                            {/* {data.fileName
                                                                 ? data?.fileName?.length > 30
                                                                     ? data?.fileName?.slice(0, 25) + '...'
                                                                     : data?.fileName
-                                                                : 'Upload Document'}
+                                                                : 'Upload Document'} */}
+                                                            {
+                                                                stateLogoUpload
+                                                                    ? 'Uploading...'
+                                                                    : (data.fileName
+                                                                        ? (data.fileName.length > 30
+                                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                                            : data.fileName.split('/').pop()) // Extract full file name
+                                                                        : 'Upload Document')
+                                                            }
                                                             <p className="mb-0">
                                                                 <FiDownloadCloud />
                                                             </p>
@@ -1035,7 +1058,7 @@ const SubUpdateClinic = () => {
 
 
 
-                                            <hr className='mb-1'/>
+                                            <hr className='mb-1' />
                                             <Col sm={12}>
                                                 <Row>
                                                     <Col sm={12} className='mb-1'>
@@ -1214,7 +1237,7 @@ const SubUpdateClinic = () => {
                                                 </Row>
                                             </Col>
 
-                                            <hr className='mb-1'/>
+                                            <hr className='mb-1' />
                                             <Col sm={12}>
                                                 <Row>
                                                     <Col sm={12} className="">
@@ -1432,7 +1455,7 @@ const SubUpdateClinic = () => {
                                                 </Row>
                                             </Col>
 
-                                            <hr className='mb-1'/>
+                                            <hr className='mb-1' />
                                             <Col sm={12}>
                                                 <Row>
                                                     <Col sm={12} className="mb-1">

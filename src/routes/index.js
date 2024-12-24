@@ -67,7 +67,7 @@ const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'))
 
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
 const Practice = React.lazy(() => import('../pages/apps/SubPractice/index'));
-const PracticeDetails = React.lazy(() => import('../pages/apps/SubPractice/PracticeDetails'));
+// const PracticeDetails = React.lazy(() => import('../pages/apps/SubPractice/PracticeDetails'));
 const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updateSubClinic'));
 
 
@@ -350,17 +350,13 @@ const AllRoutes = () => {
                         {
                             path: 'Practice',
                             children: [
-                                {
-                                    path: 'list',
-                                    element: <LoadComponent component={Practice} />,
-                                },
+                                // {
+                                //     path: 'list',
+                                //     element: <LoadComponent component={Practice} />,
+                                // },
                                 {
                                     path: 'new-practice',
                                     element: <LoadComponent component={NewPractice} />,
-                                },
-                                {
-                                    path: 'practiceDetails',
-                                    element: <LoadComponent component={PracticeDetails} />,
                                 },
                                 {
                                     path:'updateSubClinic',

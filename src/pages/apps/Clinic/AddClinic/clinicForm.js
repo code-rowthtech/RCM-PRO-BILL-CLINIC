@@ -20,7 +20,7 @@ import ChangePasswordModal from '../../../../components/ChangePasswordModal';
 import { handleFirstSpace } from '../../../../helpers/noSpace';
 import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions';
 import { FormInput } from '../../../../components';
-import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
+import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
@@ -658,7 +658,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={3}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-1 position-relative">
                                     <Form.Label className='mb-0'>Email ID <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         disabled={true}
@@ -672,7 +672,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             }
                                         })}
                                         placeholder="Email ID"
+
                                     />
+                                    <span
+                                        style={{ right: "2%", top: '43%' }}
+                                        className={`${clinicsDataGet?.userId?.verified_email ? 'text-success position-absolute fs-4' : 'd-none'}`}>
+                                        <MdVerified />
+                                    </span>
 
                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                 </Form.Group>
@@ -775,7 +781,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         logoUploading
                                             ? 'Uploading...'
                                             : typeof logoName === 'string' && logoName
-                                                ? logoName.split('/').pop()
+                                                ? logoName.split('/').pop().slice(0, 30) + "..."
                                                 : 'Upload Logo'
                                     }
                                     <p className="mb-0">
@@ -923,7 +929,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Form.Group>
                             </Col>
 
-                            <hr  className='mb-1'/>
+                            <hr className='mb-1' />
                             <Col sm={12}>
                                 <Form.Label className='mb-0'>
                                     Accreditation Details&nbsp;
@@ -963,7 +969,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <div
                                             onClick={() => document.getElementById(`fileInput-accreditation=${index}`).click()}
                                             className="custom-file-upload justify-content-between cursor-pointer"
-                                            style={{paddingTop:'7px', paddingBottom:'7px'}}
+                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                         >
                                             {/* {accreditation.loading ? 'Loading...'
                                                 : accreditation.url
@@ -973,7 +979,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 newaccreditationLogo
                                                     ? 'Uploading...'
                                                     : accreditation.url
-                                                        ? accreditation.url.split('/').pop()
+                                                        ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
                                                         : accreditation?.fileName || 'Upload Document'
                                             }
                                             <p className="mb-0"><FiDownloadCloud /></p>
@@ -996,7 +1002,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </React.Fragment>
                             ))}
-                            <hr className='mb-1'/>
+                            <hr className='mb-1' />
                             <Col sm={12} className="position-relative">
                                 <Form.Label ref={containerRef} className='mb-0'>
                                     State of Licensure&nbsp;
@@ -1046,9 +1052,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName||stateLogoUpload ? 'form-control' : 'custom-form-fields'
+                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'
                                                 }`}
-                                                style={{paddingTop:'7px', paddingBottom:'7px'}}
+                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                         >
                                             {/* {data.fileName
                                                 ? data?.fileName?.length > 30
@@ -1060,8 +1066,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     ? 'Uploading...'
                                                     : (data.fileName
                                                         ? (data.fileName.length > 30
-                                                            ? data.fileName.slice(0, 25) + '...'
-                                                            : data.fileName)
+                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                            : data.fileName.split('/').pop()) // Extract full file name
                                                         : 'Upload Document')
                                             }
 
@@ -1084,7 +1090,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </React.Fragment>
                             ))}
-                            <hr  className='mb-1'/>
+                            <hr className='mb-1' />
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className='mb-1'>
@@ -1253,7 +1259,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </Row>
                             </Col>
-                            <hr className='mb-1'/>
+                            <hr className='mb-1' />
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className="mb-0">
@@ -1472,7 +1478,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </Row>
                             </Col>
 
-                            <hr className='mb-1'/>
+                            <hr className='mb-1' />
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className="mb-1">

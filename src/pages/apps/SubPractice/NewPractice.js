@@ -4,14 +4,12 @@ import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import EmailToDoctorModal from './EmailToDoctorModal';
-import DepartmentDetails from './PracticeDetails';
-import Documents from './Documents';
+// import EmailToSubClinicModal from './EmailToSubClinicModal';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
-import ResetPassword from './ResetPassword';
+// import ResetPassword from './ResetPassword';
 import { getCities2Action, getCitiesAction, getClinicAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
@@ -40,7 +38,7 @@ const NewPractice = () => {
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile,setLogoUploading );
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
@@ -211,10 +209,11 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+ const [newaccreditationLogo, setNewAccreditationLogo] = useState(false); 
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile,setNewAccreditationLogo);
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -538,11 +537,12 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+    const [stateLogoUpload, setStateLogoUpload] = useState(false);
 
     const handleStateChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setStateLogoUpload);
             setStateDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -779,13 +779,13 @@ const NewPractice = () => {
                                                         {/* {typeof logoName === 'string' && logoName
                                                             ? logoName.split('/').pop()
                                                             : 'Upload Logo'} */}
-                                                             {
-                                                        logoUploading
-                                                            ? 'Uploading...'
-                                                            : typeof logoName === 'string' && logoName
-                                                                ? logoName.split('/').pop()
-                                                                : 'Upload Logo'
-                                                    }
+                                                        {
+                                                            logoUploading
+                                                                ? 'Uploading...'
+                                                                : typeof logoName === 'string' && logoName
+                                                                    ? logoName.split('/').pop()
+                                                                    : 'Upload Logo'
+                                                        }
                                                         <p className="mb-0">
                                                             <FiDownloadCloud />
                                                         </p>
@@ -971,10 +971,17 @@ const NewPractice = () => {
                                                                 className="custom-file-upload justify-content-between cursor-pointer"
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {accreditation.loading ? 'Loading...'
+                                                                {/* {accreditation.loading ? 'Loading...'
                                                                     : accreditation.url
                                                                         ? accreditation.url.split('/').pop()
-                                                                        : accreditation?.fileName || 'Upload Document'}
+                                                                        : accreditation?.fileName || 'Upload Document'} */}
+                                                                {
+                                                                    newaccreditationLogo
+                                                                        ? 'Uploading...'
+                                                                        : accreditation.url
+                                                                            ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
+                                                                            : accreditation?.fileName || 'Upload Document'
+                                                                }
                                                                 <p className="mb-0"><FiDownloadCloud /></p>
                                                             </div>
 
@@ -1045,15 +1052,24 @@ const NewPractice = () => {
                                                         <Col sm={4} className="mb-2 position-relative">
                                                             <div
                                                                 onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'
+                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload? 'form-control' : 'custom-form-fields'
                                                                     }`}
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {data.fileName
+                                                                {/* {data.fileName
                                                                     ? data?.fileName?.length > 30
                                                                         ? data?.fileName?.slice(0, 25) + '...'
                                                                         : data?.fileName
-                                                                    : 'Upload Document'}
+                                                                    : 'Upload Document'} */}
+                                                                     {
+                                                stateLogoUpload
+                                                    ? 'Uploading...'
+                                                    : (data.fileName
+                                                        ? (data.fileName.length > 30
+                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                            : data.fileName.split('/').pop()) // Extract full file name
+                                                        : 'Upload Document')
+                                            }
                                                                 <p className="mb-0">
                                                                     <FiDownloadCloud />
                                                                 </p>
@@ -1252,7 +1268,7 @@ const NewPractice = () => {
                                                     </Row>
                                                 </Col>
 
-                                                <hr className='mb-1'/>
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
                                                     <Row>
                                                         <Col sm={12} className="mb-0">
@@ -1471,7 +1487,7 @@ const NewPractice = () => {
                                                     </Row>
                                                 </Col>
 
-                                                <hr className='mb-1'/>
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
                                                     <Row>
                                                         <Col sm={12} className="mb-1">
@@ -1588,13 +1604,11 @@ const NewPractice = () => {
                                     }
                                 </>
                             )}
-                            {activeTab === "departmentDetails" && <DepartmentDetails />}
-                            {activeTab === "documents" && <Documents />}
                         </div>
                     </Card>
                 </div>
-                <EmailToDoctorModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} />
-                <ResetPassword closeModal={closepassModal} show={passShow} />
+                {/* <EmailToSubClinicModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} /> */}
+                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
             </div>
 
         </>
