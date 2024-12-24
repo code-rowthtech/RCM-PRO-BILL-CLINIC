@@ -3,7 +3,7 @@ import { Button, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { createRolesAction, getRoleDataAction } from '../../../redux/actions';
+import { createRolesAction, getRoleDataAction, getRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMastersDataAction } from '../../../redux/settings/action';
@@ -16,9 +16,10 @@ const AddRole = ({ show, close }) => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const createLoading = store?.createRolesReducer?.loading
     const createStatus = store?.createRolesReducer?.data
-    console.log({ createStatus })
+    console.log({ decryptedRolesData })
 
     const tableGetData = store?.getMastersDataReducer?.data?.result;
+    const roleData = store?.getRolesDataReducer?.data
 
     const userId = store?.getUserDataReducer?.data
     console.log({ tableGetData })
@@ -32,7 +33,9 @@ const AddRole = ({ show, close }) => {
     };
     useEffect(() => {
         dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
+        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+
+
 
     }, [getRoleDataAction])
     const onSubmit = (data) => {
@@ -43,9 +46,12 @@ const AddRole = ({ show, close }) => {
             email: data.email,
             password: data.password,
             phone: data?.phone,
+            phNumberSecondary: data.phNumberSecondary,
             clinicId: clinicId,
-            reportingTo: data?.reportingTo,
+            reportingTo: '676401b7e42d602da332fece',
             joiningDate: formattedJoiningDate,
+            designation: data.designation,
+            department: data.department,
             role: data.role,
         };
         console.log('Form Data:', payload);
@@ -61,7 +67,19 @@ const AddRole = ({ show, close }) => {
 
 
     };
-
+    const handleCategoryChange = (category) => {
+        if (category === 'Designation') {
+            dispatch(getMastersDataAction({ status: true, category: 'Designation', search: '', skip: '', limit: '' }));
+        } else if (category === 'Department') {
+            dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
+        } else {
+            dispatch(getMastersDataAction({ status: true, category: category, search: '', skip: '', limit: '' }));
+        }
+    };
+    const designationData = tableGetData?.filter((data) => data?.category === 'Designation');
+    const departmentData = tableGetData?.filter((data) => data?.category === 'Department');
+    
+console.log({designationData})
     return (
         <>
             <Modal centered show={show} size="md" onHide={close}>
@@ -114,7 +132,7 @@ const AddRole = ({ show, close }) => {
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                        
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2 position-relative">
                                     <Form.Label>Password</Form.Label>
@@ -194,18 +212,19 @@ const AddRole = ({ show, close }) => {
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label>Reporting</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder=" Reporting"
-                                        {...register('reportingTo', {
-                                            required: 'Reporting is required',
-                                            pattern: {
-                                                value: /^(?! )[A-Za-z0-9 ]*$/,
-                                                message: 'Special characters and leading spaces are not allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
+                                    <Form.Select
+                                        {...register('reportingTo', { required: 'Reporting is required' })}
+                                    >
+                                        <option value="">Select Reporting</option>
+                                        {roleData && roleData?.users?.map((data) => (
+                                            <option key={data._id} value={data?._id}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.reportingTo && (
+                                        <span className="text-danger fs-6">{errors.reportingTo.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -225,9 +244,9 @@ const AddRole = ({ show, close }) => {
                                     {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
                                 </Form.Group>
                             </Col>
-                         
 
-                        
+
+
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
@@ -235,7 +254,7 @@ const AddRole = ({ show, close }) => {
                                     <Form.Control
                                         type="text"
                                         placeholder=" phone number"
-                                        {...register('phone', {
+                                        {...register('phNumberSecondary', {
                                             required: 'Contact Number secondary   number is required',
                                             pattern: {
                                                 value: /^[0-9]{10}$/,
@@ -243,9 +262,49 @@ const AddRole = ({ show, close }) => {
                                             },
                                         })}
                                     />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
+                                    {errors.phNumberSecondary && <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>}
                                 </Form.Group>
                             </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Designation</Form.Label>
+                                    <Form.Select
+                                        {...register('designation', { required: 'Designation is required' })}
+                                        onFocus={() => handleCategoryChange('Designation')}
+                                    >
+                                        <option value="">Select Designation</option>
+                                        {designationData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.designation && (
+                                        <span className="text-danger fs-6">{errors.designation.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label>Department</Form.Label>
+                                    <Form.Select
+                                        {...register('department', { required: 'Department is required' })}
+                                        onFocus={() => handleCategoryChange('Department')}
+                                    >
+                                        <option value="">Select Department</option>
+                                        {departmentData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.department && (
+                                        <span className="text-danger fs-6">{errors.department.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label>Role</Form.Label>
@@ -254,7 +313,7 @@ const AddRole = ({ show, close }) => {
                                     >
                                         <option value="">Select Role</option>
                                         {decryptedRolesData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
+                                            <option key={data._id} value={data?._id}>
                                                 {data.name}
                                             </option>
                                         ))}
@@ -266,7 +325,7 @@ const AddRole = ({ show, close }) => {
                             </Col>
 
 
-                          
+
 
                         </Row>
                         <Modal.Footer className="border-0">

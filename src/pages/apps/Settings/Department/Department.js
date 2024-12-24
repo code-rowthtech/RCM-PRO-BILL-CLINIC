@@ -148,7 +148,7 @@ const Department = () => {
                     <tr key={data._id}>
                       <td>{index + 1}</td>
                       <td>{data.name}</td>
-                      <td>{data.description.slice(0, 20)}...</td>
+                      <td>{data.description}...</td>
                       <td>{formatDate(data.createdAt)}</td>
                       <td>
                         <Form.Switch checked={data.isActive} onChange={() => handleUpdate(data)} />

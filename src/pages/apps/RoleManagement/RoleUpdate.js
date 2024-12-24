@@ -3,7 +3,7 @@ import { Button, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { getRoleDataAction, updateRolesAction } from '../../../redux/actions';
+import { getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMastersDataAction } from '../../../redux/settings/action';
@@ -18,6 +18,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
     const createSuccess = store?.updateRolesReducer?.data?.status
     console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
+    const roleData = store?.getRolesDataReducer?.data
 
 
     const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +30,8 @@ const RoleUpdate = ({ show, close, currentUser }) => {
     };
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
+        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+
     }, [getRoleDataAction])
 
     const onSubmit = (data) => {
@@ -43,8 +46,10 @@ const RoleUpdate = ({ show, close, currentUser }) => {
             reportingTo: data?.reportingTo,
             joiningDate: formattedJoiningDate,
             leavingDate: formattedLeavingDate,
-            role: data.role,
-            contact: data.contact
+            role: "67592ebd321472d35c1698bb",
+            phNumberSecondary: data.contact,
+            designation: data.designation,
+            department: data.department,
         };
         console.log('edit', payload);
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
@@ -235,7 +240,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
                                 </Form.Group>
                             </Col>
-                        
+
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
@@ -249,14 +254,14 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
 
-                            {/* <Col sm={6}>
+                            <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label>Designation</Form.Label>
                                     <Form.Select
                                         defaultValue={currentUser?.designation}
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
-                                        <option value="">Select designation</option>
+                                        <option value="">Select Designation</option>
                                         {tableGetData?.map((data) => (
                                             <option key={data._id} value={data.name}>
                                                 {data.name}
@@ -267,27 +272,28 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
                                     )}
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
 
 
-                            {/* <Col sm={6}>
+                            <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label>Re-Enter Designation</Form.Label>
+                                    <Form.Label>Department</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.designation}
-
-                                        {...register('reDesignation', { required: 'Designation is required' })}
+                                        defaultValue={currentUser?.department}
+                                        {...register('department', { required: 'Department is required' })}
                                     >
-                                        <option value="">Select designation</option>
+                                        <option value="">Select Department</option>
                                         {tableGetData?.map((data) => (
                                             <option key={data._id} value={data.name}>
                                                 {data.name}
                                             </option>
                                         ))}
                                     </Form.Select>
-                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
+                                    {errors.department && (
+                                        <span className="text-danger fs-6">{errors.department.message}</span>
+                                    )}
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label>Role</Form.Label>
@@ -306,21 +312,23 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                     )}
                                 </Form.Group>
                             </Col>
+                          
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label>Reporting</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter Reporting"
-                                        {...register('reportingTo', {
-                                            required: 'Reporting is required',
-                                            pattern: {
-                                                value: /^(?! )[A-Za-z0-9 ]*$/,
-                                                message: 'Special characters and leading spaces are not allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
+                                    <Form.Select
+                                        {...register('reportingTo', { required: 'Reporting is required' })}
+                                    >
+                                        <option value="">Select Reporting</option>
+                                        {roleData && roleData?.users?.map((data) => (
+                                            <option key={data._id} value={data?._id}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.reportingTo && (
+                                        <span className="text-danger fs-6">{errors.reportingTo.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
 
