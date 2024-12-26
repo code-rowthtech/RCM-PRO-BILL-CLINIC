@@ -8,7 +8,7 @@ export const getClinicsByParentId = '';
 // ROLES
 export const createRoles = '/api/v1/clinic/createSubUser';
 export const updateRoles = '/api/v1/clinic/updateSubUser';
-export const getRoles = 'api/v1/clinic/listAllUsers';
+export const getRoles = '/api/v1/clinic/listAllUsers';
 export const getUserId = '/api/v1/clinic/getUserDetails';
 export const deleterRoles = '/api/v1/clinic/removeUser'
 
@@ -38,6 +38,7 @@ export const createContract = '/api/v1/clinic/getContractDetails';
 // SETTING
 export const addMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 export const getMastersData = '/api/v1/clinic/getmasterData';
+export const getDepartmentData = '/api/v1/clinic/getmasterData';
 export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 
 export const addRoleData = '/api/v1/clinic/roles/create';

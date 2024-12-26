@@ -3,10 +3,10 @@ import { Button, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { createRolesAction, getRoleDataAction } from '../../../redux/actions';
+import { createRolesAction, getRoleDataAction, getRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMastersDataAction } from '../../../redux/settings/action';
+import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 
 const AddRole = ({ show, close }) => {
     const dispatch = useDispatch();
@@ -16,12 +16,27 @@ const AddRole = ({ show, close }) => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const createLoading = store?.createRolesReducer?.loading
     const createStatus = store?.createRolesReducer?.data
-    console.log({ createStatus })
+    const createSuccess = store?.createRolesReducer?.data?.status
+
 
     const tableGetData = store?.getMastersDataReducer?.data?.result;
-
-    const userId = store?.getUserDataReducer?.data
+    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
     console.log({ tableGetData })
+
+    const roleData = store?.getRolesDataReducer?.data
+    const roleDataLoading = store?.getRolesDataReducer?.loading
+    console.log({ roleData })
+
+useEffect(()=>{
+    if(createSuccess === 200){
+        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+
+    }
+},[createSuccess])
+
+    useEffect(() => {
+        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    }, [dispatch]);
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -32,7 +47,11 @@ const AddRole = ({ show, close }) => {
     };
     useEffect(() => {
         dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
+        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
+
+
+
 
     }, [getRoleDataAction])
     const onSubmit = (data) => {
@@ -42,10 +61,13 @@ const AddRole = ({ show, close }) => {
             firstName: data.name,
             email: data.email,
             password: data.password,
-            phone: data?.phone,
+            phone: data?.contact,
+            phNumberSecondary: data.phNumberSecondary,
             clinicId: clinicId,
-            reportingTo: data?.reportingTo,
+            reportingTo: data.reportingTo || '676401b7e42d602da332fece',
             joiningDate: formattedJoiningDate,
+            designation: data.designation,
+            department: data.department,
             role: data.role,
         };
         console.log('Form Data:', payload);
@@ -53,6 +75,8 @@ const AddRole = ({ show, close }) => {
         if (createStatus === 200) {
             reset();
             close()
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+
         }
         dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));
         dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
@@ -61,6 +85,8 @@ const AddRole = ({ show, close }) => {
 
 
     };
+
+
 
     return (
         <>
@@ -81,7 +107,7 @@ const AddRole = ({ show, close }) => {
                     <Form onSubmit={handleSubmit(onSubmit)}>
                         <Row>
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Name</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -98,7 +124,7 @@ const AddRole = ({ show, close }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Email ID</Form.Label>
                                     <Form.Control
                                         type="text"
@@ -114,9 +140,9 @@ const AddRole = ({ show, close }) => {
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                        
+
                             <Col sm={6}>
-                                <Form.Group className="mb-1 position-relative">
+                                <Form.Group className="mb-2 position-relative">
                                     <Form.Label className="mb-0">Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
@@ -144,7 +170,7 @@ const AddRole = ({ show, close }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-1 position-relative">
+                                <Form.Group className="mb-2 position-relative">
                                     <Form.Label className="mb-0">Confirm Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
@@ -192,20 +218,27 @@ const AddRole = ({ show, close }) => {
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder=" Reporting"
-                                        {...register('reportingTo', {
-                                            required: 'Reporting is required',
-                                            pattern: {
-                                                value: /^(?! )[A-Za-z0-9 ]*$/,
-                                                message: 'Special characters and leading spaces are not allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
+                                    <Form.Select
+                                        {...register('reportingTo', { required: 'Reporting is required' })}
+                                    >
+                                        <option value="">Select Reporting</option>
+                                        {roleDataLoading ? (
+                                            <option disabled>Loading...</option>  // Display "Loading..." as an option
+                                        ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
+                                            roleData?.users.map((data, index) => (
+
+                                                <option key={index} value={data?._id}>
+                                                    {data?.name}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>No Data Found</option>  // Display "No Data Found" as an option
+                                        )}
+                                    </Form.Select>
+
+
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -225,17 +258,17 @@ const AddRole = ({ show, close }) => {
                                     {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
                                 </Form.Group>
                             </Col>
-                         
 
-                        
+
+
 
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Contact Number secondary  </Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder=" phone number"
-                                        {...register('phone', {
+                                        {...register('phNumberSecondary', {
                                             required: 'Contact Number secondary   number is required',
                                             pattern: {
                                                 value: /^[0-9]{10}$/,
@@ -243,7 +276,45 @@ const AddRole = ({ show, close }) => {
                                             },
                                         })}
                                     />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
+                                    {errors.phNumberSecondary && <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>}
+                                </Form.Group>
+                            </Col>
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className="mb-0">Designation</Form.Label>
+                                    <Form.Select
+                                        {...register('designation', { required: 'Designation is required' })}
+                                    >
+                                        <option value="">Select Designation</option>
+                                        {tableGetData && tableGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.designation && (
+                                        <span className="text-danger fs-6">{errors.designation.message}</span>
+                                    )}
+                                </Form.Group>
+                            </Col>
+
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2">
+                                    <Form.Label className="mb-0">Department</Form.Label>
+                                    <Form.Select
+                                        {...register('department', { required: 'Department is required' })}
+                                    >
+                                        <option value="">Select Department</option>
+                                        {departmentGetData?.map((data) => (
+                                            <option key={data._id} value={data.name}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.department && (
+                                        <span className="text-danger fs-6">{errors.department.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -254,7 +325,7 @@ const AddRole = ({ show, close }) => {
                                     >
                                         <option value="">Select Role</option>
                                         {decryptedRolesData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
+                                            <option key={data._id} value={data?._id}>
                                                 {data.name}
                                             </option>
                                         ))}
@@ -266,7 +337,7 @@ const AddRole = ({ show, close }) => {
                             </Col>
 
 
-                          
+
 
                         </Row>
                         <Modal.Footer className="border-0 py-0">
