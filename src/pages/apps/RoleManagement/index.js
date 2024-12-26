@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, updateRolesAction } from '../../../redux/actions';
+import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 
 function formatDate(dateString) {
@@ -30,7 +30,11 @@ const RoleManagement = () => {
     const roleData = store?.getRolesDataReducer?.data
     console.log({ roleData })
     const roleDataLoading = store?.getRolesDataReducer?.loading
+    const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
+    console.log({ deleteSuccess })
     const [smShow, setSmShow] = useState(false);
+    const [detailModal, setDetailModal] = useState(false);
+
     const [password, setPassword] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
     const [timeoutId, setTimeoutId] = useState(null);
@@ -42,15 +46,14 @@ const RoleManagement = () => {
     const [skip, setSkip] = useState(1)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const [searchQuery, setSearchQuery] = useState('');
-
+    const [userDetails, setUserDetails] = useState([])
 
 
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearchQuery('');
-        dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
 
-        
+
     };
     useEffect(() => {
         dispatch(
@@ -62,8 +65,8 @@ const RoleManagement = () => {
                 status: status,
             })
         );
-    }, [clinicId, searchQuery, skip, status, dispatch]); // Add all dependencies
-    
+    }, [dispatch, status]); // Add all dependencies
+
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         if (password === '1234') {
@@ -108,22 +111,31 @@ const RoleManagement = () => {
     };
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
-        dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
+
 
     }
-      const handleUpdateDoctorStatus = (data) => {
-            const payload = {
-                id: data?._id,
-                status: !data?.status
-            }
+    useEffect(() => {
+        if (deleteSuccess === 200) {
+            dispatch(stateEmptydAction());
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+
+        }
+    }, [deleteSuccess])
+    const handleUpdateDoctorStatus = (data) => {
+        const payload = {
+            id: data?._id,
+            status: !data?.status
+        }
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
 
-    
-        }
-        const handleDetail = (id)=>{
-            dispatch(getUserAction(id))
-        }
+
+    }
+    const handleDetail = (data) => {
+        setDetailModal(true);
+        setUserDetails(data)
+
+    }
 
 
     return (
@@ -132,7 +144,7 @@ const RoleManagement = () => {
                 <Card>
                     <Card.Body>
                         <Row className="mb-2">
-                        <Col sm={6}>
+                            <Col sm={6}>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
@@ -164,7 +176,7 @@ const RoleManagement = () => {
                                             onChange={handleSearchChange}
                                         />
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
-                                           Add Users
+                                            Add Users
                                         </Button>
                                     </Col>
                                 </Row>
@@ -202,7 +214,7 @@ const RoleManagement = () => {
                                                     <td>{data?.phone}</td>
                                                     <td>{data?.email}</td>
                                                     <td>
-                                                                    <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
+                                                        <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
                                                     <td>
                                                         <div className="d-flex gap-2">
@@ -214,10 +226,10 @@ const RoleManagement = () => {
                                                                 className="fs-5 cursor-pointer"
                                                                 onClick={() => deleteHandle(data?._id)}
                                                             /> */}
-                                                             <IoMdEye
+                                                            {/* <IoMdEye
                                                                 className="fs-4 cursor-pointer"
-                                                                onClick={() => handleDetail(data?._id)}
-                                                            />
+                                                                onClick={() => handleDetail(data)}
+                                                            /> */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -241,38 +253,60 @@ const RoleManagement = () => {
                 </Card>
             </Col>
             <Modal
-                size="sm"
-                show={smShow}
+                show={detailModal}
+                onHide={() => setDetailModal(false)}
+                size="lg"
                 centered
-                onHide={() => setSmShow(false)}
-                aria-labelledby="example-modal-sizes-title-sm"
             >
-                <Modal.Body className="rounded-4 p-3">
-                    <Form onSubmit={handlePasswordSubmit}>
-                        <Form.Group controlId="password" className="text-center my-2">
-                            <Form.Label className='mb-2'>View Phone Number</Form.Label>
-                            <Form.Control
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Row className="mt-1">
-                            <Col sm={12} className="text-center mt-2">
-                                <Button variant="primary" type="submit">
-                                    Submit
-                                </Button>
+                <Modal.Header closeButton>
+                    <Modal.Title>User Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
 
-                                <p className='fw-bold mt-2'>Show the number for 5 min only</p>
-                            </Col>
-                        </Row>
-                    </Form>
+                    <Table bordered>
+                        <thead>
+                            <tr>
+                                <th>Field</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Name</td>
+                                <td>{userDetails?.firstName} {userDetails?.lastName}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{userDetails?.email}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone</td>
+                                <td>{userDetails?.phone}</td>
+                            </tr>
+                            <tr>
+                                <td>Status</td>
+                                <td>{userDetails?.status ? "Active" : "Inactive"}</td>
+                            </tr>
+                            {/* Add more fields as needed */}
+                        </tbody>
+                    </Table>
+
                 </Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="secondary"
+                        onClick={() => {
+                            setDetailModal(false);
+                            setCurrentUser('');
+                        }}
+                    >
+                        Close
+                    </Button>
+
+                </Modal.Footer>
             </Modal>
             <AddRole show={addDepartmentModal} close={closeAddModal} />
-            <RoleUpdate show={updateDepartmentModal} currentUser={currentUser} close={closeAddModal} />
+            <RoleUpdate show={updateDepartmentModal} currentUser={currentUser} setCurrentUser={setCurrentUser} close={closeAddModal} />
         </Row>
     );
 };

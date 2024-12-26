@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import {
   createMastersDataAction,
+  getDepartmentDataAction,
   getMastersDataAction,
   stateEmptydAction,
   updateMastersDataAction
@@ -65,14 +66,14 @@ const Department = () => {
   };
 
   const createResponse = store?.createMastersDataReducer?.data;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const tableGetData = store?.getDepartmentDataReducer?.data?.result;
   const updateResponse = store?.updateMastersDataReducer?.data;
   console.log(createResponse, 'createResponse')
   console.log(tableGetData, 'tableGetData')
   useEffect(() => {
-    dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
+    dispatch(getDepartmentDataAction({ status, category: 'Department', limit: 10, skip, search }));
     if (createResponse?.status === 201 || updateResponse === 200) {
-      dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
+      dispatch(getDepartmentDataAction({ status, category: 'Department', search, limit: 10, skip }));
       dispatch(stateEmptydAction());
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
