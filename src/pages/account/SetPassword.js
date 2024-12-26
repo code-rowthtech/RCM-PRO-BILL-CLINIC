@@ -89,8 +89,6 @@ const SetPassword = (): React$Element<any> => {
     })
 );
 
-
-
     const [loginPassword, setLoginPassword] = useState(null)
     const onSubmit = (formData) => {
         setLoginPassword(formData.password)

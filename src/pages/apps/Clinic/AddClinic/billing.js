@@ -26,7 +26,6 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
     console.log(amount,"amount")
     const subscriptionsData = store?.getSubscriptionReducer?.data?.result;
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
-
     const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscription
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Store the selected date
@@ -48,10 +47,11 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
             billingContactName: data?.name,
             billingContactPhone: data?.contact,
             billingContactemail: data?.email,
-            clinicCount: multiple === 0 ? 1 : multiple,
+            // clinicCount: multiple === 0 ? 1 : multiple,
 
         }
         dispatch(addSubscriptionPlanAction({ key: encryptMessage(payload) }));
+        console.log(payload,'payloadbilling')
     };
     const billingAddResponse = store?.createSubscriptionPlanReducer?.data?.status;
     useEffect(() => {
@@ -86,14 +86,14 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
             {billingDone ?
                 <>
                     <>
-                        <Row>
+                        {/* <Row>
                             <Col>
                                 <h5 className=''>
                                     There is already a subscription attached to this account. Below are the details of the current subscription:
                                 </h5>
                             </Col>
-                        </Row>
-                        <Table responsive className="table-centered border border-muted table-nowrap mb-0">
+                        </Row> */}
+                        <Table responsive className="table-centered border border-muted table-nowrap mb-0 mt-2">
                             <thead>
                                 <tr>
                                     <th className='text-white'>Subscription Name</th>

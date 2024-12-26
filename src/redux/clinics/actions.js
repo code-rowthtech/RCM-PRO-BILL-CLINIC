@@ -53,6 +53,12 @@ export const createContractAction = (data): LayoutAction => ({
     data
 });
 
+
+export const standardContractAction = (data): LayoutAction => ({
+    type: ClinicsActionTypes.STANDARD_CONTRACT,
+    data
+});
+
 export const getClinicByParentAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_CLINIC_BY_PARENT,
     data

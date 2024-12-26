@@ -138,7 +138,6 @@ function* setPasswordChange({ payload }) {
     try {
         setAuthorization(token)
         const response = yield call(setPasswordApi, encryptedNewPassword);
-        console.log(response, 'setPasswordChange')
         yield put(authApiResponseSuccess(AuthActionTypes.SET_PASSWORD, response.data));
     } catch (error) {
         ToastHandle(error, 'danger')
@@ -158,8 +157,7 @@ function* setChangePasswordChange({ payload }) {
 
     try {
         const response = yield call(confirmPasswordApi, payload);
-
-        console.log(response, 'setChangePasswordChange');
+        ToastHandle(response?.message || 'Password changed successfully!', 'success');
         yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
     } catch (error) {
         ToastHandle(error,'danger')
