@@ -279,7 +279,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?._id ? { state: data?._id } : ''),
-                ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
+                ...(data?.stateName ? { state: data?.stateName } : ''),
+
+                // ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
@@ -291,7 +293,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         address: data?.address,
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
-                        ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
+                        // ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                         street: data?.street,
                         zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
@@ -701,42 +703,63 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
                                 </Form.Group>
                             </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-1 position-relative">
-                                    <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
-                                    <InputGroup>
-                                        <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
-                                        <Form.Control
-                                            type="tel"
-                                            {...register('contact', {
-                                                required: 'This field is required',
-                                                pattern: {
-                                                    value: /^[0-9]*$/,
-                                                    message: 'Contact must be a number'
-                                                },
-                                                maxLength: {
-                                                    value: 10,
-                                                    message: 'Contact must not exceed 10 digits'
-                                                },
-                                                minLength: {
-                                                    value: 9,
-                                                    message: 'Contact must not be less than 9 digits'
-                                                }
-                                            })}
 
-                                            placeholder="1234-234-234"
-                                            maxLength={10}
-                                        />
-                                    </InputGroup>
-                                    {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
-                                    <img
-                                        src={us}
-                                        alt="country code flag"
-                                        style={{ top: '60%', left: '1%' }}
-                                        className="position-absolute"
-                                        width={20}
-                                    />
+                            <Col sm={6}>
+                                <Form.Group className="mb-0 position-relative">
+                                    <Form.Label className='mb-1'>Contact Person <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Group>
+                                        <InputGroup>
+                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                            <Form.Control
+                                                type="tel"
+                                                // value={formattedPhone}
+                                                {...register('contact', {
+                                                    required: 'This field is required',
+                                                    pattern: {
+                                                        value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, // Accepts either the hyphenated format (XXX-XXX-XXXX) or 9–10 digits without hyphens
+                                                        message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                    },
+                                                    maxLength: {
+                                                        value: 12,
+                                                        message: 'Contact must not exceed 10 digits'
+                                                    },
+                                                    minLength: {
+                                                        value: 11,
+                                                        message: 'Contact must not be less than 9 digits'
+                                                    }
+                                                })}
+                                                onChange={(e) => {
+                                                    const rawValue = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+                                                    const formattedValue = rawValue.replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                                                        p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+                                                    ); // Format dynamically
+                                                    e.target.value = formattedValue; // Update input value
+                                                    clearErrors('contact');
+                                                }}
+                                                defaultValue={updatePage ? clinicDataToUpdate?.phone : ''}
+                                                placeholder="1234-234-234"
+                                                maxLength={12}
+                                                // onKeyPress={(event) => handleFirstSpace(event, 0)}
+                                                onKeyPress={(event) => {
+                                                    // Only allow numeric characters (0-9)
+                                                    if (!/[0-9]/.test(event.key)) {
+                                                        event.preventDefault();
+                                                    }
+                                                }}
+                                            />
+                                        </InputGroup>
+                                    </Form.Group>
+
+                                    <div
+                                        className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                    >
+                                        <img
+                                            src={us}
+                                            alt="country code flag"
+                                            width={20} />
+                                    </div>
                                 </Form.Group>
+                                {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
                             </Col>
 
                             <Col sm={6}>
@@ -1271,7 +1294,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={12} className="mb-1">
                                         <Form.Check
                                             type="checkbox"
-                                            style={{ cursor: "pointer", color:"#a9a9a982" }}
+                                            style={{ cursor: "pointer", color: "#a9a9a982" }}
                                             label="Same as Primary Address"
                                             checked={usePrimaryAsMailing}
                                             onChange={(e) => {
@@ -1563,7 +1586,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             value={data.contact}
                                                             onChange={(e) => handlePOSInputChange(e, 'contact', index)}
                                                             placeholder="1234-234-234"
-                                                            onKeyPress={handleFirstSpace}
+                                                            onKeyPress={(e) => {
+                                                                if (!/^\d$/.test(e.key)) {
+                                                                    e.preventDefault(); // Prevent non-numeric input
+                                                                }
+                                                            }}
                                                             maxLength={10} // Corrected maxLength
                                                             minLength={9}  // Corrected minLength
                                                             isInvalid={!!errors?.contact} // Corrected validation for error display
@@ -1573,12 +1600,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <img
                                                         src={us}
                                                         alt="country code flag"
-                                                        style={{ top: '60%', left: '1%' }}
+                                                        style={{ top: '56%', left: '1%' }}
                                                         className="position-absolute"
                                                         width={20}
                                                     />
                                                 </Form.Group>
                                             </Col>
+
 
                                         </React.Fragment>
                                     ))}

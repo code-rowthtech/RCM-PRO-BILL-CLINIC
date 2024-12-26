@@ -3,12 +3,12 @@ import { Button, Modal, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { getRoleDataAction, updateRolesAction } from '../../../redux/actions';
+import { getRoleDataAction, getRolesAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMastersDataAction } from '../../../redux/settings/action';
 
-const RoleUpdate = ({ show, close, currentUser }) => {
+const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     console.log({ currentUser })
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -18,6 +18,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
     const createSuccess = store?.updateRolesReducer?.data?.status
     console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
+    const roleData = store?.getRolesDataReducer?.data
 
 
     const [showPassword, setShowPassword] = useState(false);
@@ -28,41 +29,46 @@ const RoleUpdate = ({ show, close, currentUser }) => {
         setShowPassword(!showPassword);
     };
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
-    }, [getRoleDataAction])
+        if (show) {
+
+            dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+        }
+
+    }, [getRolesAction, show, dispatch])
+    useEffect(() => {
+        if (createSuccess === 200) {
+            dispatch(stateEmptydAction());
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            close();
+            reset();
+            getValues('')
+            setCurrentUser('')
+        }
+    }, [createSuccess])
 
     const onSubmit = (data) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
         const formattedLeavingDate = new Date(data.leavingDate).toISOString();
         const payload = {
+            id: currentUser?._id,
             firstName: data.name,
-            email: data.email,
+            // email: data.email,
             password: data.password,
-            phone: data?.phone,
+            phone: data?.contact,
             clinicId: clinicId,
             reportingTo: data?.reportingTo,
             joiningDate: formattedJoiningDate,
             leavingDate: formattedLeavingDate,
             role: data.role,
-            contact: data.contact
+            phNumberSecondary: data.contact,
+            designation: data.designation,
+            department: data.department,
         };
         console.log('edit', payload);
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-
-        if (createSuccess === 200) {
-            close()
-            reset();
-
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-
-        } else {
-
-
-        }
-        close()
-        reset();
-
+        getValues('')
+        reset()
     };
 
     return (
@@ -208,20 +214,20 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label className="mb-0">Contact Number secondary</Form.Label>
+                                    <Form.Label className="mb-0">Contact Number secondary  </Form.Label>
                                     <Form.Control
                                         type="text"
-
-                                        placeholder="Contact Number secondary "
-                                        {...register('phone', {
-                                            required: 'Contact Number secondary is required',
+                                        placeholder=" phone number"
+                                        defaultValue={currentUser?.phNumberSecondary}
+                                        {...register('phNumberSecondary', {
+                                            required: 'Contact Number secondary   number is required',
                                             pattern: {
                                                 value: /^[0-9]{10}$/,
                                                 message: 'Only 10-digit numbers are allowed',
                                             },
                                         })}
                                     />
-                                    {errors.phone && <span className="text-danger fs-6">{errors.phone.message}</span>}
+                                    {errors.phNumberSecondary && <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>}
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -235,7 +241,7 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
                                 </Form.Group>
                             </Col>
-                        
+
 
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
@@ -249,14 +255,14 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                 </Form.Group>
                             </Col>
 
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Designation</Form.Label>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Designation</Form.Label>
                                     <Form.Select
                                         defaultValue={currentUser?.designation}
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
-                                        <option value="">Select designation</option>
+                                        <option value="">Select Designation</option>
                                         {tableGetData?.map((data) => (
                                             <option key={data._id} value={data.name}>
                                                 {data.name}
@@ -267,36 +273,39 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
                                     )}
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
 
 
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label>Re-Enter Designation</Form.Label>
+                            <Col sm={6}>
+                                <Form.Group className="mb-1">
+                                    <Form.Label className="mb-0">Department</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.designation}
-
-                                        {...register('reDesignation', { required: 'Designation is required' })}
+                                        defaultValue={currentUser?.department}
+                                        {...register('department', { required: 'Department is required' })}
                                     >
-                                        <option value="">Select designation</option>
+                                        <option value="">Select Department</option>
                                         {tableGetData?.map((data) => (
                                             <option key={data._id} value={data.name}>
                                                 {data.name}
                                             </option>
                                         ))}
                                     </Form.Select>
-                                    {errors.reDesignation && <span className="text-danger fs-6">{errors.reDesignation.message}</span>}
+                                    {errors.department && (
+                                        <span className="text-danger fs-6">{errors.department.message}</span>
+                                    )}
                                 </Form.Group>
-                            </Col> */}
+                            </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Role</Form.Label>
                                     <Form.Select
+                                        defaultValue={currentUser?.role}
+
                                         {...register('role', { required: 'Role is required' })}
                                     >
                                         <option value="">Select Role</option>
                                         {decryptedRolesData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
+                                            <option key={data._id} value={data?._id}>
                                                 {data.name}
                                             </option>
                                         ))}
@@ -306,21 +315,23 @@ const RoleUpdate = ({ show, close, currentUser }) => {
                                     )}
                                 </Form.Group>
                             </Col>
+
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Enter Reporting"
-                                        {...register('reportingTo', {
-                                            required: 'Reporting is required',
-                                            pattern: {
-                                                value: /^(?! )[A-Za-z0-9 ]*$/,
-                                                message: 'Special characters and leading spaces are not allowed',
-                                            },
-                                        })}
-                                    />
-                                    {errors.reportingTo && <span className="text-danger fs-6">{errors.reportingTo.message}</span>}
+                                    <Form.Select
+                                        defaultValue={currentUser?.reportingTo}
+
+                                        {...register('reportingTo')}
+                                    >
+                                        <option value="">Select Reporting</option>
+                                        {roleData && roleData?.users?.map((data) => (
+                                            <option key={data._id} value={data?._id}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+
                                 </Form.Group>
                             </Col>
 
