@@ -278,7 +278,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             primaryAddress: {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
-                ...(data?.stateName ? { state: data?.stateName } : ''),
+                ...(data?._id ? { state: data?._id } : ''),
                 ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
@@ -738,6 +738,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                 </Form.Group>
                             </Col>
+
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
@@ -850,11 +851,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             ))}
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label className='mb-0'>CLIA Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('clia', {
-                                            required: 'CLIA Number is required',
+                                            // required: 'CLIA Number is required',
                                             minLength: {
                                                 value: 10,
                                                 message: 'CLIA Number must be 10 characters long',
@@ -864,7 +865,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 message: 'CLIA Number must be 10 characters long',
                                             },
                                             pattern: {
-                                                value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                value: /^[A-Z0-9]{2}D[0-9]{7}$/,
                                                 message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
                                             },
                                         })}
@@ -876,11 +877,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label className='mb-0'>Medicare Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label className='mb-0'>Medicare Number </Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('medicare', {
-                                            required: 'Medicare Number is required',
+                                            // required: 'Medicare Number is required',
                                             minLength: {
                                                 value: 10,
                                                 message: 'Medicare Number must be 10 characters long',
@@ -904,7 +905,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                             <Col sm={3}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className='mb-0'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('medicaid', {
@@ -935,7 +936,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     Accreditation Details&nbsp;
                                     <span
                                         onClick={handleAddAccreditation}
-                                        className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
+                                        className='fs-5 uil-plus-circle plusicon fw-bold cursor-pointer'>
                                     </span>
                                 </Form.Label>
                             </Col>
@@ -1270,8 +1271,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={12} className="mb-1">
                                         <Form.Check
                                             type="checkbox"
-                                            style={{ cursor: "pointer" }}
-                                            label="Use primary address as mailing address"
+                                            style={{ cursor: "pointer", color:"#a9a9a982" }}
+                                            label="Same as Primary Address"
                                             checked={usePrimaryAsMailing}
                                             onChange={(e) => {
                                                 const isChecked = e.target.checked;

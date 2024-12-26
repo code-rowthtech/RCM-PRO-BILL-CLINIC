@@ -38,13 +38,13 @@ const LockScreen2 = React.lazy(() => import('../pages/account2/LockScreen2'));
 
 // dashboard
 const ProjectDashboard = React.lazy(() => import('../pages/dashboard/Project'));
-const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
+// const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
 const AddClinics = React.lazy(() => import('../pages/apps/Clinic/AddClinic/index'));
 const ClinicForm = React.lazy(() => import('../pages/apps/Clinic/AddClinic/clinicForm'));
 const Billing = React.lazy(() => import('../pages/apps/Clinic/AddClinic/billing'));
 const Contract = React.lazy(() => import('../pages/apps/Clinic/AddClinic/contract'));
 
-const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
+// const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
 const AppointmentsList = React.lazy(() => import('../pages/apps/Appointments/index'));
 const NewAppointment = React.lazy(() => import('../pages/apps/Appointments/NewAppointment'));
 const AppointmentCalendar = React.lazy(() => import('../pages/apps/Appointments/AppointmentCalendar'));
@@ -66,8 +66,6 @@ const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'))
 
 
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
-const Practice = React.lazy(() => import('../pages/apps/SubPractice/index'));
-// const PracticeDetails = React.lazy(() => import('../pages/apps/SubPractice/PracticeDetails'));
 const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updateSubClinic'));
 
 
@@ -260,17 +258,10 @@ const AllRoutes = () => {
                             path: 'crm',
                             children: [
                                 {
-                                    path: 'orders',
-                                    element: <LoadComponent component={AllClinics} />,
-                                },
-                                {
                                     path: 'addclinic',
                                     element: <LoadComponent component={AddClinics} />,
                                 },
-                                {
-                                    path: 'updateclinic',
-                                    element: <LoadComponent component={UpdateClinic} />,
-                                },
+                               
                             ],
                         },
                         {
@@ -350,10 +341,6 @@ const AllRoutes = () => {
                         {
                             path: 'Practice',
                             children: [
-                                // {
-                                //     path: 'list',
-                                //     element: <LoadComponent component={Practice} />,
-                                // },
                                 {
                                     path: 'new-practice',
                                     element: <LoadComponent component={NewPractice} />,

@@ -11,6 +11,7 @@ import { handleFirstSpace } from '../helpers/noSpace';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
   const store = useSelector((state) => state);
+  console.log(store,'all reducer')
   const dispatch = useDispatch();
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
@@ -20,7 +21,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const changeData = store?.changePasswordSuccess;
+  const changeData = store?.Auth;
+  console.log(changeData,'changeData');
   
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
