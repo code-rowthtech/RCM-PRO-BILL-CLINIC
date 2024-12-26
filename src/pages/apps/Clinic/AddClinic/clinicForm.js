@@ -932,7 +932,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Control
                                         type="text"
                                         {...register('medicaid', {
-                                            required: 'Medicaid Number is required',
+                                            // required: 'Medicaid Number is required',
                                             minLength: {
                                                 value: 10,
                                                 message: 'Medicaid Number must be 10 characters long',
@@ -1029,10 +1029,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <hr className='mb-1' />
                             <Col sm={12} className="position-relative">
                                 <Form.Label ref={containerRef} className='mb-0'>
-                                    State of Licensure&nbsp;
+                                    State of Licensurrrre&nbsp;
                                     <span
                                         onClick={() => setStatesMenu(!statesMenu)}
-                                        className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
+                                        className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
                                     ></span>
                                     <div
                                         ref={menuRef}
@@ -1516,87 +1516,133 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                     {posDetails.map((data, index) => (
                                         <React.Fragment key={index}>
-                                            <Col sm={12} className='form-label mb-0'>
+                                            <Col sm={12} className="form-label mb-0">
                                                 {'POS ' + `${index + 1}`}
                                                 <span
                                                     onClick={() => handleRemovePOS(index)}
-                                                    className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
+                                                    className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer fs-5 fw-bold text-danger`}>
                                                 </span>
                                             </Col>
 
+                                            {/* Full Name */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Full Name <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Label className="mb-0">
+                                                        Full Name 
+                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                    </Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register(`naem.${index}`, {
-                                                            required: 'Full Name is required'
+                                                        value={data?.name}
+                                                        {...register(`name.${index}`, {
+                                                            // required: index === 0 ? 'Full Name is required' : false,
+                                                            onChange: (e) => {
+                                                                clearErrors(`name.${index}`); // Clear specific errors
+                                                                handlePOSInputChange(e, 'name', index);
+                                                            },
                                                         })}
-                                                        value={data.name} // Initialize with the current value
-                                                        onChange={(e) => {
-                                                            handlePOSInputChange(e, 'name', index); // Keep existing functionality
-                                                            setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
-                                                        }}
-                                                        onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                         placeholder="Full Name"
                                                     />
                                                     {errors.name?.[index] && (
-                                                        <span className="text-danger">{errors.name[index].message}</span>
+                                                        <span className="text-danger">{errors.name[index]?.message}</span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
 
+                                            {/* Contact Email */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Contact Email</Form.Label>
+                                                    <Form.Label className="mb-0">
+
+                                                        Contact Email
+                                                         {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                    </Form.Label>
                                                     <Form.Control
                                                         type="email"
-                                                        value={data.email}
-                                                        {...register('contactemail', {
+                                                        value={data?.email}
+                                                        {...register(`contactemail.${index}`, {
+                                                            // required: index === 0 ? 'Contact Email is required' : false,
                                                             pattern: {
-                                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
-                                                                message: 'Please enter a valid email address'
-                                                            }
+                                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                                                message: 'Please enter a valid email address',
+                                                            },
+                                                            onChange: (e) => {
+                                                                clearErrors(`contactemail.${index}`); // Clear specific errors
+                                                                handlePOSInputChange(e, 'email', index);
+                                                            },
                                                         })}
-                                                        onChange={(e) => handlePOSInputChange(e, 'email', index)}
                                                         placeholder="Contact Email"
                                                     />
-                                                    {errors.contactemail && <span className="text-danger">{errors.contactemail.message}</span>}
+                                                    {errors.contactemail?.[index] && (
+                                                        <span className="text-danger">{errors.contactemail[index]?.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
+                                            {/* Job Title / Role */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Job Title / Role</Form.Label>
+                                                    <Form.Label className="mb-0">
+                                                        Job Title / Role 
+                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                    </Form.Label>
                                                     <Form.Control
-                                                        type='text'
+                                                        type="text"
                                                         value={data?.role}
-                                                        placeholder='Job Title / Role'
-                                                        onKeyPress={handleFirstSpace}
-                                                        onChange={(e) => handlePOSInputChange(e, 'role', index)}
+                                                        {...register(`role.${index}`, {
+                                                            // required: index === 0 ? 'Job Title / Role is required' : false,
+                                                            onChange: (e) => {
+                                                                clearErrors(`role.${index}`); // Clear specific errors
+                                                                handlePOSInputChange(e, 'role', index);
+                                                            },
+                                                        })}
+                                                        placeholder="Job Title / Role"
                                                     />
+                                                    {errors.role?.[index] && (
+                                                        <span className="text-danger">{errors.role[index]?.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
+                                            {/* Contact Person */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2 position-relative">
-                                                    <Form.Label className="mb-0">Contact Person</Form.Label>
+                                                    <Form.Label className="mb-0">
+                                                        Contact Person 
+                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                    </Form.Label>
                                                     <InputGroup>
-                                                        <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
+                                                        <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
+                                                            &nbsp;&nbsp;+1
+                                                        </InputGroup.Text>
                                                         <Form.Control
                                                             type="tel"
                                                             value={data.contact}
-                                                            onChange={(e) => handlePOSInputChange(e, 'contact', index)}
+                                                            {...register(`poccontact.${index}`, {
+                                                                // required: index === 0 ? 'Contact is required' : false,
+                                                                pattern: {
+                                                                    value: /^[0-9]+$/,
+                                                                    message: 'Contact must be numeric',
+                                                                },
+                                                                maxLength: {
+                                                                    value: 10,
+                                                                    message: 'Contact must not exceed 10 digits',
+                                                                },
+                                                                minLength: {
+                                                                    value: 9,
+                                                                    message: 'Contact must be at least 9 digits',
+                                                                },
+                                                                onChange: (e) => {
+                                                                    clearErrors(`poccontact.${index}`); // Clear specific errors
+                                                                    handlePOSInputChange(e, 'contact', index);
+                                                                },
+                                                            })}
                                                             placeholder="1234-234-234"
-                                                            onKeyPress={(e) => {
-                                                                if (!/^\d$/.test(e.key)) {
-                                                                    e.preventDefault(); // Prevent non-numeric input
-                                                                }
-                                                            }}
-                                                            maxLength={10} // Corrected maxLength
-                                                            minLength={9}  // Corrected minLength
-                                                            isInvalid={!!errors?.contact} // Corrected validation for error display
                                                         />
                                                     </InputGroup>
-                                                    {errors?.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                    {errors.poccontact?.[index] && (
+                                                        <span className="text-danger">{errors.poccontact[index]?.message}</span>
+                                                    )}
                                                     <img
                                                         src={us}
                                                         alt="country code flag"
@@ -1606,10 +1652,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     />
                                                 </Form.Group>
                                             </Col>
-
-
                                         </React.Fragment>
                                     ))}
+
                                 </Row>
                             </Col>
                             <hr />

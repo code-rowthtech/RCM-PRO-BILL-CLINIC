@@ -11,7 +11,7 @@ import { handleFirstSpace } from '../helpers/noSpace';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
   const store = useSelector((state) => state);
-  console.log(store,'all reducer')
+  console.log(store, 'all reducer')
   const dispatch = useDispatch();
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
 
@@ -22,8 +22,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const changeData = store?.Auth;
-  console.log(changeData,'changeData');
-  
+  console.log(changeData, 'changeData');
+
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
     dispatch(confirmPasswordAction({ key: encryptMessage(payload) }));
@@ -56,6 +56,9 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                   {...register('oldPassword', {
                     required: 'Old password is required',
                   })}
+                  onCopy={(e) => e.preventDefault()}
+                  onCut={(e) => e.preventDefault()}
+                  onPaste={(e) => e.preventDefault()}
                 />
                 <span
                   className="position-absolute"
@@ -82,9 +85,13 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
                       message: 'Password must include uppercase, lowercase, number, and special character',
                     },
+                    
                     validate: value =>
                       value !== oldPassword || 'New password cannot be the same as the old password',
                   })}
+                  onCopy={(e) => e.preventDefault()}
+                            onCut={(e) => e.preventDefault()}
+                            onPaste={(e) => e.preventDefault()}
                 />
                 <span
                   className="position-absolute"
@@ -108,6 +115,9 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                     required: 'Please confirm your new password',
                     validate: value => value === newPassword || 'Passwords do not match',
                   })}
+                  onCopy={(e) => e.preventDefault()}
+                            onCut={(e) => e.preventDefault()}
+                            onPaste={(e) => e.preventDefault()}
                 />
                 <span
                   className="position-absolute"

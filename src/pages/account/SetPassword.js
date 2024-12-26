@@ -138,6 +138,9 @@ const SetPassword = (): React$Element<any> => {
                             label='New Password'
                             type="password"
                             name="password"
+                            onCopy={(e) => e.preventDefault()}
+                            onCut={(e) => e.preventDefault()}
+                            onPaste={(e) => e.preventDefault()}
                             placeholder={t('Enter your Password')}
                             containerClass={'mb-3'}
                         />
@@ -147,6 +150,9 @@ const SetPassword = (): React$Element<any> => {
                             name="confirmPassword"
                             placeholder={t('Confirm your Password')}
                             containerClass={'mb-3'}
+                            onCopy={(e) => e.preventDefault()}
+                            onCut={(e) => e.preventDefault()}
+                            onPaste={(e) => e.preventDefault()}
                         />
                         <div className="mb-3 mb-0 text-center">
                             <Button variant="primary" className='custom-buttons' type="submit" disabled={loading}>
