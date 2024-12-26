@@ -25,6 +25,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
     const [amount, setAmount] = useState((null));
     console.log(amount,"amount")
     const subscriptionsData = store?.getSubscriptionReducer?.data?.result;
+    console.log(subscriptionsData,'subscriptionsData')
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
     const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscription
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
@@ -54,6 +55,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
         console.log(payload,'payloadbilling')
     };
     const billingAddResponse = store?.createSubscriptionPlanReducer?.data?.status;
+    console.log(billingAddResponse,"billingAddResponse")
     useEffect(() => {
         if (billingAddResponse === 200) {
             reset();
@@ -233,7 +235,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
                     <Col sm={12}>
                         <Row>
                             <Col sm={6} className=''>
-                                <Row className='mt-2'>
+                                <Row className='mt-1'>
                                     <Col sm={12}>
                                         <span className='text-black fw-semibold'>Payment Information</span>
                                     </Col>
@@ -326,7 +328,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
     
                             </Col>
                             <Col sm={6}>
-                                <Row className='mt-2'>
+                                <Row className='mt-1'>
                                     <Col sm={12}>
                                         <span className='text-black fw-semibold'>Billing Contact Information</span>
                                     </Col>

@@ -209,11 +209,11 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
- const [newaccreditationLogo, setNewAccreditationLogo] = useState(false); 
+    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile,setNewAccreditationLogo);
+            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -680,7 +680,6 @@ const NewPractice = () => {
                                                             onChange={(e) => formDataChange('email', e.target.value)}
                                                         />
                                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
-
                                                     </Form.Group>
                                                 </Col>
                                                 <Col sm={3}>
@@ -848,11 +847,11 @@ const NewPractice = () => {
                                                 ))}
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
-                                                        <Form.Label className='mb-0'>CLIA Number <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('clia', {
-                                                                required: 'CLIA Number is required',
+                                                                // required: 'CLIA Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'CLIA Number must be 10 characters long',
@@ -875,11 +874,11 @@ const NewPractice = () => {
 
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
-                                                        <Form.Label className='mb-0'>Medicare Number <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-0'>Medicare Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicare', {
-                                                                required: 'Medicare Number is required',
+                                                                // required: 'Medicare Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'Medicare number must be at least 10 characters long',
@@ -901,11 +900,11 @@ const NewPractice = () => {
                                                 </Col>
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-0'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicaid', {
-                                                                required: 'Medicaid Number is required',
+                                                                // required: 'Medicaid Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'Medicaid number must be at least 10 characters long',
@@ -932,7 +931,7 @@ const NewPractice = () => {
                                                         Accreditation Details&nbsp;
                                                         <span
                                                             onClick={handleAddAccreditation}
-                                                            className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
+                                                            className='fs-5 uil-plus-circle plusicon fw-bold cursor-pointer'>
                                                         </span>
                                                     </Form.Label>
                                                 </Col>
@@ -1008,7 +1007,7 @@ const NewPractice = () => {
                                                         State of Licensure&nbsp;
                                                         <span
                                                             onClick={() => setStatesMenu(!statesMenu)}
-                                                            className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
+                                                            className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
                                                         ></span>
                                                         <div
                                                             ref={menuRef}
@@ -1052,7 +1051,7 @@ const NewPractice = () => {
                                                         <Col sm={4} className="mb-2 position-relative">
                                                             <div
                                                                 onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload? 'form-control' : 'custom-form-fields'
+                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'
                                                                     }`}
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
@@ -1061,15 +1060,15 @@ const NewPractice = () => {
                                                                         ? data?.fileName?.slice(0, 25) + '...'
                                                                         : data?.fileName
                                                                     : 'Upload Document'} */}
-                                                                     {
-                                                stateLogoUpload
-                                                    ? 'Uploading...'
-                                                    : (data.fileName
-                                                        ? (data.fileName.length > 30
-                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
-                                                            : data.fileName.split('/').pop()) // Extract full file name
-                                                        : 'Upload Document')
-                                            }
+                                                                {
+                                                                    stateLogoUpload
+                                                                        ? 'Uploading...'
+                                                                        : (data.fileName
+                                                                            ? (data.fileName.length > 30
+                                                                                ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                                                : data.fileName.split('/').pop()) // Extract full file name
+                                                                            : 'Upload Document')
+                                                                }
                                                                 <p className="mb-0">
                                                                     <FiDownloadCloud />
                                                                 </p>

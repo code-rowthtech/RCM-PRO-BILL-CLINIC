@@ -429,7 +429,7 @@ const SubUpdateClinic = () => {
                     }
                     :
                     {
-                        ...(formData?.address ? { address: formData?.address } : ''),
+                        ...(formData?.mailingAddress ? { address: formData?.mailingAddress } : ''),
                         ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
                         ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
                         street: formData?.mailingStreet,
@@ -440,7 +440,7 @@ const SubUpdateClinic = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
-        console.log(payload, 'payload')
+        console.log(payload, 'update Payload')
     };
     useEffect(() => {
         if (updateSuccess === 200) {
@@ -636,6 +636,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Control
                                                         type="email"
                                                         placeholder="Email"
+                                                        disabled={true}
                                                         value={formData?.email}
                                                         {...register('email', {
                                                             required: 'Email is required',
@@ -818,11 +819,11 @@ const SubUpdateClinic = () => {
                                             ))}
                                             <Col sm={3}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0'>CLIA Number <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('clia', {
-                                                            required: 'CLIA Number is required',
+                                                            // required: 'CLIA Number is required',
                                                             minLength: {
                                                                 value: 10,
                                                                 message: 'CLIA Number must be 10 characters long',
@@ -845,11 +846,11 @@ const SubUpdateClinic = () => {
 
                                             <Col sm={3}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0'>Medicare Number <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Label className='mb-0'>Medicare Number</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('medicare', {
-                                                            required: 'Medicare Number is required',
+                                                            // required: 'Medicare Number is required',
                                                             minLength: {
                                                                 value: 10,
                                                                 message: 'Medicare number must be at least 10 characters long',
@@ -872,11 +873,11 @@ const SubUpdateClinic = () => {
 
                                             <Col sm={3}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className='mb-0'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('medicaid', {
-                                                            required: 'Medicaid Number is required',
+                                                            // required: 'Medicaid Number is required',
                                                             minLength: {
                                                                 value: 10,
                                                                 message: 'Medicaid number must be at least 10 characters long',
