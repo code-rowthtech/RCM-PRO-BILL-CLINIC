@@ -15,6 +15,9 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
+.plusicon {
+    color: #6169d0;
+}
 
 .light-border-bottom {
     border-bottom: 1px solid #313a4615 !important;
@@ -35,6 +38,14 @@
     width: 100%;
     color: #6c757d;
 }
+
+.flag-icon {
+    top: 50%; /* Center vertically */
+    left: 10px; /* Adjust based on your layout */
+    transform: translateY(-50%);
+    pointer-events: none; /* Prevent interaction with the image */
+}
+
 
 .upload-icon {
     color: #6c757d;

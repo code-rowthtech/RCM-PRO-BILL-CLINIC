@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Button, Table, Spinner } from "react-bootstrap";
 import { FiEdit } from "react-icons/fi";
@@ -20,7 +20,8 @@ const ScheduleTab = () => {
   console.log({ doctorLists })
   const scheduleList = store?.getScheduleReducer?.data?.result || [];
   const isLoading = store?.getScheduleReducer?.loading;
-
+  const [focusIndex, setFocusIndex] = useState(null);
+  const inputRefs = useRef([]);
   const { control, handleSubmit, setValue, register } = useForm();
 
   useEffect(() => {
@@ -130,18 +131,27 @@ const ScheduleTab = () => {
     { day: "Saturday" },
     { day: "Sunday" },
   ];
+  console.log({days})
+
+  const handleEditClick = (index, fieldName) => {
+    setFocusIndex({ index, fieldName }); // Update focus index
+    setTimeout(() => {
+      inputRefs.current[index]?.[fieldName]?.focus(); // Focus the desired input field
+    }, 0);
+  };
 
   const renderEmptyScheduleData = () => {
     return (
       <>
-        {days.map((day, index) => (
-          <tr key={index}>
+        {days && days?.map((day, index) => (
+          <tr key={day.day}>
             <td>
               <input
                 type="text"
                 {...register(`schedules.newSchedule.${index}.availableOn`)}
                 className="form-control"
-                defaultValue={day.day}
+                value={day?.day}
+                disabled
               />
             </td>
             <td>
@@ -154,6 +164,12 @@ const ScheduleTab = () => {
                     type="time"
                     className="form-control"
                     {...field}
+                    ref={(el) => {
+                      if (!inputRefs.current[index]) {
+                        inputRefs.current[index] = {};
+                      }
+                      inputRefs.current[index]['availableFrom'] = el; // Assign the ref
+                    }}
                     value={field.value || ""}
                   />
                 )}
@@ -165,12 +181,21 @@ const ScheduleTab = () => {
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
-                  <input type="time" className="form-control" {...field} />
+                  <input type="time" className="form-control" {...field}
+                    ref={(el) => {
+                      if (!inputRefs.current[index]) {
+                        inputRefs.current[index] = {};
+                      }
+                      inputRefs.current[index]['availableTo'] = el; // Assign the ref
+                    }}
+                  />
                 )}
               />
             </td>
             <td className="text-center">
-              <FiEdit className="fs-4 ms-2" />
+              <div className="btn">
+                <FiEdit className="fs-4 ms-2" onClick={() => handleEditClick(index, 'availableFrom')} />
+              </div>
             </td>
           </tr>
         ))}
@@ -184,7 +209,7 @@ const ScheduleTab = () => {
 
       <div className="row">
         <div className="col-6 mb-1">
-          <label htmlFor="doctorName" style={{ fontWeight: "bold"}}>
+          <label htmlFor="doctorName" style={{ fontWeight: "bold" }}>
             Doctor Name<span className="text-danger">*</span>
           </label>
           <select
@@ -227,7 +252,7 @@ const ScheduleTab = () => {
         </div>
       </div>
 
-      <Table striped  className="mt-2 ">
+      <Table striped className="mt-2 ">
         <thead>
           <tr>
             <th className="text-white">Available On</th>

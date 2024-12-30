@@ -18,6 +18,7 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     const createSuccess = store?.updateRolesReducer?.data?.status
     console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
+    
     const roleData = store?.getRolesDataReducer?.data
 
 

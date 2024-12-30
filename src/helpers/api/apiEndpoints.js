@@ -34,6 +34,7 @@ export const getSubscription = '/api/v1/clinic/getSubscription/history'
 
 //CONTRACT
 export const createContract = '/api/v1/clinic/getContractDetails';
+export const standardContract = 'api/v1/clinic/getStandardContact';
 
 // SETTING
 export const addMastersData = '/api/v1/clinic/createOrUpdateMasterData';

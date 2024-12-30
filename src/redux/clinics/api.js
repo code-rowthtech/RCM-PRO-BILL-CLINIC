@@ -30,8 +30,6 @@ export function getCityByStateApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.getCityByState}${data?.state_code}?name=${data?.name}&page=${data?.skip}&limit=${data?.limit}`);
 }
-
-
 export function getClinicApi(params: any): any {
     const { data } = params;
     return api.create(URL.getClinic,data);
@@ -45,6 +43,10 @@ export function addSubscriptionPlanApi(params: any): any {
 export function createContract(params: any): any {
     const { data } = params;
     return api.create(URL.createContract, data);
+}
+export function standardContract(params: any): any {
+    const { data } = params;
+    return api.get(URL.standardContract, data);
 }
 
 export function getClinicsByParentIdApi(params: any): any {

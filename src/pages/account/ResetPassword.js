@@ -84,7 +84,7 @@ const ResetPassword = (): React$Element<any> => {
                 .required(t('Please confirm your Password')),
         })
     );
-    
+
 
     const onSubmit = (formData) => {
         dispatch(forgotPasswordChange({ token, newPassword: formData.password }));
@@ -119,6 +119,9 @@ const ResetPassword = (): React$Element<any> => {
                         name="password"
                         placeholder={t('Enter your Password')}
                         containerClass={'mb-3'}
+                        onCopy={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
+                        onPaste={(e) => e.preventDefault()}
                     />
                     <FormInput
                         label='Confirm Password'
@@ -126,6 +129,9 @@ const ResetPassword = (): React$Element<any> => {
                         name="confirmPassword"
                         placeholder={t('Confirm your Password')}
                         containerClass={'mb-3'}
+                        onCopy={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
+                        onPaste={(e) => e.preventDefault()}
                     />
 
                     <div className="mb-3 mb-0 text-center">
