@@ -208,7 +208,7 @@ const ScheduleTab = () => {
       <h4 className="mt-0">Edit Schedule</h4>
 
       <div className="row">
-        <div className="col-6 mb-1">
+        <div className="col-3 mb-1">
           <label htmlFor="doctorName" style={{ fontWeight: "bold" }}>
             Doctor Name<span className="text-danger">*</span>
           </label>
@@ -238,7 +238,7 @@ const ScheduleTab = () => {
           </select>
         </div>
 
-        <div className="col-6 mb-1">
+        <div className="col-3 mb-1">
           <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
             Per Patient Time<span className="text-danger">*</span>
           </label>

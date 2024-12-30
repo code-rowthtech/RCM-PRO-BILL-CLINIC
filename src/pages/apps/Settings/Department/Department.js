@@ -71,12 +71,12 @@ const Department = () => {
   console.log(createResponse, 'createResponse')
   console.log(tableGetData, 'tableGetData')
   useEffect(() => {
-     dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
-     if (createResponse?.status === 201 || updateResponse === 200) {
-       dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
-       dispatch(stateEmptydAction());
-     }
-   }, [dispatch, createResponse, updateResponse, status, search, skip]);
+    dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
+    if (createResponse?.status === 201 || updateResponse === 200) {
+      dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
+      dispatch(stateEmptydAction());
+    }
+  }, [dispatch, createResponse, updateResponse, status, search, skip]);
 
   const handleStatusChange = (isActive) => {
     setStatus(isActive);

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { getRoleDataAction, getRolesAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMastersDataAction } from '../../../redux/settings/action';
+import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 
 const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     console.log({ currentUser })
@@ -16,10 +16,13 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const createLoading = store?.updateRolesReducer?.loading
     const createSuccess = store?.updateRolesReducer?.data?.status
-    console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
-    
+    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
+    const tableGetDataLoading = store?.getMastersDataReducer?.data?.loading;
+    const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
+
     const roleData = store?.getRolesDataReducer?.data
+    const roleDataLoading = store?.getRolesDataReducer?.loading
 
 
     const [showPassword, setShowPassword] = useState(false);
@@ -30,9 +33,11 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
         setShowPassword(!showPassword);
     };
     useEffect(() => {
+        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    }, [dispatch]);
+    useEffect(() => {
         if (show && currentUser) {
 
-            dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
             reset({
                 name: currentUser.firstName,
@@ -47,8 +52,10 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                 department: currentUser.department,
             });
         }
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
 
-    }, [getRolesAction, show, currentUser, reset, dispatch])
+
+    }, [getRolesAction, show, currentUser, reset,])
     useEffect(() => {
         if (createSuccess === 200) {
             dispatch(stateEmptydAction());
@@ -259,19 +266,28 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
                                 </Form.Group>
                             </Col>
-
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Designation</Form.Label>
                                     <Form.Select
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
-                                        <option value="">Select Designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {tableGetDataLoading ? (
+                                            <option>Loading...</option>
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+
+
+                                            <>
+                                                <option value="">Select Designation</option>
+                                                {tableGetData?.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Desigination Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.designation && (
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
@@ -281,17 +297,25 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
 
 
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Department</Form.Label>
                                     <Form.Select
                                         {...register('department', { required: 'Department is required' })}
                                     >
-                                        <option value="">Select Department</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {departmentGetDataLoading ? (
+                                            <option>Loading...</option> // Placeholder while loading
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+                                            <>
+                                                <option value="">Select Department</option>
+                                                {departmentGetData.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Department Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.department && (
                                         <span className="text-danger fs-6">{errors.department.message}</span>
@@ -322,19 +346,24 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
-
-                                        {...register('reportingTo')}
+                                        {...register('reportingTo')} // No required validation
                                     >
                                         <option value="">Select Reporting</option>
-                                        {roleData && roleData?.users?.map((data) => (
-                                            <option key={data._id} value={data?._id}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {roleDataLoading ? (
+                                            <option disabled>Loading...</option> // Display "Loading..." as an option
+                                        ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
+                                            roleData?.users.map((data) => (
+                                                <option key={data._id} value={data._id}>
+                                                    {data.firstName || "Unnamed User"} {data.lastName || ""}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>No Reporting</option> // Display "No Data Found" as an option
+                                        )}
                                     </Form.Select>
-
                                 </Form.Group>
                             </Col>
+
 
 
                         </Row>
