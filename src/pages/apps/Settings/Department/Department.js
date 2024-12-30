@@ -66,14 +66,14 @@ const Department = () => {
   };
 
   const createResponse = store?.createMastersDataReducer?.data;
-  const tableGetData = store?.getDepartmentDataReducer?.data?.result;
+  const tableGetData = store?.getMastersDataReducer?.data?.result;
   const updateResponse = store?.updateMastersDataReducer?.data;
   console.log(createResponse, 'createResponse')
   console.log(tableGetData, 'tableGetData')
   useEffect(() => {
-    dispatch(getDepartmentDataAction({ status, category: 'Department', limit: 10, skip, search }));
+    dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
     if (createResponse?.status === 201 || updateResponse === 200) {
-      dispatch(getDepartmentDataAction({ status, category: 'Department', search, limit: 10, skip }));
+      dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
       dispatch(stateEmptydAction());
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
