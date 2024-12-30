@@ -121,7 +121,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                 break;
         }
     };
-
     return (
         <>
             <div className={classNames('navbar-custom', navbarCssClasses)}>

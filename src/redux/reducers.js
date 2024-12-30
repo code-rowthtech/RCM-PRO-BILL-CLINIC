@@ -6,7 +6,7 @@ import Layout from './layout/reducers';
 import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissionsDataReducer, updatePermissionsDataReducer } from './permissions/reducers';
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer } from './roles/reducers';
 import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer } from './settings/reducers';
-import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer, getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer } from './clinics/reducers';
+import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer, getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer } from './patients/reducers';
@@ -20,7 +20,7 @@ export default (combineReducers({
     createPermissionsDataReducer, getPermissionsDataReducer, deletePermissionsDataReducer, updatePermissionsDataReducer,
     createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer, getCitiesReducer,
-    getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer,
+    getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer,standardContractReducer,
     getDoctorsReducer, getClinicTypeReducer, updateSubClinicReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     getAnalyticsReducer, createMastersDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer,

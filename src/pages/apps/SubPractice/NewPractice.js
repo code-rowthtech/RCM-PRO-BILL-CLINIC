@@ -4,14 +4,12 @@ import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import EmailToDoctorModal from './EmailToDoctorModal';
-import DepartmentDetails from './PracticeDetails';
-import Documents from './Documents';
+// import EmailToSubClinicModal from './EmailToSubClinicModal';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
-import ResetPassword from './ResetPassword';
+// import ResetPassword from './ResetPassword';
 import { getCities2Action, getCitiesAction, getClinicAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
@@ -35,10 +33,12 @@ const NewPractice = () => {
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
     };
+
+    const [logoUploading, setLogoUploading] = useState(false);
     const handleFileChange = async (e) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name)
         } catch (error) {
@@ -209,10 +209,11 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setNewAccreditationLogo);
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -536,11 +537,12 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+    const [stateLogoUpload, setStateLogoUpload] = useState(false);
 
     const handleStateChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
-            const url = await handleUpload(selectedFile);
+            const url = await handleUpload(selectedFile, setStateLogoUpload);
             setStateDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -581,7 +583,7 @@ const NewPractice = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-4">
+                <div className="container-fluid mt-2">
                     <Card className='px-3 py-2'>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
@@ -616,15 +618,18 @@ const NewPractice = () => {
                             {activeTab === "personalDetails" && (
                                 <>
                                     {store?.getClinicsReducer?.loading ?
-                                        <div className="text-center my-3">
+                                        <div
+                                            className="d-flex justify-content-center align-items-center"
+                                            style={{ height: '82vh' }}
+                                        >
                                             <Spinner />
                                         </div>
                                         :
-                                        <Form className='mt-3' onSubmit={handleSubmit(submitSubData)} >
+                                        <Form className='mt-1' onSubmit={handleSubmit(submitSubData)} >
                                             <Row >
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Practice Name <span className='text-danger'>*</span></Form.Label>
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>Practice Name <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('clinicname', { required: 'Practice Name is required' })}
@@ -636,9 +641,9 @@ const NewPractice = () => {
 
                                                     </Form.Group>
                                                 </Col>
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className="mb-1">
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className="mb-0">
                                                             Practice type <span className="text-danger">*</span>
                                                         </Form.Label>
                                                         <Form.Select
@@ -658,9 +663,9 @@ const NewPractice = () => {
                                                         )}
                                                     </Form.Group>
                                                 </Col>
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className="mb-1">Email <span className='text-danger'>*</span></Form.Label>
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className="mb-0">Email <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="email"
                                                             placeholder="Email"
@@ -675,12 +680,11 @@ const NewPractice = () => {
                                                             onChange={(e) => formDataChange('email', e.target.value)}
                                                         />
                                                         {errors.email && <p className="text-danger">{errors.email.message}</p>}
-
                                                     </Form.Group>
                                                 </Col>
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('taxId', {
@@ -697,8 +701,8 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-2 position-relative">
-                                                        <Form.Label className="mb-1">Contact Person <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Group className="mb-1 position-relative">
+                                                        <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
                                                         <InputGroup>
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
@@ -735,8 +739,8 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             placeholder="NPI Type 2 Number"
@@ -762,18 +766,25 @@ const NewPractice = () => {
                                                         {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>}
                                                     </Form.Group>
                                                 </Col>
-                                              
-                                                <Col sm={6} className="mb-2 d-flex flex-column position-relative">
-                                                    <Form.Label>Upload Logo</Form.Label>
+
+                                                <Col sm={6} className="mb-1 d-flex flex-column position-relative">
+                                                    <Form.Label className='mb-0'>Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
                                                         className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
                                                             }`}
                                                     >
                                                         {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
-                                                        {typeof logoName === 'string' && logoName
+                                                        {/* {typeof logoName === 'string' && logoName
                                                             ? logoName.split('/').pop()
-                                                            : 'Upload Logo'}
+                                                            : 'Upload Logo'} */}
+                                                        {
+                                                            logoUploading
+                                                                ? 'Uploading...'
+                                                                : typeof logoName === 'string' && logoName
+                                                                    ? logoName.split('/').pop()
+                                                                    : 'Upload Logo'
+                                                        }
                                                         <p className="mb-0">
                                                             <FiDownloadCloud />
                                                         </p>
@@ -788,8 +799,8 @@ const NewPractice = () => {
                                                     />
                                                 </Col>
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('practiceSpecialty', {
@@ -803,9 +814,9 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
                                                 {taxonomyCodes && taxonomyCodes.map((code, index) => (
-                                                    <Col sm={6} key={index}>
-                                                        <Form.Group className="mb-2">
-                                                            <Form.Label className="mb-1">
+                                                    <Col sm={3} key={index}>
+                                                        <Form.Group className="mb-1">
+                                                            <Form.Label className="mb-0">
                                                                 Taxonomy Code(s)
                                                                 {index === taxonomyCodes.length - 1 && (
                                                                     <span
@@ -834,13 +845,13 @@ const NewPractice = () => {
                                                         </Form.Group>
                                                     </Col>
                                                 ))}
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>CLIA Number <span className='text-danger'>*</span></Form.Label>
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('clia', {
-                                                                required: 'CLIA Number is required',
+                                                                // required: 'CLIA Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'CLIA Number must be 10 characters long',
@@ -861,13 +872,13 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
 
-                                                <Col sm={6}>
-                                                    <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Medicare Number <span className='text-danger'>*</span></Form.Label>
+                                                <Col sm={3}>
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className='mb-0'>Medicare Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicare', {
-                                                                required: 'Medicare Number is required',
+                                                                // required: 'Medicare Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'Medicare number must be at least 10 characters long',
@@ -887,13 +898,13 @@ const NewPractice = () => {
                                                         {errors.medicare && <span className="text-danger">{errors.medicare.message}</span>}
                                                     </Form.Group>
                                                 </Col>
-                                                <Col sm={6}>
+                                                <Col sm={3}>
                                                     <Form.Group className="mb-2">
-                                                        <Form.Label className='mb-1'>Medicaid Number <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
                                                             {...register('medicaid', {
-                                                                required: 'Medicaid Number is required',
+                                                                // required: 'Medicaid Number is required',
                                                                 minLength: {
                                                                     value: 10,
                                                                     message: 'Medicaid number must be at least 10 characters long',
@@ -914,13 +925,13 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
 
-                                                <hr />
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
-                                                    <Form.Label>
+                                                    <Form.Label className='mb-0'>
                                                         Accreditation Details&nbsp;
                                                         <span
                                                             onClick={handleAddAccreditation}
-                                                            className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
+                                                            className='fs-5 uil-plus-circle plusicon fw-bold cursor-pointer'>
                                                         </span>
                                                     </Form.Label>
                                                 </Col>
@@ -957,11 +968,19 @@ const NewPractice = () => {
                                                             <div
                                                                 onClick={() => accreditationFileInputRef.current.click()}
                                                                 className="custom-file-upload justify-content-between cursor-pointer"
+                                                                style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {accreditation.loading ? 'Loading...'
+                                                                {/* {accreditation.loading ? 'Loading...'
                                                                     : accreditation.url
                                                                         ? accreditation.url.split('/').pop()
-                                                                        : accreditation?.fileName || 'Upload Document'}
+                                                                        : accreditation?.fileName || 'Upload Document'} */}
+                                                                {
+                                                                    newaccreditationLogo
+                                                                        ? 'Uploading...'
+                                                                        : accreditation.url
+                                                                            ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
+                                                                            : accreditation?.fileName || 'Upload Document'
+                                                                }
                                                                 <p className="mb-0"><FiDownloadCloud /></p>
                                                             </div>
 
@@ -981,14 +1000,14 @@ const NewPractice = () => {
                                                         </Col>
                                                     </React.Fragment>
                                                 ))}
-                                                <hr />
-                                              
+                                                <hr className='mb-1' />
+
                                                 <Col sm={12} className="position-relative">
-                                                    <Form.Label ref={containerRef}>
+                                                    <Form.Label ref={containerRef} className='mb-0'>
                                                         State of Licensure&nbsp;
                                                         <span
                                                             onClick={() => setStatesMenu(!statesMenu)}
-                                                            className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
+                                                            className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
                                                         ></span>
                                                         <div
                                                             ref={menuRef}
@@ -1032,14 +1051,24 @@ const NewPractice = () => {
                                                         <Col sm={4} className="mb-2 position-relative">
                                                             <div
                                                                 onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName ? 'form-control' : 'custom-form-fields'
+                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'
                                                                     }`}
+                                                                style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {data.fileName
+                                                                {/* {data.fileName
                                                                     ? data?.fileName?.length > 30
                                                                         ? data?.fileName?.slice(0, 25) + '...'
                                                                         : data?.fileName
-                                                                    : 'Upload Document'}
+                                                                    : 'Upload Document'} */}
+                                                                {
+                                                                    stateLogoUpload
+                                                                        ? 'Uploading...'
+                                                                        : (data.fileName
+                                                                            ? (data.fileName.length > 30
+                                                                                ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                                                : data.fileName.split('/').pop()) // Extract full file name
+                                                                            : 'Upload Document')
+                                                                }
                                                                 <p className="mb-0">
                                                                     <FiDownloadCloud />
                                                                 </p>
@@ -1059,17 +1088,17 @@ const NewPractice = () => {
                                                         </Col>
                                                     </React.Fragment>
                                                 ))}
-                                                <hr />
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
                                                     <Row>
-                                                        <Col sm={12} className='mb-2'>
+                                                        <Col sm={12} className='mb-1'>
                                                             <span className='text-black fw-semibold form-label'>Address Details</span>
                                                         </Col>
                                                         <Col sm={6}>
                                                             <Row className='position-relative'>
                                                                 <Col sm={12}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">
                                                                             Address
                                                                         </Form.Label>
                                                                         <div style={{ position: 'relative' }}>
@@ -1081,7 +1110,7 @@ const NewPractice = () => {
                                                                                     getGeolocation(e);
                                                                                     setFocused(true); // Open dropdown on input
                                                                                 }}
-                                                                                onFocus={() => setFocused(true)} 
+                                                                                onFocus={() => setFocused(true)}
                                                                                 onBlur={() => {
                                                                                     setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
                                                                                 }}
@@ -1128,8 +1157,8 @@ const NewPractice = () => {
                                                                 </Col>
 
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className='mb-0'>
                                                                             Latitude
                                                                         </Form.Label>
                                                                         <Form.Control
@@ -1140,8 +1169,8 @@ const NewPractice = () => {
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className='mb-0'>
                                                                             Longitude
                                                                         </Form.Label>
                                                                         <Form.Control
@@ -1155,8 +1184,8 @@ const NewPractice = () => {
                                                         <Col sm={6}>
                                                             <Row>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className='mb-0'>
                                                                             State
                                                                         </Form.Label>
                                                                         <Form.Select
@@ -1177,8 +1206,8 @@ const NewPractice = () => {
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className='mb-0'>
                                                                             City
                                                                         </Form.Label>
                                                                         <Form.Select
@@ -1197,8 +1226,8 @@ const NewPractice = () => {
                                                                 </Col>
 
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className='mb-0'>
                                                                             Street
                                                                         </Form.Label>
                                                                         <Form.Control
@@ -1210,7 +1239,7 @@ const NewPractice = () => {
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className='mb-1'>
+                                                                        <Form.Label className='mb-0'>
                                                                             Zip
                                                                         </Form.Label>
                                                                         <Form.Control
@@ -1238,13 +1267,13 @@ const NewPractice = () => {
                                                     </Row>
                                                 </Col>
 
-                                                <hr />
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
                                                     <Row>
-                                                        <Col sm={12} className="mb-2">
+                                                        <Col sm={12} className="mb-0">
                                                             <span className="text-black fw-semibold form-label">Mailing Address Details</span>
                                                         </Col>
-                                                        <Col sm={12} className="mb-2">
+                                                        <Col sm={12} className="mb-1">
                                                             <Form.Check
                                                                 type="checkbox"
                                                                 style={{ cursor: "pointer" }}
@@ -1279,8 +1308,8 @@ const NewPractice = () => {
                                                         <Col sm={6}>
                                                             <Row className="position-relative">
                                                                 <Col sm={12}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Mailing Address</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Mailing Address</Form.Label>
                                                                         <div style={{ position: 'relative' }}>
                                                                             <Form.Control
                                                                                 type="text"
@@ -1340,8 +1369,8 @@ const NewPractice = () => {
 
                                                                 {/* Latitude and Longitude */}
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Latitude</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Latitude</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             value={latitude1}
@@ -1352,8 +1381,8 @@ const NewPractice = () => {
                                                                 </Col>
 
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Longitude</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Longitude</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             value={longitude1}
@@ -1369,8 +1398,8 @@ const NewPractice = () => {
                                                             <Row>
                                                                 {/* State */}
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">State</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">State</Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control
                                                                                 readOnly
@@ -1399,8 +1428,8 @@ const NewPractice = () => {
 
                                                                 {/* City */}
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">City</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">City</Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
                                                                         ) : (
@@ -1424,8 +1453,8 @@ const NewPractice = () => {
 
                                                                 {/* Street */}
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Street</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Street</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register('mailingStreet')}
@@ -1438,7 +1467,7 @@ const NewPractice = () => {
                                                                 {/* ZIP */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Zip</Form.Label>
+                                                                        <Form.Label className="mb-0">Zip</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register('mailingZip', {
@@ -1457,10 +1486,10 @@ const NewPractice = () => {
                                                     </Row>
                                                 </Col>
 
-                                                <hr />
+                                                <hr className='mb-1' />
                                                 <Col sm={12}>
                                                     <Row>
-                                                        <Col sm={12} className="mb-2">
+                                                        <Col sm={12} className="mb-1">
                                                             <span className="text-black fw-semibold form-label">
                                                                 Primary contact
                                                                 <span
@@ -1471,7 +1500,7 @@ const NewPractice = () => {
                                                         </Col>
                                                         {posDetails?.map((data, index) => (
                                                             <React.Fragment key={index}>
-                                                                <Col sm={12} className='form-label'>
+                                                                <Col sm={12} className='form-label mb-0'>
                                                                     {'POS ' + `${index + 1}`}
                                                                     <span
                                                                         onClick={() => handleRemovePOS(index)}
@@ -1479,15 +1508,15 @@ const NewPractice = () => {
                                                                     </span>
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Full Name</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Full Name</Form.Label>
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register(`name.${index}`)}
                                                                             value={data.name}
                                                                             onChange={(e) => {
                                                                                 handlePOSInputChange(e, 'name', index);
-                                                                                setValue(`name.${index}`, e.target.value); 
+                                                                                setValue(`name.${index}`, e.target.value);
                                                                             }}
                                                                             onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                                             placeholder="Full Name"
@@ -1498,8 +1527,8 @@ const NewPractice = () => {
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Contact Email</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Contact Email</Form.Label>
                                                                         <Form.Control
                                                                             type="email"
                                                                             value={data.email}
@@ -1516,8 +1545,8 @@ const NewPractice = () => {
                                                                     </Form.Group>
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2">
-                                                                        <Form.Label className="mb-1">Job Title / Role</Form.Label>
+                                                                    <Form.Group className="mb-1">
+                                                                        <Form.Label className="mb-0">Job Title / Role</Form.Label>
                                                                         <Form.Control
                                                                             type='text'
                                                                             value={data?.role}
@@ -1529,7 +1558,7 @@ const NewPractice = () => {
                                                                 </Col>
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-2 position-relative">
-                                                                        <Form.Label className="mb-1">Contact Person</Form.Label>
+                                                                        <Form.Label className="mb-0">Contact Person</Form.Label>
                                                                         <InputGroup>
                                                                             <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
                                                                             <Form.Control
@@ -1555,13 +1584,12 @@ const NewPractice = () => {
                                                         ))}
                                                     </Row>
                                                 </Col>
-                                                <hr />
-                                                <Col md={12} className='mt-2 d-flex gap-2 justify-content-end'>
+                                                <Col md={12} className=' d-flex gap-2 justify-content-end'>
                                                     <Button
                                                         variant="primary"
                                                         type="submit"
                                                         className="custom-buttons"
-                                                        disabled={createLoading} 
+                                                        disabled={createLoading}
                                                     >
                                                         {createLoading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />
@@ -1575,13 +1603,11 @@ const NewPractice = () => {
                                     }
                                 </>
                             )}
-                            {activeTab === "departmentDetails" && <DepartmentDetails />}
-                            {activeTab === "documents" && <Documents />}
                         </div>
                     </Card>
                 </div>
-                <EmailToDoctorModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} />
-                <ResetPassword closeModal={closepassModal} show={passShow} />
+                {/* <EmailToSubClinicModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} /> */}
+                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
             </div>
 
         </>

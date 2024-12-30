@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { SettingsActionTypes } from './constants';
-import { createMastersDataApi, getMastersDataApi, updateMastersDataApi } from './api';
+import { createMastersDataApi, getDepartmentDataApi, getMastersDataApi, updateMastersDataApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -67,6 +67,35 @@ function* getMastersDataFunction(data) {
     }
 }
 
+function* getDepartmentDataFunction(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.GET_DEPARTMENT_DATA_LOADING,
+            payload: {},
+        });
+        const response = yield call(getDepartmentDataApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'decryptedData')
+
+        if (response.status === 200) {
+            yield put({
+                type: SettingsActionTypes.GET_DEPARTMENT_DATA_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.GET_DEPARTMENT_DATA_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.GET_DEPARTMENT_DATA_ERROR,
+            payload: error,
+        });
+    }
+}
+
 function* updateMastersDataFunction(data) {
     try {
         yield put({
@@ -110,6 +139,9 @@ export function* watchCreateMastersData() {
 export function* watchGetMastersData() {
     yield takeEvery(SettingsActionTypes.GET_MASTERS_DATA, getMastersDataFunction);
 }
+export function* watchGetDepartmentData() {
+    yield takeEvery(SettingsActionTypes.GET_DEPARTMENT_DATA, getDepartmentDataFunction);
+}
 export function* watchUpdateMastersData() {
     yield takeEvery(SettingsActionTypes.UPDATE_MASTERS_DATA, updateMastersDataFunction);
 }
@@ -124,6 +156,7 @@ function* settingsSaga() {
     yield all([
         fork(watchCreateMastersData),
         fork(watchGetMastersData),
+        fork(watchGetDepartmentData),
         fork(watchUpdateMastersData),
         fork(watchresetState)
     ]);

@@ -56,6 +56,11 @@ const CREATE_CONTRACT_INITIAL_STATE = {
     loading: false
 }
 
+const STANDARD_CONTRACT_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 const DELETE_CLINIC_INITIAL_STATE = {
     data: [],
     loading: false
@@ -334,6 +339,32 @@ export const createContractReducer = (state = CREATE_CONTRACT_INITIAL_STATE, act
                 loading: false
             }
         case ClinicsActionTypes.CREATE_CONTRACT_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const standardContractReducer = (state = STANDARD_CONTRACT_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicsActionTypes.STANDARD_CONTRACT_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicsActionTypes.STANDARD_CONTRACT_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.STANDARD_CONTRACT_ERROR:
             return {
                 data: action.payload,
                 loading: false
