@@ -29,13 +29,25 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
         setShowPassword(!showPassword);
     };
     useEffect(() => {
-        if (show) {
+        if (show && currentUser) {
 
             dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+            reset({
+                name: currentUser.firstName,
+                email: currentUser.email,
+                password: currentUser.password,
+                confirmPassword: currentUser.password,
+                contact: currentUser.phone,
+                phNumberSecondary: currentUser.phNumberSecondary,
+                joiningDate: currentUser.joiningDate,
+                leavingDate: currentUser.leavingDate,
+                designation: currentUser.designation,
+                department: currentUser.department,
+            });
         }
 
-    }, [getRolesAction, show, dispatch])
+    }, [getRolesAction, show, currentUser, reset, dispatch])
     useEffect(() => {
         if (createSuccess === 200) {
             dispatch(stateEmptydAction());
@@ -102,7 +114,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                                 message: 'Special characters and leading spaces are not allowed',
                                             },
                                         })}
-                                        defaultValue={currentUser?.firstName}
                                     />
                                     {errors.name && <span className="text-danger fs-6">{errors.name.message}</span>}
                                 </Form.Group>
@@ -113,7 +124,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter email"
-                                        defaultValue={currentUser?.email}
                                         {...register('email', {
                                             required: 'Email is required',
                                             pattern: {
@@ -126,13 +136,12 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 </Form.Group>
                             </Col>
 
-                            <Col sm={6}>
+                            {/* <Col sm={6}>
                                 <Form.Group className="mb-1 position-relative">
                                     <Form.Label className="mb-0">Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Enter password"
-                                        defaultValue={currentUser?.password}
                                         {...register('password', {
                                             required: 'Password is required',
                                             minLength: {
@@ -161,7 +170,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Confirm password"
-                                        defaultValue={currentUser?.password}
                                         {...register('confirmPassword', {
                                             required: 'Confirm password is required',
                                             minLength: {
@@ -193,14 +201,13 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                         </span>
                                     )}
                                 </Form.Group>
-                            </Col>
+                            </Col> */}
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Contact No.</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter contact number"
-                                        defaultValue={currentUser?.phone}
                                         {...register('contact', {
                                             required: 'Contact number is required',
                                             pattern: {
@@ -218,7 +225,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type="text"
                                         placeholder=" phone number"
-                                        defaultValue={currentUser?.phNumberSecondary}
                                         {...register('phNumberSecondary', {
                                             required: 'Contact Number secondary   number is required',
                                             pattern: {
@@ -235,7 +241,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Label className="mb-0">Date of Joining</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        defaultValue={currentUser?.joiningDate}
                                         {...register('joiningDate', { required: 'Joining date is required' })}
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
@@ -248,7 +253,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Label className="mb-0">Date of Leaving</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        defaultValue={currentUser?.joiningDate}
                                         {...register('leavingDate', { required: 'Leaving date is required' })}
                                     />
                                     {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
@@ -259,7 +263,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Designation</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.designation}
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
                                         <option value="">Select Designation</option>
@@ -280,7 +283,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Department</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.department}
                                         {...register('department', { required: 'Department is required' })}
                                     >
                                         <option value="">Select Department</option>
@@ -299,7 +301,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Role</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.role}
 
                                         {...register('role', { required: 'Role is required' })}
                                     >
@@ -320,7 +321,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.reportingTo}
 
                                         {...register('reportingTo')}
                                     >

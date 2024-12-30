@@ -27,12 +27,12 @@ const AddRole = ({ show, close }) => {
     const roleDataLoading = store?.getRolesDataReducer?.loading
     console.log({ roleData })
 
-useEffect(()=>{
-    if(createSuccess === 200){
-        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+    useEffect(() => {
+        if (createSuccess === 200) {
+            dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
 
-    }
-},[createSuccess])
+        }
+    }, [createSuccess])
 
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
@@ -64,7 +64,7 @@ useEffect(()=>{
             phone: data?.contact,
             phNumberSecondary: data.phNumberSecondary,
             clinicId: clinicId,
-            reportingTo: data.reportingTo || '676401b7e42d602da332fece',
+            reportingTo: data.reportingTo || clinicId,
             joiningDate: formattedJoiningDate,
             designation: data.designation,
             department: data.department,
@@ -221,26 +221,24 @@ useEffect(()=>{
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
-                                        {...register('reportingTo', { required: 'Reporting is required' })}
+                                        {...register('reportingTo')} // No required validation
                                     >
                                         <option value="">Select Reporting</option>
                                         {roleDataLoading ? (
-                                            <option disabled>Loading...</option>  // Display "Loading..." as an option
+                                            <option disabled>Loading...</option> // Display "Loading..." as an option
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
                                             roleData?.users.map((data, index) => (
-
                                                 <option key={index} value={data?._id}>
                                                     {data?.name}
                                                 </option>
                                             ))
                                         ) : (
-                                            <option disabled>No Data Found</option>  // Display "No Data Found" as an option
+                                            <option disabled>No RoleManagement</option> // Display "No Data Found" as an option
                                         )}
                                     </Form.Select>
-
-
                                 </Form.Group>
                             </Col>
+
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Contact No.</Form.Label>
