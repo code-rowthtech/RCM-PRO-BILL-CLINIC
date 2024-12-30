@@ -280,8 +280,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
                 ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
-                street: data?.street,
-                zip: data?.zip,
+                ...(data?.street ? { street: data?.street } : {}),
+                ...(data?.zip ? { zip: data?.zip } : {}),
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             },
@@ -292,8 +292,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
                         ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
-                        street: data?.street,
-                        zip: data?.zip,
+                        ...(data?.street ? { street: data?.street } : {}),
+                        ...(data?.zip ? { zip: data?.zip } : {}),
                         ...(latitude ? { latitude: latitude, } : ''),
                         ...(longitude ? { longitude: longitude, } : '')
                     }
@@ -308,7 +308,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     }
         };
-        console.log(newPayload, 'new payload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
     const logoFileInputRef = useRef(null);
@@ -330,7 +329,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             console.error('Error during file upload:', error);
         }
     };
-
 
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];

@@ -128,11 +128,11 @@ const NewDoctor = () => {
             setValue('degreeName', doctorDetails?.userId?.degreeName)
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
             setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
-
+            console.log(doctorDetails, 'doctorDetailsdoctorDetails')
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
                 : '';
-
+            console.log(formattedDateOfBirth, 'formattedDateOfBirthformattedDateOfBirth')
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
             const state = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.primaryAddress?.state?._id)?._id;
@@ -184,7 +184,6 @@ const NewDoctor = () => {
         }
     };
     // console.log(logo)
-
     const submitData = (data) => {
         const payload = {
             ...(updateId ? { id: updateId } : {}), // Conditionally add `id` if `updateId` exists
@@ -715,7 +714,7 @@ const NewDoctor = () => {
                                                                                 {...register("password", {
                                                                                     required: !updateId ? "Password is required" : false,
                                                                                     pattern: {
-                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
                                                                                         message:
                                                                                             "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
                                                                                     },
