@@ -5,7 +5,7 @@ import Auth from './auth/reducers';
 import Layout from './layout/reducers';
 import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissionsDataReducer, updatePermissionsDataReducer } from './permissions/reducers';
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer } from './roles/reducers';
-import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer } from './settings/reducers';
+import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer,getDepartmentDataReducer } from './settings/reducers';
 import { createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer, getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
@@ -20,10 +20,10 @@ export default (combineReducers({
     createPermissionsDataReducer, getPermissionsDataReducer, deletePermissionsDataReducer, updatePermissionsDataReducer,
     createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer, getCitiesReducer,
-    getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer,standardContractReducer,
+    getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer,getDepartmentDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer,standardContractReducer,
     getDoctorsReducer, getClinicTypeReducer, updateSubClinicReducer,
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
-    getAnalyticsReducer, createMastersDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer,
+    getAnalyticsReducer, createSubscriptionPlanReducer,
     getDoctorsReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,

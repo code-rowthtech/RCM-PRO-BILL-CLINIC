@@ -18,7 +18,7 @@ function* createMastersDataFunction(data) {
         const response = yield call(createMastersDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success')
             yield put({
                 type: SettingsActionTypes.CREATE_MASTERS_DATA_SUCCESS,
@@ -46,7 +46,6 @@ function* getMastersDataFunction(data) {
         });
         const response = yield call(getMastersDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'decryptedData')
 
         if (response.status === 200) {
             yield put({
@@ -75,7 +74,6 @@ function* getDepartmentDataFunction(data) {
         });
         const response = yield call(getDepartmentDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'decryptedData')
 
         if (response.status === 200) {
             yield put({
@@ -106,6 +104,7 @@ function* updateMastersDataFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success')
             yield put({
                 type: SettingsActionTypes.UPDATE_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { getRoleDataAction, getRolesAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMastersDataAction } from '../../../redux/settings/action';
+import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 
 const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     console.log({ currentUser })
@@ -16,9 +16,13 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const createLoading = store?.updateRolesReducer?.loading
     const createSuccess = store?.updateRolesReducer?.data?.status
-    console.log({ createSuccess })
     const tableGetData = store?.getMastersDataReducer?.data?.result;
+    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
+    const tableGetDataLoading = store?.getMastersDataReducer?.data?.loading;
+    const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
+
     const roleData = store?.getRolesDataReducer?.data
+    const roleDataLoading = store?.getRolesDataReducer?.loading
 
 
     const [showPassword, setShowPassword] = useState(false);
@@ -29,13 +33,29 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
         setShowPassword(!showPassword);
     };
     useEffect(() => {
-        if (show) {
+        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    }, [dispatch]);
+    useEffect(() => {
+        if (show && currentUser) {
 
-            dispatch(getMastersDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+            reset({
+                name: currentUser.firstName,
+                email: currentUser.email,
+                password: currentUser.password,
+                confirmPassword: currentUser.password,
+                contact: currentUser.phone,
+                phNumberSecondary: currentUser.phNumberSecondary,
+                joiningDate: currentUser.joiningDate,
+                leavingDate: currentUser.leavingDate,
+                designation: currentUser.designation,
+                department: currentUser.department,
+            });
         }
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }))
 
-    }, [getRolesAction, show, dispatch])
+
+    }, [getRolesAction, show, currentUser, reset,])
     useEffect(() => {
         if (createSuccess === 200) {
             dispatch(stateEmptydAction());
@@ -102,7 +122,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                                 message: 'Special characters and leading spaces are not allowed',
                                             },
                                         })}
-                                        defaultValue={currentUser?.firstName}
                                     />
                                     {errors.name && <span className="text-danger fs-6">{errors.name.message}</span>}
                                 </Form.Group>
@@ -113,7 +132,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter email"
-                                        defaultValue={currentUser?.email}
                                         {...register('email', {
                                             required: 'Email is required',
                                             pattern: {
@@ -126,13 +144,12 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 </Form.Group>
                             </Col>
 
-                            <Col sm={6}>
+                            {/* <Col sm={6}>
                                 <Form.Group className="mb-1 position-relative">
                                     <Form.Label className="mb-0">Password</Form.Label>
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Enter password"
-                                        defaultValue={currentUser?.password}
                                         {...register('password', {
                                             required: 'Password is required',
                                             minLength: {
@@ -161,7 +178,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type={showPassword ? 'text' : 'password'}
                                         placeholder="Confirm password"
-                                        defaultValue={currentUser?.password}
                                         {...register('confirmPassword', {
                                             required: 'Confirm password is required',
                                             minLength: {
@@ -193,14 +209,13 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                         </span>
                                     )}
                                 </Form.Group>
-                            </Col>
+                            </Col> */}
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Contact No.</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="Enter contact number"
-                                        defaultValue={currentUser?.phone}
                                         {...register('contact', {
                                             required: 'Contact number is required',
                                             pattern: {
@@ -218,7 +233,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Control
                                         type="text"
                                         placeholder=" phone number"
-                                        defaultValue={currentUser?.phNumberSecondary}
                                         {...register('phNumberSecondary', {
                                             required: 'Contact Number secondary   number is required',
                                             pattern: {
@@ -235,7 +249,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Label className="mb-0">Date of Joining</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        defaultValue={currentUser?.joiningDate}
                                         {...register('joiningDate', { required: 'Joining date is required' })}
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
@@ -248,26 +261,33 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     <Form.Label className="mb-0">Date of Leaving</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        defaultValue={currentUser?.joiningDate}
                                         {...register('leavingDate', { required: 'Leaving date is required' })}
                                     />
                                     {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
                                 </Form.Group>
                             </Col>
-
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Designation</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.designation}
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
-                                        <option value="">Select Designation</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {tableGetDataLoading ? (
+                                            <option>Loading...</option>
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+
+
+                                            <>
+                                                <option value="">Select Designation</option>
+                                                {tableGetData?.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Desigination Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.designation && (
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
@@ -277,18 +297,25 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
 
 
                             <Col sm={6}>
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Department</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.department}
                                         {...register('department', { required: 'Department is required' })}
                                     >
-                                        <option value="">Select Department</option>
-                                        {tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {departmentGetDataLoading ? (
+                                            <option>Loading...</option> // Placeholder while loading
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+                                            <>
+                                                <option value="">Select Department</option>
+                                                {departmentGetData.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Department Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.department && (
                                         <span className="text-danger fs-6">{errors.department.message}</span>
@@ -299,7 +326,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Role</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.role}
 
                                         {...register('role', { required: 'Role is required' })}
                                     >
@@ -320,20 +346,24 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
-                                        defaultValue={currentUser?.reportingTo}
-
-                                        {...register('reportingTo')}
+                                        {...register('reportingTo')} // No required validation
                                     >
                                         <option value="">Select Reporting</option>
-                                        {roleData && roleData?.users?.map((data) => (
-                                            <option key={data._id} value={data?._id}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {roleDataLoading ? (
+                                            <option disabled>Loading...</option> // Display "Loading..." as an option
+                                        ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
+                                            roleData?.users.map((data) => (
+                                                <option key={data._id} value={data._id}>
+                                                    {data.firstName || "Unnamed User"} {data.lastName || ""}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option disabled>No Reporting</option> // Display "No Data Found" as an option
+                                        )}
                                     </Form.Select>
-
                                 </Form.Group>
                             </Col>
+
 
 
                         </Row>

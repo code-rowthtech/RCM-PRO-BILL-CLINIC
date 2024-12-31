@@ -85,7 +85,7 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`${status === true ? 'custom-buttons' : 'bg-none border-primary'} me-2`}
+                                        className={`${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
                                     >
                                         Active
                                     </Button>
@@ -93,7 +93,7 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`${status === false ? 'custom-buttons' : 'bg-none border-primary'} me-2`}
+                                        className={`${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
                                     >
                                         Inactive
                                     </Button>
