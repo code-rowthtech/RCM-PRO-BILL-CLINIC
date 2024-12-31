@@ -39,6 +39,7 @@ function* login({ payload }) {
             logo: user?.logo?.url,
             clinicId: user?.clinicId
         }
+        localStorage.setItem('userData', JSON.stringify(user));
 
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);

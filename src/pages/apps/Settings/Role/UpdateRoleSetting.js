@@ -126,6 +126,7 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                             }
                         </Button>
                     </Modal.Footer>
+
                 </Form>
             </Modal.Body>
         </Modal>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiFilter, FiTrash } from 'react-icons/fi';
@@ -29,6 +29,8 @@ const RoleManagement = () => {
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
     console.log({ roleData })
+    const totalPages = roleData?.pagination?.totalPages || 1;
+
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     console.log({ deleteSuccess })
@@ -131,11 +133,21 @@ const RoleManagement = () => {
 
 
     }
-    const handleDetail = (data) => {
-        setDetailModal(true);
-        setUserDetails(data)
+    // const handleDetail = (data) => {
+    //     setDetailModal(true);
+    //     setUserDetails(data)
 
-    }
+    // }
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
 
 
     return (
@@ -245,8 +257,31 @@ const RoleManagement = () => {
                                     </tbody>
                                 </Table>
 
+                             <div className="d-flex justify-content-end">
+                                
+                            <Pagination className="mt-3 ">
+                                    <Pagination.Prev
+                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                        disabled={currentPage === 1}
+                                    />
+                                    {[...Array(totalPages)].map((_, page) => (
+                                        <Pagination.Item
+                                            key={page}
+                                            active={page + 1 === currentPage}
+                                            onClick={() => handlePageChange(page + 1)}
+                                        >
+                                            {page + 1}
+                                        </Pagination.Item>
+                                    ))}
+                                    <Pagination.Next
+                                        onClick={handleNextPage}
+                                        disabled={currentPage >= totalPages}
+                                    />
+                                </Pagination>
+                             </div>
 
 
+                           
                             </Col>
                         </Row>
                     </Card.Body>
