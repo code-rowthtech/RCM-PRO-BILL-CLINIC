@@ -22,6 +22,10 @@ export function createResponsiblePartyApi(params: any): any {
     const { data } = params;
     return api.create(URL.createResponsibleParty, data);
 }
+export function getResponsiblePartyApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.getResponsibleParty, data);
+}
 
 
 export function updatePatientsApi(params: any): any {
