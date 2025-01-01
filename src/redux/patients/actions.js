@@ -23,6 +23,11 @@ export const createResponsiblePartyAction = (data): AuthAction => ({
     data
 });
 
+export const getResponsiblePartyAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_RESPONSIBLE_PARTY,
+    data
+});
+
 export const updatePatientsAction = (data): AuthAction => ({
     type: PatientsActionTypes.UPDATE_PATIENTS,
     data

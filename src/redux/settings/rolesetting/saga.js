@@ -78,6 +78,7 @@ function* updateRoleDataFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success')
             yield put({
                 type: RoleActionTypes.UPDATE_ROLE_DATA_SUCCESS,
                 payload: { ...decryptedData },

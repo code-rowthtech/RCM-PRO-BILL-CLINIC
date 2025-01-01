@@ -13,6 +13,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
+import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 
 
 const NewDoctor = () => {
@@ -93,9 +94,12 @@ const NewDoctor = () => {
     console.log(doctorDetails, 'newDoctorIddoctorDetails')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
+    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-
+    useEffect(() => {
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
+    }, [dispatch]);
     useEffect(() => {
         if (createResponse === 200) {
             setDocId(newDoctorId)
@@ -128,11 +132,11 @@ const NewDoctor = () => {
             setValue('degreeName', doctorDetails?.userId?.degreeName)
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
             setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
-
+            console.log(doctorDetails, 'doctorDetailsdoctorDetails')
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
                 : '';
-
+            console.log(formattedDateOfBirth, 'formattedDateOfBirthformattedDateOfBirth')
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
             const state = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.primaryAddress?.state?._id)?._id;
@@ -184,7 +188,6 @@ const NewDoctor = () => {
         }
     };
     // console.log(logo)
-
     const submitData = (data) => {
         const payload = {
             ...(updateId ? { id: updateId } : {}), // Conditionally add `id` if `updateId` exists
@@ -192,6 +195,7 @@ const NewDoctor = () => {
             firstName: data?.firstName,
             lastName: data?.lastName,
             email: data?.email,
+            department: data?.department,
             dob: data?.dateOfBirth,
             gender: data?.gender,
             ...(!updateId ? { password: data?.password } : {}),
@@ -623,27 +627,52 @@ const NewDoctor = () => {
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-6">
-                                                            <Form.Group className="mb-1">
-                                                                <Form.Label className="mb-0">
-                                                                    Email {!id && <span className="text-danger">*</span>}
-                                                                </Form.Label>
-                                                                <Form.Control
-                                                                    type="email"
-                                                                    {...register('email', {
-                                                                        required: 'Email is required',
-                                                                        pattern: {
-                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
-                                                                            message: 'Enter a valid email address',
-                                                                        },
-                                                                    })}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('email');
-                                                                        setFormData({ ...formData, email: e.target.value });
-                                                                    }}
-                                                                    placeholder="Enter email"
-                                                                />
-                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                                            </Form.Group>
+                                                            <div className="col-12">
+                                                                <div className="row">
+                                                                    <div className="col-6">
+                                                                        <Form.Group className="mb-1">
+                                                                            <Form.Label className="mb-0">
+                                                                                Email {!id && <span className="text-danger">*</span>}
+                                                                            </Form.Label>
+                                                                            <Form.Control
+                                                                                type="email"
+                                                                                {...register('email', {
+                                                                                    required: 'Email is required',
+                                                                                    pattern: {
+                                                                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
+                                                                                        message: 'Enter a valid email address',
+                                                                                    },
+                                                                                })}
+                                                                                onChange={(e) => {
+                                                                                    clearErrors('email');
+                                                                                    setFormData({ ...formData, email: e.target.value });
+                                                                                }}
+                                                                                placeholder="Enter email"
+                                                                            />
+                                                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                                        </Form.Group>
+                                                                    </div>
+                                                                    <div className="col-6">
+                                                                            <Form.Group className="mb-2">
+                                                                                <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
+                                                                                <Form.Select
+                                                                                    {...register('department', { required: 'Department is required' })}
+                                                                                >
+                                                                                    <option value="">Select Department</option>
+                                                                                    {departmentGetData?.map((data) => (
+                                                                                        <option key={data._id} value={data.name}>
+                                                                                            {data.name}
+                                                                                        </option>
+                                                                                    ))}
+                                                                                </Form.Select>
+                                                                                {errors.department && (
+                                                                                    <span className="text-danger fs-6">{errors.department.message}</span>
+                                                                                )}
+                                                                            </Form.Group>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
 
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Degree Name</Form.Label>
@@ -715,7 +744,7 @@ const NewDoctor = () => {
                                                                                 {...register("password", {
                                                                                     required: !updateId ? "Password is required" : false,
                                                                                     pattern: {
-                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
                                                                                         message:
                                                                                             "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
                                                                                     },

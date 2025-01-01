@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createPatientsApi, createResponsiblePartyApi, getPatientByIdApi, getPatientsApi, updatePatientsApi } from './api';
+import { createPatientsApi, createResponsiblePartyApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updatePatientsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { createResponsibleParty } from '../../helpers/api/apiEndpoints';
@@ -121,6 +121,34 @@ function* createResponsiblePartyFunction(data) {
         });
     }
 }
+function* getResponsiblePartyFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_LOADING,
+            payload: {},
+        });
+        const response = yield call(getResponsiblePartyApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_ERROR,
+            payload: error,
+        });
+    }
+}
 
 function* updatePatientsFunction(data) {
     try {
@@ -176,6 +204,10 @@ export function* watchCreateResponsibleParty() {
     yield takeEvery(PatientsActionTypes.CREATE_RESPONSIBLE_PARTY, createResponsiblePartyFunction);
 }
 
+export function* watchGetResponsibleParty() {
+    yield takeEvery(PatientsActionTypes.GET_RESPONSIBLE_PARTY, getResponsiblePartyFunction);
+}
+
 export function* watchUpdatePatients() {
     yield takeEvery(PatientsActionTypes.UPDATE_PATIENTS, updatePatientsFunction);
 }
@@ -190,6 +222,7 @@ function* patientsSaga() {
         fork(watchGetPatientById),
         fork(watchCreatePatients),
         fork(watchCreateResponsibleParty),
+        fork(watchGetResponsibleParty),
         fork(watchUpdatePatients),
         fork(watchresetState),
     ]);

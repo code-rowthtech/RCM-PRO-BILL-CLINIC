@@ -21,18 +21,17 @@ const AddRole = ({ show, close }) => {
 
     const tableGetData = store?.getMastersDataReducer?.data?.result;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    console.log({ tableGetData })
-
+    const tableGetDataLoading = store?.getMastersDataReducer?.data?.loading;
+    const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
     const roleData = store?.getRolesDataReducer?.data
     const roleDataLoading = store?.getRolesDataReducer?.loading
-    console.log({ roleData })
 
-useEffect(()=>{
-    if(createSuccess === 200){
-        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+    useEffect(() => {
+        if (createSuccess === 200) {
+            dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
 
-    }
-},[createSuccess])
+        }
+    }, [createSuccess])
 
     useEffect(() => {
         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
@@ -64,7 +63,7 @@ useEffect(()=>{
             phone: data?.contact,
             phNumberSecondary: data.phNumberSecondary,
             clinicId: clinicId,
-            reportingTo: data.reportingTo || '676401b7e42d602da332fece',
+            reportingTo: data.reportingTo || clinicId,
             joiningDate: formattedJoiningDate,
             designation: data.designation,
             department: data.department,
@@ -221,26 +220,25 @@ useEffect(()=>{
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
-                                        {...register('reportingTo', { required: 'Reporting is required' })}
+                                        {...register('reportingTo')} // No required validation
                                     >
                                         <option value="">Select Reporting</option>
                                         {roleDataLoading ? (
-                                            <option disabled>Loading...</option>  // Display "Loading..." as an option
+                                            <option disabled>Loading...</option> // Display "Loading..." as an option
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
-                                            roleData?.users.map((data, index) => (
-
-                                                <option key={index} value={data?._id}>
-                                                    {data?.name}
+                                            roleData?.users.map((data) => (
+                                                <option key={data._id} value={data._id}>
+                                                    {data.firstName || "Unnamed User"} {data.lastName || ""}
                                                 </option>
                                             ))
                                         ) : (
-                                            <option disabled>No Data Found</option>  // Display "No Data Found" as an option
+                                            <option disabled>No RoleManagement</option> // Display "No Data Found" as an option
                                         )}
                                     </Form.Select>
-
-
                                 </Form.Group>
                             </Col>
+
+
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Contact No.</Form.Label>
@@ -285,12 +283,22 @@ useEffect(()=>{
                                     <Form.Select
                                         {...register('designation', { required: 'Designation is required' })}
                                     >
-                                        <option value="">Select Designation</option>
-                                        {tableGetData && tableGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {tableGetDataLoading ? (
+                                            <option>Loading...</option>
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+
+
+                                            <>
+                                                <option value="">Select Designation</option>
+                                                {tableGetData?.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Desigination Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.designation && (
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
@@ -305,12 +313,20 @@ useEffect(()=>{
                                     <Form.Select
                                         {...register('department', { required: 'Department is required' })}
                                     >
-                                        <option value="">Select Department</option>
-                                        {departmentGetData?.map((data) => (
-                                            <option key={data._id} value={data.name}>
-                                                {data.name}
-                                            </option>
-                                        ))}
+                                        {departmentGetDataLoading ? (
+                                            <option>Loading...</option> // Placeholder while loading
+                                        ) : departmentGetData && departmentGetData.length > 0 ? (
+                                            <>
+                                                <option value="">Select Department</option>
+                                                {departmentGetData.map((data) => (
+                                                    <option key={data._id} value={data.name}>
+                                                        {data.name}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        ) : (
+                                            <option>No Department Available</option> // Fallback for empty data
+                                        )}
                                     </Form.Select>
                                     {errors.department && (
                                         <span className="text-danger fs-6">{errors.department.message}</span>
