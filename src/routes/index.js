@@ -174,9 +174,20 @@ const AllRoutes = () => {
     const { layout } = useSelector((state) => ({
         layout: state.Layout,
     }));
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.name) || [];
+
+    console.log({ userPermissions })
+    const hasPermission = (permission) => {
+        // If userPermissions is empty, allow all permissions
+        if (userPermissions.length === 0) {
+            return true;
+        }
+        return userPermissions.some((perm) => perm === permission);
+    };
 
     const getLayout = () => {
-        let layoutCls = VerticalLayout  ;
+        let layoutCls = VerticalLayout;
 
         switch (layout.layoutType) {
             case layoutConstants.LAYOUT_HORIZONTAL:
@@ -212,7 +223,7 @@ const AllRoutes = () => {
                         { path: 'forget-password', element: <LoadComponent component={ForgetPassword} /> },
                         { path: 'reset-password/:token', element: <LoadComponent component={ResetPassword} /> },
                         // { path: 'sign-Up', element: <LoadComponent component={SignUp} /> },
-                        {path : 'set-password/:token', element: <LoadComponent component={SetPassword}/>},
+                        { path: 'set-password/:token', element: <LoadComponent component={SetPassword} /> },
                         { path: 'lock-screen', element: <LoadComponent component={LockScreen} /> },
                         { path: 'logout', element: <LoadComponent component={Logout} /> },
                         { path: 'login2', element: <LoadComponent component={Login2} /> },
@@ -244,12 +255,20 @@ const AllRoutes = () => {
             children: [
                 {
                     path: 'dashboard',
-                    children: [
-                        {
-                            path: 'project',
-                            element: <LoadComponent component={ProjectDashboard} />,
-                        },
-                    ],
+                    children: hasPermission('view dashboard')
+                        ? [
+                            {
+                                path: 'project',
+                                element: <LoadComponent component={ProjectDashboard} />,
+                            }
+                        ]
+                        : [
+                            {
+                                path: 'dashboard',
+                                element: <div className="disabled-content">You don't have permission to view this page.</div>,
+                            },
+                        ],
+
                 },
                 {
                     path: 'apps',
@@ -259,9 +278,10 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'addclinic',
-                                    element: <LoadComponent component={AddClinics} />,
+                                    element: hasPermission('view crm')
+                                        ? <LoadComponent component={AddClinics} />
+                                        : <div className="disabled-content">You don't have permission to view this page.</div>,
                                 },
-                               
                             ],
                         },
                         {
@@ -269,10 +289,10 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'transaction-list',
-                                    element: <LoadComponent component={Transaction} />,
+                                    element: hasPermission('view transaction')
+                                        ? <LoadComponent component={Transaction} />
+                                        : <div className="disabled-content">You don't have permission to view this page.</div>,
                                 },
-                              
-                              
                             ],
                         },
                         {
@@ -291,41 +311,61 @@ const AllRoutes = () => {
                                     element: (
                                         <LoadComponent component={AppointmentCalendar} />
                                     )
-                                 }
-                              
+                                }
+
                             ],
                         },
                         {
                             path: 'schedule',
-                            children: [
-                                {
-                                    path: 'list',
-                                    element: <LoadComponent component={schedule} />,
-                                },
-                                {
-                                    path: 'addHoliday',
-                                    element: <LoadComponent component={AddHoliday} />,
-                                },
-                                {
-                                    path: 'addBreak',
-                                    element: <LoadComponent component={AddBreak} />,
-                                },
-                            ],
+                            children: hasPermission('view schedule')
+                                ? [
+                                    {
+                                        path: 'list',
+                                        element: <LoadComponent component={schedule} />,
+                                    },
+                                    {
+                                        path: 'addHoliday',
+                                        element: <LoadComponent component={AddHoliday} />,
+                                    },
+                                    {
+                                        path: 'addBreak',
+                                        element: <LoadComponent component={AddBreak} />,
+                                    },
+                                ]
+                                : [
+                                    {
+                                        path: 'list',
+                                        element: <div className="disabled-content">You don't have permission to view this page.</div>
+                                    }
+                                ],
+
                         },
                         {
                             path: 'doctors',
                             children: [
                                 {
                                     path: 'list',
-                                    element: <LoadComponent component={Doctors} />,
+                                    element: hasPermission('view doctor') ? (
+                                        <LoadComponent component={Doctors} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
                                 },
                                 {
                                     path: 'new-doctor',
-                                    element: <LoadComponent component={NewDoctor} />,
+                                    element: hasPermission('create doctor') ? (
+                                        <LoadComponent component={NewDoctor} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
                                 },
                                 {
                                     path: 'departmentDetails',
-                                    element: <LoadComponent component={DepartmentDetails} />,
+                                    element: hasPermission('view department details') ? (
+                                        <LoadComponent component={DepartmentDetails} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
                                 },
                             ],
                         },
@@ -334,7 +374,11 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'list',
-                                    element: <LoadComponent component={RoleManagement} />,
+                                    element: hasPermission('view role management') ? (
+                                        <LoadComponent component={RoleManagement} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
                                 },
                             ],
                         },
@@ -343,13 +387,16 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'new-practice',
-                                    element: <LoadComponent component={NewPractice} />,
+                                    element: hasPermission('create practice') ? (
+                                        <LoadComponent component={NewPractice} />
+                                    ) : null,
                                 },
                                 {
-                                    path:'updateSubClinic',
-                                    element: <LoadComponent component={UpdateSubClinic}/>,
-                                }
-                                
+                                    path: 'updateSubClinic',
+                                    element: hasPermission('update subclinic') ? (
+                                        <LoadComponent component={UpdateSubClinic} />
+                                    ) : null,
+                                },
                             ],
                         },
                         {
@@ -357,22 +404,31 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'list',
-                                    element: <LoadComponent component={Setting} />,
+                                    element: hasPermission('view settings') ? (
+                                        <LoadComponent component={Setting} />
+                                    ) : null,
                                 },
                                 {
                                     path: 'department',
-                                    element: <LoadComponent component={Department} />,
+                                    element: hasPermission('view department settings') ? (
+                                        <LoadComponent component={Department} />
+                                    ) : null,
                                 },
                                 {
                                     path: 'desigination',
-                                    element: <LoadComponent component={Desigination} />,
+                                    element: hasPermission('view desigination settings') ? (
+                                        <LoadComponent component={Desigination} />
+                                    ) : null,
                                 },
                                 {
                                     path: 'role',
-                                    element: <LoadComponent component={RoleSetting} />,
+                                    element: hasPermission('view role settings') ? (
+                                        <LoadComponent component={RoleSetting} />
+                                    ) : null,
                                 },
                             ],
                         },
+
                         {
                             path: 'subscriptions',
                             children: [
@@ -382,19 +438,26 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
-                      
+
                         {
                             path: 'patients',
-                            children: [
-                                {
-                                    path: 'list',
-                                    element: <LoadComponent component={Patients} />,
-                                },
-                                {
-                                    path: 'new-patient',
-                                    element: <LoadComponent component={NewPatient} />,
-                                },
-                            ],
+                            children: hasPermission('view patients')
+                                ? [
+                                    {
+                                        path: 'list',
+                                        element: <LoadComponent component={Patients} />,
+                                    },
+                                    {
+                                        path: 'new-patient',
+                                        element: <LoadComponent component={NewPatient} />,
+                                    },
+                                ]
+                                : [
+                                    {
+                                        path: 'list',
+                                        element: <div className="disabled-content">You don't have permission to view this page.</div>,
+                                    },
+                                ],
                         },
                         {
                             path: 'permissions',
@@ -421,8 +484,8 @@ const AllRoutes = () => {
                                     path: 'logout-model',
                                     element: <LoadComponent component={LogoutModel} />,
                                 },
-                              
-                              
+
+
                             ],
                         },
                     ],
@@ -434,7 +497,7 @@ const AllRoutes = () => {
                             path: 'starter',
                             element: <LoadComponent component={Starter} />,
                         },
-                      
+
                         {
                             path: 'pricing',
                             element: <LoadComponent component={Pricing} />,
@@ -458,10 +521,10 @@ const AllRoutes = () => {
                         },
                     ],
                 },
-            
-             
+
+
             ],
-            
+
         },
     ]);
 };
