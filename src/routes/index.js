@@ -387,7 +387,7 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'new-practice',
-                                    element: hasPermission('create practice') ? (
+                                    element: hasPermission('view practice') ? (
                                         <LoadComponent component={NewPractice} />
                                     ) : null,
                                 },

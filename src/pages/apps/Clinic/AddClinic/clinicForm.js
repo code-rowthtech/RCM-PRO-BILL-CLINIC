@@ -280,7 +280,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?._id ? { state: data?._id } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
-
                 // ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
@@ -310,7 +309,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     }
         };
-        console.log(newPayload, 'new payload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
     const logoFileInputRef = useRef(null);
@@ -1528,7 +1526,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className="mb-0">
-                                                        Full Name 
+                                                        Full Name
                                                         {/* {index === 0 && <span className="text-danger">*</span>} */}
                                                     </Form.Label>
                                                     <Form.Control
@@ -1555,7 +1553,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">
 
                                                         Contact Email
-                                                         {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
                                                     </Form.Label>
                                                     <Form.Control
                                                         type="email"
@@ -1583,7 +1581,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className="mb-0">
-                                                        Job Title / Role 
+                                                        Job Title / Role
                                                         {/* {index === 0 && <span className="text-danger">*</span>} */}
                                                     </Form.Label>
                                                     <Form.Control
@@ -1608,7 +1606,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2 position-relative">
                                                     <Form.Label className="mb-0">
-                                                        Contact Person 
+                                                        Contact Person
                                                         {/* {index === 0 && <span className="text-danger">*</span>} */}
                                                     </Form.Label>
                                                     <InputGroup>
@@ -1696,9 +1694,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <tr>
                                                     <th className="text-white">S.No.</th>
                                                     <th className="text-white">PRACTICE NAME</th>
-                                                    <th className="text-white">Location</th>
+                                                    <th className="text-white">LOCATION</th>
                                                     <th className="text-white">PRACTICE TYPE</th>
-                                                    <th className="text-white">Specialist</th>
+                                                    <th className="text-white">SPECIALITY</th>
                                                     <th className="text-white">STATUS</th>
                                                     <th className="text-white">ACTION</th>
                                                 </tr>

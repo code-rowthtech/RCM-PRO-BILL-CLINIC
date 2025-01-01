@@ -1,5 +1,5 @@
 .cursor-pointer {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 .btn:focus {
     outline: 0;
@@ -108,7 +108,8 @@ table {
 
 input,
 textarea,
-select {
+select,
+.select__control {
     border: 1px solid rgba(15, 13, 13, 0.473) !important;
 }
 .input {
@@ -181,4 +182,11 @@ table {
 }
 .offcanvas-family-history {
     width: 28vw !important;
+}
+.responnsible-party-select input {
+    border: none !important;
+}
+
+.plusicon {
+    color: #6169d0;
 }

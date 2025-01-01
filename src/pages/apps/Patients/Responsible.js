@@ -9,14 +9,13 @@ import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
+import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction, stateEmptydAction } from "../../../redux/actions";
+import Spinner from "../../../constants/Spinner";
 
 
 const Responsiblle = () => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-    const createResponse = store?.createClinicsReducer?.data?.status;
-
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const dispatch = useDispatch();
@@ -24,7 +23,6 @@ const Responsiblle = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const updateId = searchParams.get('updateid');
-
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState("");
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
@@ -39,18 +37,19 @@ const Responsiblle = () => {
     const [searchedLocations, setSearchedLocations] = useState(null)
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
-
     const [updatePage, setUpdatePage] = useState(false);
     const [stateToSelect, setStateToSelect] = useState('');
-
     const [inputValue, setInputValue] = useState('');
-    console.log({ selectedCity })
-
-
-
-
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const createResponse = store?.createResponsiblePartyReducer?.data?.status;
+    console.log({ createResponse })
+    useEffect(() => {
+        if (createResponse === 201) {
+            dispatch(stateEmptydAction())
+            reset();
+        }
+    }, [createResponse])
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted)
@@ -63,7 +62,7 @@ const Responsiblle = () => {
     }, [selectedLocation, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county);
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
             setValue('city', selectedCounty)
         }
     }, [cities])
@@ -134,14 +133,11 @@ const Responsiblle = () => {
         const stateCode = statesData?.states?.find(
             (state) => state.name === location.components.state
         )?.state_code;
-
         setSelectedCity(location.components.city)
-
         if (stateCode) {
             setStateToSelect(stateCode);
             dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
         }
-
         setFocused(false);
     };
 
@@ -177,36 +173,50 @@ const Responsiblle = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
 
     const onSubmit = (data) => {
+        const calculateAge = (dob) => {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDifference = today.getMonth() - birthDate.getMonth();
+
+            // Adjust age if the birth month/day hasn't occurred yet in the current year
+            if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        };
         const payload = {
-            clinicId: clinicId,
-            profile: {
-                url: logo?.url?.split('?')[0],
-                fileName: logoName
-            },
-            gender: data?.gender,
-            title: data?.title,
             fullName: data?.fullName,
-            chartNumber: data?.chartNumber,
             account: data?.account,
             address: {
-                street: data?.address,
-                city: data?.city,
-                state: data?.stateName,
-                zipCode: data?.zip,
+                ...(data?.address ? { street: data?.address } : {}),
+                ...(data?.city ? { city: data?.city } : {}),
+                ...(data?.stateName ? { state: data?.stateName } : {}),
+                ...(data?.zip ? { zip: data?.zip } : {}),
             },
+            gender: data?.gender,
+            dateOfBirth: data?.dateOfBirth,
+            age: data?.dateOfBirth ? calculateAge(data?.dateOfBirth) : '', // Calculate age if dateOfBirth exists
+            ssn: data?.SSN,
             email: data?.email,
             contactNumber: data?.contactNumber,
-            note: data?.note,
-            status: data?.status,
-            ssn: data?.ssn,
-            stateMent: data?.stateMent,
-            accountType: data?.accountType,
-            employer: data?.employer,
-            patientName: data?.patientName,
-
+            clinicId: clinicId,
+            // patientsId: data?.patientsId,
+            // status: data?.status,
+            // billingInfo: data?.billingInfo,
+            // profile: {
+            //     url: logo?.url?.split('?')[0],
+            //     fileName: logoName
+            // },
+            // title: data?.title,
+            // chartNumber: data?.chartNumber,
+            // account: data?.account,
+            // note: data?.note,
+            // stateMent: data?.stateMent,
+            // accountType: data?.accountType,
+            // employer: data?.employer,
         }
-        console.log({ payload });
-        reset();
+        console.log(payload, 'payyyyyyyyyyyyyyyyyyyyyyyyy')
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
 
     };
@@ -217,26 +227,23 @@ const Responsiblle = () => {
 
     return (
         <>
-
-
-
             {/* Form Section */}
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row px-0 " >
                     <div className="row  pb-2 pt-1 pe-0" style={{ borderBottom: "1px solid #444141" }}>
                         <div className="col-3 ">
-                            <Form.Label htmlFor="fileName" className="mb-0">Full Name</Form.Label>
+                            <Form.Label htmlFor="fileName" className="mb-0">Full Name <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="Full Name"
                                 {...register('fullName', { required: "Full name is required" })}
                             />
+                            {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
                         </div>
                         <div className="col-3 pe-1">
-                            <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
+                            <Form.Label className="mb-0">Title <span className="text-danger">*</span></Form.Label>
                             <Form.Select
-                                {...register('title', { required: "Title is required" })}
-                                aria-label="Select Title"
+                                {...register('titleName', { required: "This field is required" })}
                             >
                                 <option value="">Select Title</option>
                                 <option value="Mr.">Mr.</option>
@@ -245,9 +252,10 @@ const Responsiblle = () => {
                                 <option value="Dr.">Dr.</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
+                            {errors.titleName && <span className="text-danger">{errors.titleName.message}</span>}
                         </div>
                         <div className="col-3">
-                            <Form.Label htmlFor="gender" className="mb-0">Gender<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label htmlFor="gender" className="mb-0">Gender <span className='text-danger'>*</span></Form.Label>
                             <div className="d-flex gap-2">
                                 <Form.Select
                                     {...register('gender', { required: "Gender is required" })}
@@ -265,12 +273,13 @@ const Responsiblle = () => {
 
                         </div>
                         <div className="col-3 pe-0">
-                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth</Form.Label>
+                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="date"  // Change type to "date" for date input
                                 placeholder="Date of Birth"
-                                {...register('dateOfBirth', { required: "Date of Birth is required" })}
+                                {...register('dateOfBirth', { required: "This field is required" })}
                             />
+                            {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
                     </div>
                     <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
@@ -278,16 +287,18 @@ const Responsiblle = () => {
                             <div className="py-1">
                                 <Form.Label htmlFor="SSN" className="mb-0">SSN<span className='text-danger'>*</span></Form.Label>
                                 <div className="d-flex gap-2">
-                                    <Form.Select
-                                        {...register('SSN', { required: "SSN is required" })}
-                                        aria-label="Select SSN"
-                                    >
-                                        <option value="">Select SSN</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-
-                                    </Form.Select>
+                                    <Form.Control
+                                        placeholder="SSN"
+                                        {...register('SSN', {
+                                            required: "SSN# is required", // Ensure it's not empty
+                                            pattern: {
+                                                value: /^\d{3}-\d{2}-\d{4}$/, // Regex pattern for SSN format
+                                                message: 'SSN must be in format XXX-XX-XXXX' // Custom error message
+                                            }
+                                        })}
+                                        className="Enter SSN"
+                                        maxLength={11}
+                                    />
 
                                 </div>
                                 {errors.SSN && <span className="text-danger">{errors.SSN.message}</span>}
@@ -295,12 +306,13 @@ const Responsiblle = () => {
                         </div>
                         <div className="row mb-1 mt-1 pb-1" style={{ borderBottom: "1px solid #444141" }}>
                             <div className="col-4 mb-1">
-                                <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
+                                <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="email"
                                     placeholder="Email ID"
-                                    {...register('email', { required: "Email is required", pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
+                                    {...register('email', { required: "This field is required", pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
                                 />
+                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
                             </div>
                             <div className=' col-4'>
                                 <Form.Group className="mb-0 position-relative">
@@ -326,14 +338,17 @@ const Responsiblle = () => {
                                                     }
                                                 } : {}
                                                 )}
-                                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                                onChange={(e) => {
+                                                    clearErrors('contactNumber')
+                                                    setFormData({ ...formData, phone: e.target.value })
+                                                }}
                                                 placeholder="1234-234-234"
                                                 maxLength={10}
                                             // onKeyPress={(event) => handleFirstSpace(event, 0)}
                                             />
                                         </InputGroup>
+                                        {errors.contactNumber && <span className="text-danger">{errors.contactNumber.message}</span>}
                                     </Form.Group>
-
                                     <div
                                         className='position-absolute ' style={{ top: '52%', left: '1%' }}
                                     >
@@ -359,7 +374,8 @@ const Responsiblle = () => {
                                     <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
                                     <div className="d-flex gap-2">
                                         <Form.Select
-                                            {...register('employer', { required: "employer is required" })}
+                                            {...register('employer',
+                                            )}
                                             aria-label="Select employer"
                                         >
                                             <option value="">Select Employer</option>
@@ -376,10 +392,12 @@ const Responsiblle = () => {
                             </div>
                             <div className="col-6 mb-1">
                                 <div>
-                                    <Form.Label htmlFor="status" className="mb-0">Status<span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label htmlFor="status" className="mb-0">Status</Form.Label>
                                     <div className="d-flex gap-2">
                                         <Form.Select
-                                            {...register('status', { required: "status is required" })}
+                                            {...register('status',
+                                                //  { required: "status is required" }
+                                            )}
                                             aria-label="Select status"
                                         >
                                             <option value="">Select Status</option>
@@ -398,7 +416,9 @@ const Responsiblle = () => {
                                 <div className=" mb-1">
                                     <Form.Label htmlFor="title" className="mb-0">Chart</Form.Label>
                                     <Form.Select
-                                        {...register('title', { required: "Title is required" })}
+                                        {...register('title',
+                                            //  { required: "Title is required" }
+                                        )}
                                         aria-label="Select Title"
                                     >
                                         <option value="">Select Chart</option>
@@ -494,12 +514,15 @@ const Responsiblle = () => {
                         <div className="row pb-1  px-0" style={{ borderBottom: "1px solid #444141" }}>
 
                             <div className=" my-1">
-                                <Form.Label htmlFor="fileName" className="mb-0">Account</Form.Label>
+                                <Form.Label htmlFor="fileName" className="mb-0">Account <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Account"
-                                    {...register('account', { required: "Account is required" })}
+                                    {...register('account',
+                                        { required: "Account is required" }
+                                    )}
                                 />
+                                {errors.account && <span className="text-danger">{errors.account.message}</span>}
                             </div>
                             <Col sm={12}>
 
@@ -539,7 +562,9 @@ const Responsiblle = () => {
                                                 <p
                                                     key={index}
                                                     onClick={() => {
+                                                        console.log(data)
                                                         setSelectedLocation(data)
+                                                        setValue('zip', data?.components?.postcode)
                                                         setFocused(false); // Close dropdown after selection
                                                     }}
                                                     style={{
@@ -631,7 +656,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="Account"
-                                    {...register('accountType', { required: "Account type is required" })}
+                                    {...register('accountType',
+                                        // { required: "Account type is required" }
+                                    )}
                                 >
                                     <option value="">Select Account type</option>  {/* Default option */}
                                     <option value="true">Yes</option>
@@ -643,7 +670,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Statement formate"
-                                    {...register('stateMent', { required: "stateMent formate is required" })}
+                                    {...register('stateMent',
+                                        //  { required: "stateMent formate is required" }
+                                    )}
                                 />
                             </div>
                             <div className="col-6 mb-1">
@@ -651,7 +680,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="patientBilling"
-                                    {...register('patientBilling', { required: "Patient Billing type is required" })}
+                                    {...register('patientBilling',
+                                        // { required: "Patient Billing type is required" }
+                                    )}
                                 >
                                     <option value="">Select billing type</option>  {/* Default option */}
                                     <option value="true">1</option>
@@ -663,7 +694,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Hold Reason"
-                                    {...register('holdReason', { required: "holdReason formate is required" })}
+                                    {...register('holdReason',
+                                        //  { required: "holdReason formate is require   d" }
+                                    )}
                                 />
                             </div>
                             <div className="col-6 mb-1">
@@ -671,7 +704,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="statmentBilling"
-                                    {...register('statmentBilling', { required: "Statment Billing type is required" })}
+                                    {...register('statmentBilling',
+                                        //  { required: "Statment Billing type is required" }
+                                    )}
                                 >
                                     <option value="">Select Statement billing type</option>  {/* Default option */}
                                     <option value="true">1</option>
@@ -683,7 +718,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     as="select"  // Use 'select' to create a dropdown
                                     id="financeCharges"
-                                    {...register('financeCharges', { required: "Assess finance Charges is required" })}
+                                    {...register('financeCharges',
+                                        // { required: "Assess finance Charges is required" }
+                                    )}
                                 >
                                     <option value="">Select Assess finance Charges</option>  {/* Default option */}
                                     <option value="true">1</option>
@@ -695,7 +732,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Last patient payment"
-                                    {...register('holdReason', { required: "Last patient payment is required" })}
+                                    {...register('holdReason',
+                                        // { required: "Last patient payment is required" }
+                                    )}
                                 />
                             </div>
                             <div className="col-3 mb-1 " style={{ marginTop: '21px' }}>
@@ -711,7 +750,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Last statement"
-                                    {...register('lastStatement', { required: "Last statement is required" })}
+                                    {...register('lastStatement',
+                                        //  { required: "Last statement is required" }
+                                    )}
                                 />
                             </div>
                             <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
@@ -728,7 +769,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Card"
-                                    {...register('card', { required: "card is required" })}
+                                    {...register('card',
+                                        //  { required: "Card'srequired" }
+                                    )}
                                 />
                             </div>
                             <div className="col-3 mb-1">
@@ -736,7 +779,9 @@ const Responsiblle = () => {
                                 <Form.Control
                                     type="text"
                                     placeholder="Expiry"
-                                    {...register('expiry', { required: "expiry is required" })}
+                                    {...register('expiry',
+                                        //  { required: "Epiry is required" }
+                                    )}
                                 />
                             </div>
                             <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
@@ -751,7 +796,67 @@ const Responsiblle = () => {
 
                 {/* Buttons */}
                 <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
-                    <Button className="custom-buttons" variant="primary" >Collections</Button>
+                    <Button className="custom-buttons" variant="primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
+                    <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                        <div class="offcanvas-header">
+                            <h4 class="offcanvas-title" id="offcanvasBottomLabel">Collections</h4>
+                            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body small">
+                            <Row>
+                                <Col sm={4}>
+                                    <Table>
+                                        <tr>
+                                            <th>Last statement</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Date</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Balance</td>
+                                        </tr>
+                                    </Table>
+                                </Col>
+                                <Col sm={4}>
+                                    <Table>
+                                        <tr>
+                                            <th>Last payment</th>
+                                        </tr>
+                                        <tr>
+                                            <td>Date</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Amount</td>
+                                        </tr>
+                                    </Table>
+                                </Col>
+                                <Col sm={4}>
+                                    <Table>
+                                        <tr>
+                                            <td>
+                                                <span className="fw-bold">
+                                                    Account:
+                                                    <span className="fw-medium">
+                                                        26366
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span className="fw-bold">
+                                                    Total owed:
+                                                    <span className="fw-medium">
+                                                        0.00
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </Table>
+                                </Col>
+                            </Row>
+                        </div>
+                    </div>
                     <Button className="custom-buttons" variant="primary" >Statement</Button>
                     <Button
                         className="custom-buttons "
@@ -856,6 +961,48 @@ const Responsiblle = () => {
                                             </Form.Group>
                                         </div>
                                     </Col>
+                                    <Col sm={12} className='mb-2'>
+                                        <Form.Label>Show:</Form.Label>
+                                        <div >
+                                            <Form.Group>
+                                                <div className="d-flex align-items-center gap-5">
+                                                    <div>
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="All items"
+                                                            name="show"
+                                                            value="all"
+                                                            id="all"
+                                                        />
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Open items"
+                                                            name="show"
+                                                            value="open"
+                                                            id="open"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Voided items"
+                                                            name="show"
+                                                            value="voided"
+                                                            id="voided"
+                                                        />
+                                                        <Form.Check
+                                                            type="radio"
+                                                            label="Unbilled items"
+                                                            name="show"
+                                                            value="unbilled"
+                                                            id="unbilled"
+                                                        />
+                                                    </div>
+
+                                                </div>
+                                            </Form.Group>
+                                        </div>
+                                    </Col>
                                     <Col sm={12} className='mb-2 d-flex justify-content-end gap-2'>
                                         <Button className="custom-buttons">Reset</Button>
                                         <Button className="custom-buttons">Apply</Button>
@@ -866,9 +1013,14 @@ const Responsiblle = () => {
                         </div>
                     </div>
                     <Button className="custom-buttons" variant="primary" >Credit cards</Button>
-                    {/* <Button variant="danger">Delete</Button> */}
-                    <Button className="custom-buttons" variant="secondary">Clear</Button>
                     <Button className="custom-buttons" variant="primary" > Previous </Button>
+                    <Button className="custom-buttons" disabled={store?.createResponsiblePartyReducer?.loading} type="submit">
+                        {store?.createResponsiblePartyReducer?.loading ?
+                            <Spinner color="white" className="spinner-border-sm" />
+                            :
+                            'Save'
+                        }
+                    </Button>
                 </div>
             </Form>
 
