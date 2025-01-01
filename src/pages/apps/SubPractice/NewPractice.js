@@ -174,6 +174,7 @@ const NewPractice = () => {
         control,
         formState: { errors },
         reset,
+        clearErrors,
         setValue,
         getValues,
         watch,
@@ -403,7 +404,7 @@ const NewPractice = () => {
             name: formData?.clinicname,
             email: formData?.email,
             role: getRoleId,
-            phone: formData?.contactPerson,
+            phone: '+1' + formData?.contactPerson?.replace(/\D/g, ''),
             practiceSpecialty: formData?.practiceSpecialty,
             clinicType: formData?.clinicType,
             taxIdOrEIN: formData?.taxId,
@@ -448,7 +449,7 @@ const NewPractice = () => {
                     }
                     :
                     {
-                        ...(formData?.address ? { address: formData?.mailingAddress } : ''),
+                        ...(formData?.mailingAddress ? { address: formData?.mailingAddress } : ''),
                         ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
                         ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
                         street: formData?.mailingStreet,
@@ -707,7 +708,7 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
-                                                                value={formData?.contactPerson}
+                                                                value={formData?.contactPerson }
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
                                                                     pattern: {
@@ -715,7 +716,7 @@ const NewPractice = () => {
                                                                         message: 'Contact must be a number'
                                                                     },
                                                                     maxLength: {
-                                                                        value: 10,
+                                                                        value: 12,
                                                                         message: 'Contact must not exceed 10 digits'
                                                                     },
                                                                     minLength: {
@@ -723,7 +724,11 @@ const NewPractice = () => {
                                                                         message: 'Contact must not be less than 9 digits'
                                                                     }
                                                                 })}
-                                                                onChange={(e) => formDataChange('contactPerson', e.target.value)}
+                                                                onChange={(e) => {
+                                                                    clearErrors("contactPerson");
+                                                                    formDataChange('contactPerson', e.target.value)
+                                                                }}
+
                                                                 placeholder="+1 1234-234-234"
                                                                 maxLength={10}
                                                             />
@@ -738,6 +743,7 @@ const NewPractice = () => {
                                                         />
                                                     </Form.Group>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
