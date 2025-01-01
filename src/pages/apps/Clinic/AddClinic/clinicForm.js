@@ -1696,9 +1696,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <tr>
                                                     <th className="text-white">S.No.</th>
                                                     <th className="text-white">PRACTICE NAME</th>
-                                                    <th className="text-white">Location</th>
+                                                    <th className="text-white">LOCATION</th>
                                                     <th className="text-white">PRACTICE TYPE</th>
-                                                    <th className="text-white">Specialist</th>
+                                                    <th className="text-white">SPECIALITY</th>
                                                     <th className="text-white">STATUS</th>
                                                     <th className="text-white">ACTION</th>
                                                 </tr>
