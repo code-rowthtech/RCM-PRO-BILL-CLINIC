@@ -114,6 +114,8 @@ const RoleSetting = () => {
                                     </Row>
                                 </Col>
                                 <CreateRoleSetting  show={showModal} closeModal={handleClosemodal}/>
+                                <UpdateRoleSetting show={showUpdateModal} closeModal={closeUpdateModal} data={dataToUpdate} />
+
                             </Row>
                             <Row>
                                 <Col>
@@ -133,7 +135,7 @@ const RoleSetting = () => {
                                             {store?.getRolesDataReducer?.loading ?
                                                 <tr key={''}>
                                                     <td colSpan={7} className='py-5 text-center'>
-                                                        <Spinner />
+                                                        <Spinner /> 
                                                     </td>
                                                 </tr>
                                                 :
@@ -183,7 +185,6 @@ const RoleSetting = () => {
                                                                         <i className="mdi  mdi-square-edit-outline"></i>
                                                                     </Link>
                                                                     <i onClick={() => toggleRow(index)} className="mdi mdi-eye fs-4"></i>
-                                                                    <UpdateRoleSetting show={showUpdateModal} closeModal={closeUpdateModal} data={dataToUpdate} />
                                                                 </td>
                                                             </tr>
                                                             {expandedRowIndex === index && (

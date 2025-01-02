@@ -15,7 +15,7 @@ const Doctors = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
-
+   
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,6 +27,7 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
+    console.log({doctorDetails})
     const updateStatus = useSelector((state) => state?.createtDoctorsReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
     const filteredDoctors = doctorDetails.filter((doctor) =>

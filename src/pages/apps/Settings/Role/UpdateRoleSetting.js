@@ -21,16 +21,25 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const [initialPermissions, setInitialPermissions] = useState([]);
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
 
-    useEffect(() => {
-        if (show) {
-            dispatch(getPermissionAction({ search: '', limit: '', skip: '' }));
-        }
-    }, [show]);
+  
 
     const decryptedPermissionsData = store?.getPermissionsDataReducer?.data?.data?.map((item) => ({
         ...item,
-        name: `${item?.name}`,
+        name: `${item?.permission}`,
     }));
+      useEffect(() => {
+            if (show) {
+                const permissions = {
+                    interface :'Clinic',
+                    module:'',
+                    skip :'',
+                    limit :50,
+                    search :'',
+                    status :true,
+                }
+                dispatch(getPermissionAction(permissions))
+            }
+        }, [show])
 
     useEffect(() => {
         if (data) {
@@ -126,6 +135,7 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                             }
                         </Button>
                     </Modal.Footer>
+
                 </Form>
             </Modal.Body>
         </Modal>
