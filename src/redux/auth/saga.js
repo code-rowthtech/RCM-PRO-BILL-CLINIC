@@ -39,6 +39,7 @@ function* login({ payload }) {
             logo: user?.logo?.url,
             clinicId: user?.clinicId
         }
+        localStorage.setItem('userData', JSON.stringify(user));
 
         // NOTE - You can change this according to response format from your api
         api.setLoggedInUser(userData);
@@ -119,10 +120,12 @@ function* verifyTokenFunction({ payload }) {
     try {
         setAuthorization(token)
         const response = yield call(verifyToken);
-        console.log(response, 'verifyToken')
         yield put(authApiResponseSuccess(AuthActionTypes.VERIFY_TOKEN, response.data));
     } catch (error) {
+        console.log({error})
         yield put(authApiResponseError(AuthActionTypes.VERIFY_TOKEN, error));
+        // localStorage.setItem('authError', JSON.stringify(error));
+
     }
 }
 

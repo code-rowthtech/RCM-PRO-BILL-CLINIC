@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiFilter, FiTrash } from 'react-icons/fi';
@@ -12,6 +12,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
 import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
+import Paginations from '../../../helpers/Paginations';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -28,7 +29,8 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-    console.log({ roleData })
+   
+
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     console.log({ deleteSuccess })
@@ -117,7 +119,7 @@ const RoleManagement = () => {
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(stateEmptydAction());
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: true }));
 
         }
     }, [deleteSuccess])
@@ -131,11 +133,15 @@ const RoleManagement = () => {
 
 
     }
-    const handleDetail = (data) => {
-        setDetailModal(true);
-        setUserDetails(data)
+    // const handleDetail = (data) => {
+    //     setDetailModal(true);
+    //     setUserDetails(data)
 
-    }
+    // }
+
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
 
 
     return (
@@ -247,6 +253,18 @@ const RoleManagement = () => {
 
 
 
+
+
+                            </Col>
+                        </Row>
+                        <Row>
+
+                            <Col className='mt-2 d-flex justify-content-end'>
+                                <Paginations
+                                    currentPage={skip}
+                                    totalPages={ roleData?.pagination?.totalPages || 1}
+                                    onPageChange={handlePageChange}
+                                />
                             </Col>
                         </Row>
                     </Card.Body>

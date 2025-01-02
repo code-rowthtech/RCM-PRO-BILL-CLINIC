@@ -10,7 +10,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { createSubClinicAction, getSubClinicCitiesAction, getSubClinicTypeAction, updateSubClinicAction } from '../../../redux/sub clinic/actions';
 // import ResetPassword from './ResetPassword';
-import { getCities2Action, getCitiesAction, getClinicAction, getClinicTypeAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
+import { getCities2Action, getCitiesAction, getClinicAction, getClinicTypeAction, getDoctorsrolesAction, getRoleDataAction, getStatesByCountryAction } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
@@ -174,6 +174,7 @@ const NewPractice = () => {
         control,
         formState: { errors },
         reset,
+        clearErrors,
         setValue,
         getValues,
         watch,
@@ -344,7 +345,13 @@ const NewPractice = () => {
             ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
         }
     };
+    const handleRemoveTaxonomy = (index) => {
+        setTaxonomyCodes((prev) => {
+            const updatedCodes = prev.filter((_, i) => i !== index);
+            return updatedCodes.length > 0 ? updatedCodes : [''];
+        });
 
+    };
     const handleTaxonomyChange = (index, value) => {
         const updatedCodes = [...taxonomyCodes];
         updatedCodes[index] = value;
@@ -389,13 +396,11 @@ const NewPractice = () => {
         });
     };
     useEffect(() => {
-        dispatch(
-            getDoctorsrolesAction({ search: 'clinic' })
-        );
+        dispatch(getRoleDataAction({ clinicId:clinic_id,limit: 10, search:'clinic',page:1, status: true,defaultRole :'true'}));
 
     }, [dispatch]);
-    const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-
+    const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id || {};
+    console.log(store?.getRoleDataReducer,'getRoleId')
 
 
     const submitSubData = (formData) => {
@@ -403,7 +408,8 @@ const NewPractice = () => {
             name: formData?.clinicname,
             email: formData?.email,
             role: getRoleId,
-            phone: formData?.contactPerson,
+            userId : "677512fcf484ee6281a406f1",
+            phone: '+1' + formData?.contactPerson?.replace(/\D/g, ''),
             practiceSpecialty: formData?.practiceSpecialty,
             clinicType: formData?.clinicType,
             taxIdOrEIN: formData?.taxId,
@@ -448,7 +454,7 @@ const NewPractice = () => {
                     }
                     :
                     {
-                        ...(formData?.address ? { address: formData?.mailingAddress } : ''),
+                        ...(formData?.mailingAddress ? { address: formData?.mailingAddress } : ''),
                         ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
                         ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
                         street: formData?.mailingStreet,
@@ -707,7 +713,7 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
-                                                                value={formData?.contactPerson}
+                                                                value={formData?.contactPerson }
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
                                                                     pattern: {
@@ -715,7 +721,7 @@ const NewPractice = () => {
                                                                         message: 'Contact must be a number'
                                                                     },
                                                                     maxLength: {
-                                                                        value: 10,
+                                                                        value: 12,
                                                                         message: 'Contact must not exceed 10 digits'
                                                                     },
                                                                     minLength: {
@@ -723,7 +729,11 @@ const NewPractice = () => {
                                                                         message: 'Contact must not be less than 9 digits'
                                                                     }
                                                                 })}
-                                                                onChange={(e) => formDataChange('contactPerson', e.target.value)}
+                                                                onChange={(e) => {
+                                                                    clearErrors("contactPerson");
+                                                                    formDataChange('contactPerson', e.target.value)
+                                                                }}
+
                                                                 placeholder="+1 1234-234-234"
                                                                 maxLength={10}
                                                             />
@@ -738,6 +748,7 @@ const NewPractice = () => {
                                                         />
                                                     </Form.Group>
                                                 </Col>
+
                                                 <Col sm={6}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
@@ -813,7 +824,7 @@ const NewPractice = () => {
                                                         {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
                                                     </Form.Group>
                                                 </Col>
-                                                {taxonomyCodes && taxonomyCodes.map((code, index) => (
+                                                {/* {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                                     <Col sm={3} key={index}>
                                                         <Form.Group className="mb-1">
                                                             <Form.Label className="mb-0">
@@ -844,7 +855,45 @@ const NewPractice = () => {
                                                             )}
                                                         </Form.Group>
                                                     </Col>
-                                                ))}
+                                                ))} */}
+                                                  {taxonomyCodes.map((code, index) => (
+                        <Col sm={3} key={index}>
+                            <Form.Group className="mb-2 position-relative">
+                                <Form.Label className="mb-1">
+                                    Taxonomy Code(s)
+                                    {index === taxonomyCodes.length - 1 && (
+                                        <span
+                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                            onClick={handleAddTaxonomy}
+                                        >
+                                        </span>
+                                    )}
+                                    <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    {...register(`taxonomyCode[${index}]`, {
+                                         required: 'This field is required'
+                                    })}
+                                    value={code}
+                                    placeholder="Taxonomy Code"
+                                    maxLength={10}
+                                    onKeyPress={(event) => handleFirstSpace(event, index)}
+                                    onChange={(e) => {
+                                        clearErrors(`taxonomyCode[${index}]`)
+                                        handleTaxonomyChange(index, e.target.value)
+                                    }}
+                                />
+                                <span
+                                    style={{ top: '55%', right: '1%' }}
+                                    onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
+
+                                {errors.taxonomyCode?.[index] && (
+                                    <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                )}
+                            </Form.Group>
+                        </Col>
+                    ))}
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className='mb-0'>CLIA Number </Form.Label>
@@ -952,12 +1001,12 @@ const NewPractice = () => {
                                                             <Form.Control
                                                                 type="text"
                                                                 value={accreditation.number}
-                                                                {...register('accDocno', {
-                                                                    pattern: {
-                                                                        value: /^[0-9]*$/,
-                                                                        message: 'Document no must be a number'
-                                                                    },
-                                                                })}
+                                                                // {...register('accDocno', {
+                                                                //     pattern: {
+                                                                //         value: /^[0-9]*$/,
+                                                                //         message: 'Document no must be a number'
+                                                                //     },
+                                                                // })}
                                                                 placeholder="Document Number"
                                                                 onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
                                                             // onKeyPress={(event) => handleFirstSpace(event, 0)}
@@ -1399,7 +1448,7 @@ const NewPractice = () => {
                                                                 {/* State */}
                                                                 <Col sm={6}>
                                                                     <Form.Group className="mb-1">
-                                                                        <Form.Label className="mb-0">State</Form.Label>
+                                                                        <Form.Label className="mb-0" value=''>State</Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control
                                                                                 readOnly
