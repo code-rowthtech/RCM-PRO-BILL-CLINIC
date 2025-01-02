@@ -69,7 +69,7 @@ const NewDoctor = () => {
 
     useEffect(() => {
         dispatch(
-            getDoctorsrolesAction({ search: 'Doctor' })
+            getDoctorsrolesAction({ search: 'Doctor', clinicId: clinicId })
         );
     }, [dispatch]);
 
@@ -89,9 +89,9 @@ const NewDoctor = () => {
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
-    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
-    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id
-    console.log(doctorDetails, 'newDoctorIddoctorDetails')
+    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
+    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.roles?.[0]?._id;
+    console.log(store?.getDoctorsRolesReducer, 'newDoctorIddoctorDetails')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
@@ -511,7 +511,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
                                                                     {...register('firstName', {
                                                                         required: 'First name is required',
                                                                         pattern: {
@@ -535,7 +535,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
                                                                     {...register('lastName', {
                                                                         required: 'Last name is required',
                                                                         pattern: {
@@ -653,22 +653,22 @@ const NewDoctor = () => {
                                                                         </Form.Group>
                                                                     </div>
                                                                     <div className="col-6">
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
-                                                                                <Form.Select
-                                                                                    {...register('department', { required: 'Department is required' })}
-                                                                                >
-                                                                                    <option value="">Select Department</option>
-                                                                                    {departmentGetData?.map((data) => (
-                                                                                        <option key={data._id} value={data.name}>
-                                                                                            {data.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-                                                                                {errors.department && (
-                                                                                    <span className="text-danger fs-6">{errors.department.message}</span>
-                                                                                )}
-                                                                            </Form.Group>
+                                                                        <Form.Group className="mb-2">
+                                                                            <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
+                                                                            <Form.Select
+                                                                                {...register('department', { required: 'Department is required' })}
+                                                                            >
+                                                                                <option value="">Select Department</option>
+                                                                                {departmentGetData?.map((data) => (
+                                                                                    <option key={data._id} value={data.name}>
+                                                                                        {data.name}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </Form.Select>
+                                                                            {errors.department && (
+                                                                                <span className="text-danger fs-6">{errors.department.message}</span>
+                                                                            )}
+                                                                        </Form.Group>
                                                                     </div>
                                                                 </div>
                                                             </div>

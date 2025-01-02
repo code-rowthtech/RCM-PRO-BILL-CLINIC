@@ -369,7 +369,6 @@ const NewPatient = () => {
 
 
                         {/* Form Section */}
-
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                             <div className="row mt-1" >
                                 <Col sm={6} className="border-end">

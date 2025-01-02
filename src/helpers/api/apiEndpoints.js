@@ -49,7 +49,7 @@ export const updateRoleData = '/api/v1/clinic/roles/edit';
 // DOCTORS
 export const getDoctor = '/api/v1/doctors/getClinicDoctors';
 export const createDoctor = '/api/v1/clinics/createOrUpdateUser';
-export const getDoctorRoles = '/api/v1/clinic/getRoles';
+export const getDoctorRoles = '/api/v1/clinic/roles';
 export const createDoctorDetail = '/api/v1/clinics/createOrUpdateDoctor';
 export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
 
