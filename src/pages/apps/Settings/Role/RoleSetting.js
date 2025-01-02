@@ -22,6 +22,7 @@ const RoleSetting = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
+    console.log({decryptedRolesData})
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
     const createSuccess = store?.createRoleDataReducer?.data?.status;
     const handleClosemodal = () => {
