@@ -14,6 +14,7 @@ import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { stateEmptydAction } from '../../../redux/clinics/actions';
+import ChangePasswordModal from '../../../components/ChangePasswordModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
@@ -25,6 +26,9 @@ const SubUpdateClinic = () => {
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
     const [btnShow, setBtnShow] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const closeModal = () => setShowModal(false);
+
 
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
@@ -1555,7 +1559,9 @@ const SubUpdateClinic = () => {
                                                 </Row>
                                             </Col>
                                             <Col md={12} className='mt-1 d-flex gap-2 justify-content-end'>
-
+                                                <Button variant="primary" className='custom-buttons' onClick={() => setShowModal(true)}>
+                                                    Change Password
+                                                </Button>
 
                                                 <Button
                                                     variant="primary"
@@ -1571,7 +1577,9 @@ const SubUpdateClinic = () => {
                                                 </Button>
 
                                             </Col>
-
+                                            <Col>
+                                                <ChangePasswordModal show={showModal} closeModal={closeModal} />
+                                            </Col>
                                         </Row >
                                     </Form >
                                 }
