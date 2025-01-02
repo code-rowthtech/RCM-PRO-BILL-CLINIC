@@ -88,7 +88,7 @@ const Login = (): React$Element<any> => {
                 <div className="text-center w-75 m-auto">
                     <h4 className="text-dark-50 text-center mt-0 fw-bold">{t('Sign In')}</h4>
                     <p className="text-muted mb-4">
-                        {t('Enter your email address and password to access Clinic panel.')}
+                        {t('Enter your email address and password to access Practice panel.')}
                     </p>
                 </div>
 
@@ -115,6 +115,9 @@ const Login = (): React$Element<any> => {
                         label={t('Password')}
                         type="password"
                         name="password"
+                        onCopy={(e) => e.preventDefault()}
+                        onCut={(e) => e.preventDefault()}
+                        onPaste={(e) => e.preventDefault()}
                         placeholder={t('Enter your password')}
                         containerClass={'mb-3'}>
                         <Link to="/account/forget-password" className="text-muted float-end">
