@@ -142,7 +142,6 @@ function* getResponsiblePartyFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
         yield put({
             type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_ERROR,
             payload: error,
