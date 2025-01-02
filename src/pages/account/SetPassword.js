@@ -66,6 +66,9 @@ const SetPassword = (): React$Element<any> => {
         userLoggedIn: state.Auth.userLoggedIn,
         user: state.Auth.user,
     }));
+    const error = useSelector(state => state.Auth.error);
+    ToastHandle(error, 'danger')
+
     const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
     if (tokenResponse) {
         var verifyResponse = JSON.parse(decryptMessage(tokenResponse))
@@ -119,6 +122,7 @@ const SetPassword = (): React$Element<any> => {
                     <p className="text-muted mb-4">
                         Hey enter your new password, and we'll update your password and log you in.
                     </p>
+                   
                 </div>
 
                 {!passwordChange && (
