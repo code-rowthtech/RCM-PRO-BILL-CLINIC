@@ -12,6 +12,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
 import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
+import Paginations from '../../../helpers/Paginations';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -28,8 +29,7 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-    console.log({ roleData })
-    const totalPages = roleData?.pagination?.totalPages || 1;
+   
 
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
@@ -119,7 +119,7 @@ const RoleManagement = () => {
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(stateEmptydAction());
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: true }));
 
         }
     }, [deleteSuccess])
@@ -138,15 +138,9 @@ const RoleManagement = () => {
     //     setUserDetails(data)
 
     // }
-    const [currentPage, setCurrentPage] = useState(1);
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
     };
 
 
@@ -257,31 +251,20 @@ const RoleManagement = () => {
                                     </tbody>
                                 </Table>
 
-                             <div className="d-flex justify-content-end">
-                                
-                            <Pagination className="mt-3 ">
-                                    <Pagination.Prev
-                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                        disabled={currentPage === 1}
-                                    />
-                                    {[...Array(totalPages)].map((_, page) => (
-                                        <Pagination.Item
-                                            key={page}
-                                            active={page + 1 === currentPage}
-                                            onClick={() => handlePageChange(page + 1)}
-                                        >
-                                            {page + 1}
-                                        </Pagination.Item>
-                                    ))}
-                                    <Pagination.Next
-                                        onClick={handleNextPage}
-                                        disabled={currentPage >= totalPages}
-                                    />
-                                </Pagination>
-                             </div>
 
 
-                           
+
+
+                            </Col>
+                        </Row>
+                        <Row>
+
+                            <Col className='mt-2 d-flex justify-content-end'>
+                                <Paginations
+                                    currentPage={skip}
+                                    totalPages={ roleData?.pagination?.totalPages || 1}
+                                    onPageChange={handlePageChange}
+                                />
                             </Col>
                         </Row>
                     </Card.Body>

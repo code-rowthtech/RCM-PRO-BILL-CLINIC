@@ -10,7 +10,7 @@ export function getDoctorsApi(params: any): any {
 
 export function getDoctorsRolesApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getDoctorRoles}?search=${data?.search}`);
+    return api.get(`${URL.getDoctorRoles}?search=${data?.search}&clinicId=${data?.clinicId}`);
 }
 
 export function getDoctorsDetailApi(params: any): any {

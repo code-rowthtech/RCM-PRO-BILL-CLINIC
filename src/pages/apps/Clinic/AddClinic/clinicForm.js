@@ -336,6 +336,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setNewAccreditationLogo);
+            console.log(url,'url')
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -396,6 +397,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
+    console.log(accreditationDetails,'accreditationDetails')
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
             (data) =>
@@ -409,6 +411,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...accreditationDetails,
             { name: '', number: '', url: null }
         ]);
+        ToastHandle('New accreditation added successfully', 'success');
+
     };
 
     const handleRemoveAccreditation = (index) => {
@@ -975,12 +979,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Control
                                             type="text"
                                             value={accreditation?.number}
-                                            {...register('accDocno', {
-                                                pattern: {
-                                                    value: /^[0-9]*$/,
-                                                    message: 'Document no must be a number'
-                                                },
-                                            })}
+                                            // {...register('accDocno', {
+                                            //     pattern: {
+                                            //         value: /^[0-9]*$/,
+                                            //         message: 'Document no must be a number'
+                                            //     },
+                                            // })}
                                             placeholder="Document Number"
                                             onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
                                             onKeyUp={(event) => handleFirstSpace(event, 0)}
@@ -1027,7 +1031,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <hr className='mb-1' />
                             <Col sm={12} className="position-relative">
                                 <Form.Label ref={containerRef} className='mb-0'>
-                                    State of Licensurrrre&nbsp;
+                                    State of Licensure&nbsp;
                                     <span
                                         onClick={() => setStatesMenu(!statesMenu)}
                                         className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
@@ -1209,7 +1213,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         {...register('stateName')}
                                                         onChange={(e) => handleStateSelection(e)}
                                                     >
-                                                        <option>State</option>
+                                                        <option value=''>State</option>
                                                         {statesData?.states?.map((data) => (
                                                             <option
                                                                 key={data?.id}
@@ -1294,6 +1298,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             type="checkbox"
                                             style={{ cursor: "pointer", color: "#a9a9a982" }}
                                             label="Same as Primary Address"
+                                            disabled={!getValues('zip')}
                                             checked={usePrimaryAsMailing}
                                             onChange={(e) => {
                                                 const isChecked = e.target.checked;
