@@ -1,5 +1,5 @@
 export const addPermissions = '/api/v1/permisssions';
-export const getPermissions = '/api/v1/clinic/permisssions';
+export const getPermissions = '/api/v1/clinic/getPermissions';
 export const deletePermissions = '/api/v1/permisssions/delete';
 export const updatePermissions = '/api/v1/permisssions';
 export const deleteClinicOnboarding = "";

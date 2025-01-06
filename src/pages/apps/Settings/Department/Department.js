@@ -183,7 +183,7 @@ const Department = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-2">
-                  <Form.Label>Department Name *</Form.Label>
+                  <Form.Label>Department Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     {...register("name", { required: "Name is required" })}
@@ -194,7 +194,7 @@ const Department = () => {
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-2">
-                  <Form.Label>Re-Enter Name *</Form.Label>
+                  <Form.Label>Re-Enter Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     {...register("reEnterName", {

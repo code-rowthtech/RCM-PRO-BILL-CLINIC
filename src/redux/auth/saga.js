@@ -31,6 +31,7 @@ function* login({ payload }) {
         const user = JSON.parse(decryptMessage(response?.data?.data));
         const userData = {
             name: user?.name,
+            permission: user?.permission,
             email: user?.email,
             token: user?.accessToken,
             role: user?.role,
@@ -120,6 +121,7 @@ function* verifyTokenFunction({ payload }) {
         const response = yield call(verifyToken);
         yield put(authApiResponseSuccess(AuthActionTypes.VERIFY_TOKEN, response.data));
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.VERIFY_TOKEN, error));
         // localStorage.setItem('authError', JSON.stringify(error));
 

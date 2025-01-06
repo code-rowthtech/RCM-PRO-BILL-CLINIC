@@ -9,7 +9,7 @@ export function createPermissionsApi(params: any): any {
 }
 export function getPermissionsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getPermissions}?name=${data?.search}&limit=${data?.limit}&page=${data?.skip}`);
+    return api.get(`${URL.getPermissions}?interface=${data?.interface}&module=${data?.module}&status=${data?.status}`);
 }
 export function deletePermissionsApi(params: any): any {
     const { data } = params;

@@ -396,11 +396,10 @@ const NewPractice = () => {
         });
     };
     useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId:clinic_id,limit: 10, search:'clinic',page:1, status: true,defaultRole :'true'}));
-
+        dispatch(getRoleDataAction({ clinicId: clinic_id, limit: 10, search: 'clinic', page: 1, status: true, defaultRole: 'true' }));
     }, [dispatch]);
     const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id || {};
-    console.log(store?.getRoleDataReducer,'getRoleId')
+    console.log(store?.getRoleDataReducer, 'getRoleId')
 
 
     const submitSubData = (formData) => {
@@ -408,7 +407,6 @@ const NewPractice = () => {
             name: formData?.clinicname,
             email: formData?.email,
             role: getRoleId,
-            userId : "677512fcf484ee6281a406f1",
             phone: '+1' + formData?.contactPerson?.replace(/\D/g, ''),
             practiceSpecialty: formData?.practiceSpecialty,
             clinicType: formData?.clinicType,
@@ -713,7 +711,7 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
-                                                                value={formData?.contactPerson }
+                                                                value={formData?.contactPerson}
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
                                                                     pattern: {
@@ -726,7 +724,7 @@ const NewPractice = () => {
                                                                     },
                                                                     minLength: {
                                                                         value: 9,
-                                                                        message: 'Contact must not be less than 9 digits'
+                                                                        message: 'Contact must not be less than 10 digits'
                                                                     }
                                                                 })}
                                                                 onChange={(e) => {
@@ -742,7 +740,7 @@ const NewPractice = () => {
                                                         <img
                                                             src={us}
                                                             alt="country code flag"
-                                                            style={{ top: '60%', left: '1%' }}
+                                                            style={{ top: '55%', left: '1%' }}
                                                             className="position-absolute"
                                                             width={20}
                                                         />
@@ -856,44 +854,44 @@ const NewPractice = () => {
                                                         </Form.Group>
                                                     </Col>
                                                 ))} */}
-                                                  {taxonomyCodes.map((code, index) => (
-                        <Col sm={3} key={index}>
-                            <Form.Group className="mb-2 position-relative">
-                                <Form.Label className="mb-1">
-                                    Taxonomy Code(s)
-                                    {index === taxonomyCodes.length - 1 && (
-                                        <span
-                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                            onClick={handleAddTaxonomy}
-                                        >
-                                        </span>
-                                    )}
-                                    <span className="text-danger">*</span>
-                                </Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    {...register(`taxonomyCode[${index}]`, {
-                                         required: 'This field is required'
-                                    })}
-                                    value={code}
-                                    placeholder="Taxonomy Code"
-                                    maxLength={10}
-                                    onKeyPress={(event) => handleFirstSpace(event, index)}
-                                    onChange={(e) => {
-                                        clearErrors(`taxonomyCode[${index}]`)
-                                        handleTaxonomyChange(index, e.target.value)
-                                    }}
-                                />
-                                <span
-                                    style={{ top: '55%', right: '1%' }}
-                                    onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
+                                                {taxonomyCodes.map((code, index) => (
+                                                    <Col sm={3} key={index}>
+                                                        <Form.Group className="mb-2 position-relative">
+                                                            <Form.Label className="mb-1">
+                                                                Taxonomy Code(s)
+                                                                {index === taxonomyCodes.length - 1 && (
+                                                                    <span
+                                                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                                        onClick={handleAddTaxonomy}
+                                                                    >
+                                                                    </span>
+                                                                )}
+                                                                <span className="text-danger">*</span>
+                                                            </Form.Label>
+                                                            <Form.Control
+                                                                type="text"
+                                                                {...register(`taxonomyCode[${index}]`, {
+                                                                    required: 'This field is required'
+                                                                })}
+                                                                value={code}
+                                                                placeholder="Taxonomy Code"
+                                                                maxLength={10}
+                                                                onKeyPress={(event) => handleFirstSpace(event, index)}
+                                                                onChange={(e) => {
+                                                                    clearErrors(`taxonomyCode[${index}]`)
+                                                                    handleTaxonomyChange(index, e.target.value)
+                                                                }}
+                                                            />
+                                                            <span
+                                                                style={{ top: '55%', right: '1%' }}
+                                                                onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
 
-                                {errors.taxonomyCode?.[index] && (
-                                    <span className="text-danger">{errors.taxonomyCode[index].message}</span>
-                                )}
-                            </Form.Group>
-                        </Col>
-                    ))}
+                                                            {errors.taxonomyCode?.[index] && (
+                                                                <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                                            )}
+                                                        </Form.Group>
+                                                    </Col>
+                                                ))}
                                                 <Col sm={3}>
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className='mb-0'>CLIA Number </Form.Label>
@@ -1325,8 +1323,9 @@ const NewPractice = () => {
                                                         <Col sm={12} className="mb-1">
                                                             <Form.Check
                                                                 type="checkbox"
-                                                                style={{ cursor: "pointer" }}
-                                                                label="Use primary address as mailing address"
+                                                                style={{ cursor: "pointer", color: "#a9a9a982" }}
+                                                                label="Same as Primary Address"
+                                                                disabled={!getValues('zip')}
                                                                 checked={usePrimaryAsMailing}
                                                                 onChange={(e) => {
                                                                     const isChecked = e.target.checked;
@@ -1623,7 +1622,7 @@ const NewPractice = () => {
                                                                         <img
                                                                             src={us}
                                                                             alt="country code flag"
-                                                                            style={{ top: '60%', left: '1%' }}
+                                                                            style={{ top: '55%', left: '1%' }}
                                                                             className="position-absolute"
                                                                             width={20}
                                                                         />

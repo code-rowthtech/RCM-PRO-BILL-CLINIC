@@ -155,6 +155,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         updatedCodes[index] = value;
         setTaxonomyCodes(updatedCodes);
     };
+    const handleRemoveTaxonomy = (index) => {
+        setTaxonomyCodes((prev) => {
+            const updatedCodes = prev.filter((_, i) => i !== index);
+            return updatedCodes.length > 0 ? updatedCodes : [''];
+        });
+
+    };
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -336,7 +343,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setNewAccreditationLogo);
-            console.log(url,'url')
+            console.log(url, 'url')
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -397,7 +404,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-    console.log(accreditationDetails,'accreditationDetails')
+    console.log(accreditationDetails, 'accreditationDetails')
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
             (data) =>
@@ -411,7 +418,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...accreditationDetails,
             { name: '', number: '', url: null }
         ]);
-        ToastHandle('New accreditation added successfully', 'success');
+        // ToastHandle('New accreditation added successfully', 'success');
 
     };
 
@@ -708,61 +715,54 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                             <Col sm={6}>
                                 <Form.Group className="mb-0 position-relative">
-                                    <Form.Label className='mb-1'>Contact Person <span className='text-danger'>*</span></Form.Label>
-                                    <Form.Group>
-                                        <InputGroup>
-                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
-                                            <Form.Control
-                                                type="tel"
-                                                // value={formattedPhone}
-                                                {...register('contact', {
-                                                    required: 'This field is required',
-                                                    pattern: {
-                                                        value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, // Accepts either the hyphenated format (XXX-XXX-XXXX) or 9–10 digits without hyphens
-                                                        message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
-                                                    },
-                                                    maxLength: {
-                                                        value: 12,
-                                                        message: 'Contact must not exceed 10 digits'
-                                                    },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: 'Contact must not be less than 9 digits'
-                                                    }
-                                                })}
-                                                onChange={(e) => {
-                                                    const rawValue = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                                                    const formattedValue = rawValue.replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                                                        p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
-                                                    ); // Format dynamically
-                                                    e.target.value = formattedValue; // Update input value
-                                                    clearErrors('contact');
-                                                }}
-                                                defaultValue={updatePage ? clinicDataToUpdate?.phone : ''}
-                                                placeholder="1234-234-234"
-                                                maxLength={12}
-                                                // onKeyPress={(event) => handleFirstSpace(event, 0)}
-                                                onKeyPress={(event) => {
-                                                    // Only allow numeric characters (0-9)
-                                                    if (!/[0-9]/.test(event.key)) {
-                                                        event.preventDefault();
-                                                    }
-                                                }}
-                                            />
-                                        </InputGroup>
-                                    </Form.Group>
+                                    <Form.Label className="mb-1">
+                                        Contact Person <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <InputGroup>
+                                        <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
+                                            &nbsp;&nbsp;+1
+                                        </InputGroup.Text> {/* Prefix */}
+                                        <Form.Control
+                                            type="tel"
+                                            {...register('contact', {
+                                                required: 'This field is required',
+                                                pattern: {
+                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, // Accepts either hyphenated format (XXX-XXX-XXXX) or 9–10 digits
+                                                    message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                },
+                                                validate: (value) =>
+                                                    value.replace(/\D/g, '').length === 10 || 'Contact must contain exactly 10 digits',
+                                            })}
+                                            defaultValue={updatePage ? clinicDataToUpdate?.phone || '' : ''}
+                                            onChange={(e) => {
+                                                const rawValue = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+                                                const formattedValue = rawValue.replace(/(\d{3})(\d{3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => (p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`)); // Format dynamically
+                                                e.target.value = formattedValue; // Update input value
+                                                clearErrors('contact'); // Clear error if corrected
+                                            }}
+                                            placeholder="123-456-7890"
+                                            maxLength={12} // Limit input to a formatted 10-digit number
+                                            onKeyPress={(event) => {
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault(); // Prevent non-numeric input
+                                                }
+                                            }}
+                                        />
+                                    </InputGroup>
 
-                                    <div
-                                        className='position-absolute ' style={{ top: '52%', left: '1%' }}
-                                    >
-                                        <img
-                                            src={us}
-                                            alt="country code flag"
-                                            width={20} />
+                                    {/* Country code flag */}
+                                    <div className="position-absolute" style={{ top: '52%', left: '1%' }}>
+                                        <img src={us} alt="country code flag" width={20} />
                                     </div>
+
+                                    {/* Error message */}
+                                    {errors.contact && (
+                                        <span className="text-danger">{errors.contact.message}</span>
+                                    )}
                                 </Form.Group>
-                                {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
                             </Col>
+
 
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
@@ -825,55 +825,77 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label className='mb-0'>Practice Speciality Description <span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label className="mb-0">
+                                        Practice Specialty Description <span className="text-danger">*</span>
+                                    </Form.Label>
                                     <Form.Control
                                         type="text"
                                         {...register('practiceSpecialty', {
                                             required: 'This field is required',
-                                            validate: (value) =>
-                                                !value.startsWith(' ') || 'First character cannot be a space',
+                                            validate: (value) => {
+                                                if (value && value.startsWith(' ')) {
+                                                    return 'First character cannot be a space';
+                                                }
+                                                return true;
+                                            },
                                         })}
+                                        // defaultValue={apiValue || ''} // Set default value from API
                                         onChange={(e) => {
                                             const value = e.target.value;
+                                            clearErrors('practiceSpecialty'); // Clear errors on valid input
                                         }}
                                         placeholder="Practice Specialty Description"
                                     />
-                                    {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
-
+                                    {errors.practiceSpecialty && (
+                                        <span className="text-danger">{errors.practiceSpecialty.message}</span>
+                                    )}
                                 </Form.Group>
                             </Col>
-                            {taxonomyCodes && taxonomyCodes.map((code, index) => (
-                                <Col sm={3} key={index}>
-                                    <Form.Group className="mb-1">
-                                        <Form.Label className="mb-0">
-                                            Taxonomy Code(s)
-                                            {index === taxonomyCodes.length - 1 && (
-                                                <span
-                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                    onClick={handleAddTaxonomy}
-                                                >
+
+                            {taxonomyCodes &&
+                                taxonomyCodes.map((code, index) => (
+                                    <Col sm={3} key={index}>
+                                        <Form.Group className="mb-1 position-relative">
+                                            <Form.Label className="mb-0">
+                                                Taxonomy Code(s)
+                                                {index === taxonomyCodes.length - 1 && (
+                                                    <span
+                                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                        onClick={handleAddTaxonomy}
+                                                    >
+                                                    </span>
+                                                )}
+                                                <span className="text-danger">*</span>
+                                            </Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                {...register(`taxonomyCode[${index}]`, {
+                                                    required: 'This field is required',
+                                                    validate: (value) =>
+                                                        value?.trim().length === value.length || 'Field cannot start or end with spaces',
+                                                })}
+                                                defaultValue={code || ''} // Populate field with the initial value if available
+                                                placeholder="Taxonomy Code"
+                                                maxLength={10}
+                                                onKeyUp={(event) => handleFirstSpace(event, index)}
+                                                onChange={(e) => {
+                                                    const inputValue = e.target.value.trimStart(); // Remove leading spaces dynamically
+                                                    handleTaxonomyChange(index, inputValue);
+                                                    clearErrors(`taxonomyCode[${index}]`); // Clear error when input is valid
+                                                }}
+                                            />
+                                            <span
+                                                style={{ top: '55%', right: '1%', zIndex:'1111' }}
+                                                onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle  cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
+                                            {errors.taxonomyCode?.[index] && (
+                                                <span className="text-danger">
+                                                    {errors.taxonomyCode[index]?.message}
                                                 </span>
                                             )}
-                                            <span className="text-danger">*</span>
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            {...register(`taxonomyCode[${index}]`, {
-                                                required: 'This field is required',
-                                            })}
-                                            placeholder="Taxonomy Code"
-                                            maxLength={10}
-                                            onKeyUp={(event) => handleFirstSpace(event, index)}
-                                            onChange={(e) => {
-                                                handleTaxonomyChange(index, e.target.value)
-                                            }}
-                                        />
-                                        {errors.taxonomyCode?.[index] && (
-                                            <span className="text-danger">{errors.taxonomyCode[index].message}</span>
-                                        )}
-                                    </Form.Group>
-                                </Col>
-                            ))}
+                                        </Form.Group>
+                                    </Col>
+                                ))}
+
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className='mb-0'>CLIA Number </Form.Label>
@@ -1633,7 +1655,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 },
                                                                 minLength: {
                                                                     value: 9,
-                                                                    message: 'Contact must be at least 9 digits',
+                                                                    message: 'Contact must be at least 10 digits',
                                                                 },
                                                                 onChange: (e) => {
                                                                     clearErrors(`poccontact.${index}`); // Clear specific errors
@@ -1708,7 +1730,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             </thead>
                                             <tbody>
                                                 {getTableData?.map((patient, index) => (
-                                                    <tr key={patient.id}>
+                                                    <tr key={patient?.id || `patient-${index}`}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient.name}</td>
                                                         <td>{(patient?.userId?.primaryAddress?.city?.state_code || 'N/A') + ' / ' + (patient?.userId?.primaryAddress?.city?.name || 'N/A')}</td>

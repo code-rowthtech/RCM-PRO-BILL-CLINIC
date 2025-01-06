@@ -15,13 +15,14 @@ import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
 import { stateEmptydAction } from '../../../redux/clinics/actions';
 import ChangePasswordModal from '../../../components/ChangePasswordModal';
+import EmailToDoctorModal from './EmailToSubClinicModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const idUpdateDataSubClinics = searchParams.get('id');
     const cliniId = searchParams.get('clinicId');
     const [show, setShow] = useState(false);
-    const [passShow, setPassShow] = useState(false);
+    // const [passShow, setPassShow] = useState(false);
     const logoFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
@@ -79,6 +80,7 @@ const SubUpdateClinic = () => {
     const [longitude1, setLongitude1] = useState(null);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
+    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
@@ -184,9 +186,9 @@ const SubUpdateClinic = () => {
             stateLicensing: [{ state: '', documentNumber: '' }],
         },
     });
-    const closepassModal = () => {
-        setPassShow(false);
-    }
+    // const closepassModal = () => {
+    //     setPassShow(false);
+    // }
     useEffect(() => {
         dispatch(getClinicTypeAction())
     }, [dispatch])
@@ -205,7 +207,6 @@ const SubUpdateClinic = () => {
             return updatedDetails;
         });
     };
-    const [newaccreditationLogo, setNewAccreditationLogo] = useState(false);
     const handleAccreditationChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         try {
@@ -220,12 +221,16 @@ const SubUpdateClinic = () => {
                 return updatedDetails;
             });
         } catch (error) {
+            console.error('Error during file upload:', error);
         }
     };
+    const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
+
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
 
     const [formData, setFormData] = useState({
+        role: getRoleId,
         clinicname: '',
         clinicType: '',
         email: '',
@@ -333,6 +338,13 @@ const SubUpdateClinic = () => {
         updatedCodes[index] = value;
         setTaxonomyCodes(updatedCodes);
     };
+    const handleRemoveTaxonomy = (index) => {
+        setTaxonomyCodes((prev) => {
+            const updatedCodes = prev.filter((_, i) => i !== index);
+            return updatedCodes.length > 0 ? updatedCodes : [''];
+        });
+
+    };
     const [posDetails, setPosDetails] = useState([
         { name: '', email: '', role: '', contact: '', fileName: '' }
     ])
@@ -377,25 +389,24 @@ const SubUpdateClinic = () => {
         );
 
     }, [dispatch]);
-    const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
 
 
 
-    const submitSubData = (formData) => {
+    const submitSubData = (data) => {
         const payload = {
             userId: idUpdateDataSubClinics,
             clinicId: cliniId,
-            name: formData?.clinicname,
-            email: formData?.email,
+            name: data?.clinicname,
+            email: data?.email,
             role: getRoleId,
-            phone: formData?.contactPerson,
-            practiceSpecialty: formData?.practiceSpecialty,
-            clinicType: formData?.clinicType,
-            taxIdOrEIN: formData?.taxId,
-            npiNumber: formData?.npiNumber,
-            CLIA_Number: formData?.clia,
-            medicareNumber: formData?.medicare,
-            medicaidNumber: formData?.medicaid,
+            phone: data?.contactPerson,
+            practiceSpecialty: data?.practiceSpecialty,
+            clinicType: data?.clinicType,
+            taxIdOrEIN: data?.taxId,
+            npiNumber: data?.npiNumber,
+            CLIA_Number: data?.clia,
+            medicareNumber: data?.medicare,
+            medicaidNumber: data?.medicaid,
             taxonomyCodes: taxonomyCodes.filter(code => code),
             // medicalLicenses: medicalDetails,
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
@@ -411,33 +422,33 @@ const SubUpdateClinic = () => {
                 }
                 : ''),
             primaryAddress: {
-                ...(formData?.address ? { address: formData?.address } : ''),
-                ...(formData?.city ? { city: formData?.city } : ''),
-                ...(formData?.stateName ? { state: formData?.stateName } : ''),
-                street: formData?.street,
-                zip: formData?.zip,
+                ...(data?.address ? { address: data?.address } : ''),
+                ...(data?.city ? { city: data?.city } : ''),
+                ...(data?.stateName ? { state: data?.stateName } : ''),
+                street: data?.street,
+                zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
                 ...(longitude ? { longitude: longitude, } : '')
             },
             mailingAddress:
                 usePrimaryAsMailing ?
                     {
-                        ...(formData?.address ? { address: formData?.address } : ''),
-                        ...(formData?.city ? { city: formData?.city } : ''),
-                        ...(formData?.stateName ? { state: formData?.stateName } : ''),
+                        ...(data?.address ? { address: data?.address } : ''),
+                        ...(data?.city ? { city: data?.city } : ''),
+                        ...(data?.stateName ? { state: data?.stateName } : ''),
                         // state: stateToSelect?._id,
-                        street: formData?.street,
-                        zip: formData?.zip,
+                        street: data?.street,
+                        zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
                         ...(longitude ? { longitude: longitude, } : '')
                     }
                     :
                     {
-                        ...(formData?.mailingAddress ? { address: formData?.mailingAddress } : ''),
-                        ...(formData?.mailingCity ? { city: formData?.mailingCity } : ''),
-                        ...(formData?.mailingStateName ? { state: formData?.mailingStateName } : ''),
-                        street: formData?.mailingStreet,
-                        zip: formData?.mailingZip,
+                        ...(data?.mailingAddress ? { address: data?.mailingAddress } : ''),
+                        ...(data?.mailingCity ? { city: data?.mailingCity } : ''),
+                        ...(data?.mailingStateName ? { state: data?.mailingStateName } : ''),
+                        street: data?.mailingStreet,
+                        zip: data?.mailingZip,
                         ...(latitude1 ? { latitude: latitude1, } : ''),
                         ...(longitude1 ? { longitude: longitude1, } : '')
                     },
@@ -697,7 +708,7 @@ const SubUpdateClinic = () => {
                                                                 },
                                                                 minLength: {
                                                                     value: 9,
-                                                                    message: 'Contact must not be less than 9 digits'
+                                                                    message: 'Contact must not be less than 10 digits'
                                                                 }
                                                             })}
                                                             placeholder="+1 1234-234-234"
@@ -708,7 +719,7 @@ const SubUpdateClinic = () => {
                                                     <img
                                                         src={us}
                                                         alt="country code flag"
-                                                        style={{ top: '60%', left: '1%' }}
+                                                        style={{ top: '55%', left: '1%' }}
                                                         className="position-absolute"
                                                         width={20}
                                                     />
@@ -791,7 +802,7 @@ const SubUpdateClinic = () => {
                                             </Col>
                                             {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                                 <Col sm={3} key={index}>
-                                                    <Form.Group className="mb-1">
+                                                    <Form.Group className="mb-1 position-relative">
                                                         <Form.Label className="mb-0">
                                                             Taxonomy Code(s)
                                                             {index === taxonomyCodes.length - 1 && (
@@ -815,6 +826,9 @@ const SubUpdateClinic = () => {
                                                                 handleTaxonomyChange(index, e.target.value)
                                                             }}
                                                         />
+                                                        <span
+                                                            style={{ top: '55%', right: '1%' }}
+                                                            onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
                                                         {errors.taxonomyCode?.[index] && (
                                                             <span className="text-danger">{errors.taxonomyCode[index].message}</span>
                                                         )}
@@ -908,7 +922,7 @@ const SubUpdateClinic = () => {
                                                     Accreditation Details&nbsp;
                                                     <span
                                                         onClick={handleAddAccreditation}
-                                                        className='text-black fs-5 uil-plus-circle fw-bold cursor-pointer'>
+                                                        className='fs-5 uil-plus-circle fw-bold plusicon cursor-pointer'>
                                                     </span>
                                                 </Form.Label>
                                             </Col>
@@ -927,14 +941,16 @@ const SubUpdateClinic = () => {
                                                         <Form.Control
                                                             type="text"
                                                             value={accreditation.number}
-                                                            {...register('accDocno', {
-                                                                pattern: {
-                                                                    value: /^[0-9]*$/,
-                                                                    message: 'Document no must be a number'
-                                                                },
-                                                            })}
+                                                            // {...register('accDocno', {
+                                                            //     pattern: {
+                                                            //         value: /^[0-9]*$/,
+                                                            //         message: 'Document no must be a number'
+                                                            //     },
+                                                            // })}
                                                             placeholder="Document Number"
                                                             onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
+                                                            onKeyUp={(event) => handleFirstSpace(event, 0)}
+
                                                         />
                                                         {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                                                     </Col>
@@ -980,7 +996,7 @@ const SubUpdateClinic = () => {
                                                     State of Licensure&nbsp;
                                                     <span
                                                         onClick={() => setStatesMenu(!statesMenu)}
-                                                        className={`plusicon ms-1 fs-5 ${statesMenu ? 'uil-angle-down' : 'uil-angle-up'} fw-bold cursor-pointer`}
+                                                        className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
                                                     ></span>
                                                     <div
                                                         ref={menuRef}
@@ -1253,8 +1269,9 @@ const SubUpdateClinic = () => {
                                                     <Col sm={12} className="mb-2">
                                                         <Form.Check
                                                             type="checkbox"
-                                                            style={{ cursor: "pointer" }}
-                                                            label="Use primary address as mailing address"
+                                                            style={{ cursor: "pointer", color: "#a9a9a982" }}
+                                                            label="Same as Primary Address"
+                                                            disabled={!getValues('zip')}
                                                             checked={usePrimaryAsMailing}
                                                             onChange={(e) => {
                                                                 const isChecked = e.target.checked;
@@ -1547,7 +1564,7 @@ const SubUpdateClinic = () => {
                                                                     <img
                                                                         src={us}
                                                                         alt="country code flag"
-                                                                        style={{ top: '60%', left: '1%' }}
+                                                                        style={{ top: '55%', left: '1%' }}
                                                                         className="position-absolute"
                                                                         width={20}
                                                                     />
@@ -1577,9 +1594,6 @@ const SubUpdateClinic = () => {
                                                 </Button>
 
                                             </Col>
-                                            <Col>
-                                                <ChangePasswordModal show={showModal} closeModal={closeModal} />
-                                            </Col>
                                         </Row >
                                     </Form >
                                 }
@@ -1587,8 +1601,11 @@ const SubUpdateClinic = () => {
 
                         </div>
                     </Card>
+
                 </div>
-                <ResetPassword closeModal={closepassModal} show={passShow} />
+                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
+                <EmailToDoctorModal show={showModal} formData={formData} setFormData={setFormData} closeModal={closeModal} />
+
             </div>
 
         </>

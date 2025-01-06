@@ -85,13 +85,13 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
                       message: 'Password must include uppercase, lowercase, number, and special character',
                     },
-                    
+
                     validate: value =>
                       value !== oldPassword || 'New password cannot be the same as the old password',
                   })}
                   onCopy={(e) => e.preventDefault()}
-                            onCut={(e) => e.preventDefault()}
-                            onPaste={(e) => e.preventDefault()}
+                  onCut={(e) => e.preventDefault()}
+                  onPaste={(e) => e.preventDefault()}
                 />
                 <span
                   className="position-absolute"
@@ -116,8 +116,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                     validate: value => value === newPassword || 'Passwords do not match',
                   })}
                   onCopy={(e) => e.preventDefault()}
-                            onCut={(e) => e.preventDefault()}
-                            onPaste={(e) => e.preventDefault()}
+                  onCut={(e) => e.preventDefault()}
+                  onPaste={(e) => e.preventDefault()}
                 />
                 <span
                   className="position-absolute"

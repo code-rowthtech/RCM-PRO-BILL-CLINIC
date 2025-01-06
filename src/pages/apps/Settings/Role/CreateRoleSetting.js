@@ -20,8 +20,9 @@ const CreateRoleSetting = ({ show, closeModal }) => {
     const createSuccess = store?.createRoleDataReducer?.data?.status;
     const decryptedPermissionsData = store?.getPermissionsDataReducer?.data?.data?.map((item) => ({
         ...item,
-        name: `${item?.name}`,
+        name: `${item?.permission}`,
     }));
+    console.log({decryptedPermissionsData})
     const {
         register,
         handleSubmit,
@@ -31,7 +32,15 @@ const CreateRoleSetting = ({ show, closeModal }) => {
 
     useEffect(() => {
         if (show) {
-            dispatch(getPermissionAction({ search: '', limit: 50, skip: '' }))
+            const permissions = {
+                interface :'Clinic',
+                module:'',
+                skip :'',
+                limit :50,
+                search :'',
+                status :true,
+            }
+            dispatch(getPermissionAction(permissions))
         }
     }, [show])
 

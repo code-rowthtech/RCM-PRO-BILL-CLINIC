@@ -176,7 +176,9 @@ const AllRoutes = () => {
         layout: state.Layout,
     }));
     const userData = JSON.parse(localStorage.getItem('userData'));
-    const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.name) || [];
+    const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.permission) || [];
+
+    console.log({ userData })
     const hasPermission = (permission) => {
         // If userPermissions is empty, allow all permissions
         if (userPermissions.length === 0) {
@@ -263,7 +265,7 @@ const AllRoutes = () => {
                         ]
                         : [
                             {
-                                path: 'dashboard',
+                                path: 'project',
                                 element: <div className="disabled-content">You don't have permission to view this page.</div>,
                             },
                         ],
@@ -356,7 +358,7 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'list',
-                                    element: hasPermission('view doctor') ? (
+                                    element: hasPermission("LIST_ALL_DOCTORS") ? (
                                         <LoadComponent component={Doctors} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
@@ -364,7 +366,7 @@ const AllRoutes = () => {
                                 },
                                 {
                                     path: 'new-doctor',
-                                    element: hasPermission('create doctor') ? (
+                                    element: hasPermission("ADD_A_DOCTOR") ? (
                                         <LoadComponent component={NewDoctor} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
@@ -464,7 +466,7 @@ const AllRoutes = () => {
                             children: [
                                 {
                                     path: 'list',
-                                    element: hasPermission('view patient') ? (
+                                    element: hasPermission("LIST_ALL_PATIENTS") ? (
                                         <LoadComponent component={Patients} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
@@ -472,7 +474,7 @@ const AllRoutes = () => {
                                 },
                                 {
                                     path: 'new-patient',
-                                    element: hasPermission('create patient') ? (
+                                    element: hasPermission("ADD_A_PATIENT") ? (
                                         <LoadComponent component={NewPatient} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to create a new patient.</div>
