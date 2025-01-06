@@ -4,7 +4,7 @@ import { Button, Card, Col, Form, InputGroup, OverlayTrigger, Row, Spinner, Tool
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
-import { createDoctorAction, getCities2Action, getCitiesAction, getDoctorDetailsAction, getDoctorsrolesAction, getStatesByCountryAction } from '../../../redux/actions';
+import { createDoctorAction, createDoctorDetailAction, getCities2Action, getCitiesAction, getDoctorDetailsAction, getRoleDataAction, getStatesByCountryAction } from '../../../redux/actions';
 import EmailToDoctorModal from './EmailToDoctorModal';
 import DepartmentDetails from './DepartmentDetails';
 import Documents from './Documents';
@@ -69,7 +69,7 @@ const NewDoctor = () => {
 
     useEffect(() => {
         dispatch(
-            getDoctorsrolesAction({ search: 'Doctor' })
+            getRoleDataAction({ search: 'Doctor', clinicId: clinicId, status: true, page: 1, limit: 10, defaultRole: true })
         );
     }, [dispatch]);
 
@@ -89,13 +89,11 @@ const NewDoctor = () => {
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
-    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id
-    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id
-    console.log(doctorDetails, 'newDoctorIddoctorDetails')
+    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
+    const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
@@ -113,6 +111,7 @@ const NewDoctor = () => {
 
     useEffect(() => {
         if (doctorDetails && updateId) {
+            console.log(doctorDetails, 'doctorDetailsdoctorDetails')
             const cityName = doctorDetails?.userId?.address?.city?.name || ''; // Fallback to an empty string if name is missing
             // setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
             setValue('firstName', doctorDetails?.userId?.firstName)
@@ -120,6 +119,7 @@ const NewDoctor = () => {
             setValue('email', doctorDetails?.userId?.email)
             setValue('phone', doctorDetails?.userId?.phone)
             setValue('gender', doctorDetails?.userId?.gender)
+            setValue('department', doctorDetails?.departmentId?._id)
             // setValue('city', cityName)
             setValue('zip1', doctorDetails?.userId?.primaryAddress?.zip)
             setValue('zip2', doctorDetails?.userId?.mailingAddress?.zip)
@@ -129,14 +129,12 @@ const NewDoctor = () => {
             setLatitude(doctorDetails?.userId?.primaryAddress?.latitude)
             setMailingLatitude(doctorDetails?.userId?.mailingAddress?.latitude)
             setMailingLongitude(doctorDetails?.userId?.mailingAddress?.longitude)
-            setValue('degreeName', doctorDetails?.userId?.degreeName)
+            setValue('degreeName', doctorDetails?.degree?.[0]?.name);
             setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
             setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
-            console.log(doctorDetails, 'doctorDetailsdoctorDetails')
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
                 : '';
-            console.log(formattedDateOfBirth, 'formattedDateOfBirthformattedDateOfBirth')
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
             const state = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.primaryAddress?.state?._id)?._id;
@@ -151,9 +149,11 @@ const NewDoctor = () => {
             setValue('state2', doctorDetails?.userId?.mailingAddress?.state?._id);
             if (doctorDetails?.userId?.profileImage) {
                 setLogoName(doctorDetails?.userId?.profileImage?.fileName)
+                setLogo(doctorDetails?.userId?.profileImage?.url)
             }
-            if (doctorDetails?.userId?.degreeDoc) {
-                setDegreeName(doctorDetails?.userId?.degreeDoc?.fileName)
+            if (doctorDetails?.degree) {
+                setDegreeName(doctorDetails?.degree?.[0]?.uploadedDocument?.fileName);
+                setDegree(doctorDetails?.degree?.[0]?.uploadedDocument?.url);
             }
         }
     }, [doctorDetails, setValue])
@@ -190,25 +190,33 @@ const NewDoctor = () => {
     // console.log(logo)
     const submitData = (data) => {
         const payload = {
-            ...(updateId ? { id: updateId } : {}), // Conditionally add `id` if `updateId` exists
+            ...(updateId ? { id: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add `id` if `updateId` exists
             // clinicId: clinicId,
             firstName: data?.firstName,
             lastName: data?.lastName,
             email: data?.email,
-            department: data?.department,
+            departmentId: data?.department,
             dob: data?.dateOfBirth,
             gender: data?.gender,
             ...(!updateId ? { password: data?.password } : {}),
             phone: data?.phone,
-            degreeName: data?.degreeName,
+            specialities: data?.specialist,
             profileImage: {
-                url: logo?.url?.split('?')[0],
+                url: logo?.url?.split('?')[0] || logo,
                 fileName: logoName,
             },
-            degreeDoc: {
-                url: degree?.url?.split('?')[0],
-                fileName: degreeName,
-            },
+            // degreeName: data?.degreeName,
+            // degreeDoc: {
+            //     url: degree?.url?.split('?')[0] || degree,
+            //     fileName: degreeName,
+            // },
+            degree: [{
+                name: data?.degreeName,
+                uploadedDocument: {
+                    url: degree?.url?.split('?')[0] || degree,
+                    fileName: degreeName,
+                }
+            }],
             role: doctorRoleId,
             primaryAddress: {
                 ...(data?.address1 ? { address: data?.address1 } : {}),
@@ -239,9 +247,13 @@ const NewDoctor = () => {
                     ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
                 }
         };
-        console.log(payload, 'payload')
         // Encrypt and dispatch the payload
-        dispatch(createDoctorAction({ key: encryptMessage(payload) }));
+        if (updateId) {
+            console.log({ payload })
+            dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+        } else {
+            dispatch(createDoctorAction({ key: encryptMessage(payload) }));
+        }
     };
 
 
@@ -313,7 +325,6 @@ const NewDoctor = () => {
     }
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [selectedMailingLocation, setSelectedMailingLocation] = useState(null);
-    console.log(selectedLocation, 'selectedLocationselectedLocation')
     useEffect(() => {
         if (selectedLocation) {
             setLatitude(selectedLocation?.bounds?.southwest?.lat);
@@ -343,7 +354,6 @@ const NewDoctor = () => {
             dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
         }
     }, [selectedLocation, selectedMailingLocation, setValue, statesData, dispatch])
-    console.log({ cities1 })
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
@@ -388,7 +398,6 @@ const NewDoctor = () => {
         phone: '',
         password: '',
     });
-    console.log(formData, 'formDataformData')
     useEffect(() => {
         if (logo) {
             setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
@@ -433,9 +442,6 @@ const NewDoctor = () => {
                         <Card.Body className='py-0'>
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-between align-items-center">
-                                    {/* <p className="fw-bold" style={{ fontWeight: '600' }}>
-                                        {!id ? 'NEW DOCTOR' : 'UPDATE DOCTOR'}
-                                    </p> */}
                                     <div>
                                         <ul className="nav nav-underline">
                                             <li className="nav-item">
@@ -452,14 +458,6 @@ const NewDoctor = () => {
                                                     onClick={() => handleTabChange("departmentDetails")}
                                                 >
                                                     Professional Information
-                                                </button>
-                                            </li>
-                                            <li className="nav-item">
-                                                <button
-                                                    className={`text-black nav-link ${activeTab === "documents" ? "active" : ""}`}
-                                                    onClick={() => handleTabChange("documents")}
-                                                >
-                                                    Documents
                                                 </button>
                                             </li>
                                         </ul>
@@ -511,7 +509,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
                                                                     {...register('firstName', {
                                                                         required: 'First name is required',
                                                                         pattern: {
@@ -535,7 +533,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
                                                                     {...register('lastName', {
                                                                         required: 'Last name is required',
                                                                         pattern: {
@@ -626,54 +624,128 @@ const NewDoctor = () => {
                                                                 {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-6">
-                                                            <div className="col-12">
-                                                                <div className="row">
-                                                                    <div className="col-6">
-                                                                        <Form.Group className="mb-1">
-                                                                            <Form.Label className="mb-0">
-                                                                                Email {!id && <span className="text-danger">*</span>}
-                                                                            </Form.Label>
-                                                                            <Form.Control
-                                                                                type="email"
-                                                                                {...register('email', {
-                                                                                    required: 'Email is required',
-                                                                                    pattern: {
-                                                                                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
-                                                                                        message: 'Enter a valid email address',
-                                                                                    },
-                                                                                })}
-                                                                                onChange={(e) => {
-                                                                                    clearErrors('email');
-                                                                                    setFormData({ ...formData, email: e.target.value });
-                                                                                }}
-                                                                                placeholder="Enter email"
-                                                                            />
-                                                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                                                        </Form.Group>
-                                                                    </div>
-                                                                    <div className="col-6">
-                                                                            <Form.Group className="mb-2">
-                                                                                <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
-                                                                                <Form.Select
-                                                                                    {...register('department', { required: 'Department is required' })}
-                                                                                >
-                                                                                    <option value="">Select Department</option>
-                                                                                    {departmentGetData?.map((data) => (
-                                                                                        <option key={data._id} value={data.name}>
-                                                                                            {data.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-                                                                                {errors.department && (
-                                                                                    <span className="text-danger fs-6">{errors.department.message}</span>
-                                                                                )}
-                                                                            </Form.Group>
-                                                                    </div>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Email {!id && <span className="text-danger">*</span>}
+                                                                </Form.Label>
+                                                                <Form.Control
+                                                                    type="email"
+                                                                    {...register('email', {
+                                                                        required: 'Email is required',
+                                                                        pattern: {
+                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
+                                                                            message: 'Enter a valid email address',
+                                                                        },
+                                                                    })}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('email');
+                                                                        setFormData({ ...formData, email: e.target.value });
+                                                                    }}
+                                                                    placeholder="Enter email"
+                                                                />
+                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                            </Form.Group>
+                                                        </div>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-2">
+                                                                <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
+                                                                <Form.Select
+                                                                    {...register('department', { required: 'Department is required' })}
+                                                                >
+                                                                    <option value="">Select Department</option>
+                                                                    {departmentGetData?.map((data) => (
+                                                                        <option key={data?._id} value={data?._id}>
+                                                                            {data.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                                {errors.department && (
+                                                                    <span className="text-danger fs-6">{errors.department.message}</span>
+                                                                )}
+                                                            </Form.Group>
+                                                        </div>
+                                                        <div className='col-3'>
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Password {!id && <span className="text-danger">*</span>}
+                                                                </Form.Label>
+                                                                <div className="position-relative">
+                                                                    <Form.Control
+                                                                        type={showPassword ? "text" : "password"}
+                                                                        // onKeyDown={(event) => handleFirstSpace(event, 0)}
+
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === " ") {
+                                                                                e.preventDefault();
+                                                                            }
+                                                                        }}
+                                                                        defaultValue={updateId ? '*********' : ''}
+                                                                        onCopy={(e) => e.preventDefault()}
+                                                                        onCut={(e) => e.preventDefault()}
+                                                                        placeholder={"Password"}
+                                                                        readOnly={updateId}
+                                                                        onChange={(e) => {
+                                                                            clearErrors('password');
+                                                                            setFormData({ ...formData, password: e.target.value })
+                                                                        }}
+                                                                        {...register("password", {
+                                                                            required: !updateId ? "Password is required" : false,
+                                                                            pattern: {
+                                                                                value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
+                                                                                message:
+                                                                                    "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
+                                                                            },
+
+                                                                        })}
+                                                                    />
+                                                                    <span
+                                                                        className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                                                                        onClick={() => setShowPassword(!showPassword)}
+                                                                    >
+                                                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                                    </span>
+                                                                    {errors.password && (
+                                                                        <span className="text-danger">{errors.password.message}</span>
+                                                                    )}
                                                                 </div>
-                                                            </div>
-
-
+                                                            </Form.Group>
+                                                        </div>
+                                                        <div className='col-3'>
+                                                            <Form.Group className='mb-1 '>
+                                                                <Form.Label className="mb-0">Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
+                                                                <div className="position-relative">
+                                                                    <Form.Control
+                                                                        type={showConfirmPassword ? "text" : "password"}
+                                                                        placeholder="Confirm Password"
+                                                                        readOnly={id}
+                                                                        onCopy={(e) => e.preventDefault()}
+                                                                        onCut={(e) => e.preventDefault()}
+                                                                        onChange={(e) => {
+                                                                            clearErrors('confirmPassword');
+                                                                            setFormData({ ...formData, confirmPassword: e.target.value })
+                                                                        }}
+                                                                        {...register('confirmPassword', {
+                                                                            ...(!id ? { required: 'Please confirm your password' } : {}),
+                                                                            pattern: {
+                                                                                value: id ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
+                                                                            },
+                                                                            validate: value =>
+                                                                                value === password || 'Passwords do not match'
+                                                                        })}
+                                                                    />
+                                                                    <span
+                                                                        className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                                                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                                    >
+                                                                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                                                    </span>
+                                                                    {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
+                                                                </div>
+                                                            </Form.Group>
+                                                        </div>
+                                                        <div className="col-6">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Degree Name</Form.Label>
                                                                 <Form.Control
@@ -690,6 +762,33 @@ const NewDoctor = () => {
                                                                 />
                                                                 {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
                                                             </Form.Group>
+                                                        </div>
+                                                        <div className="col-6">
+                                                            <div className="mb-1 d-flex flex-column position-relative">
+                                                                <Form.Label className="mb-0">Degree</Form.Label>
+                                                                <div
+                                                                    onClick={() => degreeFileInputRef.current.click()}
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
+                                                                >
+                                                                    {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
+                                                                    <p className="mb-0">
+                                                                        <FiUploadCloud />
+                                                                    </p>
+                                                                </div>
+                                                                <Form.Control
+                                                                    type="file"
+                                                                    className="d-none "
+                                                                    {...register('degreeDoc', {
+                                                                    })}
+                                                                    ref={degreeFileInputRef}
+                                                                    onChange={handleFileChangeDegree}
+                                                                />
+                                                                {errors.degreeDoc && (
+                                                                    <p className="text-danger">{errors.degreeDoc.message}</p>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-6">
                                                             <div className="mb-2 d-flex flex-column position-relative">
                                                                 <Form.Label className="mb-0">Profile Image</Form.Label>
                                                                 <div
@@ -715,116 +814,7 @@ const NewDoctor = () => {
                                                                 }
                                                             </div>
                                                         </div>
-                                                        <div className="col-6">
-                                                            <div className='row '>
-                                                                <div className='col-6 '>
-                                                                    <Form.Group className="mb-1">
-                                                                        <Form.Label className="mb-0">
-                                                                            Password {!id && <span className="text-danger">*</span>}
-                                                                        </Form.Label>
-                                                                        <div className="position-relative">
-                                                                            <Form.Control
-                                                                                type={showPassword ? "text" : "password"}
-                                                                                // onKeyDown={(event) => handleFirstSpace(event, 0)}
-
-                                                                                onKeyDown={(e) => {
-                                                                                    if (e.key === " ") {
-                                                                                        e.preventDefault();
-                                                                                    }
-                                                                                }}
-                                                                                defaultValue={updateId ? '*********' : ''}
-                                                                                onCopy={(e) => e.preventDefault()}
-                                                                                onCut={(e) => e.preventDefault()}
-                                                                                placeholder={"Password"}
-                                                                                readOnly={updateId}
-                                                                                onChange={(e) => {
-                                                                                    clearErrors('password');
-                                                                                    setFormData({ ...formData, password: e.target.value })
-                                                                                }}
-                                                                                {...register("password", {
-                                                                                    required: !updateId ? "Password is required" : false,
-                                                                                    pattern: {
-                                                                                        value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
-                                                                                        message:
-                                                                                            "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
-                                                                                    },
-
-                                                                                })}
-                                                                            />
-                                                                            <span
-                                                                                className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
-                                                                                onClick={() => setShowPassword(!showPassword)}
-                                                                            >
-                                                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                                                            </span>
-                                                                            {errors.password && (
-                                                                                <span className="text-danger">{errors.password.message}</span>
-                                                                            )}
-                                                                        </div>
-                                                                    </Form.Group>
-
-
-                                                                </div>
-                                                                <div className='col-6'>
-
-                                                                    <Form.Group className='mb-1 '>
-                                                                        <Form.Label className="mb-0">Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
-                                                                        <div className="position-relative">
-                                                                            <Form.Control
-                                                                                type={showConfirmPassword ? "text" : "password"}
-                                                                                placeholder="Confirm Password"
-                                                                                readOnly={id}
-                                                                                onCopy={(e) => e.preventDefault()}
-                                                                                onCut={(e) => e.preventDefault()}
-                                                                                onChange={(e) => {
-                                                                                    clearErrors('confirmPassword');
-                                                                                    setFormData({ ...formData, confirmPassword: e.target.value })
-                                                                                }}
-                                                                                {...register('confirmPassword', {
-                                                                                    ...(!id ? { required: 'Please confirm your password' } : {}),
-                                                                                    pattern: {
-                                                                                        value: id ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                        message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
-                                                                                    },
-                                                                                    validate: value =>
-                                                                                        value === password || 'Passwords do not match'
-                                                                                })}
-                                                                            />
-                                                                            <span
-                                                                                className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
-                                                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                                            >
-                                                                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                                                            </span>
-                                                                            {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
-                                                                        </div>
-                                                                    </Form.Group>
-                                                                </div>
-                                                                <div className="mb-1 d-flex flex-column position-relative">
-                                                                    <Form.Label className="mb-0">Degree</Form.Label>
-                                                                    <div
-                                                                        onClick={() => degreeFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
-                                                                    >
-                                                                        {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
-                                                                        <p className="mb-0">
-                                                                            <FiUploadCloud />
-                                                                        </p>
-                                                                    </div>
-                                                                    <Form.Control
-                                                                        type="file"
-                                                                        className="d-none "
-                                                                        {...register('degreeDoc', {
-                                                                        })}
-                                                                        ref={degreeFileInputRef}
-                                                                        onChange={handleFileChangeDegree}
-                                                                    />
-                                                                    {errors.degreeDoc && (
-                                                                        <p className="text-danger">{errors.degreeDoc.message}</p>
-                                                                    )}
-                                                                </div>
-                                                            </div>
-
+                                                        <div className="col-3">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Gender <span className="text-danger">*</span>
@@ -846,9 +836,25 @@ const NewDoctor = () => {
                                                                 {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                                             </Form.Group>
                                                         </div>
+                                                        <div className="col-3">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">Specialist <span className='text-danger'>*</span></Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('specialist',
+                                                                        { required: 'Specialist Name is required' }
+                                                                    )}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('specialist');
+                                                                        setFormData({ ...formData, specialties: e.target.value });
+                                                                    }}
+                                                                    placeholder="Enter Specialist Name"
+                                                                />
+                                                                {errors.specialist && <span className="text-danger">{errors?.specialist?.message}</span>}
+                                                            </Form.Group>
+                                                        </div>
                                                     </div>
                                                     <div className='row mt-1'>
-
                                                         <Col sm={12} className='pb-1' style={{ borderBottom: '1px solid #444141' }}>
                                                             <Row>
                                                                 <Col sm={12} className=''>
@@ -905,7 +911,6 @@ const NewDoctor = () => {
                                                                                                 key={index}
                                                                                                 onClick={() => {
                                                                                                     setSelectedLocation(data)
-                                                                                                    console.log(data, 'data202020');
                                                                                                     setValue('zip1', data?.components?.postcode || '')    // Update only the address field
                                                                                                     setFormData((prevState) => ({
                                                                                                         ...prevState,

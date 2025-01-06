@@ -5,7 +5,6 @@ const api = new APICore();
 
 export function createRolesApi(params: any): any {
     const { data } = params;
-    console.log(data,'apidata')
     return api.create(URL.createRoles, data);
 }
 

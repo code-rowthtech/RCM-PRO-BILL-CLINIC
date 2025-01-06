@@ -29,7 +29,6 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log(user, 'usernammmmmmmmmm');
         const userData = {
             name: user?.name,
             permission: user?.permission,
@@ -49,7 +48,6 @@ function* login({ payload }) {
 
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, userData));
     } catch (error) {
-        console.log(error, 'error')
         ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.LOGIN_USER, error));
         api.setLoggedInUser(null);
@@ -164,7 +162,7 @@ function* setChangePasswordChange({ payload }) {
         ToastHandle(response?.message || 'Password changed successfully!', 'success');
         yield put(authApiResponseSuccess(AuthActionTypes.CONFIRMPASSWORD, response.data));
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.CONFIRMPASSWORD, error));
     }
 }

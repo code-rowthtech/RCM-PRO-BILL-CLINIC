@@ -1,21 +1,148 @@
 // @flow
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { BiEdit } from 'react-icons/bi';
-import { Button, Card } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button, Card } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { getPatientsAction } from "../../../redux/patients/actions";
+import { encryptMessage } from "../../../cryptoUtils";
+import Select from 'react-select';
+import { createAppointmentAction, getDoctorsAction, getPractitionerScheduleAction } from "../../../redux/actions";
+import { getMastersDataAction } from "../../../redux/settings/action";
+import { useForm } from "react-hook-form";
 
 const NewAppointment = () => {
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
     const navigate = useNavigate();
-    const handleAppointment = () => {
-        navigate('/apps/appointments/list');
+    const today = new Date();
+    const dispatch = useDispatch();
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const store = useSelector((state) => state);
+    const [selectedDate, setSelectedDate] = useState(today);
+    console.log({ selectedDate })
+    const [currentStartDate, setCurrentStartDate] = useState(today);
+    const [patientsSearch, setPatientsSearch] = useState('');
+    const [departmentSearch, setDepartmentSearch] = useState('');
+    const [doctorSearch, setDoctorSearch] = useState('');
+    const [patientsSkip, setPatientsSkip] = useState(1);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const patientsData = store?.getPatientsReducer?.data?.patients;
+    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const departments = store?.getMastersDataReducer?.data?.result;
+
+    const patientOptions = patientsData?.map((data) => ({
+        value: data._id,
+        label: data.fullName,
+    }));
+
+    const doctorOptions = doctorDetails?.map((data) => ({
+        value: data._id,
+        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    }));
+
+    const departmentOptions = departments?.map((data) => ({
+        value: data._id,
+        label: data?.name,
+    }));
+
+    useEffect(() => {
+        const patientsPayload = {
+            clinicId: clinicId,
+            page: patientsSkip,
+            limit: 10,
+            search: patientsSearch,
+        }
+        const doctorPayload = { status: true, search: doctorSearch }
+        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
+        dispatch(getPatientsAction({ key: encryptMessage(patientsPayload) }));
+    }, [dispatch, patientsSearch])
+
+    useEffect(() => {
+        const doctorPayload = { status: true, search: doctorSearch, department: 'Dental' }
+        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
+    }, [dispatch, doctorSearch])
+
+    useEffect(() => {
+        dispatch(getMastersDataAction({ status: true, category: 'Department', limit: 1, skip: 1, search: departmentSearch }));
+    }, [dispatch, departmentSearch])
+    useEffect(() => {
+        if (selectedDoctor && selectedDate) {
+            const payload = {
+                doctorId: selectedDoctor?.value,
+                date: selectedDate
+            }
+            dispatch(getPractitionerScheduleAction({ key: encryptMessage(payload) }))
+        }
+    }, [selectedDoctor, selectedDate])
+    const generateWeekDates = (startDate) => {
+        return Array.from({ length: 7 }, (_, i) => {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + i);
+            return date;
+        });
     };
 
+    const weekDates = generateWeekDates(currentStartDate);
+
+    const prevWeek = () => {
+        const prevStart = new Date(currentStartDate);
+        prevStart.setDate(currentStartDate.getDate() - 7);
+        if (prevStart < today) {
+            setCurrentStartDate(today);
+        } else {
+            setCurrentStartDate(prevStart);
+        }
+    };
+
+    const nextWeek = () => {
+        const nextStart = new Date(currentStartDate);
+        nextStart.setDate(currentStartDate.getDate() + 7);
+        setCurrentStartDate(nextStart);
+    };
+
+    const handleDayClick = (date) => {
+        setSelectedDate(date);
+        navigate('/apps/appointments/appointmentCalendar')
+    };
+
+    const handleAppointment = () => {
+        navigate("/apps/appointments/list");
+    };
+
+    const handleInputChange = (data, type) => {
+        if (type === 'patient') {
+            setPatientsSearch(data)
+        } else if (type === 'doctor') {
+            setDoctorSearch(data)
+        } else if (type === 'department') {
+            setDepartmentSearch(data)
+        }
+    }
+
+    const handleChange = (selectedOption, type) => {
+        // setSelectedPatient(selectedOption, 'Selected Option');
+        if (type === 'patient') {
+            setSelectedPatient(selectedOption, 'Selected Option');
+        } else if (type === 'doctor') {
+            setSelectedDoctor(selectedOption, 'Selected Option');
+        } else if (type === 'department') {
+            setSelectedDepartment(selectedOption, 'Selected Option');
+        }
+    };
+    const onSubmit = (data) => {
+        const payload = {
+            patient: selectedPatient?.value,
+            doctor: selectedDoctor?.value,
+            department: selectedDepartment?.value,
+            date: data?.date,
+            description: data?.description,
+            clinic: clinicId,
+        }
+        dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
+    }
     return (
-        <Card className="mt-2" style={{ height: '87vh' }}>
+        <Card className="mt-2" style={{ height: "87vh" }}>
             {/* Card Header */}
             <div className="d-flex justify-content-between align-items-center mx-3 mt-2">
                 <h5 className="fw-bold mb-0">New Appointment</h5>
@@ -26,121 +153,181 @@ const NewAppointment = () => {
             <Card.Body className='py-1'>
                 <div className="row">
                     {/* Left Column */}
-                    <div className="col-6">
-                        <form>
-                            <div className="mb-1">
-                                <label htmlFor="patient" className="form-label mb-0">
-                                    Patient
-                                </label>
-                                <select id="patient" className="w-100 input ps-2 py-1">
-                                    <option selected>Select Name</option>
-                                    <option value="">Select Department</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </select>
-                            </div>
+                    <div className="col-12">
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <div className="row">
+                                <div className="col-6">
+                                    <div className="mb-1 responnsible-party-select">
+                                        <label htmlFor="patient" className="form-label mb-0">
+                                            Patient
+                                        </label>
+                                        {/* <select id="patient" className="w-100 input ps-2 py-1">
+                                            <option selected>Select Name</option>
+                                            {patientsData && patientsData?.map((data, index) => (
+                                                <option key={index} value={data?._id}>{data?.fullName}</option>
+                                            ))}
+                                        </select> */}
+                                        <Select
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            // value={
+                                            //     selectedPatient // Ensure null when no match is found
+                                            // }
+                                            isLoading={store?.getPatientsReducer?.loading}
+                                            isClearable={true}
+                                            isSearchable={true}
+                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'patient')} // Pass inputValue and type
+                                            onChange={(data) => handleChange(data, 'patient')}
+                                            name="patientName"
+                                            options={patientOptions}
+                                            placeholder="Select Patient Name"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div className="mb-1 responnsible-party-select">
+                                        <label htmlFor="doctorDepartment" className="form-label mb-0">
+                                            Doctor Department
+                                        </label>
+                                        <Select
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            // value={
+                                            //     selectedPatient // Ensure null when no match is found
+                                            // }
+                                            isLoading={store?.getMastersDataReducer?.loading}
+                                            isClearable={true}
+                                            isSearchable={true}
+                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'department')} // Pass inputValue and type
+                                            onChange={(data) => handleChange(data, 'department')}
+                                            name="departmentName"
+                                            options={departmentOptions}
+                                            placeholder="Select Department"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div className="mb-1 responnsible-party-select">
+                                        <label htmlFor="doctor" className="form-label mb-0">
+                                            Doctor
+                                        </label>
+                                        <Select
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            // value={
+                                            //     selectedPatient // Ensure null when no match is found
+                                            // }
+                                            isLoading={store?.getDoctorsReducer?.loading}
+                                            isClearable={true}
+                                            isSearchable={true}
+                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                                            onChange={(data) => handleChange(data, 'doctor')}
+                                            name="doctorName"
+                                            options={doctorOptions}
+                                            placeholder="Select Doctor Name"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div className="mb-1">
+                                        <label htmlFor="date" className="form-label mb-0">
+                                            Date:
+                                        </label>
+                                        <input
+                                            type="date"
+                                            className="w-100 input ps-2 py-1"
+                                            id="date"
+                                            {...register('date')}
+                                            placeholder="Enter Date of birth"
+                                            style={{ border: '1px solid #444141', fontSize: '14px' }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    <div className="mb-1">
+                                        <label htmlFor="description" className="form-label mb-0">
+                                            Description
+                                        </label>
+                                        <textarea
+                                            id="description"
+                                            {...register('description')}
+                                            className="w-100 input ps-2 py-1"
+                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
+                                            rows="3"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                                <div className="col-6">
+                                    {/* Active Date Range */}
+                                    <div className="mb-0 text-start fw-bold">
+                                        <span>
+                                            {currentStartDate.toDateString()} - {weekDates[6].toDateString()}
+                                        </span>
+                                    </div>
 
-                            <div className="mb-1">
-                                <label htmlFor="doctor" className="form-label mb-0">
-                                    Doctor
-                                </label>
-                                <select id="doctor" className="w-100 input ps-2 py-1" style={{ border: '1px solid #444141' }}>
-                                    <option selected>Select Doctor</option>
-                                    <option value="">Select Department</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </select>
-                            </div>
-                            <div className="mb-1">
-                                <label htmlFor="belongToDoctor" className="form-label mb-0">
-                                    Belong to Doctor
-                                </label>
-                                <select id="belongToDoctor" className="w-100 input ps-2 py-1" style={{ border: '1px solid #444141' }}>
-                                    <option selected>Belong to Doctor</option>
-                                    <option value="">Select Department</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </select>
-                            </div>
-                            <div className="mb-1">
-                                <label htmlFor="description" className="form-label mb-0">
-                                    Description
-                                </label>
-                                <textarea
-                                    id="description"
-                                    className="w-100 input ps-2 py-1"
-                                    style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
-                                    rows="3"
-                                ></textarea>
-                            </div>
-                        </form>
-                    </div>
+                                    {/* Date Carousel */}
+                                    <div className="date-carousel d-flex align-items-center py-1 justify-content-around">
+                                        <div
+                                            className={`arrow color-black fw-bold fs-2 px-2 ${currentStartDate <= today ? "disabled" : ""
+                                                }`}
+                                            style={{
+                                                cursor: currentStartDate <= today ? "not-allowed" : "pointer",
+                                                opacity: currentStartDate <= today ? 0.5 : 1,
+                                            }}
+                                            onClick={prevWeek}
+                                        >
+                                            &#8249;
+                                        </div>
+                                        {weekDates.map((date) => (
+                                            <div
+                                                key={date}
+                                                className={`day mx-2 d-flex justify-content-center align-items-center flex-column px-3 rounded-2 py-0 text-center ${date.toDateString() === selectedDate.toDateString()
+                                                    ? "selected"
+                                                    : ""
+                                                    }`}
+                                                style={{
+                                                    cursor: "pointer",
+                                                    backgroundColor:
+                                                        date.toDateString() === selectedDate.toDateString()
+                                                            ? "#444141"
+                                                            : "white",
+                                                    borderRadius: "1px solid #808080",
+                                                }}
+                                                onClick={() => handleDayClick(date)}
+                                            >
+                                                <span className="mb-0">{date.toLocaleString("en-US", { weekday: "short" })}</span>
+                                                <h5 className="my-0">{date.getDate()}</h5>
 
-                    {/* Right Column */}
-                    <div className="col-6">
-                        <form>
-                            <div className="mb-1">
-                                <label htmlFor="doctorDepartment" className="form-label mb-0">
-                                    Doctor Department
-                                </label>
-                                <select id="doctorDepartment" className="w-100 input ps-2 py-1" style={{ border: '1px solid #444141' }}>
-                                    <option selected>Doctor Department</option>
-                                    <option value="">Select Department</option>
-                                    <option value="Cardiology">Cardiology</option>
-                                    <option value="Neurology">Neurology</option>
-                                    <option value="Pediatrics">Pediatrics</option>
-                                    <option value="Orthopedics">Orthopedics</option>
-                                </select>
-                            </div>
-
-                            <div className="mb-1">
-                                <label htmlFor="date" className="form-label mb-0">
-                                    Date:
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-100 input ps-2 py-1"
-                                    id="date"
-                                    placeholder="Enter Date of birth"
-                                    style={{ border: '1px solid #444141', fontSize: '14px' }}
-                                />
-                            </div>
-                            <div className="mt-1">
-                                <label htmlFor="taraq" className="form-label mb-0">
-                                    Taraq
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-100 input ps-2 py-1"
-                                    id="taraq"
-                                    placeholder="Taraq"
-                                    style={{ border: '1px solid #444141', fontSize: '14px' }}
-                                />
-                            </div>
-                            <div className="mt-2">
-                                <p className='mb-1 fw-bold'>Status</p>
-                                <div className="form-check form-switch mt-0">
-                                    <input className="form-check-input" type="checkbox" id="statusSwitch" />
+                                            </div>
+                                        ))}
+                                        <div
+                                            className="arrow px-2 color-black fw-bold fs-2"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={nextWeek}
+                                        >
+                                            &#8250;
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-2">
+                                        <h5 className="mb-0">Available Slots</h5>
+                                        <div className="row m-0">
+                                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]?.map((data, index) => (
+                                                <div key={index} className="col-2 text-center slots m-1 m-0 d-flex gap-1 py-1 rounded-2">Slot Time</div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="d-flex justify-content-end gap-2 mt-3">
+                                        <Button variant="secondary">Cancel</Button>
+                                        <Button className="custom-buttons" type="submit">Save</Button>
+                                    </div>
                                 </div>
                             </div>
-
                         </form>
-                    </div>
-                    <div className="d-flex justify-content-end gap-2">
-                        <Button variant='secondary'>Cancel</Button>
-                        <Button>Save</Button>
                     </div>
                 </div>
             </Card.Body>
-
-            {/* Card Footer */}
-
         </Card>
     );
 };

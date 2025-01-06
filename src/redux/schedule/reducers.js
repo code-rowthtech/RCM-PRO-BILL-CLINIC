@@ -24,22 +24,23 @@ export const createScheduleReducer = (state = CREATE_SCHEDULE_INITIAL_STATE, act
         case ScheduleActionTypes.CREATE_SCHEDULE_LOADING:
             return {
                 data: state.data,
-                loading: true
+                loading: true,
             }
         case ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS:
             return {
                 data: action.payload,
-                loading: false
+                loading: false,
             }
         case ScheduleActionTypes.CREATE_SCHEDULE_ERROR:
             return {
                 data: action.payload,
-                loading: false
+                loading: false,
             }
         case ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE:
             return {
                 data: [],
-                loading: false
+                loading: false,
+
             }
         default: return state
     }

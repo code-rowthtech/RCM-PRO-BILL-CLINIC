@@ -24,13 +24,13 @@ const Breaks = () => {
     const deleteHandle = (id) => {
         dispatch(deleteScheduleAction(id))
         const payload = {
-          startDate: '',
-          endDate: '',
-          type: "Break",
-          search : ''
+            startDate: '',
+            endDate: '',
+            type: "Break",
+            search: ''
         };
         dispatch(getScheduleAction(payload));
-      }
+    }
 
     return (
         <div>
@@ -48,13 +48,13 @@ const Breaks = () => {
                 <tbody>
                     {isLoading ? (
                         <tr>
-                            <td colSpan={5} className="text-center">
+                            <td colSpan={6} className="text-center">
                                 <Spinner animation="border" role="status" />
                             </td>
                         </tr>
                     ) : scheduleResponse.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className="text-center">
+                            <td colSpan={6} className="text-center">
                                 <h3 className="my-5">No Data Found</h3>
                             </td>
                         </tr>
@@ -69,7 +69,7 @@ const Breaks = () => {
                                     {breakItem.breakDay}
                                 </td>
                                 <td>
-                                <RiDeleteBin5Line onClick={()=>deleteHandle(breakItem?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
+                                    <RiDeleteBin5Line onClick={() => deleteHandle(breakItem?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                                 </td>
                             </tr>
                         ))

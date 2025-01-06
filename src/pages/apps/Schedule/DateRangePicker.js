@@ -18,7 +18,7 @@ const DateRangePicker = () => {
 
   // Format date to display in input field
   const formatDateShow = (date) => {
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "numeric",
       year: "numeric",
