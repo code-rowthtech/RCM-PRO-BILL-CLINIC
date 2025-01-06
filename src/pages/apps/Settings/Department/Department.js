@@ -19,6 +19,7 @@ import { formatDate } from '../../../../helpers/dateFormat';
 
 const Department = () => {
   const store = useSelector((state) => state);
+  console.log(store, 'stoed')
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -131,8 +132,12 @@ const Department = () => {
                 </Row>
               </Col>
             </Row>
-            <Table responsive className="table-centered table-nowrap mb-0">
-              <thead className="ght">
+            <Table
+              responsive
+              className="table-centered table-nowrap mb-0  rounded"
+              style={{ height: 'auto' }}
+            >
+              <thead className="text-white">
                 <tr>
                   <th className='text-white'>S.No.</th>
                   <th className='text-white'>Department Name</th>
@@ -142,34 +147,53 @@ const Department = () => {
                   <th className='text-white'>Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody >
                 {store?.getMastersDataReducer?.loading ? (
-                  <tr><td colSpan={6} className='text-center'><Spinner /></td></tr>
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      <Spinner />
+                    </td>
+                  </tr>
                 ) : tableGetData?.length ? (
                   tableGetData?.map((data, index) => (
-                    <tr key={data._id}>
+                    <tr key={data._id} className="border-bottom">
                       <td>{index + 1}</td>
                       <td>{data.name}</td>
                       <td>{data.description}...</td>
                       <td>{formatDate(data.createdAt)}</td>
                       <td>
-                        <Form.Switch checked={data.isActive} onChange={() => handleUpdate(data)} />
+                        <Form.Switch
+                          checked={data.isActive}
+                          onChange={() => handleUpdate(data)}
+                        />
                       </td>
                       <td>
-                        <i className="mdi mdi-square-edit-outline cursor-pointer fs-4" onClick={() => handleEdit(data)}></i>
+                        <i
+                          className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
+                          onClick={() => handleEdit(data)}
+                        ></i>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={6} className='text-center'>No Data Found</td></tr>
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      No Data Found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </Table>
-            <Paginations
-              currentPage={skip}
-              totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
-              onPageChange={handlePageChange}
-            />
+
+            <Row>
+              <Col className='mt-2 d-flex justify-content-end'>
+                <Paginations
+                  currentPage={skip}
+                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       </Col>

@@ -22,7 +22,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
         ...item,
         name: `${item?.permission}`,
     }));
-    console.log({decryptedPermissionsData})
     const {
         register,
         handleSubmit,
