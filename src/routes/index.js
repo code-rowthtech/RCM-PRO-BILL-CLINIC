@@ -177,8 +177,6 @@ const AllRoutes = () => {
     }));
     const userData = JSON.parse(localStorage.getItem('userData'));
     const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.name) || [];
-
-    console.log({ userPermissions })
     const hasPermission = (permission) => {
         // If userPermissions is empty, allow all permissions
         if (userPermissions.length === 0) {
@@ -324,7 +322,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
                         {
                             path: 'schedule',
@@ -346,9 +344,9 @@ const AllRoutes = () => {
                                 : [
                                     {
                                         path: 'list',
-                                        element:  <>
-                                        <div className="disabled-content">You don't have permission to view this page.</div>
-                                    </>
+                                        element: <>
+                                            <div className="disabled-content">You don't have permission to view this page.</div>
+                                        </>
                                     }
                                 ],
 
@@ -448,7 +446,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
 
                         {
@@ -473,7 +471,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                                 {
-                                    path: 'new patient',
+                                    path: 'new-patient',
                                     element: hasPermission('create patient') ? (
                                         <LoadComponent component={NewPatient} />
                                     ) : (
@@ -481,7 +479,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
                         {
                             path: 'permissions',

@@ -25,6 +25,6 @@ export function createDoctorApi(params: any): any {
 
 export function createDoctorDetailApi(params: any): any {
     const { data } = params;
-    return api.create(URL.createDoctorDetail, data);
+    return api.update(URL.createDoctorDetail, data);
 }
 

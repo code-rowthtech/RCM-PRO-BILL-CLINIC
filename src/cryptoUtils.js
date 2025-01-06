@@ -26,8 +26,8 @@ export function encryptMessage(text) {
 
 // Function to decrypt a message
 export function decryptMessage(encryptedText) {
-    console.log(encryptedText);
-    
+    // console.log(encryptedText);
+
     const decipher = new nodeRSA(privateKey, "pkcs1");
     const decrypted = decipher.decrypt(encryptedText, "utf8");
     return decrypted;
@@ -39,4 +39,4 @@ export function decryptMessage(encryptedText) {
 // // console.log("encrypted: ", encrypted);
 
 const decrypted = decryptMessage("SKiZHzmCsrVCB/1866HeKOb1fk2c3QlqBzScUjg3QwFiaj5v/g8y7MfOlO/kbGUKDIAYXM5ATh/ohD0OJtBmZB+VHNpQXzNNL44Ud/V9LNAZlq07eRCZFz/BSfMjyc9ZMqt0BKMIjYo3AVsV+E8VnhiOAQ+w72zFHYLxzwwYer4=");
-console.log("decrypted: ", decrypted);
+// console.log("decrypted: ", decrypted);

@@ -68,8 +68,7 @@ const Department = () => {
   const createResponse = store?.createMastersDataReducer?.data;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
   const updateResponse = store?.updateMastersDataReducer?.data;
-  console.log(createResponse, 'createResponse')
-  console.log(tableGetData, 'tableGetData')
+
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
     if (createResponse?.status === 201 || updateResponse === 200) {

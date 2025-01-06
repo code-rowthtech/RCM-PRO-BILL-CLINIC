@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
@@ -9,6 +9,9 @@ import { patientsData } from './data';
 import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAppointmentsAction } from '../../../redux/appointments/action';
+const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
 type OrderListItems = {
@@ -28,6 +31,13 @@ type OrderListProps = {
 
 // Component for Appointments List Table
 const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getAppointmentsAction({ clinicId: clinicId }))
+    }, [dispatch])
+    const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    console.log(appointmentsList, 'appointmentsList')
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
@@ -41,14 +51,14 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                 </tr>
             </thead>
             <tbody>
-                {[0, 1, 2, 3, 4, 5].map((index) => (
+                {appointmentsList && appointmentsList?.map((data, index) => (
                     <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>Patient Name</td>
-                        <td>Doctor Demo</td>
-                        <td>Allergists</td>
-                        <td>DD/MM/YYYY</td>
-                        <td><span className='px-1 text-white bg-secondary rounded-2'>Confirm</span></td>
+                        <td className='text-capitalize'>{data?.patient?.fullName}</td>
+                        <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
+                        <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
+                        <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                        <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
                     </tr>
                 ))}
             </tbody>
@@ -66,7 +76,7 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
                     <th className='text-white'>Patient Name</th>
                     <th className='text-white'>Doctor</th>
                     <th className='text-white'>Doctor Department</th>
-                    <th className='text-white'>Appointment Date</th>                                                                          
+                    <th className='text-white'>Appointment Date</th>
                     <th className='text-white'>Payment Status</th>
                     <th className='text-white'>Payment Mode</th>
                     <th className='text-white'>Amount</th>
@@ -98,6 +108,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 
     const navigate = useNavigate();
     const goto = () => {
+        alert('ads')
         navigate("/apps/appointments/appointmentCalendar");
     };
 
