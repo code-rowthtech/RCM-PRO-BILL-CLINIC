@@ -94,8 +94,16 @@ const ForgetPassword = (): React$Element<any> => {
                             label='E-mail'
                             type="text"
                             name="username"
-                            placeholder={t('Enter your Username')}
+                            placeholder={t('Enter your Email')}
                             containerClass={'mb-3'}
+                            onChange={(e) => {
+                                e.target.value = e.target.value.replace(/\s+/g, ''); 
+                            }}
+                            onKeyPress={(e) => {
+                                if (e.key === ' ') {
+                                    e.preventDefault();
+                                }
+                            }}
                         />
 
                         <div className="mb-3 mb-0 text-center">

@@ -15,6 +15,7 @@ import { decryptMessage, encryptMessage } from '../../cryptoUtils';
 import Loader from '../../components/Loader';
 import Spinner from '../../constants/Spinner';
 import ToastHandle from '../../helpers/ToastMessage';
+import { handleFirstSpace } from '../../helpers/noSpace';
 
 /* bottom link of account pages */
 const BottomLink = () => {
@@ -109,8 +110,16 @@ const Login = (): React$Element<any> => {
                         name="username"
                         placeholder={t('Enter your Email')}
                         containerClass={'mb-3'}
-
+                        onChange={(e) => {
+                            e.target.value = e.target.value.replace(/\s+/g, ''); // Remove spaces
+                        }}
+                        onKeyPress={(e) => {
+                            if (e.key === ' ') {
+                                e.preventDefault(); // Prevent space keypress
+                            }
+                        }}
                     />
+
                     <FormInput
                         label={t('Password')}
                         type="password"
@@ -119,7 +128,8 @@ const Login = (): React$Element<any> => {
                         onCut={(e) => e.preventDefault()}
                         onPaste={(e) => e.preventDefault()}
                         placeholder={t('Enter your password')}
-                        containerClass={'mb-3'}>
+                        containerClass={'mb-3'}
+                        >
                         <Link to="/account/forget-password" className="text-muted float-end">
                             <small>{t('Forgot your password?')}</small>
                         </Link>

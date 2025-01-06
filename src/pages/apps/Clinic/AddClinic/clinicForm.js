@@ -75,7 +75,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [accreditationDetails, setAccreditationDetails] = useState([
         { name: '', number: '', url: null, fileName: '' }
     ]);
-    console.log(accreditationDetails, 'accreditationDetails')
     // const [medicalDetails, setMedicalDetails] = useState([
     //     { name: '', number: '', url: null, fileName: '' }
     // ]);
@@ -192,8 +191,17 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
         setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
-        setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
-        setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
+        if (clinicsDataGet?.userId?.primaryAddress?.latitude) {
+            const newLatitude = clinicsDataGet.userId.primaryAddress.latitude;
+            setLatitude(newLatitude); // Update the local state
+            setValue("latitude", newLatitude); // Update the form field
+        }
+        // setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
+        if (clinicsDataGet?.userId?.primaryAddress?.longitude) {
+            const newLongitude = clinicsDataGet.userId.primaryAddress.longitude;
+            setLongitude(newLongitude); // Update the local state
+            setValue("longitude", newLongitude); // Update the form field
+        }
         setField('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
         if (clinicsDataGet?.userId?.primaryAddress?.city) {
             dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.primaryAddress?.state?.id, name: clinicsDataGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
@@ -210,6 +218,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
+        }else{
+            setAccreditationDetails([
+                ...accreditationDetails,
+                { name: '', number: '', url: null }
+            ]);
         }
 
         // if (clinicsDataGet?.taxonomyCodes) {
@@ -404,7 +417,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-    console.log(accreditationDetails, 'accreditationDetails')
     const handleAddAccreditation = () => {
         const isIncomplete = accreditationDetails.some(
             (data) =>
@@ -449,6 +461,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setValue('clinicType', clinicsDataGet.clinicType);
         }
     }, [clinicsDataGet, setValue]);
+
+    
     const [searchedLocations, setSearchedLocations] = useState(null)
     const [searchedLocations2, setSearchedLocations2] = useState(null)
 
@@ -742,7 +756,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 clearErrors('contact'); // Clear error if corrected
                                             }}
                                             placeholder="123-456-7890"
-                                            maxLength={12} // Limit input to a formatted 10-digit number
+                                            maxLength={10} // Limit input to a formatted 10-digit number
                                             onKeyPress={(event) => {
                                                 if (!/[0-9]/.test(event.key)) {
                                                     event.preventDefault(); // Prevent non-numeric input
@@ -885,7 +899,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 }}
                                             />
                                             <span
-                                                style={{ top: '55%', right: '1%', zIndex:'1111' }}
+                                                style={{ top: '55%', right: '1%', zIndex: '1111' }}
                                                 onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle  cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
                                             {errors.taxonomyCode?.[index] && (
                                                 <span className="text-danger">
@@ -1142,18 +1156,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className='mb-1'>
-                                        <span className='text-black fw-semibold form-label'>Address Details </span>
+                                        <span className='text-black fw-semibold form-label'>Address Details  <span className="text-danger">*</span> </span>
                                     </Col>
                                     <Col sm={6}>
                                         <Row className='position-relative'>
                                             <Col sm={12}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Primary Address</Form.Label>
+                                                    <Form.Label className="mb-0">Primary Address  <span className="text-danger">*</span></Form.Label>
                                                     <div style={{ position: 'relative' }}>
                                                         <Form.Control
                                                             type="text"
                                                             defaultValue={updatePage ? clinicDataToUpdate?.address?.address : ''}
-                                                            {...register('address')}
+                                                            {...register('address', { required: "Primary Address is required" })}
                                                             onChange={(e) => {
                                                                 getGeolocation(e);
                                                                 setFocused(true);
@@ -1198,6 +1212,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 </p>
                                                             ))}
                                                             {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                            {errors.address && (
+                                                                <span className="text-danger">{errors.address.message}</span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </Form.Group>
@@ -1205,23 +1222,29 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className='mb-0'>Latitude</Form.Label>
+                                                    <Form.Label className='mb-0'>Latitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        defaultValue={latitude}
+                                                        {...register("latitude", { required: "Latitude is required" })}
+                                                        // defaultValue={latitude}
                                                         placeholder="Latitude"
                                                     />
-                                                    {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                    {errors.latitude && (
+                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0'>Longitude</Form.Label>
+                                                    <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        defaultValue={longitude}
+                                                        {...register("longitude", { required: "Longitude is required" })}
+                                                        // defaultValue={longitude}
                                                         placeholder="Longitude" />
-                                                    {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                    {errors.longitude && (
+                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
                                         </Row>
@@ -1230,9 +1253,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Row>
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0' >State</Form.Label>
+                                                    <Form.Label className='mb-0' >State <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
-                                                        {...register('stateName')}
+                                                        {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
                                                     >
                                                         <option value=''>State</option>
@@ -1246,15 +1269,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             </option>
                                                         ))}
                                                     </Form.Select>
+                                                    {errors.stateName && (
+                                                        <span className="text-danger">{errors.stateName.message}</span>
+                                                    )}
                                                 </Form.Group>
 
                                             </Col>
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0'>City</Form.Label>
+                                                    <Form.Label className='mb-0'>City <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
                                                         disabled={store?.getCitiesReducer?.loading}
-                                                        {...register('city')}
+                                                        {...register("city", { required: "City is required" })}
                                                     >
                                                         <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities1?.map((data) => (
@@ -1264,25 +1290,27 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             </option>
                                                         ))}
                                                     </Form.Select>
-                                                    {/* } */}
+                                                    {errors.city && (
+                                                        <span className="text-danger">{errors.city.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className='mb-0'>Street</Form.Label>
+                                                    <Form.Label className='mb-0'>Street <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('street')}
                                                         onKeyPress={handleFirstSpace}
                                                         placeholder="Street" />
 
-                                                    {/* {errors.street && <span className="text-danger">{errors.street.message}</span>} */}
+                                                    {errors.street && <span className="text-danger">{errors.street.message}</span>}
                                                 </Form.Group>
                                             </Col>
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className='mb-0'>Zip</Form.Label>
+                                                    <Form.Label className='mb-0'>Zip <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
                                                         type="text"
@@ -1311,7 +1339,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className="mb-0">
-                                        <span className="text-black fw-semibold form-label">Mailing Address Details</span>
+                                        <span className="text-black fw-semibold form-label">Mailing Address Details <spam className='text-danger'>*</spam></span>
                                     </Col>
 
                                     {/* Checkbox for using primary address */}
@@ -1351,12 +1379,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Row className="position-relative">
                                             <Col sm={12}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Mailing Address</Form.Label>
+                                                    <Form.Label className="mb-0">Mailing Address <span className="text-danger">*</span></Form.Label>
                                                     <div style={{ position: 'relative' }}>
                                                         <Form.Control
                                                             type="text"
                                                             value={watch('mailingAddress')}
-                                                            {...register('mailingAddress')}
+                                                            {...register('mailingAddress', {
+                                                                required: 'Mailing Address is required', 
+                                                                maxLength: {
+                                                                    value: 255,
+                                                                    message: 'Mailing Address cannot exceed 255 characters', 
+                                                                },
+                                                            })}
                                                             onChange={(e) => {
                                                                 if (!usePrimaryAsMailing) {
                                                                     setValue('mailingAddress', e.target.value);
@@ -1406,33 +1440,57 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                                         </div>
                                                     </div>
+                                                    {errors.mailingAddress && (
+                                                        <span className="text-danger">{errors.mailingAddress.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
                                             {/* Latitude and Longitude */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className="mb-0">Latitude</Form.Label>
+                                                    <Form.Label className="mb-0">Latitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         value={latitude1}
                                                         placeholder="Latitude"
                                                         readOnly
+                                                        {...register('latitude', {
+                                                            required: 'Latitude is required', 
+                                                            pattern: {
+                                                                value: /^[-+]?\d*\.\d+|\d+$/, 
+                                                                message: 'Please enter a valid latitude',
+                                                            },
+                                                        })}
                                                     />
+                                                    {errors.latitude && (
+                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className="mb-0">Longitude</Form.Label>
+                                                    <Form.Label className="mb-0">Longitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         value={longitude1}
                                                         placeholder="Longitude"
                                                         readOnly
+                                                        {...register('longitude', {
+                                                            required: 'Longitude is required', 
+                                                            pattern: {
+                                                                value: /^[-+]?\d*\.\d+|\d+$/, 
+                                                                message: 'Please enter a valid longitude',
+                                                            },
+                                                        })}
                                                     />
+                                                    {errors.longitude && (
+                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
                                         </Row>
                                     </Col>
 
@@ -1441,7 +1499,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* State */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">State</Form.Label>
+                                                    <Form.Label className="mb-0">State <span className="text-danger">*</span></Form.Label>
                                                     {usePrimaryAsMailing ? (
                                                         <Form.Control
                                                             readOnly
@@ -1453,30 +1511,41 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         />
                                                     ) : (
                                                         <Form.Select
-                                                            {...register('mailingStateName')}
+                                                            {...register('mailingStateName', {
+                                                                required: 'State is required',
+                                                            })}
                                                             onChange={(e) => handleStateSelection(e)}
                                                             disabled={usePrimaryAsMailing}
                                                         >
-                                                            <option value={''}>State</option>
+                                                            <option value="">State</option>
                                                             {statesData?.states?.map((data) => (
-                                                                <option key={data?.id} value={data?._id}>
+                                                                <option key={data?._id} value={data?._id}>
                                                                     {data?.name}
                                                                 </option>
                                                             ))}
                                                         </Form.Select>
                                                     )}
+                                                    {errors.mailingStateName && (
+                                                        <span className="text-danger">{errors.mailingStateName.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
                                             {/* City */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">City</Form.Label>
-                                                    {usePrimaryAsMailing ?
-                                                        <Form.Control readOnly value={cities1 && cities1?.find((data) => data?._id === getValues('city'))?.name} />
-                                                        :
+                                                    <Form.Label className="mb-0">City <span className="text-danger">*</span></Form.Label>
+                                                    {usePrimaryAsMailing ? (
+                                                        <Form.Control
+                                                            readOnly
+                                                            value={cities1 && cities1?.find((data) => data?._id === getValues('city'))?.name || ''}
+                                                        />
+                                                    ) : (
                                                         <Form.Select
                                                             disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
-                                                            {...register('mailingCity')}
+                                                            {...register('mailingCity', {
+                                                                required: 'City is required',
+                                                            })}
                                                         >
                                                             <option value="">
                                                                 {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
@@ -1487,31 +1556,44 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 </option>
                                                             ))}
                                                         </Form.Select>
-                                                    }
+                                                    )}
+                                                    {errors.mailingCity && (
+                                                        <span className="text-danger">{errors.mailingCity.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
 
 
                                             {/* Street */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">Street</Form.Label>
+                                                    <Form.Label className="mb-0">
+                                                        Street <span className="text-danger">*</span>
+                                                    </Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register('mailingStreet')}
+                                                        {...register('mailingStreet', {
+                                                            required: 'Street is required',
+                                                        })}
                                                         placeholder="Street"
                                                         disabled={usePrimaryAsMailing}
                                                     />
+                                                    {errors.mailingStreet && (
+                                                        <span className="text-danger">{errors.mailingStreet.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
+
 
                                             {/* ZIP */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
-                                                    <Form.Label className="mb-0">Zip</Form.Label>
+                                                    <Form.Label className="mb-0">Zip <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         {...register('mailingZip', {
+                                                            required: !usePrimaryAsMailing && 'ZIP is required',
                                                             minLength: { value: 5, message: 'ZIP must be 5 characters long' },
                                                             pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
                                                         })}
@@ -1552,24 +1634,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* Full Name */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">
-                                                        Full Name
-                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
-                                                    </Form.Label>
+                                                    <Form.Label className="mb-0">Full Name  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         value={data?.name}
                                                         {...register(`name.${index}`, {
-                                                            // required: index === 0 ? 'Full Name is required' : false,
+                                                            required: index === 0 ? 'Full Name is required' : false, 
                                                             onChange: (e) => {
-                                                                clearErrors(`name.${index}`); // Clear specific errors
+                                                                clearErrors(`name.${index}`); 
                                                                 handlePOSInputChange(e, 'name', index);
                                                             },
                                                         })}
                                                         placeholder="Full Name"
                                                     />
-                                                    {errors.name?.[index] && (
-                                                        <span className="text-danger">{errors.name[index]?.message}</span>
+                                                    {errors[`name.${index}`] && (
+                                                        <span className="text-danger">{errors[`name.${index}`]?.message}</span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
@@ -1577,29 +1656,25 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* Contact Email */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">
-
-                                                        Contact Email
-                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
-                                                    </Form.Label>
+                                                    <Form.Label className="mb-0">Contact Email  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                     <Form.Control
                                                         type="email"
                                                         value={data?.email}
                                                         {...register(`contactemail.${index}`, {
-                                                            // required: index === 0 ? 'Contact Email is required' : false,
                                                             pattern: {
                                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                                 message: 'Please enter a valid email address',
                                                             },
+                                                            required: index !== 1 ? 'Contact Email is required' : false,
                                                             onChange: (e) => {
-                                                                clearErrors(`contactemail.${index}`); // Clear specific errors
+                                                                clearErrors(`contactemail.${index}`); 
                                                                 handlePOSInputChange(e, 'email', index);
                                                             },
                                                         })}
                                                         placeholder="Contact Email"
                                                     />
-                                                    {errors.contactemail?.[index] && (
-                                                        <span className="text-danger">{errors.contactemail[index]?.message}</span>
+                                                    {errors[`contactemail.${index}`] && (
+                                                        <span className="text-danger">{errors[`contactemail.${index}`]?.message}</span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
@@ -1607,24 +1682,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {/* Job Title / Role */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
-                                                    <Form.Label className="mb-0">
-                                                        Job Title / Role
-                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
-                                                    </Form.Label>
+                                                    <Form.Label className="mb-0">Job Title / Role {index === 0 && <span className='text-danger'>*</span>} </Form.Label>
                                                     <Form.Control
                                                         type="text"
                                                         value={data?.role}
                                                         {...register(`role.${index}`, {
-                                                            // required: index === 0 ? 'Job Title / Role is required' : false,
+                                                            required: index !== 1 ? 'Job Title / Role is required' : false, 
                                                             onChange: (e) => {
-                                                                clearErrors(`role.${index}`); // Clear specific errors
+                                                                clearErrors(`role.${index}`); 
                                                                 handlePOSInputChange(e, 'role', index);
                                                             },
                                                         })}
                                                         placeholder="Job Title / Role"
                                                     />
-                                                    {errors.role?.[index] && (
-                                                        <span className="text-danger">{errors.role[index]?.message}</span>
+                                                    {errors[`role.${index}`] && (
+                                                        <span className="text-danger">{errors[`role.${index}`]?.message}</span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
@@ -1633,8 +1705,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2 position-relative">
                                                     <Form.Label className="mb-0">
-                                                        Contact Person
-                                                        {/* {index === 0 && <span className="text-danger">*</span>} */}
+                                                        Contact Person {index === 0 && <span className="text-danger">*</span>}
                                                     </Form.Label>
                                                     <InputGroup>
                                                         <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
@@ -1644,29 +1715,47 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             type="tel"
                                                             value={data.contact}
                                                             {...register(`poccontact.${index}`, {
-                                                                // required: index === 0 ? 'Contact is required' : false,
+                                                                required: index !== 1 ? 'Contact is required' : false, 
                                                                 pattern: {
-                                                                    value: /^[0-9]+$/,
-                                                                    message: 'Contact must be numeric',
+                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
+                                                                    message:
+                                                                        'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,
-                                                                    message: 'Contact must not exceed 10 digits',
+                                                                    message: 'Contact must not exceed 10 characters',
                                                                 },
                                                                 minLength: {
-                                                                    value: 9,
-                                                                    message: 'Contact must be at least 10 digits',
+                                                                    value: 10,
+                                                                    message: 'Contact must not be less than 10 digits',
                                                                 },
                                                                 onChange: (e) => {
-                                                                    clearErrors(`poccontact.${index}`); // Clear specific errors
-                                                                    handlePOSInputChange(e, 'contact', index);
+                                                                    const rawValue = e.target.value.replace(/\D/g, ''); 
+                                                                    const formattedValue = rawValue.replace(
+                                                                        /(\d{3})(\d{3})(\d{0,4})/,
+                                                                        (match, p1, p2, p3) =>
+                                                                            p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+                                                                    ); 
+                                                                    handlePOSInputChange(
+                                                                        { ...e, target: { ...e.target, value: rawValue } },
+                                                                        'contact',
+                                                                        index
+                                                                    );
+                                                                    e.target.value = formattedValue;
+                                                                    clearErrors(`poccontact.${index}`); 
                                                                 },
                                                             })}
-                                                            placeholder="1234-234-234"
+                                                            placeholder="123-456-7890"
+                                                            maxLength={10}
+                                                            onKeyPress={(event) => {
+                                                                if (!/[0-9]/.test(event.key)) {
+                                                                    event.preventDefault();
+                                                                }
+                                                            }}
                                                         />
                                                     </InputGroup>
-                                                    {errors.poccontact?.[index] && (
-                                                        <span className="text-danger">{errors.poccontact[index]?.message}</span>
+                                                    {errors[`poccontact.${index}`] && (
+                                                        <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
                                                     )}
                                                     <img
                                                         src={us}
@@ -1679,9 +1768,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             </Col>
                                         </React.Fragment>
                                     ))}
-
                                 </Row>
                             </Col>
+
                             <hr />
                             <Col md={12} className='mt-0 d-flex gap-2 justify-content-end'>
                                 <Button as={Link} to={'/apps/Practice/new-practice'} variant="primary" className='custom-buttons'>
