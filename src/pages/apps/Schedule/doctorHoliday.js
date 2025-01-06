@@ -9,7 +9,7 @@ const DoctorHoliday = () => {
   const store = useSelector((state) => state);
 
   const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-  console.log(scheduleResponse,'iddd')
+  console.log(scheduleResponse, 'iddd')
   const isLoading = store?.getScheduleReducer?.loading;
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const DoctorHoliday = () => {
       startDate: '',
       endDate: '',
       type: "Holiday",
-      search : ''
+      search: ''
     };
     dispatch(getScheduleAction(payload));
   }, [dispatch]);
@@ -29,7 +29,7 @@ const DoctorHoliday = () => {
       startDate: '',
       endDate: '',
       type: "Holiday",
-      search : ''
+      search: ''
     };
     dispatch(getScheduleAction(payload));
   }
@@ -65,12 +65,12 @@ const DoctorHoliday = () => {
                 <td>{holiday.name}</td>
                 <td>{holiday.reason ? holiday.reason : 'NAN'}</td>
                 <td>
-                  <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{width:'100px'}}>
-                    {new Date(holiday.fromDate).toLocaleDateString()}
+                  <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
+                    {new Date(holiday.fromDate).toLocaleDateString('en-GB')}
                   </div>
                 </td>
                 <td>
-                  <RiDeleteBin5Line onClick={()=>deleteHandle(holiday?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
+                  <RiDeleteBin5Line onClick={() => deleteHandle(holiday?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                 </td>
               </tr>
             ))

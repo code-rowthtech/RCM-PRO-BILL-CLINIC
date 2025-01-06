@@ -324,7 +324,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
                         {
                             path: 'schedule',
@@ -346,9 +346,9 @@ const AllRoutes = () => {
                                 : [
                                     {
                                         path: 'list',
-                                        element:  <>
-                                        <div className="disabled-content">You don't have permission to view this page.</div>
-                                    </>
+                                        element: <>
+                                            <div className="disabled-content">You don't have permission to view this page.</div>
+                                        </>
                                     }
                                 ],
 
@@ -448,7 +448,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
 
                         {
@@ -481,7 +481,7 @@ const AllRoutes = () => {
                                     ),
                                 },
                             ],
-                            
+
                         },
                         {
                             path: 'permissions',

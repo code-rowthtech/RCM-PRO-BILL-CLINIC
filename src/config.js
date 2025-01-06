@@ -3,6 +3,5 @@ const config = {
     REACT_APP_PUBLIC_KEY: process.env.REACT_APP_PUBLIC_KEY,
     REACT_APP_PRIVATE_KEY: process.env.REACT_APP_PRIVATE_KEY,
 };
-console.log(process.env,'url')
 
 export default config;

@@ -15,7 +15,6 @@ const DepartmentDetails = ({ docId }) => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result;
-  console.log(departmentId, 'departmentIddepartmentId')
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
   const id = doctorDetails?._id
   // console.log(departmentId, 'departmentId')
@@ -29,7 +28,6 @@ const DepartmentDetails = ({ docId }) => {
   } = useForm();
   // const id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
   // console.log(id, '12345678998765432')
-
   const [searchParams] = useSearchParams();
   const updateId = searchParams.get('id');
 
@@ -71,7 +69,7 @@ const DepartmentDetails = ({ docId }) => {
       // clinicId: id,
       // userId: docId,
       // id: id ,
-      departmentId: data?.department,
+      // departmentId: data?.department,
     }
     // console.log('Form Submitted:', payload);
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
@@ -86,7 +84,7 @@ const DepartmentDetails = ({ docId }) => {
       setValue('CAQHUsername', doctorDetails?.CAQHUsername)
       setValue('medicarePTAN', doctorDetails?.medicarePTAN)
       setValue('medicaidID', doctorDetails?.medicaidID)
-      setValue('department', doctorDetails?.departmentId?._id)
+      // setValue('department', doctorDetails?.departmentId?._id)
       setValue('Medicare_SPOT_Logins', doctorDetails?.Medicare_SPOT_Logins)
       setValue('Medicare_PECOS_Logins', doctorDetails?.Medicare_PECOS_Logins)
       setValue('stateLicense', doctorDetails?.LicensingInformation?.[0]?.stateLicense)
@@ -361,7 +359,7 @@ const DepartmentDetails = ({ docId }) => {
                 <div className="col-6">
                   <div className="row">
                     {/* Medicaid ID */}
-                    <div className="col-6">
+                    <div className="col-12">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">
                           Medicaid ID  {!updateId && <span className='text-danger'>*</span>}
@@ -382,7 +380,7 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
 
                     {/* Department */}
-                    <div className="col-6">
+                    {/* <div className="col-6">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">
                           Department  {!updateId && <span className='text-danger'>*</span>}
@@ -408,7 +406,7 @@ const DepartmentDetails = ({ docId }) => {
                           <span className="text-danger">{errors.department.message}</span>
                         )}
                       </Form.Group>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Medicare PECOS Logins */}

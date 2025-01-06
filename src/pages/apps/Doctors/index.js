@@ -4,7 +4,7 @@ import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiEdit, FiTrash } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
-import { createDoctorAction, getDoctorsAction, stateEmptydAction } from '../../../redux/actions';
+import { createDoctorAction, createDoctorDetailAction, getDoctorsAction, stateEmptydAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -15,7 +15,7 @@ const Doctors = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
-   
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,8 +27,8 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
-    console.log({doctorDetails})
-    const updateStatus = useSelector((state) => state?.createtDoctorsReducer?.data?.status) || [];
+    console.log({ doctorDetails })
+    const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
     const filteredDoctors = doctorDetails.filter((doctor) =>
         doctor.userDetails?.status === status &&
@@ -37,11 +37,11 @@ const Doctors = () => {
 
     const handleStatusChange = () => {
         const payload = {
-            id: selectedDoctor?.userId,
+            id: selectedDoctor?._id,
             status: !selectedDoctor?.userDetails?.status,
         }
-        dispatch(createDoctorAction({ key: encryptMessage(payload) }));
-        closeStatusModal(); // Close modal after the action is confirmed
+        dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+        closeStatusModal();
         dispatch(stateEmptydAction());
     };
 
@@ -53,7 +53,6 @@ const Doctors = () => {
         if (updateStatus === 200) {
             dispatch(
                 getDoctorsAction({ key: encryptMessage(payload) })
-
             );
         }
     }, [updateStatus]);
@@ -114,7 +113,7 @@ const Doctors = () => {
                                         {store?.getDoctorsReducer?.loading ? (
                                             <tr>
                                                 <td className='text-center' colSpan={6}>
-                                                    <Spinner className="spinner-border-lg my-5 " />
+                                                    <Spinner className=" my-5 " />
                                                 </td>
                                             </tr>
                                         ) : (

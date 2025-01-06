@@ -14,9 +14,12 @@ import settingsSaga from './settings/saga';
 import subclinicsSaga from './sub clinic/saga';
 import scheduleSaga from './schedule/saga';
 import settingsRoleSaga from './settings/rolesetting/saga';
+import appointentsSaga from './appointments/saga';
+
 
 export default function* rootSaga(): any {
-    yield all([authSaga(), layoutSaga(),settingsRoleSaga(), permissionsSaga(), rolesSaga(),subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(),settingsSaga(),scheduleSaga()]);
+    yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(),
+    dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga()]);
 }
 // export default function* rootSaga(): any {
 //     yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(),settingsSaga(),scheduleSaga() ]);

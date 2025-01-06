@@ -26,7 +26,6 @@ const NewPatient = () => {
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-    console.log(patientDetails, 'patientDetailspatientDetails')
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const [focused, setFocused] = useState(false);
     const [smShow, setSmShow] = useState(false);
@@ -369,7 +368,6 @@ const NewPatient = () => {
 
 
                         {/* Form Section */}
-
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                             <div className="row mt-1" >
                                 <Col sm={6} className="border-end">
@@ -392,6 +390,7 @@ const NewPatient = () => {
                                                     {...register('profileImage', {
                                                         // required: 'This field is required'
                                                     })}
+                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                                                     ref={logoFileInputRef}
                                                     onChange={handleFileChange}
 
@@ -596,9 +595,7 @@ const NewPatient = () => {
                                                 className="basic-single"
                                                 classNamePrefix="select"
                                                 value={
-                                                    id && patientDetails?.responsibleParty
-                                                        ? selectedParty
-                                                        : null // Ensure null when no match is found
+                                                    selectedParty || 'Select Responsible Party'  // Ensure null when no match is found
                                                 }
                                                 isLoading={store?.getResponsiblePartyReducer?.loading}
                                                 isClearable={true}
@@ -753,10 +750,10 @@ const NewPatient = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr >
+                                                <tr>
                                                     <td>1</td>
                                                     <td>Primary</td>
-                                                    <td className="">Anthem</td>
+                                                    <td>Anthem</td>
                                                     <td>Test</td>
                                                     <td>2333</td>
                                                     <td>

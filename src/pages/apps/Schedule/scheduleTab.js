@@ -15,9 +15,9 @@ const ScheduleTab = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const [time, setTime] = useState("");
+  console.log({ time })
   const [name, setName] = useState("");
   const doctorLists = store?.getDoctorsListReducer?.data?.result;
-  console.log({ doctorLists })
   const scheduleList = store?.getScheduleReducer?.data?.result || [];
   const isLoading = store?.getScheduleReducer?.loading;
   const [focusIndex, setFocusIndex] = useState(null);
@@ -108,9 +108,8 @@ const ScheduleTab = () => {
       perPatientTime: time,
       availability,
     };
-
+    console.log({ payload })
     dispatch(createScheduleAction({ key: encryptMessage(payload) }));
-    console.log({ payload });
 
     dispatch(
       getScheduleAction({
@@ -131,12 +130,11 @@ const ScheduleTab = () => {
     { day: "Saturday" },
     { day: "Sunday" },
   ];
-  console.log({days})
 
   const handleEditClick = (index, fieldName) => {
     setFocusIndex({ index, fieldName }); // Update focus index
     setTimeout(() => {
-      inputRefs.current[index]?.[fieldName]?.focus(); // Focus the desired input field
+      inputRefs.current[index]?.[fieldName]?.focus();
     }, 0);
   };
 
@@ -240,10 +238,10 @@ const ScheduleTab = () => {
 
         <div className="col-3 mb-1">
           <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
-            Per Patient Time<span className="text-danger">*</span>
+            Per Patient Time (in minutes) <span className="text-danger">*</span>
           </label>
           <input
-            type="time"
+            type="text"
             id="perPatientTime"
             className="form-control"
             value={time}
@@ -265,9 +263,12 @@ const ScheduleTab = () => {
       </Table>
 
       <div className="d-flex justify-content-end">
-        <Button type="submit" variant="primary">
-          Save Schedule
-          {/* {isLoading && <Spinner animation="border" />} */}
+        <Button variant="primary" disabled={store?.createScheduleReducer?.loading} type="submit">
+          {store?.createScheduleReducer?.loading ?
+            <Spinner className="spinner-border-sm" color="white" />
+            :
+            'Save Schedule'
+          }
         </Button>
       </div>
     </form>
