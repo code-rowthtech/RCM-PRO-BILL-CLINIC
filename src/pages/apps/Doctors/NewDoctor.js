@@ -94,7 +94,8 @@ const NewDoctor = () => {
     console.log(doctorDetails, 'newDoctorIddoctorDetails')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
-    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
+    const departmentGetData = store?.getDepartmentDataReducer;
+    console.log({departmentGetData})
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {

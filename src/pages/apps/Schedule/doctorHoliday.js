@@ -9,7 +9,6 @@ const DoctorHoliday = () => {
   const store = useSelector((state) => state);
 
   const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-  console.log(scheduleResponse,'iddd')
   const isLoading = store?.getScheduleReducer?.loading;
 
   useEffect(() => {

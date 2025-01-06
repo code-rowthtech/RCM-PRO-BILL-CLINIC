@@ -64,7 +64,6 @@ const AddBreak = () => {
 
         dispatch(createScheduleAction({ key: encryptMessage(payload) }));
         reset();
-        console.log(payload, "payload");
     };
 
     return (

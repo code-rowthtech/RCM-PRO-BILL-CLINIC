@@ -49,7 +49,7 @@ const Department = () => {
       //   id: edit?._id,
       ...(edit ? { id: edit?._id } : {}),
       name: data?.name,
-      description: data?.description,
+      description: data?.description || 'N/A',
       category: 'Department',
       clinicId: clinic_id,
       showTo: "clinic",
@@ -93,11 +93,12 @@ const Department = () => {
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
+
   return (
     <Row className='mt-2'>
       <Col xs={12}>
-        <Card>
-          <Card.Body>
+        <Card >
+          <Card.Body style={{ height: 'auto' }}>
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
@@ -135,7 +136,7 @@ const Department = () => {
             <Table
               responsive
               className="table-centered table-nowrap mb-0  rounded"
-              style={{ height: 'auto' }}
+              style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}
             >
               <thead className="text-white">
                 <tr>
@@ -211,8 +212,21 @@ const Department = () => {
                   <Form.Label>Department Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
-                    {...register("name", { required: "Name is required" })}
+                    {...register("name", {
+                      required: "Name is required",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                      },
+                    })}
                     placeholder="Enter Department Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
                   />
                   {errors.name && <p className="text-danger">{errors.name.message}</p>}
                 </Form.Group>
@@ -224,27 +238,54 @@ const Department = () => {
                     type="text"
                     {...register("reEnterName", {
                       required: "Re-enter department name",
-                      validate: (value) => value === nameValue || "Names do not match",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                        matchName: (value) => value === watch('name') || "Name do not match", // Match with 'name' field value
+                      },
                     })}
                     placeholder="Re-enter Department Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
                   />
+
                   {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
                 </Form.Group>
               </Col>
               <Col md={12}>
                 <Form.Group className="mb-2">
                   <Form.Label>Description</Form.Label>
-                  <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    {...register("description")}
+                    placeholder="Enter description"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
+                  />
                 </Form.Group>
+
+
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
-              <Button type="submit" className='custom-buttons'>
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
+              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button type="submit" className="custom-buttons">
+                {store?.createMastersDataReducer?.loading ? <Spinner /> : "Submit"}
               </Button>
             </Modal.Footer>
           </Form>
+
         </Modal.Body>
       </Modal>
     </Row>

@@ -117,7 +117,17 @@ const AddRole = ({ show, close }) => {
                                                 value: /^(?! )[A-Za-z0-9 ]*$/,
                                                 message: 'Special characters and leading spaces are not allowed',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     {errors.name && <span className="text-danger fs-6">{errors.name.message}</span>}
                                 </Form.Group>
@@ -134,7 +144,17 @@ const AddRole = ({ show, close }) => {
                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                 message: 'Invalid email format',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Email cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
@@ -152,7 +172,17 @@ const AddRole = ({ show, close }) => {
                                                 value: 6,
                                                 message: 'Password must be at least 6 characters',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Password cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     <span
                                         className="position-absolute"
@@ -180,7 +210,17 @@ const AddRole = ({ show, close }) => {
                                                 value: 6,
                                                 message: 'Password must be at least 6 characters',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Confirm password cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     <span
                                         className="position-absolute d-flex align-items-center justify-content-center"
@@ -251,7 +291,17 @@ const AddRole = ({ show, close }) => {
                                                 value: /^[0-9]{10}$/,
                                                 message: 'Only 10-digit numbers are allowed',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Contact cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     {errors.contact && <span className="text-danger fs-6">{errors.contact.message}</span>}
                                 </Form.Group>
@@ -272,7 +322,17 @@ const AddRole = ({ show, close }) => {
                                                 value: /^[0-9]{10}$/,
                                                 message: 'Only 10-digit numbers are allowed',
                                             },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Phone number cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                              },
                                         })}
+                                        onInput={(e) => {
+                                            const value = e.target.value;
+                                            if (value.trim() === "") {
+                                              e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                            }
+                                          }}
                                     />
                                     {errors.phNumberSecondary && <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>}
                                 </Form.Group>
