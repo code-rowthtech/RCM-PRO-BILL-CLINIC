@@ -5,10 +5,13 @@ import { FiEdit } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createScheduleAction,
+  createTimingsAction,
   getDoctorsListAction,
+  getPractitionerTimingsAction,
   getScheduleAction,
 } from "../../../redux/schedule/action";
 import { encryptMessage } from "../../../cryptoUtils";
+import Select from 'react-select';
 
 const ScheduleTab = () => {
   const [selectedDoctor, setSelectedDoctor] = useState("");
@@ -23,7 +26,16 @@ const ScheduleTab = () => {
   const [focusIndex, setFocusIndex] = useState(null);
   const inputRefs = useRef([]);
   const { control, handleSubmit, setValue, register } = useForm();
-
+  const [doctorSearch, setDoctorSearch] = useState('');
+  // const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const doctorDetails = store?.getDoctorsReducer?.data?.response;
+  const doctorOptions = doctorDetails?.map((data) => ({
+    value: data._id,
+    label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+  }));
+  const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+  const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;
+  console.log(practitionerTimings, 'practitionerTimings')
   useEffect(() => {
     dispatch(getDoctorsListAction());
     dispatch(
@@ -35,54 +47,68 @@ const ScheduleTab = () => {
       })
     );
   }, [dispatch]);
+  useEffect(() => {
+    if (selectedDoctor?.value) {
+      const payload = {
+        clinicId: clinicId,
+        doctorId: selectedDoctor?.value
+      }
+      dispatch(getPractitionerTimingsAction({ key: encryptMessage(payload) }))
+    }
+  }, [selectedDoctor])
+
+  // useEffect(() => {
+  //   if (selectedDoctor) {
+  //     // const doctorInfo = JSON.parse(selectedDoctor || "{}");
+  //     const filteredScheduleList = scheduleList.filter(
+  //       (schedule) => schedule?.doctorId === selectedDoctor?.value
+  //     );
+
+  //     if (filteredScheduleList.length > 0) {
+  //       const firstSchedule = filteredScheduleList[0];
+  //       setValue('perPatientTime', practitionerTimings?.[0]?.perPatientTime);
+  //       setName(firstSchedule.name || "");
+
+  //       firstSchedule?.availability?.forEach((schedule, index) => {
+  //         setValue(
+  //           `schedules.newSchedule.${index}.availableOn`,
+  //           schedule.availableOn || "Not Available"
+  //         );
+  //         setValue(
+  //           `schedules.newSchedule.${index}.availableFrom`,
+  //           schedule.availableFrom || ""
+  //         );
+  //         setValue(
+  //           `schedules.newSchedule.${index}.availableTo`,
+  //           schedule.availableTo || ""
+  //         );
+  //       });
+  //     } else {
+  //       setTime("");
+  //       setName("");
+
+  //       scheduleList.forEach((schedule, index) => {
+  //         setValue(`schedules.newSchedule.${index}.availableOn`, "");
+  //         setValue(`schedules.newSchedule.${index}.availableFrom`, "");
+  //         setValue(`schedules.newSchedule.${index}.availableTo`, "");
+  //       });
+  //     }
+  //   } else {
+  //     setTime("");
+  //     setName("");
+  //     scheduleList.forEach((schedule, index) => {
+  //       setValue(`schedules.newSchedule.${index}.availableOn`, "");
+  //       setValue(`schedules.newSchedule.${index}.availableFrom`, "");
+  //       setValue(`schedules.newSchedule.${index}.availableTo`, "");
+  //     });
+  //   }
+  // }, [selectedDoctor, scheduleList, setValue]);
 
   useEffect(() => {
-    if (selectedDoctor) {
-      const doctorInfo = JSON.parse(selectedDoctor || "{}");
-      const filteredScheduleList = scheduleList.filter(
-        (schedule) => schedule?.doctorId === doctorInfo?.id
-      );
-
-      if (filteredScheduleList.length > 0) {
-        const firstSchedule = filteredScheduleList[0];
-        setTime(firstSchedule.perPatientTime || "");
-        setName(firstSchedule.name || "");
-
-        firstSchedule?.availability?.forEach((schedule, index) => {
-          setValue(
-            `schedules.newSchedule.${index}.availableOn`,
-            schedule.availableOn || "Not Available"
-          );
-          setValue(
-            `schedules.newSchedule.${index}.availableFrom`,
-            schedule.availableFrom || ""
-          );
-          setValue(
-            `schedules.newSchedule.${index}.availableTo`,
-            schedule.availableTo || ""
-          );
-        });
-      } else {
-        setTime("");
-        setName("");
-
-        scheduleList.forEach((schedule, index) => {
-          setValue(`schedules.newSchedule.${index}.availableOn`, "");
-          setValue(`schedules.newSchedule.${index}.availableFrom`, "");
-          setValue(`schedules.newSchedule.${index}.availableTo`, "");
-        });
-      }
-    } else {
-      setTime("");
-      setName("");
-      scheduleList.forEach((schedule, index) => {
-        setValue(`schedules.newSchedule.${index}.availableOn`, "");
-        setValue(`schedules.newSchedule.${index}.availableFrom`, "");
-        setValue(`schedules.newSchedule.${index}.availableTo`, "");
-      });
+    if (selectedDoctor && practitionerTimings?.length > 0) {
+      setValue('perPatientTime', practitionerTimings?.[0]?.perPatientTime)
     }
-  }, [selectedDoctor, scheduleList, setValue]);
-
+  }, [selectedDoctor, practitionerTimings])
   const formatTime = (time) => {
     if (!time) return null;
     const [hours, minutes] = time.split(":");
@@ -90,26 +116,31 @@ const ScheduleTab = () => {
   };
 
   const onSubmit = (data) => {
-    const doctorInfo = JSON.parse(selectedDoctor || "{}");
+    // const doctorInfo = JSON.parse(selectedDoctor || "{}");
     const availability = days.map((day, index) => ({
-      availableOn: day.day,
-      availableFrom:
-        formatTime(data.schedules?.newSchedule?.[index]?.availableFrom) ||
-        "00:00:00",
-      availableTo:
-        formatTime(data.schedules?.newSchedule?.[index]?.availableTo) ||
-        "00:00:00",
+      day: day.day,
+      slots: [
+        {
+          startTime: formatTime(data.schedules?.newSchedule?.[index]?.availableFrom),
+          endTime: formatTime(data.schedules?.newSchedule?.[index]?.availableTo)
+        }
+      ]
+
     }));
 
     const payload = {
-      doctorId: doctorInfo.id,
-      type: "Schedule",
-      name: doctorInfo.name,
-      perPatientTime: time,
-      availability,
+      doctorId: selectedDoctor?.value,
+      name: selectedDoctor?.label,
+      perPatientTime: data?.perPatientTime,
+      availability: availability.filter(
+        (day) => !(
+          day.slots[0].startTime === null &&
+          day.slots[0].endTime === null
+        )
+      ),
     };
-    console.log({ payload })
-    dispatch(createScheduleAction({ key: encryptMessage(payload) }));
+    console.log(payload, '000000000000000000000')
+    dispatch(createTimingsAction({ key: encryptMessage(payload) }));
 
     dispatch(
       getScheduleAction({
@@ -138,6 +169,18 @@ const ScheduleTab = () => {
     }, 0);
   };
 
+  const handleInputChange = (data, type) => {
+    if (type === 'doctor') {
+      setDoctorSearch(data)
+    }
+  }
+
+  const handleSearchInputChange = (selectedOption, type) => {
+    // setSelectedPatient(selectedOption, 'Selected Option');
+    if (type === 'doctor') {
+      setSelectedDoctor(selectedOption, 'Selected Option');
+    }
+  };
   const renderEmptyScheduleData = () => {
     return (
       <>
@@ -206,11 +249,11 @@ const ScheduleTab = () => {
       <h4 className="mt-0">Edit Schedule</h4>
 
       <div className="row">
-        <div className="col-3 mb-1">
+        <div className="col-3 mb-1 responnsible-party-select">
           <label htmlFor="doctorName" style={{ fontWeight: "bold" }}>
             Doctor Name<span className="text-danger">*</span>
           </label>
-          <select
+          {/* <select
             id="doctorName"
             value={selectedDoctor}
             onChange={(e) => setSelectedDoctor(e.target.value)}
@@ -233,10 +276,22 @@ const ScheduleTab = () => {
                 {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
               </option>
             ))}
-          </select>
+          </select> */}
+          <Select
+            className="basic-single"
+            classNamePrefix="select"
+            isLoading={store?.getDoctorsReducer?.loading}
+            isClearable={true}
+            isSearchable={true}
+            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+            onChange={(data) => handleSearchInputChange(data, 'doctor')}
+            name="doctorName"
+            options={doctorOptions}
+            placeholder="Select Doctor"
+          />
         </div>
 
-        <div className="col-3 mb-1">
+        <div className="col-3 mb-1 ">
           <label htmlFor="perPatientTime" style={{ fontWeight: "bold" }}>
             Per Patient Time (in minutes) <span className="text-danger">*</span>
           </label>
@@ -244,9 +299,17 @@ const ScheduleTab = () => {
             type="text"
             id="perPatientTime"
             className="form-control"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
+            {...register('perPatientTime')}
+            defaultValue={time}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d*\.?\d{0,2}$/.test(value)) { // Matches numbers like "10", "10.", "10.0", "10.00"
+                setTime(value);
+              }
+            }}
+            placeholder="Enter time (e.g., 10.00)"
           />
+
         </div>
       </div>
 

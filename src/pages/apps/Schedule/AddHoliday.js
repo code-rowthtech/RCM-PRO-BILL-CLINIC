@@ -1,24 +1,40 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Card, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
+import { createScheduleAction } from "../../../redux/schedule/action";
 import { encryptMessage } from "../../../cryptoUtils";
-import { stateEmptydAction } from "../../../redux/actions";
+import { getDoctorsAction, stateEmptydAction } from "../../../redux/actions";
 import Spinner from "../../../constants/Spinner";
+import Select from 'react-select';
 
 const AddHoliday = () => {
     const store = useSelector((state) => state);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const doctorLists = store?.getDoctorsListReducer?.data?.result;
+    const [status, setStatus] = useState(true);
+    const [doctorSearch, setDoctorSearch] = useState('');
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    // console.log({ selectedDoctor })
     const addResponse = store?.createScheduleReducer?.data?.response?.status;
+    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorOptions = doctorDetails?.map((data) => ({
+        value: data._id,
+        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    }));
+
     useEffect(() => {
         if (addResponse === 200) {
             reset();
             dispatch(stateEmptydAction());
-            dispatch(getDoctorsListAction());
+            const payload = {
+                search: doctorSearch,
+                status: status,
+            }
+            dispatch(
+                getDoctorsAction({ key: encryptMessage(payload) })
+            );
         }
     }, [addResponse])
     const {
@@ -27,24 +43,46 @@ const AddHoliday = () => {
         reset,
         formState: { errors },
     } = useForm();
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const onSubmit = (data) => {
-        const doctorInfo = JSON.parse(data.doctorInfo);
+        // const doctorInfo = JSON.parse(data.doctorInfo);
         const payload = {
-            doctorId: doctorInfo.id,
-            type: 'Holiday',
-            name: doctorInfo.name,
-            reason: data.reason,
+            doctorId: selectedDoctor?.value,
+            clinicId: clinicId,
             fromDate: data.fromDate,
-            tillDate: data.tillDate,
+            toDate: data.tillDate,
+            // type: 'Holiday',
+            // name: selectedDoctor?.label,
+            reason: data?.reason,
         };
+        // console.log({ payload })
         dispatch(createScheduleAction({ key: encryptMessage(payload) }));
     };
 
     useEffect(() => {
-        dispatch(getDoctorsListAction());
-    }, [dispatch]);
+        const payload = {
+            search: doctorSearch,
+            status: status,
+        }
+        dispatch(
+            getDoctorsAction({ key: encryptMessage(payload) })
+        );
 
+    }, [dispatch, doctorSearch]);
+
+    const handleInputChange = (data, type) => {
+        if (type === 'doctor') {
+            setDoctorSearch(data)
+        }
+    }
+
+    const handleChange = (selectedOption, type) => {
+        // setSelectedPatient(selectedOption, 'Selected Option');
+        if (type === 'doctor') {
+            setSelectedDoctor(selectedOption, 'Selected Option');
+        }
+    };
     return (
         <div className="background_Color pt-1 pb-2">
             <div className="container-fluid mt-4">
@@ -58,7 +96,7 @@ const AddHoliday = () => {
 
                     <div className="px-2" style={{ height: '100%' }}>
                         {
-                            store?.getDoctorsListReducer?.loading ?
+                            store?.getDoctorsReducer?.loading ?
                                 <div className="d-flex justify-content-center align-items-center h-100">
                                     <Spinner />
                                 </div>
@@ -66,29 +104,22 @@ const AddHoliday = () => {
                                 <Form onSubmit={handleSubmit(onSubmit)}>
                                     <div className="row pb-2 mt-1">
                                         <div className="col-6">
-                                            <Form.Group className="mb-1">
+                                            <Form.Group className="mb-1 responnsible-party-select">
                                                 <Form.Label className="mb-0">
                                                     Doctor Name<span className="text-danger">*</span>
                                                 </Form.Label>
-                                                <Form.Select
-                                                    {...register("doctorInfo", {
-                                                        required: "Doctor selection is required",
-                                                    })}
-                                                >
-                                                    <option value="">Select doctor</option>
-                                                    {doctorLists &&
-                                                        doctorLists.map((doctor, index) => (
-                                                            <option
-                                                                key={index}
-                                                                value={JSON.stringify({
-                                                                    id: doctor?.userId?._id,
-                                                                    name: `${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`,
-                                                                })}
-                                                            >
-                                                                {`${doctor?.userId?.firstName} ${doctor?.userId?.lastName}`}
-                                                            </option>
-                                                        ))}
-                                                </Form.Select>
+                                                <Select
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    isLoading={store?.getDoctorsReducer?.loading}
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                                                    onChange={(data) => handleChange(data, 'doctor')}
+                                                    name="doctorName"
+                                                    options={doctorOptions}
+                                                    placeholder="Select Doctor Name"
+                                                />
                                                 {errors.doctorName && (
                                                     <span className="text-danger">{errors.doctorName.message}</span>
                                                 )}
@@ -145,7 +176,7 @@ const AddHoliday = () => {
                                     </div>
 
                                     <div className="d-flex gap-2 justify-content-end mb-2">
-                                        <Button variant="secondary" type="button">
+                                        <Button variant="secondary" type="button" onClick={() => navigate(-1)}>
                                             Cancel
                                         </Button>
                                         <Button variant="primary" disabled={store?.createScheduleReducer?.loading} type="submit">

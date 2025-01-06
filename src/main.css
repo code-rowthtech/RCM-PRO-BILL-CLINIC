@@ -228,3 +228,9 @@ table {
 }
 /* 
  */
+.react-datepicker__input-container input {
+    height: 2.3rem !important;
+    width: 14rem !important;
+    padding: 0 0.5rem !important;
+    border-radius: 3px;
+}

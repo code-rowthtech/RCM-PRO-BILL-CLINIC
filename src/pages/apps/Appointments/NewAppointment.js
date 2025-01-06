@@ -161,18 +161,9 @@ const NewAppointment = () => {
                                         <label htmlFor="patient" className="form-label mb-0">
                                             Patient
                                         </label>
-                                        {/* <select id="patient" className="w-100 input ps-2 py-1">
-                                            <option selected>Select Name</option>
-                                            {patientsData && patientsData?.map((data, index) => (
-                                                <option key={index} value={data?._id}>{data?.fullName}</option>
-                                            ))}
-                                        </select> */}
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getPatientsReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}
@@ -192,9 +183,6 @@ const NewAppointment = () => {
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getMastersDataReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}
@@ -214,9 +202,6 @@ const NewAppointment = () => {
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getDoctorsReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}

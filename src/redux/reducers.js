@@ -12,7 +12,7 @@ import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
-import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, deleteScheduleReducer } from './schedule/reducers';
+import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, deleteScheduleReducer, createTimingsReducer, getPractitionerTimingsReducer } from './schedule/reducers';
 import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from './settings/rolesetting/reducers';
 import { createAppointmentReducer, getAppointmentsReducer, getPractitionerScheduleReducer } from './appointments/reducers';
 export default (combineReducers({
@@ -32,5 +32,5 @@ export default (combineReducers({
     getSubscriptionReducer, getSubSubscriptionReducer,
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
-    createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer
+    createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, createTimingsReducer, getPractitionerTimingsReducer
 }): any);
