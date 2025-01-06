@@ -6,6 +6,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import { IoMdClose } from 'react-icons/io';
 import { FiDownload } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 const Contract = ({ billingId, activeTab }) => {
     const dispatch = useDispatch();
@@ -15,15 +16,17 @@ const Contract = ({ billingId, activeTab }) => {
     const [show, setShow] = useState(false);
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     // Check if the createContract data is empty
+    const store = useSelector((state) => state);
+    console.log(store?.createContractReducer?.data, '==============')
     const contract =
         createContractReducer?.data &&
-        Object.keys(createContractReducer?.data).length > 0
+            Object.keys(createContractReducer?.data).length > 0
             ? createContractReducer?.data
             : null;
-        console.log(contract,"contract")
+    console.log(contract, "contract")
 
     const standardContract = standardContractReducer?.data;
-    console.log(standardContract,"standardContract")
+    console.log(standardContract, "standardContract")
 
     useEffect(() => {
         if (activeTab === 'contract') {
@@ -86,12 +89,11 @@ const Contract = ({ billingId, activeTab }) => {
                                     </td>
                                     <td>
                                         <span
-                                            className={`${
-                                                (contract?.contract?.clinicSignStatus ||
+                                            className={`${(contract?.contract?.clinicSignStatus ||
                                                     standardContract?.contract?.clinicSignStatus)
                                                     ? 'bg-success'
                                                     : 'bg-secondary'
-                                            } text-light px-1 rounded-1`}
+                                                } text-light px-1 rounded-1`}
                                         >
                                             {(contract?.contract?.clinicSignStatus ||
                                                 standardContract?.contract?.clinicSignStatus)
@@ -101,18 +103,18 @@ const Contract = ({ billingId, activeTab }) => {
                                     </td>
                                     <td>
                                         <span
-                                            className={`${
-                                                (contract?.contract?.adminSignStatus ||
+                                            className={`${(contract?.contract?.adminSignStatus ||
                                                     standardContract?.contract?.adminSignStatus)
                                                     ? 'bg-success'
                                                     : 'bg-secondary'
-                                            } text-light px-1 rounded-1`}
+                                                } text-light px-1 rounded-1`}
                                         >
                                             {(contract?.contract?.adminSignStatus ||
                                                 standardContract?.contract?.adminSignStatus)
                                                 ? 'Signed'
                                                 : 'Pending'}
                                         </span>
+
                                     </td>
                                     <td>{contract?.contract?.sentDate || standardContract?.contract?.sentDate || 'N/A'}</td>
                                     <td>
@@ -120,17 +122,11 @@ const Contract = ({ billingId, activeTab }) => {
                                             className="fs-4 me-1 uil-eye cursor-pointer"
                                             onClick={() => setShow(true)}
                                         ></i>
-                                        <i
-                                            className="cursor-pointer fs-4"
-                                            onClick={() => {
-                                                handleDownload(
-                                                    contract?.contract?.certificateFileUrl ||
-                                                        standardContract?.contract?.certificateFileUrl
-                                                );
-                                            }}
-                                        >
-                                            <FiDownload />
-                                        </i>
+                                        {contract && contract.contract?.contractTemplateId?.fileUrl && (
+                                            <Link to={contract.contract.contractTemplateId.fileUrl} target="blank" className="cursor-pointer fs-4">
+                                                <FiDownload />
+                                            </Link>
+                                        )}
                                     </td>
                                 </tr>
                             )}
