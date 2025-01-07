@@ -70,12 +70,16 @@ export const getSubSubscriptions = '/api/v1/clinic/getSubscription/history'
 export const addSubscriptionPlan = '/api/v1/clinic/addSubscriptionPlan';
 
 // SCHEDULE
-export const createSchedule = '/api/v1/clinic/addOrUpdateSchedule';
+export const createSchedule = '/api/v1/clinic/practitioner/holiday/create';
+export const createTimings = '/api/v1/clinic/practitioner/schedule/create';
+export const updateTimings = '/api/v1/clinic/practitioner/schedule/update';
 export const getDoctorsList = 'api/v1/clinic/getDoctorsList';
-export const deleteSchedule = '/api/v1/clinic/removeSchedule'
-export const getSchedule = '/api/v1/clinic/getSchedule';
+export const deleteSchedule = '/api/v1/clinic/practitioner/holiday/delete'
+export const getSchedule = '/api/v1/clinic/practitioner/holidays';
+export const getPractitionerTimings = '/api/v1/clinic/practitioner/schedule';
 
 // appointments
 export const createAppointment = '/api/v1/appointments'
 export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule'
-export const getAppointments = '/api/v1/appointments/clinic/'
+export const getAppointments = '/api/v1/clinic/appointment/getAll/';
+export const getPractitionerSlots = '/api/v1/clinic/practitioner/slots';

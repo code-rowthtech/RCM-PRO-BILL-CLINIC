@@ -91,6 +91,7 @@ const NewDoctor = () => {
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
+    console.log(store?.getRoleDataReducer, 'store?.getRoleDataReducer')
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
@@ -252,6 +253,7 @@ const NewDoctor = () => {
             console.log({ payload })
             dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         } else {
+            console.log({ payload })
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
     };
@@ -652,6 +654,9 @@ const NewDoctor = () => {
                                                                 <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
                                                                 <Form.Select
                                                                     {...register('department', { required: 'Department is required' })}
+                                                                    onChange={(e) => {
+                                                                        setFormData({ ...formData, departmentId: e.target.value });
+                                                                    }}
                                                                 >
                                                                     <option value="">Select Department</option>
                                                                     {departmentGetData?.map((data) => (
