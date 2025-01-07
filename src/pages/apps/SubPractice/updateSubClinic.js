@@ -179,6 +179,7 @@ const SubUpdateClinic = () => {
         setValue,
         getValues,
         watch,
+        clearErrors,
     } = useForm({
         defaultValues: {
             accreditationDetails: [{ name: '', documentNumber: '' }],
@@ -1500,67 +1501,121 @@ const SubUpdateClinic = () => {
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Full Name</Form.Label>
+                                                                    <Form.Label className="mb-0">Full Name {index === 0 && <span className='text-danger'>*</span>} </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
-                                                                        {...register(`name.${index}`)}
-                                                                        value={data.name} // Initialize with the current value
+                                                                        {...register(`name.${index}`, {
+                                                                            required: index === 0 ? 'Full Name is required' : false,
+                                                                        })}
+                                                                        value={data.name}
                                                                         onChange={(e) => {
-                                                                            handlePOSInputChange(e, 'name', index); // Keep existing functionality
-                                                                            setValue(`name.${index}`, e.target.value); // Sync with react-hook-form
+                                                                            clearErrors(`name.${index}`);
+                                                                            handlePOSInputChange(e, 'name', index);
+                                                                            setValue(`name.${index}`, e.target.value);
                                                                         }}
                                                                         onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                                         placeholder="Full Name"
                                                                     />
-                                                                    {errors.name?.[index] && (
-                                                                        <span className="text-danger">{errors.name[index].message}</span>
+                                                                    {errors[`name.${index}`] && (
+                                                                        <span className="text-danger">{errors[`name.${index}`]?.message}</span>
                                                                     )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Contact Email</Form.Label>
+                                                                    <Form.Label className="mb-0">Contact Email  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <Form.Control
                                                                         type="email"
                                                                         value={data.email}
-                                                                        {...register('contactemail', {
+                                                                        {...register(`contactemail.${index}`, {
                                                                             pattern: {
                                                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
                                                                                 message: 'Please enter a valid email address'
-                                                                            }
+                                                                            },
+                                                                            required: index !== 1 ? 'Contact Email is required' : false,
+                                                                            onChange: (e) => {
+                                                                                clearErrors(`contactemail.${index}`);
+                                                                                handlePOSInputChange(e, 'email', index);
+                                                                            },
                                                                         })}
-                                                                        onChange={(e) => handlePOSInputChange(e, 'email', index)}
                                                                         placeholder="Contact Email"
                                                                     />
-                                                                    {errors.contactemail && <span className="text-danger">{errors.contactemail.message}</span>}
+                                                                    {errors[`contactemail.${index}`] && (
+                                                                        <span className="text-danger">{errors[`contactemail.${index}`]?.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Job Title / Role</Form.Label>
+                                                                    <Form.Label className="mb-0">Job Title / Role{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <Form.Control
                                                                         type='text'
                                                                         value={data?.role}
+                                                                        {...register(`role.${index}`, {
+                                                                            required: index !== 1 ? 'Job Title / Role is required' : false,
+                                                                            onChange: (e) => {
+                                                                                clearErrors(`role.${index}`);
+                                                                                handlePOSInputChange(e, 'role', index);
+                                                                            },
+                                                                        })}
                                                                         placeholder='Job Title / Role'
-                                                                        onChange={(e) => handlePOSInputChange(e, 'role', index)}
                                                                     />
+                                                                    {errors[`role.${index}`] && (
+                                                                        <span className="text-danger">{errors[`role.${index}`]?.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1 position-relative">
-                                                                    <Form.Label className="mb-0">Contact Person</Form.Label>
+                                                                    <Form.Label className="mb-0">Contact Person{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <InputGroup>
                                                                         <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
                                                                         <Form.Control
                                                                             type="tel"
                                                                             value={data.contact}
-                                                                            onChange={(e) => handlePOSInputChange(e, 'contact', index)} // Retain original functionality
-                                                                            placeholder="1234-234-234"
+                                                                            {...register(`poccontact.${index}`, {
+                                                                                required: index !== 1 ? 'Contact is required' : false,
+                                                                                pattern: {
+                                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
+                                                                                    message:
+                                                                                        'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                                                },
+                                                                                maxLength: {
+                                                                                    value: 10,
+                                                                                    message: 'Contact must not exceed 10 characters',
+                                                                                },
+                                                                                minLength: {
+                                                                                    value: 10,
+                                                                                    message: 'Contact must not be less than 10 digits',
+                                                                                },
+                                                                                onChange: (e) => {
+                                                                                    const rawValue = e.target.value.replace(/\D/g, '');
+                                                                                    const formattedValue = rawValue.replace(
+                                                                                        /(\d{3})(\d{3})(\d{0,4})/,
+                                                                                        (match, p1, p2, p3) =>
+                                                                                            p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+                                                                                    );
+                                                                                    handlePOSInputChange(
+                                                                                        { ...e, target: { ...e.target, value: rawValue } },
+                                                                                        'contact',
+                                                                                        index
+                                                                                    );
+                                                                                    e.target.value = formattedValue;
+                                                                                    clearErrors(`poccontact.${index}`);
+                                                                                },
+                                                                            })}
+                                                                            placeholder="123-456-7890"
                                                                             maxLength={10}
-                                                                            isInvalid={errors?.contact}
+                                                                            onKeyPress={(event) => {
+                                                                                if (!/[0-9]/.test(event.key)) {
+                                                                                    event.preventDefault();
+                                                                                }
+                                                                            }}
                                                                         />
                                                                     </InputGroup>
-                                                                    {errors?.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                                    {errors[`poccontact.${index}`] && (
+                                                                        <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
+                                                                    )}                                                                    
                                                                     <img
                                                                         src={us}
                                                                         alt="country code flag"

@@ -318,7 +318,7 @@ function* createContractFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger');
+        // ToastHandle(error,'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_CONTRACT_ERROR,
             payload: error,
