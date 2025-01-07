@@ -10,6 +10,10 @@ const CREATE_TIMINGS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const UPDATE_TIMINGS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 const GET_DOCTORS_LIST_INITIAL_STATE = {
     data: [],
@@ -69,6 +73,33 @@ export const createTimingsReducer = (state = CREATE_TIMINGS_INITIAL_STATE, actio
                 loading: false,
             }
         case ScheduleActionTypes.CREATE_TIMINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            }
+        case ScheduleActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false,
+
+            }
+        default: return state
+    }
+}
+
+export const updateTimingsReducer = (state = UPDATE_TIMINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.UPDATE_TIMINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            }
+        case ScheduleActionTypes.UPDATE_TIMINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            }
+        case ScheduleActionTypes.UPDATE_TIMINGS_ERROR:
             return {
                 data: action.payload,
                 loading: false,

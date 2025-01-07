@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { AppointmentActionTypes } from './constants';
-import { createAppointmentApi, getAppointmentsApi, getPractitionerScheduleApi } from './api';
+import { createAppointmentApi, getAppointmentsApi, getPractitionerScheduleApi, getPractitionerSlotsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -66,6 +66,35 @@ function* getPractitionerScheduleFunction(data) {
         });
     }
 }
+
+function* getPractitionerSlotsFunction(data) {
+    try {
+        yield put({
+            type: AppointmentActionTypes.GET_PRACTITIONER_SLOTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPractitionerSlotsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success')
+            yield put({
+                type: AppointmentActionTypes.GET_PRACTITIONER_SLOTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: AppointmentActionTypes.GET_PRACTITIONER_SLOTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: AppointmentActionTypes.GET_PRACTITIONER_SLOTS_ERROR,
+            payload: error,
+        });
+    }
+}
 function* getAppointmentsFunction(data) {
     try {
         yield put({
@@ -106,6 +135,10 @@ export function* watchGetPractitionerScedule() {
     yield takeEvery(AppointmentActionTypes.GET_PRACTITIONER_SCHEDULE, getPractitionerScheduleFunction);
 }
 
+export function* watchGetPractitionerSlots() {
+    yield takeEvery(AppointmentActionTypes.GET_PRACTITIONER_SLOTS, getPractitionerSlotsFunction);
+}
+
 export function* watchGetAppointments() {
     yield takeEvery(AppointmentActionTypes.GET_APPOINTMENT, getAppointmentsFunction);
 }
@@ -118,6 +151,7 @@ function* appointentsSaga() {
     yield all([
         fork(watchCreateAppointment),
         fork(watchGetPractitionerScedule),
+        fork(watchGetPractitionerSlots),
         fork(watchGetAppointments),
     ]);
 }

@@ -3,7 +3,7 @@ import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createScheduleApi, createTimingsApi, deleteScheduleApi, getDoctorsListApi, getPractitionerTimingsApi, getScheduleApi } from './api';
+import { createScheduleApi, createTimingsApi, deleteScheduleApi, getDoctorsListApi, getPractitionerTimingsApi, getScheduleApi, updateTimingsApi } from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -62,6 +62,34 @@ function* createTimingsFunction(data) {
         ToastHandle(error, 'danger');
         yield put({
             type: ScheduleActionTypes.CREATE_TIMINGS_ERROR,
+            payload: error,
+        });
+    }
+}
+function* updateTimingsFunction(data) {
+    try {
+        yield put({
+            type: ScheduleActionTypes.UPDATE_TIMINGS_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateTimingsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response?.data?.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: ScheduleActionTypes.UPDATE_TIMINGS_SUCCESS,
+                payload: { response },
+            });
+        } else {
+            yield put({
+                type: ScheduleActionTypes.UPDATE_TIMINGS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: ScheduleActionTypes.UPDATE_TIMINGS_ERROR,
             payload: error,
         });
     }
@@ -190,6 +218,9 @@ export function* watchSchedule() {
 export function* watchCreateTimings() {
     yield takeEvery(ScheduleActionTypes.CREATE_TIMINGS, createTimingsFunction);
 }
+export function* watchUpdateTimings() {
+    yield takeEvery(ScheduleActionTypes.UPDATE_TIMINGS, updateTimingsFunction);
+}
 export function* watchGetDoctorsList() {
     yield takeEvery(ScheduleActionTypes.GET_DOCTORS_LIST, getDoctorListFunction);
 }
@@ -210,6 +241,7 @@ function* scheduleSaga() {
     yield all([
         fork(watchSchedule),
         fork(watchCreateTimings),
+        fork(watchUpdateTimings),
         fork(watchGetDoctorsList),
         fork(watchGetSchedule),
         fork(watchGetPractitionerTimings),

@@ -14,6 +14,11 @@ export const getPractitionerScheduleAction = (data): AuthAction => ({
     data
 });
 
+export const getPractitionerSlotsAction = (data): AuthAction => ({
+    type: AppointmentActionTypes.GET_PRACTITIONER_SLOTS,
+    data
+});
+
 export const getAppointmentsAction = (data): AuthAction => ({
     type: AppointmentActionTypes.GET_APPOINTMENT,
     data

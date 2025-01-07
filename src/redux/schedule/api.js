@@ -11,6 +11,11 @@ export function createTimingsApi(params: any): any {
     const { data } = params;
     return api.create(URL.createTimings, data);
 }
+
+export function updateTimingsApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.updateTimings, data);
+}
 export function deleteScheduleApi(params: any): any {
     const { id } = params;
     return api.delete(`${URL.deleteSchedule}/${id}`);

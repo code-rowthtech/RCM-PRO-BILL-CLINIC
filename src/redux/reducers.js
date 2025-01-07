@@ -12,9 +12,9 @@ import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
-import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, deleteScheduleReducer, createTimingsReducer, getPractitionerTimingsReducer } from './schedule/reducers';
+import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, deleteScheduleReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer } from './schedule/reducers';
 import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from './settings/rolesetting/reducers';
-import { createAppointmentReducer, getAppointmentsReducer, getPractitionerScheduleReducer } from './appointments/reducers';
+import { createAppointmentReducer, getAppointmentsReducer, getPractitionerScheduleReducer, getPractitionerSlotsReducer } from './appointments/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -32,5 +32,5 @@ export default (combineReducers({
     getSubscriptionReducer, getSubSubscriptionReducer,
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
-    createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, createTimingsReducer, getPractitionerTimingsReducer
+    createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer, getPractitionerSlotsReducer
 }): any);

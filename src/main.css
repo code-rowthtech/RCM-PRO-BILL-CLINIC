@@ -234,3 +234,6 @@ table {
     padding: 0 0.5rem !important;
     border-radius: 3px;
 }
+.schedule-table {
+    box-shadow: none !important;
+}
