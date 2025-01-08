@@ -63,10 +63,11 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/crm/addclinic': 'Practice',
         '/apps/settings/department': 'Department',
         '/apps/settings/desigination': 'Desigination',
-        '/apps/settings/role/rolesetting': 'Role',
+        '/apps/settings/role': 'Role',
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',
+        '/apps/appointments/appointmentCalendar': 'Appointment Calendar'
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {

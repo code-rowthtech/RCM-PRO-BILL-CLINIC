@@ -17,7 +17,7 @@ function* createScheduleFunction(data) {
             payload: {},
         });
         const response = yield call(createScheduleApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        const decryptedData = JSON.parse(decryptMessage(response?.data?.data));
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -31,7 +31,7 @@ function* createScheduleFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error?.message, 'danger');
+        ToastHandle(error, 'danger');
         yield put({
             type: ScheduleActionTypes.CREATE_SCHEDULE_ERROR,
             payload: error,
@@ -143,7 +143,7 @@ export function* watchdeleteSchedule() {
 
 function* scheduleSaga() {
     yield all([
-        fork(watchSchedule), 
+        fork(watchSchedule),
         fork(watchGetDoctorsList),
         fork(watchGetSchedule),
         fork(watchdeleteSchedule),

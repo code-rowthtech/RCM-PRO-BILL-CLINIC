@@ -53,16 +53,18 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
-                clinicId: clinicId,
-                createdById: idFromStorage?._id,
-                showto: 'clinic'
+               
+                // clinicId: clinicId,
+                // createdById: idFromStorage?._id,
+                // showto: 'clinic'
             }
             if (createSuccess === 200) {
                 reset();
                 closeModal();
             }
+            console.log(payload,'role')
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '',createdById:'', page: 1, status: true }));
             reset();
             closeModal();
 

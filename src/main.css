@@ -56,7 +56,6 @@
     pointer-events: none; /* Prevent interaction with the image */
 }
 
-
 .upload-icon {
     color: #6c757d;
     width: 5vw;
@@ -200,3 +199,42 @@ table {
 .plusicon {
     color: #6169d0;
 }
+.date-carousel {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #ddd;
+}
+
+.date-carousel .day {
+    width: 40px;
+    height: 60px;
+    font-family: 'Arial', sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #000;
+}
+
+.date-carousel .day.selected {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #333;
+    font-weight: bold;
+}
+
+.date-carousel .arrow {
+    cursor: pointer;
+    padding: 0 20px;
+    color: #555;
+    font-size: 18px;
+}
+
+.date-carousel .arrow:hover {
+    color: #000;
+}
+.slots {
+    background-color: #d9d9d9 !important;
+    font-weight: 600;
+}
+/* 
+ */

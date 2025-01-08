@@ -68,6 +68,7 @@ const Department = () => {
 
   const createResponse = store?.createMastersDataReducer?.data;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
+  
   const updateResponse = store?.updateMastersDataReducer?.data;
   console.log(createResponse, 'createResponse')
   console.log(tableGetData, 'tableGetData')
@@ -98,7 +99,7 @@ const Department = () => {
     <Row className='mt-2'>
       <Col xs={12}>
         <Card >
-          <Card.Body style={{ height: 'auto' }}>
+          <Card.Body style={{ height: '88vh' }}>
             <Row className="mb-2">
               <Col sm={6}>
                 <Button

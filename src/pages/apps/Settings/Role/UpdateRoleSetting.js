@@ -68,8 +68,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
             name: formData.name,
             description: formData.description,
             permissions: changedPermissions.length > 0 ? changedPermissions : initialPermissions,
+            status: true
         };
-
+console.log(payload,'editrole')
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
     };
 

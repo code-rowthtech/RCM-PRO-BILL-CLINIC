@@ -77,6 +77,7 @@ const Patients = () => {
         setSelectedDetails(null);
     };
 
+
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -121,6 +122,7 @@ const Patients = () => {
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Sr.No.</th>
+                                                <th className='text-white'>Patient ID</th>
                                                 <th className='text-white'>Patients Name</th>
                                                 <th className='text-white'>Gender</th>
                                                 <th className='text-white'>Phone</th>
@@ -132,9 +134,11 @@ const Patients = () => {
                                         </thead>
                                         <tbody>
                                             {store?.getPatientsReducer?.loading ?
-                                                <td colSpan={8} className='text-center'>
-                                                    <Spinner />
-                                                </td>
+                                                <tr>
+                                                    <td colSpan={8} className='text-center'>
+                                                        <Spinner />
+                                                    </td>
+                                                </tr>
                                                 :
                                                 patientsData && patientsData?.length === 0 ? (
                                                     <tr>
@@ -146,6 +150,7 @@ const Patients = () => {
                                                     patientsData && patientsData?.map((data, index) => (
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
+                                                            <td>{data?.patientId}</td>
                                                             <td className='text-capitalize'>{data?.fullName}</td>
                                                             <td className='text-capitalize'>{data?.gender}</td>
                                                             <td>{data?.contactNumber}</td>

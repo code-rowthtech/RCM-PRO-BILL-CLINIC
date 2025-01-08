@@ -99,8 +99,8 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
                             <thead>
                                 <tr>
                                     <th className='text-white'>Subscription Name</th>
-                                    <th className='text-white'>Renewal Date</th>
                                     <th className='text-white'>Start Date</th>
+                                    <th className='text-white'>Renewal Date</th>
                                     <th className='text-white'>Amount</th>
                                     <th className='text-white'>Status</th>
                                 </tr>
@@ -109,17 +109,17 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
                                 <tr>
                                     <td>{billingData?.name}</td>
                                     <td>
-                                        {billingData?.subscriptionRenewalDate ?
-                                            new Date(billingData.subscriptionRenewalDate).toLocaleDateString('en-GB') :
-                                            'N/A'}
-                                    </td>
-                                    <td>
                                         {billingData?.subscriptionStartDate ?
                                             new Date(billingData.subscriptionStartDate).toLocaleDateString('en-GB') :
                                             'N/A'}
                                     </td>
                                     <td>
-                                        {billingData?.totalAmount}
+                                        {billingData?.subscriptionRenewalDate ?
+                                            new Date(billingData.subscriptionRenewalDate).toLocaleDateString('en-GB') :
+                                            'N/A'}
+                                    </td>
+                                    <td>
+                                        <span className='me-0'>$</span>{billingData?.totalAmount}
                                     </td>
                                     <td>
                                         <Form.Switch checked={billingData?.isActive} />
@@ -435,7 +435,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId,multiple }) 
                             {store?.createSubscriptionPlanReducer?.loading ?
                                 <Spinner className='spinner-border-sm' color='white' />
                                 :
-                                'Generate Contract'
+                                'Next'
                             }
                         </Button>
                     </Col>

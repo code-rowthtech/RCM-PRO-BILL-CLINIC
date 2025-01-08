@@ -45,7 +45,7 @@ const AddRole = ({ show, close }) => {
         setShowPassword(!showPassword);
     };
     useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10,createdById:'', search: '', page: 1, status: true }));
         dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
 
@@ -78,7 +78,7 @@ const AddRole = ({ show, close }) => {
 
         }
         dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10,createdById:'', search: '', page: 1, status: true }));
         reset();
         close()
 

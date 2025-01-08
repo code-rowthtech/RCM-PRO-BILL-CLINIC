@@ -17,7 +17,6 @@ function* getDoctorsFunction(data) {
         });
         const response = yield call(getDoctorsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decryptedData get apiii')
 
         if (response.status === 200) {
             yield put({
@@ -73,7 +72,6 @@ function* createDoctorsFunction(data) {
         });
         const response = yield call(createDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        // console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData.message, 'success')
 

@@ -43,14 +43,14 @@ export const getDepartmentData = '/api/v1/clinic/getmasterData';
 export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 
 export const addRoleData = '/api/v1/clinic/roles/create';
-export const getRoleData = '/api/v1/clinic/roles';
+export const getRoleData = '/api/v1/clinic/getAllRoles';
 export const updateRoleData = '/api/v1/clinic/roles/edit';
 
 // DOCTORS
 export const getDoctor = '/api/v1/doctors/getClinicDoctors';
-export const createDoctor = '/api/v1/clinics/createOrUpdateUser';
-export const getDoctorRoles = '/api/v1/clinic/getRoles';
-export const createDoctorDetail = '/api/v1/clinics/createOrUpdateDoctor';
+export const createDoctor = '/api/v1/clinics/practitioner/add';
+export const getDoctorRoles = '/api/v1/clinic/roles';
+export const createDoctorDetail = '/api/v1/clinics/practitioner/update';
 export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
 
 // PATIENTS
@@ -74,3 +74,8 @@ export const createSchedule = '/api/v1/clinic/addOrUpdateSchedule';
 export const getDoctorsList = 'api/v1/clinic/getDoctorsList';
 export const deleteSchedule = '/api/v1/clinic/removeSchedule'
 export const getSchedule = '/api/v1/clinic/getSchedule';
+
+// appointments
+export const createAppointment = '/api/v1/appointments'
+export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule'
+export const getAppointments = '/api/v1/appointments/clinic/'
