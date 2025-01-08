@@ -30,7 +30,7 @@ const RoleManagement = () => {
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
    
-
+console.log({roleData})
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     console.log({ deleteSuccess })
@@ -263,7 +263,7 @@ const RoleManagement = () => {
                                 <Paginations
                                     currentPage={skip}
                                     totalPages={ roleData?.pagination?.totalPages || 1}
-                                    onPageChange={handlePageChange}
+                                    onPageChange={handlePageChange()}
                                 />
                             </Col>
                         </Row>

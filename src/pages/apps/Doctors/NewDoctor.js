@@ -95,6 +95,8 @@ const NewDoctor = () => {
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
+    console.log({departmentGetData})
+
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));

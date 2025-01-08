@@ -10,10 +10,10 @@ export function createRoleDataApi(params: any): any {
 
 export function getRoleDataApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getRoleData}?search=${data?.search}&clinicId=${data?.clinicId}&status=${data?.status}&page=${data?.page}&limit=${data?.limit}&defaultRole=${data?.defaultRole}`);
+    return api.get(`${URL.getRoleData}?search=${data?.search}&clinicId=${data?.clinicId}&createdById=${data?.createdById}&status=${data?.status}&page=${data?.page}&limit=${data?.limit}`);
 }
 
 export function updateRoleDataApi(params: any): any {
     const { data } = params;
-    return api.update(URL.updateRoleData, data)
+    return api.create(URL.updateRoleData, data)
 }

@@ -127,7 +127,14 @@ const SetPassword = (): React$Element<any> => {
                 {popup ? (
                     <div className="text-center">
                         <h4 className="text-muted fw-medium">Expired token. Please request a new password reset link.</h4>
-                        <Button className='mt-2' variant="secondary" onClick={() => setPopup(false)}>
+                        <Button
+                            className="mt-2"
+                            variant="secondary"
+                            onClick={() => {
+                                setPopup(false);
+                                navigate('/account/login');
+                            }}
+                        >
                             Dismiss
                         </Button>
                     </div>

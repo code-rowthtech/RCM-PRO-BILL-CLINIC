@@ -8,7 +8,6 @@ const Breaks = () => {
     const store = useSelector((state) => state);
 
     const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-    console.log(scheduleResponse, 'break')
     const isLoading = store?.getScheduleReducer?.loading;
 
     useEffect(() => {
