@@ -209,7 +209,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
         if (clinicsDataGet?.accreditationDetails) {
             setAccreditationDetails(clinicsDataGet?.accreditationDetails)
-        }else{
+        } else {
             setAccreditationDetails([
                 ...accreditationDetails,
                 { name: '', number: '', url: null }
@@ -453,7 +453,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [clinicsDataGet, setValue]);
 
-    
+
     const [searchedLocations, setSearchedLocations] = useState(null)
     const [searchedLocations2, setSearchedLocations2] = useState(null)
 
@@ -719,7 +719,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
 
                             <Col sm={6}>
-                                <Form.Group className="mb-0 position-relative">
+                                <Form.Group className="mb-0 position-relative"style={{ minHeight: '100px' }}>
                                     <Form.Label className="mb-1">
                                         Contact Person <span className="text-danger">*</span>
                                     </Form.Label>
@@ -747,7 +747,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 clearErrors('contact'); // Clear error if corrected
                                             }}
                                             placeholder="123-456-7890"
-                                            maxLength={10} // Limit input to a formatted 10-digit number
+                                            maxLength={12} // Limit input to a formatted 10-digit number
                                             onKeyPress={(event) => {
                                                 if (!/[0-9]/.test(event.key)) {
                                                     event.preventDefault(); // Prevent non-numeric input
@@ -757,7 +757,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </InputGroup>
 
                                     {/* Country code flag */}
-                                    <div className="position-absolute" style={{ top: '52%', left: '1%' }}>
+                                    <div className="position-absolute" style={{ top: '55%', left: '1%',transform: 'translateY(-100%)' }}>
                                         <img src={us} alt="country code flag" width={20} />
                                     </div>
 
@@ -1203,11 +1203,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 </p>
                                                             ))}
                                                             {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                            </div>
+                                                        </div>
                                                     </div>
                                                     {errors.address && (
-                                                                <span className="text-danger">{errors.address.message}</span>
-                                                            )}
+                                                        <span className="text-danger">{errors.address.message}</span>
+                                                    )}
                                                 </Form.Group>
                                             </Col>
 
@@ -1290,8 +1290,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Street <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register('street',{
-                                                            required:"Street is required",
+                                                        {...register('street', {
+                                                            required: "Street is required",
                                                         })}
                                                         onKeyPress={handleFirstSpace}
                                                         placeholder="Street" />
@@ -1306,7 +1306,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
                                                         type="text"
                                                         {...register('zip', {
-                                                            required:'Zip is requried',
+                                                            required: 'Zip is requried',
                                                             minLength: {
                                                                 value: 5,
                                                                 message: 'ZIP code must be at least 5 characters long',
@@ -1340,7 +1340,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             type="checkbox"
                                             style={{ cursor: "pointer", color: "#6c757d" }}
                                             label="Same as Primary Address"
-                                            disabled={!getValues('zip')}
+                                            // disabled={!getValues('zip')}
                                             checked={usePrimaryAsMailing}
                                             onChange={(e) => {
                                                 const isChecked = e.target.checked;
@@ -1377,10 +1377,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             type="text"
                                                             value={watch('mailingAddress')}
                                                             {...register('mailingAddress', {
-                                                                required: 'Mailing Address is required', 
+                                                                required: 'Mailing Address is required',
                                                                 maxLength: {
                                                                     value: 255,
-                                                                    message: 'Mailing Address cannot exceed 255 characters', 
+                                                                    message: 'Mailing Address cannot exceed 255 characters',
                                                                 },
                                                             })}
                                                             onChange={(e) => {
@@ -1619,16 +1619,19 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         type="text"
                                                         value={data?.name}
                                                         {...register(`name.${index}`, {
-                                                            required: index === 0 ? 'Full Name is required' : false, 
-                                                            onChange: (e) => {
-                                                                clearErrors(`name.${index}`); 
-                                                                handlePOSInputChange(e, 'name', index);
-                                                            },
+                                                            required: index === 0 ? 'Full Name is required' : false,
+
                                                         })}
+                                                        onChange={(e) => {
+                                                            clearErrors(`name.${index}`);
+                                                            handlePOSInputChange(e, 'name', index);
+                                                        }}
                                                         placeholder="Full Name"
                                                     />
-                                                    {errors[`name.${index}`] && (
-                                                        <span className="text-danger">{errors[`name.${index}`]?.message}</span>
+                                                    {errors?.name?.[index] && (
+                                                        <span className="text-danger">
+                                                            {errors.name[index]?.message}
+                                                        </span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
@@ -1646,15 +1649,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 message: 'Please enter a valid email address',
                                                             },
                                                             required: index !== 1 ? 'Contact Email is required' : false,
-                                                            onChange: (e) => {
-                                                                clearErrors(`contactemail.${index}`); 
-                                                                handlePOSInputChange(e, 'email', index);
-                                                            },
+
                                                         })}
+                                                        onChange={(e) => {
+                                                            clearErrors(`contactemail.${index}`);
+                                                            handlePOSInputChange(e, 'email', index);
+                                                        }}
                                                         placeholder="Contact Email"
                                                     />
-                                                    {errors[`contactemail.${index}`] && (
-                                                        <span className="text-danger">{errors[`contactemail.${index}`]?.message}</span>
+                                                    {errors?.contactemail?.[index] && (
+                                                        <span className="text-danger">
+                                                            {errors.contactemail[index]?.message}
+                                                        </span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
@@ -1667,23 +1673,26 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         type="text"
                                                         value={data?.role}
                                                         {...register(`role.${index}`, {
-                                                            required: index !== 1 ? 'Job Title / Role is required' : false, 
-                                                            onChange: (e) => {
-                                                                clearErrors(`role.${index}`); 
-                                                                handlePOSInputChange(e, 'role', index);
-                                                            },
+                                                            required: index !== 1 ? 'Job Title / Role is required' : false,
+
                                                         })}
+                                                        onChange={(e) => {
+                                                            clearErrors(`role.${index}`);
+                                                            handlePOSInputChange(e, 'role', index);
+                                                        }}
                                                         placeholder="Job Title / Role"
                                                     />
-                                                    {errors[`role.${index}`] && (
-                                                        <span className="text-danger">{errors[`role.${index}`]?.message}</span>
+                                                    {errors?.role?.[index] && (
+                                                        <span className="text-danger">
+                                                            {errors.role[index]?.message}
+                                                        </span>
                                                     )}
                                                 </Form.Group>
                                             </Col>
 
                                             {/* Contact Person */}
                                             <Col sm={6}>
-                                                <Form.Group className="mb-2 position-relative">
+                                                <Form.Group className="mb-2 position-relative"style={{ minHeight: '100px' }}>
                                                     <Form.Label className="mb-0">
                                                         Contact Person {index === 0 && <span className="text-danger">*</span>}
                                                     </Form.Label>
@@ -1695,7 +1704,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             type="tel"
                                                             value={data.contact}
                                                             {...register(`poccontact.${index}`, {
-                                                                required: index !== 1 ? 'Contact is required' : false, 
+                                                                required: index !== 1 ? 'Contact is required' : false,
                                                                 pattern: {
                                                                     value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
                                                                     message:
@@ -1709,22 +1718,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                     value: 10,
                                                                     message: 'Contact must not be less than 10 digits',
                                                                 },
-                                                                onChange: (e) => {
-                                                                    const rawValue = e.target.value.replace(/\D/g, ''); 
-                                                                    const formattedValue = rawValue.replace(
-                                                                        /(\d{3})(\d{3})(\d{0,4})/,
-                                                                        (match, p1, p2, p3) =>
-                                                                            p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
-                                                                    ); 
-                                                                    handlePOSInputChange(
-                                                                        { ...e, target: { ...e.target, value: rawValue } },
-                                                                        'contact',
-                                                                        index
-                                                                    );
-                                                                    e.target.value = formattedValue;
-                                                                    clearErrors(`poccontact.${index}`); 
-                                                                },
+
                                                             })}
+                                                            onChange={(e) => {
+                                                                const rawValue = e.target.value.replace(/\D/g, '');
+                                                                const formattedValue = rawValue.replace(
+                                                                    /(\d{3})(\d{3})(\d{0,4})/,
+                                                                    (match, p1, p2, p3) =>
+                                                                        p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+                                                                );
+                                                                handlePOSInputChange(
+                                                                    { ...e, target: { ...e.target, value: rawValue } },
+                                                                    'contact',
+                                                                    index
+                                                                );
+                                                                e.target.value = formattedValue;
+                                                                clearErrors(`poccontact.${index}`);
+                                                            }}
                                                             placeholder="123-456-7890"
                                                             maxLength={10}
                                                             onKeyPress={(event) => {
@@ -1734,16 +1744,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             }}
                                                         />
                                                     </InputGroup>
-                                                    {errors[`poccontact.${index}`] && (
-                                                        <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
+                                                    {errors?.poccontact?.[index] && (
+                                                        <span className="text-danger">
+                                                            {errors.poccontact[index]?.message}
+                                                        </span>
                                                     )}
-                                                    <img
-                                                        src={us}
-                                                        alt="country code flag"
-                                                        style={{ top: '56%', left: '1%' }}
-                                                        className="position-absolute"
-                                                        width={20}
-                                                    />
+                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)'}}>
+                                                        <img src={us} alt="country code flag" width={20} />
+                                                    </div>
                                                 </Form.Group>
                                             </Col>
                                         </React.Fragment>

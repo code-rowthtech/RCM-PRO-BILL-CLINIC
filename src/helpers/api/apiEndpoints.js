@@ -43,7 +43,7 @@ export const getDepartmentData = '/api/v1/clinic/getmasterData';
 export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
 
 export const addRoleData = '/api/v1/clinic/roles/create';
-export const getRoleData = '/api/v1/clinic/roles';
+export const getRoleData = '/api/v1/clinic/getAllRoles';
 export const updateRoleData = '/api/v1/clinic/roles/edit';
 
 // DOCTORS
