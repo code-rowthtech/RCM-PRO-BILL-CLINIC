@@ -3,35 +3,35 @@ import { Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
+import { encryptMessage } from '../../../cryptoUtils';
+import { stateEmptydAction } from '../../../redux/actions';
 
 const DoctorHoliday = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
-
-  const scheduleResponse = store?.getScheduleReducer?.data?.result || [];
-  console.log(scheduleResponse, 'iddd')
+  const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+  const scheduleResponse = store?.getScheduleReducer?.data?.holidays || [];
   const isLoading = store?.getScheduleReducer?.loading;
-
+  const deleteResponse = store?.deleteScheduleReducer?.data?.response?.status;
   useEffect(() => {
     const payload = {
-      startDate: '',
-      endDate: '',
-      type: "Holiday",
-      search: ''
+      clinicId: clinicId,
     };
-    dispatch(getScheduleAction(payload));
+    dispatch(getScheduleAction({ key: encryptMessage(payload) }));
   }, [dispatch]);
+  useEffect(() => {
+    if (deleteResponse === 200) {
+      dispatch(stateEmptydAction())
+      const payload = {
+        clinicId: clinicId,
+      };
+      dispatch(getScheduleAction({ key: encryptMessage(payload) }));
+    }
+  }, [deleteResponse]);
 
 
   const deleteHandle = (id) => {
     dispatch(deleteScheduleAction(id))
-    const payload = {
-      startDate: '',
-      endDate: '',
-      type: "Holiday",
-      search: ''
-    };
-    dispatch(getScheduleAction(payload));
   }
   return (
     <div>
@@ -60,13 +60,13 @@ const DoctorHoliday = () => {
             </tr>
           ) : (
             scheduleResponse.map((holiday, index) => (
-              <tr key={holiday.id || index}>
+              <tr key={holiday?.id || index}>
                 <td>{index + 1}</td>
-                <td>{holiday.name}</td>
-                <td>{holiday.reason ? holiday.reason : 'NAN'}</td>
+                <td className='text-capitalize'>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
+                <td className='text-capitalize'>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
                 <td>
                   <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
-                    {new Date(holiday.fromDate).toLocaleDateString('en-GB')}
+                    {new Date(holiday?.date).toLocaleDateString('en-GB')}
                   </div>
                 </td>
                 <td>

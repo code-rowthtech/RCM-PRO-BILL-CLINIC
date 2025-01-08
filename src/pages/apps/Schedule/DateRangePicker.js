@@ -4,6 +4,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./index.css";
 import { getScheduleAction } from "../../../redux/schedule/action";
 import { useDispatch } from "react-redux";
+import { encryptMessage } from "../../../cryptoUtils";
 
 const DateRangePicker = () => {
   const dispatch = useDispatch();
@@ -12,9 +13,9 @@ const DateRangePicker = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isCustom, setIsCustom] = useState(false);
   const [isRange, setIsRange] = useState(true);
-
   const dropdownRef = useRef(null);
   const inputRef = useRef(null);
+  const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
   // Format date to display in input field
   const formatDateShow = (date) => {
@@ -98,15 +99,15 @@ const DateRangePicker = () => {
     setShowDropdown(false);
 
     const payload = {
-      startDate: formatDate(newStartDate),
-      endDate: formatDate(newEndDate, true),
-      type: "Holiday",
+      fromDate: formatDate(newStartDate),
+      toDate: formatDate(newEndDate),
       search: "",
+      clinicId: clinicId
     };
 
-    console.log(payload, "date");
     dispatch(getScheduleAction(payload));
   };
+
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -130,15 +131,14 @@ const DateRangePicker = () => {
     setEndDate(date);
     setIsRange(true);
     setIsCustom(false);  // Switch to range selection after selecting the end date
-
     const payload = {
-      startDate: formatDate(startDate),
-      endDate: formatDate(date, true),
+      fromDate: formatDate(startDate),
+      toDate: formatDate(date, true),
       type: "Holiday",
       search: "",
+      clinicId: clinicId
     };
 
-    console.log(payload, "date");
     dispatch(getScheduleAction(payload));
   };
 

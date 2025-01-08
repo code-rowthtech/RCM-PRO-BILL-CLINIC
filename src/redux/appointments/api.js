@@ -18,3 +18,8 @@ export function getAppointmentsApi(params: any): any {
     return api.get(`${URL.getAppointments}${data?.clinicId}`);
 }
 
+export function getPractitionerSlotsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.getPractitionerSlots, data);
+}
+

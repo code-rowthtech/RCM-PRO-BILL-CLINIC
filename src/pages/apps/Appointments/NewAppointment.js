@@ -6,9 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPatientsAction } from "../../../redux/patients/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import Select from 'react-select';
-import { createAppointmentAction, getDoctorsAction, getPractitionerScheduleAction } from "../../../redux/actions";
+import { createAppointmentAction, getDoctorsAction, getPractitionerScheduleAction, getPractitionerSlotsAction } from "../../../redux/actions";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useForm } from "react-hook-form";
+import { getScheduleAction } from "../../../redux/schedule/action";
 
 const NewAppointment = () => {
     const navigate = useNavigate();
@@ -30,7 +31,12 @@ const NewAppointment = () => {
     const patientsData = store?.getPatientsReducer?.data?.patients;
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const departments = store?.getMastersDataReducer?.data?.result;
+    const doctorSchedule = store?.getScheduleReducer?.data;
+    const availableWeekDays = doctorSchedule?.days;
+    const doctorHolidays = doctorSchedule?.holidays;
+    const availableSlots = store?.getPractitionerSlotsReducer?.data?.allSlots;
 
+    console.log(availableSlots, 'doctorSchedule')
     const patientOptions = patientsData?.map((data) => ({
         value: data._id,
         label: data.fullName,
@@ -67,14 +73,14 @@ const NewAppointment = () => {
         dispatch(getMastersDataAction({ status: true, category: 'Department', limit: 1, skip: 1, search: departmentSearch }));
     }, [dispatch, departmentSearch])
     useEffect(() => {
-        if (selectedDoctor && selectedDate) {
+        if (selectedDoctor) {
             const payload = {
                 doctorId: selectedDoctor?.value,
-                date: selectedDate
+                forAppointment: true,
             }
-            dispatch(getPractitionerScheduleAction({ key: encryptMessage(payload) }))
+            dispatch(getScheduleAction({ key: encryptMessage(payload) }))
         }
-    }, [selectedDoctor, selectedDate])
+    }, [selectedDoctor])
     const generateWeekDates = (startDate) => {
         return Array.from({ length: 7 }, (_, i) => {
             const date = new Date(startDate);
@@ -103,7 +109,12 @@ const NewAppointment = () => {
 
     const handleDayClick = (date) => {
         setSelectedDate(date);
-        navigate('/apps/appointments/appointmentCalendar')
+        // navigate('/apps/appointments/appointmentCalendar')
+        const data = {
+            doctorId: selectedDoctor?.value,
+            date: date
+        }
+        dispatch(getPractitionerSlotsAction({ key: encryptMessage(data) }));
     };
 
     const handleAppointment = () => {
@@ -161,18 +172,9 @@ const NewAppointment = () => {
                                         <label htmlFor="patient" className="form-label mb-0">
                                             Patient
                                         </label>
-                                        {/* <select id="patient" className="w-100 input ps-2 py-1">
-                                            <option selected>Select Name</option>
-                                            {patientsData && patientsData?.map((data, index) => (
-                                                <option key={index} value={data?._id}>{data?.fullName}</option>
-                                            ))}
-                                        </select> */}
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getPatientsReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}
@@ -192,9 +194,6 @@ const NewAppointment = () => {
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getMastersDataReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}
@@ -214,9 +213,6 @@ const NewAppointment = () => {
                                         <Select
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            // value={
-                                            //     selectedPatient // Ensure null when no match is found
-                                            // }
                                             isLoading={store?.getDoctorsReducer?.loading}
                                             isClearable={true}
                                             isSearchable={true}
@@ -278,28 +274,33 @@ const NewAppointment = () => {
                                         >
                                             &#8249;
                                         </div>
-                                        {weekDates.map((date) => (
-                                            <div
-                                                key={date}
-                                                className={`day mx-2 d-flex justify-content-center align-items-center flex-column px-3 rounded-2 py-0 text-center ${date.toDateString() === selectedDate.toDateString()
-                                                    ? "selected"
-                                                    : ""
-                                                    }`}
-                                                style={{
-                                                    cursor: "pointer",
-                                                    backgroundColor:
-                                                        date.toDateString() === selectedDate.toDateString()
-                                                            ? "#444141"
-                                                            : "white",
-                                                    borderRadius: "1px solid #808080",
-                                                }}
-                                                onClick={() => handleDayClick(date)}
-                                            >
-                                                <span className="mb-0">{date.toLocaleString("en-US", { weekday: "short" })}</span>
-                                                <h5 className="my-0">{date.getDate()}</h5>
+                                        {weekDates && weekDates.map((date) => {
+                                            // Get the day short format (e.g., 'Mon', 'Tue')
+                                            const dayShort = date.toLocaleString("en-US", { weekday: "short" });
 
-                                            </div>
-                                        ))}
+                                            // Check if the day is available and not a holiday
+                                            const isAvailableDay = availableWeekDays && availableWeekDays?.includes(dayShort);
+                                            const isHoliday = doctorHolidays && doctorHolidays?.some(holidayDate => new Date(holidayDate).toDateString() === date.toDateString());
+
+                                            return (
+                                                <div
+                                                    key={date}
+                                                    className={`day mx-2 d-flex justify-content-center align-items-center flex-column px-3 rounded-2 py-0 text-center ${date.toDateString() === selectedDate.toDateString() ? "selected" : ""}`}
+                                                    style={{
+                                                        cursor: isAvailableDay && !isHoliday ? "pointer" : "not-allowed", // Disable click if not available or a holiday
+                                                        backgroundColor: date.toDateString() === selectedDate.toDateString()
+                                                            ? "#444141"
+                                                            : (isAvailableDay && !isHoliday ? "white" : "#f0f0f0"), // Change background based on availability
+                                                        opacity: isAvailableDay && !isHoliday ? 1 : 0.5, // Disabled style for unavailable or holiday days
+                                                    }}
+                                                    onClick={() => isAvailableDay && !isHoliday && handleDayClick(date)} // Only allow clicks if available
+                                                >
+                                                    <span className="mb-0">{dayShort}</span>
+                                                    <h5 className="my-0">{date.getDate()}</h5>
+                                                </div>
+                                            );
+                                        })}
+
                                         <div
                                             className="arrow px-2 color-black fw-bold fs-2"
                                             style={{ cursor: "pointer" }}
@@ -311,8 +312,8 @@ const NewAppointment = () => {
                                     <div className="bg-white rounded-2">
                                         <h5 className="mb-0">Available Slots</h5>
                                         <div className="row m-0">
-                                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]?.map((data, index) => (
-                                                <div key={index} className="col-2 text-center slots m-1 m-0 d-flex gap-1 py-1 rounded-2">Slot Time</div>
+                                            {availableSlots?.map((data, index) => (
+                                                <div key={index} className="col-2 text-center slots m-1 m-0 d-flex gap-1 py-1 rounded-2">{data}</div>
                                             ))}
                                         </div>
                                     </div>
