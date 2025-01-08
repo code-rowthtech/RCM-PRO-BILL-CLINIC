@@ -54,9 +54,9 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
-                clinicId: clinicId,
-                createdById: idFromStorage?._id,
-                showto: 'clinic'
+                // clinicId: clinicId,
+                // createdById: idFromStorage?._id,
+                // showto: 'clinic'
             }
             if (createSuccess === 200) {
                 reset();

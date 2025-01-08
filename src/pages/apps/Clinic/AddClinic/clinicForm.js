@@ -191,17 +191,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setField('address', clinicsDataGet?.userId?.primaryAddress?.address);
         setField('street', clinicsDataGet?.userId?.primaryAddress?.street);
         setField('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
-        if (clinicsDataGet?.userId?.primaryAddress?.latitude) {
-            const newLatitude = clinicsDataGet.userId.primaryAddress.latitude;
-            setLatitude(newLatitude); // Update the local state
-            setValue("latitude", newLatitude); // Update the form field
-        }
-        // setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
-        if (clinicsDataGet?.userId?.primaryAddress?.longitude) {
-            const newLongitude = clinicsDataGet.userId.primaryAddress.longitude;
-            setLongitude(newLongitude); // Update the local state
-            setValue("longitude", newLongitude); // Update the form field
-        }
+        setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
+        setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
         setField('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
         if (clinicsDataGet?.userId?.primaryAddress?.city) {
             dispatch(getCitiesAction({ state_code: clinicsDataGet?.userId?.primaryAddress?.state?.id, name: clinicsDataGet?.userId?.primaryAddress?.city?.name, limit: '', skip: '' }))
@@ -1156,7 +1147,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className='mb-1'>
-                                        <span className='text-black fw-semibold form-label'>Address Details  <span className="text-danger">*</span> </span>
+                                        <span className='text-black fw-semibold form-label'>Address Details  </span>
                                     </Col>
                                     <Col sm={6}>
                                         <Row className='position-relative'>
@@ -1212,11 +1203,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 </p>
                                                             ))}
                                                             {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                            {errors.address && (
+                                                            </div>
+                                                    </div>
+                                                    {errors.address && (
                                                                 <span className="text-danger">{errors.address.message}</span>
                                                             )}
-                                                        </div>
-                                                    </div>
                                                 </Form.Group>
                                             </Col>
 
@@ -1225,8 +1216,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Latitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register("latitude", { required: "Latitude is required" })}
-                                                        // defaultValue={latitude}
+                                                        defaultValue={latitude}
                                                         placeholder="Latitude"
                                                     />
                                                     {errors.latitude && (
@@ -1239,8 +1229,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register("longitude", { required: "Longitude is required" })}
-                                                        // defaultValue={longitude}
+                                                        defaultValue={longitude}
                                                         placeholder="Longitude" />
                                                     {errors.longitude && (
                                                         <span className="text-danger">{errors.longitude.message}</span>
@@ -1301,7 +1290,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Street <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
-                                                        {...register('street')}
+                                                        {...register('street',{
+                                                            required:"Street is required",
+                                                        })}
                                                         onKeyPress={handleFirstSpace}
                                                         placeholder="Street" />
 
@@ -1315,6 +1306,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
                                                         type="text"
                                                         {...register('zip', {
+                                                            required:'Zip is requried',
                                                             minLength: {
                                                                 value: 5,
                                                                 message: 'ZIP code must be at least 5 characters long',
@@ -1339,14 +1331,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             <Col sm={12}>
                                 <Row>
                                     <Col sm={12} className="mb-0">
-                                        <span className="text-black fw-semibold form-label">Mailing Address Details <spam className='text-danger'>*</spam></span>
+                                        <span className="text-black fw-semibold form-label">Mailing Address Details </span>
                                     </Col>
 
                                     {/* Checkbox for using primary address */}
                                     <Col sm={12} className="mb-1">
                                         <Form.Check
                                             type="checkbox"
-                                            style={{ cursor: "pointer", color: "#a9a9a982" }}
+                                            style={{ cursor: "pointer", color: "#6c757d" }}
                                             label="Same as Primary Address"
                                             disabled={!getValues('zip')}
                                             checked={usePrimaryAsMailing}
@@ -1455,13 +1447,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         value={latitude1}
                                                         placeholder="Latitude"
                                                         readOnly
-                                                        {...register('latitude', {
-                                                            required: 'Latitude is required', 
-                                                            pattern: {
-                                                                value: /^[-+]?\d*\.\d+|\d+$/, 
-                                                                message: 'Please enter a valid latitude',
-                                                            },
-                                                        })}
+                                                        defaultValue={latitude1}
                                                     />
                                                     {errors.latitude && (
                                                         <span className="text-danger">{errors.latitude.message}</span>
@@ -1477,13 +1463,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         value={longitude1}
                                                         placeholder="Longitude"
                                                         readOnly
-                                                        {...register('longitude', {
-                                                            required: 'Longitude is required', 
-                                                            pattern: {
-                                                                value: /^[-+]?\d*\.\d+|\d+$/, 
-                                                                message: 'Please enter a valid longitude',
-                                                            },
-                                                        })}
+                                                        defaultValue={longitude1}
                                                     />
                                                     {errors.longitude && (
                                                         <span className="text-danger">{errors.longitude.message}</span>

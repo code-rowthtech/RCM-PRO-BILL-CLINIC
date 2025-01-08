@@ -1091,13 +1091,15 @@ const SubUpdateClinic = () => {
                                                             <Col sm={12}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">
-                                                                        Address
+                                                                        Address <span className='text-danger'>*</span>
                                                                     </Form.Label>
                                                                     <div style={{ position: 'relative' }}>
                                                                         <Form.Control
                                                                             type="text"
                                                                             defaultValue={subClinicsDetailsGet?.address?.address || ''}
-                                                                            {...register('address')} // Marked as required
+                                                                            {...register('address', {
+                                                                                required: "Address is required",
+                                                                            })} // Marked as required
                                                                             onChange={(e) => {
                                                                                 getGeolocation(e);
                                                                                 setFocused(true); // Open dropdown on input
@@ -1143,6 +1145,9 @@ const SubUpdateClinic = () => {
                                                                                 </p>
                                                                             ))}
                                                                             {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                            {errors.address && (
+                                                                                <span className="text-danger">{errors.address.message}</span>
+                                                                            )}
                                                                         </div>
                                                                     </div>
                                                                 </Form.Group>
@@ -1151,24 +1156,28 @@ const SubUpdateClinic = () => {
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className='mb-0'>
-                                                                        Latitude
+                                                                        Latitude <span className='text-danger'>*</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         defaultValue={latitude}
                                                                         placeholder="Latitude"
                                                                     />
+                                                                    {errors.latitude && (
+                                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className='mb-0'>
-                                                                        Longitude
-                                                                    </Form.Label>
+                                                                    <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         defaultValue={longitude}
                                                                         placeholder="Longitude" />
+                                                                    {errors.longitude && (
+                                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                         </Row>
@@ -1181,7 +1190,9 @@ const SubUpdateClinic = () => {
                                                                         State
                                                                     </Form.Label>
                                                                     <Form.Select
-                                                                        {...register('stateName')} // Marked as required
+                                                                        {...register('stateName', {
+                                                                            required: 'State is required',
+                                                                        })} // Marked as required
                                                                         onChange={(e) => handleStateSelection(e)}
                                                                     >
                                                                         <option value={''}>State</option>
@@ -1195,16 +1206,21 @@ const SubUpdateClinic = () => {
                                                                             </option>
                                                                         ))}
                                                                     </Form.Select>
+                                                                    {errors.stateName && (
+                                                                        <span className="text-danger">{errors.stateName.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className='mb-0'>
-                                                                        City
+                                                                        City <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Select
                                                                         disabled={store?.getCitiesReducer?.loading}
-                                                                        {...register('city')} // Marked as required
+                                                                        {...register('city', {
+                                                                            required: 'City is required',
+                                                                        })} // Marked as required
                                                                         onChange={(e) => handleCitySelection(e)}
                                                                     >
                                                                         <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
@@ -1214,30 +1230,37 @@ const SubUpdateClinic = () => {
                                                                             </option>
                                                                         ))}
                                                                     </Form.Select>
+                                                                    {errors.city && (
+                                                                        <span className="text-danger">{errors.city.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className='mb-0'>
-                                                                        Street
+                                                                        Street <span className='text-danger'>*</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
-                                                                        {...register('street')} // Marked as required
+                                                                        {...register('street', {
+                                                                            required: 'Street is required',
+                                                                        })} // Marked as required
                                                                         onKeyPress={handleFirstSpace}
                                                                         placeholder="Street" />
                                                                 </Form.Group>
+                                                                {errors.street && <span className="text-danger">{errors.street.message}</span>}
                                                             </Col>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-2">
                                                                     <Form.Label className='mb-0'>
-                                                                        Zip
+                                                                        Zip <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         defaultValue={subClinicsDetailsGet?.address?.zip || ''}
                                                                         type="text"
                                                                         {...register('zip', {
+                                                                            required: 'ZIP is required',
                                                                             minLength: {
                                                                                 value: 5,
                                                                                 message: 'ZIP code must be at least 5 characters long',
@@ -1263,14 +1286,14 @@ const SubUpdateClinic = () => {
                                             <Col sm={12}>
                                                 <Row>
                                                     <Col sm={12} className="">
-                                                        <span className="text-black fw-semibold form-label">Mailing Address Details</span>
+                                                        <span className="text-black fw-semibold form-label">Mailing Address Details </span>
                                                     </Col>
 
                                                     {/* Checkbox for using primary address */}
                                                     <Col sm={12} className="mb-2">
                                                         <Form.Check
                                                             type="checkbox"
-                                                            style={{ cursor: "pointer", color: "#a9a9a982" }}
+                                                            style={{ cursor: "pointer", color: "#6c757d" }}
                                                             label="Same as Primary Address"
                                                             disabled={!getValues('zip')}
                                                             checked={usePrimaryAsMailing}
@@ -1302,12 +1325,14 @@ const SubUpdateClinic = () => {
                                                         <Row className="position-relative">
                                                             <Col sm={12}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Mailing Address</Form.Label>
+                                                                    <Form.Label className="mb-0">Mailing Address <span className="text-danger">*</span></Form.Label>
                                                                     <div style={{ position: 'relative' }}>
                                                                         <Form.Control
                                                                             type="text"
                                                                             value={watch('mailingAddress')}
-                                                                            {...register('mailingAddress')}
+                                                                            {...register('mailingAddress', {
+                                                                                required: 'Mailing Address is required', // Validation rule: required
+                                                                            })}
                                                                             onChange={(e) => {
                                                                                 if (!usePrimaryAsMailing) {
                                                                                     setValue('mailingAddress', e.target.value);
@@ -1357,30 +1382,39 @@ const SubUpdateClinic = () => {
                                                                             {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
                                                                         </div>
                                                                     </div>
+                                                                    {errors.mailingAddress && (
+                                                                        <span className="text-danger">{errors.mailingAddress.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Latitude</Form.Label>
+                                                                    <Form.Label className="mb-0">Latitude  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         value={latitude1}
                                                                         placeholder="Latitude"
                                                                         disabled={usePrimaryAsMailing}
                                                                     />
+                                                                    {errors.latitude && (
+                                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Longitude</Form.Label>
+                                                                    <Form.Label className="mb-0">Longitude  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         value={longitude1}
                                                                         placeholder="Longitude"
                                                                         disabled={usePrimaryAsMailing}
                                                                     />
+                                                                    {errors.longitude && (
+                                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
                                                         </Row>
@@ -1391,7 +1425,7 @@ const SubUpdateClinic = () => {
                                                             {/* State */}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">State</Form.Label>
+                                                                    <Form.Label className="mb-0">State <span className="text-danger">*</span></Form.Label>
                                                                     {usePrimaryAsMailing ? (
                                                                         <Form.Control
                                                                             readOnly
@@ -1403,7 +1437,9 @@ const SubUpdateClinic = () => {
                                                                         />
                                                                     ) : (
                                                                         <Form.Select
-                                                                            {...register('mailingStateName')}
+                                                                            {...register('mailingStateName', {
+                                                                                required: 'State is required',
+                                                                            })}
                                                                             onChange={(e) => handleStateSelection(e)}
                                                                             disabled={usePrimaryAsMailing}
                                                                         >
@@ -1415,19 +1451,24 @@ const SubUpdateClinic = () => {
                                                                             ))}
                                                                         </Form.Select>
                                                                     )}
+                                                                    {errors.mailingStateName && (
+                                                                        <span className="text-danger">{errors.mailingStateName.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             {/* City */}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">City</Form.Label>
+                                                                    <Form.Label className="mb-0">City  <span className="text-danger">*</span></Form.Label>
                                                                     {usePrimaryAsMailing ? (
                                                                         <Form.Control readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
                                                                     ) : (
                                                                         <Form.Select
                                                                             disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
-                                                                            {...register('mailingCity')}
+                                                                            {...register('mailingCity', {
+                                                                                required: 'City is required',
+                                                                            })}
                                                                             onChange={(e) => handleCitySelection(e)}
                                                                         >
                                                                             <option value="">
@@ -1440,29 +1481,38 @@ const SubUpdateClinic = () => {
                                                                             ))}
                                                                         </Form.Select>
                                                                     )}
+                                                                    {errors.mailingCity && (
+                                                                        <span className="text-danger">{errors.mailingCity.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             {/* Street */}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
-                                                                    <Form.Label className="mb-0">Street</Form.Label>
+                                                                    <Form.Label className="mb-0">Street  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
-                                                                        {...register('mailingStreet')}
+                                                                        {...register('mailingStreet', {
+                                                                            required: 'Street is required',
+                                                                        })}
                                                                         placeholder="Street"
                                                                         disabled={usePrimaryAsMailing}
                                                                     />
+                                                                    {errors.mailingStreet && (
+                                                                        <span className="text-danger">{errors.mailingStreet.message}</span>
+                                                                    )}
                                                                 </Form.Group>
                                                             </Col>
 
                                                             {/* ZIP */}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-2">
-                                                                    <Form.Label className="mb-0">Zip</Form.Label>
+                                                                    <Form.Label className="mb-0">Zip  <span className='text-danger'>*</span> </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         {...register('mailingZip', {
+                                                                            required: !usePrimaryAsMailing && 'ZIP is required',
                                                                             minLength: { value: 5, message: 'ZIP must be 5 characters long' },
                                                                             pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
                                                                         })}
@@ -1615,7 +1665,7 @@ const SubUpdateClinic = () => {
                                                                     </InputGroup>
                                                                     {errors[`poccontact.${index}`] && (
                                                                         <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
-                                                                    )}                                                                    
+                                                                    )}
                                                                     <img
                                                                         src={us}
                                                                         alt="country code flag"

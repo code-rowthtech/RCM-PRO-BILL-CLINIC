@@ -253,18 +253,8 @@ const NewPractice = () => {
             setValue('address', clinicsDataGet?.userId?.primaryAddress?.address);
             setValue('street', clinicsDataGet?.userId?.primaryAddress?.street);
             setValue('zip', clinicsDataGet?.userId?.primaryAddress?.zip);
-            // setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
-            if (clinicsDataGet?.userId?.primaryAddress?.latitude) {
-                const newLatitude = clinicsDataGet.userId.primaryAddress.latitude;
-                setLatitude(newLatitude);
-                setValue("latitude", newLatitude);
-            }
-            // setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
-            if (clinicsDataGet?.userId?.primaryAddress?.longitude) {
-                const newLongitude = clinicsDataGet.userId.primaryAddress.longitude;
-                setLongitude(newLongitude);
-                setValue("longitude", newLongitude);
-            }
+            setLatitude(clinicsDataGet?.userId?.primaryAddress?.latitude)
+            setLongitude(clinicsDataGet?.userId?.primaryAddress?.longitude)
             setUsePrimaryAsMailing(clinicsDataGet?.userId?.isPrimaryAndMailingAddressSame)
             setValue('stateName', clinicsDataGet?.userId?.primaryAddress?.state?._id)
             if (clinicsDataGet?.userId?.primaryAddress?.city) {
@@ -1149,7 +1139,7 @@ const NewPractice = () => {
                                                 <Col sm={12}>
                                                     <Row>
                                                         <Col sm={12} className='mb-1'>
-                                                            <span className='text-black fw-semibold form-label'>Address Details <span className='text-danger'>*</span></span>
+                                                            <span className='text-black fw-semibold form-label'>Address Details </span>
                                                         </Col>
                                                         <Col sm={6}>
                                                             <Row className='position-relative'>
@@ -1210,11 +1200,12 @@ const NewPractice = () => {
                                                                                     </p>
                                                                                 ))}
                                                                                 {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                                {errors.address && (
-                                                                                    <span className="text-danger">{errors.address.message}</span>
-                                                                                )}
+                                                                                
                                                                             </div>
                                                                         </div>
+                                                                        {errors.address && (
+                                                                                    <span className="text-danger">{errors.address.message}</span>
+                                                                                )}
                                                                     </Form.Group>
                                                                 </Col>
 
@@ -1225,10 +1216,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            // defaultValue={latitude}
-                                                                            {...register('latitude', {
-                                                                                required: 'Latitude is required',
-                                                                            })}
+                                                                            defaultValue={latitude}
                                                                             placeholder="Latitude"
                                                                         />
                                                                         {errors.latitude && (
@@ -1243,10 +1231,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
-                                                                            // defaultValue={longitude}
-                                                                            {...register('longitude', {
-                                                                                required: 'longitude is required',
-                                                                            })}
+                                                                            defaultValue={longitude}
                                                                             placeholder="Longitude" />
                                                                         {errors.longitude && (
                                                                             <span className="text-danger">{errors.longitude.message}</span>
@@ -1361,12 +1346,12 @@ const NewPractice = () => {
                                                 <Col sm={12}>
                                                     <Row>
                                                         <Col sm={12} className="mb-0">
-                                                            <span className="text-black fw-semibold form-label">Mailing Address Details <span className='text-danger'>*</span></span>
+                                                            <span className="text-black fw-semibold form-label">Mailing Address Details</span>
                                                         </Col>
                                                         <Col sm={12} className="mb-1">
                                                             <Form.Check
                                                                 type="checkbox"
-                                                                style={{ cursor: "pointer", color: "#a9a9a982" }}
+                                                                style={{ cursor: "pointer", color: "#6c757d" }}
                                                                 label="Same as Primary Address"
                                                                 disabled={!getValues('zip')}
                                                                 checked={usePrimaryAsMailing}
@@ -1455,11 +1440,12 @@ const NewPractice = () => {
                                                                                     </p>
                                                                                 ))}
                                                                                 {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                                {errors.mailingAddress && (
-                                                                                    <span className="text-danger">{errors.mailingAddress.message}</span>
-                                                                                )}
+                                                                              
                                                                             </div>
                                                                         </div>
+                                                                        {errors.mailingAddress && (
+                                                                                    <span className="text-danger">{errors.mailingAddress.message}</span>
+                                                                                )}
                                                                     </Form.Group>
                                                                 </Col>
 
@@ -1474,16 +1460,6 @@ const NewPractice = () => {
                                                                             value={latitude1}
                                                                             placeholder="Latitude"
                                                                             disabled={usePrimaryAsMailing}
-                                                                            {...(!usePrimaryAsMailing &&
-                                                                                register('latitude1', {
-                                                                                    required: 'Latitude is required',
-                                                                                    pattern: {
-                                                                                        value: /^-?\d+(\.\d+)?$/,
-                                                                                        message: 'Latitude must be a valid number',
-                                                                                    },
-                                                                                    validate: (value) =>
-                                                                                        value >= -90 && value <= 90 || 'Latitude must be between -90 and 90',
-                                                                                }))}
                                                                         />
                                                                         {!usePrimaryAsMailing && errors.latitude1 && (
                                                                             <span className="text-danger">{errors.latitude1.message}</span>
@@ -1502,10 +1478,6 @@ const NewPractice = () => {
                                                                             value={longitude1}
                                                                             placeholder="Longitude"
                                                                             disabled={usePrimaryAsMailing}
-                                                                            {...(!usePrimaryAsMailing &&
-                                                                                register('longitude1', {
-                                                                                    required: 'Longitude is required',
-                                                                                }))}
                                                                         />
                                                                         {!usePrimaryAsMailing && errors.longitude1 && (
                                                                             <span className="text-danger">{errors.longitude1.message}</span>
@@ -1615,9 +1587,10 @@ const NewPractice = () => {
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register('mailingZip', {
+                                                                                
                                                                                 minLength: { value: 5, message: 'ZIP must be 5 characters long' },
                                                                                 pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
-                                                                                required: true
+                                                                                required: "ZIP must required"
                                                                             })}
                                                                             maxLength={5}
                                                                             placeholder="Zip"
@@ -1768,8 +1741,8 @@ const NewPractice = () => {
                                                                         </InputGroup>
                                                                         {errors[`poccontact.${index}`] && (
                                                                             <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
-                                                                        )} 
-                                                                            <img
+                                                                        )}
+                                                                        <img
                                                                             src={us}
                                                                             alt="country code flag"
                                                                             style={{ top: '55%', left: '1%' }}

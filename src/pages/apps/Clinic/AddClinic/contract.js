@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createContractAction, standardContractAction } from '../../../../redux/actions';
+import { createContractAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import { IoMdClose } from 'react-icons/io';
@@ -10,23 +10,13 @@ import { Link } from 'react-router-dom';
 
 const Contract = ({ billingId, activeTab }) => {
     const dispatch = useDispatch();
-    const { createContractReducer, getContractReducer, standardContractReducer } = useSelector((state) => state);
+    const { createContractReducer, getContractReducer } = useSelector((state) => state);
 
-    const [viewList, setViewList] = useState(false);
     const [show, setShow] = useState(false);
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    // Check if the createContract data is empty
-    const store = useSelector((state) => state);
-    console.log(store?.createContractReducer?.data, '==============')
-    const contract =
-        createContractReducer?.data &&
-            Object.keys(createContractReducer?.data).length > 0
-            ? createContractReducer?.data
-            : null;
-    console.log(contract, "contract")
 
-    const standardContract = standardContractReducer?.data;
-    console.log(standardContract, "standardContract")
+    const contract = createContractReducer?.data;
+    console.log({contract})
 
     useEffect(() => {
         if (activeTab === 'contract') {
@@ -37,15 +27,7 @@ const Contract = ({ billingId, activeTab }) => {
         }
     }, [activeTab, clinic_id, dispatch]);
 
-    useEffect(() => {
-        dispatch(standardContractAction());
-    }, [dispatch]);
-
     const handleCloseContractModal = () => setShow(false);
-
-    const handleDownload = (fileUrl) => {
-        if (fileUrl) window.open(fileUrl, '_blank');
-    };
 
     return (
         <>
@@ -68,13 +50,13 @@ const Contract = ({ billingId, activeTab }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {createContractReducer?.loading || standardContractReducer?.loading ? (
+                            {createContractReducer?.loading ? (
                                 <tr>
                                     <td className="text-center" colSpan={5}>
                                         <Spinner />
                                     </td>
                                 </tr>
-                            ) : (!contract && !standardContract) ? (
+                            ) : !contract ? (
                                 <tr>
                                     <td colSpan={5} className="text-center">
                                         <h3 className="my-5">No Contract Found</h3>
@@ -83,50 +65,35 @@ const Contract = ({ billingId, activeTab }) => {
                             ) : (
                                 <tr>
                                     <td className="text-black">
-                                        {contract?.contract?.contractName ||
-                                            standardContract?.contract?.contractType ||
-                                            'N/A'}
+                                        {contract?.contract?.contractName || contract?.standardContract?.contractType ||  'N/A'}
                                     </td>
                                     <td>
                                         <span
-                                            className={`${(contract?.contract?.clinicSignStatus ||
-                                                    standardContract?.contract?.clinicSignStatus)
-                                                    ? 'bg-success'
-                                                    : 'bg-secondary'
-                                                } text-light px-1 rounded-1`}
+                                            className={`${contract?.contract?.clinicSignStatus ? 'bg-success' : 'bg-secondary'} text-light px-1 rounded-1`}
                                         >
-                                            {(contract?.contract?.clinicSignStatus ||
-                                                standardContract?.contract?.clinicSignStatus)
-                                                ? 'Signed'
-                                                : 'Pending'}
+                                            {contract?.contract?.clinicSignStatus ? 'Signed' : 'Pending'}
                                         </span>
                                     </td>
                                     <td>
                                         <span
-                                            className={`${(contract?.contract?.adminSignStatus ||
-                                                    standardContract?.contract?.adminSignStatus)
-                                                    ? 'bg-success'
-                                                    : 'bg-secondary'
-                                                } text-light px-1 rounded-1`}
+                                            className={`${contract?.contract?.adminSignStatus ? 'bg-success' : 'bg-secondary'} text-light px-1 rounded-1`}
                                         >
-                                            {(contract?.contract?.adminSignStatus ||
-                                                standardContract?.contract?.adminSignStatus)
-                                                ? 'Signed'
-                                                : 'Pending'}
+                                            {contract?.contract?.adminSignStatus ? 'Signed' : 'Pending'}
                                         </span>
-
                                     </td>
-                                    <td>{contract?.contract?.sentDate || standardContract?.contract?.sentDate || 'N/A'}</td>
+                                    <td>{contract?.contract?.sentDate || contract?.standardContract?.createdAt || 'N/A'}</td>
                                     <td>
                                         <i
                                             className="fs-4 me-1 uil-eye cursor-pointer"
                                             onClick={() => setShow(true)}
                                         ></i>
-                                        {contract && contract.contract?.contractTemplateId?.fileUrl && (
-                                            <Link to={contract.contract.contractTemplateId.fileUrl} target="blank" className="cursor-pointer fs-4">
+                                            <Link
+                                                to={contract?.contract?.contractTemplateId?.fileUrl||contract?.standardContract?.fileUrl}
+                                                target="blank"
+                                                className="cursor-pointer fs-4"
+                                            >
                                                 <FiDownload />
                                             </Link>
-                                        )}
                                     </td>
                                 </tr>
                             )}
@@ -149,8 +116,8 @@ const Contract = ({ billingId, activeTab }) => {
                     <Row>
                         <Col sm={12}>
                             <iframe
-                                src={contract?.contract?.fileUrl || standardContract?.contract?.fileUrl}
-                                title={contract?.contract?.fileName || standardContract?.contract?.fileName}
+                                src={contract?.contract?.contractTemplateId?.fileUrl}
+                                title={contract?.contract?.contractTemplateId?.fileName}
                                 width="100%"
                                 height="620px"
                                 className="px-4"

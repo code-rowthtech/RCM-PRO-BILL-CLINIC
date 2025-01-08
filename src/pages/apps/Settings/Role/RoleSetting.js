@@ -31,12 +31,12 @@ const RoleSetting = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
 
     useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId:clinicId,limit: 10, search: search,page:skip, status: status }));
+        dispatch(getRoleDataAction({ clinicId:clinicId,createdById:'',limit: 10, search: search,page:skip, status: status}));
         if (updateSuccess === 200 || createSuccess === 200) {
             dispatch(stateEmptydAction());
             setShowUpdateModal(false)
             setShowModal(false);
-            dispatch(getRoleDataAction({clinicId:clinicId, limit: 10, search: search,page:skip, status: status }));
+            dispatch(getRoleDataAction({clinicId:clinicId,createdById:'', limit: 10, search: search,page:skip, status: status }));
         }
     }, [dispatch, updateSuccess, skip, search, createSuccess, status])
     const [dataToUpdate, setDataToUpdate] = useState(null);
