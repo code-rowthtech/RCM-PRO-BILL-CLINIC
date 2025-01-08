@@ -15,5 +15,5 @@ export function getRoleDataApi(params: any): any {
 
 export function updateRoleDataApi(params: any): any {
     const { data } = params;
-    return api.update(URL.updateRoleData, data)
+    return api.create(URL.updateRoleData, data)
 }

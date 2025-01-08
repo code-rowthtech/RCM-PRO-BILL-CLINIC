@@ -19,6 +19,7 @@ import { formatDate } from '../../../../helpers/dateFormat';
 
 const Department = () => {
   const store = useSelector((state) => state);
+  console.log(store, 'stoed')
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ const Department = () => {
       //   id: edit?._id,
       ...(edit ? { id: edit?._id } : {}),
       name: data?.name,
-      description: data?.description,
+      description: data?.description || 'N/A',
       category: 'Department',
       clinicId: clinic_id,
       showTo: "clinic",
@@ -67,8 +68,10 @@ const Department = () => {
 
   const createResponse = store?.createMastersDataReducer?.data;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
+  
   const updateResponse = store?.updateMastersDataReducer?.data;
-
+  console.log(createResponse, 'createResponse')
+  console.log(tableGetData, 'tableGetData')
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
     if (createResponse?.status === 201 || updateResponse === 200) {
@@ -91,11 +94,12 @@ const Department = () => {
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
+
   return (
     <Row className='mt-2'>
       <Col xs={12}>
-        <Card>
-          <Card.Body>
+        <Card >
+          <Card.Body style={{ height: '88vh' }}>
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
@@ -130,8 +134,12 @@ const Department = () => {
                 </Row>
               </Col>
             </Row>
-            <Table responsive className="table-centered table-nowrap mb-0">
-              <thead className="ght">
+            <Table
+              responsive
+              className="table-centered table-nowrap mb-0  rounded"
+              style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}
+            >
+              <thead className="text-white">
                 <tr>
                   <th className='text-white'>S.No.</th>
                   <th className='text-white'>Department Name</th>
@@ -141,34 +149,53 @@ const Department = () => {
                   <th className='text-white'>Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody >
                 {store?.getMastersDataReducer?.loading ? (
-                  <tr><td colSpan={6} className='text-center'><Spinner /></td></tr>
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      <Spinner />
+                    </td>
+                  </tr>
                 ) : tableGetData?.length ? (
                   tableGetData?.map((data, index) => (
-                    <tr key={data._id}>
+                    <tr key={data._id} className="border-bottom">
                       <td>{index + 1}</td>
                       <td>{data.name}</td>
                       <td>{data.description}...</td>
                       <td>{formatDate(data.createdAt)}</td>
                       <td>
-                        <Form.Switch checked={data.isActive} onChange={() => handleUpdate(data)} />
+                        <Form.Switch
+                          checked={data.isActive}
+                          onChange={() => handleUpdate(data)}
+                        />
                       </td>
                       <td>
-                        <i className="mdi mdi-square-edit-outline cursor-pointer fs-4" onClick={() => handleEdit(data)}></i>
+                        <i
+                          className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
+                          onClick={() => handleEdit(data)}
+                        ></i>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={6} className='text-center'>No Data Found</td></tr>
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      No Data Found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </Table>
-            <Paginations
-              currentPage={skip}
-              totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
-              onPageChange={handlePageChange}
-            />
+
+            <Row>
+              <Col className='mt-2 d-flex justify-content-end'>
+                <Paginations
+                  currentPage={skip}
+                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       </Col>
@@ -186,8 +213,21 @@ const Department = () => {
                   <Form.Label>Department Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
-                    {...register("name", { required: "Name is required" })}
+                    {...register("name", {
+                      required: "Name is required",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                      },
+                    })}
                     placeholder="Enter Department Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
                   />
                   {errors.name && <p className="text-danger">{errors.name.message}</p>}
                 </Form.Group>
@@ -199,27 +239,54 @@ const Department = () => {
                     type="text"
                     {...register("reEnterName", {
                       required: "Re-enter department name",
-                      validate: (value) => value === nameValue || "Names do not match",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                        matchName: (value) => value === watch('name') || "Name do not match", // Match with 'name' field value
+                      },
                     })}
                     placeholder="Re-enter Department Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
                   />
+
                   {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
                 </Form.Group>
               </Col>
               <Col md={12}>
                 <Form.Group className="mb-2">
                   <Form.Label>Description</Form.Label>
-                  <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    {...register("description")}
+                    placeholder="Enter description"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
+                  />
                 </Form.Group>
+
+
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
-              <Button type="submit" className='custom-buttons'>
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
+              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button type="submit" className="custom-buttons">
+                {store?.createMastersDataReducer?.loading ? <Spinner /> : "Submit"}
               </Button>
             </Modal.Footer>
           </Form>
+
         </Modal.Body>
       </Modal>
     </Row>

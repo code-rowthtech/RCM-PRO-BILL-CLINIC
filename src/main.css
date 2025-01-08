@@ -5,6 +5,16 @@
     outline: 0;
     box-shadow: 0;
 }
+/* Add this to your CSS file or inline style */
+/* In your CSS file or inline styles */
+.custom-multiselect .ms-choice, 
+.custom-multiselect .ms-drop {
+    border: none !important;  /* Remove border */
+    box-shadow: none !important; /* Remove box shadow */
+    outline: none !important; /* Remove outline */
+}
+
+
 .headers {
     background-color: #010101 !important;
 }

@@ -22,7 +22,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
         ...item,
         name: `${item?.permission}`,
     }));
-    console.log({decryptedPermissionsData})
     const {
         register,
         handleSubmit,
@@ -33,12 +32,12 @@ const CreateRoleSetting = ({ show, closeModal }) => {
     useEffect(() => {
         if (show) {
             const permissions = {
-                interface :'Clinic',
-                module:'',
-                skip :'',
-                limit :50,
-                search :'',
-                status :true,
+                interface: 'Clinic',
+                module: '',
+                skip: '',
+                limit: 50,
+                search: '',
+                status: true,
             }
             dispatch(getPermissionAction(permissions))
         }
@@ -54,6 +53,7 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
+               
                 // clinicId: clinicId,
                 // createdById: idFromStorage?._id,
                 // showto: 'clinic'
@@ -62,8 +62,9 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 reset();
                 closeModal();
             }
+            console.log(payload,'role')
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '',createdById:'', page: 1, status: true }));
             reset();
             closeModal();
 
@@ -137,11 +138,12 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                                 <Multiselect
                                     options={decryptedPermissionsData}
                                     displayValue="name"
-                                    className="form-control p-0"
+                                    className="form-control p-0 custom-multiselect"
                                     placeholder="Select Permissions"
                                     onSelect={handleSelect}
                                     onRemove={handleRemove}
                                 />
+
                                 {permissionError ?
                                     <span className='text-danger'>
                                         Atleast one permission has to be selected

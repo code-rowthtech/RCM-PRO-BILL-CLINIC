@@ -38,7 +38,7 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
     useEffect(() => {
         if (show && currentUser) {
 
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
             reset({
                 name: currentUser.firstName,
                 email: currentUser.email,

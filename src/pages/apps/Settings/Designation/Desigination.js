@@ -17,7 +17,7 @@ import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 
 const Designation = () => {
-    const store = useSelector((state) => state);
+  const store = useSelector((state) => state);
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -44,8 +44,8 @@ const Designation = () => {
 
   const addDesigination = (data) => {
     const payload = {
-    //   id: edit?._id,
-      ...(edit ? { id:edit?._id } : {}), 
+      //   id: edit?._id,
+      ...(edit ? { id: edit?._id } : {}),
       name: data?.name,
       description: data?.desigination,
       category: 'Desigination',
@@ -89,137 +89,180 @@ const Designation = () => {
     const payload = { id: data?._id, isActive: !data?.isActive };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
-    return (
-        <Row className='mt-2'>
-        <Col xs={12}>
-          <Card>
-            <Card.Body>
-              <Row className="mb-2">
-                <Col sm={6}>
-                  <Button
-                    variant={status === false ? 'outlined' : ''}
-                    onClick={() => handleStatusChange(true)}
-                    className={`${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
-                  >
-                    Active
-                  </Button>
-                  <Button
-                    variant={status === true ? 'outlined' : ''}
-                    onClick={() => handleStatusChange(false)}
-                    className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
-                  >
-                    Inactive
-                  </Button>
-                </Col>
-                <Col sm={6} className='text-end'>
-                  <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
-                    <Col xs="auto" className='d-flex gap-2'>
-                      <FormInput
-                        type="text"
-                        onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
-                        placeholder="Search..."
-                      />
-                      <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
-                      <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
-                      <Button onClick={() => {setAddDesiginationModal(true) ; setEdit(null)}} className="custom-buttons">
-                        New Desigination
-                      </Button>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-              <Table responsive className="table-centered table-nowrap mb-0">
-                <thead className="ght">
-                  <tr>
-                    <th className='text-white'>S.No.</th>
-                    <th className='text-white'>Desigination Name</th>
-                    <th className='text-white'>Created Date</th>
-                    <th className='text-white'>Status</th>
-                    <th className='text-white'>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {store?.getMastersDataReducer?.loading ? (
-                    <tr><td colSpan={6} className='text-center'><Spinner /></td></tr>
-                  ) : tableGetData?.length ? (
-                      tableGetData?.map((data, index) => (
-                      <tr key={data._id}>
-                        <td>{index + 1}</td>
-                        <td>{data.name}</td>
-                        <td>{formatDate(data.createdAt)}</td>
-                        <td>
-                          <Form.Switch checked={data.isActive} onChange={() => handleUpdate(data)} />
-                        </td>
-                        <td>
-                          <i className="mdi mdi-square-edit-outline cursor-pointer fs-4" onClick={() => handleEdit(data)}></i>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan={6} className='text-center'>No Data Found</td></tr>
-                  )}
-                </tbody>
-              </Table>
-              <Paginations
-                currentPage={skip}
-                totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
-                onPageChange={handlePageChange}
-              />
-            </Card.Body>
-          </Card>
-        </Col>
-  
-        <Modal centered show={addDesiginationModal} onHide={closeAddModal}>
-          <Modal.Body>
-            <Row className="border-bottom mb-2 pb-2">
-              <Col sm={11} className='text-center'><h4>{edit ? 'Edit Desigination' : 'New Desigination'}</h4></Col>
-              <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} /></Col>
+  return (
+    <Row className='mt-2'>
+      <Col xs={12}>
+        <Card>
+          <Card.Body>
+            <Row className="mb-2">
+              <Col sm={6}>
+                <Button
+                  variant={status === false ? 'outlined' : ''}
+                  onClick={() => handleStatusChange(true)}
+                  className={`${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                >
+                  Active
+                </Button>
+                <Button
+                  variant={status === true ? 'outlined' : ''}
+                  onClick={() => handleStatusChange(false)}
+                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                >
+                  Inactive
+                </Button>
+              </Col>
+              <Col sm={6} className='text-end'>
+                <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
+                  <Col xs="auto" className='d-flex gap-2'>
+                    <FormInput
+                      type="text"
+                      onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
+                      placeholder="Search..."
+                    />
+                    <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
+                    <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
+                    <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons">
+                      New Desigination
+                    </Button>
+                  </Col>
+                </Row>
+              </Col>
             </Row>
-            <Form onSubmit={handleSubmit(addDesigination)}>
-              <Row>
-                <Col md={6}>
-                  <Form.Group className="mb-2">
-                    <Form.Label>Desigination Name *</Form.Label>
-                    <Form.Control
-                      type="text"
-                      {...register("name", { required: "Name is required" })}
-                      placeholder="Enter Desigination Name"
-                    />
-                    {errors.name && <p className="text-danger">{errors.name.message}</p>}
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group className="mb-2">
-                    <Form.Label>Re-Enter Name *</Form.Label>
-                    <Form.Control
-                      type="text"
-                      {...register("reEnterName", {
-                        required: "Re-enter desigination name",
-                        validate: (value) => value === nameValue || "Names do not match",
-                      })}
-                      placeholder="Re-enter Desigination Name"
-                    />
-                    {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
-                  </Form.Group>
-                </Col>
-                {/* <Col md={12}>
+            <Table
+              responsive
+              className="table-centered table-nowrap mb-0  rounded"
+              style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}
+            >
+              <thead className="text-white">
+                <tr>
+                  <th className='text-white'>S.No.</th>
+                  <th className='text-white'>Department Name</th>
+                  <th className='text-white'>Created Date</th>
+                  <th className='text-white'>Status</th>
+                  <th className='text-white'>Action</th>
+                </tr>
+              </thead>
+              <tbody >
+                {store?.getMastersDataReducer?.loading ? (
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      <Spinner />
+                    </td>
+                  </tr>
+                ) : tableGetData?.length ? (
+                  tableGetData?.map((data, index) => (
+                    <tr key={data._id} className="border-bottom">
+                      <td>{index + 1}</td>
+                      <td>{data.name}</td>
+                      <td>{formatDate(data.createdAt)}</td>
+                      <td>
+                        <Form.Switch
+                          checked={data.isActive}
+                          onChange={() => handleUpdate(data)}
+                        />
+                      </td>
+                      <td>
+                        <i
+                          className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
+                          onClick={() => handleEdit(data)}
+                        ></i>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="text-center">
+                      No Data Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+            <Paginations
+              currentPage={skip}
+              totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </Card.Body>
+        </Card>
+      </Col>
+
+      <Modal centered show={addDesiginationModal} onHide={closeAddModal}>
+        <Modal.Body>
+          <Row className="border-bottom mb-2 pb-2">
+            <Col sm={11} className='text-center'><h4>{edit ? 'Edit Desigination' : 'New Desigination'}</h4></Col>
+            <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} /></Col>
+          </Row>
+          <Form onSubmit={handleSubmit(addDesigination)}>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-2">
+                  <Form.Label>Desigination Name *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    {...register("name", {
+                      required: "Name is required",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                      }
+                    })}
+
+                    placeholder="Enter Desigination Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
+                  />
+                  {errors.name && <p className="text-danger">{errors.name.message}</p>}
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-2">
+                  <Form.Label>Re-Enter Name *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    {...register("reEnterName", {
+                      required: "Re-enter desigination name",
+                      validate: {
+                        noEmpty: (value) => value.trim() !== "" || "Name cannot be empty or only spaces",
+                        noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                        matchName: (value) => value === watch('name') || "Name do not match", // Match with 'name' field value
+                      },
+                    })}
+                    placeholder="Re-enter Desigination Name"
+                    onInput={(e) => {
+                      const value = e.target.value;
+                      // Prevent spaces when input is empty
+                      if (value.trim() === "") {
+                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                      }
+                    }}
+                  />
+                  {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
+                </Form.Group>
+              </Col>
+              {/* <Col md={12}>
                   <Form.Group className="mb-2">
                     <Form.Label>Description</Form.Label>
                     <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
                   </Form.Group>
                 </Col> */}
-              </Row>
-              <Modal.Footer>
-                <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
-                <Button type="submit" className='custom-buttons'>
-                  {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal.Body>
-        </Modal>
-      </Row>
-    )
+            </Row>
+            <Modal.Footer>
+              <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
+              <Button type="submit" className='custom-buttons'>
+                {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </Row>
+  )
 }
 
 export default Designation
