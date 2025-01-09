@@ -119,7 +119,7 @@ const RoleSetting = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <Table responsive className="table-centered table-nowrap mb-0"
+                                    <Table responsive  className="table-centered table-nowrap mb-0  rounded"
                                      style={{ height: decryptedRolesData?.length === 0 ? '100vh' : 'auto' }}
                                     >
                                         <thead className=" text-white">
