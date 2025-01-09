@@ -57,6 +57,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
+    const [modalFileUrl, setModalFileUrl] = useState(""); // State to store file URL for modal
+
+    const handleShowModal = (url) => {
+        setModalFileUrl(url); // Set the URL of the file to display in modal
+        setShowModalPic(true);   // Open the modal
+    };
+
+    const handleCloseModal = () => {
+        setShowModalPic(false); // Close the modal
+        setModalFileUrl(""); // Reset file URL
+    };
     // table data
     // const [detailsModal, setDetailsModal] = useState(false);
     // const [selectedDetails, setSelectedDetails] = useState(null);
@@ -177,6 +189,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
+        setLogo(clinicsDataGet?.logo?.url);
         setField('contact', clinicsDataGet?.userId?.phone?.startsWith("+1")
             ? clinicsDataGet.userId.phone.substring(2)
             : clinicsDataGet?.userId?.phone);
@@ -336,7 +349,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
-            setLogoName(selectedFile?.name)
+            setLogoName(url)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -719,8 +732,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
 
                             <Col sm={6}>
-                                <Form.Group className="mb-0 position-relative"style={{ minHeight: '100px' }}>
-                                    <Form.Label className="mb-1">
+                                <Form.Group className="mb-0 position-relative"  >
+                                    <Form.Label className="mb-0">
                                         Contact Person <span className="text-danger">*</span>
                                     </Form.Label>
                                     <InputGroup>
@@ -757,7 +770,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </InputGroup>
 
                                     {/* Country code flag */}
-                                    <div className="position-absolute" style={{ top: '55%', left: '1%',transform: 'translateY(-100%)' }}>
+                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-16%)' }}>
                                         <img src={us} alt="country code flag" width={20} />
                                     </div>
 
@@ -815,9 +828,24 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 ? logoName.split('/').pop().slice(0, 30) + "..."
                                                 : 'Upload Logo'
                                     }
-                                    <p className="mb-0">
-                                        <FiDownloadCloud />
-                                    </p>
+
+                                    <div className="d-flex align-items-center gap-2">
+                                        {logo && (
+                                            <FiEye
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Prevent the file input from opening
+                                                    handleShowModal(logo); // Open the modal with the file URL
+                                                }}
+                                                className="text-danger cursor-pointer"
+                                                style={{ zIndex: 1 }}
+                                            />
+                                        )}
+
+                                        {/* Download Icon */}
+                                        <p className="mb-0">
+                                            <FiDownloadCloud />
+                                        </p>
+                                    </div>
                                 </div>
                                 <Form.Control
                                     type="file"
@@ -1020,22 +1048,37 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
-                                            onClick={() => document.getElementById(`fileInput-accreditation=${index}`).click()}
-                                            className="custom-file-upload justify-content-between cursor-pointer"
-                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                            onClick={(e) => document.getElementById(`fileInput-accreditation=${index}`).click()}
+                                            className="custom-file-upload justify-content-between cursor-pointer d-flex align-items-center"
+                                            style={{ paddingTop: '6px', paddingBottom: '6px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}
                                         >
-                                            {/* {accreditation.loading ? 'Loading...'
-                                                : accreditation.url
-                                                    ? accreditation.url.split('/').pop()
-                                                    : accreditation?.fileName || 'Upload Document'} */}
-                                            {
-                                                newaccreditationLogo
-                                                    ? 'Uploading...'
-                                                    : accreditation.url
-                                                        ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
-                                                        : accreditation?.fileName || 'Upload Document'
-                                            }
-                                            <p className="mb-0"><FiDownloadCloud /></p>
+                                            <span style={{ flex: 1 }}>
+                                                {
+                                                    newaccreditationLogo
+                                                        ? 'Uploading...'
+                                                        : accreditation.url
+                                                            ? accreditation.fileName.split('/').pop().slice(0, 30)
+                                                            : accreditation?.fileName || 'Upload Document'
+                                                }
+                                            </span>
+
+                                            <div className="d-flex align-items-center gap-2">
+                                                {accreditation.url && (
+                                                    <FiEye
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent the file input from opening
+                                                            handleShowModal(accreditation?.url); // Open the modal with the file URL
+                                                        }}
+                                                        className="text-danger cursor-pointer"
+                                                        style={{ zIndex: 1 }}
+                                                    />
+                                                )}
+
+                                                {/* Download Icon */}
+                                                <p className="mb-0">
+                                                    <FiDownloadCloud />
+                                                </p>
+                                            </div>
                                         </div>
 
                                         <Form.Control
@@ -1046,13 +1089,16 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             ref={accreditationFileInputRef}
                                             onChange={(e) => handleAccreditationChange(e, index)}
                                         />
+
                                         <span
                                             onClick={() => handleRemoveAccreditation(index)}
                                             style={{ right: '-2%', top: '20%' }}
                                             className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                         >
+                                            &#x2716;
                                         </span>
                                     </Col>
+
                                 </React.Fragment>
                             ))}
                             <hr className='mb-1' />
@@ -1105,28 +1151,34 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'
-                                                }`}
+                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
                                             style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                         >
-                                            {/* {data.fileName
-                                                ? data?.fileName?.length > 30
-                                                    ? data?.fileName?.slice(0, 25) + '...'
-                                                    : data?.fileName
-                                                : 'Upload Document'} */}
-                                            {
-                                                stateLogoUpload
-                                                    ? 'Uploading...'
-                                                    : (data.fileName
-                                                        ? (data.fileName.length > 30
-                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
-                                                            : data.fileName.split('/').pop()) // Extract full file name
-                                                        : 'Upload Document')
-                                            }
+                                            {stateLogoUpload
+                                                ? 'Uploading...'
+                                                : (data.fileName
+                                                    ? (data.fileName.length > 30
+                                                        ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                        : data.fileName.split('/').pop()) // Extract full file name
+                                                    : 'Upload Document')}
 
-                                            <p className="mb-0">
-                                                <FiDownloadCloud />
-                                            </p>
+                                            <div className="d-flex align-items-center gap-2">
+                                                {data.url && (
+                                                    <FiEye
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent file input trigger
+                                                            handleShowModal(data.url); // Pass the URL to open the modal
+                                                        }}
+                                                        className="text-danger cursor-pointer"
+                                                        style={{ zIndex: 1 }}
+                                                    />
+                                                )}
+
+                                                {/* Download Icon */}
+                                                <p className="mb-0">
+                                                    <FiDownloadCloud />
+                                                </p>
+                                            </div>
                                         </div>
                                         <Form.Control
                                             type="file"
@@ -1136,8 +1188,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         />
                                         <span
                                             onClick={() => handleRemoveState(index)}
-                                            className={`${stateDetails.length <= 1 ? 'd-none' : ''
-                                                } uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                            className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                             style={{ right: '-2%', top: '20%' }}
                                         ></span>
                                     </Col>
@@ -1619,7 +1670,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         type="text"
                                                         value={data?.name}
                                                         {...register(`name.${index}`, {
-                                                            required: index === 0 ? 'Full Name is required' : false,
+                                                            required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "") ? 'Full Name is required' : false,
 
                                                         })}
                                                         onChange={(e) => {
@@ -1648,7 +1699,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                                 message: 'Please enter a valid email address',
                                                             },
-                                                            required: index !== 1 ? 'Contact Email is required' : false,
+                                                            required: index !== 1 && (!posDetails?.[0]?.email || posDetails[0]?.email.trim() === "") ? 'Contact Email is required' : false,
 
                                                         })}
                                                         onChange={(e) => {
@@ -1673,7 +1724,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         type="text"
                                                         value={data?.role}
                                                         {...register(`role.${index}`, {
-                                                            required: index !== 1 ? 'Job Title / Role is required' : false,
+                                                            required: index !== 1 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
 
                                                         })}
                                                         onChange={(e) => {
@@ -1692,7 +1743,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                             {/* Contact Person */}
                                             <Col sm={6}>
-                                                <Form.Group className="mb-2 position-relative"style={{ minHeight: '100px' }}>
+                                                <Form.Group className="mb-2 position-relative" style={{ minHeight: '100px' }}>
                                                     <Form.Label className="mb-0">
                                                         Contact Person {index === 0 && <span className="text-danger">*</span>}
                                                     </Form.Label>
@@ -1704,7 +1755,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             type="tel"
                                                             value={data.contact}
                                                             {...register(`poccontact.${index}`, {
-                                                                required: index !== 1 ? 'Contact is required' : false,
+                                                                required: index !== 1 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                 pattern: {
                                                                     value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
                                                                     message:
@@ -1749,7 +1800,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {errors.poccontact[index]?.message}
                                                         </span>
                                                     )}
-                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)'}}>
+                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)' }}>
                                                         <img src={us} alt="country code flag" width={20} />
                                                     </div>
                                                 </Form.Group>
@@ -1832,6 +1883,28 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Row>
                         </Col>
                     </Row>
+
+                    <Modal show={showModalPic} onHide={handleCloseModal} centered>
+
+                        <Modal.Body>
+                            <div className='d-flex justify-content-center'>
+                                <p className='fw-bold' style={{ color: '#6169D0' }}> File Preview</p>
+
+                            </div>
+                            <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <img
+                                    src={modalFileUrl} // Set the source of the image
+                                    alt="File Preview"
+                                    style={{
+                                        maxWidth: '100%', // Ensures the image fits within the modal width
+                                        maxHeight: '100vh', // Prevents the image from exceeding the viewport height
+                                        objectFit: 'contain', // Ensures the image maintains its aspect ratio
+                                        display: 'block'
+                                    }}
+                                />
+                            </div>
+                        </Modal.Body>
+                    </Modal>
                 </>
 
             )
