@@ -79,7 +79,8 @@ export const getSchedule = '/api/v1/clinic/practitioner/holidays';
 export const getPractitionerTimings = '/api/v1/clinic/practitioner/schedule';
 
 // appointments
-export const createAppointment = '/api/v1/appointments'
+export const createAppointment = '/api/v1/clinic/appointments'
 export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule'
 export const getAppointments = '/api/v1/clinic/appointment/getAll/';
+export const getAppointmentById = '/api/v1/clinic/appointment/';
 export const getPractitionerSlots = '/api/v1/clinic/practitioner/slots';

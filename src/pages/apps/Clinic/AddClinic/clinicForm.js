@@ -173,7 +173,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction())
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'clinicDataGet')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -347,7 +346,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setNewAccreditationLogo);
-            console.log(url, 'url')
             setAccreditationDetails((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {
@@ -550,7 +548,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [cities1, cities2]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics
-    console.log(getTableData, 'getTableDatagetTableData')
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     const handleCheckboxChange = (stateName) => {
@@ -719,7 +716,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
 
                             <Col sm={6}>
-                                <Form.Group className="mb-0 position-relative"style={{ minHeight: '100px' }}>
+                                <Form.Group className="mb-0 position-relative" style={{ minHeight: '100px' }}>
                                     <Form.Label className="mb-1">
                                         Contact Person <span className="text-danger">*</span>
                                     </Form.Label>
@@ -757,7 +754,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </InputGroup>
 
                                     {/* Country code flag */}
-                                    <div className="position-absolute" style={{ top: '55%', left: '1%',transform: 'translateY(-100%)' }}>
+                                    <div className="position-absolute" style={{ top: '55%', left: '1%', transform: 'translateY(-100%)' }}>
                                         <img src={us} alt="country code flag" width={20} />
                                     </div>
 
@@ -1692,7 +1689,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
                                             {/* Contact Person */}
                                             <Col sm={6}>
-                                                <Form.Group className="mb-2 position-relative"style={{ minHeight: '100px' }}>
+                                                <Form.Group className="mb-2 position-relative" style={{ minHeight: '100px' }}>
                                                     <Form.Label className="mb-0">
                                                         Contact Person {index === 0 && <span className="text-danger">*</span>}
                                                     </Form.Label>
@@ -1749,7 +1746,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {errors.poccontact[index]?.message}
                                                         </span>
                                                     )}
-                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)'}}>
+                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)' }}>
                                                         <img src={us} alt="country code flag" width={20} />
                                                     </div>
                                                 </Form.Group>

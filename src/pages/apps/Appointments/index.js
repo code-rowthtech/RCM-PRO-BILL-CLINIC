@@ -11,6 +11,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentsAction } from '../../../redux/appointments/action';
+import Spinner from '../../../constants/Spinner';
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
@@ -37,7 +38,6 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
         dispatch(getAppointmentsAction({ clinicId: clinicId }))
     }, [dispatch])
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(appointmentsList, 'appointmentsList')
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
@@ -48,19 +48,34 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     <th className='text-white'>Doctor Department</th>
                     <th className='text-white'>Date</th>
                     <th className='text-white'>Status</th>
+                    <th className='text-white'>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {appointmentsList && appointmentsList?.map((data, index) => (
-                    <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td className='text-capitalize'>{data?.patient?.fullName}</td>
-                        <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
-                        <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
-                        <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                        <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
+                {store?.getAppointmentsReducer?.loading ?
+                    <tr>
+                        <td colSpan={6} className='text-center'>
+                            <Spinner />
+                        </td>
                     </tr>
-                ))}
+                    :
+                    appointmentsList && appointmentsList?.map((data, index) => (
+                        <tr key={index}>
+                            <td>{index + 1}</td>
+                            <td className='text-capitalize'>{data?.patient?.fullName}</td>
+                            <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
+                            <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
+                            <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                            <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
+                            <td>
+                                <Link to={`/apps/appointments/newAppointment?updateid=${data?._id}`} className="action-icon">
+                                    <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                </Link>
+                            </td>
+                        </tr>
+                    ))
+                }
+
             </tbody>
         </Table>
     );
@@ -105,7 +120,6 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
     const [activeTab, setActiveTab] = useState('appointments');
-
     const navigate = useNavigate();
     const goto = () => {
         alert('ads')
