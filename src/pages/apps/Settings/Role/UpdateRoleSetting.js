@@ -72,6 +72,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
         };
 console.log(payload,'editrole')
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
+        if (updateSuccess === 200) {
+            closeModal();
+        }
     };
 
     return (

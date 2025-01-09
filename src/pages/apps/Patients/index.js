@@ -86,7 +86,7 @@ const Patients = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body>
+                        <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
                                 <Col sm={6}>
                                     {/* <Button
@@ -108,8 +108,8 @@ const Patients = () => {
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons">
+                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{height:'30px'}} />
+                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                                 New Patient
                                             </Button>
                                         </Col>
@@ -118,18 +118,18 @@ const Patients = () => {
                             </Row>
                             <Row>
                                 <Col sm={12}>
-                                    <Table responsive className="table-centered table-nowrap mb-0">
+                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"   style={{ height: patientsData?.length === 0 ? '100vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
-                                                <th className='text-white'>Sr.No.</th>
-                                                <th className='text-white'>Patient ID</th>
-                                                <th className='text-white'>Patients Name</th>
-                                                <th className='text-white'>Gender</th>
-                                                <th className='text-white'>Phone</th>
-                                                <th className='text-white'>Insurance Range</th>
-                                                <th className='text-white'>Last Visit</th>
-                                                <th className='text-white'>Next Visit</th>
-                                                <th className='text-white'>Action</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Sr.No.</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Patient ID</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Patients Name</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Gender</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Phone</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Insurance Range</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Last Visit</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Next Visit</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -149,15 +149,15 @@ const Patients = () => {
                                                 ) : (
                                                     patientsData && patientsData?.map((data, index) => (
                                                         <tr key={data?._id}>
-                                                            <td>{index + 1}</td>
-                                                            <td>{data?.patientId}</td>
-                                                            <td className='text-capitalize'>{data?.fullName}</td>
-                                                            <td className='text-capitalize'>{data?.gender}</td>
-                                                            <td>{data?.contactNumber}</td>
-                                                            <td>{data?.insuranceRange || 'N/A'}</td>
-                                                            <td>{data?.lastVisit || 'N/A'}</td>
-                                                            <td>{data?.nextVisit || 'N/A'}</td>
-                                                            <td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.patientId}</td>
+                                                            <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.fullName}</td>
+                                                            <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.gender}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.contactNumber}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.insuranceRange || 'N/A'}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.lastVisit || 'N/A'}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.nextVisit || 'N/A'}</td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Link to={`/apps/patients/new-patient?updateid=${data?._id}`} className="action-icon">
                                                                     <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
                                                                 </Link>

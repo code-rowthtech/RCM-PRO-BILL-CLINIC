@@ -35,20 +35,21 @@ const DoctorHoliday = () => {
   }
   return (
     <div>
-      <Table responsive className="table-centered table-nowrap mb-0">
+      <Table responsive  className="table-centered table-nowrap mb-0  rounded"
+              style={{ height: scheduleResponse?.length === 0 ? '90vh' : 'auto' }}>
         <thead className="text-white">
           <tr>
-            <th className="text-white">Sr.No.</th>
-            <th className="text-white">Doctor Name</th>
-            <th className="text-white">Reason</th>
-            <th className="text-white">Date</th>
-            <th className="text-white">Action</th>
+            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Sr.No.</th>
+            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Doctor Name</th>
+            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Reason</th>
+            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Date</th>
+            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Action</th>
           </tr>
         </thead>
         <tbody>
           {isLoading ? (
             <tr>
-              <td colSpan={5} className="text-center">
+              <td colSpan={5} className="text-center " >
                 <Spinner animation="border" role="status" />
               </td>
             </tr>
@@ -61,15 +62,15 @@ const DoctorHoliday = () => {
           ) : (
             scheduleResponse.map((holiday, index) => (
               <tr key={holiday?.id || index}>
-                <td>{index + 1}</td>
-                <td className='text-capitalize'>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
-                <td className='text-capitalize'>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
-                <td>
+                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
+                <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
+                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                   <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
                     {new Date(holiday?.date).toLocaleDateString('en-GB')}
                   </div>
                 </td>
-                <td>
+                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                   <RiDeleteBin5Line onClick={() => deleteHandle(holiday?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                 </td>
               </tr>

@@ -25,8 +25,21 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
+.custom-datepicker {
+    height: 30px;
+    line-height: 30px; /* Ensures vertical alignment */
+    padding: 0 8px; /* Adds space inside the input */
+    font-size: 14px; /* Matches the font size of the Select component */
+    border: 1px solid #ced4da; /* Matches default input borders */
+    border-radius: 4px; /* Ensures consistent rounded corners */
+    width: 100%; /* Optional: Sets width to fit the parent container */
+}
+
 .plusicon {
     color: #6169d0;
+}
+.custom-datepicker{
+    height: 30px !important;
 }
 
 .light-border-bottom {

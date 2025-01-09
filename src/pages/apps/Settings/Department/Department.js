@@ -62,27 +62,38 @@ const Department = () => {
       console.log("create", payload);
 
     }
-    setAddDepartmentModal(false);
-    reset();
+
   };
 
-  const createResponse = store?.createMastersDataReducer?.data;
+  const createResponse = store?.createMastersDataReducer?.data?.status;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
-  
-  const updateResponse = store?.updateMastersDataReducer?.data;
-  console.log(createResponse, 'createResponse')
-  console.log(tableGetData, 'tableGetData')
+
+  const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
-    dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
-    if (createResponse?.status === 201 || updateResponse === 200) {
-      dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
+    if (createResponse === 200) {
+      setAddDepartmentModal(false);
+      reset();
+    }
+  }, [createResponse]);
+  useEffect(() => {
+    if (updateResponse === 200) {
+      setAddDepartmentModal(false);
+      reset();
+      setEdit(null);
+    }
+  }, [updateResponse]);
+  useEffect(() => {
+    dispatch(getMastersDataAction({ status: status, category: 'Department', limit: 10, skip, search: search }));
+    if (createResponse === 200 || updateResponse === 200) {
+      dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
       dispatch(stateEmptydAction());
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 
-  const handleStatusChange = (isActive) => {
-    setStatus(isActive);
+  const handleStatusChange = (data) => {
+    setStatus(data);
     setSearch('');
+
   };
 
   const handlePageChange = (pageNumber) => {
@@ -103,16 +114,19 @@ const Department = () => {
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
-                  variant={status === false ? 'outlined' : ''}
+                  variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={`${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={`${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
+                  style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                 >
                   Active
                 </Button>
+
                 <Button
-                  variant={status === true ? 'outlined' : ''}
+                  variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={`${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
+                  style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                 >
                   Inactive
                 </Button>
@@ -124,10 +138,11 @@ const Department = () => {
                       type="text"
                       onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
                       placeholder="Search..."
+                      style={{ height: '30px' }}
                     />
-                    <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
-                    <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
-                    <Button onClick={() => { setAddDepartmentModal(true); setEdit(null) }} className="custom-buttons">
+                    <Button className="custom-buttons py-0" style={{ height: '30px' }} ><FiFilter className='fs-5' style={{ fontSize: '13px', fontWeight: '400' }} /></Button>
+                    <Button className="custom-buttons py-0" style={{ height: '30px' }} ><FiFileText className='fs-5' style={{ fontSize: '13px', fontWeight: '400' }} /></Button>
+                    <Button onClick={() => { setAddDepartmentModal(true); setEdit(null) }} className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                       New Department
                     </Button>
                   </Col>
@@ -141,12 +156,12 @@ const Department = () => {
             >
               <thead className="text-white">
                 <tr>
-                  <th className='text-white'>S.No.</th>
-                  <th className='text-white'>Department Name</th>
-                  <th className='text-white'>Description</th>
-                  <th className='text-white'>Created Date</th>
-                  <th className='text-white'>Status</th>
-                  <th className='text-white'>Action</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>S.No.</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Department Name</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Description</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Created Date</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                 </tr>
               </thead>
               <tbody >
@@ -159,17 +174,17 @@ const Department = () => {
                 ) : tableGetData?.length ? (
                   tableGetData?.map((data, index) => (
                     <tr key={data._id} className="border-bottom">
-                      <td>{index + 1}</td>
-                      <td>{data.name}</td>
-                      <td>{data.description}...</td>
-                      <td>{formatDate(data.createdAt)}</td>
-                      <td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data.name}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data.description}...</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{formatDate(data.createdAt)}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                         <Form.Switch
                           checked={data.isActive}
                           onChange={() => handleUpdate(data)}
                         />
                       </td>
-                      <td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                         <i
                           className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
                           onClick={() => handleEdit(data)}
@@ -189,11 +204,11 @@ const Department = () => {
 
             <Row>
               <Col className='mt-2 d-flex justify-content-end'>
-                <Paginations
+                {/* <Paginations
                   currentPage={skip}
                   totalPages={store?.getMastersDataReducer?.data?.totalPages}
                   onPageChange={handlePageChange}
-                />
+                /> */}
               </Col>
             </Row>
           </Card.Body>
@@ -282,7 +297,14 @@ const Department = () => {
             <Modal.Footer>
               <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
               <Button type="submit" className="custom-buttons">
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : "Submit"}
+                {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+
+                ) : (
+                  'Submit'
+                )}
               </Button>
             </Modal.Footer>
           </Form>

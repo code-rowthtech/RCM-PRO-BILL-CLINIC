@@ -27,7 +27,10 @@ const Designation = () => {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState(true);
   const [skip, setSkip] = useState(1);
-
+  const createResponse = store?.createMastersDataReducer?.data?.status;
+  const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const updateResponse = store?.updateMastersDataReducer?.data?.status;
+  console.log({ tableGetData })
   const closeAddModal = () => {
     setAddDesiginationModal(false);
     setEdit(null);
@@ -55,22 +58,34 @@ const Designation = () => {
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
       console.log("Updated", payload);
-    } else {
+    }
+    else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
       console.log("create", payload);
 
     }
-    setAddDesiginationModal(false);
-    reset();
-  };
 
-  const createResponse = store?.createMastersDataReducer?.data;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
-  const updateResponse = store?.updateMastersDataReducer?.data;
+  };
+  useEffect(() => {
+    if (createResponse === 200) {
+      setAddDesiginationModal(false);
+      reset();
+    }
+  }, [createResponse]);
+  useEffect(() => {
+    if (updateResponse === 200) {
+      setAddDesiginationModal(false); // Close the modal
+      reset(); // Reset the form fields
+      setEdit(null); // Clear the edit state
+    }
+  }, [updateResponse]);
+
+
+
 
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Desigination', limit: 10, skip, search }));
-    if (createResponse?.status === 201 || updateResponse === 200) {
+    if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'Desigination', search, limit: 10, skip }));
       dispatch(stateEmptydAction());
     }
@@ -93,20 +108,22 @@ const Designation = () => {
     <Row className='mt-2'>
       <Col xs={12}>
         <Card>
-          <Card.Body>
+          <Card.Body  style={{height:'100vh'}}>
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
                   variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={`${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={`${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                 >
                   Active
                 </Button>
                 <Button
                   variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                 >
                   Inactive
                 </Button>
@@ -118,10 +135,11 @@ const Designation = () => {
                       type="text"
                       onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
                       placeholder="Search..."
+                      style={{height:'30px'}}
                     />
-                    <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
-                    <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
-                    <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons">
+                    <Button className="custom-buttons py-0" style={{height:'30px'}} ><FiFilter className='fs-5' style={{fontSize:'13px', fontWeight:'400'}} /></Button>
+                    <Button className="custom-buttons py-0" style={{height:'30px'}} ><FiFileText className='fs-5' style={{fontSize:'13px', fontWeight:'400'}} /></Button>
+                    <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons py-1" style={{fontSize:'13px',height:'30px', fontWeight:'400'}}>
                       New Desigination
                     </Button>
                   </Col>
@@ -134,12 +152,12 @@ const Designation = () => {
               style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}
             >
               <thead className="text-white">
-                <tr>
-                  <th className='text-white'>S.No.</th>
-                  <th className='text-white'>Department Name</th>
-                  <th className='text-white'>Created Date</th>
-                  <th className='text-white'>Status</th>
-                  <th className='text-white'>Action</th>
+                <tr className=''>
+                  <th className='text-white py-2' style={{fontSize:'13px'}}>S.No.</th>
+                  <th className='text-white py-2' style={{fontSize:'13px'}}>Department Name</th>
+                  <th className='text-white py-2' style={{fontSize:'13px'}}>Created Date</th>
+                  <th className='text-white py-2' style={{fontSize:'13px'}}>Status</th>
+                  <th className='text-white py-2' style={{fontSize:'13px'}}>Action</th>
                 </tr>
               </thead>
               <tbody >
@@ -152,16 +170,16 @@ const Designation = () => {
                 ) : tableGetData?.length ? (
                   tableGetData?.map((data, index) => (
                     <tr key={data._id} className="border-bottom">
-                      <td>{index + 1}</td>
-                      <td>{data.name}</td>
-                      <td>{formatDate(data.createdAt)}</td>
-                      <td>
+                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{index + 1}</td>
+                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{data.name}</td>
+                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{formatDate(data.createdAt)}</td>
+                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>
                         <Form.Switch
                           checked={data.isActive}
                           onChange={() => handleUpdate(data)}
                         />
                       </td>
-                      <td>
+                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>
                         <i
                           className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
                           onClick={() => handleEdit(data)}
@@ -178,11 +196,11 @@ const Designation = () => {
                 )}
               </tbody>
             </Table>
-            <Paginations
+            {/* <Paginations
               currentPage={skip}
               totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
               onPageChange={handlePageChange}
-            />
+            /> */}
           </Card.Body>
         </Card>
       </Col>
@@ -253,11 +271,19 @@ const Designation = () => {
                 </Col> */}
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
-              <Button type="submit" className='custom-buttons'>
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
+              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button type="submit" className="custom-buttons">
+                {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
+                 <div class="spinner-border spinner-border-sm" role="status">
+                 <span class="visually-hidden">Loading...</span>
+               </div>
+
+                ) : (
+                  'Submit'
+                )}
               </Button>
             </Modal.Footer>
+
           </Form>
         </Modal.Body>
       </Modal>
