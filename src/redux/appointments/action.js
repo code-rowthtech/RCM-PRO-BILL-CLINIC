@@ -24,3 +24,8 @@ export const getAppointmentsAction = (data): AuthAction => ({
     data
 });
 
+export const getAppointmentByIdAction = (data): AuthAction => ({
+    type: AppointmentActionTypes.GET_APPOINTMENT_BY_ID,
+    data
+});
+

@@ -177,8 +177,6 @@ const AllRoutes = () => {
     }));
     const userData = JSON.parse(localStorage.getItem('userData'));
     const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.permission) || [];
-
-    console.log({ userData })
     const hasPermission = (permission) => {
         // If userPermissions is empty, allow all permissions
         if (userPermissions.length === 0) {
