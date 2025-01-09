@@ -271,7 +271,10 @@ const Designation = () => {
               <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
-                  <Spinner />
+                 <div class="spinner-border spinner-border-sm" role="status">
+                 <span class="visually-hidden">Loading...</span>
+               </div>
+
                 ) : (
                   'Submit'
                 )}

@@ -690,7 +690,7 @@ const SubUpdateClinic = () => {
                                                 </Form.Group>
                                             </Col>
                                             <Col sm={6}>
-                                                <Form.Group className="mb-1 position-relative">
+                                                <Form.Group className="mb-1 position-relative"style={{ minHeight: '100px' }}>
                                                     <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
                                                     <InputGroup>
                                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -717,13 +717,9 @@ const SubUpdateClinic = () => {
                                                         />
                                                     </InputGroup>
                                                     {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
-                                                    <img
-                                                        src={us}
-                                                        alt="country code flag"
-                                                        style={{ top: '55%', left: '1%' }}
-                                                        className="position-absolute"
-                                                        width={20}
-                                                    />
+                                                    <div className="position-absolute" style={{ top: '50%', left: '1%',transform: 'translateY(-100%)' }}>
+                                                        <img src={us} alt="country code flag" width={20} />
+                                                    </div>
                                                 </Form.Group>
                                             </Col>
                                             <Col sm={6}>
@@ -1295,7 +1291,7 @@ const SubUpdateClinic = () => {
                                                             type="checkbox"
                                                             style={{ cursor: "pointer", color: "#6c757d" }}
                                                             label="Same as Primary Address"
-                                                            disabled={!getValues('zip')}
+                                                            // disabled={!getValues('')}
                                                             checked={usePrimaryAsMailing}
                                                             onChange={(e) => {
                                                                 const isChecked = e.target.checked;
@@ -1549,13 +1545,16 @@ const SubUpdateClinic = () => {
                                                                     className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
                                                                 </span>
                                                             </Col>
+                                                            {console.log(posDetails, 'nameeee')}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">Full Name {index === 0 && <span className='text-danger'>*</span>} </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
                                                                         {...register(`name.${index}`, {
-                                                                            required: index === 0 ? 'Full Name is required' : false,
+                                                                            required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "")
+                                                                                ? "Full Name is required"
+                                                                                : false,
                                                                         })}
                                                                         value={data.name}
                                                                         onChange={(e) => {
@@ -1566,8 +1565,10 @@ const SubUpdateClinic = () => {
                                                                         onKeyPress={(event) => handleFirstSpace(event, 1)}
                                                                         placeholder="Full Name"
                                                                     />
-                                                                    {errors[`name.${index}`] && (
-                                                                        <span className="text-danger">{errors[`name.${index}`]?.message}</span>
+                                                                    {errors?.name?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.name[index]?.message}
+                                                                        </span>
                                                                     )}
                                                                 </Form.Group>
                                                             </Col>
@@ -1582,7 +1583,7 @@ const SubUpdateClinic = () => {
                                                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
                                                                                 message: 'Please enter a valid email address'
                                                                             },
-                                                                            required: index !== 1 ? 'Contact Email is required' : false,
+                                                                            required: index === 0 && (!posDetails?.[0]?.email || posDetails[0]?.email.trim() === "") ? 'Contact Email is required' : false,
                                                                             onChange: (e) => {
                                                                                 clearErrors(`contactemail.${index}`);
                                                                                 handlePOSInputChange(e, 'email', index);
@@ -1590,8 +1591,10 @@ const SubUpdateClinic = () => {
                                                                         })}
                                                                         placeholder="Contact Email"
                                                                     />
-                                                                    {errors[`contactemail.${index}`] && (
-                                                                        <span className="text-danger">{errors[`contactemail.${index}`]?.message}</span>
+                                                                    {errors?.contactemail?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.contactemail[index]?.message}
+                                                                        </span>
                                                                     )}
                                                                 </Form.Group>
                                                             </Col>
@@ -1602,7 +1605,7 @@ const SubUpdateClinic = () => {
                                                                         type='text'
                                                                         value={data?.role}
                                                                         {...register(`role.${index}`, {
-                                                                            required: index !== 1 ? 'Job Title / Role is required' : false,
+                                                                            required: index === 0 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
                                                                             onChange: (e) => {
                                                                                 clearErrors(`role.${index}`);
                                                                                 handlePOSInputChange(e, 'role', index);
@@ -1610,13 +1613,15 @@ const SubUpdateClinic = () => {
                                                                         })}
                                                                         placeholder='Job Title / Role'
                                                                     />
-                                                                    {errors[`role.${index}`] && (
-                                                                        <span className="text-danger">{errors[`role.${index}`]?.message}</span>
+                                                                    {errors?.role?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.role[index]?.message}
+                                                                        </span>
                                                                     )}
                                                                 </Form.Group>
                                                             </Col>
                                                             <Col sm={6}>
-                                                                <Form.Group className="mb-1 position-relative">
+                                                                <Form.Group className="mb-1 position-relative" style={{ minHeight: '100px' }}>
                                                                     <Form.Label className="mb-0">Contact Person{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <InputGroup>
                                                                         <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
@@ -1624,7 +1629,7 @@ const SubUpdateClinic = () => {
                                                                             type="tel"
                                                                             value={data.contact}
                                                                             {...register(`poccontact.${index}`, {
-                                                                                required: index !== 1 ? 'Contact is required' : false,
+                                                                                required: index === 0 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                                 pattern: {
                                                                                     value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
                                                                                     message:
@@ -1663,16 +1668,14 @@ const SubUpdateClinic = () => {
                                                                             }}
                                                                         />
                                                                     </InputGroup>
-                                                                    {errors[`poccontact.${index}`] && (
-                                                                        <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
+                                                                    {errors?.poccontact?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.poccontact[index]?.message}
+                                                                        </span>
                                                                     )}
-                                                                    <img
-                                                                        src={us}
-                                                                        alt="country code flag"
-                                                                        style={{ top: '55%', left: '1%' }}
-                                                                        className="position-absolute"
-                                                                        width={20}
-                                                                    />
+                                                                    <div className="position-absolute" style={{ top: '50%', left: '1%',transform: 'translateY(-100%)' }}>
+                                                                        <img src={us} alt="country code flag" width={20} />
+                                                                    </div>
                                                                 </Form.Group>
 
                                                             </Col>

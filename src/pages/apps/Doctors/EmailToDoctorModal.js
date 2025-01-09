@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 
-const EmailToDoctorModal = ({show, closeModal, formData,setFormData}) => {
+const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
 
     const {
         register,
@@ -15,24 +15,24 @@ const EmailToDoctorModal = ({show, closeModal, formData,setFormData}) => {
         formState: { errors },
         reset,
     } = useForm();
-const dispatch=useDispatch();
+    const dispatch = useDispatch();
     const onSubmit = () => {
-console.log(formData,'pppp')
-dispatch(createDoctorAction({ key: encryptMessage(formData) }));
+        // console.log(formData,'pppp')
+        dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }
-    const store=useSelector((state)=>state);
+    const store = useSelector((state) => state);
     const createResponse = store?.createtDoctorsReducer?.data?.status
-useEffect(()=>{
-if(createResponse===200){
-    closeModal();
-    setFormData();
-    reset();
-}
-},[createResponse])
-  return (
-    <div>
-         <Modal centered show={show} onHide={closeModal}>
+    useEffect(() => {
+        if (createResponse === 200) {
+            closeModal();
+            setFormData();
+            reset();
+        }
+    }, [createResponse])
+    return (
+        <div>
+            <Modal centered show={show} onHide={closeModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
                         <Col sm={1}></Col>
@@ -49,7 +49,7 @@ if(createResponse===200){
                                 <Form.Group className="my-2 mx-3">
 
                                     <Form.Control
-                                    className='text-center'
+                                        className='text-center'
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
@@ -66,18 +66,18 @@ if(createResponse===200){
                         </Row>
                         <Modal.Footer className='d-flex justify-content-center'>
                             <Button type="submit" className="custom-buttons" disabled={store?.createDoctorsReducer?.loading}>
-                                {store?.createtDoctorsReducer?.loading?
-                                <Spinner color='white' className='spinner-border-sm'/>
-                                :
-                                'Send'
+                                {store?.createtDoctorsReducer?.loading ?
+                                    <Spinner color='white' className='spinner-border-sm' />
+                                    :
+                                    'Send'
                                 }
                             </Button>
                         </Modal.Footer>
                     </Form>
                 </Modal.Body>
             </Modal>
-    </div>
-  )
+        </div>
+    )
 }
 
 export default EmailToDoctorModal

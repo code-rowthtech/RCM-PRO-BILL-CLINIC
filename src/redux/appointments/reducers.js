@@ -10,6 +10,10 @@ const PRACTITIONER_SCHEDULE_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const PRACTITIONER_SLOTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 const GET_APPOINTMENTS_INITIAL_STATE = {
     data: [],
@@ -55,6 +59,32 @@ export const getPractitionerScheduleReducer = (state = PRACTITIONER_SCHEDULE_INI
                 loading: false
             }
         case AppointmentActionTypes.GET_PRACTITIONER_SCHEDULE_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case AppointmentActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const getPractitionerSlotsReducer = (state = PRACTITIONER_SLOTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case AppointmentActionTypes.GET_PRACTITIONER_SLOTS_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case AppointmentActionTypes.GET_PRACTITIONER_SLOTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case AppointmentActionTypes.GET_PRACTITIONER_SLOTS_ERROR:
             return {
                 data: action.payload,
                 loading: false

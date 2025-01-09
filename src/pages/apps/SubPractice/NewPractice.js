@@ -395,11 +395,12 @@ const NewPractice = () => {
             return updatedDetails;
         });
     };
+    const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
+        console.log({getRoleId})
     useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId: clinic_id, limit: 10, search: 'clinic', page: 1, status: true, defaultRole: 'true' }));
+        dispatch(getRoleDataAction({ clinicId:clinic_id,createdById:'',limit: 10, search: '',page:1, status: true}));
     }, [dispatch]);
-    const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id || {};
-    console.log(store?.getRoleDataReducer, 'getRoleId')
+
 
 
     const submitSubData = (formData) => {
@@ -705,7 +706,7 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-1 position-relative">
+                                                    <Form.Group className="mb-1 position-relative"style={{ minHeight: '100px' }}>
                                                         <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
                                                         <InputGroup>
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -737,13 +738,9 @@ const NewPractice = () => {
                                                             />
                                                         </InputGroup>
                                                         {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
-                                                        <img
-                                                            src={us}
-                                                            alt="country code flag"
-                                                            style={{ top: '55%', left: '1%' }}
-                                                            className="position-absolute"
-                                                            width={20}
-                                                        />
+                                                        <div className="position-absolute" style={{ top: '50%', left: '1%',transform: 'translateY(-100%)' }}>
+                                                            <img src={us} alt="country code flag" width={20} />
+                                                        </div>
                                                     </Form.Group>
                                                 </Col>
 
@@ -1200,12 +1197,12 @@ const NewPractice = () => {
                                                                                     </p>
                                                                                 ))}
                                                                                 {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                                
+
                                                                             </div>
                                                                         </div>
                                                                         {errors.address && (
-                                                                                    <span className="text-danger">{errors.address.message}</span>
-                                                                                )}
+                                                                            <span className="text-danger">{errors.address.message}</span>
+                                                                        )}
                                                                     </Form.Group>
                                                                 </Col>
 
@@ -1353,7 +1350,7 @@ const NewPractice = () => {
                                                                 type="checkbox"
                                                                 style={{ cursor: "pointer", color: "#6c757d" }}
                                                                 label="Same as Primary Address"
-                                                                disabled={!getValues('zip')}
+                                                                // disabled={!getValues('')}
                                                                 checked={usePrimaryAsMailing}
                                                                 onChange={(e) => {
                                                                     const isChecked = e.target.checked;
@@ -1440,12 +1437,12 @@ const NewPractice = () => {
                                                                                     </p>
                                                                                 ))}
                                                                                 {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                              
+
                                                                             </div>
                                                                         </div>
                                                                         {errors.mailingAddress && (
-                                                                                    <span className="text-danger">{errors.mailingAddress.message}</span>
-                                                                                )}
+                                                                            <span className="text-danger">{errors.mailingAddress.message}</span>
+                                                                        )}
                                                                     </Form.Group>
                                                                 </Col>
 
@@ -1536,7 +1533,7 @@ const NewPractice = () => {
                                                                                 readOnly
                                                                                 value={
                                                                                     cities &&
-                                                                                    cities?.find((data) => data?._id === getValues('mailingCity'))?.name || ''
+                                                                                    cities?.find((data) => data?._id === getValues('city'))?.name
                                                                                 }
                                                                             />
                                                                         ) : (
@@ -1587,7 +1584,7 @@ const NewPractice = () => {
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register('mailingZip', {
-                                                                                
+
                                                                                 minLength: { value: 5, message: 'ZIP must be 5 characters long' },
                                                                                 pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
                                                                                 required: "ZIP must required"
@@ -1631,18 +1628,21 @@ const NewPractice = () => {
                                                                         <Form.Control
                                                                             type="text"
                                                                             {...register(`name.${index}`, {
-                                                                                required: index === 0 ? 'Full Name is required' : false,
+                                                                                required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "") ? 'Full Name is required' : false,
                                                                             })}
                                                                             value={data.name}
                                                                             onChange={(e) => {
                                                                                 handlePOSInputChange(e, 'name', index);
                                                                                 setValue(`name.${index}`, e.target.value);
+                                                                                clearErrors(`name.${index}`);
                                                                             }}
                                                                             onKeyPress={(event) => handleFirstSpace(event, 'name', index)}
                                                                             placeholder="Full Name"
                                                                         />
-                                                                        {errors[`name.${index}`] && (
-                                                                            <span className="text-danger">{errors[`name.${index}`]?.message}</span>
+                                                                        {errors?.name?.[index] && (
+                                                                            <span className="text-danger">
+                                                                                {errors.name[index]?.message}
+                                                                            </span>
                                                                         )}
                                                                     </Form.Group>
                                                                 </Col>
@@ -1657,7 +1657,7 @@ const NewPractice = () => {
                                                                                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                                                     message: 'Please enter a valid email address'
                                                                                 },
-                                                                                required: index !== 1 ? 'Contact Email is required' : false,
+                                                                                required: index === 0 && (!posDetails?.[0]?.email || posDetails[0]?.email.trim() === "") ? 'Contact Email is required' : false,
                                                                             })}
                                                                             onChange={(e) => {
                                                                                 clearErrors(`contactemail.${index}`);
@@ -1666,8 +1666,10 @@ const NewPractice = () => {
                                                                             }
                                                                             placeholder="Contact Email"
                                                                         />
-                                                                        {errors[`contactemail.${index}`] && (
-                                                                            <span className="text-danger">{errors[`contactemail.${index}`]?.message}</span>
+                                                                        {errors?.contactemail?.[index] && (
+                                                                            <span className="text-danger">
+                                                                                {errors.contactemail[index]?.message}
+                                                                            </span>
                                                                         )}
                                                                     </Form.Group>
                                                                 </Col>
@@ -1678,7 +1680,7 @@ const NewPractice = () => {
                                                                             type='text'
                                                                             value={data?.role}
                                                                             {...register(`role.${index}`, {
-                                                                                required: index !== 1 ? 'Job Title / Role is required' : false,
+                                                                                required: index === 0 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
                                                                                 onChange: (e) => {
                                                                                     clearErrors(`role.${index}`);
                                                                                     handlePOSInputChange(e, 'role', index);
@@ -1687,12 +1689,14 @@ const NewPractice = () => {
                                                                             placeholder='Job Title / Role'
                                                                         />
                                                                     </Form.Group>
-                                                                    {errors[`role.${index}`] && (
-                                                                        <span className="text-danger">{errors[`role.${index}`]?.message}</span>
+                                                                    {errors?.role?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.role[index]?.message}
+                                                                        </span>
                                                                     )}
                                                                 </Col>
                                                                 <Col sm={6}>
-                                                                    <Form.Group className="mb-2 position-relative">
+                                                                    <Form.Group className="mb-2 position-relative" style={{ minHeight: '100px' }}>
                                                                         <Form.Label className="mb-0">Contact Person {index === 0 && <span className="text-danger">*</span>}</Form.Label>
                                                                         <InputGroup>
                                                                             <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
@@ -1700,7 +1704,7 @@ const NewPractice = () => {
                                                                                 type="tel"
                                                                                 value={data.contact}
                                                                                 {...register(`poccontact.${index}`, {
-                                                                                    required: index !== 1 ? 'Contact is required' : false,
+                                                                                    required: index === 0 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                                     pattern: {
                                                                                         value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
                                                                                         message:
@@ -1739,16 +1743,14 @@ const NewPractice = () => {
                                                                                 }}
                                                                             />
                                                                         </InputGroup>
-                                                                        {errors[`poccontact.${index}`] && (
-                                                                            <span className="text-danger">{errors[`poccontact.${index}`]?.message}</span>
+                                                                        {errors?.poccontact?.[index] && (
+                                                                            <span className="text-danger">
+                                                                                {errors.poccontact[index]?.message}
+                                                                            </span>
                                                                         )}
-                                                                        <img
-                                                                            src={us}
-                                                                            alt="country code flag"
-                                                                            style={{ top: '55%', left: '1%' }}
-                                                                            className="position-absolute"
-                                                                            width={20}
-                                                                        />
+                                                                        <div className="position-absolute" style={{ top: '50%', left: '1%' ,transform: 'translateY(-100%)'}}>
+                                                                            <img src={us} alt="country code flag" width={20} />
+                                                                        </div>
                                                                     </Form.Group>
                                                                 </Col>
                                                             </React.Fragment>

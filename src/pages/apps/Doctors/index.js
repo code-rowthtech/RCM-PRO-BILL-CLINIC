@@ -27,7 +27,6 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
-    console.log({ doctorDetails })
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
     const filteredDoctors = doctorDetails.filter((doctor) =>
