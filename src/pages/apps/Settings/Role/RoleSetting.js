@@ -119,7 +119,9 @@ const RoleSetting = () => {
                             </Row>
                             <Row>
                                 <Col>
-                                    <Table responsive className="table-centered table-nowrap mb-0">
+                                    <Table responsive  className="table-centered table-nowrap mb-0  rounded"
+                                     style={{ height: decryptedRolesData?.length === 0 ? '100vh' : 'auto' }}
+                                    >
                                         <thead className=" text-white">
                                             <tr key={''}>
                                                 <th className='text-white'>
@@ -132,7 +134,7 @@ const RoleSetting = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {store?.getRolesDataReducer?.loading ?
+                                            {store?.getRoleDataReducer?.loading ?
                                                 <tr key={''}>
                                                     <td colSpan={7} className='py-5 text-center'>
                                                         <Spinner /> 

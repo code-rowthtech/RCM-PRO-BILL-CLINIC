@@ -62,19 +62,29 @@ const Department = () => {
       console.log("create", payload);
 
     }
-    setAddDepartmentModal(false);
-    reset();
+
   };
 
-  const createResponse = store?.createMastersDataReducer?.data;
+  const createResponse = store?.createMastersDataReducer?.data?.status;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
-  
-  const updateResponse = store?.updateMastersDataReducer?.data;
-  console.log(createResponse, 'createResponse')
-  console.log(tableGetData, 'tableGetData')
+
+  const updateResponse = store?.updateMastersDataReducer?.data?.status;
+  useEffect(() => {
+    if (createResponse === 200) {
+      setAddDepartmentModal(false);
+      reset();
+    }
+  }, [createResponse]);
+  useEffect(() => {
+    if (updateResponse === 200) {
+      setAddDepartmentModal(false);
+      reset();
+      setEdit(null);
+    }
+  }, [updateResponse]);
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Department', limit: 10, skip, search }));
-    if (createResponse?.status === 201 || updateResponse === 200) {
+    if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'Department', search, limit: 10, skip }));
       dispatch(stateEmptydAction());
     }
@@ -282,7 +292,14 @@ const Department = () => {
             <Modal.Footer>
               <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
               <Button type="submit" className="custom-buttons">
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : "Submit"}
+                {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+
+                ) : (
+                  'Submit'
+                )}
               </Button>
             </Modal.Footer>
           </Form>

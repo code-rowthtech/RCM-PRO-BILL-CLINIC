@@ -29,8 +29,7 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-   
-console.log({roleData})
+
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     console.log({ deleteSuccess })
@@ -67,7 +66,8 @@ console.log({roleData})
                 status: status,
             })
         );
-    }, [dispatch, status]); // Add all dependencies
+    }, [dispatch, status, searchQuery, skip]);
+    
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -262,9 +262,10 @@ console.log({roleData})
                             <Col className='mt-2 d-flex justify-content-end'>
                                 <Paginations
                                     currentPage={skip}
-                                    totalPages={ roleData?.pagination?.totalPages || 1}
-                                    onPageChange={handlePageChange()}
+                                    totalPages={roleData?.pagination?.totalPages || 1}
+                                    onPageChange={(pageNumber) => handlePageChange(pageNumber)}
                                 />
+
                             </Col>
                         </Row>
                     </Card.Body>
