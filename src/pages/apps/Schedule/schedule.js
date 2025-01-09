@@ -120,19 +120,37 @@ const Schedule = () => {
                                         {/* <Col xs="auto" className="d-flex gap-2"> */}
                                         {activeTab !== 'schedules' && (
                                             <div className="d-flex align-items-center gap-2 justify-content-end ">
-                                                <div className='w-25 responnsible-party-select text-start'>
+                                                <div className='w-25 responnsible-party-select text-start' styles={{ height: '30px' }}>
                                                     <Select
                                                         className="basic-single"
                                                         classNamePrefix="select"
                                                         isLoading={store?.getDoctorsReducer?.loading}
                                                         isClearable={true}
                                                         isSearchable={true}
-                                                        onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                                                        onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
                                                         onChange={(data) => handleSearchInputChange(data, 'doctor')}
                                                         name="doctorName"
                                                         options={doctorOptions}
                                                         placeholder="Select Doctor"
+                                                        styles={{
+                                                            control: (base) => ({
+                                                                ...base,
+                                                                height: '30px', // Set control height
+                                                                minHeight: '30px', // Ensure consistent height
+                                                            }),
+                                                            valueContainer: (base) => ({
+                                                                ...base,
+                                                                height: '30px', // Adjust internal container height
+                                                                padding: '0 8px', // Adjust padding for text
+                                                            }),
+                                                            indicatorsContainer: (base) => ({
+                                                                ...base,
+                                                                height: '30px', // Adjust indicator height
+                                                            }),
+                                                        }}
                                                     />
+
+
                                                 </div>
                                                 <DatePicker
                                                     selected={startDate}
@@ -142,9 +160,11 @@ const Schedule = () => {
                                                     selectsRange
                                                     isClearable
                                                     placeholderText="Select a date range"
+                                                    className="custom-datepicker"
                                                 />
+
                                                 <Button
-                                                    className="custom-buttons"
+                                                    className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}
                                                     as={Link}
                                                     to="/apps/schedule/addHoliday"
                                                 >

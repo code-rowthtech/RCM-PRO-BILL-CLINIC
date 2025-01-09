@@ -61,18 +61,20 @@ const Doctors = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body>
+                        <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
                                 <Col sm={6}>
                                     <Button
                                         onClick={() => setStatus(true)}
-                                        className={`me-2 ${status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                        className={`me-2 ${status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
+                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                     >
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
-                                        className={`me-2 ${!status ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
+                                        className={`me-2 ${!status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
+                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                     >
                                         Inactive
                                     </Button>
@@ -86,8 +88,9 @@ const Doctors = () => {
                                                 value={search}
                                                 onChange={(e) => setSearch(e.target.value)} // Update search query
                                                 placeholder="Search..."
+                                                style={{ height: '30px' }}
                                             />
-                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons">
+                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                                 New Doctor
                                             </Button>
                                         </Col>
@@ -98,15 +101,16 @@ const Doctors = () => {
 
                             <Row>
                                 <Col>
-                                    <Table responsive className="table-centered table-nowrap mb-0">
+                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"
+                                        style={{ height: filteredDoctors?.length === 0 ? '100vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
-                                                <th className='text-white'>S.No.</th>
-                                                <th className='text-white'>Doctor Name</th>
-                                                <th className='text-white'>Specialist</th>
-                                                <th className='text-white'>Department Name</th>
-                                                <th className='text-white'>Status</th>
-                                                <th className='text-white'>Action</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>S.No.</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Doctor Name</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Specialist</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Department Name</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                                             </tr>
                                         </thead>
                                         {store?.getDoctorsReducer?.loading ? (
@@ -126,15 +130,15 @@ const Doctors = () => {
                                                 ) : (
                                                     filteredDoctors.map((data, index) => (
                                                         <tr key={index}>
-                                                            <td>{index + 1}</td>
-                                                            <td className='text-capitalize'>
+                                                            <td className='py1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                                                            <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {data?.userDetails?.firstName} {data?.userDetails?.lastName}
                                                             </td>
-                                                            <td>{data?.departmentDetails?.specialist || 'N/A'}</td>
-                                                            <td className='text-uppercase'>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.departmentDetails?.specialist || 'N/A'}</td>
+                                                            <td className='text-uppercase py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {data?.departmentDetails?.name || 'N/A'}
                                                             </td>
-                                                            <td>
+                                                            <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
                                                                     checked={data?.userDetails?.status}
                                                                     onChange={() => {
@@ -143,7 +147,7 @@ const Doctors = () => {
                                                                     }}
                                                                 />
                                                             </td>
-                                                            <td>
+                                                            <td className='py-1 'style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className='d-flex gap-2'>
                                                                     <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />

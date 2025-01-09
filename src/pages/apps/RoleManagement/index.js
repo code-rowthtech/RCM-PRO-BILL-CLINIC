@@ -67,7 +67,7 @@ const RoleManagement = () => {
             })
         );
     }, [dispatch, status, searchQuery, skip]);
-    
+
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -148,13 +148,14 @@ const RoleManagement = () => {
         <Row className='mt-2'>
             <Col xs={12}>
                 <Card>
-                    <Card.Body>
+                    <Card.Body className='' style={{height:'100vh'}}>
                         <Row className="mb-2">
                             <Col sm={6}>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`${status === true ? 'custom-buttons text-white' : ' text-dark bg-none border-primary '} me-2`}
+                                    className={`${status === true ? 'custom-buttons text-white' : ' text-dark bg-none border-primary '} me-2 py-1`}
+                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                                 >
                                     Active
                                 </Button>
@@ -162,7 +163,8 @@ const RoleManagement = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`${status === false ? 'custom-buttons text-white' : ' text-dark bg-none border-primary'} me-2`}
+                                    className={`${status === false ? 'custom-buttons text-white' : ' text-dark bg-none border-primary'} me-2 py-1`}
+                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                                 >
                                     Inactive
                                 </Button>
@@ -180,8 +182,9 @@ const RoleManagement = () => {
                                             placeholder="Search..."
                                             value={searchQuery}  // Bind the input to the searchQuery state
                                             onChange={handleSearchChange}
+                                            style={{height:'30px'}}
                                         />
-                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
+                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                             Add Users
                                         </Button>
                                     </Col>
@@ -190,15 +193,16 @@ const RoleManagement = () => {
                         </Row>
                         <Row>
                             <Col>
-                                <Table responsive className="table-centered table-nowrap mb-0">
+                                <Table responsive className="table-centered table-nowrap mb-0  rounded"
+                                    style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white">Sr. No.</th>
-                                            <th className="text-white">Name</th>
-                                            <th className="text-white">Phone</th>
-                                            <th className="text-white">Username</th>
-                                            <th className="text-white">Status</th>
-                                            <th className="text-white">Action</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px'} }>Sr. No.</th>
+                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Name</th>
+                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Phone</th>
+                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Username</th>
+                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Status</th>
+                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -214,15 +218,15 @@ const RoleManagement = () => {
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
                                             // Render data rows when available
                                             roleData?.users.map((data, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{data?.firstName}</td>
-                                                    <td>{data?.phone}</td>
-                                                    <td>{data?.email}</td>
-                                                    <td>
+                                                <tr key={index} className="border-bottom">
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{index + 1}</td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.firstName}</td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.phone}</td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.email}</td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
-                                                    <td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"
