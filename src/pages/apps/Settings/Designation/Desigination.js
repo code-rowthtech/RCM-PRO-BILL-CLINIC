@@ -27,7 +27,10 @@ const Designation = () => {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState(true);
   const [skip, setSkip] = useState(1);
-
+  const createResponse = store?.createMastersDataReducer?.data?.status;
+  const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const updateResponse = store?.updateMastersDataReducer?.data?.status;
+  console.log({ updateResponse })
   const closeAddModal = () => {
     setAddDesiginationModal(false);
     setEdit(null);
@@ -55,22 +58,34 @@ const Designation = () => {
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
       console.log("Updated", payload);
-    } else {
+    }
+    else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
       console.log("create", payload);
 
     }
-    setAddDesiginationModal(false);
-    reset();
-  };
 
-  const createResponse = store?.createMastersDataReducer?.data;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
-  const updateResponse = store?.updateMastersDataReducer?.data;
+  };
+  useEffect(() => {
+    if (createResponse === 200) {
+      setAddDesiginationModal(false);
+      reset();
+    }
+  }, [createResponse]);
+  useEffect(() => {
+    if (updateResponse === 200) {
+      setAddDesiginationModal(false); // Close the modal
+      reset(); // Reset the form fields
+      setEdit(null); // Clear the edit state
+    }
+  }, [updateResponse]);
+
+
+
 
   useEffect(() => {
     dispatch(getMastersDataAction({ status, category: 'Desigination', limit: 10, skip, search }));
-    if (createResponse?.status === 201 || updateResponse === 200) {
+    if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'Desigination', search, limit: 10, skip }));
       dispatch(stateEmptydAction());
     }
@@ -253,11 +268,16 @@ const Designation = () => {
                 </Col> */}
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className='custom-buttons'>Close</Button>
-              <Button type="submit" className='custom-buttons'>
-                {store?.createMastersDataReducer?.loading ? <Spinner /> : 'Submit'}
+              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              <Button type="submit" className="custom-buttons">
+                {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
+                  <Spinner />
+                ) : (
+                  'Submit'
+                )}
               </Button>
             </Modal.Footer>
+
           </Form>
         </Modal.Body>
       </Modal>
