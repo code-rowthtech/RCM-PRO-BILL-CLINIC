@@ -53,6 +53,14 @@ const AddRole = ({ show, close }) => {
 
 
     }, [getRoleDataAction])
+    useEffect(()=>{
+        if (createSuccess === 200) {
+            reset();
+            close()
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+
+        }
+    },[createSuccess])
     const onSubmit = (data) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
         // const formattedLeavingDate = new Date(data.leavingDate).toISOString();
@@ -71,16 +79,10 @@ const AddRole = ({ show, close }) => {
         };
         console.log('Form Data:', payload);
 
-        if (createStatus === 200) {
-            reset();
-            close()
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-
-        }
+       
         dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));
         dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10,createdById:'', search: '', page: 1, status: true }));
-        reset();
-        close()
+       
 
 
     };
