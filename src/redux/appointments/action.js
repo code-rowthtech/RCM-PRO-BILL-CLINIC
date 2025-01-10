@@ -9,6 +9,11 @@ export const createAppointmentAction = (data): AuthAction => ({
     data
 });
 
+export const rescheduleAppointmentAction = (data): AuthAction => ({
+    type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT,
+    data
+});
+
 export const getPractitionerScheduleAction = (data): AuthAction => ({
     type: AppointmentActionTypes.GET_PRACTITIONER_SCHEDULE,
     data
