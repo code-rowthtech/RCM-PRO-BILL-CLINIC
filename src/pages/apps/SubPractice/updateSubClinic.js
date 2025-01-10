@@ -62,14 +62,12 @@ const SubUpdateClinic = () => {
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(subClinicsDetailsGet, 'subClinicsDetailsGet')
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
     const createLoading = store?.createSubClinicsReducer?.loading;
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const updateSuccess = store?.updateSubClinicReducer?.data?.status;
-    console.log(updateSuccess, 'updateSuccess');
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null)
     const [focused, setFocused] = useState(false);
@@ -1545,7 +1543,6 @@ const SubUpdateClinic = () => {
                                                                     className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
                                                                 </span>
                                                             </Col>
-                                                            {console.log(posDetails, 'nameeee')}
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">Full Name {index === 0 && <span className='text-danger'>*</span>} </Form.Label>

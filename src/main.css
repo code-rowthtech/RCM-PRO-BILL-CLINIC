@@ -7,13 +7,12 @@
 }
 /* Add this to your CSS file or inline style */
 /* In your CSS file or inline styles */
-.custom-multiselect .ms-choice, 
+.custom-multiselect .ms-choice,
 .custom-multiselect .ms-drop {
-    border: none !important;  /* Remove border */
+    border: none !important; /* Remove border */
     box-shadow: none !important; /* Remove box shadow */
     outline: none !important; /* Remove outline */
 }
-
 
 .headers {
     background-color: #010101 !important;
@@ -215,7 +214,7 @@ table {
 .date-carousel {
     display: flex;
     align-items: center;
-    border-top: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
 }
 
 .date-carousel .day {
@@ -246,8 +245,9 @@ table {
     color: #000;
 }
 .slots {
-    background-color: #d9d9d9 !important;
+    background-color: #d9d9d9;
     font-weight: 600;
+    margin: 0.3rem !important;
 }
 /* 
  */
@@ -259,4 +259,15 @@ table {
 }
 .schedule-table {
     box-shadow: none !important;
+}
+.chip {
+    background-color: #6169d0 !important;
+    border-radius: 11px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.7rem;
+    line-height: 0 !important;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 2px 4px;
 }

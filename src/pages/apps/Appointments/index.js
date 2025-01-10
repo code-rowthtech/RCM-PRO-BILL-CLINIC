@@ -11,6 +11,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { FiFileText, FiFilter } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentsAction } from '../../../redux/appointments/action';
+import Spinner from '../../../constants/Spinner';
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
@@ -37,56 +38,45 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
         dispatch(getAppointmentsAction({ clinicId: clinicId }))
     }, [dispatch])
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    const isLoading = store?.getAppointmentsReducer?.loading;
-
     return (
         <Table responsive  className="table-centered table-nowrap mb-0  rounded"
         style={{ height: appointmentsList?.length === 0 ? '75vh' : 'auto' }}>
             <thead className="text-white">
                 <tr>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Sr.No.</th>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Patients Name</th>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Doctor</th>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Doctor Department</th>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Date</th>
-                    <th className="text-white py-2" style={{ fontSize: '13px' }}>Status</th>
+                    <th className='text-white'>Sr.No.</th>
+                    <th className='text-white'>Patients Name</th>
+                    <th className='text-white'>Doctor</th>
+                    <th className='text-white'>Doctor Department</th>
+                    <th className='text-white'>Date</th>
+                    <th className='text-white'>Status</th>
+                    <th className='text-white'>Action</th>
                 </tr>
             </thead>
             <tbody>
-                {/* Show a loading spinner if data is still loading */}
-                {isLoading ? (
+                {store?.getAppointmentsReducer?.loading ?
                     <tr>
-                        <td colSpan="6" className="text-center py-4">
-                            <div className="spinner-border text-primary" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </div>
+                        <td colSpan={6} className='text-center'>
+                            <Spinner />
                         </td>
                     </tr>
-                ) : appointmentsList && appointmentsList.length > 0 ? (
-                    appointmentsList.map((data, index) => (
+                    :
+                    appointmentsList && appointmentsList?.map((data, index) => (
                         <tr key={index}>
-                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                            <td className="text-capitalize py-1" style={{ fontSize: '13px', fontWeight: '400' }}>{data?.patient?.fullName}</td>
-                            <td className="text-capitalize py-1" style={{ fontSize: '13px', fontWeight: '400' }}>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
-                            <td className="text-capitalize py-1" style={{ fontSize: '13px', fontWeight: '400' }}>{data?.doctor?.departmentId?.name}</td>
-                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                <span
-                                    className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}
-                                >
-                                    {data?.status}
-                                </span>
+                            <td>{index + 1}</td>
+                            <td className='text-capitalize'>{data?.patient?.fullName}</td>
+                            <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
+                            <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
+                            <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                            <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
+                            <td>
+                                <Link to={`/apps/appointments/newAppointment?updateid=${data?._id}`} className="action-icon">
+                                    <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                </Link>
                             </td>
                         </tr>
                     ))
-                ) : (
-                    // Show a "No data available" message if the array is empty
-                    <tr>
-                        <td colSpan="6" className="text-center py-4" style={{ fontSize: '14px', fontWeight: '500' }}>
-                            No appointments found.
-                        </td>
-                    </tr>
-                )}
+                }
+
             </tbody>
         </Table>
 
@@ -132,7 +122,6 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
     const [activeTab, setActiveTab] = useState('appointments');
-
     const navigate = useNavigate();
     const goto = () => {
         alert('ads')

@@ -16,7 +16,6 @@ const Contract = ({ billingId, activeTab }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const contract = createContractReducer?.data;
-    console.log({contract})
 
     useEffect(() => {
         if (activeTab === 'contract') {
@@ -65,7 +64,7 @@ const Contract = ({ billingId, activeTab }) => {
                             ) : (
                                 <tr>
                                     <td className="text-black">
-                                        {contract?.contract?.contractName || contract?.standardContract?.contractType ||  'N/A'}
+                                        {contract?.contract?.contractName || contract?.standardContract?.contractType || 'N/A'}
                                     </td>
                                     <td>
                                         <span
@@ -87,13 +86,13 @@ const Contract = ({ billingId, activeTab }) => {
                                             className="fs-4 me-1 uil-eye cursor-pointer"
                                             onClick={() => setShow(true)}
                                         ></i>
-                                            <Link
-                                                to={contract?.contract?.contractTemplateId?.fileUrl||contract?.standardContract?.fileUrl}
-                                                target="blank"
-                                                className="cursor-pointer fs-4"
-                                            >
-                                                <FiDownload />
-                                            </Link>
+                                        <Link
+                                            to={contract?.contract?.contractTemplateId?.fileUrl || contract?.standardContract?.fileUrl}
+                                            target="blank"
+                                            className="cursor-pointer fs-4"
+                                        >
+                                            <FiDownload />
+                                        </Link>
                                     </td>
                                 </tr>
                             )}

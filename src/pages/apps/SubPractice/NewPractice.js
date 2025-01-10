@@ -26,9 +26,7 @@ const NewPractice = () => {
     const [passShow, setPassShow] = useState(false);
     const logoFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo, 'go')
     const [logoName, setLogoName] = useState('');
-    console.log({ logoName })
     // const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
     const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
@@ -78,7 +76,6 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'clinicsDataGetclinicsDataGet')
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -411,7 +408,6 @@ const NewPractice = () => {
         });
     };
     const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-    console.log({ getRoleId })
     useEffect(() => {
         dispatch(getRoleDataAction({ clinicId: clinic_id, createdById: '', limit: 10, search: '', page: 1, status: true }));
     }, [dispatch]);
@@ -479,7 +475,6 @@ const NewPractice = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-        console.log('createData', payload)
     };
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {

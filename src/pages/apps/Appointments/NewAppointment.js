@@ -1,24 +1,28 @@
 // @flow
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Card } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { getPatientsAction } from "../../../redux/patients/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import Select from 'react-select';
-import { createAppointmentAction, getDoctorsAction, getPractitionerScheduleAction, getPractitionerSlotsAction } from "../../../redux/actions";
+import { createAppointmentAction, getAppointmentByIdAction, getDoctorsAction, getPractitionerScheduleAction, getPractitionerSlotsAction } from "../../../redux/actions";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useForm } from "react-hook-form";
 import { getScheduleAction } from "../../../redux/schedule/action";
+import Spinner from '../../../constants/Spinner';
+import { GoDotFill } from "react-icons/go";
+import ToastHandle from "../../../helpers/ToastMessage";
 
 const NewAppointment = () => {
     const navigate = useNavigate();
     const today = new Date();
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('updateid');
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, getValues } = useForm();
     const store = useSelector((state) => state);
     const [selectedDate, setSelectedDate] = useState(today);
-    console.log({ selectedDate })
     const [currentStartDate, setCurrentStartDate] = useState(today);
     const [patientsSearch, setPatientsSearch] = useState('');
     const [departmentSearch, setDepartmentSearch] = useState('');
@@ -27,6 +31,7 @@ const NewAppointment = () => {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [selectedSlot, setSelectedSlot] = useState(null);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const patientsData = store?.getPatientsReducer?.data?.patients;
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
@@ -35,8 +40,11 @@ const NewAppointment = () => {
     const availableWeekDays = doctorSchedule?.days;
     const doctorHolidays = doctorSchedule?.holidays;
     const availableSlots = store?.getPractitionerSlotsReducer?.data?.allSlots;
+    const bookedSlots = store?.getPractitionerSlotsReducer?.data?.bookedSlots;
+    const perPatientTime = store?.getPractitionerSlotsReducer?.data?.perPatientTime;
+    const updateData = store?.getAppointmentByIdReducer?.data?.data;
+    console.log(updateData, 'updateData')
 
-    console.log(availableSlots, 'doctorSchedule')
     const patientOptions = patientsData?.map((data) => ({
         value: data._id,
         label: data.fullName,
@@ -51,7 +59,18 @@ const NewAppointment = () => {
         value: data._id,
         label: data?.name,
     }));
-
+    useEffect(() => {
+        if (id && updateData) {
+            const doctor = doctorOptions && doctorOptions?.find((data) => data?.value === updateData?.doctor?._id);
+            console.log({ doctor })
+            setSelectedDoctor()
+        }
+    }, [id, updateData])
+    useEffect(() => {
+        if (id) {
+            dispatch(getAppointmentByIdAction({ id: id }))
+        }
+    }, [id])
     useEffect(() => {
         const patientsPayload = {
             clinicId: clinicId,
@@ -90,7 +109,6 @@ const NewAppointment = () => {
     };
 
     const weekDates = generateWeekDates(currentStartDate);
-
     const prevWeek = () => {
         const prevStart = new Date(currentStartDate);
         prevStart.setDate(currentStartDate.getDate() - 7);
@@ -109,13 +127,13 @@ const NewAppointment = () => {
 
     const handleDayClick = (date) => {
         setSelectedDate(date);
-        // navigate('/apps/appointments/appointmentCalendar')
         const data = {
             doctorId: selectedDoctor?.value,
             date: date
         }
         dispatch(getPractitionerSlotsAction({ key: encryptMessage(data) }));
     };
+
 
     const handleAppointment = () => {
         navigate("/apps/appointments/list");
@@ -132,7 +150,6 @@ const NewAppointment = () => {
     }
 
     const handleChange = (selectedOption, type) => {
-        // setSelectedPatient(selectedOption, 'Selected Option');
         if (type === 'patient') {
             setSelectedPatient(selectedOption, 'Selected Option');
         } else if (type === 'doctor') {
@@ -141,21 +158,57 @@ const NewAppointment = () => {
             setSelectedDepartment(selectedOption, 'Selected Option');
         }
     };
+    function calculateEndTime(startTime, perPatientTime) {
+        const [time, meridian] = startTime && startTime?.split(" ");
+        let [hours, minutes] = time && time?.split(":")?.map(Number);
+
+        // Convert hours to 24-hour format if needed
+        if (meridian === "PM" && hours !== 12) {
+            hours += 12;
+        } else if (meridian === "AM" && hours === 12) {
+            hours = 0;
+        }
+
+        // Add perPatientTime to the start time
+        minutes += perPatientTime;
+        hours += Math.floor(minutes / 60);
+        minutes = minutes % 60;
+
+        // Handle wrapping of hours
+        hours = hours % 24;
+
+        // Convert hours back to 12-hour format
+        const newMeridian = hours >= 12 ? "PM" : "AM";
+        hours = hours % 12 || 12; // If 0, set to 12
+
+        // Format minutes as two digits
+        minutes = minutes.toString().padStart(2, "0");
+
+        // Return the formatted time
+        return `${hours}:${minutes} ${newMeridian}`;
+    }
     const onSubmit = (data) => {
         const payload = {
             patient: selectedPatient?.value,
             doctor: selectedDoctor?.value,
             department: selectedDepartment?.value,
-            date: data?.date,
+            date: selectedDate,
             description: data?.description,
             clinic: clinicId,
+            slot: selectedSlot,
+            startTime: selectedSlot,
+            endTime: selectedSlot ? calculateEndTime(selectedSlot, perPatientTime) : '',
         }
-        dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
+        if (selectedSlot) {
+            dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
+        } else {
+            ToastHandle('Please select a slot before proceeding.', 'danger')
+        }
     }
     return (
         <Card className="mt-2" style={{ height: "87vh" }}>
             {/* Card Header */}
-            <div className="d-flex justify-content-between align-items-center mx-3 mt-2">
+            <div className="d-flex justify-content-between align-items-center mx-3 my-2">
                 <h5 className="fw-bold mb-0">New Appointment</h5>
                 <Button variant='secondary' onClick={handleAppointment}>Back</Button>
             </div>
@@ -165,163 +218,217 @@ const NewAppointment = () => {
                 <div className="row">
                     {/* Left Column */}
                     <div className="col-12">
-                        <form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row">
+                        <form className="" onSubmit={handleSubmit(onSubmit)}>
+                            <div className="row" style={{ minHeight: '70vh' }}>
                                 <div className="col-6">
-                                    <div className="mb-1 responnsible-party-select">
-                                        <label htmlFor="patient" className="form-label mb-0">
-                                            Patient
-                                        </label>
-                                        <Select
-                                            className="basic-single"
-                                            classNamePrefix="select"
-                                            isLoading={store?.getPatientsReducer?.loading}
-                                            isClearable={true}
-                                            isSearchable={true}
-                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'patient')} // Pass inputValue and type
-                                            onChange={(data) => handleChange(data, 'patient')}
-                                            name="patientName"
-                                            options={patientOptions}
-                                            placeholder="Select Patient Name"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="mb-1 responnsible-party-select">
-                                        <label htmlFor="doctorDepartment" className="form-label mb-0">
-                                            Doctor Department
-                                        </label>
-                                        <Select
-                                            className="basic-single"
-                                            classNamePrefix="select"
-                                            isLoading={store?.getMastersDataReducer?.loading}
-                                            isClearable={true}
-                                            isSearchable={true}
-                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'department')} // Pass inputValue and type
-                                            onChange={(data) => handleChange(data, 'department')}
-                                            name="departmentName"
-                                            options={departmentOptions}
-                                            placeholder="Select Department"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="mb-1 responnsible-party-select">
-                                        <label htmlFor="doctor" className="form-label mb-0">
-                                            Doctor
-                                        </label>
-                                        <Select
-                                            className="basic-single"
-                                            classNamePrefix="select"
-                                            isLoading={store?.getDoctorsReducer?.loading}
-                                            isClearable={true}
-                                            isSearchable={true}
-                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
-                                            onChange={(data) => handleChange(data, 'doctor')}
-                                            name="doctorName"
-                                            options={doctorOptions}
-                                            placeholder="Select Doctor Name"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="mb-1">
-                                        <label htmlFor="date" className="form-label mb-0">
-                                            Date:
-                                        </label>
-                                        <input
-                                            type="date"
-                                            className="w-100 input ps-2 py-1"
-                                            id="date"
-                                            {...register('date')}
-                                            placeholder="Enter Date of birth"
-                                            style={{ border: '1px solid #444141', fontSize: '14px' }}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    <div className="mb-1">
-                                        <label htmlFor="description" className="form-label mb-0">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            id="description"
-                                            {...register('description')}
-                                            className="w-100 input ps-2 py-1"
-                                            style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
-                                            rows="3"
-                                        ></textarea>
-                                    </div>
-                                </div>
-                                <div className="col-6">
-                                    {/* Active Date Range */}
-                                    <div className="mb-0 text-start fw-bold">
-                                        <span>
-                                            {currentStartDate.toDateString()} - {weekDates[6].toDateString()}
-                                        </span>
-                                    </div>
-
-                                    {/* Date Carousel */}
-                                    <div className="date-carousel d-flex align-items-center py-1 justify-content-around">
-                                        <div
-                                            className={`arrow color-black fw-bold fs-2 px-2 ${currentStartDate <= today ? "disabled" : ""
-                                                }`}
-                                            style={{
-                                                cursor: currentStartDate <= today ? "not-allowed" : "pointer",
-                                                opacity: currentStartDate <= today ? 0.5 : 1,
-                                            }}
-                                            onClick={prevWeek}
-                                        >
-                                            &#8249;
-                                        </div>
-                                        {weekDates && weekDates.map((date) => {
-                                            // Get the day short format (e.g., 'Mon', 'Tue')
-                                            const dayShort = date.toLocaleString("en-US", { weekday: "short" });
-
-                                            // Check if the day is available and not a holiday
-                                            const isAvailableDay = availableWeekDays && availableWeekDays?.includes(dayShort);
-                                            const isHoliday = doctorHolidays && doctorHolidays?.some(holidayDate => new Date(holidayDate).toDateString() === date.toDateString());
-
-                                            return (
-                                                <div
-                                                    key={date}
-                                                    className={`day mx-2 d-flex justify-content-center align-items-center flex-column px-3 rounded-2 py-0 text-center ${date.toDateString() === selectedDate.toDateString() ? "selected" : ""}`}
-                                                    style={{
-                                                        cursor: isAvailableDay && !isHoliday ? "pointer" : "not-allowed", // Disable click if not available or a holiday
-                                                        backgroundColor: date.toDateString() === selectedDate.toDateString()
-                                                            ? "#444141"
-                                                            : (isAvailableDay && !isHoliday ? "white" : "#f0f0f0"), // Change background based on availability
-                                                        opacity: isAvailableDay && !isHoliday ? 1 : 0.5, // Disabled style for unavailable or holiday days
+                                    <div className="row">
+                                        <div className="col-12">
+                                            <div className="mb-1 responnsible-party-select">
+                                                <label htmlFor="patient" className="form-label mb-0">
+                                                    Patient <span className="text-danger">*</span>
+                                                </label>
+                                                <Select
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    isLoading={store?.getPatientsReducer?.loading}
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    {...register('selectedPatient', {
+                                                        required: 'This field is required',
+                                                    })}
+                                                    onChange={(data) => {
+                                                        setValue('selectedPatient', data); // Update the selectedPatient value
+                                                        clearErrors('selectedPatient'); // Clear errors when a valid value is selected
+                                                        handleChange(data, 'patient');
                                                     }}
-                                                    onClick={() => isAvailableDay && !isHoliday && handleDayClick(date)} // Only allow clicks if available
-                                                >
-                                                    <span className="mb-0">{dayShort}</span>
-                                                    <h5 className="my-0">{date.getDate()}</h5>
-                                                </div>
-                                            );
-                                        })}
+                                                    onInputChange={(inputValue) => handleInputChange(inputValue, 'patient')}
+                                                    options={patientOptions}
+                                                    placeholder="Select Patient Name"
+                                                />
+                                                {errors.selectedPatient && (
+                                                    <span className="text-danger">{errors.selectedPatient.message}</span>
+                                                )}
 
-                                        <div
-                                            className="arrow px-2 color-black fw-bold fs-2"
-                                            style={{ cursor: "pointer" }}
-                                            onClick={nextWeek}
-                                        >
-                                            &#8250;
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="bg-white rounded-2">
-                                        <h5 className="mb-0">Available Slots</h5>
-                                        <div className="row m-0">
-                                            {availableSlots?.map((data, index) => (
-                                                <div key={index} className="col-2 text-center slots m-1 m-0 d-flex gap-1 py-1 rounded-2">{data}</div>
-                                            ))}
+
+                                        <div className="col-12">
+                                            <div className="mb-1 responnsible-party-select">
+                                                <label htmlFor="doctorDepartment" className="form-label mb-0">
+                                                    Doctor Department
+                                                </label>
+                                                <Select
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    isLoading={store?.getMastersDataReducer?.loading}
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    onInputChange={(inputValue) => handleInputChange(inputValue, 'department')}
+                                                    onChange={(data) => handleChange(data, 'department')}
+                                                    name="departmentName"
+                                                    options={departmentOptions}
+                                                    placeholder="Select Department"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="col-12">
+                                            <div className="mb-1 responnsible-party-select">
+                                                <label htmlFor="doctor" className="form-label mb-0">
+                                                    Doctor <span className="text-danger">*</span>
+                                                </label>
+                                                <Select
+                                                    className="basic-single"
+                                                    classNamePrefix="select"
+                                                    isLoading={store?.getDoctorsReducer?.loading}
+                                                    isClearable={true}
+                                                    isSearchable={true}
+                                                    {...register('selectedDoctor', {
+                                                        required: 'This field is required'
+                                                    })}
+                                                    onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
+                                                    onChange={(data) => {
+                                                        setValue('selectedDoctor', data); // Update the selectedPatient value
+                                                        handleChange(data, 'doctor');
+                                                        clearErrors('selectedDoctor')
+                                                    }}
+                                                    name="doctorName"
+                                                    options={doctorOptions}
+                                                    placeholder="Select Doctor Name"
+                                                />
+                                                {errors?.selectedDoctor && <span className="text-danger">{errors?.selectedDoctor?.message}</span>}
+                                            </div>
+                                        </div>
+
+                                        <div className="col-12">
+                                            <div className="mb-1">
+                                                <label htmlFor="description" className="form-label mb-0">
+                                                    Description
+                                                </label>
+                                                <textarea
+                                                    id="description"
+                                                    {...register('description')}
+                                                    className="w-100 input ps-2 py-1"
+                                                    style={{ border: '1px solid #444141', fontSize: '14px', color: '#444141' }}
+                                                    rows="3"
+                                                ></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div className="col-6">
+                                    <div className="col-12">
+                                        <div className="mb-0 fw-bold ">
+                                            <span className="fs-5 ">
+                                                <div className="text-center">
+                                                    Select Date And Time
+                                                </div>
+                                                <div className="d-flex gap-1 justify-content-end">
+                                                    <p className="d-flex align-items-center mb-0 fs-6">
+                                                        <GoDotFill className="fs-5 text-muted" />
+                                                        <span>Available</span></p>
+                                                    <p className="d-flex align-items-center mb-0 fs-6">
+                                                        <GoDotFill className="fs-5 text-success" />
+                                                        <span>Selected</span></p>
+                                                    <p className="d-flex align-items-center mb-0 fs-6">
+                                                        <GoDotFill className="fs-5 text-warning" />
+                                                        <span>Not Available</span></p>
+                                                </div>
+                                            </span>
+                                        </div>
+
+                                        {/* Date Carousel */}
+                                        <div className="date-carousel d-flex align-items-center py-2     justify-content-around">
+                                            <div
+                                                className={`arrow color-black fw-bold fs-2 px-2 ${currentStartDate <= today ? "disabled" : ""
+                                                    }`}
+                                                style={{
+                                                    cursor: currentStartDate <= today ? "not-allowed" : "pointer",
+                                                    opacity: currentStartDate <= today ? 0.5 : 1,
+                                                }}
+                                                onClick={prevWeek}
+                                            >
+                                                &#8249;
+                                            </div>
+                                            {weekDates && weekDates.map((date) => {
+                                                // Get the day short format (e.g., 'Mon', 'Tue')
+                                                const dayShort = date?.toLocaleString("en-US", { weekday: "short" });
+                                                // Check if the day is available and not a holiday
+                                                const isAvailableDay = availableWeekDays && availableWeekDays?.includes(dayShort);
+                                                const isHoliday = doctorHolidays && doctorHolidays?.some(holidayDate => new Date(holidayDate).toDateString() === date.toDateString());
+
+                                                return (
+                                                    <div
+                                                        key={date}
+                                                        className={`day mx-2 d-flex justify-content-center align-items-center flex-column px-3 rounded-2 py-0 text-center ${date.toDateString() === selectedDate.toDateString() ? "selected" : ""}`}
+                                                        style={{
+                                                            cursor: isAvailableDay && !isHoliday ? "pointer" : "not-allowed", // Disable click if not available or a holiday
+                                                            backgroundColor: date.toDateString() === selectedDate.toDateString()
+                                                                ? "#444141"
+                                                                : (isAvailableDay && !isHoliday ? "white" : "#f0f0f0"),
+                                                            opacity: isAvailableDay && !isHoliday ? 1 : 0.5, //     Disabled style for unavailable or holiday days
+                                                        }}
+                                                        onClick={() => isAvailableDay && !isHoliday && handleDayClick(date)} // Only allow clicks if available
+                                                    >
+                                                        <span className="mb-0">{dayShort}</span>
+                                                        <h5 className="my-0">{date.getDate()}</h5>
+                                                    </div>
+                                                );
+                                            })}
+
+                                            <div
+                                                className="arrow px-2 color-black fw-bold fs-2"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={nextWeek}
+                                            >
+                                                &#8250;
+                                            </div>
+                                        </div>
+                                        <div className="rounded-2 ">
+                                            {
+                                                store?.getPractitionerSlotsReducer?.loading ?
+                                                    <div className="text-center mt-1 mb-0">
+                                                        <Spinner className="spinner-border-sm" />
+                                                    </div>
+                                                    :
+                                                    <div style={{ cursor: 'pointer' }}>
+                                                        <div className="row mx-3 d-flex justify-content-center align-items-center">
+                                                            {availableSlots?.map((data, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    onClick={() => !bookedSlots?.includes(data) && setSelectedSlot(data)} // Disable onClick if the slot is booked
+                                                                    style={{
+                                                                        cursor: bookedSlots?.includes(data) ? 'not-allowed' : 'pointer',
+                                                                        opacity: bookedSlots?.includes(data) ? '0.7' : '1'
+                                                                    }} // Set cursor style dynamically
+                                                                    className={`slots col-2 text-center m-0 gap-2 py-1 rounded-2 ${selectedSlot === data
+                                                                        ? 'border border-success bg-success text-white fw-bolder'
+                                                                        : bookedSlots?.includes(data)
+                                                                            ? 'bg-warning text-white fw-bolder'
+                                                                            : ''
+                                                                        }`}
+                                                                >
+                                                                    {data}
+                                                                </div>
+                                                            ))}
+
+                                                        </div>
+                                                    </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="row">
                                 <div className="col-12">
                                     <div className="d-flex justify-content-end gap-2 mt-3">
                                         <Button variant="secondary">Cancel</Button>
-                                        <Button className="custom-buttons" type="submit">Save</Button>
+                                        <Button className="custom-buttons" type="submit" disabled={store?.createAppointmentReducer?.loading}>
+                                            {store?.createAppointmentReducer?.loading ?
+                                                <Spinner className="spinner-border-sm" color="white" />
+                                                :
+                                                'Save'
+                                            }
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
