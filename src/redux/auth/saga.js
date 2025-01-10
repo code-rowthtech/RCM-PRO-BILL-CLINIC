@@ -124,8 +124,6 @@ function* verifyTokenFunction({ payload }) {
     } catch (error) {
         ToastHandle(error, 'danger')
         yield put(authApiResponseError(AuthActionTypes.VERIFY_TOKEN, error));
-        // localStorage.setItem('authError', JSON.stringify(error));
-
     }
 }
 
