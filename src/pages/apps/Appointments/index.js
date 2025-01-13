@@ -217,8 +217,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         type="Date"
                                                         placeholder="Search..."
                                                     />
-                                                    <Button className="custom-buttons">
-                                                        <IoCalendarOutline className="fs-4" onClick={() => navigate("/apps/appointments/appointmentCalendar")} />
+                                                    <Button className="custom-buttons" onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
+                                                        <IoCalendarOutline className="fs-4" />
                                                     </Button>
                                                     <Button as={Link} to="/apps/appointments/newAppointment">New Appointment</Button>
                                                 </>
