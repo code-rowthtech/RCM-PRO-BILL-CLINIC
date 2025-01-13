@@ -5,6 +5,11 @@ const CREATE_CLINICS_INITIAL_STATE = {
     loading: false
 }
 
+const CHANGE_EMAIL_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 const GET_CLINICS_INITIAL_STATE = {
     data: [],
     loading: false
@@ -79,6 +84,31 @@ export const createClinicsReducer = (state = CREATE_CLINICS_INITIAL_STATE, actio
                 loading: false
             }
         case ClinicsActionTypes.CREATE_CLINIC_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+export const changeEmailReducer = (state = CHANGE_EMAIL_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ClinicsActionTypes.CHANGE_EMAIL_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case ClinicsActionTypes.CHANGE_EMAIL_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case ClinicsActionTypes.CHANGE_EMAIL_ERROR:
             return {
                 data: action.payload,
                 loading: false

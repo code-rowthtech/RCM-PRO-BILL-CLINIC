@@ -5,6 +5,11 @@ const CREATE_ROLES_INITIAL_STATE = {
     loading: false
 }
 
+const VIEW_PASSWORD_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 const UPDATE_ROLES_INITIAL_STATE = {
     data: [],
     loading: false
@@ -38,6 +43,27 @@ export const createRolesReducer = (state = CREATE_ROLES_INITIAL_STATE, action) =
                 loading: false
             }
         case RolesActionTypes.CREATE_ROLES_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const viewPasswordReducer = (state = VIEW_PASSWORD_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case RolesActionTypes.VIEW_PASSWORD_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case RolesActionTypes.VIEW_PASSWORD_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case RolesActionTypes.VIEW_PASSWORD_ERROR:
             return {
                 data: action.payload,
                 loading: false

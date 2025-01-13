@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { RolesActionTypes } from './constants';
-import { createRolesApi, deleteRoles, getRolesApi, getUser, updateRolesApi } from './api';
+import { createRolesApi, deleteRoles, getRolesApi, getUser, updateRolesApi, viewPasswordApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -31,10 +31,41 @@ function* createRolesFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle('Something went wrong, please try again later', 'danger')
+        ToastHandle(error, 'danger')
 
         yield put({
             type: RolesActionTypes.CREATE_ROLES_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* viewPasswordFunction(data) {
+    try {
+        yield put({
+            type: RolesActionTypes.VIEW_PASSWORD_LOADING,
+            payload: {},
+        });
+        const response = yield call(viewPasswordApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success')
+
+
+            yield put({
+                type: RolesActionTypes.VIEW_PASSWORD_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: RolesActionTypes.VIEW_PASSWORD_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger')
+        yield put({
+            type: RolesActionTypes.VIEW_PASSWORD_ERROR,
             payload: error,
         });
     }
@@ -61,7 +92,7 @@ function* updateRolesFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle('Something went wrong, please try again later', 'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: RolesActionTypes.UPDATE_ROLES_ERROR,
             payload: error,
@@ -165,6 +196,10 @@ export function* watchCreateRoles() {
     yield takeEvery(RolesActionTypes.CREATE_ROLES, createRolesFunction);
 }
 
+export function* watchViewPassword() {
+    yield takeEvery(RolesActionTypes.VIEW_PASSWORD, viewPasswordFunction);
+}
+
 export function* watchUpdateRoles() {
     yield takeEvery(RolesActionTypes.UPDATE_ROLES, updateRolesFunction);
 }
@@ -183,7 +218,7 @@ export function* watchGetUser() {
 
 function* rolesSaga() {
     yield all([
-        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchresetState), fork(watchGetUser),fork(watchDeleteRoles),
+        fork(watchCreateRoles), fork(watchUpdateRoles), fork(watchGetRoles), fork(watchresetState), fork(watchGetUser), fork(watchDeleteRoles), fork(watchViewPassword)
     ]);
 }
 export default rolesSaga;

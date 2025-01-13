@@ -8,10 +8,16 @@ import { FormInput } from '../../../components';
 import { patientsData } from './data';
 import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { FiFileText, FiFilter } from 'react-icons/fi';
+import { FiFilter } from 'react-icons/fi';
+import { IoCalendarOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentsAction } from '../../../redux/appointments/action';
 import Spinner from '../../../constants/Spinner';
+import { getDoctorsAction } from '../../../redux/actions';
+import { encryptMessage } from '../../../cryptoUtils';
+import Select from 'react-select';
+import { useForm } from 'react-hook-form';
+
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
@@ -34,9 +40,7 @@ type OrderListProps = {
 const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(getAppointmentsAction({ clinicId: clinicId }))
-    }, [dispatch])
+
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     return (
         <Table responsive className="table-centered table-nowrap mb-0">
@@ -46,6 +50,8 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     <th className='text-white'>Patients Name</th>
                     <th className='text-white'>Doctor</th>
                     <th className='text-white'>Doctor Department</th>
+                    <th className='text-white'>Purpose of Visit</th>
+                    <th className='text-white'>Booked Slot</th>
                     <th className='text-white'>Date</th>
                     <th className='text-white'>Status</th>
                     <th className='text-white'>Action</th>
@@ -54,7 +60,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
             <tbody>
                 {store?.getAppointmentsReducer?.loading ?
                     <tr>
-                        <td colSpan={6} className='text-center'>
+                        <td colSpan={9} className='text-center'>
                             <Spinner />
                         </td>
                     </tr>
@@ -62,9 +68,11 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     appointmentsList && appointmentsList?.map((data, index) => (
                         <tr key={index}>
                             <td>{index + 1}</td>
-                            <td className='text-capitalize'>{data?.patient?.fullName}</td>
+                            <td className='text-capitalize'>{data?.patient?.firstName}</td>
                             <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
                             <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
+                            <td className='text-capitalize'>{data?.purposeOfVisit}</td>
+                            <td>{data?.startTime} - {data?.endTime}</td>
                             <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
                             <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
                             <td>
@@ -75,7 +83,6 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                         </tr>
                     ))
                 }
-
             </tbody>
         </Table>
     );
@@ -119,13 +126,33 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
 
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, getValues } = useForm();
+
     const [activeTab, setActiveTab] = useState('appointments');
     const navigate = useNavigate();
-    const goto = () => {
-        alert('ads')
-        navigate("/apps/appointments/appointmentCalendar");
-    };
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch()
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [doctorSearch, setDoctorSearch] = useState('');
+    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorOptions = doctorDetails?.map((data) => ({
+        value: data?._id,
+        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    }));
+    useEffect(() => {
+        const doctorPayload = { status: true, search: doctorSearch }
+        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
+    }, [dispatch, doctorSearch])
+    useEffect(() => {
+        dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value }))
+    }, [dispatch, selectedDoctor])
+    const handleInputChange = (data, type) => {
+        setDoctorSearch(data)
+    }
 
+    const handleChange = (selectedOption, type) => {
+        setSelectedDoctor(selectedOption, 'Selected Option');
+    };
     return (
         <>
             <Row className="mt-2">
@@ -158,11 +185,26 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 
                                 <Col sm={8} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
-                                        <Col xs="auto" className="d-flex gap-2">
+                                        <Col xs="auto" className="d-flex gap-2 responnsible-party-select">
                                             {/* Search input shown in both tabs */}
-                                            <FormInput
-                                                type="text"
-                                                placeholder="Search..."
+                                            <Select
+                                                className="basic-single"
+                                                classNamePrefix="select"
+                                                isLoading={store?.getDoctorsReducer?.loading}
+                                                isClearable={true}
+                                                value={selectedDoctor}
+                                                // isDisabled={id ? true : false}
+                                                isSearchable={true}
+                                                {...register('selectedDoctor')}
+                                                onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
+                                                onChange={(data) => {
+                                                    setValue('selectedDoctor', data);
+                                                    handleChange(data, 'doctor');
+                                                    clearErrors('selectedDoctor')
+                                                }}
+                                                name="doctorName"
+                                                options={doctorOptions}
+                                                placeholder="Select Doctor Name"
                                             />
 
                                             {/* Additional controls shown only in the "Appointments" tab */}
@@ -176,7 +218,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         placeholder="Search..."
                                                     />
                                                     <Button className="custom-buttons">
-                                                        <FiFileText className="fs-4" onClick={goto} />
+                                                        <IoCalendarOutline className="fs-4" onClick={() => navigate("/apps/appointments/appointmentCalendar")} />
                                                     </Button>
                                                     <Button as={Link} to="/apps/appointments/newAppointment">New Appointment</Button>
                                                 </>

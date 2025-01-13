@@ -6,8 +6,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPatientsAction } from "../../../redux/patients/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import Select from 'react-select';
-import { createAppointmentAction, getAppointmentByIdAction, getDoctorsAction, getPractitionerScheduleAction, getPractitionerSlotsAction, rescheduleAppointmentAction } from "../../../redux/actions";
-import { getMastersDataAction } from "../../../redux/settings/action";
+import {
+    createAppointmentAction, getAppointmentByIdAction, getDoctorsAction,
+    getPractitionerScheduleAction, getPractitionerSlotsAction, rescheduleAppointmentAction
+} from "../../../redux/actions";
+import { getDepartmentDataAction, getMastersDataAction } from "../../../redux/settings/action";
 import { useForm } from "react-hook-form";
 import { getScheduleAction } from "../../../redux/schedule/action";
 import Spinner from '../../../constants/Spinner';
@@ -27,15 +30,19 @@ const NewAppointment = () => {
     const [patientsSearch, setPatientsSearch] = useState('');
     const [departmentSearch, setDepartmentSearch] = useState('');
     const [doctorSearch, setDoctorSearch] = useState('');
+    const [purposeSearch, setPurposeSearch] = useState('');
     const [patientsSkip, setPatientsSkip] = useState(1);
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState(null);
+    const [selectedPurpose, setSelectedPurpose] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedSlot, setSelectedSlot] = useState(null);
+    const [showTooltip, setShowTooltip] = useState(false);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const patientsData = store?.getPatientsReducer?.data?.patients;
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
-    const departments = store?.getMastersDataReducer?.data?.result;
+    const departments = store?.getDepartmentDataReducer?.data?.result;
+    const visitingPurposeData = store?.getMastersDataReducer?.data?.result;
     const doctorSchedule = store?.getScheduleReducer?.data;
     const availableWeekDays = doctorSchedule?.days;
     const doctorHolidays = doctorSchedule?.holidays;
@@ -45,28 +52,34 @@ const NewAppointment = () => {
     const updateData = store?.getAppointmentByIdReducer?.data?.data;
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     const patientOptions = patientsData?.map((data) => ({
-        value: data._id,
-        label: data.fullName,
+        value: data?._id,
+        label: data?.firstName,
     }));
 
     const doctorOptions = doctorDetails?.map((data) => ({
-        value: data._id,
+        value: data?._id,
         label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
     }));
 
     const departmentOptions = departments?.map((data) => ({
-        value: data._id,
+        value: data?._id,
+        label: data?.name,
+    }));
+    const visitingPurposeOptions = visitingPurposeData?.map((data) => ({
+        value: data?._id,
         label: data?.name,
     }));
     useEffect(() => {
-        if (id && updateData && patientsData && doctorDetails && departments) {
+        if (id && updateData && patientsData && doctorDetails && departments && visitingPurposeData) {
             const doctor = doctorOptions && doctorOptions?.find((data) => data?.value === updateData?.doctor?._id);
             const patient = patientOptions && patientOptions?.find((data) => data?.value === updateData?.patient?._id);
+            const purpose = visitingPurposeOptions && visitingPurposeOptions?.find((data) => data?.label === updateData?.purposeOfVisit);
             const department = departmentOptions && departmentOptions?.find((data) => data?.value === updateData?.doctor?.departmentId?._id);
             const formattedDate = new Date(updateData?.date);
-            setSelectedDoctor(doctor)
-            setSelectedPatient(patient)
-            setSelectedDepartment(department)
+            setSelectedDoctor(doctor);
+            setSelectedPatient(patient);
+            setSelectedDepartment(department);
+            setSelectedPurpose(purpose);
             setSelectedDate(formattedDate);
             setValue('reason', updateData?.reason)
             if (doctor && patient && department && formattedDate) {
@@ -77,7 +90,7 @@ const NewAppointment = () => {
                 dispatch(getPractitionerSlotsAction({ key: encryptMessage(data) }));
             }
         }
-    }, [id, updateData && patientsData && doctorDetails && departments])
+    }, [id, updateData && patientsData && doctorDetails && departments && visitingPurposeData])
 
 
     useEffect(() => {
@@ -102,20 +115,20 @@ const NewAppointment = () => {
             limit: 10,
             search: patientsSearch,
         }
-        const doctorPayload = { status: true, search: doctorSearch }
-        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
         dispatch(getPatientsAction({ key: encryptMessage(patientsPayload) }));
     }, [dispatch, patientsSearch])
 
-
     useEffect(() => {
-        const doctorPayload = { status: true, search: doctorSearch, department: 'Dental' }
+        const doctorPayload = { status: true, search: doctorSearch, departmentId: selectedDepartment?.value || '' }
         dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
-    }, [dispatch, doctorSearch])
+    }, [dispatch, doctorSearch, selectedDepartment])
 
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: true, category: 'Department', limit: 1, skip: 1, search: departmentSearch }));
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 1, skip: 1, search: departmentSearch }));
     }, [dispatch, departmentSearch])
+    useEffect(() => {
+        dispatch(getMastersDataAction({ status: true, category: 'purposeOfVisit', limit: 10, search: purposeSearch }));
+    }, [dispatch, purposeSearch])
     useEffect(() => {
         if (selectedDoctor) {
             const payload = {
@@ -171,6 +184,8 @@ const NewAppointment = () => {
             setDoctorSearch(data)
         } else if (type === 'department') {
             setDepartmentSearch(data)
+        } else if (type === 'purpose') {
+            setPurposeSearch(data)
         }
     }
 
@@ -181,6 +196,8 @@ const NewAppointment = () => {
             setSelectedDoctor(selectedOption, 'Selected Option');
         } else if (type === 'department') {
             setSelectedDepartment(selectedOption, 'Selected Option');
+        } else if (type === 'purpose') {
+            setSelectedPurpose(selectedOption, 'Selected Option');
         }
     };
     function calculateEndTime(startTime, perPatientTime) {
@@ -223,6 +240,7 @@ const NewAppointment = () => {
             slot: selectedSlot,
             startTime: selectedSlot,
             endTime: selectedSlot ? calculateEndTime(selectedSlot, perPatientTime) : '',
+            purposeOfVisit: selectedPurpose?.label,
         }
         const updatePayload = {
             date: selectedDate,
@@ -234,7 +252,6 @@ const NewAppointment = () => {
         }
         if (selectedSlot) {
             if (id) {
-                console.log(updatePayload, 'payload');
                 dispatch(rescheduleAppointmentAction({ key: encryptMessage(updatePayload), id }))
             } else {
                 dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
@@ -336,6 +353,13 @@ const NewAppointment = () => {
                                                         value={selectedDoctor}
                                                         isDisabled={id ? true : false}
                                                         isSearchable={true}
+                                                        noOptionsMessage={() => {
+                                                            if (selectedDepartment) {
+                                                                return "No doctors available for selected department.";
+                                                            } else {
+                                                                return "No doctors available.";
+                                                            }
+                                                        }}
                                                         {...register('selectedDoctor', {
                                                             required: !id ? 'This field is required.' : false
                                                         })}
@@ -353,6 +377,39 @@ const NewAppointment = () => {
                                                 </div>
                                             </div>
 
+                                            <div className="col-12">
+                                                <div className="mb-1 responnsible-party-select">
+                                                    <label htmlFor="purposeOfVisit" className="form-label mb-0">
+                                                        Purpose Of Visit
+                                                        {/* <span
+                                                            onMouseEnter={() => setShowTooltip(true)}
+                                                            onMouseLeave={() => setShowTooltip(false)}
+                                                            onClick={() => {
+                                                                setShowTooltip(false);
+                                                                navigate('/apps/settings/purposeofvisit')
+                                                            }}
+                                                            className='fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer'>
+                                                        </span>
+                                                        <div className={`position-absolute border bg-white p-1 ${showTooltip ? '' : 'd-none'}`} style={{ zIndex: '2', top: '-50%', left: '29.5%', borderRadius: '8px 8px 8px 0px' }}>
+                                                            Click to add new responsible parties.
+                                                        </div> */}
+                                                    </label>
+                                                    <Select
+                                                        className="basic-single"
+                                                        classNamePrefix="select"
+                                                        isLoading={store?.getMastersDataReducer?.loading}
+                                                        isClearable={true}
+                                                        value={selectedPurpose}
+                                                        isSearchable={true}
+                                                        isDisabled={id ? true : false}
+                                                        onInputChange={(inputValue) => handleInputChange(inputValue, 'purpose')}
+                                                        onChange={(data) => handleChange(data, 'purpose')}
+                                                        name="purposeOfVisit"
+                                                        options={visitingPurposeOptions}
+                                                        placeholder="Select Purpose Of Visit"
+                                                    />
+                                                </div>
+                                            </div>
                                             <div className="col-12">
                                                 <div className="mb-1">
                                                     <label htmlFor="reason" className="form-label mb-0">
@@ -443,7 +500,7 @@ const NewAppointment = () => {
                                                         </div>
                                                         :
                                                         <div style={{ cursor: 'pointer' }}>
-                                                            <div className="row mx-3 d-flex justify-content-center align-items-center">
+                                                            <div className="row ms-4 ps-2 d-flex justify-content-start align-items-center">
                                                                 {availableSlots?.map((data, index) => (
                                                                     <div
                                                                         key={index}

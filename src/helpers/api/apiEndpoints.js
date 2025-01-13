@@ -7,6 +7,7 @@ export const getClinicsByParentId = '';
 
 // ROLES
 export const createRoles = '/api/v1/clinic/createSubUser';
+export const viewPassword = '/api/v1/clinic/viewPassword';
 export const updateRoles = '/api/v1/clinic/updateSubUser';
 export const getRoles = '/api/v1/clinic/listAllUsers';
 export const getUserId = '/api/v1/clinic/getUserDetails';
@@ -14,6 +15,7 @@ export const deleterRoles = '/api/v1/clinic/removeUser'
 
 // CLINIC
 export const createClinic = '/api/v1/clinic/editClinicDetails';
+export const changeEmail = 'api/v1/clinic/requestOtpForEmailVerification';
 // export const updateClinic = '/api/v1/clinic/editClinicDetails';
 export const getClinic = '/api/v1/clinic/getClinicDetails';
 export const getClinicById = '/api/v1/clinic/byId';
