@@ -98,12 +98,12 @@ const NewPatient = () => {
     }, [id, patientDetails, responsibleParties])
     useEffect(() => {
         if (id && patientDetails) {
-            setValue('fullName', patientDetails?.fullName)
+            setValue('fullName', patientDetails?.firstName)
             setValue('title', patientDetails?.title)
-            setValue('gender', patientDetails?.gender)
+            setValue('gender', patientDetails?.sex)
             setValue('email', patientDetails?.email)
-            setValue('contactNumber', patientDetails?.contactNumber)
-            setValue('note', patientDetails?.note)
+            setValue('contactNumber', patientDetails?.cellPhone)
+            setValue('note', patientDetails?.notes)
             setValue('maritalStatus', patientDetails?.maritalStatus)
             setValue('deceased', patientDetails?.deceased)
             setValue('ssn', patientDetails?.ssn)
@@ -126,9 +126,9 @@ const NewPatient = () => {
             if (stateId) {
                 dispatch(getCitiesAction({ state_code: stateId, name: patientDetails?.address?.city?.name, limit: '', skip: '' }))
             }
-            if (patientDetails?.profile?.fileName && patientDetails?.profile?.url) {
-                setLogoName(patientDetails?.profile?.fileName)
-                setLogo(patientDetails?.profile?.fileName)
+            if (patientDetails?.patientChartPhoto?.fileName && patientDetails?.patientChartPhoto?.url) {
+                setLogoName(patientDetails?.patientChartPhoto?.fileName)
+                setLogo(patientDetails?.patientChartPhoto?.fileName)
             }
         }
     }, [id, patientDetails, statesData])
@@ -264,7 +264,7 @@ const NewPatient = () => {
             ...(logo?.url === undefined
                 ? {}
                 : {
-                    profile: {
+                    patientChartPhoto: {
                         url: logo?.url?.split('?')[0],
                         fileName: logoName
                     }
@@ -272,10 +272,10 @@ const NewPatient = () => {
             ...(data?.email ? { email: data?.email } : {}),
             ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
             ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-            ...(data?.contactNumber ? { contactNumber: data?.contactNumber } : {}),
-            ...(data?.fullName ? { fullName: data?.fullName } : {}),
+            ...(data?.contactNumber ? { cellPhone: data?.contactNumber } : {}),
+            ...(data?.fullName ? { firstName: data?.fullName } : {}),
             ...(data?.title ? { title: data?.title } : {}),
-            ...(data?.gender ? { gender: data?.gender } : {}),
+            ...(data?.gender ? { sex: data?.gender } : {}),
             ...(data?.chartNumber ? { chartNumber: data?.chartNumber } : {}),
             ...(selectedParty?.value ? { responsibleParty: selectedParty?.value } : {}),
             address: {
@@ -284,7 +284,7 @@ const NewPatient = () => {
                 ...(data?.stateName ? { state: data?.stateName } : {}),
                 ...(data?.zip ? { zip: data?.zip } : {}),
             },
-            ...(data?.note ? { note: data?.note } : {}),
+            ...(data?.note ? { notes: data?.note } : {}),
             ...(data?.deceased ? { deceased: data?.deceased } : {}),
             ...(data?.ssn ? { ssn: data?.ssn } : {}),
             ...(data?.additionalMRN ? { additionalMRN: data?.additionalMRN } : {}),

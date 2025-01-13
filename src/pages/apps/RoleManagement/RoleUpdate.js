@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 
 const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
-    console.log({ currentUser })
+    // console.log({ currentUser })
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
@@ -143,73 +143,6 @@ const RoleUpdate = ({ show, close, currentUser, setCurrentUser }) => {
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-1 position-relative">
-                                    <Form.Label className="mb-0">Password</Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="Enter password"
-                                        {...register('password', {
-                                            required: 'Password is required',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'Password must be at least 6 characters',
-                                            },
-                                        })}
-                                    />
-                                    <span
-                                        className="position-absolute"
-                                        style={{ top: '35px', right: '10px', cursor: 'pointer' }}
-                                        onClick={togglePasswordVisibility}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.password && (
-                                        <span className="text-danger fs-6">
-                                            {errors.password.message}
-                                        </span>
-                                    )}
-                                </Form.Group>
-                            </Col>
-                            <Col sm={6}>
-                                <Form.Group className="mb-1 position-relative">
-                                    <Form.Label className="mb-0">Confirm Password</Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="Confirm password"
-                                        {...register('confirmPassword', {
-                                            required: 'Confirm password is required',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'Password must be at least 6 characters',
-                                            },
-                                        })}
-                                    />
-                                    <span
-                                        className="position-absolute d-flex align-items-center justify-content-center"
-                                        style={{
-                                            top: '35px',
-                                            right: '10px',
-                                            cursor: 'pointer',
-                                            fontSize: '1.2rem',
-                                            color: '#666',
-                                            transition: 'color 0.3s ease-in-out',
-                                        }}
-                                        onClick={togglePasswordVisibility}
-                                        onMouseEnter={(e) => (e.target.style.color = '#000')}
-                                        onMouseLeave={(e) => (e.target.style.color = '#666')}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-
-                                    {errors.confirmPassword && (
-                                        <span className="text-danger fs-6">
-                                            {errors.confirmPassword.message}
-                                        </span>
-                                    )}
-                                </Form.Group>
-                            </Col> */}
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Contact No.</Form.Label>

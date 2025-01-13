@@ -8,6 +8,11 @@ export function createRolesApi(params: any): any {
     return api.create(URL.createRoles, data);
 }
 
+export function viewPasswordApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.viewPassword, data);
+}
+
 export function updateRolesApi(params: any): any {
     const { data } = params;
     return api.create(URL.updateRoles, data);

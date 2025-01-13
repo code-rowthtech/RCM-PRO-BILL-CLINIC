@@ -122,8 +122,8 @@ const Patients = () => {
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Sr.No.</th>
-                                                <th className='text-white'>Patient ID</th>
-                                                <th className='text-white'>Patients Name</th>
+                                                <th className='text-white'>Patient Chart</th>
+                                                <th className='text-white'>Patient Name</th>
                                                 <th className='text-white'>Gender</th>
                                                 <th className='text-white'>Phone</th>
                                                 <th className='text-white'>Insurance Range</th>
@@ -150,10 +150,10 @@ const Patients = () => {
                                                     patientsData && patientsData?.map((data, index) => (
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
-                                                            <td>{data?.patientId}</td>
-                                                            <td className='text-capitalize'>{data?.fullName}</td>
-                                                            <td className='text-capitalize'>{data?.gender}</td>
-                                                            <td>{data?.contactNumber}</td>
+                                                            <td>{data?.chartNumber}</td>
+                                                            <td className='text-capitalize'>{data?.firstName}</td>
+                                                            <td className='text-capitalize'>{data?.sex}</td>
+                                                            <td>{data?.cellPhone}</td>
                                                             <td>{data?.insuranceRange || 'N/A'}</td>
                                                             <td>{data?.lastVisit || 'N/A'}</td>
                                                             <td>{data?.nextVisit || 'N/A'}</td>
