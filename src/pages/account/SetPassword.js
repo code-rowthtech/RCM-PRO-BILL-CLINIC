@@ -123,10 +123,10 @@ const SetPassword = (): React$Element<any> => {
     return (
         <>
             {(userLoggedIn || user) && <Navigate to={redirectUrl} replace />}
-            <AccountLayout bottomLinks={<BottomLink />}>
                 {popup ? (
+                     <AccountLayout >
                     <div className="text-center">
-                        <h4 className="text-muted fw-medium">Expired token. Please request a new password reset link.</h4>
+                        <h4 className="text-muted fw-medium">Your account is already set up. Please log in or reset your password if needed.</h4>
                         <Button
                             className="mt-2"
                             variant="secondary"
@@ -135,11 +135,14 @@ const SetPassword = (): React$Element<any> => {
                                 navigate('/account/login');
                             }}
                         >
-                            Dismiss
+                        Log In
                         </Button>
                     </div>
+                    </AccountLayout>
                 ) : (
                     <>
+            <AccountLayout bottomLinks={<BottomLink />}>
+
                         <div className="text-center m-auto">
                             <h4 className="text-dark-50 text-center mt-0 font-weight-bold">{t('Set Password')}</h4>
                             <p className="text-muted mb-4">
@@ -189,9 +192,11 @@ const SetPassword = (): React$Element<any> => {
                             </VerticalForm>
 
                         )}
-                    </>
-                )}
             </AccountLayout>
+
+                    </>
+
+                )}
         </>
     );
 };

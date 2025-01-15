@@ -34,7 +34,9 @@
     border-radius: 4px; /* Ensures consistent rounded corners */
     width: 100%; /* Optional: Sets width to fit the parent container */
 }
-
+select .select{
+    color: #e70910;
+}
 .plusicon {
     color: #6169d0;
 }

@@ -31,7 +31,7 @@ function* createRolesFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle('Something went wrong, please try again later', 'danger')
+        ToastHandle(error, 'danger')
 
         yield put({
             type: RolesActionTypes.CREATE_ROLES_ERROR,
@@ -61,7 +61,7 @@ function* updateRolesFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle('Something went wrong, please try again later', 'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: RolesActionTypes.UPDATE_ROLES_ERROR,
             payload: error,

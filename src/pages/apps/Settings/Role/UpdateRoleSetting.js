@@ -18,67 +18,88 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [selectedPermissions, setSelectedPermissions] = useState([]);
-    const [initialPermissions, setInitialPermissions] = useState([]);
+    console.log({selectedPermissions})
+    const [initialPermissions, setInitialPermissions] = useState(data?.permissions || []);
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
-
-  
 
     const decryptedPermissionsData = store?.getPermissionsDataReducer?.data?.data?.map((item) => ({
         ...item,
         name: `${item?.permission}`,
     }));
-      useEffect(() => {
-            if (show) {
-                const permissions = {
-                    interface :'Clinic',
-                    module:'',
-                    skip :'',
-                    limit :50,
-                    search :'',
-                    status :true,
-                }
-                dispatch(getPermissionAction(permissions))
-            }
-        }, [show])
+
+    useEffect(() => {
+        if (show) {
+            const permissions = {
+                interface: 'Clinic',
+                module: '',
+                skip: '',
+                limit: 50,
+                search: '',
+                status: true,
+            };
+            dispatch(getPermissionAction(permissions));
+        }
+    }, [show]);
 
     useEffect(() => {
         if (data) {
-            setValue('name', data.name || '');
+            setValue('name', data.name ? data.name.charAt(0).toUpperCase() + data.name.slice(1) : ''); // Capitalize first letter
             setValue('description', data.description || '');
             setInitialPermissions(data?.permissions || []);
-            setSelectedPermissions(data?.permissions?.map(permission => ({ name: permission?.name })) || []);
+    
+            // Map permissions to match the Multiselect options structure
+            const mappedPermissions = data?.permissions?.map(permission => ({
+                _id: permission?._id,
+                name: permission?.name || permission?.permission,
+                permission: permission?.permission,
+            })) || [];
+    
+            setSelectedPermissions(mappedPermissions);
         }
+    
         if (updateSuccess === 200) {
             closeModal();
         }
     }, [data, setValue, updateSuccess]);
+    
 
     const onSelect = (selectedList) => setSelectedPermissions(selectedList);
     const onRemove = (selectedList) => setSelectedPermissions(selectedList);
 
     const onSubmit = (formData) => {
-        // Ensure the selected permissions are only the ones that changed
         const changedPermissions = selectedPermissions.filter(
-            (permission) => !initialPermissions.some((p) => p.name === permission.name)
+            (permission) => !initialPermissions.some((p) => p.permission === permission.permission)
         );
 
-        // If no permissions changed, use the initial permissions
+        // Map selected permissions to only include the permission ids
+        const permissionIds = changedPermissions.length > 0
+            ? changedPermissions.map(permission => permission._id)
+            : initialPermissions.map(permission => permission._id);
+
         const payload = {
             id: data?._id,
             name: formData.name,
             description: formData.description,
-            permissions: changedPermissions.length > 0 ? changedPermissions : initialPermissions,
+            permissions: permissionIds,  // Only send permission ids
             status: true
         };
-console.log(payload,'editrole')
+
+        console.log(payload, 'editrole');
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
+
         if (updateSuccess === 200) {
             closeModal();
         }
     };
 
+    // Filter out already selected permissions from the available list
+    const availablePermissions = decryptedPermissionsData?.filter(permission =>
+        !selectedPermissions.some(selectedPerm => selectedPerm._id === permission._id)
+    );
+    
+
     return (
-        <Modal centered show={show} >
+        <Modal centered show={show}>
             <Modal.Body>
                 <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
                     <Col sm={1}></Col>
@@ -93,7 +114,7 @@ console.log(payload,'editrole')
                     <Row>
                         <Col md={12}>
                             <Form.Group className="mb-2">
-                                <Form.Label>Name</Form.Label>
+                                <Form.Label>Name <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter role name"
@@ -105,7 +126,7 @@ console.log(payload,'editrole')
 
                         <Col md={12}>
                             <Form.Group className="mb-2">
-                                <Form.Label>Description</Form.Label>
+                                <Form.Label>Description <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -118,9 +139,9 @@ console.log(payload,'editrole')
 
                         <Col md={12}>
                             <Form.Group className="mb-2">
-                                <Form.Label>Permissions</Form.Label>
+                                <Form.Label>Permissions <span className="text-danger">*</span></Form.Label>
                                 <Multiselect
-                                    options={decryptedPermissionsData}
+                                    options={availablePermissions} // Filtered permissions
                                     displayValue="name"
                                     className="form-control p-0"
                                     placeholder="Select Permissions"
@@ -132,9 +153,12 @@ console.log(payload,'editrole')
                         </Col>
                     </Row>
                     <Modal.Footer>
-                        <Button type='submit' className='custom-buttons' disabled={store?.updateRoleDataReducer?.loading}>
+                          <Button type="button" className="custom-buttons" onClick={closeModal}>
+                                                        Cancel
+                                                    </Button>
+                        <Button type="submit" className="custom-buttons" disabled={store?.updateRoleDataReducer?.loading}>
                             {store?.updateRoleDataReducer?.loading ?
-                                <Spinner className="spinner-border-sm" color='white' /> :
+                                <Spinner className="spinner-border-sm" color="white" /> :
                                 'Update'
                             }
                         </Button>
@@ -144,6 +168,6 @@ console.log(payload,'editrole')
             </Modal.Body>
         </Modal>
     );
-}
+};
 
 export default UpdateRoleSetting;
