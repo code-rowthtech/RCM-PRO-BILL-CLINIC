@@ -53,6 +53,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
+    console.log(logo,'logo')
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
@@ -291,14 +292,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
             ...posDetails && { pos: posDetails },
-            ...(logo ?
-                {
+            // ...(logo ?
+            //     {
                     logo: {
                         url: logo?.url?.split('?')[0],
                         fileName: logoName,
-                    }
-                }
-                : ''),
+                    },
+                // }
+                // : ''),
             primaryAddress: {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
@@ -334,6 +335,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     }
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
+        console.log({newPayload})
     };
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
@@ -349,7 +351,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
-            setLogoName(url)
+            setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -826,6 +828,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 ? logoName.split('/').pop().slice(0, 30) + "..."
                                                 : 'Upload Logo'
                                     }
+                                    {/* {logoName} */}
 
                                     <div className="d-flex align-items-center gap-2">
                                         {logo && (

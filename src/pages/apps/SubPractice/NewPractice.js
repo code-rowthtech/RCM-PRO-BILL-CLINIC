@@ -796,7 +796,7 @@ const NewPractice = () => {
                                                                     ? logoName?.slice(0,30) + '...'
                                                                     : 'Upload Logo'
                                                         } */}
-                                                        {logoName && logoName?.length ? logoName : logoUploading ? 'Uploading...' : 'Upload Logo'}
+                                                        {logoName && logoName?.length ? logoName.split('/').pop().slice(0,30) : logoUploading ? 'Uploading...' : 'Upload Logo'}
 
 
                                                         <div className="d-flex align-items-center gap-2">

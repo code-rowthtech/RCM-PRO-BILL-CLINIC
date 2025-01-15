@@ -276,7 +276,7 @@ function* createSubscriptionPlanFunction(data) {
         });
         const response = yield call(addSubscriptionPlanApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
+        if (response.status === 201) {
             ToastHandle(decryptedData.message,'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_SUBSCRIPTION_SUCCESS,
@@ -307,7 +307,7 @@ function* createContractFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         console.log(decryptedData,'ddddddddddd');
         if (response.status === 200) {
-            ToastHandle(decryptedData.message,'success')
+            // ToastHandle(decryptedData.message,'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_CONTRACT_SUCCESS,
                 payload: { ...decryptedData },
@@ -319,7 +319,7 @@ function* createContractFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger');
+        // ToastHandle(error,'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_CONTRACT_ERROR,
             payload: error,
