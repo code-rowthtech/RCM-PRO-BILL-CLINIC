@@ -155,13 +155,14 @@ const RoleManagement = () => {
         <Row className='mt-2'>
             <Col xs={12}>
                 <Card>
-                    <Card.Body>
+                    <Card.Body className='' style={{height:'100vh'}}>
                         <Row className="mb-2">
                             <Col sm={6}>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`${status === true ? 'custom-buttons text-white' : ' text-dark bg-none border-primary '} me-2`}
+                                    className={`${status === true ? 'custom-buttons text-white' : ' text-dark bg-none border-primary '} me-2 py-1`}
+                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                                 >
                                     Active
                                 </Button>
@@ -169,7 +170,8 @@ const RoleManagement = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`${status === false ? 'custom-buttons text-white' : ' text-dark bg-none border-primary'} me-2`}
+                                    className={`${status === false ? 'custom-buttons text-white' : ' text-dark bg-none border-primary'} me-2 py-1`}
+                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
                                 >
                                     Inactive
                                 </Button>
@@ -182,8 +184,9 @@ const RoleManagement = () => {
                                             placeholder="Search..."
                                             value={searchQuery}  // Bind the input to the searchQuery state
                                             onChange={handleSearchChange}
+                                            style={{height:'30px'}}
                                         />
-                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons">
+                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                             Add Users
                                         </Button>
                                     </Col>
@@ -192,7 +195,8 @@ const RoleManagement = () => {
                         </Row>
                         <Row>
                             <Col>
-                                <Table responsive className="table-centered table-nowrap mb-0">
+                                <Table responsive className="table-centered table-nowrap mb-0  rounded"
+                                    style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
                                             <th className="text-white">Sr. No.</th>
@@ -222,7 +226,7 @@ const RoleManagement = () => {
                                                     <td>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
-                                                    <td>
+                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"

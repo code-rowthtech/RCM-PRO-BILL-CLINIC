@@ -86,7 +86,7 @@ const Patients = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body>
+                        <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
                                 <Col sm={6}>
                                     {/* <Button
@@ -108,8 +108,8 @@ const Patients = () => {
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons">
+                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{height:'30px'}} />
+                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                                 New Patient
                                             </Button>
                                         </Col>
@@ -118,7 +118,7 @@ const Patients = () => {
                             </Row>
                             <Row>
                                 <Col sm={12}>
-                                    <Table responsive className="table-centered table-nowrap mb-0">
+                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"   style={{ height: patientsData?.length === 0 ? '100vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Sr.No.</th>
