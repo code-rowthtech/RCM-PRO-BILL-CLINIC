@@ -14,6 +14,7 @@ import { getCitiesAction, getStatesByCountryAction, getSubClinicCitiesAction } f
 import Responsiblle from "./Responsible";
 import { getResponsibleParty } from "../../../helpers/api/apiEndpoints";
 import Select from 'react-select';
+import Insurance from "./Insurance/Insurance";
 
 
 const NewPatient = () => {
@@ -338,6 +339,14 @@ const NewPatient = () => {
                                         onClick={() => handleTabChange("responsible")}
                                     >
                                         Responsible party
+                                    </button>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className={`text-black nav-link fw-medium ${activeTab === "insurance" ? "active fw-bold" : ""}`}
+                                        onClick={() => handleTabChange("insurance")}
+                                    >
+                                        Insurance
                                     </button>
                                 </li>
                             </ul>
@@ -1446,6 +1455,7 @@ const NewPatient = () => {
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle />}
+                        {activeTab === "insurance" && <Insurance />}
                     </div>
                 </Card>
             </div>
