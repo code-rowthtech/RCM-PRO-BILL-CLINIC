@@ -17,6 +17,11 @@ export const getRolesAction = (data): AuthAction => ({
     type: RolesActionTypes.GET_ROLES,
     data
 });
+
+export const viewPasswordAction = (data): AuthAction => ({
+    type: RolesActionTypes.VIEW_PASSWORD,
+    data
+});
 export const getUserAction = (id): AuthAction => ({
     type: RolesActionTypes.GET_USER,
     id

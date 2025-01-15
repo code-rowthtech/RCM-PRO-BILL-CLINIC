@@ -86,8 +86,14 @@ const MENU_ITEMS = [
             },
             {
                 key: 'designation',
-                label: 'Desigination',
+                label: 'Designation',
                 url: '/apps/settings/desigination',
+                parentKey: 'setting',
+            },
+            {
+                key: 'purposeofvisit',
+                label: 'Purpose of Visit',
+                url: '/apps/settings/purposeofvisit',
                 parentKey: 'setting',
             },
             {

@@ -112,44 +112,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    // useEffect(() => {
-    //     if (clinicId) {
-    //         const payload = {
-    //             parentClinic: clinicId,
-    //         }
-    //         dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
-    //     }
-    //     if (clinicDataToUpdate) {
-    //         setAccreditationDetails(clinicDataToUpdate?.accreditationDetails)
-    //         // setMedicalDetails(clinicDataToUpdate?.medicalLicenses)
-    //         setStateDetails(clinicDataToUpdate?.stateOfLicensing)
-    //     }
-    // }, [clinicId, clinicDataToUpdate])
-    // const deleteClinicResponse = store?.deleteClinicOnboardingReducer?.data?.status;
-    // useEffect(() => {
-    //     if (createResponse === 200) {
-
-    //         if (clinicsList?.length > 0) {
-    //             const payload = {
-    //                 parentClinic: clinicId,
-    //             }
-    //             dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
-    //         } else {
-    //             setClinicId(store?.createClinicsReducer?.data?.data?._id);
-    //             setBillingId(store?.createClinicsReducer?.data?.data?.clinicId)
-    //         }
-    //     }
-    //     if (createResponse === 200 && nextClicked === true) {
-    //         setActiveTab('billing');
-    //     }
-    //     if (deleteClinicResponse === 200) {
-    //         const payload = {
-    //             parentClinic: clinicId,
-    //         }
-    //         dispatch(getClinicByParentAction({ key: encryptMessage(payload) }));
-    //     }
-    // }, [createResponse, deleteClinicResponse])
-
 
     const handleAddTaxonomy = () => {
         const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
@@ -280,15 +242,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             CLIA_Number: data?.clia,
             medicareNumber: data?.medicare,
             medicaidNumber: data?.medicaid,
-            // taxonomyCodes: taxonomyCodes,
-            taxonomyCodes: taxonomyCodes.filter(code => code), // Filter out empty taxonomy codes
+            taxonomyCodes: taxonomyCodes.filter(code => code),
             isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
             flag: 'Clinic',
-            // medicalLicenses: medicalDetails,
-            // stateOfLicensing: stateDetails,
-            // accreditationDetails: accreditationDetails,
-            // pos: posDetails,
-            // logo: logo?.url?.split('?')[0],
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
             ...posDetails && { pos: posDetails },
@@ -305,7 +261,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 ...(data?.city ? { city: data?.city } : ''),
                 ...(data?._id ? { state: data?._id } : ''),
                 ...(data?.stateName ? { state: data?.stateName } : ''),
-                // ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                 street: data?.street,
                 zip: data?.zip,
                 ...(latitude ? { latitude: latitude, } : ''),
@@ -317,7 +272,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         address: data?.address,
                         ...(data?.city ? { city: data?.city } : ''),
                         ...(data?.stateName ? { state: data?.stateName } : ''),
-                        // ...(stateToSelect?._id ? { state: stateToSelect?._id } : ''),
                         street: data?.street,
                         zip: data?.zip,
                         ...(latitude ? { latitude: latitude, } : ''),
@@ -376,7 +330,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     };
 
-    // Handle accreditation input changes
     const handleAccreditationInputChange = (e, field, index) => {
         const value = e.target.value;
         setAccreditationDetails((prevDetails) => {
@@ -435,8 +388,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...accreditationDetails,
             { name: '', number: '', url: null }
         ]);
-        // ToastHandle('New accreditation added successfully', 'success');
-
     };
 
     const handleRemoveAccreditation = (index) => {
@@ -485,10 +436,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }
 
                 const data = await response.json();
-                return data; // Return the geocoding data
+                return data;
             } catch (error) {
                 console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
+                return null;
             }
         }
         fetchGeocodeData(addressToSearch)
@@ -513,10 +464,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 }
 
                 const data = await response.json();
-                return data; // Return the geocoding data
+                return data;
             } catch (error) {
                 console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
+                return null;
             }
         }
         fetchGeocodeData(addressToSearch)
@@ -570,9 +521,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setSelectedStates((prev) => {
             const updatedStates = prev.includes(stateName)
                 ? prev.filter((name) => name !== stateName)
-                : [...prev, stateName]; // Add state if checked
-
-            // Sync stateDetails with selected states
+                : [...prev, stateName];
             setStateDetails((prevDetails) => {
                 const newDetails = updatedStates.map((state) =>
                     prevDetails.find((detail) => detail.name === state) || { name: state, number: '', url: null, fileName: '' }

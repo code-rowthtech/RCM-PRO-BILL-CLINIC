@@ -6,7 +6,8 @@ import {
     addSubscriptionPlanApi, getClinicsByParentIdApi, deleteClinicOnboardingApi,
     createContract,
     getClinicTypeApi,
-    standardContract
+    standardContract,
+    changeEmailApi
 } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
@@ -25,7 +26,7 @@ function* createClinicsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-         ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_CLINIC_SUCCESS,
                 payload: { ...decryptedData },
@@ -37,9 +38,39 @@ function* createClinicsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: ClinicsActionTypes.CREATE_CLINIC_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* changeEmailFunction(data) {
+    try {
+        yield put({
+            type: ClinicsActionTypes.CHANGE_EMAIL_LOADING,
+            payload: {},
+        });
+        const response = yield call(changeEmailApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData.message, 'success')
+            yield put({
+                type: ClinicsActionTypes.CHANGE_EMAIL_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: ClinicsActionTypes.CHANGE_EMAIL_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger')
+        yield put({
+            type: ClinicsActionTypes.CHANGE_EMAIL_ERROR,
             payload: error,
         });
     }
@@ -289,7 +320,7 @@ function* createSubscriptionPlanFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger');
+        ToastHandle(error, 'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR,
             payload: error,
@@ -305,7 +336,7 @@ function* createContractFunction(data) {
         });
         const response = yield call(createContract, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'ddddddddddd');
+        console.log(decryptedData, 'ddddddddddd');
         if (response.status === 200) {
             // ToastHandle(decryptedData.message,'success')
             yield put({
@@ -395,6 +426,10 @@ export function* callStateEmpty() {
 export function* watchCreateClinics() {
     yield takeEvery(ClinicsActionTypes.CREATE_CLINIC, createClinicsFunction);
 }
+
+export function* watchChangeEmail() {
+    yield takeEvery(ClinicsActionTypes.CHANGE_EMAIL, changeEmailFunction);
+}
 export function* watchgetClinicsTypeState() {
     yield takeEvery(ClinicsActionTypes.GET_CLINIC_TYPE, getClinicTypeFunction);
 }
@@ -448,8 +483,8 @@ export function* watchresetState() {
 function* clinicsSaga() {
     yield all([
         fork(watchCreateClinics), fork(watchGetClinicById), fork(watchGetClinics),
-        fork(watchresetState), fork(watchGetStates), fork(watchGetCities),fork(watchGetCities2), fork(watchCreateSubscriptions),fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
-        fork(watchGetClinicByParent),fork(watchgetClinicsTypeState),fork(watchStandardContract)
+        fork(watchresetState), fork(watchGetStates), fork(watchGetCities), fork(watchGetCities2), fork(watchCreateSubscriptions), fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
+        fork(watchGetClinicByParent), fork(watchgetClinicsTypeState), fork(watchStandardContract), fork(watchChangeEmail)
     ]);
 }
 export default clinicsSaga;

@@ -271,3 +271,6 @@ table {
     margin-right: 5px;
     padding: 2px 4px;
 }
+.select--is-disabled {
+    font-weight: 600 !important;
+}

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
+import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
 
@@ -29,10 +29,9 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-
+    console.log({ roleData });
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
-    console.log({ deleteSuccess })
     const [smShow, setSmShow] = useState(false);
     const [detailModal, setDetailModal] = useState(false);
 
@@ -47,15 +46,14 @@ const RoleManagement = () => {
     const [skip, setSkip] = useState(1)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const [searchQuery, setSearchQuery] = useState('');
-    const [userDetails, setUserDetails] = useState([])
-
+    const [userDetails, setUserDetails] = useState([]);
+    const viewPasswordStatus = store?.viewPasswordReducer?.data?.status;
 
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearchQuery('');
-
-
     };
+
     useEffect(() => {
         dispatch(
             getRolesAction({
@@ -67,7 +65,19 @@ const RoleManagement = () => {
             })
         );
     }, [dispatch, status, searchQuery, skip]);
-
+    useEffect(() => {
+        if (viewPasswordStatus === 200) {
+            dispatch(
+                getRolesAction({
+                    clinicId: clinicId,
+                    limit: 10,
+                    search: searchQuery,
+                    page: skip,
+                    status: status,
+                })
+            );
+        }
+    }, [viewPasswordStatus]);
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -109,20 +119,19 @@ const RoleManagement = () => {
         setSearchQuery(e.target.value);
         setSkip(1);
         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
-
     };
+
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
-
-
     }
+
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(stateEmptydAction());
             dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: true }));
-
         }
-    }, [deleteSuccess])
+    }, [deleteSuccess]);
+
     const handleUpdateDoctorStatus = (data) => {
         const payload = {
             id: data?._id,
@@ -130,20 +139,18 @@ const RoleManagement = () => {
         }
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
-
-
     }
-    // const handleDetail = (data) => {
-    //     setDetailModal(true);
-    //     setUserDetails(data)
-
-    // }
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
 
-
+    const handleViewPassword = (id) => {
+        const payload = {
+            userId: id
+        }
+        dispatch(viewPasswordAction({ key: encryptMessage(payload) }))
+    }
     return (
         <Row className='mt-2'>
             <Col xs={12}>
@@ -169,11 +176,6 @@ const RoleManagement = () => {
                                     Inactive
                                 </Button>
                             </Col>
-                            {/* <Col sm={6}>
-                                <Button className="custom-buttons">
-                                    Receptionist
-                                </Button>
-                            </Col> */}
                             <Col sm={6} className='text-end'>
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                     <Col xs="auto" className='d-flex gap-2'>
@@ -197,33 +199,31 @@ const RoleManagement = () => {
                                     style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white py-2" style={{ fontSize: '13px'} }>Sr. No.</th>
-                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Name</th>
-                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Phone</th>
-                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Username</th>
-                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Status</th>
-                                            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Action</th>
+                                            <th className="text-white">Sr. No.</th>
+                                            <th className="text-white">Name</th>
+                                            <th className="text-white">Phone</th>
+                                            <th className="text-white">Username</th>
+                                            <th className="text-white">Designation</th>
+                                            <th className="text-white">Status</th>
+                                            <th className="text-white">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {roleDataLoading ? (
-                                            // Show a loading spinner or placeholder row while data is being fetched
                                             <tr>
-                                                <td colSpan={6} className="text-center">
-                                                    <div className="spinner-border text-primary" role="status">
-                                                        <span className="visually-hidden">Loading...</span>
-                                                    </div>
+                                                <td colSpan={8} className="text-center">
+                                                    <Spinner />
                                                 </td>
                                             </tr>
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
-                                            // Render data rows when available
                                             roleData?.users.map((data, index) => (
-                                                <tr key={index} className="border-bottom">
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{index + 1}</td>
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.firstName}</td>
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.phone}</td>
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>{data?.email}</td>
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{data?.firstName}</td>
+                                                    <td>{data?.phone}</td>
+                                                    <td>{data?.email}</td>
+                                                    <td>{data?.designation}</td>
+                                                    <td>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
                                                     <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
@@ -232,14 +232,6 @@ const RoleManagement = () => {
                                                                 className="fs-4 cursor-pointer"
                                                                 onClick={() => openEditModal(data)}
                                                             />
-                                                            {/* <FiTrash
-                                                                className="fs-5 cursor-pointer"
-                                                                onClick={() => deleteHandle(data?._id)}
-                                                            /> */}
-                                                            {/* <IoMdEye
-                                                                className="fs-4 cursor-pointer"
-                                                                onClick={() => handleDetail(data)}
-                                                            /> */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -247,7 +239,7 @@ const RoleManagement = () => {
                                         ) : (
                                             // Show "No Data Found" when no data is available
                                             <tr>
-                                                <td colSpan={6} className="text-center">
+                                                <td colSpan={8} className="text-center">
                                                     <h3 className="my-5">No Data Found</h3>
                                                 </td>
                                             </tr>

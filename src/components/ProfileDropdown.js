@@ -1,9 +1,14 @@
 // @flow
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Link } from 'react-router-dom';
+import { Button, Col, Dropdown, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import classNames from 'classnames';
 import { FaUserCircle } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { changeEmailAction } from '../redux/clinics/actions';
+import { IoMdClose } from 'react-icons/io';
+import { useForm } from 'react-hook-form';
 
 type ProfileMenuItem = {
     label: string,
@@ -23,9 +28,32 @@ type ProfileDropdownState = {
 };
 
 const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownState): React$Element<any> => {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        watch,
+        setValue,
+        getValues,
+        setError,
+        clearErrors
+    } = useForm();
     const profilePic = props.profilePic || null;
     const [dropdownOpen, setDropdownOpen] = useState(false);
-
+    const [show, setShow] = useState(false);
+    const dispatch = useDispatch();
+    const [otp, setOtp] = useState(Array(6).fill(""));
+    const store = useSelector((state) => state);
+    const changeEmailApiResponse = store?.changeEmailReducer?.data?.status
+    const closeModal = () => {
+        setShow(false);
+    }
+    useEffect(() => {
+        if (changeEmailApiResponse === 200) {
+            setShow(true);
+        }
+    }, [changeEmailApiResponse])
     /*
      * toggle profile-dropdown
      */
@@ -35,10 +63,35 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
 
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name || '';
-    const changedLogo=sessionStorage.getItem('logo');
-    // console.log({changedLogo});
-    const logo=JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
+    const changedLogo = sessionStorage.getItem('logo');
+    const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
+    const handleOtpGeneration = () => {
+        dispatch(changeEmailAction())
+    }
 
+    // Handle input changes
+    const handleChange = (value, index) => {
+        if (!/^[0-9]$/.test(value) && value !== "") return; // Allow only digits
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
+
+        // Automatically focus next field
+        if (value && index < otp.length - 1) {
+            document.getElementById(`otp-${index + 1}`).focus();
+        }
+    };
+
+    // Handle key navigation (e.g., Backspace)
+    const handleKeyDown = (e, index) => {
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+            document.getElementById(`otp-${index - 1}`).focus();
+        }
+    };
+    const onSubmit = () => {
+        const otpString = otp.join('');
+        console.log({ otpString })
+    }
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>
             <Dropdown.Toggle
@@ -49,13 +102,13 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                 onClick={toggleDropdown}
                 className="nav-link  border-0 dropdown-toggle nav-user arrow-none me-0">
                 <span className="account-user-avatar">
-                    {changedLogo?
-                     <img src={changedLogo} className="rounded-circle" alt="user" />
-                    :
-                    logo?
-                    <img src={logo} className="rounded-circle" alt="user" />
-                    :
-                    <FaUserCircle className="rounded-circle fs-1  text-dark" />
+                    {changedLogo ?
+                        <img src={changedLogo} className="rounded-circle" alt="user" />
+                        :
+                        logo ?
+                            <img src={logo} className="rounded-circle" alt="user" />
+                            :
+                            <FaUserCircle className="rounded-circle fs-1  text-dark" />
                     }
                 </span>
                 <span className='text-capitalize'>
@@ -72,9 +125,6 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
             </Dropdown.Toggle>
             <Dropdown.Menu align={'end'} className="dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
                 <div onClick={toggleDropdown}>
-                    {/* <div className="dropdown-header noti-title">
-                        <h6 className="text-overflow m-0">Welcome !</h6>
-                    </div> */}
                     <p className='mb-0 ps-3 text-start fw-bold'>Practice</p>
                     <hr className='my-0' />
                     {props.menuItems.map((item, i) => {
@@ -85,9 +135,59 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                             </Link>
                         );
                     })}
+                    <Link to='#' onClick={handleOtpGeneration} className="dropdown-item notify-item" >
+                        <i className='mdi mdi-email-edit cursor-pointer me-1'></i>
+                        <span>Change Email</span>
+                    </Link>
                 </div>
             </Dropdown.Menu>
-        </Dropdown>
+            <Modal centered show={show} onHide={closeModal}>
+                <Modal.Body>
+                    <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
+                        <Col sm={1}></Col>
+                        <Col sm={10}>
+                            <h4 className="mb-0 text-center">Email to Doctor</h4>
+                        </Col>
+                        <Col sm={1}>
+                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
+                        </Col>
+                    </Row>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Row className="mb-3">
+                            <Col sm={12} className="my-2">
+                                <div className="text-center">
+                                    <p className="mb-2">
+                                        To confirm your new email address, please enter the One-Time Password (OTP) sent to your current email address. This step helps us verify your identity and secure your account.
+                                    </p>
+                                </div>
+                            </Col>
+                            <Col md={12} className="d-flex justify-content-center align-items-center px-4 otp-input-group">
+                                {otp.map((digit, index) => (
+                                    <input
+                                        key={index}
+                                        id={`otp-${index}`}
+                                        type="text"
+                                        maxLength="1"
+                                        value={digit}
+                                        onChange={(e) => handleChange(e.target.value, index)}
+                                        onKeyDown={(e) => handleKeyDown(e, index)}
+                                        className="otp-input w-25 mx-1 p-1 rounded-2 text-center"
+                                        aria-label={`OTP Digit ${index + 1}`}
+                                        placeholder="•"
+                                    />
+                                ))}
+                            </Col>
+                        </Row>
+                        <Modal.Footer className="d-flex justify-content-center">
+                            <Button type="submit" className="custom-button">
+                                Verify
+                            </Button>
+                        </Modal.Footer>
+                    </form>
+
+                </Modal.Body>
+            </Modal >
+        </Dropdown >
     );
 };
 

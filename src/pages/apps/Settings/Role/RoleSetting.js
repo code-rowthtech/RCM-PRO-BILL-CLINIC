@@ -11,7 +11,7 @@ import CreateRoleSetting from './CreateRoleSetting'
 import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
-import {  getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
+import { getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
 
 const RoleSetting = () => {
     const [showModal, setShowModal] = useState(false);
@@ -22,7 +22,6 @@ const RoleSetting = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
-    console.log({decryptedRolesData})
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
     const createSuccess = store?.createRoleDataReducer?.data?.status;
     const handleClosemodal = () => {
@@ -31,12 +30,12 @@ const RoleSetting = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
 
     useEffect(() => {
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search,createdById:'', page: skip, status: status }));
+        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', createdById: '', page: 1, status: status }));
         if (updateSuccess === 200 || createSuccess === 200) {
             dispatch(stateEmptydAction());
             setShowUpdateModal(false)
             setShowModal(false);
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search,createdById:'', page: skip, status: status }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', createdById: '', page: 1, status: status }));
         }
     }, [dispatch, updateSuccess,skip,search, createSuccess, status])
     const [dataToUpdate, setDataToUpdate] = useState(null);
@@ -60,7 +59,7 @@ const RoleSetting = () => {
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearch('');
-        
+
     };
 
     const [expandedRowIndex, setExpandedRowIndex] = useState(null);
@@ -119,14 +118,14 @@ const RoleSetting = () => {
                                         </Col>
                                     </Row>
                                 </Col>
-                                <CreateRoleSetting  show={showModal} closeModal={handleClosemodal}/>
+                                <CreateRoleSetting show={showModal} closeModal={handleClosemodal} />
                                 <UpdateRoleSetting show={showUpdateModal} closeModal={closeUpdateModal} data={dataToUpdate} />
 
                             </Row>
                             <Row>
                                 <Col>
-                                    <Table responsive  className="table-centered table-nowrap mb-0  rounded"
-                                     style={{ height: decryptedRolesData?.length === 0 ? '100vh' : 'auto' }}
+                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"
+                                        style={{ height: decryptedRolesData?.length === 0 ? '100vh' : 'auto' }}
                                     >
                                         <thead className=" text-white">
                                             <tr key={''}>
@@ -143,7 +142,7 @@ const RoleSetting = () => {
                                             {store?.getRoleDataReducer?.loading ?
                                                 <tr key={''}>
                                                     <td colSpan={7} className='py-5 text-center'>
-                                                        <Spinner /> 
+                                                        <Spinner />
                                                     </td>
                                                 </tr>
                                                 :
