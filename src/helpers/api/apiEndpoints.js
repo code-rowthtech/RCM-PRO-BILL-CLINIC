@@ -7,6 +7,7 @@ export const getClinicsByParentId = '';
 
 // ROLES
 export const createRoles = '/api/v1/clinic/createSubUser';
+export const viewPassword = '/api/v1/clinic/viewPassword';
 export const updateRoles = '/api/v1/clinic/updateSubUser';
 export const getRoles = '/api/v1/clinic/listAllUsers';
 export const getUserId = '/api/v1/clinic/getUserDetails';
@@ -14,6 +15,7 @@ export const deleterRoles = '/api/v1/clinic/removeUser'
 
 // CLINIC
 export const createClinic = '/api/v1/clinic/editClinicDetails';
+export const changeEmail = 'api/v1/clinic/requestOtpForEmailVerification';
 // export const updateClinic = '/api/v1/clinic/editClinicDetails';
 export const getClinic = '/api/v1/clinic/getClinicDetails';
 export const getClinicById = '/api/v1/clinic/byId';
@@ -79,7 +81,9 @@ export const getSchedule = '/api/v1/clinic/practitioner/holidays';
 export const getPractitionerTimings = '/api/v1/clinic/practitioner/schedule';
 
 // appointments
-export const createAppointment = '/api/v1/appointments'
-export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule'
+export const createAppointment = '/api/v1/clinic/appointments';
+export const rescheduleAppointment = '/api/v1/clinic/appointment/';
+export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule';
 export const getAppointments = '/api/v1/clinic/appointment/getAll/';
+export const getAppointmentById = '/api/v1/clinic/appointment/';
 export const getPractitionerSlots = '/api/v1/clinic/practitioner/slots';

@@ -18,7 +18,7 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [selectedPermissions, setSelectedPermissions] = useState([]);
-    console.log({selectedPermissions})
+    console.log({ selectedPermissions })
     const [initialPermissions, setInitialPermissions] = useState(data?.permissions || []);
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
 
@@ -46,22 +46,22 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
             setValue('name', data.name ? data.name.charAt(0).toUpperCase() + data.name.slice(1) : ''); // Capitalize first letter
             setValue('description', data.description || '');
             setInitialPermissions(data?.permissions || []);
-    
+
             // Map permissions to match the Multiselect options structure
             const mappedPermissions = data?.permissions?.map(permission => ({
                 _id: permission?._id,
                 name: permission?.name || permission?.permission,
                 permission: permission?.permission,
             })) || [];
-    
+
             setSelectedPermissions(mappedPermissions);
         }
-    
+
         if (updateSuccess === 200) {
             closeModal();
         }
     }, [data, setValue, updateSuccess]);
-    
+
 
     const onSelect = (selectedList) => setSelectedPermissions(selectedList);
     const onRemove = (selectedList) => setSelectedPermissions(selectedList);
@@ -96,7 +96,7 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const availablePermissions = decryptedPermissionsData?.filter(permission =>
         !selectedPermissions.some(selectedPerm => selectedPerm._id === permission._id)
     );
-    
+
 
     return (
         <Modal centered show={show}>
@@ -153,9 +153,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                         </Col>
                     </Row>
                     <Modal.Footer>
-                          <Button type="button" className="custom-buttons" onClick={closeModal}>
-                                                        Cancel
-                                                    </Button>
+                        <Button type="button" className="custom-buttons" onClick={closeModal}>
+                            Cancel
+                        </Button>
                         <Button type="submit" className="custom-buttons" disabled={store?.updateRoleDataReducer?.loading}>
                             {store?.updateRoleDataReducer?.loading ?
                                 <Spinner className="spinner-border-sm" color="white" /> :

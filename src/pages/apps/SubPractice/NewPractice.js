@@ -29,6 +29,19 @@ const NewPractice = () => {
     const [logoName, setLogoName] = useState('');
     // const [smShow, setSmShow] = useState(false);
     const [btnShow, setBtnShow] = useState(true);
+    const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
+
+    const [modalFileUrl, setModalFileUrl] = useState(""); // State to store file URL for modal
+
+    const handleShowModal = (url) => {
+        setModalFileUrl(url); // Set the URL of the file to display in modal
+        setShowModalPic(true);   // Open the modal
+    };
+
+    const handleCloseModal = () => {
+        setShowModalPic(false); // Close the modal
+        setModalFileUrl(""); // Reset file URL
+    };
     // const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const handleLogoClick = () => {
         logoFileInputRef.current.click();
@@ -40,7 +53,7 @@ const NewPractice = () => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
-            setLogoName(selectedFile?.name)
+            setLogoName(url)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -63,7 +76,6 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'clinicsDataGetclinicsDataGet')
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -246,7 +258,7 @@ const NewPractice = () => {
                 ? clinicsDataGet.userId.phone.substring(2)
                 : clinicsDataGet?.userId?.phone);
             setValue('npiNumber', clinicsDataGet?.npiNumber);
-            setValue('logo', clinicsDataGet?.logo);
+            setLogo(clinicsDataGet?.logo?.url);
             setValue('medicare', clinicsDataGet?.medicareNumber);
             setValue('medicaid', clinicsDataGet?.medicaidNumber);
             setValue('clia', clinicsDataGet?.CLIA_Number);
@@ -396,9 +408,8 @@ const NewPractice = () => {
         });
     };
     const getRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-        console.log({getRoleId})
     useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId:clinic_id,createdById:'',limit: 10, search: '',page:1, status: true}));
+        dispatch(getRoleDataAction({ clinicId: clinic_id, createdById: '', limit: 10, search: '', page: 1, status: true }));
     }, [dispatch]);
 
 
@@ -464,7 +475,6 @@ const NewPractice = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-        console.log('createData', payload)
     };
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {
@@ -706,7 +716,7 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
                                                 <Col sm={6}>
-                                                    <Form.Group className="mb-1 position-relative"style={{ minHeight: '100px' }}>
+                                                    <Form.Group className="mb-1 position-relative">
                                                         <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
                                                         <InputGroup>
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
@@ -738,7 +748,7 @@ const NewPractice = () => {
                                                             />
                                                         </InputGroup>
                                                         {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
-                                                        <div className="position-absolute" style={{ top: '50%', left: '1%',transform: 'translateY(-100%)' }}>
+                                                        <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-10%)' }}>
                                                             <img src={us} alt="country code flag" width={20} />
                                                         </div>
                                                     </Form.Group>
@@ -777,23 +787,36 @@ const NewPractice = () => {
                                                     <Form.Label className='mb-0'>Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
-                                                            }`}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
                                                     >
-                                                        {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
-                                                        {/* {typeof logoName === 'string' && logoName
-                                                            ? logoName.split('/').pop()
-                                                            : 'Upload Logo'} */}
-                                                        {
+                                                        {/* {
                                                             logoUploading
                                                                 ? 'Uploading...'
-                                                                : typeof logoName === 'string' && logoName
-                                                                    ? logoName.split('/').pop()
+                                                                : logoName && logoName
+                                                                    ? logoName?.slice(0,30) + '...'
                                                                     : 'Upload Logo'
-                                                        }
-                                                        <p className="mb-0">
-                                                            <FiDownloadCloud />
-                                                        </p>
+                                                        } */}
+                                                        {logoName && logoName?.length ? logoName.split('/').pop().slice(0,30) : logoUploading ? 'Uploading...' : 'Upload Logo'}
+
+
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            {/* Eye Icon for Preview */}
+                                                            {logo && (
+                                                                <FiEye
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation(); // Prevent file input trigger
+                                                                        handleShowModal(logo); // Open modal with logo URL
+                                                                    }}
+                                                                    className="text-danger cursor-pointer"
+                                                                    style={{ zIndex: 1 }}
+                                                                />
+                                                            )}
+
+                                                            {/* Download Icon */}
+                                                            <p className="mb-0">
+                                                                <FiDownloadCloud />
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                     <Form.Control
                                                         type="file"
@@ -1014,18 +1037,32 @@ const NewPractice = () => {
                                                                 className="custom-file-upload justify-content-between cursor-pointer"
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {/* {accreditation.loading ? 'Loading...'
-                                                                    : accreditation.url
-                                                                        ? accreditation.url.split('/').pop()
-                                                                        : accreditation?.fileName || 'Upload Document'} */}
-                                                                {
-                                                                    newaccreditationLogo
-                                                                        ? 'Uploading...'
-                                                                        : accreditation.url
-                                                                            ? accreditation.fileName.split('/').pop().slice(0, 30) + "..."
-                                                                            : accreditation?.fileName || 'Upload Document'
-                                                                }
-                                                                <p className="mb-0"><FiDownloadCloud /></p>
+                                                                <span style={{ flex: 1 }}>
+                                                                    {
+                                                                        newaccreditationLogo
+                                                                            ? 'Uploading...'
+                                                                            : accreditation.url
+                                                                                ? accreditation.fileName.split('/').pop().slice(0, 30) // Truncated file name
+                                                                                : accreditation?.fileName || 'Upload Document'
+                                                                    }
+                                                                </span>
+
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    {/* Eye Icon for Preview */}
+                                                                    {accreditation.url && (
+                                                                        <FiEye
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation(); // Prevent file input trigger
+                                                                                handleShowModal(accreditation.url); // Open modal with accreditation URL
+                                                                            }}
+                                                                            className="text-danger cursor-pointer"
+                                                                            style={{ zIndex: 1 }}
+                                                                        />
+                                                                    )}
+
+                                                                    {/* Download Icon */}
+                                                                    <p className="mb-0"><FiDownloadCloud /></p>
+                                                                </div>
                                                             </div>
 
                                                             <Form.Control
@@ -1042,6 +1079,7 @@ const NewPractice = () => {
                                                             >
                                                             </span>
                                                         </Col>
+
                                                     </React.Fragment>
                                                 ))}
                                                 <hr className='mb-1' />
@@ -1095,27 +1133,34 @@ const NewPractice = () => {
                                                         <Col sm={4} className="mb-2 position-relative">
                                                             <div
                                                                 onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
-                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'
-                                                                    }`}
+                                                                className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                {/* {data.fileName
-                                                                    ? data?.fileName?.length > 30
-                                                                        ? data?.fileName?.slice(0, 25) + '...'
-                                                                        : data?.fileName
-                                                                    : 'Upload Document'} */}
-                                                                {
-                                                                    stateLogoUpload
-                                                                        ? 'Uploading...'
-                                                                        : (data.fileName
-                                                                            ? (data.fileName.length > 30
-                                                                                ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
-                                                                                : data.fileName.split('/').pop()) // Extract full file name
-                                                                            : 'Upload Document')
-                                                                }
-                                                                <p className="mb-0">
-                                                                    <FiDownloadCloud />
-                                                                </p>
+                                                                {stateLogoUpload
+                                                                    ? 'Uploading...'
+                                                                    : (data.fileName
+                                                                        ? (data.fileName.length > 30
+                                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                                            : data.fileName.split('/').pop()) // Extract full file name
+                                                                        : 'Upload Document')}
+
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    {data.url && (
+                                                                        <FiEye
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation(); // Prevent file input trigger
+                                                                                handleShowModal(data.url); // Pass the URL to open the modal
+                                                                            }}
+                                                                            className="text-danger cursor-pointer"
+                                                                            style={{ zIndex: 1 }}
+                                                                        />
+                                                                    )}
+
+                                                                    {/* Download Icon */}
+                                                                    <p className="mb-0">
+                                                                        <FiDownloadCloud />
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                             <Form.Control
                                                                 type="file"
@@ -1125,8 +1170,7 @@ const NewPractice = () => {
                                                             />
                                                             <span
                                                                 onClick={() => handleRemoveState(index)}
-                                                                className={`${stateDetails.length <= 1 ? 'd-none' : ''
-                                                                    } uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                                                className={`${stateDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                                                 style={{ right: '-2%', top: '20%' }}
                                                             ></span>
                                                         </Col>
@@ -1748,7 +1792,7 @@ const NewPractice = () => {
                                                                                 {errors.poccontact[index]?.message}
                                                                             </span>
                                                                         )}
-                                                                        <div className="position-absolute" style={{ top: '50%', left: '1%' ,transform: 'translateY(-100%)'}}>
+                                                                        <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)' }}>
                                                                             <img src={us} alt="country code flag" width={20} />
                                                                         </div>
                                                                     </Form.Group>
@@ -1782,7 +1826,27 @@ const NewPractice = () => {
                 {/* <EmailToSubClinicModal setIsModalRequest={setIsModalRequest} closeModal={closeModal} show={show} formData={formData} /> */}
                 {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
             </div>
+            <Modal show={showModalPic} onHide={handleCloseModal} centered>
 
+                <Modal.Body>
+                    <div className='d-flex justify-content-center'>
+                        <p className='fw-bold' style={{ color: '#6169D0' }}> File Preview</p>
+
+                    </div>
+                    <div style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <img
+                            src={modalFileUrl} // Set the source of the image
+                            alt="File Preview"
+                            style={{
+                                maxWidth: '100%', // Ensures the image fits within the modal width
+                                maxHeight: '100vh', // Prevents the image from exceeding the viewport height
+                                objectFit: 'contain', // Ensures the image maintains its aspect ratio
+                                display: 'block'
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+            </Modal>
         </>
     );
 };

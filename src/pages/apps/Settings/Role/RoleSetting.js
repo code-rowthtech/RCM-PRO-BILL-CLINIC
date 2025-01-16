@@ -103,7 +103,7 @@ const RoleSetting = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body className='scroll-container' style={{ height: '76vh' }}>
+                        <Card.Body className="scroll-container" style={{ minHeight: '76vh', overflowY: 'auto' }}>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col sm={6}>
                                     <Button
@@ -124,127 +124,160 @@ const RoleSetting = () => {
                                         Inactive
                                     </Button>
                                 </Col>
-                                <Col xs='auto'>
-                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between ">
-                                        <Col xs="auto" className='d-flex gap-2'>
+                                <Col xs="auto">
+                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
+                                        <Col xs="auto" className="d-flex gap-2">
                                             <FormInput
                                                 type="text"
                                                 onChange={(e) => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
-                                                    dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search, createdById: '', page: 1, status: true }));
-
+                                                    dispatch(
+                                                        getRoleDataAction({
+                                                            clinicId: clinicId,
+                                                            limit: 10,
+                                                            search: search,
+                                                            createdById: '',
+                                                            page: 1,
+                                                            status: true,
+                                                        })
+                                                    );
                                                 }}
                                                 placeholder="Search..."
                                                 style={{ height: '30px' }}
                                             />
-                                            <Button className='custom-buttons py-1' onClick={() => setShowModal(true)} style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}><span className='uil-plus' ></span> Add New Role</Button>
+                                            <Button
+                                                className="custom-buttons py-1"
+                                                onClick={() => setShowModal(true)}
+                                                style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}
+                                            >
+                                                <span className="uil-plus"></span> Add New Role
+                                            </Button>
                                         </Col>
                                     </Row>
                                 </Col>
                                 <CreateRoleSetting show={showModal} closeModal={handleClosemodal} />
                                 <UpdateRoleSetting show={showUpdateModal} closeModal={closeUpdateModal} data={dataToUpdate} />
-
                             </Row>
                             <Row>
-                                <Col className='h-100'>
-                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"
-                                        style={{ height: decryptedRolesData?.length === 0 ? '76vh' : 'auto' }}
+                                <Col className="h-100">
+                                    <Table
+                                        responsive
+                                        className="table-centered table-nowrap mb-0 rounded"
+                                        style={{
+                                            height: decryptedRolesData?.length === 0 ? '76vh' : 'auto',
+                                        }}
                                     >
-                                        <thead className=" text-white">
-                                            <tr key={''}>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>
+                                        <thead className="text-white">
+                                            <tr key="">
+                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
                                                     S.no
                                                 </th>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Name</th>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Description</th>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
+                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
+                                                    Name
+                                                </th>
+                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
+                                                    Description
+                                                </th>
+                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
+                                                    Status
+                                                </th>
+                                                <th className="text-white py-2" style={{ fontSize: '13px' }}>
+                                                    Action
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {store?.getRoleDataReducer?.loading ? (
-                                                <tr key={''}>
-                                                    <td colSpan={7} className='py-5 text-center'>
+                                                <tr key="">
+                                                    <td colSpan={7} className="py-5 text-center">
                                                         <Spinner />
                                                     </td>
                                                 </tr>
                                             ) : decryptedRolesData?.length > 0 ? (
                                                 decryptedRolesData?.map((data, index) => (
                                                     <React.Fragment key={index}>
-                                                        <tr className='cursor-pointer'>
-                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        <tr className="cursor-pointer">
+                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {index + 1}
                                                             </td>
-                                                            <td className='cursor-pointer py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td
+                                                                className="cursor-pointer py-1"
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}
+                                                            >
                                                                 <span
                                                                     data-bs-toggle="tooltip"
-                                                                    title={'Permissions' + ' : ' + data?.permissions?.map(permission => permission?.name).join(', ') || ''}
-                                                                    className="d-inline-block mt-1 text-truncate text-capitalize">
-                                                                    {data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}
+                                                                    title={
+                                                                        'Permissions' +
+                                                                        ' : ' +
+                                                                        data?.permissions?.map(
+                                                                            (permission) => permission?.name
+                                                                        ).join(', ') || ''
+                                                                    }
+                                                                    className="d-inline-block mt-1 text-truncate text-capitalize"
+                                                                >
+                                                                    {data?.name?.charAt(0).toUpperCase() +
+                                                                        data?.name?.slice(1)}
                                                                 </span>
                                                             </td>
-                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <span className='text-truncate cursor-pointer' title={data?.description}>
+                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                <span
+                                                                    className="text-truncate cursor-pointer"
+                                                                    title={data?.description}
+                                                                >
                                                                     {data?.description
-                                                                        ? (data?.description?.length > 50
+                                                                        ? data?.description.length > 50
                                                                             ? data?.description.slice(0, 49) + '...'
-                                                                            : data?.description)
+                                                                            : data?.description
                                                                         : 'N/A'}
                                                                 </span>
                                                             </td>
-                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
+                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                <Form.Switch
+                                                                    onClick={() => handleUpdateDoctorStatus(data)}
+                                                                    checked={data?.status === true}
+                                                                />
                                                             </td>
-                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <Link to="#" className="action-icon" onClick={() => {
-                                                                    setShowUpdateModal(true);
-                                                                    setDataToUpdate(data);
-                                                                }}>
+                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                <Link
+                                                                    to="#"
+                                                                    className="action-icon"
+                                                                    onClick={() => {
+                                                                        setShowUpdateModal(true);
+                                                                        setDataToUpdate(data);
+                                                                    }}
+                                                                >
                                                                     <i className="mdi mdi-square-edit-outline"></i>
                                                                 </Link>
-                                                                <i onClick={() => toggleRow(index)} className="mdi mdi-eye fs-4"></i>
+                                                                <i
+                                                                    onClick={() => toggleRow(index)}
+                                                                    className="mdi mdi-eye fs-4"
+                                                                ></i>
                                                             </td>
                                                         </tr>
                                                         {expandedRowIndex === index && (
                                                             <tr>
                                                                 <td colSpan="7">
                                                                     <div className="expanded-content px-5">
-                                                                        <div className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${data?.permissions?.length === 0 ? 'd-none' : ''}`}>
+                                                                        <div
+                                                                            className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${data?.permissions?.length === 0
+                                                                                ? 'd-none'
+                                                                                : ''
+                                                                                }`}
+                                                                        >
                                                                             <div className="col-1"></div>
-                                                                            <div className="permission-name text-black fw-bold col-2">Permission</div>
-                                                                            <div className="action-name col-2 text-black fw-bold text-center">Add</div>
-                                                                            <div className="action-name col-2 text-black fw-bold text-center">View</div>
-                                                                            <div className="action-name col-2 text-black fw-bold text-center">Delete</div>
-                                                                            <div className="action-name col-2 text-black fw-bold text-center">Update</div>
-                                                                            <div className="col-1"></div>
-                                                                        </div>
-                                                                        <div className="permissions-body scroll-container">
-                                                                            {data?.permissions?.length === 0 ? (
-                                                                                <div className="no-permissions-message text-center py-2">
-                                                                                    No permissions are available for this role
-                                                                                </div>
-                                                                            ) : (
-                                                                                data?.permissions?.map((permission, idx) => (
-                                                                                    <div key={idx} className="permissions-row py-2 d-flex align-items-center">
-                                                                                        <div className="col-1"></div>
-                                                                                        <div className="permission-name text-black fw-bold col-2 text-capitalize">{permission?.permission}</div>
-                                                                                        <div className="action-name col-2 text-center">
-                                                                                            {/(add|create)/i.test(permission?.permission) ? '✅' : '❌'}
-                                                                                        </div>
-                                                                                        <div className="action-name col-2 text-center">
-                                                                                            {/view/i.test(permission?.permission) ? '✅' : '❌'}
-                                                                                        </div>
-                                                                                        <div className="action-name col-2 text-center">
-                                                                                            {/(delete|remove)/i.test(permission?.permission) ? '✅' : '❌'}
-                                                                                        </div>
-                                                                                        <div className="action-name col-2 text-center">
-                                                                                            {/(update|edit)/i.test(permission?.permission) ? '✅' : '❌'}
-                                                                                        </div>
-                                                                                        <div className="col-1"></div>
-                                                                                    </div>
-                                                                                ))
-                                                                            )}
+                                                                            <div className="permission-name text-black fw-bold col-2">
+                                                                                Permission
+                                                                            </div>
+                                                                            <div className="action-name col-2 text-black fw-bold text-center">
+                                                                                Add
+                                                                            </div>
+                                                                            <div className="action-name col-2 text-black fw-bold text-center">
+                                                                                View
+                                                                            </div>
+                                                                            <div className="action-name col-2 text-black fw-bold text-center">
+                                                                                Edit
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </td>
@@ -253,28 +286,29 @@ const RoleSetting = () => {
                                                     </React.Fragment>
                                                 ))
                                             ) : (
-                                                <tr key={''}>
-                                                    <td colSpan={7} className='text-center'>
-                                                        <h3 className='my-5'>No Data Found</h3>
+                                                <tr>
+                                                    <td colSpan="7" className="text-center py-3">
+                                                        No Roles Available
                                                     </td>
                                                 </tr>
                                             )}
                                         </tbody>
-
-                                    </Table >
+                                    </Table>
                                 </Col>
-                                <Row>
-                                    <Col className='mt-2 d-flex justify-content-end'>
-                                        <Paginations
-                                            currentPage={skip}
-                                            totalPages={rolePagination?.totalPages}
-                                            onPageChange={handlePageChange}
-                                        />
-                                    </Col>
-                                </Row>
+                            </Row>
+                            <Row>
 
+                                <Col className='mt-2 d-flex justify-content-end'>
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={rolePagination?.totalPages || 1}
+                                        onPageChange={handlePageChange}
+                                    />
+
+                                </Col>
                             </Row>
                         </Card.Body>
+
                     </Card>
                 </Col>
             </Row>

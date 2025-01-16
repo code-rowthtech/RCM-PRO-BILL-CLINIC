@@ -73,6 +73,7 @@ const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updat
 const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
 const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
+const PurposeOfVisit = React.lazy(() => import('../pages/apps/Settings/Purpose/PurposeOfVisit'));
 
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
@@ -177,8 +178,6 @@ const AllRoutes = () => {
     }));
     const userData = JSON.parse(localStorage.getItem('userData'));
     const userPermissions = userData?.user?.role?.permissions?.map(permission => permission.permission) || [];
-
-    console.log({ userData })
     const hasPermission = (permission) => {
         // If userPermissions is empty, allow all permissions
         if (userPermissions.length === 0) {
@@ -435,6 +434,14 @@ const AllRoutes = () => {
                                     path: 'desigination',
                                     element: hasPermission('view desigination settings') ? (
                                         <LoadComponent component={Desigination} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'purposeofvisit',
+                                    element: hasPermission('view desigination settings') ? (
+                                        <LoadComponent component={PurposeOfVisit} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
                                     ),

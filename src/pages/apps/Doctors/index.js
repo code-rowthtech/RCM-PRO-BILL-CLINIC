@@ -33,6 +33,7 @@ const Doctors = () => {
         doctor.userDetails?.status === status &&
         doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
+    console.log({ filteredDoctors })
 
     const handleStatusChange = () => {
         const payload = {

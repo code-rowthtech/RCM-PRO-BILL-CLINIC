@@ -8,6 +8,11 @@ export const createClinicAction = (data): AuthAction => ({
     data
 });
 
+export const changeEmailAction = (data): AuthAction => ({
+    type: ClinicsActionTypes.CHANGE_EMAIL,
+    data
+});
+
 export const getClinicAction = (data): AuthAction => ({
     type: ClinicsActionTypes.GET_CLINIC,
     data

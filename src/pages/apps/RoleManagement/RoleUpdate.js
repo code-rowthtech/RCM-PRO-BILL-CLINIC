@@ -29,7 +29,7 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
     const roleDataLoading = store?.getRolesDataReducer?.loading;
     const [showPassword, setShowPassword] = useState(false);
     console.log({ reportingTo })
-    const { register, reset, setValue, handleSubmit, formState: { errors }, getValues } = useForm();
+    const { register, reset, setValue, watch, handleSubmit, formState: { errors }, getValues } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const togglePasswordVisibility = () => {
@@ -49,7 +49,7 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
     useEffect(() => {
         if (show && currentUser) {
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
 
             reset({
                 name: currentUser.firstName,
@@ -68,18 +68,21 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
 
     useEffect(() => {
         if (createSuccess === 200) {
-            dispatch(stateEmptydAction());
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+            // dispatch(stateEmptydAction());
+            // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
             close();
             reset();
             getValues('');
+            setLeavingDate('')
             setCurrentUser('');
         }
     }, [createSuccess]);
+    const [leavingDate, setLeavingDate] = useState("");
+    const [leavingSelectedDate, setLeavingSelectedDate] = useState("");
+
 
     const onSubmit = (data) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
-        const formattedLeavingDate = new Date(data.leavingDate).toISOString();
         const payload = {
             id: currentUser?._id,
             firstName: data.name,
@@ -88,7 +91,7 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
             clinicId: clinicId,
             reportingTo: data?.reportingTo,
             joiningDate: formattedJoiningDate,
-            leavingDate: formattedLeavingDate,
+            leavingDate: leavingSelectedDate,
             role: data.role,
             phNumberSecondary: data.contact,
             designation: data?.designation,
@@ -111,16 +114,34 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
 
         }
     }, [currentUser?.designation, setValue]); // `setValue` comes from `useForm`
+    const leaving = watch('leavingDate')
+
+    const joiningDate = watch('joiningDate')
+    const desigination = watch('designation')
+    const department = watch('department')
+    const role = watch('role')
+    const reporting = watch('reportingTo')
 
 
+    const handleDateChange = (e) => {
+        const selectedDate = e.target.value; // Get selected date
+        if (selectedDate) {
+            const leavingDateWithTime = new Date(selectedDate);
+            leavingDateWithTime.setUTCHours(23, 59, 59, 0); // Set time to 23:59:59 UTC
+
+            const formattedDate = leavingDateWithTime.toISOString(); // Convert to ISO string
+            setLeavingDate(selectedDate);
+            setLeavingSelectedDate(formattedDate);
+            setValue("leavingDate", formattedDate); // Update React Hook Form
+        }
+    };
     return (
         <>
-            <Modal centered show={show} size="md" onHide={close}>
+            <Modal centered show={show} size="lg" onHide={close}>
                 <Modal.Body>
                     <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
-                        <Col sm={1}></Col>
-                        <Col sm={10}>
-                            <h4 className="mb-0 text-center">
+                        <Col sm={11}>
+                            <h4 className="mb-0 ms-lg-5 text-center">
                                 Edit User Details
                             </h4>
                         </Col>
@@ -287,6 +308,8 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                         type="date"
                                         defaultValue={currentUser?.joiningDate ? new Date(currentUser.joiningDate).toISOString().split('T')[0] : ''}
                                         {...register('joiningDate', { required: 'Joining date is required' })}
+                                        className={joiningDate ? 'text-dark border border-secondary' : 'custom-date-input border border-secondary'}
+
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
                                 </Form.Group>
@@ -297,7 +320,10 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                     <Form.Label className="mb-0">Date of Leaving</Form.Label>
                                     <Form.Control
                                         type="date"
-                                        {...register('leavingDate', { required: 'Leaving date is required' })}
+                                        value={leavingDate} // Bind state to display selected date
+                                        {...register("leavingDate", { required: "Leaving date is required" })}
+                                        className={`text-dark border border-secondary ${leavingDate ? 'custom-date-input-select' : 'custom-date-input'}`}
+                                        onChange={handleDateChange} // Handle date change
                                     />
                                     {errors.leavingDate && <span className="text-danger fs-6">{errors.leavingDate.message}</span>}
                                 </Form.Group>
@@ -308,7 +334,8 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                     <Form.Label className="mb-0">Designation</Form.Label>
                                     <Form.Select
                                         {...register('designation', { required: 'Designation is required' })}
-                                        className='text-dark'
+                                        className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}
+
                                     >
                                         {tableGetDataLoading ? (
                                             <option>Loading...</option>
@@ -331,13 +358,19 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                     <Form.Label className="mb-0">Department</Form.Label>
                                     <Form.Select
                                         {...register('department', { required: 'Department is required' })}
+                                        className={`text-dark border border-secondary ${department ? ' custom-date-input-select' : 'custom-date-input'}`}
+
                                     >
                                         {departmentGetDataLoading ? (
-                                            <option>Loading...</option>
+                                           <button class="btn" type="button" disabled>
+                                           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                           Loading...
+                                         </button>
                                         ) : departmentGetData && departmentGetData.length > 0 ? (
-                                            departmentGetData.map((data) => (
-                                                <option key={data._id} value={data.name}>
-                                                    {data.name}
+                                            departmentGetData?.map((data) => (
+                                                <option key={data._id} className={department ? 'text-dark border border-secondary' : 'custom-date-input border border-secondary'}
+                                                    value={data.name}>
+                                                    {data?.name}
                                                 </option>
                                             ))
                                         ) : (
@@ -353,12 +386,14 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                     <Form.Label className="mb-0">Role</Form.Label>
                                     <Form.Select
                                         {...register('role', { required: 'Role is required' })}
+                                        className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
+
                                     >
                                         {roleDataLoading ? (
                                             <option>Loading...</option>
                                         ) : roleData && roleData.length > 0 ? (
                                             roleData?.map((role) => (
-                                                <option key={role._id} value={role.name}>
+                                                <option key={role._id} value={role?._id}>
                                                     {role.name}
                                                 </option>
                                             ))
@@ -374,6 +409,8 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                                     <Form.Label className="mb-0">Reporting</Form.Label>
                                     <Form.Select
                                         {...register('reportingTo')}
+                                        className={`text-dark border border-secondary ${reporting ? ' custom-date-input-select' : 'custom-date-input'}`}
+
                                         defaultValue={currentUser?.reportingTo}
                                     >
                                         <option value="">Select Reporting</option>

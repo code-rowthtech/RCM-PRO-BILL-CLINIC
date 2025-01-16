@@ -9,6 +9,11 @@ export const createAppointmentAction = (data): AuthAction => ({
     data
 });
 
+export const rescheduleAppointmentAction = (data): AuthAction => ({
+    type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT,
+    data
+});
+
 export const getPractitionerScheduleAction = (data): AuthAction => ({
     type: AppointmentActionTypes.GET_PRACTITIONER_SCHEDULE,
     data
@@ -21,6 +26,11 @@ export const getPractitionerSlotsAction = (data): AuthAction => ({
 
 export const getAppointmentsAction = (data): AuthAction => ({
     type: AppointmentActionTypes.GET_APPOINTMENT,
+    data
+});
+
+export const getAppointmentByIdAction = (data): AuthAction => ({
+    type: AppointmentActionTypes.GET_APPOINTMENT_BY_ID,
     data
 });
 

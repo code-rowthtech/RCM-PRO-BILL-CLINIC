@@ -65,10 +65,12 @@ const SetPassword = (): React$Element<any> => {
 
     const [popup, setPopup] = useState(false);
     const error = useSelector((state) => state.Auth.error);
+    const errorLoading = useSelector((state) => state.Auth.loading);
+
 
     useEffect(() => {
-        setPopup(!!error);
-    }, [error]);
+        setPopup(!!error || errorLoading); // Show popup when there is an error or loading
+    }, [error, errorLoading]);
 
     const handleClose = () => setPopup(false);
 
@@ -123,10 +125,14 @@ const SetPassword = (): React$Element<any> => {
     return (
         <>
             {(userLoggedIn || user) && <Navigate to={redirectUrl} replace />}
-                {popup ? (
-                     <AccountLayout >
+            {popup ? (
+                <AccountLayout>
                     <div className="text-center">
-                        <h4 className="text-muted fw-medium">Your account is already set up. Please log in or reset your password if needed.</h4>
+                        <h4 className="text-muted fw-medium">
+                            {errorLoading
+                                ? "Loading... Please wait."
+                                : "Your account is already set up. Please log in or reset your password if needed."}
+                        </h4>
                         <Button
                             className="mt-2"
                             variant="secondary"
@@ -135,20 +141,20 @@ const SetPassword = (): React$Element<any> => {
                                 navigate('/account/login');
                             }}
                         >
-                        Log In
+                            Log In
                         </Button>
                     </div>
-                    </AccountLayout>
-                ) : (
-                    <>
-            <AccountLayout bottomLinks={<BottomLink />}>
-
+                </AccountLayout>
+            ) : (
+                <>
+                    <AccountLayout bottomLinks={<BottomLink />}>
                         <div className="text-center m-auto">
-                            <h4 className="text-dark-50 text-center mt-0 font-weight-bold">{t('Set Password')}</h4>
+                            <h4 className="text-dark-50 text-center mt-0 font-weight-bold">
+                                {t('Set Password')}
+                            </h4>
                             <p className="text-muted mb-4">
                                 Hey enter your new password, and we'll update your password and log you in.
                             </p>
-
                         </div>
                         {!passwordChange && (
                             <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
@@ -161,7 +167,6 @@ const SetPassword = (): React$Element<any> => {
                                     placeholder={t('Your Email')}
                                     containerClass={'mb-3'}
                                 />
-
                                 <FormInput
                                     label="New Password"
                                     type="password"
@@ -172,7 +177,6 @@ const SetPassword = (): React$Element<any> => {
                                     placeholder={t('Enter your Password')}
                                     containerClass={'mb-3'}
                                 />
-
                                 <FormInput
                                     label="Confirm Password"
                                     type="password"
@@ -183,20 +187,21 @@ const SetPassword = (): React$Element<any> => {
                                     onCut={(e) => e.preventDefault()}
                                     onPaste={(e) => e.preventDefault()}
                                 />
-
                                 <div className="mb-3 mb-0 text-center">
-                                    <Button variant="primary" className="custom-buttons" type="submit" disabled={loading}>
+                                    <Button
+                                        variant="primary"
+                                        className="custom-buttons"
+                                        type="submit"
+                                        disabled={loading}
+                                    >
                                         {t('Submit')}
                                     </Button>
                                 </div>
                             </VerticalForm>
-
                         )}
-            </AccountLayout>
-
-                    </>
-
-                )}
+                    </AccountLayout>
+                </>
+            )}
         </>
     );
 };

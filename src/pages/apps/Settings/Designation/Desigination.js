@@ -29,8 +29,10 @@ const Designation = () => {
   const [skip, setSkip] = useState(1);
   const createResponse = store?.createMastersDataReducer?.data?.status;
   const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const pagination = store?.getMastersDataReducer?.data;
+
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
-  console.log({ tableGetData })
+  console.log({ pagination})
   const closeAddModal = () => {
     setAddDesiginationModal(false);
     setEdit(null);

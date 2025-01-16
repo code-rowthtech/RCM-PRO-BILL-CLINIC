@@ -10,9 +10,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
+import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
+import { getMastersDataAction } from '../../../redux/settings/action';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -29,10 +30,10 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-
+    console.log({ roleData });
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
-    console.log({ deleteSuccess })
+    const createSuccess = store?.updateRolesReducer?.data?.status;
     const [smShow, setSmShow] = useState(false);
     const [detailModal, setDetailModal] = useState(false);
 
@@ -48,8 +49,8 @@ const RoleManagement = () => {
     const [skip, setSkip] = useState(1)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const [searchQuery, setSearchQuery] = useState('');
-    const [userDetails, setUserDetails] = useState([])
-
+    const [userDetails, setUserDetails] = useState([]);
+    const viewPasswordStatus = store?.viewPasswordReducer?.data?.status;
 
 
     useEffect(() => {
@@ -63,7 +64,19 @@ const RoleManagement = () => {
             })
         );
     }, [dispatch, status, searchQuery, skip]);
-
+    useEffect(() => {
+        if (viewPasswordStatus === 200) {
+            dispatch(
+                getRolesAction({
+                    clinicId: clinicId,
+                    limit: 10,
+                    search: searchQuery,
+                    page: skip,
+                    status: status,
+                })
+            );
+        }
+    }, [viewPasswordStatus]);
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
@@ -100,13 +113,21 @@ const RoleManagement = () => {
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
         setSkip(1);
-
     };
+
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
-
-
     }
+    useEffect(() => {
+        if (createSuccess === 200) {
+            dispatch(stateEmptydAction());
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
+            dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+
+
+        }
+    }, [createSuccess]);
+
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(stateEmptydAction());
@@ -130,15 +151,22 @@ const RoleManagement = () => {
     };
 
     const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
+        if (pageNumber >= 1 && pageNumber <= roleData?.pagination?.totalPages) {
+            setSkip(pageNumber);
+        }
     };
 
-
+    const handleViewPassword = (id) => {
+        const payload = {
+            userId: id
+        }
+        dispatch(viewPasswordAction({ key: encryptMessage(payload) }))
+    }
     return (
         <Row className='mt-2'>
             <Col xs={12}>
                 <Card>
-                    <Card.Body className='' style={{ height: '100vh' }}>
+                    <Card.Body className='' style={{ height: '76vh' }}>
                         <Row className="mb-2">
                             <Col sm={6}>
                                 <Button
@@ -158,11 +186,6 @@ const RoleManagement = () => {
                                     Inactive
                                 </Button>
                             </Col>
-                            {/* <Col sm={6}>
-                                <Button className="custom-buttons">
-                                    Receptionist
-                                </Button>
-                            </Col> */}
                             <Col sm={6} className='text-end'>
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                     <Col xs="auto" className='d-flex gap-2'>
@@ -198,31 +221,27 @@ const RoleManagement = () => {
                                     </thead>
                                     <tbody>
                                         {roleDataLoading ? (
-                                            // Show a loading spinner or placeholder row while data is being fetched
                                             <tr>
-                                                <td colSpan={6} className="text-center">
-                                                    <div className="spinner-border text-primary" role="status">
-                                                        <span className="visually-hidden">Loading...</span>
-                                                    </div>
+                                                <td colSpan={8} className="text-center">
+                                                    <Spinner />
                                                 </td>
                                             </tr>
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
-                                            // Render data rows when available
                                             roleData?.users.map((data, index) => (
                                                 <tr key={index} className="border-bottom">
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>{index + 1}</td>
-                                                    <td className='py-1' style={{ fontSize: '14px', fontWeight: '400' }}>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                                                    <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.firstName?.charAt(0).toUpperCase() + data?.firstName?.slice(1)}
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>+1 {data?.phone}</td>
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>{data?.email}</td>
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '14px', fontWeight: '400' }}>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"
@@ -236,7 +255,7 @@ const RoleManagement = () => {
                                         ) : (
                                             // Show "No Data Found" when no data is available
                                             <tr>
-                                                <td colSpan={6} className="text-center">
+                                                <td colSpan={8} className="text-center">
                                                     <h3 className="my-5">No Data Found</h3>
                                                 </td>
                                             </tr>
@@ -257,7 +276,7 @@ const RoleManagement = () => {
                                 <Paginations
                                     currentPage={skip}
                                     totalPages={roleData?.pagination?.totalPages || 1}
-                                    onPageChange={(pageNumber) => handlePageChange(pageNumber)}
+                                    onPageChange={handlePageChange}
                                 />
 
                             </Col>

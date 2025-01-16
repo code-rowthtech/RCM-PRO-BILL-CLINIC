@@ -8,14 +8,14 @@ export function createClinicApi(params: any): any {
     return api.create(URL.createClinic, data);
 }
 
+export function changeEmailApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.changeEmail, data);
+}
+
 export function getClinicTypeApi(params: any): any {
     return api.get(URL.getClinicType);
 }
-
-// export function updateClinicApi(params: any): any {
-//     const { data } = params;
-//     return api.update(URL.updateClinic, data);
-// }
 
 export function getClinicByIdApi(params: any): any {
     const { data } = params;
@@ -32,7 +32,7 @@ export function getCityByStateApi(params: any): any {
 }
 export function getClinicApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getClinic,data);
+    return api.create(URL.getClinic, data);
 }
 
 export function addSubscriptionPlanApi(params: any): any {

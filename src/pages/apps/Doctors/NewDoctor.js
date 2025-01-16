@@ -69,7 +69,7 @@ const NewDoctor = () => {
 
     useEffect(() => {
         dispatch(
-            getRoleDataAction({ search: 'Doctor', clinicId: clinicId, status: true, page: 1, limit: 10, defaultRole: true })
+            getRoleDataAction({ search: 'Doctor', clinicId: clinicId, status: true, page: 1, limit: 10, createdById: '' })
         );
     }, [dispatch]);
 
@@ -81,6 +81,7 @@ const NewDoctor = () => {
         dispatch(getStatesByCountryAction())
     }, [dispatch]);
 
+    // http://192.168.1.26:9001/api/v1/clinic/getAllRoles?search=&clinicId=677f4ab193938994008638c9&createdById=&status=true&page=1&limit=10
 
 
     const cities = store?.getCitiesReducer?.data?.cities;
@@ -91,11 +92,10 @@ const NewDoctor = () => {
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-    console.log(store?.getRoleDataReducer, 'store?.getRoleDataReducer')
+    const doctorRole = store?.getRoleDataReducer?.data;
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    console.log({departmentGetData})
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {
@@ -114,7 +114,6 @@ const NewDoctor = () => {
 
     useEffect(() => {
         if (doctorDetails && updateId) {
-            console.log(doctorDetails, 'doctorDetailsdoctorDetails')
             const cityName = doctorDetails?.userId?.address?.city?.name || ''; // Fallback to an empty string if name is missing
             // setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
             setValue('firstName', doctorDetails?.userId?.firstName)
@@ -203,16 +202,11 @@ const NewDoctor = () => {
             gender: data?.gender,
             ...(!updateId ? { password: data?.password } : {}),
             phone: data?.phone,
-            specialities: data?.specialist,
+            specialities: [data?.specialist],
             profileImage: {
                 url: logo?.url?.split('?')[0] || logo,
                 fileName: logoName,
             },
-            // degreeName: data?.degreeName,
-            // degreeDoc: {
-            //     url: degree?.url?.split('?')[0] || degree,
-            //     fileName: degreeName,
-            // },
             degree: [{
                 name: data?.degreeName,
                 uploadedDocument: {
@@ -250,7 +244,6 @@ const NewDoctor = () => {
                     ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
                 }
         };
-        // Encrypt and dispatch the payload
         if (updateId) {
             console.log({ payload })
             dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
@@ -609,13 +602,13 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
-                                                                    max={new Date().toISOString().split('T')[0]} // Prevents future dates in date picker
+                                                                    max={new Date().toISOString().split('T')[0]}
                                                                     {...register('dateOfBirth', {
                                                                         required: 'Date of birth is required',
                                                                         validate: (value) => {
                                                                             const selectedDate = new Date(value);
                                                                             const today = new Date();
-                                                                            today.setHours(0, 0, 0, 0); // Reset hours to ensure clean comparison
+                                                                            today.setHours(0, 0, 0, 0);
                                                                             return selectedDate <= today || 'Date of birth cannot be in the future';
                                                                         },
                                                                     })}
@@ -638,7 +631,7 @@ const NewDoctor = () => {
                                                                     {...register('email', {
                                                                         required: 'Email is required',
                                                                         pattern: {
-                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for basic email format
+                                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                                             message: 'Enter a valid email address',
                                                                         },
                                                                     })}

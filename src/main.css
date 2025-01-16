@@ -13,6 +13,9 @@
     box-shadow: none !important; /* Remove box shadow */
     outline: none !important; /* Remove outline */
 }
+.custom-multiselect{
+    border: none !important; /* Remove border */
+}
 
 
 .headers {
@@ -34,9 +37,7 @@
     border-radius: 4px; /* Ensures consistent rounded corners */
     width: 100%; /* Optional: Sets width to fit the parent container */
 }
-select .select{
-    color: #e70910;
-}
+
 .plusicon {
     color: #6169d0;
 }
@@ -129,6 +130,39 @@ table {
 .card {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
+.custom-date-input::placeholder {
+    color: grey; /* Set the placeholder color */
+    opacity: 1; /* Ensure the placeholder is fully visible */
+}
+/* Apply grey color to all input placeholders */
+form input::placeholder,
+form textarea::placeholder {
+    color: grey; /* Set placeholder text color to grey */
+    opacity: 1; /* Ensure full visibility of placeholder */
+}
+
+/* Optional: Specific for form-control class (Bootstrap inputs) */
+.custom-date-input::placeholder,
+.form-control::placeholder {
+    color: grey; /* Grey color for placeholders */
+    opacity: 1;
+}
+
+.custom-date-input {
+    color: grey !important; /* Set the input text color to grey */
+    font-size: 14px; /* Adjust font size if needed */
+}
+.custom-date-input-select {
+    color: black !important; /* Set the input text color to black */;
+}
+.custom-date {
+    color: grey !important; /* Set the input text color to grey */
+    font-size: 14px; /* Adjust font size if needed */
+}
+.scroll-container {
+    overflow-y: auto;
+}
+
 
 input,
 textarea,
