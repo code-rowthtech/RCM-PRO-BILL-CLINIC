@@ -807,7 +807,7 @@ const NewPractice = () => {
                                                                         e.stopPropagation(); // Prevent file input trigger
                                                                         handleShowModal(logo); // Open modal with logo URL
                                                                     }}
-                                                                    className="text-danger cursor-pointer"
+                                                                    className="text-dark cursor-pointer"
                                                                     style={{ zIndex: 1 }}
                                                                 />
                                                             )}
@@ -1055,7 +1055,7 @@ const NewPractice = () => {
                                                                                 e.stopPropagation(); // Prevent file input trigger
                                                                                 handleShowModal(accreditation.url); // Open modal with accreditation URL
                                                                             }}
-                                                                            className="text-danger cursor-pointer"
+                                                                            className="text-dark cursor-pointer"
                                                                             style={{ zIndex: 1 }}
                                                                         />
                                                                     )}
@@ -1151,7 +1151,7 @@ const NewPractice = () => {
                                                                                 e.stopPropagation(); // Prevent file input trigger
                                                                                 handleShowModal(data.url); // Pass the URL to open the modal
                                                                             }}
-                                                                            className="text-danger cursor-pointer"
+                                                                            className="text-dark cursor-pointer"
                                                                             style={{ zIndex: 1 }}
                                                                         />
                                                                     )}

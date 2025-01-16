@@ -53,7 +53,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo,'logo')
+    console.log(logo, 'logo')
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
@@ -112,7 +112,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-
+    console.log(cities1, 'cities1cities1')
     const handleAddTaxonomy = () => {
         const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
 
@@ -148,7 +148,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction())
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log({clinicsDataGet})
+    console.log({ clinicsDataGet })
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -250,12 +250,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...posDetails && { pos: posDetails },
             // ...(logo ?
             //     {
-                    logo: {
-                        url: logo?.url?.split('?')[0],
-                        fileName: logoName,
-                    },
-                // }
-                // : ''),
+            logo: {
+                url: logo?.url?.split('?')[0],
+                fileName: logoName,
+            },
+            // }
+            // : ''),
             primaryAddress: {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
@@ -289,7 +289,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     }
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log({newPayload})
+        console.log({ newPayload })
     };
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);
@@ -507,6 +507,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
+            console.log(selectedCounty, 'selectedCountyselectedCounty')
             setValue('city', selectedCounty)
         }
         if (cities2) {
@@ -514,6 +515,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setValue('mailingCity', selectedCounty1)
         }
     }, [cities1, cities2]);
+    console.log(store, 'store')
     const getTableData = store.getSubClinicsReducer?.data?.clinics
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
@@ -786,7 +788,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     e.stopPropagation(); // Prevent the file input from opening
                                                     handleShowModal(logo); // Open the modal with the file URL
                                                 }}
-                                                className="text-danger cursor-pointer"
+                                                className="text-dark cursor-pointer"
                                                 style={{ zIndex: 1 }}
                                             />
                                         )}
@@ -941,12 +943,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         {...register('medicaid', {
                                             // required: 'Medicaid Number is required',
                                             minLength: {
-                                                value: 10,
-                                                message: 'Medicaid Number must be 10 characters long',
+                                                value: 8,
+                                                message: 'Medicaid Number must be 8 characters long',
                                             },
                                             maxLength: {
-                                                value: 10,
-                                                message: 'Medicaid Number must be 10 characters long',
+                                                value: 12,
+                                                message: 'Medicaid Number must be 12 characters long',
                                             },
                                             pattern: {
                                                 value: /^[0-9]+$/,
@@ -954,7 +956,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             },
                                         })}
                                         placeholder="Medicaid Number"
-                                        maxLength={10}
+                                        maxLength={12}
                                     />
                                     {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
                                 </Form.Group>
@@ -1019,7 +1021,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             e.stopPropagation(); // Prevent the file input from opening
                                                             handleShowModal(accreditation?.url); // Open the modal with the file URL
                                                         }}
-                                                        className="text-danger cursor-pointer"
+                                                        className="text-dark cursor-pointer"
                                                         style={{ zIndex: 1 }}
                                                     />
                                                 )}
@@ -1119,7 +1121,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             e.stopPropagation(); // Prevent file input trigger
                                                             handleShowModal(data.url); // Pass the URL to open the modal
                                                         }}
-                                                        className="text-danger cursor-pointer"
+                                                        className="text-dark cursor-pointer"
                                                         style={{ zIndex: 1 }}
                                                     />
                                                 )}
@@ -1707,9 +1709,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {...register(`poccontact.${index}`, {
                                                                 required: index !== 1 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                 pattern: {
-                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
-                                                                    message:
-                                                                        'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, 
+                                                                    message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
                                                                 },
                                                                 maxLength: {
                                                                     value: 10,

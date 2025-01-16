@@ -91,6 +91,7 @@ function* updateRoleDataFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error,'danger')
         yield put({
             type: RoleActionTypes.UPDATE_ROLE_DATA_ERROR,
             payload: error,
