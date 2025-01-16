@@ -35,5 +35,5 @@ export default (combineReducers({
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
     createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, getAppointmentByIdReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer, getPractitionerSlotsReducer,
-    rescheduleAppointmentReducer, viewPasswordReducer
+    rescheduleAppointmentReducer, viewPasswordReducer,getCitiesReducer
 }): any);
