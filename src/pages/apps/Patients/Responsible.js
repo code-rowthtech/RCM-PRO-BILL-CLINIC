@@ -591,7 +591,7 @@ const Responsiblle = () => {
                                         {...register('stateName')}
                                         onChange={(e) => handleStateSelection(e)}
                                     >
-                                        <option>State</option>
+                                        <option value=''>State</option>
                                         {statesData?.states?.map((data) => (
                                             <option
                                                 key={data?.id} // Unique key for each option
