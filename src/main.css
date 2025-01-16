@@ -261,3 +261,12 @@ table {
 .select--is-disabled {
     font-weight: 600 !important;
 }
+body,
+body::-webkit-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+:root {
+    overflow: hidden !important;
+}
