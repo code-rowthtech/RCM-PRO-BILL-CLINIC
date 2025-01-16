@@ -17,7 +17,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
     }
 
     return (
-        <Pagination className="pagination-rounded">
+        <Pagination className="pagination-rounded " style={{fontSize:'13px'}}>
             <Pagination.Prev
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}

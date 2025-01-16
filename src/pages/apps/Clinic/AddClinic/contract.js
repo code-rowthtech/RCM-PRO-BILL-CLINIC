@@ -16,6 +16,7 @@ const Contract = ({ billingId, activeTab }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const contract = createContractReducer?.data;
+    console.log(contract, 'contractcontract')
 
     useEffect(() => {
         if (activeTab === 'contract') {
@@ -64,7 +65,7 @@ const Contract = ({ billingId, activeTab }) => {
                             ) : (
                                 <tr>
                                     <td className="text-black">
-                                        {contract?.contract?.contractName || contract?.standardContract?.contractType || 'N/A'}
+                                        {contract?.contract?.contractName || "Standard Agreement Document" || 'N/A'}
                                     </td>
                                     <td>
                                         <span
@@ -80,14 +81,18 @@ const Contract = ({ billingId, activeTab }) => {
                                             {contract?.contract?.adminSignStatus ? 'Signed' : 'Pending'}
                                         </span>
                                     </td>
-                                    <td>{contract?.contract?.sentDate || contract?.standardContract?.createdAt || 'N/A'}</td>
+                                    <td>{contract?.contract?.sentDate ||
+                                         (contract?.standardContract?.createdAt ? 
+                                            new Date(contract.standardContract.createdAt)
+                                              .toLocaleDateString('en-GB') : // 'en-GB' ensures DD/MM/YYYY format
+                                            'N/A')}</td>
                                     <td>
                                         <i
                                             className="fs-4 me-1 uil-eye cursor-pointer"
                                             onClick={() => setShow(true)}
                                         ></i>
                                         <Link
-                                            to={contract?.contract?.contractTemplateId?.fileUrl || contract?.standardContract?.fileUrl}
+                                            to={contract?.contract?.documentFileUrl || contract?.standardContract?.fileUrl}
                                             target="blank"
                                             className="cursor-pointer fs-4"
                                         >
@@ -114,9 +119,10 @@ const Contract = ({ billingId, activeTab }) => {
                     </Row>
                     <Row>
                         <Col sm={12}>
-                            <iframe
-                                src={contract?.contract?.contractTemplateId?.fileUrl}
-                                title={contract?.contract?.contractTemplateId?.fileName}
+                         
+                             <iframe
+                                src={contract?.contract?.contractSignStatus === true ? contract?.contract?.documentFileUrl : contract?.contract?.contractTemplateId?.fileUrl || contract?.standardContract?.fileUrl}
+                                title={contract?.contract?.contractSignStatus === true ? contract?.contract?.documentFileName : contract?.contract?.contractName}
                                 width="100%"
                                 height="620px"
                                 className="px-4"

@@ -37,7 +37,7 @@ const RoleSetting = () => {
             setShowModal(false);
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', createdById: '', page: 1, status: status }));
         }
-    }, [dispatch, updateSuccess, skip, search, createSuccess, status])
+    }, [dispatch, updateSuccess,skip,search, createSuccess, status])
     const [dataToUpdate, setDataToUpdate] = useState(null);
 
     const closeUpdateModal = () => {
@@ -79,13 +79,14 @@ const RoleSetting = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body className='scroll-container' style={{ height: '88vh' }}>
+                        <Card.Body className='scroll-container' style={{height:'100vh'}}>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col sm={6}>
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
+                                        className={`${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
+                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                     >
                                         Active
                                     </Button>
@@ -93,7 +94,8 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2`}
+                                        className={`${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
+                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                     >
                                         Inactive
                                     </Button>
@@ -106,9 +108,13 @@ const RoleSetting = () => {
                                                 onChange={(e) => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
+                                                    dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search,createdById:'', page: 1, status: true }));
+
                                                 }}
-                                                placeholder="Search..." />
-                                            <Button className='custom-buttons' onClick={() => setShowModal(true)}><span className='uil-plus'></span> Add New Role</Button>
+                                                placeholder="Search..." 
+                                                style={{ height: '30px' }}
+                                                />
+                                            <Button className='custom-buttons py-1' onClick={() => setShowModal(true)} style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}><span className='uil-plus' ></span> Add New Role</Button>
                                         </Col>
                                     </Row>
                                 </Col>
@@ -123,13 +129,13 @@ const RoleSetting = () => {
                                     >
                                         <thead className=" text-white">
                                             <tr key={''}>
-                                                <th className='text-white'>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>
                                                     S.no
                                                 </th>
-                                                <th className='text-white'>Name</th>
-                                                <th className='text-white'>Description</th>
-                                                <th className='text-white'>Status</th>
-                                                <th className='text-white'>Action</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Name</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Description</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -152,20 +158,20 @@ const RoleSetting = () => {
                                                             <tr
                                                                 className='cursor-pointer'
                                                                 key={index}>
-                                                                <td>
+                                                                <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}> 
                                                                     {index + 1}
                                                                 </td>
-                                                                <td className='cursor-pointer'>
+                                                                <td className='cursor-pointer py-1 ' style={{fontSize:'13px', fontWeight:'400'}}> 
                                                                     <span
                                                                         data-bs-toggle="tooltip"
                                                                         title={'Permissions' + ' : ' + data?.permissions?.map(permission => permission?.name).join(', ') || ''}
-                                                                        className="d-inline-block text-truncate text-capitalize">
+                                                                        className="d-inline-block mt-1 text-truncate text-capitalize">
                                                                         {data?.name}
                                                                     </span>
                                                                 </td>
 
 
-                                                                <td>
+                                                                <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}> 
                                                                     <span className='text-truncate cursor-pointer' title={data?.description}>
                                                                         {data?.description
                                                                             ? (data?.description?.length > 50
@@ -175,10 +181,10 @@ const RoleSetting = () => {
                                                                     </span>
                                                                 </td>
 
-                                                                <td>
+                                                                <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}> 
                                                                     <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                                 </td>
-                                                                <td>
+                                                                <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}> 
                                                                     <Link to="#" className="action-icon" onClick={() => {
                                                                         setShowUpdateModal(true);
                                                                         setDataToUpdate(data);
@@ -242,11 +248,11 @@ const RoleSetting = () => {
                                 </Col>
                                 <Row>
                                     <Col className='mt-2 d-flex justify-content-end'>
-                                        <Paginations
+                                        {/* <Paginations
                                             currentPage={skip}
                                             totalPages={store?.getRolesDataReducer?.data?.totalPages}
                                             onPageChange={handlePageChange}
-                                        />
+                                        /> */}
                                     </Col>
                                 </Row>
 

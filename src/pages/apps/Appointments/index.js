@@ -43,7 +43,8 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
 
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     return (
-        <Table responsive className="table-centered table-nowrap mb-0">
+        <Table responsive  className="table-centered table-nowrap mb-0  rounded"
+        style={{ height: appointmentsList?.length === 0 ? '75vh' : 'auto' }}>
             <thead className="text-white">
                 <tr>
                     <th className='text-white'>Sr.No.</th>
@@ -85,6 +86,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                 }
             </tbody>
         </Table>
+
     );
 };
 
@@ -94,29 +96,29 @@ const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$El
         <Table responsive className="table-centered table-nowrap mb-0">
             <thead className="text-white">
                 <tr>
-                    <th className='text-white'>Sr.No.</th>
-                    <th className='text-white'>Patient Name</th>
-                    <th className='text-white'>Doctor</th>
-                    <th className='text-white'>Doctor Department</th>
-                    <th className='text-white'>Appointment Date</th>
-                    <th className='text-white'>Payment Status</th>
-                    <th className='text-white'>Payment Mode</th>
-                    <th className='text-white'>Amount</th>
-                    <th className='text-white'>Status</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Sr.No.</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Patient Name</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Doctor</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Doctor Department</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Appointment Date</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Payment Status</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Payment Mode</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Amount</th>
+                    <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
                 </tr>
             </thead>
             <tbody>
                 {[0, 1, 2, 3].map((index) => (
                     <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>John Doe</td>
-                        <td>Doctor Demo</td>
-                        <td>Nephrologists</td>
-                        <td>26th sep, 2024</td>
-                        <td><span className='px-1 text-white bg-success rounded-2'>Confirm</span></td>
-                        <td>Paystack</td>
-                        <td>AR$1,000,00</td>
-                        <td><span className='px-1 text-white bg-success rounded-2'>30th apr,2024</span></td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>John Doe</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>Doctor Demo</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>Nephrologists</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>26th sep, 2024</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}><span className='px-1 text-white bg-success rounded-2'>Confirm</span></td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>Paystack</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>AR$1,000,00</td>
+                        <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}><span className='px-1 text-white bg-success rounded-2'>30th apr,2024</span></td>
                     </tr>
                 ))}
             </tbody>
@@ -210,17 +212,18 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             {/* Additional controls shown only in the "Appointments" tab */}
                                             {activeTab === 'appointments' && (
                                                 <>
-                                                    <Button className="custom-buttons">
-                                                        <FiFilter className="fs-4" />
+                                                    <Button className="custom-buttons py-0" style={{ height: '30px' }}>
+                                                        <FiFilter className="fs-5" style={{ fontSize: '13px', fontWeight: '400' }} />
                                                     </Button>
                                                     <FormInput
                                                         type="Date"
                                                         placeholder="Search..."
+                                                        style={{ height: '30px' }}
                                                     />
                                                     <Button className="custom-buttons" onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
                                                         <IoCalendarOutline className="fs-4" />
                                                     </Button>
-                                                    <Button as={Link} to="/apps/appointments/newAppointment">New Appointment</Button>
+                                                    <Button as={Link} to="/apps/appointments/newAppointment " className='py-1' style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>New Appointment</Button>
                                                 </>
                                             )}
                                         </Col>
