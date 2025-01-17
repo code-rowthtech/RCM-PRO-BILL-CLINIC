@@ -53,7 +53,7 @@ const NewPractice = () => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
-            setLogoName(url)
+            setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -796,7 +796,13 @@ const NewPractice = () => {
                                                                     ? logoName?.slice(0,30) + '...'
                                                                     : 'Upload Logo'
                                                         } */}
-                                                        {logoName && logoName?.length ? logoName.split('/').pop().slice(0,30) : logoUploading ? 'Uploading...' : 'Upload Logo'}
+                                                        {
+                                                            logoUploading
+                                                                ? 'Uploading...'
+                                                                : typeof logoName === 'string' && logoName
+                                                                    ? logoName.split('/').pop().slice(0, 30) + "..."
+                                                                    : 'Upload Logo'
+                                                        }
 
 
                                                         <div className="d-flex align-items-center gap-2">
