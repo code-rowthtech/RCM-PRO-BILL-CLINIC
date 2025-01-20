@@ -53,7 +53,7 @@ const NewPractice = () => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
-            setLogoName(url)
+            setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -254,9 +254,15 @@ const NewPractice = () => {
             setValue('email', clinicsDataGet?.userId?.email);
             setValue('taxId', clinicsDataGet?.taxIdOrEIN);
             setValue('practiceSpecialty', clinicsDataGet?.practiceSpecialty);
-            setValue('contactPerson', clinicsDataGet?.userId?.phone?.startsWith("+1")
-                ? clinicsDataGet.userId.phone.substring(2)
-                : clinicsDataGet?.userId?.phone);
+            // setValue('contactPerson', clinicsDataGet?.userId?.phone?.startsWith("+1")
+            //     ? clinicsDataGet.userId.phone.substring(2)
+            //     : clinicsDataGet?.userId?.phone);
+                setValue('contactPerson', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
+                            .replace(/\D/g, '') // Remove all non-numeric characters
+                            .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+                            )
+                            : '')
             setValue('npiNumber', clinicsDataGet?.npiNumber);
             setLogo(clinicsDataGet?.logo?.url);
             setValue('medicare', clinicsDataGet?.medicareNumber);
@@ -722,29 +728,45 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
-                                                                value={formData?.contactPerson}
+                                                                // value={formData?.contactPerson}
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
                                                                     pattern: {
-                                                                        value: /^[0-9]*$/,
-                                                                        message: 'Contact must be a number'
+                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                        message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                                     },
                                                                     maxLength: {
-                                                                        value: 12,
-                                                                        message: 'Contact must not exceed 10 digits'
+                                                                        value: 13,
+                                                                        message: 'Contact must not exceed 13 digits'
                                                                     },
                                                                     minLength: {
-                                                                        value: 9,
-                                                                        message: 'Contact must not be less than 10 digits'
+                                                                        value: 13,
+                                                                        message: 'Contact must not be less than 13 digits'
                                                                     }
-                                                                })}
+                                                                }
+                                                                )}
                                                                 onChange={(e) => {
-                                                                    clearErrors("contactPerson");
-                                                                    formDataChange('contactPerson', e.target.value)
+                                                                    let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                                    if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                                    const formattedValue = rawValue.replace(
+                                                                        /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                                        (match, p1, p2, p3) => {
+                                                                            if (p3) return `(${p1})${p2}-${p3}`;
+                                                                            if (p2) return `(${p1})${p2}`;
+                                                                            return `(${p1}`;
+                                                                        }
+                                                                    ); // Format dynamically as (XXX)XXX-XXXX
+                                                                    e.target.value = formattedValue; // Update input value
+                                                                    clearErrors('phone'); // Clear validation errors
                                                                 }}
-
-                                                                placeholder="+1 1234-234-234"
-                                                                maxLength={10}
+                                                                placeholder="(###)###-####"
+                                                                maxLength={14}
+                                                                onKeyPress={(event) => {
+                                                                    // Only allow numeric characters (0-9)
+                                                                    if (!/[0-9]/.test(event.key)) {
+                                                                        event.preventDefault();
+                                                                    }
+                                                                }}
                                                             />
                                                         </InputGroup>
                                                         {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
@@ -796,7 +818,13 @@ const NewPractice = () => {
                                                                     ? logoName?.slice(0,30) + '...'
                                                                     : 'Upload Logo'
                                                         } */}
-                                                        {logoName && logoName?.length ? logoName.split('/').pop().slice(0,30) : logoUploading ? 'Uploading...' : 'Upload Logo'}
+                                                        {
+                                                            logoUploading
+                                                                ? 'Uploading...'
+                                                                : typeof logoName === 'string' && logoName
+                                                                    ? logoName.split('/').pop().slice(0, 30) + "..."
+                                                                    : 'Upload Logo'
+                                                        }
 
 
                                                         <div className="d-flex align-items-center gap-2">
@@ -876,7 +904,7 @@ const NewPractice = () => {
                                                 ))} */}
                                                 {taxonomyCodes.map((code, index) => (
                                                     <Col sm={3} key={index}>
-                                                        <Form.Group className="mb-2 position-relative">
+                                                        <Form.Group className="mb-2 position-relative" style={{ minHeight: '80px' }}>
                                                             <Form.Label className="mb-1">
                                                                 Taxonomy Code(s)
                                                                 {index === taxonomyCodes.length - 1 && (
@@ -903,11 +931,13 @@ const NewPractice = () => {
                                                                 }}
                                                             />
                                                             <span
-                                                                style={{ top: '55%', right: '1%' }}
+                                                                style={{
+                                                                    top: '50%', right: '1%', transform: 'translateY(-25%)', zIndex: '1111',
+                                                                }}
                                                                 onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
 
                                                             {errors.taxonomyCode?.[index] && (
-                                                                <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                                                <span className="text-danger" style={{ top: '100%' }}>{errors.taxonomyCode[index].message}</span>
                                                             )}
                                                         </Form.Group>
                                                     </Col>

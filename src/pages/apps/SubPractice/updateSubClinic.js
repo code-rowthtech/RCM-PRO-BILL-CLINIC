@@ -259,9 +259,15 @@ const SubUpdateClinic = () => {
             setValue('email', subClinicsDetailsGet?.userId?.email);
             setValue('taxId', subClinicsDetailsGet?.taxIdOrEIN);
             setValue('practiceSpecialty', subClinicsDetailsGet?.practiceSpecialty);
-            setValue('contactPerson', subClinicsDetailsGet?.userId?.phone?.startsWith("+1")
-                ? subClinicsDetailsGet.userId.phone.substring(2)
-                : subClinicsDetailsGet?.userId?.phone);
+            // setValue('contactPerson', subClinicsDetailsGet?.userId?.phone?.startsWith("+1")
+            //     ? subClinicsDetailsGet.userId.phone.substring(2)
+            //     : subClinicsDetailsGet?.userId?.phone);
+            setValue('contactPerson', subClinicsDetailsGet?.userId?.phone ? subClinicsDetailsGet?.userId?.phone
+                .replace(/\D/g, '') // Remove all non-numeric characters
+                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+                )
+                : '')
             setValue('npiNumber', subClinicsDetailsGet?.npiNumber);
             setValue('logo', subClinicsDetailsGet?.logo);
             setValue('medicare', subClinicsDetailsGet?.medicareNumber);
@@ -711,20 +717,41 @@ const SubUpdateClinic = () => {
                                                             {...register('contactPerson', {
                                                                 required: 'This field is required',
                                                                 pattern: {
-                                                                    value: /^[0-9]*$/,
-                                                                    message: 'Contact must be a number'
+                                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                                 },
                                                                 maxLength: {
-                                                                    value: 10,
-                                                                    message: 'Contact must not exceed 10 digits'
+                                                                    value: 13,
+                                                                    message: 'Contact must not exceed 13 digits'
                                                                 },
                                                                 minLength: {
-                                                                    value: 9,
-                                                                    message: 'Contact must not be less than 10 digits'
+                                                                    value: 13,
+                                                                    message: 'Contact must not be less than 13 digits'
                                                                 }
-                                                            })}
-                                                            placeholder="+1 1234-234-234"
-                                                            maxLength={10}
+                                                            }
+                                                            )}
+                                                            onChange={(e) => {
+                                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                                const formattedValue = rawValue.replace(
+                                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                                    (match, p1, p2, p3) => {
+                                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                                        if (p2) return `(${p1})${p2}`;
+                                                                        return `(${p1}`;
+                                                                    }
+                                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                                e.target.value = formattedValue; // Update input value
+                                                                clearErrors('phone'); // Clear validation errors
+                                                            }}
+                                                            placeholder="(###)###-####"
+                                                            maxLength={14}
+                                                            onKeyPress={(event) => {
+                                                                // Only allow numeric characters (0-9)
+                                                                if (!/[0-9]/.test(event.key)) {
+                                                                    event.preventDefault();
+                                                                }
+                                                            }}
                                                         />
                                                     </InputGroup>
                                                     {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
@@ -825,7 +852,7 @@ const SubUpdateClinic = () => {
                                             </Col>
                                             {taxonomyCodes && taxonomyCodes.map((code, index) => (
                                                 <Col sm={3} key={index}>
-                                                    <Form.Group className="mb-1 position-relative">
+                                                    <Form.Group className="mb-1 position-relative" style={{ minHeight: '80px' }}>
                                                         <Form.Label className="mb-0">
                                                             Taxonomy Code(s)
                                                             {index === taxonomyCodes.length - 1 && (
@@ -850,10 +877,10 @@ const SubUpdateClinic = () => {
                                                             }}
                                                         />
                                                         <span
-                                                            style={{ top: '55%', right: '1%' }}
+                                                            style={{ top: '50%', right: '1%', transform: 'translateY(-50%)', zIndex: '1111', }}
                                                             onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
                                                         {errors.taxonomyCode?.[index] && (
-                                                            <span className="text-danger">{errors.taxonomyCode[index].message}</span>
+                                                            <span className="text-danger" style={{ top: '100%' }}>{errors.taxonomyCode[index].message}</span>
                                                         )}
                                                     </Form.Group>
                                                 </Col>
