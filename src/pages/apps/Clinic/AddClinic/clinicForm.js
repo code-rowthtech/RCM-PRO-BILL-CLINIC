@@ -153,9 +153,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
         setLogo(clinicsDataGet?.logo?.url);
-        setField('contact', clinicsDataGet?.userId?.phone?.startsWith("+1")
-            ? clinicsDataGet.userId.phone.substring(2)
-            : clinicsDataGet?.userId?.phone);
+        // setField('contact', clinicsDataGet?.userId?.phone?.startsWith("+1")
+        //     ? clinicsDataGet.userId.phone.substring(2)
+        //     : clinicsDataGet?.userId?.phone);
+        setValue('contact', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
+            .replace(/\D/g, '') // Remove all non-numeric characters
+            .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+            )
+            : '')
         setField('clinicname', clinicsDataGet?.name);
         setField('practiceSpecialty', clinicsDataGet?.practiceSpecialty);
         setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
@@ -226,16 +232,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             });
             return;
         }
-        if (logo) {
-            sessionStorage.setItem('logo', logo?.url?.split('?')[0]);
-        }
+        sessionStorage.setItem('logo', logo?.url?.split('?')[0]|| clinicsDataGet?.logo?.url);
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
             ...(updateId && { id: updateId }),
             name: data?.clinicname || clinicsDataGet?.name,
             practiceSpecialty: data?.practiceSpecialty || clinicsDataGet?.practiceSpecialty,
             email: data?.email || clinicsDataGet?.userId?.email,
-            phone: '+1' + data?.contact || '+1' + clinicsDataGet?.userId?.phone,
+            phone: '+1' + data?.contact?.replace(/\D/g, '') || '+1' + clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
             taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
@@ -251,7 +255,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             // ...(logo ?
             //     {
             logo: {
-                url: logo?.url?.split('?')[0],
+                url: logo?.url?.split('?')[0]|| clinicsDataGet?.logo?.url,
                 fileName: logoName,
             },
             // }
@@ -696,25 +700,39 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {...register('contact', {
                                                 required: 'This field is required',
                                                 pattern: {
-                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, // Accepts either hyphenated format (XXX-XXX-XXXX) or 9–10 digits
-                                                    message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                 },
-                                                validate: (value) =>
-                                                    value.replace(/\D/g, '').length === 10 || 'Contact must contain exactly 10 digits',
-                                            })}
-                                            defaultValue={updatePage ? clinicDataToUpdate?.phone || '' : ''}
+                                                maxLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not exceed 13 digits'
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 digits'
+                                                }
+                                            }
+                                            )}
                                             onChange={(e) => {
-                                                const rawValue = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-                                                const formattedValue = rawValue.replace(/(\d{3})(\d{3})(\d{0,4})/,
-                                                    (match, p1, p2, p3) => (p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`)); // Format dynamically
+                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                ); // Format dynamically as (XXX)XXX-XXXX
                                                 e.target.value = formattedValue; // Update input value
-                                                clearErrors('contact'); // Clear error if corrected
+                                                clearErrors('phone'); // Clear validation errors
                                             }}
-                                            placeholder="123-456-7890"
-                                            maxLength={12} // Limit input to a formatted 10-digit number
+                                            placeholder="(###)###-####"
+                                            maxLength={14}
                                             onKeyPress={(event) => {
+                                                // Only allow numeric characters (0-9)
                                                 if (!/[0-9]/.test(event.key)) {
-                                                    event.preventDefault(); // Prevent non-numeric input
+                                                    event.preventDefault();
                                                 }
                                             }}
                                         />
@@ -786,7 +804,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <FiEye
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // Prevent the file input from opening
-                                                    handleShowModal(logo); // Open the modal with the file URL
+                                                    handleShowModal(logo || clinicId?.logo?.url); // Open the modal with the file URL
                                                 }}
                                                 className="text-dark cursor-pointer"
                                                 style={{ zIndex: 1 }}
@@ -840,7 +858,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             {taxonomyCodes &&
                                 taxonomyCodes.map((code, index) => (
                                     <Col sm={3} key={index}>
-                                        <Form.Group className="mb-1 position-relative">
+                                        <Form.Group className="mb-1 position-relative" style={{ minHeight: "80px" }}>
                                             <Form.Label className="mb-0">
                                                 Taxonomy Code(s)
                                                 {index === taxonomyCodes.length - 1 && (
@@ -870,10 +888,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 }}
                                             />
                                             <span
-                                                style={{ top: '55%', right: '1%', zIndex: '1111' }}
+                                                style={{ top: '50%', right: '1%', zIndex: '1111', transform: 'translateY(-50%)' }}
                                                 onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle  cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
                                             {errors.taxonomyCode?.[index] && (
-                                                <span className="text-danger">
+                                                <span className="text-danger" style={{ top: '100%' }}>
+
                                                     {errors.taxonomyCode[index]?.message}
                                                 </span>
                                             )}
@@ -1709,7 +1728,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             {...register(`poccontact.${index}`, {
                                                                 required: index !== 1 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                 pattern: {
-                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/, 
+                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
                                                                     message: 'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
                                                                 },
                                                                 maxLength: {
