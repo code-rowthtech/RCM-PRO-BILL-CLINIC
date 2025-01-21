@@ -298,6 +298,32 @@ function* getCities2Function(data) {
     }
 }
 
+function* getCities3Function(data) {
+    try {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES3_LOADING,
+        });
+        const response = yield call(getCityByStateApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES3_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES3_ERROR,
+                payload: decryptedData,
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES3_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 function* createSubscriptionPlanFunction(data) {
     try {
@@ -308,7 +334,7 @@ function* createSubscriptionPlanFunction(data) {
         const response = yield call(addSubscriptionPlanApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
-            ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: ClinicsActionTypes.CREATE_SUBSCRIPTION_SUCCESS,
                 payload: { ...decryptedData },
@@ -450,6 +476,10 @@ export function* watchGetCities2() {
     yield takeEvery(ClinicsActionTypes.GET_CITIES2, getCities2Function);
 }
 
+export function* watchGetCities3() {
+    yield takeEvery(ClinicsActionTypes.GET_CITIES3, getCities3Function);
+}
+
 export function* watchGetClinicById() {
     yield takeEvery(ClinicsActionTypes.GET_CLINIC_BY_ID, getClinicByIdFunction);
 }
@@ -484,7 +514,7 @@ function* clinicsSaga() {
     yield all([
         fork(watchCreateClinics), fork(watchGetClinicById), fork(watchGetClinics),
         fork(watchresetState), fork(watchGetStates), fork(watchGetCities), fork(watchGetCities2), fork(watchCreateSubscriptions), fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
-        fork(watchGetClinicByParent), fork(watchgetClinicsTypeState), fork(watchStandardContract), fork(watchChangeEmail)
+        fork(watchGetClinicByParent), fork(watchgetClinicsTypeState), fork(watchStandardContract), fork(watchChangeEmail), fork(watchGetCities3)
     ]);
 }
 export default clinicsSaga;

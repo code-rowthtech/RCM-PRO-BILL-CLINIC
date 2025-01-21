@@ -37,7 +37,7 @@
 .plusicon {
     color: #6169d0;
 }
-.custom-datepicker{
+.custom-datepicker {
     height: 30px !important;
 }
 
@@ -249,8 +249,7 @@ table {
     font-weight: 600;
     margin: 0.3rem !important;
 }
-/* 
- */
+
 .react-datepicker__input-container input {
     height: 2.3rem !important;
     width: 14rem !important;
@@ -274,12 +273,13 @@ table {
 .select--is-disabled {
     font-weight: 600 !important;
 }
-body,
-body::-webkit-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+
+.patient-menu-item {
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid #f1f1f1;
 }
 
-:root {
-    overflow: hidden !important;
+.patient-menu-item:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }

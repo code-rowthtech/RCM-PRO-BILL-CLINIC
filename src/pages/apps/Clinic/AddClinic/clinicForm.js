@@ -53,7 +53,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo,'logo')
+    console.log(logo, 'logo')
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
@@ -148,7 +148,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction())
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log({clinicsDataGet})
+    console.log({ clinicsDataGet })
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -250,12 +250,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ...posDetails && { pos: posDetails },
             // ...(logo ?
             //     {
-                    logo: {
-                        url: logo?.url?.split('?')[0],
-                        fileName: logoName,
-                    },
-                // }
-                // : ''),
+            logo: {
+                url: logo?.url?.split('?')[0],
+                fileName: logoName,
+            },
+            // }
+            // : ''),
             primaryAddress: {
                 address: data?.address,
                 ...(data?.city ? { city: data?.city } : ''),
@@ -289,7 +289,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     }
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log({newPayload})
+        console.log({ newPayload })
     };
     const logoFileInputRef = useRef(null);
     const accreditationFileInputRef = useRef(null);

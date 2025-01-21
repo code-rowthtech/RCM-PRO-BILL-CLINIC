@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { DoctorsActionTypes } from './constants';
-import { createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsDetailApi, getDoctorsRolesApi } from './api';
+import { addReferringDoctorApi, createDoctorApi, createDoctorDetailApi, getDoctorsApi, getDoctorsDetailApi, getDoctorsRolesApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -63,6 +63,7 @@ function* getDoctorsRoleFunction(data) {
         });
     }
 }
+
 
 function* createDoctorsFunction(data) {
     try {
@@ -150,6 +151,33 @@ function* getDoctorDetailsFunction(data) {
     }
 }
 
+function* addReferringDoctorFunction(data) {
+    try {
+        yield put({
+            type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_LOADING,
+            payload: {},
+        });
+        const response = yield call(addReferringDoctorApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callStateEmpty() {
     put({
         type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -179,9 +207,12 @@ export function* watchGetDoctorDetails() {
     yield takeEvery(DoctorsActionTypes.GET_DOCTORS_DETAILS, getDoctorDetailsFunction);
 }
 
-
 export function* watchresetState() {
     yield takeEvery(DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+}
+
+export function* watchAddReferringDoctor() {
+    yield takeEvery(DoctorsActionTypes.ADD_REFERRING_DOCTOR, addReferringDoctorFunction);
 }
 
 function* doctorsSaga() {
@@ -192,6 +223,7 @@ function* doctorsSaga() {
         fork(watchGetDoctorsRoles),
         fork(watchCreateDoctorsDeatil),
         fork(watchGetDoctorDetails),
+        fork(watchAddReferringDoctor),
     ]);
 }
 export default doctorsSaga;

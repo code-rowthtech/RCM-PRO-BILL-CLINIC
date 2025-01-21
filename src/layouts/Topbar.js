@@ -69,7 +69,8 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/schedule/addBreak': 'Schedule',
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
-        '/apps/settings/purposeofvisit': 'Purpose Of Visit'
+        '/apps/settings/purposeofvisit': 'Purpose Of Visit',
+        '/apps/patients/update-patient': 'Update Patient'
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {

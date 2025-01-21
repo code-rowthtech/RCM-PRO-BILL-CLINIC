@@ -33,3 +33,8 @@ export const getDoctorDetailsAction = (data): AuthAction => ({
     type: DoctorsActionTypes.GET_DOCTORS_DETAILS,
     data
 });
+
+export const addReferringDoctorAction = (data): AuthAction => ({
+    type: DoctorsActionTypes.ADD_REFERRING_DOCTOR,
+    data
+});

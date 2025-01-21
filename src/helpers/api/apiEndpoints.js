@@ -54,6 +54,7 @@ export const createDoctor = '/api/v1/clinics/practitioner/add';
 export const getDoctorRoles = '/api/v1/clinic/roles';
 export const createDoctorDetail = '/api/v1/clinics/practitioner/update';
 export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
+export const addReferringDoctor = '/api/v1/clinics/add/referringDoc'
 
 // PATIENTS
 export const getPatients = '/api/v1/clinics/patient-get';

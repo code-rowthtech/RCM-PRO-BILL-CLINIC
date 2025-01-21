@@ -28,3 +28,8 @@ export function createDoctorDetailApi(params: any): any {
     return api.update(URL.createDoctorDetail, data);
 }
 
+export function addReferringDoctorApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.addReferringDoctor, data);
+}
+

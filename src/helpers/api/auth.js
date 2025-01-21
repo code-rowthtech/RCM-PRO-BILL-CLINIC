@@ -44,4 +44,9 @@ function confirmPasswordApi(params: any): any {
     return api.create(`${baseUrl}`, params);
 }
 
-export { login, logout, signup, forgotPassword, forgotPasswordConfirm, verifyToken, setPasswordApi,confirmPasswordApi };
+function verifyEmailApi(params: any): any {
+    const baseUrl = `api/v1/clinic/verify-password?token=${params}`;
+    return api.get(`${baseUrl}`);
+}
+
+export { login, logout, signup, forgotPassword, forgotPasswordConfirm, verifyToken, setPasswordApi, confirmPasswordApi, verifyEmailApi };
