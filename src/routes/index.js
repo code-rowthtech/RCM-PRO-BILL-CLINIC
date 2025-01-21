@@ -28,6 +28,7 @@ const ForgetPassword = React.lazy(() => import('../pages/account/ForgetPassword'
 const ResetPassword = React.lazy(() => import('../pages/account/ResetPassword'));
 const LockScreen = React.lazy(() => import('../pages/account/LockScreen'));
 const SetPassword = React.lazy(() => import('../pages/account/SetPassword'));
+const VerifyPassword = React.lazy(() => import('../pages/account/VerifyEmail'));
 
 
 const Login2 = React.lazy(() => import('../pages/account2/Login2'));
@@ -64,6 +65,7 @@ const DepartmentDetails = React.lazy(() => import('../pages/apps/Doctors/Departm
 
 const Patients = React.lazy(() => import('../pages/apps/Patients/index'));
 const NewPatient = React.lazy(() => import('../pages/apps/Patients/NewPatient'));
+const UpdatePatient = React.lazy(() => import('../pages/apps/Patients/UpdatePatient/index'));
 
 
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
@@ -223,8 +225,9 @@ const AllRoutes = () => {
                         { path: 'forget-password', element: <LoadComponent component={ForgetPassword} /> },
                         { path: 'reset-password/:token', element: <LoadComponent component={ResetPassword} /> },
                         // { path: 'sign-Up', element: <LoadComponent component={SignUp} /> },
-                        { path: 'set-password/:token', element: <LoadComponent component={SetPassword} /> },
                         { path: 'lock-screen', element: <LoadComponent component={LockScreen} /> },
+                        { path: 'set-password/:token', element: <LoadComponent component={SetPassword} /> },
+                        { path: 'verify-password/:token', element: <LoadComponent component={VerifyPassword} /> },
                         { path: 'logout', element: <LoadComponent component={Logout} /> },
                         { path: 'login2', element: <LoadComponent component={Login2} /> },
                         { path: 'register2', element: <LoadComponent component={Register2} /> },
@@ -485,6 +488,14 @@ const AllRoutes = () => {
                                         <LoadComponent component={NewPatient} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to create a new patient.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'update-patient',
+                                    element: hasPermission("UPDATE_A_PATIENT") ? (
+                                        <LoadComponent component={UpdatePatient} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to update a patient.</div>
                                     ),
                                 },
                             ],

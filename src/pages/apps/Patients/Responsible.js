@@ -13,7 +13,7 @@ import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStates
 import Spinner from "../../../constants/Spinner";
 
 
-const Responsiblle = () => {
+const Responsiblle = ({ patientId }) => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const statesData = store?.getStatesReducer?.data;
@@ -186,6 +186,7 @@ const Responsiblle = () => {
             return age;
         };
         const payload = {
+            patientId: patientId,
             fullName: data?.fullName,
             account: data?.account,
             address: {

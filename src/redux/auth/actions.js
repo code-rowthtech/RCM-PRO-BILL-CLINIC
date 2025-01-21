@@ -47,12 +47,17 @@ export const verifyToken = (data): AuthAction => ({
     type: AuthActionTypes.VERIFY_TOKEN,
     payload: data,
 });
+
+export const verifyEmailAction = (data): AuthAction => ({
+    type: AuthActionTypes.VERIFY_EMAIL,
+    payload: data,
+});
 export const setPassword = (data): AuthAction => ({
     type: AuthActionTypes.SET_PASSWORD,
     payload: data,
 });
-export const confirmPasswordAction = (data):AuthAction => ({
-type: AuthActionTypes.CONFIRMPASSWORD,
-payload: data,
+export const confirmPasswordAction = (data): AuthAction => ({
+    type: AuthActionTypes.CONFIRMPASSWORD,
+    payload: data,
 });
 

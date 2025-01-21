@@ -10,11 +10,13 @@ import { useForm } from "react-hook-form";
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../cryptoUtils";
 import { handleUpload } from '../../../helpers/HandleUpload';
-import { getCitiesAction, getStatesByCountryAction, getSubClinicCitiesAction } from "../../../redux/actions";
+import { getCitiesAction, getDoctorsAction, getStatesByCountryAction, getSubClinicCitiesAction, stateEmptydAction } from "../../../redux/actions";
 import Responsiblle from "./Responsible";
 import { getResponsibleParty } from "../../../helpers/api/apiEndpoints";
 import Select from 'react-select';
 import Insurance from "./Insurance/Insurance";
+import Demographicdetails from "./Demographic";
+import ReferringDoctor from "./referringDoctor";
 
 
 const NewPatient = () => {
@@ -24,39 +26,47 @@ const NewPatient = () => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createPatientsReducer?.data?.status;
+    const createPatientResponse = store?.createPatientsReducer?.data?.patient;
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
+    const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const [focused, setFocused] = useState(false);
+    const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState("");
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
+    const [patientId, setPatientId] = useState(null);
     const [formData, setFormData] = useState({
         role: doctorRoleId,
     });
     const [partySearch, setPartySearch] = useState('')
     const [selectedParty, setSelectedParty] = useState(null)
-
+    const [doctorSearch, setDoctorSearch] = useState('');
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [searchedLocations, setSearchedLocations] = useState(null)
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [selectedCity, setSelectedCity] = useState(null);
-    const [updatePage, setUpdatePage] = useState(false);
+
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
-    const [inputValue, setInputValue] = useState('');
+    const [selectedDoctor, setSelectedDoctor] = useState(null);
+
     const options = responsibleParties?.map((party) => ({
         value: party._id,
         label: party.fullName,
     }));
 
+    const doctorOptions = doctorDetails?.map((data) => ({
+        value: data?._id,
+        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    }));
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         if (tab === "personalDetails") {
@@ -69,21 +79,38 @@ const NewPatient = () => {
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
     useEffect(() => {
-        if (createResponse === 201) {
+        if (createResponse === 201 && submissionType === 'saveAndNext') {
             reset();
+            setActiveTab('demographicDetails');
+            setPatientId(createPatientResponse?._id);
+            dispatch(stateEmptydAction());
+        } else if (createResponse === 201 && submissionType === 'saveAndReset') {
+            reset();
+            setSelectedDoctor(null);
+            setLogo(null);
+            setLogoName(null);
+            setPatientId(null);
+            dispatch(stateEmptydAction());
         }
-    }, [createResponse])
+    }, [createResponse, submissionType])
     useEffect(() => {
 
         const payload = {
             clinicId: clinicId,
-            search: partySearch,
+            search: doctorSearch,
             limit: 20
         }
         if (activeTab === 'personalDetails') {
             dispatch(getResponsiblePartyAction({ key: encryptMessage(payload) }))
         }
-    }, [dispatch, partySearch, activeTab])
+        const doctorPayload = { status: true, search: doctorSearch, departmentId: '' }
+        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
+    }, [dispatch, doctorSearch, activeTab])
+    useEffect(() => {
+        if (createResponse === 201) {
+            setPatientId(createPatientResponse?._id)
+        }
+    }, [createResponse])
     useEffect(() => {
         if (id) {
             const payload = {
@@ -97,42 +124,7 @@ const NewPatient = () => {
             setSelectedParty(options && options?.find((option) => option.value === patientDetails?.responsibleParty?._id));
         }
     }, [id, patientDetails, responsibleParties])
-    useEffect(() => {
-        if (id && patientDetails) {
-            setValue('fullName', patientDetails?.firstName)
-            setValue('title', patientDetails?.title)
-            setValue('gender', patientDetails?.sex)
-            setValue('email', patientDetails?.email)
-            setValue('contactNumber', patientDetails?.cellPhone)
-            setValue('note', patientDetails?.notes)
-            setValue('maritalStatus', patientDetails?.maritalStatus)
-            setValue('deceased', patientDetails?.deceased)
-            setValue('ssn', patientDetails?.ssn)
-            setValue('raceEthnicity', patientDetails?.raceEthnicity)
-            setValue('relationship', patientDetails?.relationship)
-            setValue('additionalMRN', patientDetails?.additionalMRN)
-            setValue('responsiblePartyName', patientDetails?.responsibleParty?._id)
-            setValue('chartNumber', patientDetails?.chartNumber)
-            setValue('address', patientDetails?.address?.street);
-            setValue('zip', patientDetails?.address?.zip);
-            setValue('financialClass', patientDetails?.financialClass);
-            setValue('employer', patientDetails?.employer);
-            setValue('preferredLanguage', patientDetails?.preferredLanguage);
-            const formattedDateOfBirth = patientDetails?.dateOfBirth
-                ? new Date(patientDetails?.dateOfBirth).toISOString().split('T')[0]
-                : '';
-            setValue('dateOfBirth', formattedDateOfBirth);
-            const stateId = statesData?.states && statesData?.states.find((data) => data?._id === patientDetails?.address?.state?._id)?.id;
-            setValue('stateName', patientDetails?.address?.state?._id)
-            if (stateId) {
-                dispatch(getCitiesAction({ state_code: stateId, name: patientDetails?.address?.city?.name, limit: '', skip: '' }))
-            }
-            if (patientDetails?.patientChartPhoto?.fileName && patientDetails?.patientChartPhoto?.url) {
-                setLogoName(patientDetails?.patientChartPhoto?.fileName)
-                setLogo(patientDetails?.patientChartPhoto?.fileName)
-            }
-        }
-    }, [id, patientDetails, statesData])
+
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted)
@@ -160,7 +152,6 @@ const NewPatient = () => {
                 setIsPasswordCorrect(false);
                 setIsVisible(false);
             }, 300000);
-
             setTimeoutId(id);
         }
     };
@@ -173,60 +164,14 @@ const NewPatient = () => {
             setLogoName(selectedFile?.name);
             clearErrors('profileImage')
         } catch (error) {
-            // console.error('Error during file upload:', error);
         }
     };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
-        // dispatch(getSubClinicCitiesAction())
     }, [dispatch]);
-    const getGeolocation = async (e) => {
-        const addressToSearch = e.target.value;
-
-        if (!addressToSearch) {
-            setSearchedLocations([]);
-            return;
-        }
-
-        const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(addressToSearch)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Error fetching data: ${response.status}`);
-            }
-            const data = await response.json();
-            setSearchedLocations(data.results || []);
-        } catch (error) {
-            console.error('Failed to fetch geocode data:', error);
-        }
-    };
 
     const [stateCode, setStateCode] = useState()
 
-    const handleAddressSelection = (location) => {
-        setValue('address', location.formatted);
-        setValue('zip', location.components.postcode || '');
-        setValue('stateName', location.components.state || '');
-        setValue('city', location.components.city || location.components.town || '');
-        setValue('street', location.components.road || location.components.street || '');
-        setStateCode(location?.components?.state_code)
-        dispatch(getSubClinicCitiesAction({ state_code: location?.components?.state_code, name: '', limit: 25, skip: '' }));
-
-        const stateCode = statesData?.states?.find(
-            (state) => state.name === location.components.state
-        )?.state_code;
-
-        setSelectedCity(location.components.city)
-
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
-
-        setFocused(false);
-    };
 
     useEffect(() => {
         if (stateToSelect) {
@@ -235,34 +180,20 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
 
-    const handleStateSelection = (e) => {
-        const stateCode = e.target.value;
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getSubClinicCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
-    };
-
-    const handleCitySelection = (e) => {
-        const city = JSON.parse(e.target.value);
-        if (city) {
-            setSelectedCity(city);
-        }
-    };
-
-    const stateGeoLocation = 'stateName';
-    useEffect(() => {
-        if (stateGeoLocation) {
-            setStateToSelect(statesData?.states && statesData?.states.find((data) => data?.state_code === stateGeoLocation));
-        }
-    }, [stateGeoLocation])
-
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const onSubmit = (data) => {
         const payload = {
             ...(id ? { id: id } : {}),
             clinicId: clinicId,
-            ...(logo?.url === undefined
+            ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
+            ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
+            ...(data?.title ? { title: data?.title } : {}),
+            ...(data?.firstName ? { firstName: data?.firstName } : {}),
+            ...(data?.middleName ? { middleName: data?.middleName } : {}),
+            ...(data?.lastName ? { lastName: data?.lastName } : {}),
+            ...(data?.birthName ? { birthName: data?.birthName } : {}),
+            ...(data?.suffix ? { suffix: data?.suffix } : {}),
+            ...(logo?.url === null
                 ? {}
                 : {
                     patientChartPhoto: {
@@ -270,37 +201,22 @@ const NewPatient = () => {
                         fileName: logoName
                     }
                 }),
+            ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
+            ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
+            ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
             ...(data?.email ? { email: data?.email } : {}),
-            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-            ...(data?.contactNumber ? { cellPhone: data?.contactNumber } : {}),
-            ...(data?.fullName ? { firstName: data?.fullName } : {}),
-            ...(data?.title ? { title: data?.title } : {}),
-            ...(data?.gender ? { sex: data?.gender } : {}),
-            ...(data?.chartNumber ? { chartNumber: data?.chartNumber } : {}),
-            ...(selectedParty?.value ? { responsibleParty: selectedParty?.value } : {}),
-            address: {
-                ...(data?.address ? { street: data?.address } : {}),
-                ...(data?.city ? { city: data?.city } : {}),
-                ...(data?.stateName ? { state: data?.stateName } : {}),
-                ...(data?.zip ? { zip: data?.zip } : {}),
-            },
-            ...(data?.note ? { notes: data?.note } : {}),
-            ...(data?.deceased ? { deceased: data?.deceased } : {}),
-            ...(data?.ssn ? { ssn: data?.ssn } : {}),
-            ...(data?.additionalMRN ? { additionalMRN: data?.additionalMRN } : {}),
-            ...(data?.financialClass ? { financialClass: data?.financialClass } : {}),
-            ...(data?.providerProfile ? { providerProfile: data?.providerProfile } : {}),
-            ...(data?.employer ? { employer: data?.employer } : {}),
-            ...(data?.relationship ? { relationship: data?.relationship } : {}),
-            ...(data?.raceEthnicity ? { raceEthnicity: data?.raceEthnicity } : {}),
-            ...(data?.pcp ? { pcp: data?.pcp } : {}),
-            ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
+            ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
+            ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
+            ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
+            ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
+            ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
+            ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
+            ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
+            ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
         }
 
         // reset();
         if (id) {
-            console.log({ payload })
             dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
         } else {
             dispatch(createPatientsAction({ key: encryptMessage(payload) }))
@@ -312,10 +228,10 @@ const NewPatient = () => {
     ];
 
     const handleInputChange = (data) => {
-        setPartySearch(data)
+        setDoctorSearch(data)
     }
     const handleChange = (selectedOption) => {
-        setSelectedParty(selectedOption, 'Selected Option');
+        setSelectedDoctor(selectedOption);
     };
 
     return (
@@ -331,6 +247,22 @@ const NewPatient = () => {
                                         onClick={() => handleTabChange("personalDetails")}
                                     >
                                         Personal Details
+                                    </button>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className={`text-black nav-link fw-medium ${activeTab === "demographicDetails" ? "active fw-bold" : ""}`}
+                                        onClick={() => handleTabChange("demographicDetails")}
+                                    >
+                                        Demographic
+                                    </button>
+                                </li>
+                                <li className="nav-item">
+                                    <button
+                                        className={`text-black nav-link fw-medium ${activeTab === "referringDoctor" ? "active fw-bold" : ""}`}
+                                        onClick={() => handleTabChange("referringDoctor")}
+                                    >
+                                        Referring Doctor
                                     </button>
                                 </li>
                                 <li className="nav-item">
@@ -363,563 +295,498 @@ const NewPatient = () => {
                                 </Button>
                             )}
 
-                            <Button className="me-2">
+                            {/* <Button className="me-2">
                                 Clear
                             </Button>
                             <Button className="me-2">
                                 Set Password
-                            </Button>
+                            </Button> */}
                             <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
                     <div className="px-2">
-
-
                         {/* Form Section */}
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row mt-1" >
-                                <Col sm={6} className="border-end">
-                                    <Row>
-                                        <div className="col-4 pe-0">
-                                            <div className="mb-1 d-flex flex-column position-relative">
-                                                <Form.Label className="mb-0">Profile Image</Form.Label>
-                                                <div
-                                                    onClick={() => logoFileInputRef.current.click()}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
-                                                >
-                                                    {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Profile Image'}
-                                                    <p className="mb-0">
-                                                        <FiUploadCloud />
-                                                    </p>
-                                                </div>
+                            <div className="row my-2">
+                                <div className="col-6">
+                                    <Form.Group className="responnsible-party-select">
+                                        <Form.Label className="mb-0">
+                                            Primary Provider
+                                        </Form.Label>
+                                        <Select
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            isLoading={store?.getDoctorsReducer?.loading}
+                                            isClearable={true}
+                                            value={selectedDoctor}
+                                            isDisabled={id ? true : false}
+                                            isSearchable={true}
+                                            {...register('selectedDoctor')}
+                                            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
+                                            onChange={(data) => {
+                                                setValue('selectedDoctor', data);
+                                                handleChange(data);
+                                                clearErrors('selectedDoctor')
+                                            }}
+                                            name="doctorName"
+                                            options={doctorOptions}
+                                            placeholder="Select Doctor Name"
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
+                                        <Form.Select
+                                            as="select"  // Use 'select' to make it a dropdown
+                                            id="patientstatus"
+                                            {...register('patientStatus')}
+                                        >
+                                            <option value="">Select status</option>  {/* Default option */}
+                                            <option value="Active">Active</option>
+                                            <option value="Inactive">Inactive</option>
+                                            <option value="Inactive-Deceased">Inactive-Deceased</option>
+                                            <option value="Other">Other</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
+                                        <Form.Select
+                                            {...register('title')}
+                                            aria-label="Select Title"
+                                        >
+                                            <option value="">Select Title</option>
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Dr.">Dr.</option>
+                                            <option value="Other">Other</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
+                                        <Form.Control
+                                            id="firstName"
+                                            type="text"
+                                            placeholder="First Name"
+                                            {...register('firstName', { required: "First name is required" })}
+                                        />
+                                        {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="middleName" className="mb-0">Middle Name</Form.Label>
+                                        <Form.Control
+                                            id="middleName"
+                                            type="text"
+                                            placeholder="Middle Name"
+                                            {...register('middleName')}
+                                        />
+                                        {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
+                                        <Form.Control
+                                            id="lastName"
+                                            type="text"
+                                            placeholder="Last Name"
+                                            {...register('lastName', { required: 'Last Name is required' })}
+                                        />
+                                        {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Previous Birth Name </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Previous Birth Name"
+                                            {...register('birthName')}
+                                        />
+                                        {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Suffix </Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Suffix"
+                                            {...register('suffix')}
+                                        />
+                                        {errors.suffix && <span className="text-danger">{errors.suffix.message}</span>}
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <div className="mb-1 d-flex flex-column position-relative">
+                                        <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
+                                        <div
+                                            onClick={() => logoFileInputRef.current.click()}
+                                            className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
+                                        >
+                                            {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Chart Photo'}
+                                            <p className="mb-0">
+                                                <FiUploadCloud />
+                                            </p>
+                                        </div>
+                                        <Form.Control
+                                            type="file"
+                                            className="d-none "
+                                            {...register('profileImage', {
+                                            })}
+                                            accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                            ref={logoFileInputRef}
+                                            onChange={handleFileChange}
+
+                                        />
+                                        {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div className="row">
+                                <div className="col-6">
+                                    <Form.Group className="mb-1 position-relative">
+                                        <Form.Label className='mb-0'>Home Phone</Form.Label>
+                                        <Form.Group>
+                                            <InputGroup>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
-                                                    type="file"
-                                                    className="d-none "
-                                                    {...register('profileImage', {
-                                                        // required: 'This field is required'
-                                                    })}
-                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
-                                                    ref={logoFileInputRef}
-                                                    onChange={handleFileChange}
-
-                                                />
-                                                {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="col-4 mb-1">
-                                            <div>
-                                                <Form.Label htmlFor="gender" className="mb-0">Gender<span className='text-danger'>*</span></Form.Label>
-                                                <div className="d-flex gap-2">
-                                                    <Form.Select
-                                                        {...register('gender', { required: "Gender is required" })}
-                                                        aria-label="Select Gender"
-                                                    >
-                                                        <option value="">Select Gender</option>
-                                                        <option value="Male">Male</option>
-                                                        <option value="Female">Female</option>
-                                                        <option value="Other">Other</option>
-
-                                                    </Form.Select>
-
-                                                </div>
-                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
-                                            </div>
-                                        </div>
-                                        <div className="col-3">
-                                            <div className=" mb-1">
-                                                <Form.Label htmlFor="title" className="mb-0">Title <span className="text-danger">*</span></Form.Label>
-                                                <Form.Select
-                                                    {...register('title', { required: "Title is required" })}
-                                                    aria-label="Select Title"
-                                                >
-                                                    <option value="">Select Title</option>
-                                                    <option value="Mr.">Mr.</option>
-                                                    <option value="Mrs.">Mrs.</option>
-                                                    <option value="Miss">Miss</option>
-                                                    <option value="Dr.">Dr.</option>
-                                                    <option value="Other">Other</option>
-                                                </Form.Select>
-                                                {errors.title && <span className="text-danger">{errors.title.message}</span>}
-                                            </div>
-                                        </div>
-                                        <hr />
-                                        <div className="col-4">
-                                            <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                type="email"
-                                                placeholder="Email ID"
-                                                {...register('email', { required: "Email is required", pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
-                                            />
-                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                        </div>
-                                        <div className='col-4'>
-                                            <Form.Group className="mb-1 position-relative">
-                                                <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
-                                                <Form.Group>
-                                                    <InputGroup>
-                                                        <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
-                                                        <Form.Control
-                                                            type="tel"
-                                                            {...register('contactNumber', !id ? {
-                                                                required: 'This field is required',
-                                                                pattern: {
-                                                                    value: /^[0-9]*$/,
-                                                                    message: 'Contact must be a number'
-                                                                },
-                                                                maxLength: {
-                                                                    value: 15,
-                                                                    message: 'Contact must not exceed 10 digits'
-                                                                },
-                                                                minLength: {
-                                                                    value: 10,
-                                                                    message: 'Contact must not be less than 10 digits'
-                                                                }
-                                                            } : {}
-                                                            )}
-                                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}                                                                                // value={formData.phone}
-                                                            placeholder="1234-234-234"
-                                                            maxLength={10}
-                                                        // onKeyPress={(event) => handleFirstSpace(event, 0)}
-                                                        />
-                                                    </InputGroup>
-                                                </Form.Group>
-
-                                                <div
-                                                    className='position-absolute ' style={{ top: '52%', left: '1%' }}
-                                                >
-                                                    <img
-                                                        src={us}
-                                                        alt="country code flag"
-                                                        width={20} />
-                                                </div>
-
-
-                                            </Form.Group>
-                                        </div>
-                                        <div className="col-4 ">
-                                            <Form.Label htmlFor="note" className="mb-0">Note (Text)</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Note"
-                                                {...register('note')}
-                                            />
-                                        </div>
-                                        <hr />
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="marital" className="mb-0">Marital Status <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to make it a dropdown
-                                                id="marital"
-                                                {...register('maritalStatus', { required: "Marital status is required" })}
-                                            >
-                                                <option value="">Select marital status</option>  {/* Default option */}
-                                                <option value="Single">Single</option>
-                                                <option value="Married">Married</option>
-                                                <option value="Divorced">Divorced</option>
-                                                <option value="Widowed">Widowed</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
-                                            {errors.maritalStatus && <span className="text-danger">{errors.maritalStatus.message}</span>}
-                                        </div>
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="DOB" className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                type="date"  // Change type to "date" for date input
-                                                placeholder="Date of Birth"
-                                                {...register('dateOfBirth', { required: "Date of Birth is required" })}
-                                            />
-                                            {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
-                                        </div>
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="deceased" className="mb-0">Deceased</Form.Label>
-                                            <Form.Control
-                                                as="select"
-                                                id="deceased"
-                                                {...register('deceased')}
-                                            >
-                                                <option value="">Select Deceased</option>
-                                                <option value="true">Yes</option>
-                                                <option value="false">No</option>
-                                            </Form.Control>
-                                            {errors.deceased && <span className="text-danger">{errors.deceased.message}</span>}
-                                        </div>
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="SSN" className="mb-0">SSN# <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="SSN#"
-                                                {...register('ssn', {
-                                                    required: "SSN# is required", // Ensure it's not empty
-                                                    pattern: {
-                                                        value: /^\d{3}-\d{2}-\d{4}$/, // Regex pattern for SSN format
-                                                        message: 'SSN must be in format XXX-XX-XXXX' // Custom error message
-                                                    }
-                                                })}
-                                                maxLength={11}
-                                            />
-                                            {/* Display error message */}
-                                            {errors.ssn && <span className="text-danger">{errors.ssn.message}</span>}
-                                        </div>
-                                        <div className="col-12 mb-1">
-                                            <Form.Label htmlFor="additional" className="mb-0">Additional MRN</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Additional MRN"
-                                                {...register('additionalMRN',
-                                                    // { required: "Additional MRN is required" }
-                                                )}
-                                            />
-                                        </div>
-                                    </Row>
-                                </Col>
-                                <Col sm={6}>
-                                    <Row>
-                                        <div className="col-12 mb-1">
-                                            <Form.Label htmlFor="fileName" className="mb-0">Full Name <span className="text-danger">*</span></Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Full Name"
-                                                {...register('fullName', { required: "Full name is required" })}
-                                            />
-                                            {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
-                                        </div>
-                                        <div className="mb-1 col-12 mt-1 responnsible-party-select position-relative">
-                                            <Form.Label htmlFor="responsibleParty" className="mb-0">Responsible Party Name
-                                                <span
-                                                    onMouseEnter={() => setShowTooltip(true)}
-                                                    onMouseLeave={() => setShowTooltip(false)}
-                                                    onClick={() => {
-                                                        setShowTooltip(false);
-                                                        setActiveTab('responsible');
-                                                    }}
-                                                    className='fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer'>
-                                                </span>
-                                                <div className={`position-absolute border bg-white p-1 ${showTooltip ? '' : 'd-none'}`} style={{ zIndex: '2', top: '-50%', left: '29.5%', borderRadius: '8px 8px 8px 0px' }}>
-                                                    Click to add new responsible parties.
-                                                </div>
-                                            </Form.Label>
-                                            <Select
-                                                className="basic-single"
-                                                classNamePrefix="select"
-                                                value={
-                                                    selectedParty || 'Select Responsible Party'  // Ensure null when no match is found
-                                                }
-                                                isLoading={store?.getResponsiblePartyReducer?.loading}
-                                                isClearable={true}
-                                                isSearchable={true}
-                                                onInputChange={handleInputChange}
-                                                onChange={handleChange}
-                                                name="responsiblePartyName"
-                                                options={options}
-                                                placeholder="Select Responsible Party"
-                                            />
-                                        </div>
-                                        <div className="mb-1 col-12">
-                                            <Form.Label htmlFor="chartNumber" className="mb-0">Chart Number</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Chart Number"
-                                                {...register('chartNumber',
-                                                    //  { required: "Chart number is required" }
-                                                )}
-                                                maxLength={7}
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            <Form.Group className="mb-1">
-                                                <Form.Label className="mb-0">Address</Form.Label>
-                                                <div style={{ position: 'relative' }}>
-                                                    <Form.Control
-                                                        type="text"
-                                                        {...register('address')}
-                                                        onChange={(e) => {
-                                                            getGeolocation(e);
-                                                            setFocused(true); // Open dropdown on input
-                                                        }}
-                                                        onFocus={() => setFocused(true)} // Open dropdown when the field is focused
-                                                        onBlur={() => {
-                                                            setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
-                                                        }}
-                                                        placeholder="Search for address"
-                                                        autoComplete="off"
-                                                    />
-                                                    {/* Dropdown suggestions */}
-                                                    <div
-                                                        style={{
-                                                            position: 'absolute',
-                                                            top: '100%',
-                                                            left: 0,
-                                                            width: '100%',
-                                                            maxHeight: '150px',
-                                                            overflow: 'auto',
-                                                            zIndex: 111,
-                                                            backgroundColor: '#fff',
-                                                            border: '1px solid #ced4da',
-                                                            borderTop: 'none',
-                                                        }}
-                                                        className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                    >
-                                                        {searchedLocations?.map((data, index) => (
-                                                            <p
-                                                                key={index}
-                                                                onClick={() => {
-                                                                    setSelectedLocation(data)
-                                                                    setFocused(false); // Close dropdown after selection
-                                                                }}
-                                                                style={{
-                                                                    margin: 0,
-                                                                    padding: '8px 12px',
-                                                                    cursor: 'pointer',
-                                                                }}
-                                                                className="hover-bg-change text-black"
-                                                            >
-                                                                {data?.formatted}
-                                                            </p>
-                                                        ))}
-                                                        {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                    </div>
-                                                </div>
-                                            </Form.Group>
-                                        </div>
-                                        <div className="mb-1 col-12">
-                                            <Form.Group className="">
-                                                <Form.Label className='mb-0' >State</Form.Label>
-                                                <Form.Select
-                                                    {...register('stateName')}
-                                                    onChange={(e) => handleStateSelection(e)}>
-                                                    <option value=''>State</option>
-                                                    {statesData?.states?.map((data) => (
-                                                        <option
-                                                            key={data?.id} // Unique key for each option
-                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                            value={data?._id}
-                                                        >
-                                                            {data?.name}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                            </Form.Group>
-                                        </div>
-                                        <Col sm={6}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-0'>City</Form.Label>
-                                                <Form.Select
-                                                    disabled={store?.getCitiesReducer?.loading}
-                                                    {...register('city')}
-                                                    onChange={(e) => handleCitySelection(e)}
-                                                >
-                                                    <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                    {cities?.map((data) => (
-                                                        <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?._id}>
-                                                            {data?.name}
-                                                        </option>
-                                                    ))}
-                                                </Form.Select>
-                                                {/* } */}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={6}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-0'>Zip</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('zip', {
-                                                        minLength: {
-                                                            value: 5,
-                                                            message: 'ZIP code must be at least 5 characters long',
-                                                        },
+                                                    type="tel"
+                                                    {...register('homePhone', !id ? {
                                                         pattern: {
-                                                            value: /^[0-9]+$/,
-                                                            message: 'ZIP code must contain numbers only',
+                                                            value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                            message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                         },
-                                                    })}
-                                                    // onKeyPress={handleFirstSpace}
-                                                    placeholder="Zip"
-                                                    maxLength={5}
+                                                        maxLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not exceed 13 digits'
+                                                        },
+                                                        minLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not be less than 13 digits'
+                                                        }
+                                                    } : {}
+                                                    )}
+                                                    onChange={(e) => {
+                                                        let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                        const formattedValue = rawValue.replace(
+                                                            /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                            (match, p1, p2, p3) => {
+                                                                if (p3) return `(${p1})${p2}-${p3}`;
+                                                                if (p2) return `(${p1})${p2}`;
+                                                                return `(${p1}`;
+                                                            }
+                                                        ); // Format dynamically as (XXX)XXX-XXXX
+                                                        e.target.value = formattedValue; // Update input value
+                                                        clearErrors('homePhone'); // Clear validation errors
+                                                    }}
+                                                    placeholder="(###)###-####"
+                                                    maxLength={14}
+                                                    onKeyPress={(event) => {
+                                                        // Only allow numeric characters (0-9)
+                                                        if (!/[0-9]/.test(event.key)) {
+                                                            event.preventDefault();
+                                                        }
+                                                    }}
                                                 />
-                                                {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                </Col>
-                                <hr className="my-0" />
-                                <Col sm={6} className="border-end mt-1">
-                                    <div className="col-12">
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-1">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className='text-white'>Seq</th>
-                                                    <th className='text-white'>Coverage</th>
-                                                    <th className='text-white'>Carrier</th>
-                                                    <th className='text-white'>Subscriber</th>
-                                                    <th className='text-white'>Id#</th>
-                                                    <th className='text-white'>Capay</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>Primary</td>
-                                                    <td>Anthem</td>
-                                                    <td>Test</td>
-                                                    <td>2333</td>
-                                                    <td>
-                                                        0.00
-                                                    </td>
-                                                </tr>
+                                            </InputGroup>
+                                        </Form.Group>
+                                        <div className='position-absolute' style={{ top: '52%', left: '1%' }}>
+                                            <img
+                                                src={us}
+                                                alt="country code flag"
+                                                width={20} />
+                                        </div>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group className="mb-1 position-relative">
+                                        <Form.Label className='mb-0'>Cell Phone</Form.Label>
+                                        <Form.Group>
+                                            <InputGroup>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <Form.Control
+                                                    type="tel"
+                                                    {...register('cellPhone', !id ? {
+                                                        pattern: {
+                                                            value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                            message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                        },
+                                                        maxLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not exceed 13 digits'
+                                                        },
+                                                        minLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not be less than 13 digits'
+                                                        }
+                                                    } : {}
+                                                    )}
+                                                    onChange={(e) => {
+                                                        let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                        const formattedValue = rawValue.replace(
+                                                            /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                            (match, p1, p2, p3) => {
+                                                                if (p3) return `(${p1})${p2}-${p3}`;
+                                                                if (p2) return `(${p1})${p2}`;
+                                                                return `(${p1}`;
+                                                            }
+                                                        ); // Format dynamically as (XXX)XXX-XXXX
+                                                        e.target.value = formattedValue; // Update input value
+                                                        clearErrors('cellPhone'); // Clear validation errors
+                                                    }}
+                                                    placeholder="(###)###-####"
+                                                    maxLength={14}
+                                                    onKeyPress={(event) => {
+                                                        // Only allow numeric characters (0-9)
+                                                        if (!/[0-9]/.test(event.key)) {
+                                                            event.preventDefault();
+                                                        }
+                                                    }}
+                                                />
+                                            </InputGroup>
+                                        </Form.Group>
 
-
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                    <div className="col-12">
-                                        <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
-                                            <thead className="text-white">
-                                                <tr>
-                                                    <th className="text-white"></th>
-                                                    <th className="text-white">0-30</th>
-                                                    <th className="text-white">31-60</th>
-                                                    <th className="text-white">61-90</th>
-                                                    <th className="text-white">91-120</th>
-                                                    <th className="text-white">121+</th>
-                                                    <th className="text-white">Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {tableData.map((row, rowIndex) => (
-                                                    <tr key={rowIndex}>
-                                                        <td>{row.type}</td>
-                                                        {row.values.map((value, colIndex) => (
-                                                            <td key={colIndex}>
-                                                                <Form.Group>
-                                                                    <InputGroup>
-                                                                        <Form.Control
-                                                                            type="tel"
-                                                                            placeholder={value}
-                                                                        />
-                                                                    </InputGroup>
-                                                                </Form.Group>
-                                                            </td>
-                                                        ))}
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table>
-                                    </div>
-                                </Col>
-                                <Col sm={6} className="mt-1">
-                                    <div className="row pb-0 mt-1" >
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="financial" className="mb-0">Financial Class</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="financial"
-                                                {...register('financialClass',
-                                                    // { required: "Financial Class is required" }
-                                                )}
-                                            >
-                                                <option value="">Select Financial Class</option>
-                                                <option value="Self-Pay">Self-Pay</option>
-                                                <option value="Insurance">Insurance</option>
-                                                <option value="Medicaid">Medicaid</option>
-                                                <option value="Medicare">Medicare</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
-
+                                        <div
+                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                        >
+                                            <img
+                                                src={us}
+                                                alt="country code flag"
+                                                width={20} />
                                         </div>
 
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="provider" className="mb-0">Provider Profile</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Provider Profile"
-                                                {...register('providerProfile',
-                                                    //  { required: "Provider Profile is required" }
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Employer"
-                                                {...register('employer',
-                                                    //  { required: "Employer is required" }
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="relationship" className="mb-0">Relationship</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="relationship"
-                                                {...register('relationship',
-                                                    // { required: "Relationship is required" }
-                                                )}
-                                            >
-                                                <option value="">Select Relationship</option>
-                                                <option value="Self">Self</option>
-                                                <option value="Spouse">Spouse</option>
-                                                <option value="Child">Child</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
 
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group className="mb-1 position-relative">
+                                        <Form.Label className='mb-0'>Office Phone</Form.Label>
+                                        <Form.Group>
+                                            <InputGroup>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <Form.Control
+                                                    type="tel"
+                                                    {...register('officePhone', !id ? {
+                                                        pattern: {
+                                                            value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                            message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                        },
+                                                        maxLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not exceed 13 digits'
+                                                        },
+                                                        minLength: {
+                                                            value: 13,
+                                                            message: 'Contact must not be less than 13 digits'
+                                                        }
+                                                    } : {}
+                                                    )}
+                                                    onChange={(e) => {
+                                                        let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                        const formattedValue = rawValue.replace(
+                                                            /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                            (match, p1, p2, p3) => {
+                                                                if (p3) return `(${p1})${p2}-${p3}`;
+                                                                if (p2) return `(${p1})${p2}`;
+                                                                return `(${p1}`;
+                                                            }
+                                                        ); // Format dynamically as (XXX)XXX-XXXX
+                                                        e.target.value = formattedValue; // Update input value
+                                                        clearErrors('officePhone'); // Clear validation errors
+                                                    }}
+                                                    placeholder="(###)###-####"
+                                                    maxLength={14}
+                                                    onKeyPress={(event) => {
+                                                        // Only allow numeric characters (0-9)
+                                                        if (!/[0-9]/.test(event.key)) {
+                                                            event.preventDefault();
+                                                        }
+                                                    }}
+                                                />
+                                            </InputGroup>
+                                        </Form.Group>
+
+                                        <div
+                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                        >
+                                            <img
+                                                src={us}
+                                                alt="country code flag"
+                                                width={20} />
                                         </div>
 
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="preferred" className="mb-0">Preferred Language</Form.Label>
-                                            <Form.Control
-                                                as="select"  // Use 'select' to create a dropdown
-                                                id="preferred"
-                                                {...register('preferredLanguage',
-                                                )}
-                                            >
-                                                <option value="">Select Preferred Language</option>
-                                                <option value="English">English</option>
-                                                <option value="Spanish">Spanish</option>
-                                                <option value="Other">Other</option>
-                                            </Form.Control>
 
-                                        </div>
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
+                                        <Form.Control
+                                            type="email"
+                                            placeholder="Email ID"
+                                            {...register('email', { pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" } })}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Alternate Email</Form.Label>
+                                        <Form.Control
+                                            type="email"
+                                            placeholder="Alternate Email ID"
+                                            {...register('alternateEmail', {
+                                                pattern: { value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/, message: "Invalid email address" }
+                                            })}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Preferred Communication</Form.Label>
+                                        <Form.Select
+                                            {...register('preferredCommunication')}
+                                            aria-label="Select Title"
+                                        >
+                                            <option value="">Select Preferred Communication</option>
+                                            <option value="Home Phone">Home Phone</option>
+                                            <option value="Work Phone">Work Phone</option>
+                                            <option value="Cell Phone">Cell Phone</option>
+                                            <option value="Email">Email</option>
+                                            <option value="Text Message">Text Message</option>
+                                            <option value="Declined">Declined</option>
+                                            <option value="Snail Mail">Snail Mail</option>
+                                            <option value="Other">Other</option>
+                                        </Form.Select>
+                                        {errors.preferredCommunication && <span className="text-danger">{errors.preferredCommunication.message}</span>}
+                                    </Form.Group>
+                                </div>
 
-                                        <div className="col-6 mb-1">
-                                            <Form.Label htmlFor="PCP" className="mb-0">PCP</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="PCP"
-                                                {...register('pcp',
-                                                )}
-                                            />
-                                        </div>
-                                        <div className="col-6">
-                                            <Form.Label htmlFor="race" className="mb-0">Race & Ethnicity</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Race & Ethnicity"
-                                                {...register('raceEthnicity',
-                                                )}
-                                            />
-                                        </div>
-                                    </div>
-                                </Col>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Reminder Language</Form.Label>
+                                        <Form.Select
+                                            {...register('reminderLanguage',
+                                            )}
+                                        >
+                                            <option value="">Select Reminder Language</option>
+                                            <option value="English">English</option>
+                                            <option value="Spanish">Spanish</option>
+                                            <option value="French">French</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Medication History Concent</Form.Label>
+                                        <Form.Select
+                                            {...register('medicationHistoryConsent',
+                                            )}
+                                        >
+                                            <option value="">Select Medication History Concent</option>
+                                            <option value={'true'}>Yes</option>
+                                            <option value={'false'}>No</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </div>
+
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Payment Profile</Form.Label>
+                                        <Form.Select
+                                            {...register('paymentProfile')}
+                                            aria-label="Payment Profile"
+                                        >
+                                            <option value="">Select Payment Profile</option>
+                                            <option value="Cash">Cash</option>
+                                            <option value="Insurance">Insurance</option>
+                                            <option value="Insurance Out of Network">Insurance Out of Network</option>
+                                            <option value="Auto Accident">Auto Accident</option>
+                                            <option value="Worker's Comp">Worker's Comp</option>
+                                            <option value="Other">Other</option>
+                                        </Form.Select>
+                                        {errors.paymentProfile && <span className="text-danger">{errors.paymentProfile.message}</span>}
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Patient's Copay"
+                                            {...register('patientCopayAmount', {
+                                                pattern: {
+                                                    value: /^[0-9]+(\.[0-9]+)?$/,
+                                                    message: 'Only numbers or decimals are allowed'
+                                                }
+                                            })}
+                                        />
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
+                                        <Form.Control
+                                            type="date"  // Change type to "date" for date input
+                                            placeholder="Follow Up Date"
+                                            {...register('followupDate')}
+                                        />
+                                        {errors.followupDate && <span className="text-danger">{errors.followupDate.message}</span>}
+                                    </Form.Group>
+                                </div>
+                                <div className="col-6">
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Follow Up Reason</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Follow Up Reason"
+                                            {...register('followupReason')}
+                                        />
+                                    </Form.Group>
+                                </div>
                             </div>
 
                             {/* Buttons */}
-                            <div className="d-flex gap-2 justify-content-end mb-2">
-                                <Button variant="secondary">Clear</Button>
+                            <div className="d-flex gap-2 justify-content-end my-2">
+                                <Button variant="secondary" onClick={() => {
+                                    reset();
+                                    setSelectedDoctor(null);
+                                    setLogo(null);
+                                    setLogoName(null);
+                                }}>Clear</Button>
+                                <Button variant="primary" onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                    Save & Add Another
+                                </Button>
+                                <Button variant="primary" onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                    Save & Continue Editing
+                                </Button>
                                 <Button variant="primary" disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
-                                    {store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading ?
-                                        <Spinner color="white" className="spinner-border-sm" />
-                                        :
-                                        'Next'
-                                    }
+                                    Save
                                 </Button>
                             </div>
                         </Form>)}
-                        {activeTab === "responsible" && <Responsiblle />}
+                        {activeTab === "responsible" && <Responsiblle patientId={patientId} />}
                         {activeTab === "insurance" && <Insurance />}
+                        {activeTab === "demographicDetails" && <Demographicdetails patientId={patientId} />}
+                        {activeTab === "referringDoctor" && <ReferringDoctor patientId={patientId} />}
                     </div>
                 </Card>
             </div>

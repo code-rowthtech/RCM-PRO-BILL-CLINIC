@@ -6,7 +6,8 @@ import {
     logout as logoutApi,
     signup as signupApi,
     forgotPassword as forgotPasswordApi,
-    forgotPasswordConfirm, verifyToken
+    forgotPasswordConfirm, verifyToken,
+    verifyEmailApi
 } from '../../helpers/';
 
 import { APICore, setAuthorization } from '../../helpers/api/apiCore';
@@ -146,6 +147,18 @@ function* setPasswordChange({ payload }) {
     }
 }
 
+function* verifyEmailFunction({ payload }) {
+    const { token } = payload;
+    try {
+        setAuthorization(token)
+        const response = yield call(verifyEmailApi, token);
+        yield put(authApiResponseSuccess(AuthActionTypes.VERIFY_EMAIL, JSON.parse(decryptMessage(response?.data?.data))));
+    } catch (error) {
+        ToastHandle(error, 'danger')
+        yield put(authApiResponseError(AuthActionTypes.VERIFY_EMAIL, error));
+    }
+}
+
 function* setChangePasswordChange({ payload }) {
     const { oldPassword, token, newPassword } = payload;
     const confirmpasswordPayload = {
@@ -187,6 +200,10 @@ export function* watchForgotPasswordChange(): any {
 export function* watchVerifyToken(): any {
     yield takeEvery(AuthActionTypes.VERIFY_TOKEN, verifyTokenFunction);
 }
+
+export function* watchVerifyEmail(): any {
+    yield takeEvery(AuthActionTypes.VERIFY_EMAIL, verifyEmailFunction);
+}
 export function* watchSetPassword(): any {
     yield takeEvery(AuthActionTypes.SET_PASSWORD, setPasswordChange);
 }
@@ -205,6 +222,7 @@ function* authSaga(): any {
         fork(watchForgotPassword),
         fork(watchForgotPasswordChange),
         fork(watchVerifyToken),
+        fork(watchVerifyEmail),
         fork(watchSetPassword),
         fork(watchChangePassword),
 

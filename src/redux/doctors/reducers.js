@@ -18,6 +18,11 @@ const GET_DOCTORS_DETAILS_INITIAL_STATE = {
     loading: false
 }
 
+const ADD_REFERRING_DOCTOR_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 export const getDoctorsReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.GET_DOCTORS_LOADING:
@@ -148,4 +153,28 @@ export const createtDoctorsDetailReducer = (state = GET_DOCTORS_INITIAL_STATE, a
     }
 }
 
-
+export const addReferringDoctorReducer = (state = ADD_REFERRING_DOCTOR_DETAILS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case DoctorsActionTypes.ADD_REFERRING_DOCTOR_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}

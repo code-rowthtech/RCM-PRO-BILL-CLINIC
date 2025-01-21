@@ -12,6 +12,7 @@ export const AuthActionTypes = {
     CONFIRMPASSWORD: '@@auth/CONFIRMPASSWORD',
 
     VERIFY_TOKEN: '@@auth/VERIFY_TOKEN',
+    VERIFY_EMAIL: '@@auth/VERIFY_EMAIL',
     SET_PASSWORD: '@@auth/SET_PASSWORD',
 
 };

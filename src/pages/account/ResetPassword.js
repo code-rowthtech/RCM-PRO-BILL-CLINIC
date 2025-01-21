@@ -53,12 +53,6 @@ const ResetPassword = (): React$Element<any> => {
     }, [dispatch]);
 
     const store = useSelector((state) => state);
-    // console.log(store?.Auth?.verifyTokenSuccess?.data)
-    // useEffect(()=>{
-    //     if(store?.Auth?.verifyTokenSuccess?.data){
-    //        console.log(decryptMessage(store?.Auth?.verifyTokenSuccess?.data),' decryptMessage(store?.Auth?.verifyTokenSuccess?.data)')
-    //     }
-    // },[store?.Auth?.verifyTokenSuccess?.data])
     const { loading, passwordChange, changePasswordSuccess } = useSelector((state) => ({
         loading: state.Auth.loading,
         passwordChange: state.Auth.passwordChange,

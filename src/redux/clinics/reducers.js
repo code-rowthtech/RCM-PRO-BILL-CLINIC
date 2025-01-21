@@ -28,6 +28,10 @@ const GET_CITIES_INITIAL_STATE = {
     cities2: {
         data: [],
         loading: false,
+    },
+    cities3: {
+        data: [],
+        loading: false,
     }
 };
 
@@ -269,6 +273,30 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
             return {
                 ...state,
                 cities2: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES3_LOADING:
+            return {
+                ...state,
+                cities3: {
+                    ...state.cities3,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES3_SUCCESS:
+            return {
+                ...state,
+                cities3: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES3_ERROR:
+            return {
+                ...state,
+                cities3: {
                     data: [],
                     loading: false
                 }

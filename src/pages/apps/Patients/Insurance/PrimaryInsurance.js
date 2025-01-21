@@ -3,6 +3,10 @@ import { FiUploadCloud } from 'react-icons/fi';
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 
 const PrimaryInsurance = () => {
+    const tableData = [
+        { type: 'Patient', values: Array(6).fill("0.00") },
+        { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
+    ];
     return (
         <div>
             <Form>
@@ -158,12 +162,75 @@ const PrimaryInsurance = () => {
                         </Form.Group>
                     </div>
                 </div>
-                <div className="row my-4">
-                    <div className="col-12 d-flex align-items-center gap-2 justify-content-end">
-                        <Button className='custom-buttons' >Save and add another</Button>
-                        <Button className='custom-buttons' >Save and continue editing</Button>
-                        <Button className='custom-buttons' type='submit' >Save</Button>
-                    </div>
+                <Row className='my-2'>
+                    <Col sm={6} className="">
+                        <Table responsive className="table-centered table-nowrap mb-0 mt-1">
+                            <thead className="text-white">
+                                <tr>
+                                    <th className='text-white'>Seq</th>
+                                    <th className='text-white'>Coverage</th>
+                                    <th className='text-white'>Carrier</th>
+                                    <th className='text-white'>Subscriber</th>
+                                    <th className='text-white'>Id#</th>
+                                    <th className='text-white'>Capay</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Primary</td>
+                                    <td>Anthem</td>
+                                    <td>Test</td>
+                                    <td>2333</td>
+                                    <td>
+                                        0.00
+                                    </td>
+                                </tr>
+
+
+                            </tbody>
+                        </Table>
+                    </Col>
+                    <Col sm={6}>
+                        <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
+                            <thead className="text-white">
+                                <tr>
+                                    <th className="text-white">Unapplied</th>
+                                    <th className="text-white">0-30</th>
+                                    <th className="text-white">31-60</th>
+                                    <th className="text-white">61-90</th>
+                                    <th className="text-white">91-120</th>
+                                    <th className="text-white">121+</th>
+                                    <th className="text-white">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {tableData.map((row, rowIndex) => (
+                                    <tr key={rowIndex}>
+                                        <td>{row.type}</td>
+                                        {row.values.map((value, colIndex) => (
+                                            <td key={colIndex}>
+                                                <Form.Group>
+                                                    <InputGroup>
+                                                        <Form.Control
+                                                            type="tel"
+                                                            placeholder={value}
+                                                        />
+                                                    </InputGroup>
+                                                </Form.Group>
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+
+                <div className="col-12 d-flex align-items-center gap-2 justify-content-end">
+                    <Button className='custom-buttons' >Save and add another</Button>
+                    <Button className='custom-buttons' >Save and continue editing</Button>
+                    <Button className='custom-buttons' type='submit' >Save</Button>
                 </div>
             </Form>
         </div>
