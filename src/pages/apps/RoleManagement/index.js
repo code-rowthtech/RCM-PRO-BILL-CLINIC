@@ -13,6 +13,7 @@ import AddRole from './AddRole';
 import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
+import { getMastersDataAction } from '../../../redux/settings/action';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -32,6 +33,7 @@ const RoleManagement = () => {
     console.log({ roleData });
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
+    const createSuccess = store?.updateRolesReducer?.data?.status;
     const [smShow, setSmShow] = useState(false);
     const [detailModal, setDetailModal] = useState(false);
 
@@ -43,16 +45,13 @@ const RoleManagement = () => {
     const [updateDepartmentModal, setUpdateDepartmentModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [status, setStatus] = useState(true)
+
     const [skip, setSkip] = useState(1)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const [searchQuery, setSearchQuery] = useState('');
     const [userDetails, setUserDetails] = useState([]);
     const viewPasswordStatus = store?.viewPasswordReducer?.data?.status;
 
-    const handleStatusChange = (data) => {
-        setStatus(data);
-        setSearchQuery('');
-    };
 
     useEffect(() => {
         dispatch(
@@ -109,40 +108,52 @@ const RoleManagement = () => {
         setUpdateDepartmentModal(true);
     };
 
-    const closeAddModal = () => {
-        setAddDepartmentModal(false);
-        setCurrentUser(null);
-        setUpdateDepartmentModal(false);
-    };
+
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
         setSkip(1);
-        dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
     };
 
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
     }
+    useEffect(() => {
+        if (createSuccess === 200) {
+            dispatch(stateEmptydAction());
+            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
+            dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+
+
+        }
+    }, [createSuccess]);
 
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(stateEmptydAction());
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: true }));
+
         }
-    }, [deleteSuccess]);
+    }, [deleteSuccess])
+
+    const handleStatusChange = (isActive) => {
+        setStatus(isActive);
+        setSearchQuery('');
+    };
 
     const handleUpdateDoctorStatus = (data) => {
         const payload = {
             id: data?._id,
-            status: !data?.status
-        }
+            status: !data?.status,
+        };
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
-        dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: searchQuery, page: skip, status: status }));
-    }
+        console.log({ status })
+
+    };
 
     const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
+        if (pageNumber >= 1 && pageNumber <= roleData?.pagination?.totalPages) {
+            setSkip(pageNumber);
+        }
     };
 
     const handleViewPassword = (id) => {
@@ -155,23 +166,22 @@ const RoleManagement = () => {
         <Row className='mt-2'>
             <Col xs={12}>
                 <Card>
-                    <Card.Body className='' style={{height:'100vh'}}>
+                    <Card.Body className='' style={{ height: '76vh' }}>
                         <Row className="mb-2">
                             <Col sm={6}>
                                 <Button
-                                    variant={status === true ? 'outlined' : ''}
+                                    variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`${status === true ? 'custom-buttons text-white' : ' text-dark bg-none border-primary '} me-2 py-1`}
-                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
+                                    className={`${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                                    style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                 >
                                     Active
                                 </Button>
-
                                 <Button
-                                    variant={status === false ? 'outlined' : ''}
+                                    variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`${status === false ? 'custom-buttons text-white' : ' text-dark bg-none border-primary'} me-2 py-1`}
-                                    style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
+                                    className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                                    style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
                                 >
                                     Inactive
                                 </Button>
@@ -184,10 +194,10 @@ const RoleManagement = () => {
                                             placeholder="Search..."
                                             value={searchQuery}  // Bind the input to the searchQuery state
                                             onChange={handleSearchChange}
-                                            style={{height:'30px'}}
+                                            style={{ height: '30px' }}
                                         />
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
-                                            Add Users
+                                            Add User
                                         </Button>
                                     </Col>
                                 </Row>
@@ -199,13 +209,14 @@ const RoleManagement = () => {
                                     style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white">Sr. No.</th>
-                                            <th className="text-white">Name</th>
-                                            <th className="text-white">Phone</th>
-                                            <th className="text-white">Username</th>
-                                            <th className="text-white">Designation</th>
-                                            <th className="text-white">Status</th>
-                                            <th className="text-white">Action</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Sr. No.</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Name</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Phone</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Username</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Joining Date</th>
+
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Status</th>
+                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -217,21 +228,26 @@ const RoleManagement = () => {
                                             </tr>
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
                                             roleData?.users.map((data, index) => (
-                                                <tr key={index}>
-                                                    <td>{index + 1}</td>
-                                                    <td>{data?.firstName}</td>
-                                                    <td>{data?.phone}</td>
-                                                    <td>{data?.email}</td>
-                                                    <td>{data?.designation}</td>
-                                                    <td>
+                                                <tr key={index} className="border-bottom">
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                                                    <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        {data?.firstName?.charAt(0).toUpperCase() + data?.firstName?.slice(1)}
+                                                    </td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
+                                                    </td>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
-                                                    <td className='py-1 ' style={{fontSize:'14px', fontWeight:'400'}}>
+                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"
                                                                 onClick={() => openEditModal(data)}
                                                             />
+                                                            {/* Additional actions */}
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -245,6 +261,7 @@ const RoleManagement = () => {
                                             </tr>
                                         )}
                                     </tbody>
+
                                 </Table>
 
 
@@ -259,7 +276,7 @@ const RoleManagement = () => {
                                 <Paginations
                                     currentPage={skip}
                                     totalPages={roleData?.pagination?.totalPages || 1}
-                                    onPageChange={(pageNumber) => handlePageChange(pageNumber)}
+                                    onPageChange={handlePageChange}
                                 />
 
                             </Col>
@@ -320,8 +337,8 @@ const RoleManagement = () => {
 
                 </Modal.Footer>
             </Modal>
-            <AddRole show={addDepartmentModal} close={closeAddModal} />
-            <RoleUpdate show={updateDepartmentModal} currentUser={currentUser} setCurrentUser={setCurrentUser} close={closeAddModal} />
+            <AddRole show={addDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} setCurrentUser={setCurrentUser} setUpdateDepartmentModal={setUpdateDepartmentModal} />
+            <RoleUpdate show={updateDepartmentModal} currentUser={currentUser} setUpdateDepartmentModal={setUpdateDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} setCurrentUser={setCurrentUser} />
         </Row>
     );
 };

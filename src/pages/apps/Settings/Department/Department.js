@@ -110,7 +110,7 @@ const Department = () => {
     <Row className='mt-2'>
       <Col xs={12}>
         <Card >
-          <Card.Body style={{ height: '88vh' }}>
+          <Card.Body style={{ height: '76vh' }}>
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
@@ -152,7 +152,7 @@ const Department = () => {
             <Table
               responsive
               className="table-centered table-nowrap mb-0  rounded"
-              style={{ height: tableGetData?.length === 0 ? '100vh' : 'auto' }}
+              style={{ height: tableGetData?.length === 0 ? '76vh' : 'auto' }}
             >
               <thead className="text-white">
                 <tr>
@@ -175,7 +175,7 @@ const Department = () => {
                   tableGetData?.map((data, index) => (
                     <tr key={data._id} className="border-bottom">
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data.name}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}</td>
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data.description}...</td>
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{formatDate(data.createdAt)}</td>
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -193,11 +193,11 @@ const Department = () => {
                     </tr>
                   ))
                 ) : (
-                  <tr>
-                    <td colSpan={6} className="text-center">
-                      No Data Found
-                    </td>
-                  </tr>
+                  <tr key={''}>
+                  <td colSpan={7} className='text-center'>
+                      <h3 className='my-5'>No Data Found</h3>
+                  </td>
+              </tr>
                 )}
               </tbody>
             </Table>

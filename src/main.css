@@ -13,6 +13,9 @@
     box-shadow: none !important; /* Remove box shadow */
     outline: none !important; /* Remove outline */
 }
+.custom-multiselect {
+    border: none !important; /* Remove border */
+}
 
 .headers {
     background-color: #010101 !important;
@@ -126,6 +129,38 @@ table {
 .card {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
+.custom-date-input::placeholder {
+    color: grey; /* Set the placeholder color */
+    opacity: 1; /* Ensure the placeholder is fully visible */
+}
+/* Apply grey color to all input placeholders */
+form input::placeholder,
+form textarea::placeholder {
+    color: grey; /* Set placeholder text color to grey */
+    opacity: 1; /* Ensure full visibility of placeholder */
+}
+
+/* Optional: Specific for form-control class (Bootstrap inputs) */
+.custom-date-input::placeholder,
+.form-control::placeholder {
+    color: grey; /* Grey color for placeholders */
+    opacity: 1;
+}
+
+.custom-date-input {
+    color: grey !important; /* Set the input text color to grey */
+    font-size: 14px; /* Adjust font size if needed */
+}
+.custom-date-input-select {
+    color: black !important; /* Set the input text color to black */
+}
+.custom-date {
+    color: grey !important; /* Set the input text color to grey */
+    font-size: 14px; /* Adjust font size if needed */
+}
+.scroll-container {
+    overflow-y: auto;
+}
 
 input,
 textarea,
@@ -214,7 +249,7 @@ table {
 .date-carousel {
     display: flex;
     align-items: center;
-    /* border: 1px solid #ddd; */
+    border-top: 1px solid #ddd;
 }
 
 .date-carousel .day {
@@ -245,9 +280,8 @@ table {
     color: #000;
 }
 .slots {
-    background-color: #d9d9d9;
+    background-color: #d9d9d9 !important;
     font-weight: 600;
-    margin: 0.3rem !important;
 }
 
 .react-datepicker__input-container input {
