@@ -9,6 +9,7 @@ import us from '../../../../assets/images/flags/us.jpg'
 import { encryptMessage } from "../../../../cryptoUtils";
 import Select from 'react-select';
 import { handleUpload } from "../../../../helpers/HandleUpload";
+import Spinner from "../../../../constants/Spinner";
 
 const calculateAge = (dob) => {
   const birthDate = new Date(dob);
@@ -54,6 +55,8 @@ const PatientDetails = ({ patientId }) => {
     value: data?._id,
     label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
   }));
+  const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+
   useEffect(() => {
     const doctorPayload = { status: true, search: doctorSearch, departmentId: '' }
     dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
@@ -62,8 +65,7 @@ const PatientDetails = ({ patientId }) => {
     if (patientDetails && doctorDetails) {
       const doctor = doctorOptions && doctorOptions?.find((data) => data?.value === patientDetails?.primaryProvider?._id);
       setSelectedDoctor(doctor);
-
-      setValue('patientStatus', patientDetails?.patientStatus);
+      setValue('patientStatus', patientDetails?.status);
       setValue('firstName', patientDetails?.firstName);
       setValue('middleName', patientDetails?.middleName);
       setValue('lastName', patientDetails?.lastName);
@@ -71,21 +73,21 @@ const PatientDetails = ({ patientId }) => {
       setValue('birthName', patientDetails?.birthName);
       setValue('suffix', patientDetails?.suffix);
       setValue('homePhone', patientDetails?.homePhone
-        ? patientDetails?.homePhone.replace(/\D/g, '') // Remove all non-numeric characters
+        ? patientDetails?.homePhone.replace(/\D/g, '')
           .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
           )
         : '');
       setValue('cellPhone', patientDetails?.cellPhone
-        ? patientDetails?.cellPhone.replace(/\D/g, '') // Remove all non-numeric characters
+        ? patientDetails?.cellPhone.replace(/\D/g, '')
           .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
           )
         : '');
       setValue('officePhone', patientDetails?.officePhone
-        ? patientDetails?.officePhone.replace(/\D/g, '') // Remove all non-numeric characters
+        ? patientDetails?.officePhone.replace(/\D/g, '')
           .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
           )
         : '');
       setValue('email', patientDetails?.email);
@@ -108,8 +110,40 @@ const PatientDetails = ({ patientId }) => {
     }
   }, [patientDetails && doctorDetails])
 
-  const onSubmit = () => {
-
+  const onSubmit = (data) => {
+    const payload = {
+      id: id,
+      clinicId: clinicId,
+      ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
+      ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
+      ...(data?.title ? { title: data?.title } : {}),
+      ...(data?.firstName ? { firstName: data?.firstName } : {}),
+      ...(data?.middleName ? { middleName: data?.middleName } : {}),
+      ...(data?.lastName ? { lastName: data?.lastName } : {}),
+      ...(data?.birthName ? { birthName: data?.birthName } : {}),
+      ...(data?.suffix ? { suffix: data?.suffix } : {}),
+      ...(logo?.url === null
+        ? {}
+        : {
+          patientChartPhoto: {
+            url: logo?.url?.split('?')[0] || patientDetails?.patientChartPhoto?.url,
+            fileName: logoName
+          }
+        }),
+      ...(data?.homePhone ? { homePhone: data?.homePhone?.replace(/\D/g, '') } : {}),
+      ...(data?.cellPhone ? { cellPhone: data?.cellPhone?.replace(/\D/g, '') } : {}),
+      ...(data?.officePhone ? { officePhone: data?.officePhone?.replace(/\D/g, '') } : {}),
+      ...(data?.email ? { email: data?.email } : {}),
+      ...(data?.alternateEmail ? { alternativeEmail: data?.alternateEmail } : {}),
+      ...(data?.preferredCommunication ? { preferredCommunication: data?.preferredCommunication } : {}),
+      ...(data?.reminderLanguage ? { reminderLanguage: data?.reminderLanguage } : {}),
+      ...(data?.medicationHistoryConsent ? { medicationHistoryConsent: data?.medicationHistoryConsent === 'true' ? true : false } : {}),
+      ...(data?.paymentProfile ? { paymentProfile: data?.paymentProfile } : {}),
+      ...(data?.patientCopayAmount ? { patientCopayAmount: data?.patientCopayAmount } : {}),
+      ...(data?.followupDate ? { followupDate: data?.followupDate } : {}),
+      ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
+    }
+    dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
   }
   const handleInputChange = (data) => {
     setDoctorSearch(data)
@@ -594,7 +628,13 @@ const PatientDetails = ({ patientId }) => {
 
         {/* Buttons */}
         <div className="d-flex gap-2 justify-content-end my-2">
-          <Button className="custom-buttons">Update</Button>
+          <Button type="submit" className="custom-buttons" disabled={store?.updatePatientsReducer?.loading}>
+            {store?.updatePatientsReducer?.loading ?
+              <Spinner className="spinner-border-sm" color="white" />
+              :
+              'Update'
+            }
+          </Button>
         </div>
       </Form>
     </>

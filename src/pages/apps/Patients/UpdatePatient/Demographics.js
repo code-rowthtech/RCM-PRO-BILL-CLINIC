@@ -115,10 +115,18 @@ const Demographicdetails = ({ patientId }) => {
             setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition)
             // Employer details
             setValue('emergencyContactName', patientDetails?.emergencyContactName)
-            setValue('emergencyContactPhone', patientDetails?.emergencyContactPhone)
+            setValue('emergencyContactPhone', patientDetails?.emergencyContactPhone ? patientDetails?.emergencyContactPhone.replace(/\D/g, '')
+                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                )
+                : '');
             setValue('emergencyContactRelation', patientDetails?.emergencyContactRelation)
             setValue('employerName', patientDetails?.employerName)
-            setValue('employerPhone', patientDetails?.employerPhone)
+            setValue('employerPhone', patientDetails?.employerPhone ? patientDetails?.employerPhone.replace(/\D/g, '')
+                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                )
+                : '');
             setValue('employerTimeZone', patientDetails?.employerAddress?.timeZone)
             setValue('employerAddress', patientDetails?.employerAddress?.address);
             setValue('employerStreet', patientDetails?.employerAddress?.street)
@@ -162,15 +170,15 @@ const Demographicdetails = ({ patientId }) => {
     }, [statesData, patientDetails])
     const handleStateSelection = (e, data) => {
         if (data === 'primary') {
-            const stateCity1 = statesData?.states?.find((data) => data?.state_code === e.target.value)?.id
+            const stateCity1 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
             dispatch(getCitiesAction({ state_code: stateCity1, name: '', limit: 25, skip: '' }))
         }
         if (data === 'mailing') {
-            const stateCity2 = statesData?.states?.find((data) => data?.state_code === e.target.value)?.id
+            const stateCity2 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
             dispatch(getCities2Action({ state_code: stateCity2, name: '', limit: 25, skip: '' }))
         }
         if (data === 'employer') {
-            const stateCity3 = statesData?.states?.find((data) => data?.state_code === e.target.value)?.id
+            const stateCity3 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
             dispatch(getCities3Action({ state_code: stateCity3, name: '', limit: 25, skip: '' }))
         }
     }
@@ -186,38 +194,63 @@ const Demographicdetails = ({ patientId }) => {
         }
     }, [cities1, cities2, cities3, patientDetails])
     const onSubmit = (data) => {
-        const payload = {
-            id: patientId,
-            ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
-            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
-            ...(data?.sex ? { sex: data?.sex } : {}),
-            ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
-            ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
-            ...(data?.race ? { race: data?.race } : {}),
-            ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
-            ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
-            ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
-            ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
-            ...(data?.notes ? { notes: data?.notes } : {}),
-            ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-            ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
-            ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
-            ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
-            ...(data?.emergencyContactPhone ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') } : {}),
-            ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
-            ...(data?.employerName ? { employerName: data?.employerName } : {}),
-            ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
-            employerAddress: {
-                address: data?.employerAddress,
-                street: data?.employerStreet,
-                city: data?.employerCity,
-                state: data?.employerStateName,
-                zip: data?.employerZip,
-                latitude: employerLatitude,
-                longitude: employerLongitude,
-                timeZone: data?.employerTimeZone
-            },
+        // const payload = {
+        //     id: patientId,
+        //     ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
+        //     ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
+        //     ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
+        //     ...(data?.sex ? { sex: data?.sex } : {}),
+        //     ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
+        //     ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
+        //     ...(data?.race ? { race: data?.race } : {}),
+        //     ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
+        //     ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
+        //     ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
+        //     ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
+        //     ...(data?.notes ? { notes: data?.notes } : {}),
+        //     ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
+        //     ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
+        //     ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
+        //     ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
+        //     ...(data?.emergencyContactPhone ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') } : {}),
+        //     ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
+        //     ...(data?.employerName ? { employerName: data?.employerName } : {}),
+        //     ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
+        //     employerAddress: {
+        //         address: data?.employerAddress,
+        //         street: data?.employerStreet,
+        //         city: data?.employerCity,
+        //         state: data?.employerStateName,
+        //         zip: data?.employerZip,
+        //         latitude: employerLatitude,
+        //         longitude: employerLongitude,
+        //         timeZone: data?.employerTimeZone
+        //     },
+        //     address: {
+        //         address: data?.primaryAddress,
+        //         street: data?.primaryStreet,
+        //         city: data?.primaryCity,
+        //         state: data?.primaryStateName,
+        //         zip: data?.primaryZip,
+        //         latitude: latitude,
+        //         longitude: longitude,
+        //         timeZone: data?.primaryTimeZone
+        //     },
+        //     mailingAddress: {
+        //         address: data?.mailingAddress,
+        //         street: data?.mailingStreet,
+        //         city: data?.mailingCity,
+        //         state: data?.mailingStateName,
+        //         zip: data?.mailingZip,
+        //         latitude: mailingLatitude,
+        //         longitude: mailingLongitude,
+        //         timeZone: data?.mailingTimeZone
+        //     },
+        // }
+        const enrichedData = {
+            ...data,
+            emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, ''), // Sanitize emergency contact phone
+            employerPhone: data?.employerPhone?.replace(/\D/g, ''), // Sanitize employer phone
             address: {
                 address: data?.primaryAddress,
                 street: data?.primaryStreet,
@@ -228,6 +261,16 @@ const Demographicdetails = ({ patientId }) => {
                 longitude: longitude,
                 timeZone: data?.primaryTimeZone
             },
+            employerAddress: {
+                address: data?.employerAddress,
+                street: data?.employerStreet,
+                city: data?.employerCity,
+                state: data?.employerStateName,
+                zip: data?.employerZip,
+                latitude: employerLatitude,
+                longitude: employerLongitude,
+                timeZone: data?.employerTimeZone
+            },
             mailingAddress: {
                 address: data?.mailingAddress,
                 street: data?.mailingStreet,
@@ -237,9 +280,10 @@ const Demographicdetails = ({ patientId }) => {
                 latitude: mailingLatitude,
                 longitude: mailingLongitude,
                 timeZone: data?.mailingTimeZone
-            },
-        }
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+            }
+        };
+        console.log(enrichedData, 'enrichedData')
+        // dispatch(updatePatientsAction({ key: encryptMessage(enrichedData) }))
     };
 
     const getGeolocation = (e) => {
@@ -530,6 +574,7 @@ const Demographicdetails = ({ patientId }) => {
                                                                 setValue('primaryAddress', data?.formatted)
                                                                 setFocused(false);
                                                                 setValue('primaryTimeZone', data?.annotations?.timezone?.name)
+                                                                handleStateSelection(data?.components?.state_code, 'primary')
                                                             }}
                                                             style={{
                                                                 margin: 0,
