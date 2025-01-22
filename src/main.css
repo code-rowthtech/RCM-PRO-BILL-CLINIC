@@ -317,3 +317,14 @@ table {
     background-color: #f1f1f1;
     cursor: pointer;
 }
+
+.patient-item {
+    color: white;
+}
+
+.patient-item:hover,
+.active-patient-item {
+    background-color: #f5f5f5;
+    color: black;
+    transition: background-color 0.3s ease;
+}

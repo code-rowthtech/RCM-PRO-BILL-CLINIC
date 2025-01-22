@@ -20,16 +20,20 @@ const UpdatePatientIndex = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-    console.log({ patientDetails })
+    const updateSuccess = store?.updatePatientsReducer?.data?.status;
     useEffect(() => {
-        if (id) {
-            const payload = {
-                id: id,
-            }
-            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
-
+        const payload = {
+            id: id,
         }
-    }, [id])
+        if (id) {
+
+            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+        }
+        if (updateSuccess === 200) {
+            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+        }
+
+    }, [id, updateSuccess])
     const [activeTab, setActiveTab] = useState('Patient Details');
 
     const handleTabClick = (tabName) => {
@@ -56,14 +60,13 @@ const UpdatePatientIndex = () => {
                                         <Col sm={2} className='d-flex align-items-center justify-content-center'>
                                             <div>
                                                 <img
-                                                    src={patientDetails?.patientChartPhoto?.url ? patientDetails?.patientChartPhoto?.url : ''}
+                                                    src={patientDetails?.patientChartPhoto?.url ? patientDetails?.patientChartPhoto?.url : profileDummy}
                                                     alt="Patient Profile"
                                                     className="img-fluid rounded-circle"
                                                     style={{ width: '6rem', height: '6rem', objectFit: 'cover' }}
                                                 />
                                             </div>
                                         </Col>
-
                                         <Col sm={8}>
                                             <Row className='pt-1'>
                                                 <div className='d-flex gap-2 ps-1 lh-sm'>
@@ -87,7 +90,7 @@ const UpdatePatientIndex = () => {
                                                 </Col>
                                                 <Col sm={6}>
                                                     <div>
-                                                        <p className='fs-6 m-1'><span className='fw-bold'>Primary Provider:</span><span className='ps-2'>Nishchay Sharma</span></p>
+                                                        <p className='fs-6 m-1'><span className='fw-bold'>Primary Provider:</span><span className='ps-2'>{patientDetails?.primaryProvider?.userId?.firstName} {patientDetails?.primaryProvider?.userId?.lastName || ''}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Date Added:</span><span className='ps-2'>{new Date(patientDetails?.createdAt)?.toLocaleDateString('en-GB')}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Last Scheduled appt:</span><span className='ps-2 text-primary'>01/01/2025</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Next Scheduled appt:</span><span className='ps-2'>None</span></p>
@@ -110,9 +113,9 @@ const UpdatePatientIndex = () => {
                                     </Row>
                                 </Card.Body>
                             </Card>
-                            <div className=' mt-2' >
-                                <Card className='px-2 '>
-                                    <div>
+                            <div className='mt-2' >
+                                <Card className='px-2'>
+                                    <div className='d-flex justify-content-between align-items-center mt-1'>
                                         <ul className="nav nav-underline">
                                             {[
                                                 'Patient Details',
@@ -122,7 +125,7 @@ const UpdatePatientIndex = () => {
                                                 'Authorizations',
                                                 'Vital Status',
                                                 'Balance',
-                                                'Drchrono Payment'
+                                                'Payment'
                                             ].map((tab) => (
                                                 <li className="nav-item" key={tab}>
                                                     <a
@@ -135,6 +138,7 @@ const UpdatePatientIndex = () => {
                                                 </li>
                                             ))}
                                         </ul>
+                                        <Button className='custom-buttons' onClick={() => navigate(-1)}>Back</Button>
                                     </div>
 
                                     <div className="mt-2 scroll-container" style={{ height: '64vh', overflowY: 'scroll' }}>
@@ -145,13 +149,10 @@ const UpdatePatientIndex = () => {
                                         {activeTab === 'Authorizations' && <p>Authorizations Content</p>}
                                         {activeTab === 'Vital Status' && <p>Vital Status Content</p>}
                                         {activeTab === 'Balance' && <p>Balance Content</p>}
-                                        {activeTab === 'Drchrono Payment' && <p>Drchrono Payment Content</p>}
+                                        {activeTab === 'Payment' && <p> Payment Content</p>}
                                     </div>
 
-                                    {/* <div className='d-flex gap-1 justify-content-end mb-2'>
-                                <Button className=''>Cancel</Button>
-                                <Button className='custom-buttons'>Save</Button>
-                            </div> */}
+
                                 </Card>
                             </div>
                         </div>

@@ -183,7 +183,6 @@ const NewPatient = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const onSubmit = (data) => {
         const payload = {
-            ...(id ? { id: id } : {}),
             clinicId: clinicId,
             ...(selectedDoctor ? { primaryProvider: selectedDoctor?.value } : {}),
             ...(data?.patientStatus ? { status: data?.patientStatus } : {}),
