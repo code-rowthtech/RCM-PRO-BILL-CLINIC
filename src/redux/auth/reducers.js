@@ -71,6 +71,14 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
 
                     };
                 }
+                case AuthActionTypes.VERIFY_EMAIL: {
+                    return {
+                        ...state,
+                        verifyEmailSuccess: action?.payload?.data,
+                        loading: false, // Ensure loading is set to false on success
+                        verifyEmail: true,
+                    };
+                }
                 case AuthActionTypes.SET_PASSWORD: {
                     return {
                         ...state,
@@ -135,6 +143,14 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                         verifyToken: false,
                     };
                 }
+                case AuthActionTypes.VERIFY_EMAIL: {
+                    return {
+                        ...state,
+                        error: action.payload.error,
+                        loading: false, // Ensure loading is set to false on error
+                        verifyEmail: false,
+                    };
+                }
                 case AuthActionTypes.SET_PASSWORD: {
                     return {
                         ...state,
@@ -167,6 +183,8 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
             return { ...state, loading: true, passwordChange: false };
         case AuthActionTypes.VERIFY_TOKEN:
             return { ...state, loading: true, verifyToken: false };
+        case AuthActionTypes.VERIFY_EMAIL:
+            return { ...state, loading: true, verifyEmail: false };
         case AuthActionTypes.SET_PASSWORD:
             return { ...state, loading: true, changeSetPassword: false };
         case AuthActionTypes.CONFIRMPASSWORD:
@@ -181,8 +199,10 @@ const Auth = (state: State = INIT_STATE, action: AuthAction): any => {
                 passwordReset: false,
                 passwordChange: false,
                 changeSetPassword: false,
-                changeChangePassword:false,
+                changeChangePassword: false,
                 resetPasswordSuccess: null,
+                verifyEmail: false, // Reset verifyEmail state on reset
+
             };
         default:
             return { ...state };

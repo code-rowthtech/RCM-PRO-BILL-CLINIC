@@ -1,6 +1,6 @@
 // @flow
-import React, { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import classNames from 'classnames';
 
@@ -16,6 +16,12 @@ import logoDarkSm from '../assets/images/logo_sm_dark.png';
 import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
+import { useDispatch, useSelector } from 'react-redux';
+import { getPatientsAction } from '../redux/actions';
+import { encryptMessage } from '../cryptoUtils';
+import { FormInput } from '../components';
+import Spinner from '../constants/Spinner';
+import { Button } from 'react-bootstrap';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -35,26 +41,7 @@ const SideBarContent = ({ hideUserProfile }: SideBarContentProps) => {
             )}
             <AppMenu menuItems={getMenuItems()} />
 
-            {/* <div
-                className={classNames('help-box', 'text-center', {
-                    'text-white': hideUserProfile,
-                })}>
-                <Link to="/" className="float-end close-btn text-white">
-                    <i className="mdi mdi-close" />
-                </Link>
 
-                <img src={helpBoxImage} height="90" alt="Helper Icon" />
-                <h5 className="mt-3">Unlimited Access</h5>
-                <p className="mb-3">Upgrade to plan to get access to unlimited reports</p>
-                <button
-                    className={classNames(
-                        'btn',
-                        'btn-sm',
-                        hideUserProfile ? 'btn-outline-light' : 'btn-outline-primary'
-                    )}>
-                    Upgrade
-                </button>
-            </div> */}
             <div className="clearfix" />
         </>
     );
@@ -69,7 +56,17 @@ type LeftSidebarProps = {
 
 const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
-
+    const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const patientsData = store?.getPatientsReducer?.data?.patients;
+    console.log(patientsData, 'patientsDatapatientsData')
+    const [search, setSearch] = useState('');
+    const [skip, setSkip] = useState(1);
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     /**
      * Handle the click anywhere in doc
      */
@@ -89,9 +86,21 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         };
     }, []);
 
+    useEffect(() => {
+        if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient') {
+            const data = {
+                clinicId: clinicId,
+                page: skip,
+                limit: 10,
+                search: search,
+            }
+            dispatch(getPatientsAction({ key: encryptMessage(data) }));
+        }
+    }, [location.pathname, dispatch, skip, search])
+
     return (
         <>
-            <div className="leftside-menu" ref={menuNodeRef}>
+            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} ref={menuNodeRef}>
                 {!hideLogo && (
                     <>
                         <Link to="/" className="logo text-center logo-light">
@@ -113,17 +122,67 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                         </Link>
                     </>
                 )}
+                {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
+                    <>
+                        {!isCondensed && (
+                            <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
+                                <li className='px-1 mb-1'>
+                                    <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
+                                </li>
+                                <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
+                                    <Link to='/apps/patients/new-patient'>
+                                        <Button className='custom-buttons w-100'>Add New Patient</Button>
+                                    </Link>
+                                </li>
+                                {store?.getPatientsReducer?.loading ?
+                                    <div className='text-center my-5'>
+                                        <Spinner color='white' />
+                                    </div>
+                                    :
+                                    patientsData &&
+                                    patientsData.map((data, index) => (
+                                        <li
+                                            key={index}
+                                            className={`py-2 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                            onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
+                                        >
+                                            <div className="d-flex gap-2 align-items-center">
+                                                <img
+                                                    height='40'
+                                                    width='40'
+                                                    src={data?.patientChartPhoto?.url}
+                                                    // style={{ height: '5vh' }}
+                                                    className="rounded-circle border border-black"
+                                                    alt="profile image"
+                                                />
+                                                <div>
+                                                    <p className="mb-0 text-capitalize">
+                                                        {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
+                                                    </p>
+                                                    <p className="mb-0">{data?.sex}</p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))
+                                }
+                            </ul>
+                        )}
+                    </>
+                    :
+                    <>
+                        {!isCondensed && (
+                            <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
+                                <SideBarContent
+                                    menuClickHandler={() => { }}
+                                    isLight={isLight}
+                                    hideUserProfile={hideUserProfile}
+                                />
+                            </SimpleBar>
+                        )}
+                        {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
+                    </>
+                }
 
-                {!isCondensed && (
-                    <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
-                        <SideBarContent
-                            menuClickHandler={() => { }}
-                            isLight={isLight}
-                            hideUserProfile={hideUserProfile}
-                        />
-                    </SimpleBar>
-                )}
-                {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
             </div>
         </>
     );

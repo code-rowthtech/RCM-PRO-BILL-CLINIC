@@ -10,7 +10,7 @@ import {
     createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer,
     getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer, changeEmailReducer
 } from './clinics/reducers';
-import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer } from './doctors/reducers';
+import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
 import { createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
@@ -27,7 +27,7 @@ export default (combineReducers({
     getDoctorsReducer, getClinicTypeReducer, updateSubClinicReducer,
     createClinicsReducer, changeEmailReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     createSubscriptionPlanReducer,
-    getDoctorsReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer,
+    getDoctorsReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,
     getPatientsReducer,
@@ -35,5 +35,5 @@ export default (combineReducers({
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
     createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, getAppointmentByIdReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer, getPractitionerSlotsReducer,
-    rescheduleAppointmentReducer, viewPasswordReducer,getCitiesReducer
+    rescheduleAppointmentReducer, viewPasswordReducer, getCitiesReducer
 }): any);

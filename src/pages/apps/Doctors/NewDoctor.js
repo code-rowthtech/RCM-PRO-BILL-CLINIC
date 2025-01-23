@@ -462,7 +462,7 @@ const NewDoctor = () => {
                                                 </ul>
                                         </div>
 
-                                        <div className="col-3 col-md-4 d-flex justify-content-md-end align-items-center gap-md-2 gap-0 px-0">
+                                        <div className="col-3 col-md-4 d-flex justify-content-end align-items-center gap-md-2 gap-0 px-0">
                                             {activeTab === "personalDetails" && (
                                                 <>
                                                     {!id && (
@@ -509,7 +509,7 @@ const NewDoctor = () => {
                                             <>
                                                 <div className="col-12 mt-1">
                                                     <div className="row" style={{ borderBottom: '1px solid #444141' }}>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     First Name {!id && <span className="text-danger">*</span>}
@@ -533,7 +533,7 @@ const NewDoctor = () => {
                                                                 {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-md-3  col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Last Name {!id && <span className="text-danger">*</span>}
@@ -557,7 +557,7 @@ const NewDoctor = () => {
                                                                 {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <div className="mb-1">
                                                                 <Form.Group className="mb-0 position-relative">
                                                                     <Form.Label className="mb-0">
@@ -605,7 +605,7 @@ const NewDoctor = () => {
                                                                 </Form.Group>
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Date of Birth <span className='text-danger'>*</span>
@@ -632,7 +632,7 @@ const NewDoctor = () => {
                                                                 {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-md-3 col-12 ">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12 ">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Email {!id && <span className="text-danger">*</span>}
@@ -655,7 +655,7 @@ const NewDoctor = () => {
                                                                 {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
                                                                 <Form.Select
@@ -677,7 +677,7 @@ const NewDoctor = () => {
                                                                 )}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className='col-md-3 col-12'>
+                                                        <div className='col-md-6 col-lg-3 col-sm-6 col-12'>
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Password {!id && <span className="text-danger">*</span>}
@@ -723,7 +723,7 @@ const NewDoctor = () => {
                                                                 </div>
                                                             </Form.Group>
                                                         </div>
-                                                        <div className='col-md-3 col-12'>
+                                                        <div className='col-md-6 col-lg-3 col-sm-6 col-12'>
                                                             <Form.Group className='mb-1 '>
                                                                 <Form.Label className="mb-0">Confirm Password {!id && <span className="text-danger">*</span>}</Form.Label>
                                                                 <div className="position-relative">
@@ -828,7 +828,7 @@ const NewDoctor = () => {
                                                                 }
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Gender <span className="text-danger">*</span>
@@ -850,7 +850,7 @@ const NewDoctor = () => {
                                                                 {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                                             </Form.Group>
                                                         </div>
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Specialist <span className='text-danger'>*</span></Form.Label>
                                                                 <Form.Control

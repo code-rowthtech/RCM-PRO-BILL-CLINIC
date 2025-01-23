@@ -108,7 +108,7 @@ const Patients = () => {
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{height:'30px'}} />
+                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{ height: '30px' }} />
                                             <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
                                                 New Patient
                                             </Button>
@@ -118,7 +118,7 @@ const Patients = () => {
                             </Row>
                             <Row>
                                 <Col sm={12}>
-                                    <Table responsive className="table-centered table-nowrap mb-0  rounded"   style={{ height: patientsData?.length === 0 ? '100vh' : 'auto' }}>
+                                    <Table responsive className="table-centered table-nowrap mb-0  rounded" style={{ height: patientsData?.length === 0 ? '100vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white'>Sr.No.</th>
@@ -135,14 +135,14 @@ const Patients = () => {
                                         <tbody>
                                             {store?.getPatientsReducer?.loading ?
                                                 <tr>
-                                                    <td colSpan={8} className='text-center'>
+                                                    <td colSpan={9} className='text-center'>
                                                         <Spinner />
                                                     </td>
                                                 </tr>
                                                 :
                                                 patientsData && patientsData?.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={8} className='text-center'>
+                                                        <td colSpan={9} className='text-center'>
                                                             <h3 className='my-5'>No Data Found</h3>
                                                         </td>
                                                     </tr>
@@ -150,7 +150,7 @@ const Patients = () => {
                                                     patientsData && patientsData?.map((data, index) => (
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
-                                                            <td>{data?.chartNumber}</td>
+                                                            <td>CH-{data?.chartNumber}</td>
                                                             <td className='text-capitalize'>{data?.firstName}</td>
                                                             <td className='text-capitalize'>{data?.sex}</td>
                                                             <td>{data?.cellPhone}</td>
@@ -158,7 +158,7 @@ const Patients = () => {
                                                             <td>{data?.lastVisit || 'N/A'}</td>
                                                             <td>{data?.nextVisit || 'N/A'}</td>
                                                             <td>
-                                                                <Link to={`/apps/patients/new-patient?updateid=${data?._id}`} className="action-icon">
+                                                                <Link to={`/apps/patients/update-patient?id=${data?._id}`} className="action-icon">
                                                                     <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
                                                                 </Link>
                                                             </td>

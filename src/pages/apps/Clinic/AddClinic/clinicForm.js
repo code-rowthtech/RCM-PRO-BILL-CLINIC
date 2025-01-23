@@ -231,7 +231,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             });
             return;
         }
-        sessionStorage.setItem('logo', logo?.url?.split('?')[0]|| clinicsDataGet?.logo?.url);
+        sessionStorage.setItem('logo', logo?.url?.split('?')[0] || clinicsDataGet?.logo?.url);
         const newPayload = {
             ...(clinicsList && { parentClinic: clinicId }),
             ...(updateId && { id: updateId }),
@@ -254,7 +254,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             // ...(logo ?
             //     {
             logo: {
-                url: logo?.url?.split('?')[0]|| clinicsDataGet?.logo?.url,
+                url: logo?.url?.split('?')[0] || clinicsDataGet?.logo?.url,
                 fileName: logoName,
             },
             // }

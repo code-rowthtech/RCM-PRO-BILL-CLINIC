@@ -7,16 +7,15 @@
 }
 /* Add this to your CSS file or inline style */
 /* In your CSS file or inline styles */
-.custom-multiselect .ms-choice, 
+.custom-multiselect .ms-choice,
 .custom-multiselect .ms-drop {
-    border: none !important;  /* Remove border */
+    border: none !important; /* Remove border */
     box-shadow: none !important; /* Remove box shadow */
     outline: none !important; /* Remove outline */
 }
-.custom-multiselect{
+.custom-multiselect {
     border: none !important; /* Remove border */
 }
-
 
 .headers {
     background-color: #010101 !important;
@@ -28,15 +27,24 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
-.cancel-button{
-  background-color: #5C636B !important;
+.cancel-button {
+    background-color: #5c636b !important;
     border: none !important;
-
+    font-size: 14px;
 }
-.font_active_tabs{
-    font-size: 14.4px ;
+.active_inactive_buttons {
+    font-size: 13px;
+    font-weight: 400;
+    width: 78px;
+    height: 35px;
 }
-.form_heading{
+.input_search_box {
+    height: 35px;
+}
+.font_active_tabs {
+    font-size: 14.4px;
+}
+.form_heading {
     font-size: 16px;
     font-weight: 700;
 }
@@ -53,7 +61,7 @@
 .plusicon {
     color: #6169d0;
 }
-.custom-datepicker{
+.custom-datepicker {
     height: 30px !important;
 }
 
@@ -76,7 +84,6 @@
     width: 100%;
     color: #6c757d;
 }
-
 
 .flag-icon {
     top: 50%; /* Center vertically */
@@ -166,7 +173,7 @@ form textarea::placeholder {
     font-size: 14px; /* Adjust font size if needed */
 }
 .custom-date-input-select {
-    color: black !important; /* Set the input text color to black */;
+    color: black !important; /* Set the input text color to black */
 }
 .custom-date {
     color: grey !important; /* Set the input text color to grey */
@@ -175,7 +182,6 @@ form textarea::placeholder {
 .scroll-container {
     overflow-y: auto;
 }
-
 
 input,
 textarea,
@@ -298,8 +304,7 @@ table {
     background-color: #d9d9d9 !important;
     font-weight: 600;
 }
-/* 
- */
+
 .react-datepicker__input-container input {
     height: 2.3rem !important;
     width: 14rem !important;
@@ -310,35 +315,92 @@ table {
     box-shadow: none !important;
 }
 /* media query */
+@media (min-width: 768px) and (max-width: 979px) {
+    .custom-buttons {
+        font-size: 9px;
+    }
+    .cancel-button {
+        font-size: 10px;
+        height: 30px;
+    }
+}
 @media (max-width: 768px) and (min-width: 320px) {
-  .card {
-    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
+    .card {
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
+    }
+    .card-body {
+        padding: 0rem 0rem;
+    }
+    .form-label {
+        font-size: 10px;
+    }
+    .font_active_tabs {
+        font-size: 13px;
+    }
+    .custom-buttons {
+        font-size: 10px;
+    }
+    .content-page {
+        background-color: white !important;
+    }
+    .cancel-button {
+        font-size: 10px;
+        height: 30px;
+    }
+    .active_inactive_buttons {
+        font-size: 10px;
+        font-weight: 400;
+        width: 78px;
+        height: 30px;
+    }
+    .form-control::placeholder {
+        color: grey; /* Grey color for placeholders */
+        opacity: 1;
+        font-size: 10px;
+    }
+    .form-control.form-control {
+        font-size: 10px;
+    }
+    .form_heading {
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .input_search_box {
+        height: 30px;
+    }
 }
-.form-label {
-   font-size: 10px;
+.chip {
+    background-color: #6169d0 !important;
+    border-radius: 11px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.7rem;
+    line-height: 0 !important;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 2px 4px;
 }
-.font_active_tabs{
-    font-size: 13px ;
+.select--is-disabled {
+    font-weight: 600 !important;
 }
-.custom-buttons {
-  font-size: 10px;
+
+.patient-menu-item {
+    transition: background-color 0.3s ease;
+    border-bottom: 1px solid #f1f1f1;
 }
-.content-page {
-    background-color: white !important;
+
+.patient-menu-item:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }
-.cancel-button{
-font-size: 10px;
-  }
-  .form-control::placeholder {
-    color: grey; /* Grey color for placeholders */
-    opacity: 1;
-    font-size: 10px;
+
+.patient-item {
+    color: white;
 }
-.form-control.form-control{
-    font-size: 10px;
-}
-.form_heading{
-    font-size: 12px;
-    font-weight: 700;
-}
+
+.patient-item:hover,
+.active-patient-item {
+    background-color: #f5f5f5;
+    color: black;
+    transition: background-color 0.3s ease;
 }
