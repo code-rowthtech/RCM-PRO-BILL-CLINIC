@@ -52,7 +52,7 @@ const SubUpdateClinic = () => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url);
+            setLogo(url?.url?.split('?')[0]);
             setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -75,6 +75,10 @@ const SubUpdateClinic = () => {
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
+
+    useEffect(()=>{
+        setLogo(subClinicsDetailsGet?.logo?.url)
+    },[subClinicsDetailsGet]);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -269,7 +273,7 @@ const SubUpdateClinic = () => {
                 )
                 : '')
             setValue('npiNumber', subClinicsDetailsGet?.npiNumber);
-            setValue('logo', subClinicsDetailsGet?.logo);
+            setValue('logo', subClinicsDetailsGet?.logo?.url);
             setValue('medicare', subClinicsDetailsGet?.medicareNumber);
             setValue('medicaid', subClinicsDetailsGet?.medicaidNumber);
             setValue('clia', subClinicsDetailsGet?.CLIA_Number);
@@ -473,7 +477,6 @@ const SubUpdateClinic = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
-        console.log(payload, 'update Payload')
     };
     useEffect(() => {
         if (updateSuccess === 200) {
@@ -802,12 +805,12 @@ const SubUpdateClinic = () => {
                                                         ? logoName.split('/').pop()
                                                         : 'Upload Logo'} */}
                                                     {
-                                                        logoUploading
-                                                            ? 'Uploading...'
-                                                            : typeof logoName === 'string' && logoName
-                                                                ? logoName.split('/').pop()
-                                                                : 'Upload Logo'
-                                                    }
+                                                            logoUploading
+                                                                ? 'Uploading...'
+                                                                : typeof logoName === 'string' && logoName
+                                                                    ? logoName.split('/').pop().slice(0, 30) + "..."
+                                                                    : 'Upload Logo'
+                                                        }
                                                     <div className="d-flex align-items-center gap-2">
                                                         {/* Eye Icon for Preview */}
                                                         {logo && (
@@ -968,7 +971,7 @@ const SubUpdateClinic = () => {
                                             </Col>
 
                                             <hr className='mb-1' />
-                                            <Col sm={12}>
+                                            <Col sm={12} className=''>
                                                 <Form.Label>
                                                     Accreditation Details&nbsp;
                                                     <span
@@ -1005,7 +1008,7 @@ const SubUpdateClinic = () => {
                                                         />
                                                         {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                                                     </Col>
-                                                    <Col sm={4} className="mb-2 position-relative mb-md-0">
+                                                    <Col sm={4} className="mb-2 position-relative mb-md-2">
                                                         <div
                                                             onClick={() => accreditationFileInputRef.current.click()}
                                                             className="custom-file-upload justify-content-between cursor-pointer"
@@ -1059,7 +1062,7 @@ const SubUpdateClinic = () => {
                                                     </Col>
                                                 </React.Fragment>
                                             ))}
-                                            <hr />
+                                            <hr/>
                                             <Col sm={12} className="position-relative">
                                                 <Form.Label ref={containerRef} className='mb-0'>
                                                     State of Licensure&nbsp;

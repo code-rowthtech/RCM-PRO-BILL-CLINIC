@@ -17,8 +17,6 @@ const DepartmentDetails = ({ docId }) => {
   const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
   const id = doctorDetails?._id
-  // console.log(departmentId, 'departmentId')
-  // console.log(doctorDetails,'123456789876543')
   const {
     register,
     handleSubmit,
@@ -26,8 +24,7 @@ const DepartmentDetails = ({ docId }) => {
     reset,
     setValue,
   } = useForm();
-  // const id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-  // console.log(id, '12345678998765432')
+
   const [searchParams] = useSearchParams();
   const updateId = searchParams.get('id');
 

@@ -32,7 +32,6 @@ const Designation = () => {
   const pagination = store?.getMastersDataReducer?.data;
 
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
-  console.log({ pagination})
   const closeAddModal = () => {
     setAddDesiginationModal(false);
     setEdit(null);
@@ -59,11 +58,9 @@ const Designation = () => {
     };
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("Updated", payload);
     }
     else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("create", payload);
 
     }
 

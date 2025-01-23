@@ -14,10 +14,7 @@ const Contract = ({ billingId, activeTab }) => {
 
     const [show, setShow] = useState(false);
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-
     const contract = createContractReducer?.data;
-    console.log(contract, 'contractcontract')
-
     useEffect(() => {
         if (activeTab === 'contract') {
             const payload = {

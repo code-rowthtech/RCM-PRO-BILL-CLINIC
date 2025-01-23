@@ -34,7 +34,6 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
 
     const tableGetData = store?.getMastersDataReducer?.data?.result;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    console.log({ departmentGetData })
     const tableGetDataLoading = store?.getMastersDataReducer?.data?.loading;
     const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
     const roleData = store?.getRolesDataReducer?.data

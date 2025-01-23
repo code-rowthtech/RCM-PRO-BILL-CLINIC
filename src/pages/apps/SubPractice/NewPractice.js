@@ -52,7 +52,7 @@ const NewPractice = () => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url);
+            setLogo(url?.url?.split('?')[0]);
             setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -76,6 +76,7 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log({clinicsDataGet})
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -439,14 +440,14 @@ const NewPractice = () => {
             flag: 'subClinic',
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
-            ...(logo ?
-                {
+            // ...(logo ?
+                // {
                     logo: {
-                        url: logo?.url?.split('?')[0],
+                        url: logo,
                         fileName: logoName,
-                    }
-                }
-                : ''),
+                    },
+                // }
+                // : ''),
             primaryAddress: {
                 ...(formData?.address ? { address: formData?.address } : ''),
                 ...(formData?.city ? { city: formData?.city } : ''),
@@ -481,6 +482,7 @@ const NewPractice = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+        console.log({payload})
     };
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {

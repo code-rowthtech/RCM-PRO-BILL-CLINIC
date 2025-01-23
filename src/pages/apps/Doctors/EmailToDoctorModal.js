@@ -17,7 +17,6 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
     } = useForm();
     const dispatch = useDispatch();
     const onSubmit = () => {
-        // console.log(formData,'pppp')
         dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }

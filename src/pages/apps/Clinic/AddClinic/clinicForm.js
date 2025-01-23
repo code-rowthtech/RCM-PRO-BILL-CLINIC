@@ -53,17 +53,17 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo, 'logo')
+    console.log(logo,'logo')
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [showModalPic, setShowModalPic] = useState(false);
-    const [modalFileUrl, setModalFileUrl] = useState(""); 
+    const [modalFileUrl, setModalFileUrl] = useState("");
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
-        setShowModalPic(true);   
+        setShowModalPic(true);
     };
 
     const handleCloseModal = () => {
@@ -112,7 +112,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    console.log(cities1, 'cities1cities1')
     const handleAddTaxonomy = () => {
         const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
 
@@ -148,6 +147,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     }, [dispatch])
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
     console.log({ clinicsDataGet })
+
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         setField('clinicType', clinicsDataGet?.clinicType);
@@ -158,12 +158,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setValue('contact', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
             .replace(/\+1/, '') // Remove all non-numeric characters
             .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` 
+                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
             )
             : '')
         setField('clinicname', clinicsDataGet?.name);
         setField('practiceSpecialty', clinicsDataGet?.practiceSpecialty);
-        setField('taxId', clinicsDataGet?.taxIdOrEIN || '');
+        setField('taxId', clinicsDataGet?.taxIdOrEIN);
         setField('npi', clinicsDataGet?.npiNumber);
         setField('email', clinicsDataGet?.userId?.email);
         setField('medicare', clinicsDataGet?.medicareNumber);
@@ -240,7 +240,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             email: data?.email || clinicsDataGet?.userId?.email,
             phone: '+1' + data?.contact?.replace(/\D/g, '') || '+1' + clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
-            taxIdOrEIN: data?.taxId?.replace(/\D/g,''),
+            taxIdOrEIN: data?.taxId,
             npiNumber: data?.npi,
             CLIA_Number: data?.clia,
             medicareNumber: data?.medicare,
@@ -254,7 +254,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             // ...(logo ?
             //     {
             logo: {
-                url: logo?.url?.split('?')[0] || clinicsDataGet?.logo?.url,
+                url: logo,
                 fileName: logoName,
             },
             // }
@@ -307,7 +307,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url);
+            setLogo(url?.url?.split('?')[0]);
             setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -510,7 +510,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || clinicsDataGet?.userId?.primaryAddress?.city?.name)?._id;
-            console.log(selectedCounty, 'selectedCountyselectedCounty')
             setValue('city', selectedCounty)
         }
         if (cities2) {
@@ -518,7 +517,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setValue('mailingCity', selectedCounty1)
         }
     }, [cities1, cities2]);
-    console.log(store, 'store')
     const getTableData = store.getSubClinicsReducer?.data?.clinics
     const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
@@ -629,7 +627,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className='mb-0'>Practice type <span className='text-danger'>*</span></Form.Label>
                                     <Form.Select
-                                    className='form-control'
+                                        className='form-control'
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}
                                     >
@@ -803,8 +801,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         {logo && (
                                             <FiEye
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); 
-                                                    handleShowModal(logo || clinicId?.logo?.url); 
+                                                    e.stopPropagation();
+                                                    handleShowModal(logo);
                                                 }}
                                                 className="text-dark cursor-pointer"
                                                 style={{ zIndex: 1 }}
@@ -877,14 +875,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     validate: (value) =>
                                                         value?.trim().length === value.length || 'Field cannot start or end with spaces',
                                                 })}
-                                                defaultValue={code || ''} 
+                                                defaultValue={code || ''}
                                                 placeholder="Taxonomy Code"
                                                 maxLength={10}
                                                 onKeyUp={(event) => handleFirstSpace(event, index)}
                                                 onChange={(e) => {
-                                                    const inputValue = e.target.value.trimStart(); 
+                                                    const inputValue = e.target.value.trimStart();
                                                     handleTaxonomyChange(index, inputValue);
-                                                    clearErrors(`taxonomyCode[${index}]`); 
+                                                    clearErrors(`taxonomyCode[${index}]`);
                                                 }}
                                             />
                                             <span
@@ -1266,7 +1264,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0' >State <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
-                                                    className='form-control'
+                                                        className='form-control'
                                                         {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
                                                     >
@@ -1291,7 +1289,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0'>City <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
-                                                    className='form-control'
+                                                        className='form-control'
                                                         disabled={store?.getCitiesReducer?.loading}
                                                         {...register("city", { required: "City is required" })}
                                                     >

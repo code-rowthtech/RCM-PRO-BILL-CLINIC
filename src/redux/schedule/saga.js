@@ -191,7 +191,6 @@ function* deleteScheduleFunction(data) {
         });
         const response = yield call(deleteScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(response, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
