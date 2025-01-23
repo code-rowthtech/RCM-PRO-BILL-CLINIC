@@ -61,7 +61,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.patients;
-    console.log(patientsData, 'patientsDatapatientsData')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;

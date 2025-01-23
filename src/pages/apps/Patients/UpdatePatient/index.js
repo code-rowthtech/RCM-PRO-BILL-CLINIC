@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPatientByIdAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
+import ResponsibleParty from './ResponsibleParty';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -114,12 +115,13 @@ const UpdatePatientIndex = () => {
                                 </Card.Body>
                             </Card>
                             <div className='mt-2' >
-                                <Card className='px-2'>
+                                <Card className='px-3'>
                                     <div className='d-flex justify-content-between align-items-center mt-1'>
                                         <ul className="nav nav-underline">
                                             {[
                                                 'Patient Details',
                                                 'Demographics',
+                                                'Responsible Party',
                                                 'Insurances',
                                                 'Eligibility',
                                                 'Authorizations',
@@ -141,7 +143,7 @@ const UpdatePatientIndex = () => {
                                         <Button className='custom-buttons' onClick={() => navigate(-1)}>Back</Button>
                                     </div>
 
-                                    <div className="mt-2 scroll-container" style={{ height: '64vh', overflowY: 'scroll' }}>
+                                    <div className="mt-2 px-2 scroll-container" style={{ height: '64vh', overflowY: 'scroll' }}>
                                         {activeTab === 'Patient Details' && <PatientDetails />}
                                         {activeTab === 'Demographics' && <Demographics />}
                                         {activeTab === 'Insurances' && <p>Insurances Content</p>}
@@ -150,6 +152,7 @@ const UpdatePatientIndex = () => {
                                         {activeTab === 'Vital Status' && <p>Vital Status Content</p>}
                                         {activeTab === 'Balance' && <p>Balance Content</p>}
                                         {activeTab === 'Payment' && <p> Payment Content</p>}
+                                        {activeTab === 'Responsible Party' && <p><ResponsibleParty /></p>}
                                     </div>
 
 

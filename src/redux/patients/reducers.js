@@ -19,6 +19,11 @@ const CREATE_RESPONSIBLE_PARTY_INITIAL_STATE = {
     loading: false,
 }
 
+const UPDATE_RESPONSIBLE_PARTY_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
+
 const GET_RESPONSIBLE_PARTY_INITIAL_STATE = {
     data: [],
     loading: false,
@@ -118,6 +123,32 @@ export const createResponsiblePartyReducer = (state = CREATE_RESPONSIBLE_PARTY_I
                 loading: false
             }
         case PatientsActionTypes.CREATE_RESPONSIBLE_PARTY_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const updateResponsiblePartyReducer = (state = UPDATE_RESPONSIBLE_PARTY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR:
             return {
                 data: action.payload,
                 loading: false

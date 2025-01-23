@@ -54,7 +54,7 @@ const Responsiblle = ({ patientId }) => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted)
             const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.name;
             setValue('stateName', selectedState)
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
@@ -62,7 +62,7 @@ const Responsiblle = ({ patientId }) => {
     }, [selectedLocation, setValue, statesData, dispatch])
     useEffect(() => {
         if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?._id;
+            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county)?.name;
             setValue('city', selectedCounty)
         }
     }, [cities])
@@ -202,6 +202,7 @@ const Responsiblle = ({ patientId }) => {
             email: data?.email,
             contactNumber: data?.contactNumber,
             clinicId: clinicId,
+            title: data?.title,
             // patientsId: data?.patientsId,
             // status: data?.status,
             // billingInfo: data?.billingInfo,
@@ -244,7 +245,7 @@ const Responsiblle = ({ patientId }) => {
                         <div className="col-3 pe-1">
                             <Form.Label className="mb-0">Title <span className="text-danger">*</span></Form.Label>
                             <Form.Select
-                                {...register('titleName', { required: "This field is required" })}
+                                {...register('title', { required: "This field is required" })}
                             >
                                 <option value="">Select Title</option>
                                 <option value="Mr.">Mr.</option>
@@ -253,7 +254,7 @@ const Responsiblle = ({ patientId }) => {
                                 <option value="Dr.">Dr.</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
-                            {errors.titleName && <span className="text-danger">{errors.titleName.message}</span>}
+                            {errors.title && <span className="text-danger">{errors.title.message}</span>}
                         </div>
                         <div className="col-3">
                             <Form.Label htmlFor="gender" className="mb-0">Gender <span className='text-danger'>*</span></Form.Label>
@@ -597,7 +598,7 @@ const Responsiblle = ({ patientId }) => {
                                             <option
                                                 key={data?.id} // Unique key for each option
                                                 data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                value={data?._id}
+                                                value={data?.name}
                                             >
                                                 {data?.name}
                                             </option>
@@ -617,7 +618,7 @@ const Responsiblle = ({ patientId }) => {
                                             >
                                                 <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
-                                                    <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?._id}>
+                                                    <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?.name}>
 
                                                         {data?.name}
                                                     </option>
