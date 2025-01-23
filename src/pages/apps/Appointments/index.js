@@ -43,8 +43,8 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
 
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     return (
-        <Table responsive  className="table-centered table-nowrap mb-0  rounded"
-        style={{ height: appointmentsList?.length === 0 ? '75vh' : 'auto' }}>
+        <Table responsive className="table-centered table-nowrap mb-0  rounded"
+            style={{ height: appointmentsList?.length === 0 ? '75vh' : 'auto' }}>
             <thead className="text-white">
                 <tr>
                     <th className='text-white'>Sr.No.</th>
@@ -195,19 +195,40 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 isLoading={store?.getDoctorsReducer?.loading}
                                                 isClearable={true}
                                                 value={selectedDoctor}
-                                                // isDisabled={id ? true : false}
                                                 isSearchable={true}
                                                 {...register('selectedDoctor')}
                                                 onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
                                                 onChange={(data) => {
                                                     setValue('selectedDoctor', data);
                                                     handleChange(data, 'doctor');
-                                                    clearErrors('selectedDoctor')
+                                                    clearErrors('selectedDoctor');
                                                 }}
                                                 name="doctorName"
                                                 options={doctorOptions}
                                                 placeholder="Select Doctor Name"
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        minHeight: '30px',  // Reduce height
+                                                        height: '30px',
+                                                        padding: '0px',      // Remove extra padding
+                                                        fontSize: '14px',    // Adjust font size
+                                                    }),
+                                                    valueContainer: (provided) => ({
+                                                        ...provided,
+                                                        padding: '0px',      // Remove padding inside input
+                                                    }),
+                                                    input: (provided) => ({
+                                                        ...provided,
+                                                        margin: '0px',       // Ensure no additional margins
+                                                    }),
+                                                    indicatorsContainer: (provided) => ({
+                                                        ...provided,
+                                                        height: '30px',      // Keep indicators aligned
+                                                    }),
+                                                }}
                                             />
+
 
                                             {/* Additional controls shown only in the "Appointments" tab */}
                                             {activeTab === 'appointments' && (
@@ -220,8 +241,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         placeholder="Search..."
                                                         style={{ height: '30px' }}
                                                     />
-                                                    <Button className="custom-buttons" onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
-                                                        <IoCalendarOutline className="fs-4" />
+                                                    <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
+                                                        <IoCalendarOutline className="fs-5 " />
                                                     </Button>
                                                     <Button as={Link} to="/apps/appointments/newAppointment " className='py-1' style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>New Appointment</Button>
                                                 </>
