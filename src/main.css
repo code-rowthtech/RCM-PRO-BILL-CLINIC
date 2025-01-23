@@ -28,6 +28,18 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
+.cancel-button{
+  background-color: #5C636B !important;
+    border: none !important;
+
+}
+.font_active_tabs{
+    font-size: 14.4px ;
+}
+.form_heading{
+    font-size: 16px;
+    font-weight: 700;
+}
 .custom-datepicker {
     height: 30px;
     line-height: 30px; /* Ensures vertical alignment */
@@ -64,6 +76,7 @@
     width: 100%;
     color: #6c757d;
 }
+
 
 .flag-icon {
     top: 50%; /* Center vertically */
@@ -295,4 +308,37 @@ table {
 }
 .schedule-table {
     box-shadow: none !important;
+}
+/* media query */
+@media (max-width: 768px) and (min-width: 320px) {
+  .card {
+    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
+}
+.form-label {
+   font-size: 10px;
+}
+.font_active_tabs{
+    font-size: 13px ;
+}
+.custom-buttons {
+  font-size: 10px;
+}
+.content-page {
+    background-color: white !important;
+}
+.cancel-button{
+font-size: 10px;
+  }
+  .form-control::placeholder {
+    color: grey; /* Grey color for placeholders */
+    opacity: 1;
+    font-size: 10px;
+}
+.form-control.form-control{
+    font-size: 10px;
+}
+.form_heading{
+    font-size: 12px;
+    font-weight: 700;
+}
 }

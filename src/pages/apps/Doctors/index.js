@@ -64,24 +64,24 @@ const Doctors = () => {
                     <Card>
                         <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
-                                <Col sm={6}>
+                                <Col sm={6} xs={6}>
                                     <Button
                                         onClick={() => setStatus(true)}
-                                        className={`me-2 ${status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
-                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                        className={`me-md-2 ${status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
+                                        style={{ fontSize: '13px', fontWeight: '400' }}
                                     >
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
-                                        className={`me-2 ${!status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
-                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                        className={`me-md-2 ms-1 ms-md-0 ${!status ? 'custom-buttons text-white py-1' : 'bg-white border-primary text-dark py-1'}`}
+                                        style={{ fontSize: '13px', fontWeight: '400' }}
                                     >
                                         Inactive
                                     </Button>
                                 </Col>
 
-                                <Col sm={6} className='text-end'>
+                                <Col sm={6} xs={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between ">
                                         <Col xs="auto" className='d-flex gap-2'>
                                             <FormInput
@@ -89,10 +89,13 @@ const Doctors = () => {
                                                 value={search}
                                                 onChange={(e) => setSearch(e.target.value)} // Update search query
                                                 placeholder="Search..."
-                                                style={{ height: '30px' }}
+                                              
                                             />
-                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
+                                             <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py-1 d-none d-md-block" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                 New Doctor
+                                            </Button>
+                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py d-block d-md-none" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                +
                                             </Button>
                                         </Col>
                                     </Row>

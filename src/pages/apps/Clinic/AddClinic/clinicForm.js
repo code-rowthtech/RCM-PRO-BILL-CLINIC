@@ -58,12 +58,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
-    const [modalFileUrl, setModalFileUrl] = useState(""); // State to store file URL for modal
+    const [showModalPic, setShowModalPic] = useState(false);
+    const [modalFileUrl, setModalFileUrl] = useState(""); 
 
     const handleShowModal = (url) => {
-        setModalFileUrl(url); // Set the URL of the file to display in modal
-        setShowModalPic(true);   // Open the modal
+        setModalFileUrl(url);
+        setShowModalPic(true);   
     };
 
     const handleCloseModal = () => {
@@ -123,7 +123,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ToastHandle('Please complete the current Taxonomy Code field before adding another.', 'danger')
         }
     };
-    // Function to handle field changes
     const handleTaxonomyChange = (index, value) => {
         const updatedCodes = [...taxonomyCodes];
         updatedCodes[index] = value;
@@ -157,9 +156,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         //     ? clinicsDataGet.userId.phone.substring(2)
         //     : clinicsDataGet?.userId?.phone);
         setValue('contact', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
-            .replace(/\D/g, '') // Remove all non-numeric characters
+            .replace(/\+1/, '') // Remove all non-numeric characters
             .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` 
             )
             : '')
         setField('clinicname', clinicsDataGet?.name);
@@ -241,7 +240,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             email: data?.email || clinicsDataGet?.userId?.email,
             phone: '+1' + data?.contact?.replace(/\D/g, '') || '+1' + clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
-            taxIdOrEIN: data?.taxId,
+            taxIdOrEIN: data?.taxId?.replace(/\D/g,''),
             npiNumber: data?.npi,
             CLIA_Number: data?.clia,
             medicareNumber: data?.medicare,
@@ -630,6 +629,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Group className="mb-1">
                                     <Form.Label className='mb-0'>Practice type <span className='text-danger'>*</span></Form.Label>
                                     <Form.Select
+                                    className='form-control'
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}
                                     >
@@ -727,7 +727,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 e.target.value = formattedValue; // Update input value
                                                 clearErrors('phone'); // Clear validation errors
                                             }}
-                                            placeholder="(###)###-####"
+                                            placeholder="(123)456-7890"
                                             maxLength={14}
                                             onKeyPress={(event) => {
                                                 // Only allow numeric characters (0-9)
@@ -783,7 +783,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className='mb-0'>Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
+                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
                                         }`}
                                 >
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
@@ -803,8 +803,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         {logo && (
                                             <FiEye
                                                 onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent the file input from opening
-                                                    handleShowModal(logo || clinicId?.logo?.url); // Open the modal with the file URL
+                                                    e.stopPropagation(); 
+                                                    handleShowModal(logo || clinicId?.logo?.url); 
                                                 }}
                                                 className="text-dark cursor-pointer"
                                                 style={{ zIndex: 1 }}
@@ -877,14 +877,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     validate: (value) =>
                                                         value?.trim().length === value.length || 'Field cannot start or end with spaces',
                                                 })}
-                                                defaultValue={code || ''} // Populate field with the initial value if available
+                                                defaultValue={code || ''} 
                                                 placeholder="Taxonomy Code"
                                                 maxLength={10}
                                                 onKeyUp={(event) => handleFirstSpace(event, index)}
                                                 onChange={(e) => {
-                                                    const inputValue = e.target.value.trimStart(); // Remove leading spaces dynamically
+                                                    const inputValue = e.target.value.trimStart(); 
                                                     handleTaxonomyChange(index, inputValue);
-                                                    clearErrors(`taxonomyCode[${index}]`); // Clear error when input is valid
+                                                    clearErrors(`taxonomyCode[${index}]`); 
                                                 }}
                                             />
                                             <span
@@ -993,7 +993,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             {accreditationDetails && accreditationDetails?.map((accreditation, index) => (
                                 <React.Fragment key={index}>
-                                    <Col sm={4}>
+                                    <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
                                             type="text"
                                             value={accreditation?.name || ''}
@@ -1001,7 +1001,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
                                         />
                                     </Col>
-                                    <Col sm={4}>
+                                    <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
                                             type="text"
                                             value={accreditation?.number}
@@ -1020,10 +1020,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2 position-relative">
                                         <div
                                             onClick={(e) => document.getElementById(`fileInput-accreditation=${index}`).click()}
-                                            className="custom-file-upload justify-content-between cursor-pointer d-flex align-items-center"
+                                            className="custom-file-upload justify-content-between cursor-pointer d-flex align-items-center form-control"
                                             style={{ paddingTop: '6px', paddingBottom: '6px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}
                                         >
-                                            <span style={{ flex: 1 }}>
+                                            <span style={{ flex: 1 }} className=''>
                                                 {
                                                     newaccreditationLogo
                                                         ? 'Uploading...'
@@ -1103,7 +1103,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             {stateDetails.map((data, index) => (
                                 <React.Fragment key={index}>
-                                    <Col sm={4}>
+                                    <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
                                             type="text"
                                             value={data.name}
@@ -1111,7 +1111,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             placeholder="State"
                                         />
                                     </Col>
-                                    <Col sm={4}>
+                                    <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
                                             type="text"
                                             value={data.number}
@@ -1119,7 +1119,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onChange={(e) => handleStateInputChange(e, 'number', index)}
                                         />
                                     </Col>
-                                    <Col sm={4} className="mb-2 position-relative">
+                                    <Col sm={4} className="mb-2 position-relative ">
                                         <div
                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
                                             className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
@@ -1266,6 +1266,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0' >State <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
+                                                    className='form-control'
                                                         {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
                                                     >
@@ -1290,6 +1291,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0'>City <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
+                                                    className='form-control'
                                                         disabled={store?.getCitiesReducer?.loading}
                                                         {...register("city", { required: "City is required" })}
                                                     >

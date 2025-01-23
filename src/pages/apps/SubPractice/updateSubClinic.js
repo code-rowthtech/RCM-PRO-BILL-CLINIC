@@ -263,7 +263,7 @@ const SubUpdateClinic = () => {
             //     ? subClinicsDetailsGet.userId.phone.substring(2)
             //     : subClinicsDetailsGet?.userId?.phone);
             setValue('contactPerson', subClinicsDetailsGet?.userId?.phone ? subClinicsDetailsGet?.userId?.phone
-                .replace(/\D/g, '') // Remove all non-numeric characters
+                .replace(/\+1/, '') // Remove all non-numeric characters
                 .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
                     p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
                 )
@@ -592,15 +592,15 @@ const SubUpdateClinic = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-2">
-                    <Card className='px-3 py-2'>
+                <div className="container-fluid mt-2 px-0">
+                    <Card className='px-md-3 py-md-2 px-0'>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className="text-black nav-link active"
+                                                className="text-black nav-link font_active_tabs active"
                                             >
                                                 Practice Sub Update Information
                                             </button>
@@ -608,7 +608,7 @@ const SubUpdateClinic = () => {
 
                                     </ul>
                                 </div>
-                                <div className='d-flex gap-2'>
+                                <div className='d-flex gap-2  d-none d-md-block'>
                                     {btnShow && (
                                         <>
                                             <Button as={Link} to={'/apps/crm/addclinic'}>
@@ -650,6 +650,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Select
                                                         {...register('clinicType', { required: 'Practice Type is required' })}
                                                         defaultValue=""
+                                                        className='form-control'
                                                     >
                                                         <option value="">Select Clinic type</option>
                                                         {clinectypes?.map((data) => (
@@ -793,7 +794,7 @@ const SubUpdateClinic = () => {
                                                 <Form.Label className='mb-0'>Upload Logo</Form.Label>
                                                 <div
                                                     onClick={handleLogoClick}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'
+                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
                                                         }`}
                                                 >
                                                     {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
@@ -978,7 +979,7 @@ const SubUpdateClinic = () => {
                                             </Col>
                                             {accreditationDetails.map((accreditation, index) => (
                                                 <React.Fragment key={index}>
-                                                    <Col sm={4}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
                                                             value={accreditation.name}
@@ -987,7 +988,7 @@ const SubUpdateClinic = () => {
                                                         />
                                                     </Col>
 
-                                                    <Col sm={4}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
                                                             value={accreditation.number}
@@ -1004,7 +1005,7 @@ const SubUpdateClinic = () => {
                                                         />
                                                         {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
                                                     </Col>
-                                                    <Col sm={4} className="mb-2 position-relative">
+                                                    <Col sm={4} className="mb-2 position-relative mb-md-0">
                                                         <div
                                                             onClick={() => accreditationFileInputRef.current.click()}
                                                             className="custom-file-upload justify-content-between cursor-pointer"
@@ -1089,7 +1090,7 @@ const SubUpdateClinic = () => {
                                             </Col>
                                             {stateDetails.map((data, index) => (
                                                 <React.Fragment key={index}>
-                                                    <Col sm={4}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
                                                             value={data.name}
@@ -1097,7 +1098,7 @@ const SubUpdateClinic = () => {
                                                             placeholder="State"
                                                         />
                                                     </Col>
-                                                    <Col sm={4}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
                                                             value={data.number}
@@ -1271,6 +1272,7 @@ const SubUpdateClinic = () => {
                                                                         State
                                                                     </Form.Label>
                                                                     <Form.Select
+                                                                    className='form-control'
                                                                         {...register('stateName', {
                                                                             required: 'State is required',
                                                                         })} // Marked as required
@@ -1298,6 +1300,7 @@ const SubUpdateClinic = () => {
                                                                         City <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Select
+                                                                    className='form-control'
                                                                         disabled={store?.getCitiesReducer?.loading}
                                                                         {...register('city', {
                                                                             required: 'City is required',

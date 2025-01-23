@@ -137,10 +137,10 @@ const DepartmentDetails = ({ docId }) => {
             :
             <>
               <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold mb-1">
+                <p className=" form_heading mb-1">
                   Identification & Credentials  {!updateId && <span className='text-danger'>*</span>}
                 </p>
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   {/* TIN/SSN Field */}
                   <Form.Group className="mb-1">
                     <Form.Label className="mb-0">
@@ -203,7 +203,7 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
                 </div>
 
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   {/* NPI Field */}
                   <Form.Group className="mb-1">
                     <Form.Label className="mb-0">
@@ -254,7 +254,7 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
                   <div className="row">
                     {/* CAQH Username Field */}
-                    <div className="col-6">
+                    <div className="col-md-6 col-12">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">
                           CAQH Username  {!updateId && <span className='text-danger'>*</span>}
@@ -275,7 +275,7 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
 
                     {/* CAQH Password Field */}
-                    <div className="col-6">
+                    <div className="col-md-6 col-12">
                       <Form.Group className='mb-2 '>
                         <Form.Label className="mb-0">CAQH Password {!updateId && <span className="text-danger">*</span>}</Form.Label>
                         <div className="position-relative">
@@ -308,10 +308,10 @@ const DepartmentDetails = ({ docId }) => {
               </div>
 
               <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold mb-1">
+                <p className=" mb-1 form_heading">
                   Medicare & Medicaid Information  {!updateId && <span className='text-danger'>*</span>}
                 </p>
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   {/* Medicare PTAN */}
                   <Form.Group className="mb-1">
                     <Form.Label className="mb-0">
@@ -356,7 +356,7 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
                 </div>
 
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   <div className="row">
                     {/* Medicaid ID */}
                     <div className="col-12">
@@ -431,10 +431,10 @@ const DepartmentDetails = ({ docId }) => {
               </div>
 
               <div className="row mt-1" style={{ borderBottom: '1px solid #444141' }}>
-                <p className="fw-bold mt-1 mb-1">
+                <p className=" mt-1 mb-1 form_heading">
                   Licensing Information  {!updateId && <span className='text-danger'>*</span>}
                 </p>
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   {/* State License */}
                   <Form.Group className="mb-1">
                     <Form.Label className="mb-0">
@@ -472,7 +472,7 @@ const DepartmentDetails = ({ docId }) => {
                   </Form.Group>
                 </div>
 
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   {/* State License Provider */}
                   <Form.Group className="mb-1">
                     <Form.Label className="mb-0">
@@ -494,7 +494,7 @@ const DepartmentDetails = ({ docId }) => {
 
                   <div className="row">
                     {/* State License Issue Date */}
-                    <div className="col-6">
+                    <div className="col-md-6 col-12">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">
                           State License Issue Date  {!updateId && <span className='text-danger'>*</span>}
@@ -517,7 +517,7 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
 
                     {/* License Expiration Date */}
-                    <div className="col-6">
+                    <div className="col-md-6 col-12">
                       <Form.Group className="mb-2">
                         <Form.Label className="mb-0">
                           License Expiration Date  {!updateId && <span className='text-danger'>*</span>}
@@ -543,7 +543,7 @@ const DepartmentDetails = ({ docId }) => {
               </div>
 
               <div className="row mt-1">
-                <div className="col-4">
+                <div className="col-md-4 col-12">
                   <div>
                     <Form.Group className="mb-1">
                       <Form.Label htmlFor="DEA" className="form-label mb-0">
@@ -569,7 +569,7 @@ const DepartmentDetails = ({ docId }) => {
                     </Form.Group>
                   </div>
                 </div>
-                <div className="col-4">
+                <div className="col-md-4 col-12">
                   <div>
                     <div className="row">
                       <Form.Group className="mb-1">
@@ -594,7 +594,7 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
                   </div>
                 </div>
-                <div className="col-4">
+                <div className="col-md-4 col-12">
                   <div>
                     <div className="row">
                       <Form.Group className="mb-1">
