@@ -52,7 +52,7 @@ const NewPractice = () => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url);
+            setLogo(url?.url?.split('?')[0]);
             setLogoName(selectedFile?.name)
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -76,6 +76,7 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log({clinicsDataGet})
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -258,7 +259,7 @@ const NewPractice = () => {
             //     ? clinicsDataGet.userId.phone.substring(2)
             //     : clinicsDataGet?.userId?.phone);
                 setValue('contactPerson', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
-                            .replace(/\D/g, '') // Remove all non-numeric characters
+                            .replace(/\+1/, '') // Remove all non-numeric characters
                             .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
                                 p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
                             )
@@ -439,14 +440,14 @@ const NewPractice = () => {
             flag: 'subClinic',
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
-            ...(logo ?
-                {
+            // ...(logo ?
+                // {
                     logo: {
-                        url: logo?.url?.split('?')[0],
+                        url: logo,
                         fileName: logoName,
-                    }
-                }
-                : ''),
+                    },
+                // }
+                // : ''),
             primaryAddress: {
                 ...(formData?.address ? { address: formData?.address } : ''),
                 ...(formData?.city ? { city: formData?.city } : ''),
@@ -481,6 +482,7 @@ const NewPractice = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
+        console.log({payload})
     };
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {
@@ -605,14 +607,14 @@ const NewPractice = () => {
         <>
             <div className='pt-1 pb-2'>
                 <div className="container-fluid mt-2">
-                    <Card className='px-3 py-2'>
+                    <Card className='px-md-3 py-md-2'>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === "personalDetails" ? "active" : ""}`}
                                                 onClick={() => handleTabChange("personalDetails")}
                                             >
                                                 Practice Sub Information
@@ -620,7 +622,7 @@ const NewPractice = () => {
                                         </li>
                                     </ul>
                                 </div>
-                                <div className='d-flex gap-2'>
+                                <div className='d-flex gap-2  d-none d-md-block'>
                                     {btnShow && (
                                         <>
                                             {/* 
@@ -628,7 +630,7 @@ const NewPractice = () => {
                                                     Email to Sub Practice
                                                 </Button>
                                            */}
-                                            <Button as={Link} to={'/apps/crm/addclinic'}>
+                                            <Button className='custom-buttons' as={Link} to={'/apps/crm/addclinic'}>
                                                 Back
                                             </Button>
                                         </>
@@ -670,6 +672,7 @@ const NewPractice = () => {
                                                         <Form.Select
                                                             {...register('clinicType', { required: 'Practice Type is required' })}
                                                             onChange={(e) => formDataChange('clinicType', e.target.value)}
+                                                            className='form-control'
                                                             defaultValue=""
                                                         >
                                                             <option value="">Select Clinic type</option>
@@ -809,7 +812,7 @@ const NewPractice = () => {
                                                     <Form.Label className='mb-0'>Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName ? '' : 'custom-form-fields'}`}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'}`}
                                                     >
                                                         {/* {
                                                             logoUploading
@@ -1034,7 +1037,7 @@ const NewPractice = () => {
                                                 </Col>
                                                 {accreditationDetails.map((accreditation, index) => (
                                                     <React.Fragment key={index}>
-                                                        <Col sm={4}>
+                                                        <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
                                                                 value={accreditation.name}
@@ -1045,7 +1048,7 @@ const NewPractice = () => {
                                                             />
                                                         </Col>
 
-                                                        <Col sm={4}>
+                                                        <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
                                                                 value={accreditation.number}
@@ -1064,10 +1067,10 @@ const NewPractice = () => {
                                                         <Col sm={4} className="mb-2 position-relative">
                                                             <div
                                                                 onClick={() => accreditationFileInputRef.current.click()}
-                                                                className="custom-file-upload justify-content-between cursor-pointer"
+                                                                className="custom-file-upload justify-content-between cursor-pointer form-control"
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
                                                             >
-                                                                <span style={{ flex: 1 }}>
+                                                                <span style={{ flex: 1 }} >
                                                                     {
                                                                         newaccreditationLogo
                                                                             ? 'Uploading...'
@@ -1144,7 +1147,7 @@ const NewPractice = () => {
                                                 </Col>
                                                 {stateDetails.map((data, index) => (
                                                     <React.Fragment key={index}>
-                                                        <Col sm={4}>
+                                                        <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
                                                                 value={data.name}
@@ -1152,7 +1155,7 @@ const NewPractice = () => {
                                                                 placeholder="State"
                                                             />
                                                         </Col>
-                                                        <Col sm={4}>
+                                                        <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
                                                                 value={data.number}
@@ -1319,6 +1322,7 @@ const NewPractice = () => {
                                                                             State <span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
+                                                                        className='form-control'
                                                                             {...register('stateName', {
                                                                                 required: 'State is required',
                                                                             })}
@@ -1346,6 +1350,7 @@ const NewPractice = () => {
                                                                             City<span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
+                                                                        className='form-control'
                                                                             disabled={store?.getCitiesReducer?.loading}
                                                                             {...register('city', {
                                                                                 required: 'City is required',

@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 const EmailToDoctorModal = ({ show, closeModal,setFormData, formData }) => {
         const store = useSelector((state) => state)
     
-    console.log({formData})
     const getRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createSubClinicsReducer?.data?.status;
 

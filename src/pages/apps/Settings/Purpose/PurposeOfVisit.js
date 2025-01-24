@@ -106,7 +106,7 @@ const POV = () => {
 
   return (
     <Row className='mt-2'>
-      <Col xs={12}>
+      <Col xs={12} className='px-0'>
         <Card >
           <Card.Body style={{ height: '88vh' }}>
             <Row className="mb-2">
@@ -114,25 +114,26 @@ const POV = () => {
                 <Button
                   variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={`${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={`active_inactive_buttons ${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
                 >
                   Active
                 </Button>
                 <Button
                   variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2`}
+                  className={` active_inactive_buttons ${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
                 >
                   Inactive
                 </Button>
               </Col>
-              <Col sm={6} className='text-end'>
+              <Col sm={6} className='text-end mt-md-0 mt-2 mt-sm-0'>
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className='d-flex gap-2'>
                     <FormInput
                       type="text"
                       onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
                       placeholder="Search..."
+                      className='input_search_box'
                     />
                     <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
                     <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>

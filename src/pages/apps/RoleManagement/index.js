@@ -164,40 +164,41 @@ const RoleManagement = () => {
     }
     return (
         <Row className='mt-2'>
-            <Col xs={12}>
+            <Col xs={12} className='px-0'>
                 <Card>
                     <Card.Body className='' style={{ height: '76vh' }}>
                         <Row className="mb-2">
-                            <Col sm={6}>
+                            <Col xs={6}>
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
-                                    style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                    className={`active_inactive_buttons ${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
                                 >
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
-                                    style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                    className={` active_inactive_buttons ${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
                                 >
                                     Inactive
                                 </Button>
                             </Col>
-                            <Col sm={6} className='text-end'>
-                                <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
+                            <Col xs={6} className='text-end'>
+                                <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                     <Col xs="auto" className='d-flex gap-2'>
                                         <FormInput
                                             type="text"
                                             placeholder="Search..."
                                             value={searchQuery}  // Bind the input to the searchQuery state
                                             onChange={handleSearchChange}
-                                            style={{ height: '30px' }}
+                                            className='input_search_box'
                                         />
-                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
+                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons d-none d-md-block py-1" >
                                             Add User
+                                        </Button>
+                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons d-md-none py-1">
+                                            +
                                         </Button>
                                     </Col>
                                 </Row>

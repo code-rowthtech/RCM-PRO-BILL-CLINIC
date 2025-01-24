@@ -44,7 +44,7 @@ const Index = () => {
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card className="px-3 py-2">
+                    <Card className="px-md-3 py-md-2">
                         <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex gap-3">
@@ -54,7 +54,7 @@ const Index = () => {
                                             onClick={() => handleActiveTab(tab)}
                                             role="button"
                                             tabIndex="0"
-                                            className={`fw-semibold cursor-pointer ${
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${
                                                 activeTab === tab ? 'border-bottom border-2 border-dark text-black fw-bold' : ''
                                             }`}>
                                             {tab === 'clinic'
