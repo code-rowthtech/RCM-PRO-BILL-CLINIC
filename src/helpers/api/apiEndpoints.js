@@ -64,6 +64,8 @@ export const updatePatients = '/api/v1/clinics/patient-edit';
 export const createResponsibleParty = '/api/v1/clinics/responsible-party-add';
 export const updateResponsibleParty = '/api/v1/clinics/responsible-party-edit';
 export const getResponsibleParty = '/api/v1/clinics/responsible-party-get';
+export const createInsurance = 'api/v1/clinics/createInsurances';
+export const updateInsurance = 'api';
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';

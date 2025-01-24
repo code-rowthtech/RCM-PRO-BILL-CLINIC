@@ -4,7 +4,7 @@ import SecondaryInsurance from './SecondaryInsurance';
 import AutoAccident from './AutoAccident';
 import WorkersCamp from './WorkersCamp';
 
-const Insurance = () => {
+const Insurance = ({ patientId }) => {
     const [activeTab, setActiveTab] = useState("primaryInsurance");
 
     const handleTabChange = (tab) => {
@@ -52,15 +52,15 @@ const Insurance = () => {
                 </div>
                 <div className="col-12 mt-2">
                     {activeTab === 'primaryInsurance' ?
-                        <PrimaryInsurance />
+                        <PrimaryInsurance patientId={patientId} />
                         :
                         activeTab === 'secondaryInsurance' ?
-                            <SecondaryInsurance />
+                            <SecondaryInsurance patientId={patientId} />
                             :
                             activeTab === 'autoAccident' ?
-                                <AutoAccident />
+                                <AutoAccident patientId={patientId} />
                                 : activeTab === 'workersCamp' ?
-                                    <WorkersCamp /> : ''
+                                    <WorkersCamp patientId={patientId} /> : ''
                     }
 
                 </div>

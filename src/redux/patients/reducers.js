@@ -32,6 +32,16 @@ const UPDATE_PATIENTS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const UPDATE_INSURANCE_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const CREATE_INSURANCE_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -201,6 +211,58 @@ export const updatePatientsReducer = (state = UPDATE_PATIENTS_INITIAL_STATE, act
                 loading: false
             }
         case PatientsActionTypes.UPDATE_PATIENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const createInsuranceReducer = (state = CREATE_INSURANCE_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.CREATE_INSURANCE_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.CREATE_INSURANCE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.CREATE_INSURANCE_ERROR:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
+            return {
+                data: [],
+                loading: false
+            }
+        default: return state
+    }
+}
+
+export const updateInsuranceReducer = (state = UPDATE_INSURANCE_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPDATE_INSURANCE_LOADING:
+            return {
+                data: state.data,
+                loading: true
+            }
+        case PatientsActionTypes.UPDATE_INSURANCE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false
+            }
+        case PatientsActionTypes.UPDATE_INSURANCE_ERROR:
             return {
                 data: action.payload,
                 loading: false

@@ -386,7 +386,7 @@ table {
 
 .navbar-custom {
     margin-top: 50px !important;
-    height: 100px!important;
+    /* height: 100px!important; */
 }
 
 /* .leftside-menu {
@@ -396,9 +396,9 @@ table {
 /* .logo.logo-light {
     margin-top: 60px !important;
 } */
-.content{
+.content {
     margin-top: 65px !important;
 }
 .navbar-custom-top {
-    background-color: #313A46 !important;
+    background-color: #313a46 !important;
 }

@@ -91,6 +91,8 @@ const NewPatient = () => {
             setLogoName(null);
             setPatientId(null);
             dispatch(stateEmptydAction());
+        } else if (createResponse === 201 && submissionType === 'save') {
+            setPatientId(createPatientResponse?._id)
         }
     }, [createResponse, submissionType])
     useEffect(() => {
@@ -777,13 +779,13 @@ const NewPatient = () => {
                                 <Button variant="primary" onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button variant="primary" disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button variant="primary" onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save
                                 </Button>
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle patientId={patientId} />}
-                        {activeTab === "insurance" && <Insurance />}
+                        {activeTab === "insurance" && <Insurance patientId={patientId} />}
                         {activeTab === "demographicDetails" && <Demographicdetails patientId={patientId} />}
                         {activeTab === "referringDoctor" && <ReferringDoctor patientId={patientId} />}
                     </div>

@@ -38,6 +38,15 @@ export const updatePatientsAction = (data): AuthAction => ({
     data
 });
 
+export const createInsuranceAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_INSURANCE,
+    data
+});
+
+export const updateInsuranceAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_INSURANCE,
+    data
+});
 export const stateEmptydAction = (): LayoutAction => ({
     type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
