@@ -79,7 +79,7 @@ const Documents = () => {
           <div className="col-12">
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="row">
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   <div className="mb-1">
                     <label htmlFor="firstName" className="form-label mb-0">
                       State License #
@@ -92,7 +92,7 @@ const Documents = () => {
                     />
                   </div>
                 </div>
-                <div className="col-6">
+                <div className="col-md-6 col-12">
                   <div className="mb-1">
                     <label htmlFor="firstName" className="form-label mb-0">
                       State License Provider (licensing authority name)

@@ -101,16 +101,15 @@ const RoleSetting = () => {
                 title={'Roles'}
             /> */}
             <Row className='mt-2'>
-                <Col xs={12}>
+                <Col xs={12} className='px-0'>
                     <Card>
                         <Card.Body className="scroll-container" style={{ minHeight: '76vh', overflowY: 'auto' }}>
                             <Row className="mb-2 d-flex justify-content-between">
-                                <Col sm={6}>
+                                <Col xs={6}>
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
-                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                        className={`active_inactive_buttons ${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
                                     >
                                         Active
                                     </Button>
@@ -118,14 +117,13 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
-                                        style={{ fontSize: '13px', fontWeight: '400', height: '30px' }}
+                                        className={`active_inactive_buttons ${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
                                     >
                                         Inactive
                                     </Button>
                                 </Col>
-                                <Col xs="auto">
-                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
+                                <Col xs={6}>
+                                    <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                         <Col xs="auto" className="d-flex gap-2">
                                             <FormInput
                                                 type="text"
@@ -144,14 +142,19 @@ const RoleSetting = () => {
                                                     );
                                                 }}
                                                 placeholder="Search..."
-                                                style={{ height: '30px' }}
+                                                className='input_search_box'
                                             />
                                             <Button
-                                                className="custom-buttons py-1"
+                                                className="custom-buttons py-1 d-none d-md-block"
                                                 onClick={() => setShowModal(true)}
-                                                style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}
                                             >
                                                 <span className="uil-plus"></span> Add New Role
+                                            </Button>
+                                            <Button
+                                                className="custom-buttons d-md-none py-1"
+                                                onClick={() => setShowModal(true)}
+                                            >
+                                                <span className="uil-plus"></span> 
                                             </Button>
                                         </Col>
                                     </Row>

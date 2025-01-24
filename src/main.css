@@ -35,8 +35,28 @@
     background-color: #6169d0 !important;
     border: none !important;
 }
-
-.custom-datepicker {
+<<<<<<< HEAD ======= .cancel-button {
+    background-color: #5c636b !important;
+    border: none !important;
+    font-size: 14px;
+}
+.active_inactive_buttons {
+    font-size: 13px;
+    font-weight: 400;
+    width: 78px;
+    height: 35px;
+}
+.input_search_box {
+    height: 35px;
+}
+.font_active_tabs {
+    font-size: 14.4px;
+}
+.form_heading {
+    font-size: 16px;
+    font-weight: 700;
+}
+>>>>>>>7c867924567b4b733002c5754a529b1a7faf13 .custom-datepicker {
     height: 30px;
     line-height: 30px;
     /* Ensures vertical alignment */
@@ -347,6 +367,61 @@ table {
     box-shadow: none !important;
 }
 
+/* media query */
+@media (min-width: 768px) and (max-width: 979px) {
+    .custom-buttons {
+        font-size: 9px;
+    }
+    .cancel-button {
+        font-size: 10px;
+        height: 30px;
+    }
+}
+@media (max-width: 768px) and (min-width: 320px) {
+    .card {
+        box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
+    }
+    .card-body {
+        padding: 0rem 0rem;
+    }
+    .form-label {
+        font-size: 10px;
+    }
+    .font_active_tabs {
+        font-size: 13px;
+    }
+    .custom-buttons {
+        font-size: 10px;
+    }
+    .content-page {
+        background-color: white !important;
+    }
+    .cancel-button {
+        font-size: 10px;
+        height: 30px;
+    }
+    .active_inactive_buttons {
+        font-size: 10px;
+        font-weight: 400;
+        width: 78px;
+        height: 30px;
+    }
+    .form-control::placeholder {
+        color: grey; /* Grey color for placeholders */
+        opacity: 1;
+        font-size: 10px;
+    }
+    .form-control.form-control {
+        font-size: 10px;
+    }
+    .form_heading {
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .input_search_box {
+        height: 30px;
+    }
+}
 .chip {
     background-color: #6169d0 !important;
     border-radius: 11px;

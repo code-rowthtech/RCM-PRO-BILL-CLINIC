@@ -32,7 +32,6 @@ const Designation = () => {
   const pagination = store?.getMastersDataReducer?.data;
 
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
-  console.log({ pagination})
   const closeAddModal = () => {
     setAddDesiginationModal(false);
     setEdit(null);
@@ -59,11 +58,9 @@ const Designation = () => {
     };
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("Updated", payload);
     }
     else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("create", payload);
 
     }
 
@@ -108,7 +105,7 @@ const Designation = () => {
   };
   return (
     <Row className='mt-2'>
-      <Col xs={12}>
+      <Col xs={12} className='px-0'>
         <Card>
           <Card.Body  style={{height:'76vh'}}>
             <Row className="mb-2">
@@ -116,32 +113,30 @@ const Designation = () => {
                 <Button
                   variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={`${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
-                  style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
+                  className={` active_inactive_buttons ${status ? 'custom-buttons text-light ' : 'bg-none border-primary text-dark'} me-2 py-1`}
                 >
                   Active
                 </Button>
                 <Button
                   variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={`${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
-                  style={{fontSize:'13px', fontWeight:'400',height:'30px'}}
+                  className={`active_inactive_buttons ${!status ? 'custom-buttons text-light' : 'bg-none border-primary text-dark'} me-2 py-1`}
                 >
                   Inactive
                 </Button>
               </Col>
-              <Col sm={6} className='text-end'>
+              <Col sm={6} className='text-end mt-md-0 mt-2 mt-sm-0'>
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className='d-flex gap-2'>
                     <FormInput
                       type="text"
                       onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
                       placeholder="Search..."
-                      style={{height:'30px'}}
+                      className='input_search_box'
                     />
-                    <Button className="custom-buttons py-0" style={{height:'30px'}} ><FiFilter className='fs-5' style={{fontSize:'13px', fontWeight:'400'}} /></Button>
-                    <Button className="custom-buttons py-0" style={{height:'30px'}} ><FiFileText className='fs-5' style={{fontSize:'13px', fontWeight:'400'}} /></Button>
-                    <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons py-1" style={{fontSize:'13px',height:'30px', fontWeight:'400'}}>
+                    <Button className="custom-buttons py-0" ><FiFilter className='fs-5' /></Button>
+                    <Button className="custom-buttons py-0" ><FiFileText className='fs-5' /></Button>
+                    <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons py-1">
                       New Desigination
                     </Button>
                   </Col>
