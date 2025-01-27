@@ -261,7 +261,7 @@ const NewAppointment = () => {
         }
     }
     return (
-        <Card className="mt-2" style={{ height: "87vh" }}>
+        <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
             <div className="d-flex justify-content-between align-items-center mx-3 my-2">
                 <h5 className="fw-bold mb-0">
                     {id ?
@@ -270,7 +270,7 @@ const NewAppointment = () => {
                         'New Appointment'
                     }
                 </h5>
-                <Button variant='secondary' onClick={handleAppointment}>Back</Button>
+                <Button className="cancel-button" onClick={handleAppointment}>Back</Button>
             </div>
             <Card.Body className='py-1'>
                 {store?.getAppointmentByIdReducer?.loading ?
@@ -530,7 +530,7 @@ const NewAppointment = () => {
                                 <div className="row">
                                     <div className="col-12">
                                         <div className="d-flex justify-content-end gap-2 mt-3">
-                                            <Button variant="secondary">Cancel</Button>
+                                            <Button className="cancel-button">Cancel</Button>
                                             <Button className="custom-buttons" type="submit" disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}>
                                                 {store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading ?
                                                     <Spinner className="spinner-border-sm" color="white" />

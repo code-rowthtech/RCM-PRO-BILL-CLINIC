@@ -106,8 +106,8 @@ const Designation = () => {
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>
-        <Card>
-          <Card.Body  style={{height:'76vh'}}>
+      <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+          <Card.Body  >
             <Row className="mb-2">
               <Col sm={6}>
                 <Button

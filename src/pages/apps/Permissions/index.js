@@ -81,8 +81,8 @@ const Permissions = () => {
             /> */}
             <Row className='mt-2'>
                 <Col xs={12}>
-                    <Card>
-                        <Card.Body>
+                <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col xs="auto">
                                     <FormInput onChange={(e) => setSearch(e.target.value)} type="text" name="search" placeholder="Search..." />

@@ -102,8 +102,8 @@ const RoleSetting = () => {
             /> */}
             <Row className='mt-2'>
                 <Col xs={12} className='px-0'>
-                    <Card>
-                        <Card.Body className="scroll-container" style={{ minHeight: '76vh', overflowY: 'auto' }}>
+                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col xs={6}>
                                     <Button
@@ -154,7 +154,7 @@ const RoleSetting = () => {
                                                 className="custom-buttons d-md-none py-1"
                                                 onClick={() => setShowModal(true)}
                                             >
-                                                <span className="uil-plus"></span> 
+                                                <span className="uil-plus"></span>
                                             </Button>
                                         </Col>
                                     </Row>

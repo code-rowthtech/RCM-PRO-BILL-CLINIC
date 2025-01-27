@@ -165,10 +165,10 @@ const RoleManagement = () => {
     return (
         <Row className='mt-2'>
             <Col xs={12} className='px-0'>
-                <Card>
-                    <Card.Body className='' style={{ height: '76vh' }}>
+            <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card.Body className='' >
                         <Row className="mb-2">
-                            <Col xs={6}>
+                            <Col md={6} sm={6} xs={6}>
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
@@ -184,7 +184,7 @@ const RoleManagement = () => {
                                     Inactive
                                 </Button>
                             </Col>
-                            <Col xs={6} className='text-end'>
+                            <Col md={6} sm={6} xs={6} className='text-end'>
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                     <Col xs="auto" className='d-flex gap-2'>
                                         <FormInput
@@ -210,14 +210,14 @@ const RoleManagement = () => {
                                     style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Sr. No.</th>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Name</th>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Phone</th>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Username</th>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Joining Date</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Sr. No.</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Name</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Phone</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Username</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Joining Date</th>
 
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Status</th>
-                                            <th className="text-white py-2" style={{ fontSize: '13px' }}>Action</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Status</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -230,19 +230,19 @@ const RoleManagement = () => {
                                         ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
                                             roleData?.users.map((data, index) => (
                                                 <tr key={index} className="border-bottom">
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                                                    <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                                                    <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.firstName?.charAt(0).toUpperCase() + data?.firstName?.slice(1)}
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
-                                                    <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"

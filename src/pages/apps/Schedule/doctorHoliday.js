@@ -39,11 +39,11 @@ const DoctorHoliday = () => {
               style={{ height: scheduleResponse?.length === 0 ? '90vh' : 'auto' }}>
         <thead className="text-white">
           <tr>
-            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Sr.No.</th>
-            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Doctor Name</th>
-            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Reason</th>
-            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Date</th>
-            <th className="text-white py-2"  style={{ fontSize: '13px' }}>Action</th>
+            <th className="text-white "  style={{ fontSize: '13px' }}>Sr.No.</th>
+            <th className="text-white "  style={{ fontSize: '13px' }}>Doctor Name</th>
+            <th className="text-white "  style={{ fontSize: '13px' }}>Reason</th>
+            <th className="text-white "  style={{ fontSize: '13px' }}>Date</th>
+            <th className="text-white "  style={{ fontSize: '13px' }}>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -62,15 +62,15 @@ const DoctorHoliday = () => {
           ) : (
             scheduleResponse.map((holiday, index) => (
               <tr key={holiday?.id || index}>
-                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
-                <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
-                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                  <div className=" py-1 text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
+                <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                <td className='text-capitalize ' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
+                <td className='text-capitalize ' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
+                <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
+                  <div className="  text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>
                     {new Date(holiday?.date).toLocaleDateString('en-GB')}
                   </div>
                 </td>
-                <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
                   <RiDeleteBin5Line onClick={() => deleteHandle(holiday?._id)} className="fs-4 text-danger ms-2 cursor-pointer" />
                 </td>
               </tr>

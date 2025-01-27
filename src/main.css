@@ -20,9 +20,9 @@
 .headers {
     background-color: #010101 !important;
 }
-/* :root{
+:root{
     overflow: hidden;
-} */
+}
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
@@ -32,6 +32,7 @@
     border: none !important;
     font-size: 14px;
 }
+
 .active_inactive_buttons {
     font-size: 13px;
     font-weight: 400;
@@ -49,7 +50,7 @@
     font-weight: 700;
 }
 .custom-datepicker {
-    height: 30px;
+    height: 30px !important;
     line-height: 30px; /* Ensures vertical alignment */
     padding: 0 8px; /* Adds space inside the input */
     font-size: 14px; /* Matches the font size of the Select component */
@@ -60,9 +61,6 @@
 
 .plusicon {
     color: #6169d0;
-}
-.custom-datepicker {
-    height: 30px !important;
 }
 
 .light-border-bottom {
@@ -306,7 +304,7 @@ table {
 }
 
 .react-datepicker__input-container input {
-    height: 2.3rem !important;
+    height: 30px !important;
     width: 14rem !important;
     padding: 0 0.5rem !important;
     border-radius: 3px;
@@ -368,6 +366,14 @@ table {
     .input_search_box {
         height: 30px;
     }
+    .react-datepicker__input-container input {
+        height: 30px !important;
+        width: 10rem !important;
+        padding: 0 0.5rem !important;
+        border-radius: 3px;
+        font-size: 10px;
+    }
+  
 }
 .chip {
     background-color: #6169d0 !important;

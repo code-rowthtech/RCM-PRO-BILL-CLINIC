@@ -28,7 +28,7 @@ const Contract = ({ billingId, activeTab }) => {
 
     return (
         <>
-            <Row style={{ height: '100%' }}>
+            <Row >
                 {getContractReducer?.loading ? (
                     <Row>
                         <Col className="d-flex justify-content-center align-items-center">

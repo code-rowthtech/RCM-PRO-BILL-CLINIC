@@ -22,7 +22,7 @@ const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     // }, [dispatch])
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
-        <>
+        <div className='scroll-container' style={{height: '82vh', overflow: 'scroll' }}>
             {/* <PageTitle
                 breadCrumbItems={[
                     { label: 'Dashboard', path: '/', active: true },
@@ -58,7 +58,7 @@ const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
                     <Calendar />
                 </Col> */}
             </Row>
-        </>
+        </div>
     );
 };
 

@@ -58,8 +58,8 @@ const Setting = () => {
         <>
             <Row className='mt-2'>
                 <Col xs={12}>
-                    <Card>
-                        <Card.Body>
+                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                   <Card.Body>
                             <Row className="mb-2">
                             <Col sm={6}>
                                     <Button
