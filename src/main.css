@@ -1,3 +1,7 @@
+body {
+    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen',
+        'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
 .cursor-pointer {
     cursor: pointer !important;
 }
@@ -28,14 +32,18 @@
     background-color: #010101 !important;
 }
 
-/* :root{
+:root {
     overflow: hidden;
-} */
+}
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
+    /* height: 30px !important; */
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
 }
-<<<<<<< HEAD ======= .cancel-button {
+.cancel-button {
     background-color: #5c636b !important;
     border: none !important;
     font-size: 14px;
@@ -56,20 +64,14 @@
     font-size: 16px;
     font-weight: 700;
 }
->>>>>>>7c867924567b4b733002c5754a529b1a7faf13 .custom-datepicker {
+.custom-datepicker {
     height: 30px;
     line-height: 30px;
-    /* Ensures vertical alignment */
     padding: 0 8px;
-    /* Adds space inside the input */
     font-size: 14px;
-    /* Matches the font size of the Select component */
     border: 1px solid #ced4da;
-    /* Matches default input borders */
     border-radius: 4px;
-    /* Ensures consistent rounded corners */
     width: 100%;
-    /* Optional: Sets width to fit the parent container */
 }
 
 .plusicon {
@@ -126,13 +128,15 @@
 
 .form-label {
     color: black;
-    font-weight: 650 !important;
+    font-weight: 550 !important;
 }
 
 .form-control,
 .form-select {
     color: black !important;
     font-weight: 550 !important;
+    padding: 5px !important;
+    font-size: 14px;
 }
 
 .form-select {
@@ -149,18 +153,10 @@
     color: black !important;
 }
 
-/* .form-select.empty {
-    color: red !important;
-} */
-
-/* .form-control::placeholder {
-    color: #a9a9a9;
-    opacity: 0.8;
-} */
-
 .custom-form-fields,
 .form-control::placeholder {
     color: #a9a9a982 !important;
+    font-size: 12px;
 }
 
 table {
@@ -413,6 +409,9 @@ table {
     }
     .form-control.form-control {
         font-size: 10px;
+    }
+    .form-control {
+        padding: 0px !important;
     }
     .form_heading {
         font-size: 12px;

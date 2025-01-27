@@ -22,6 +22,7 @@ import { encryptMessage } from '../cryptoUtils';
 import { FormInput } from '../components';
 import Spinner from '../constants/Spinner';
 import { Button } from 'react-bootstrap';
+import { IoMdAdd } from 'react-icons/io';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -99,7 +100,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
     return (
         <>
-            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} ref={menuNodeRef}>
+            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '53px' }} ref={menuNodeRef}>
                 {/* {!hideLogo && (
                     <>
                         <Link to="/" className="logo text-center logo-light">
@@ -124,13 +125,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
                     <>
                         {!isCondensed && (
-                            <ul style={{ listStyle: 'none' }} className='px-0 mt-1'>
+                            <ul style={{ listStyle: 'none' }} className='px-0'>
                                 <li className='px-1 mb-1'>
                                     <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
                                 </li>
                                 <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
                                     <Link to='/apps/patients/new-patient'>
-                                        <Button className='custom-buttons w-100'>Add New Patient</Button>
+                                        <Button
+                                            className='border-0 w-100 d-flex align-items-center justify-content-center text-black'
+                                            style={{
+                                                height: '30px',
+                                                backgroundColor: '#ffffff',
+                                                boxShadow: 'none',
+                                            }}
+                                        >
+                                            <IoMdAdd /> &nbsp; New Patient
+                                        </Button>
                                     </Link>
                                 </li>
                                 {store?.getPatientsReducer?.loading ?
@@ -142,7 +152,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                     patientsData.map((data, index) => (
                                         <li
                                             key={index}
-                                            className={`py-2 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                            className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
                                             onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
                                         >
                                             <div className="d-flex gap-2 align-items-center">

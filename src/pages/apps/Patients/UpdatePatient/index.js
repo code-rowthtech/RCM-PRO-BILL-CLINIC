@@ -13,6 +13,8 @@ import { getPatientByIdAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
+import Insurance from './Insurance/Insurance';
+import VitalStatus from './VitalStatus';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -36,19 +38,60 @@ const UpdatePatientIndex = () => {
 
     }, [id, updateSuccess])
     const [activeTab, setActiveTab] = useState('Patient Details');
-
+    const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
+    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const handleTabClick = (tabName) => {
         setActiveTab(tabName);
     };
+    const handleSidebarToggle = () => {
+        setSidebarCollapsed(!isSidebarCollapsed);
+    };
+
+    const handleToggle = () => {
+        setIsClinicalReviewExpandedData(!isClinicalReviewExpandedData);
+    };
+    const patientMenuItems = [
+        { label: "Demographic", icon: "bi bi-person" },
+        { label: "Appointments", icon: "bi bi-person" },
+        { label: "Clinical Dashboard", icon: "bi bi-person" },
+        { label: "Documents", icon: "bi bi-person" },
+        {
+            label: 'Clinical Review',
+            icon: "bi bi-person",
+            subItems: [
+                { label: 'Problem List', icon: 'bi bi-person' },
+                { label: 'Allergy List', icon: 'bi bi-person' },
+                { label: 'Drug Medication', icon: 'bi bi-person' },
+                { label: 'Medication List', icon: 'bi bi-person' },
+                { label: 'Drug Interactions', icon: 'bi bi-person' },
+                { label: 'Care Quality Indicators (CQIs)', icon: 'bi bi-person' },
+            ],
+        },
+        { label: 'Intake Data', icon: 'bi bi-person' },
+        { label: 'Lab Orders', icon: 'bi bi-person' },
+        { label: 'Immunizations', icon: 'bi bi-person' },
+        { label: 'Patient Cost Estimator', icon: 'bi bi-person' },
+        { label: 'Growth Charts', icon: 'bi bi-person' },
+        { label: 'Onpatient Access', icon: 'bi bi-person' },
+        { label: 'Education Resources', icon: 'bi bi-person' },
+        { label: 'Communication', icon: 'bi bi-person' },
+        { label: 'Family History', icon: 'bi bi-person' },
+        { label: 'Imaging Orders', icon: 'bi bi-person' },
+        { label: 'Implantable Devices', icon: 'bi bi-person' },
+    ];
+    const handleClinicalReviewToggle = () => {
+        setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
+    };
 
     return (
-        <div className="pt-1 pb-2">
+        <div className="">
             <div className='container-fluid d-flex justify-content-center align-items-center px-0 mt-2'>
                 {store?.getPatientByIdReducer?.loading ?
                     <Spinner />
                     :
                     <div className='row'>
-                        <div className='col-10'>
+                        <div className={`${isSidebarCollapsed ? 'col-11' : 'col-10'} pe-0`}>
                             <Card
                                 className='mb-1'
                                 style={{
@@ -63,10 +106,16 @@ const UpdatePatientIndex = () => {
                                                 <img
                                                     src={patientDetails?.patientChartPhoto?.url ? patientDetails?.patientChartPhoto?.url : profileDummy}
                                                     alt="Patient Profile"
-                                                    className="img-fluid rounded-circle"
+                                                    className="img-fluid rounded"
                                                     style={{ width: '6rem', height: '6rem', objectFit: 'cover' }}
                                                 />
+                                                <div className='mt-1 d-flex gap-2 ps-2 '>
+                                                    <IoPrintSharp className='fs-4' />
+                                                    <LiaReceiptSolid className='fs-4 text-black' />
+                                                    <TbHeartRateMonitor className='fs-4' />
+                                                </div>
                                             </div>
+
                                         </Col>
                                         <Col sm={8}>
                                             <Row className='pt-1'>
@@ -76,10 +125,10 @@ const UpdatePatientIndex = () => {
                                                             {patientDetails?.firstName + ' ' + patientDetails?.middleName + ' ' + patientDetails?.lastName}
                                                         </span>
                                                     </p>
-                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2'>
+                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2 fw-bold'>
                                                         <span className='fs-6'> {patientDetails?.sex}</span></p>
-                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2'><span>{new Date(patientDetails?.dateOfBirth)?.toLocaleDateString('en-GB')}</span></p>
-                                                    <p className='text-nowrap mb-0 fs-6'><span>{patientDetails?.approxAge} years old</span></p>
+                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2 fw-bold'><span>{new Date(patientDetails?.dateOfBirth)?.toLocaleDateString('en-GB')}</span></p>
+                                                    <p className='text-nowrap mb-0 fs-6 fw-bold'><span>{patientDetails?.approxAge} years old</span></p>
                                                 </div>
                                                 <Col sm={6} className='p-0'>
                                                     <div>
@@ -102,13 +151,9 @@ const UpdatePatientIndex = () => {
 
                                         <Col sm={2} className='d-flex justify-content-center align-items-center'>
                                             <div className='d-flex justify-content-center align-items-center flex-column'>
-                                                <Button className=' text-nowrap custom-buttons' onClick={() => navigate('/apps/appointments/newAppointment')} style={{ width: '100%', fontSize: '12px', height: '30px' }}>New Appointment</Button>
-                                                <Button className=' text-nowrap custom-buttons mt-2' style={{ width: '100%', fontSize: '12px', height: '30px' }}>New Referral</Button>
-                                                <div className='mt-1 d-flex gap-2 ps-2 '>
-                                                    <IoPrintSharp className='fs-3' />
-                                                    <LiaReceiptSolid className='fs-3 text-black' />
-                                                    <TbHeartRateMonitor className='fs-3' />
-                                                </div>
+                                                <Button className=' text-nowrap text-black d-flex justify-content-center align-items-center' onClick={() => navigate('/apps/appointments/newAppointment')} style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff' }}>New Appointment</Button>
+                                                <Button className=' text-nowrap mt-2 text-black d-flex justify-content-center align-items-center' style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff' }}>New Referral</Button>
+
                                             </div>
                                         </Col>
                                     </Row>
@@ -143,13 +188,13 @@ const UpdatePatientIndex = () => {
                                         <Button className='custom-buttons' onClick={() => navigate(-1)}>Back</Button>
                                     </div>
 
-                                    <div className="mt-2 px-2 scroll-container" style={{ height: '64vh', overflowY: 'scroll' }}>
+                                    <div className="mt-2 px-2 scroll-container" style={{ height: '58vh', overflowY: 'scroll' }}>
                                         {activeTab === 'Patient Details' && <PatientDetails />}
                                         {activeTab === 'Demographics' && <Demographics />}
-                                        {activeTab === 'Insurances' && <p>Insurances Content</p>}
+                                        {activeTab === 'Insurances' && <Insurance />}
+                                        {activeTab === 'Vital Status' && <VitalStatus />}
                                         {activeTab === 'Eligibility' && <p>Eligibility Content</p>}
                                         {activeTab === 'Authorizations' && <p>Authorizations Content</p>}
-                                        {activeTab === 'Vital Status' && <p>Vital Status Content</p>}
                                         {activeTab === 'Balance' && <p>Balance Content</p>}
                                         {activeTab === 'Payment' && <p> Payment Content</p>}
                                         {activeTab === 'Responsible Party' && <p><ResponsibleParty /></p>}
@@ -159,36 +204,113 @@ const UpdatePatientIndex = () => {
                                 </Card>
                             </div>
                         </div>
-                        <div className='col-2'>
-                            {/* <div style={{ height: '30px' }}> */}
-                            <FormInput type="text" placeholder="Search..." />
-                            {/* </div> */}
-                            <div className='d-flex justify-content-center mt-2'>
-                                <Button className="custom-buttons text-nowrap w-100" onClick={() => navigate('/apps/patients/new-patient')} style={{ height: '30px' }}>
-                                    Add New Patient
-                                </Button>
-                            </div>
-                            <div>
+                        <div className={isSidebarCollapsed ? 'col-1 ' : 'col-2'}>
+                            <div
+                                className="patient-menu-container bg-white mt-0"
+                                style={{
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '10px',
+                                }}
+                            >
                                 <div
-                                    className="patient-menu-container rounded bg-white mt-2"
-                                    style={{ border: '1px solid #ced4da' }}
+                                    className="card m-0 overflow-hidden"
+                                    style={{ borderRadius: '5px' }}
                                 >
-                                    {[
-                                        "Demographic", "Appointments", "Clinical Dashboard", "Documents", "Problem list",
-                                        "Medication list", "Allergy list", "Drug Interactions", "CQMs", "Intake Data",
-                                        "Lab Orders", "Immunizations", "Patient Cost Estimator", "Growth Charts",
-                                        "Onpatient Access", "Education Resources", "Communication", "Family History",
-                                        "Imaging orders", "Implantable devices"
-                                    ].map((item, index) => (
-                                        <p
-                                            key={index}
-                                            className="patient-menu-item text-black mb-0 ps-2 py-1"
+                                    <div
+                                        className="card-header d-flex justify-content-between align-items-center text-white px-2 py-1"
+                                        style={{ backgroundColor: '#313A46' }}
+                                    >
+                                        <button
+                                            className="btn p-0 shadow-none outline-none"
+                                            onClick={handleSidebarToggle}
                                         >
-                                            {item}
-                                        </p>
-                                    ))}
+                                            <i
+                                                className="bi bi-list text-white"
+                                                style={{ fontSize: '18px' }}
+                                            ></i>
+                                        </button>
+                                        {!isSidebarCollapsed && <h5 className="m-0">Patient Chart</h5>}
+                                        <button
+                                            className="btn p-0 shadow-none outline-none"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#patientChartData"
+                                            aria-expanded={isClinicalReviewExpandedData}
+                                            aria-controls="patientChartData"
+                                            onClick={handleToggle}
+                                        >
+                                            <i
+                                                className={`bi ${isClinicalReviewExpandedData ? 'bi-chevron-up' : 'bi-chevron-down'
+                                                    }`}
+                                                style={{ fontSize: '14px', color: "white" }}
+                                            ></i>
+                                        </button>
+                                    </div>
+                                    <div id="patientChartData" className="collapse">
+                                        <div className="card-body p-0 scroll-container" style={{ height: '77.7vh', overflow: 'auto' }}>
+                                            {patientMenuItems.map((item, index) => (
+                                                item.subItems ? (
+                                                    <div key={index} className='ms-0'>
+                                                        <p
+                                                            className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : 'd-flex justify-content-between align-items-center'}`}
+                                                            onClick={handleClinicalReviewToggle}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                backgroundColor: isClinicalReviewExpanded ? '#f8f9fa' : 'transparent',
+                                                            }}
+                                                        >
+                                                            <span className='text-center'>
+                                                                <i className={`${item.icon}`}></i>
+                                                                <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>
+                                                                    {" " + item.label}
+                                                                </span>
+                                                            </span>
+                                                            <i
+                                                                className={`bi ${isClinicalReviewExpanded
+                                                                    ? 'bi-chevron-up'
+                                                                    : 'bi-chevron-down'
+                                                                    }
+                                                           ${isSidebarCollapsed ? 'd-none' : ''}     
+                                                                `}
+                                                            ></i>
+                                                        </p>
+                                                        {isClinicalReviewExpanded && (
+                                                            <div className="ms-0">
+                                                                {item.subItems.map((subItem, subIndex) => (
+                                                                    <p
+                                                                        key={subIndex}
+                                                                        className="text-black mb-0 ps-4 border-bottom py-1"
+                                                                        // onClick={() => handleTabClick(subItem.label)}
+                                                                        style={{
+                                                                            cursor: 'pointer',
+                                                                            backgroundColor:
+                                                                                activeTab === subItem.label ? '#e9ecef' : 'transparent',
+                                                                            fontWeight: activeTab === subItem.label ? 'bold' : 'normal',
+                                                                        }}
+                                                                    >
+                                                                        {subItem.label}
+                                                                    </p>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p
+                                                        key={index}
+                                                        className={`patient-menu-item text-black mb-0 ps-2 py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : ''}`}
+                                                        // onClick={() => handleTabClick(item.label)}
+                                                        style={{
+                                                            cursor: 'pointer',
+                                                            backgroundColor: activeTab === item.label ? '#f8f9fa' : 'transparent',
+                                                            fontWeight: activeTab === item.label ? 'bold' : 'normal',
+                                                        }}
+                                                    >
+                                                        <i className={`${item.icon}`}></i> <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>{item.label}</span>
+                                                    </p>
+                                                )
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>

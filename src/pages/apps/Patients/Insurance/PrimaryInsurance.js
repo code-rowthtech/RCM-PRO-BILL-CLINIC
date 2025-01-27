@@ -46,7 +46,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row">
-                    <div className="col-6 mt-1 ">
+                    <div className="col-12 mt-1 ">
                         <Form.Group className='d-flex'>
                             <Form.Check
                                 type="checkbox"
@@ -60,7 +60,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                             />
                         </Form.Group>
                     </div>
-                    <div className="col-6 mt-1 ">
+                    {/* <div className="col-6 mt-1 ">
                         <Form.Group className='d-flex'>
                             <Form.Check
                                 type="checkbox"
@@ -74,7 +74,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                                 }}
                             />
                         </Form.Group>
-                    </div>
+                    </div> */}
                     <div className="col-6 mt-1">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Company</Form.Label>
