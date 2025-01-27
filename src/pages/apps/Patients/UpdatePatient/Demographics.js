@@ -61,7 +61,6 @@ const Demographicdetails = ({ patientId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    console.log({ cities3 })
     const primaryState = watch('primaryStateName');
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
@@ -1166,7 +1165,6 @@ const Demographicdetails = ({ patientId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                console.log(data, 'selectedAddress')
                                                                 setValue('employerZip', data?.components?.postcode)
                                                                 setValue('employerStateName', data?.components?.state_code)
                                                                 setValue('employerStreet', data?.components?.road)

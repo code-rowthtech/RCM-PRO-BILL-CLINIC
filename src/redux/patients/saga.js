@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createPatientsApi, createResponsiblePartyApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updatePatientsApi } from './api';
+import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { createResponsibleParty } from '../../helpers/api/apiEndpoints';
@@ -121,6 +121,36 @@ function* createResponsiblePartyFunction(data) {
         });
     }
 }
+
+function* updateResponsiblePartyFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateResponsiblePartyApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY_ERROR,
+            payload: error,
+        });
+    }
+}
 function* getResponsiblePartyFunction(data) {
     try {
         yield put({
@@ -178,6 +208,66 @@ function* updatePatientsFunction(data) {
         });
     }
 }
+
+function* updateInsuranceFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.UPDATE_INSURANCE_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateInsuranceApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.UPDATE_INSURANCE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.UPDATE_INSURANCE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.UPDATE_INSURANCE_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createInsuranceFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.CREATE_INSURANCE_LOADING,
+            payload: {},
+        });
+        const response = yield call(createInsuranceApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.CREATE_INSURANCE_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.CREATE_INSURANCE_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.CREATE_INSURANCE_ERROR,
+            payload: error,
+        });
+    }
+}
 export function* callStateEmpty() {
     put({
         type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
@@ -203,12 +293,22 @@ export function* watchCreateResponsibleParty() {
     yield takeEvery(PatientsActionTypes.CREATE_RESPONSIBLE_PARTY, createResponsiblePartyFunction);
 }
 
+export function* watchUpdateResponsibleParty() {
+    yield takeEvery(PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY, updateResponsiblePartyFunction);
+}
+
 export function* watchGetResponsibleParty() {
     yield takeEvery(PatientsActionTypes.GET_RESPONSIBLE_PARTY, getResponsiblePartyFunction);
 }
 
 export function* watchUpdatePatients() {
     yield takeEvery(PatientsActionTypes.UPDATE_PATIENTS, updatePatientsFunction);
+}
+export function* watchCreateInsurance() {
+    yield takeEvery(PatientsActionTypes.CREATE_INSURANCE, createInsuranceFunction);
+}
+export function* watchUpdateInsurance() {
+    yield takeEvery(PatientsActionTypes.UPDATE_INSURANCE, updateInsuranceFunction);
 }
 
 export function* watchresetState() {
@@ -221,8 +321,9 @@ function* patientsSaga() {
         fork(watchGetPatientById),
         fork(watchCreatePatients),
         fork(watchCreateResponsibleParty),
+        fork(watchUpdateResponsibleParty),
         fork(watchGetResponsibleParty),
-        fork(watchUpdatePatients),
+        fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
         fork(watchresetState),
     ]);
 }

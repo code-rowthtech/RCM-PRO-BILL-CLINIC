@@ -91,6 +91,8 @@ const NewPatient = () => {
             setLogoName(null);
             setPatientId(null);
             dispatch(stateEmptydAction());
+        } else if (createResponse === 201 && submissionType === 'save') {
+            setPatientId(createPatientResponse?._id)
         }
     }, [createResponse, submissionType])
     useEffect(() => {
@@ -234,9 +236,9 @@ const NewPatient = () => {
     };
 
     return (
-        <div className="background_Color pt-1 pb-2 px-0">
+        <div className="background_Color ">
             <div className="container-fluid mt-2 px-0">
-                <Card className="px-3 py-2">
+                <Card className="px-3 py-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
@@ -308,7 +310,7 @@ const NewPatient = () => {
                         {/* Form Section */}
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
                             <div className="row my-2">
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="responnsible-party-select">
                                         <Form.Label className="mb-0">
                                             Primary Provider
@@ -334,7 +336,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
                                         <Form.Select
@@ -350,7 +352,7 @@ const NewPatient = () => {
                                         </Form.Select>
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
                                         <Form.Select
@@ -367,7 +369,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
                                         <Form.Control
@@ -380,7 +382,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="middleName" className="mb-0">Middle Name</Form.Label>
                                         <Form.Control
@@ -393,7 +395,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
                                         <Form.Control
@@ -406,7 +408,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Previous Birth Name </Form.Label>
                                         <Form.Control
@@ -417,7 +419,7 @@ const NewPatient = () => {
                                         {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Suffix </Form.Label>
                                         <Form.Control
@@ -428,7 +430,7 @@ const NewPatient = () => {
                                         {errors.suffix && <span className="text-danger">{errors.suffix.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <div className="mb-1 d-flex flex-column position-relative">
                                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                                         <div
@@ -457,7 +459,7 @@ const NewPatient = () => {
                             </div>
                             <hr />
                             <div className="row">
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Home Phone</Form.Label>
                                         <Form.Group>
@@ -513,7 +515,7 @@ const NewPatient = () => {
                                         </div>
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Cell Phone</Form.Label>
                                         <Form.Group>
@@ -574,7 +576,7 @@ const NewPatient = () => {
 
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Office Phone</Form.Label>
                                         <Form.Group>
@@ -635,7 +637,7 @@ const NewPatient = () => {
 
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
                                         <Form.Control
@@ -645,7 +647,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Alternate Email</Form.Label>
                                         <Form.Control
@@ -657,7 +659,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                         <Form.Select
@@ -678,7 +680,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Reminder Language</Form.Label>
                                         <Form.Select
@@ -693,7 +695,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Medication History Concent</Form.Label>
                                         <Form.Select
@@ -707,7 +709,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Payment Profile</Form.Label>
                                         <Form.Select
@@ -725,7 +727,7 @@ const NewPatient = () => {
                                         {errors.paymentProfile && <span className="text-danger">{errors.paymentProfile.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
                                         <Form.Control
@@ -740,7 +742,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
                                         <Form.Control
@@ -751,7 +753,7 @@ const NewPatient = () => {
                                         {errors.followupDate && <span className="text-danger">{errors.followupDate.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Follow Up Reason</Form.Label>
                                         <Form.Control
@@ -777,13 +779,13 @@ const NewPatient = () => {
                                 <Button variant="primary" onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button variant="primary" disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button variant="primary" onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save
                                 </Button>
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle patientId={patientId} />}
-                        {activeTab === "insurance" && <Insurance />}
+                        {activeTab === "insurance" && <Insurance patientId={patientId} />}
                         {activeTab === "demographicDetails" && <Demographicdetails patientId={patientId} />}
                         {activeTab === "referringDoctor" && <ReferringDoctor patientId={patientId} />}
                     </div>

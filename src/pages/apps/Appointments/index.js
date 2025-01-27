@@ -212,12 +212,28 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 options={doctorOptions}
                                                 placeholder="Select Doctor Name"
                                                 styles={{
-                                                    container: (provided) => ({
+                                                    control: (provided) => ({
                                                         ...provided,
-                                                        minWidth: '200px', // Adjust minimum width for better responsiveness
+                                                        minHeight: '30px',  // Reduce height
+                                                        height: '30px',
+                                                        padding: '0px',      // Remove extra padding
+                                                        fontSize: '14px',    // Adjust font size
+                                                    }),
+                                                    valueContainer: (provided) => ({
+                                                        ...provided,
+                                                        padding: '0px',      // Remove padding inside input
+                                                    }),
+                                                    input: (provided) => ({
+                                                        ...provided,
+                                                        margin: '0px',       // Ensure no additional margins
+                                                    }),
+                                                    indicatorsContainer: (provided) => ({
+                                                        ...provided,
+                                                        height: '30px',      // Keep indicators aligned
                                                     }),
                                                 }}
                                             />
+
 
                                             {/* Additional controls shown only in the "Appointments" tab */}
                                             {activeTab === 'appointments' && (
@@ -231,11 +247,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         className="input_search_box"
                                                         style={{ minWidth: '150px' }} // Add a minimum width for better alignment
                                                     />
-                                                    <Button
-                                                        className="custom-buttons"
-                                                        onClick={() => navigate('/apps/appointments/appointmentCalendar')}
-                                                    >
-                                                        <IoCalendarOutline className="fs-4" />
+                                                    <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
+                                                        <IoCalendarOutline className="fs-5 " />
                                                     </Button>
                                                     <Button
                                                         as={Link}
