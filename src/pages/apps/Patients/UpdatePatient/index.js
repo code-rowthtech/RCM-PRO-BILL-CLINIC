@@ -15,6 +15,9 @@ import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
 import Insurance from './Insurance/Insurance';
 import VitalStatus from './VitalStatus';
+import { MdPhone } from "react-icons/md";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
+import { BiSolidLocationPlus } from "react-icons/bi";
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -92,73 +95,167 @@ const UpdatePatientIndex = () => {
                     :
                     <div className='row'>
                         <div className={`${isSidebarCollapsed ? 'col-11' : 'col-10'} pe-0`}>
-                            <Card
+                            <div
                                 className='mb-1'
                                 style={{
-                                    background: '#E6EBFF',
+                                    background: 'transparent',
                                     width: 'auto',
-                                    border: '1px solid #a4c5d5'
-                                }}>
+                                    border: '0px!important',
+                                    boxShadow:0,
+                                }}
+                                >
                                 <Card.Body className="p-1">
                                     <Row>
-                                        <Col sm={2} className='d-flex align-items-center justify-content-center'>
+                                        <Col sm={2} className='ps-2 pt-1'>
                                             <div>
                                                 <img
                                                     src={patientDetails?.patientChartPhoto?.url ? patientDetails?.patientChartPhoto?.url : profileDummy}
                                                     alt="Patient Profile"
                                                     className="img-fluid rounded"
-                                                    style={{ width: '6rem', height: '6rem', objectFit: 'cover' }}
+                                                    style={{ width: '126px', height: '129px', objectFit: 'cover' }}
                                                 />
-                                                <div className='mt-1 d-flex gap-2 ps-2 '>
-                                                    <IoPrintSharp className='fs-4' />
-                                                    <LiaReceiptSolid className='fs-4 text-black' />
-                                                    <TbHeartRateMonitor className='fs-4' />
-                                                </div>
                                             </div>
 
                                         </Col>
                                         <Col sm={8}>
                                             <Row className='pt-1'>
                                                 <div className='d-flex gap-2 ps-1 lh-sm'>
-                                                    <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap mb-0 fs-6'>
+                                                    <p style={{ borderRight: '1px solid black' }} className='pe-2 text-nowrap  fs-6'>
                                                         <span className='fw-bold text-capitalize' style={{ color: '#f9a004' }}>
                                                             {patientDetails?.firstName + ' ' + patientDetails?.middleName + ' ' + patientDetails?.lastName}
                                                         </span>
                                                     </p>
-                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2 fw-bold'>
+                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap  fs-6 pe-2 fw-bold'>
                                                         <span className='fs-6'> {patientDetails?.sex}</span></p>
-                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap mb-0 fs-6 pe-2 fw-bold'><span>{new Date(patientDetails?.dateOfBirth)?.toLocaleDateString('en-GB')}</span></p>
+                                                    <p style={{ borderRight: '1px solid black' }} className='text-nowrap fs-6 pe-2 fw-bold'><span>{new Date(patientDetails?.dateOfBirth)?.toLocaleDateString('en-GB')}</span></p>
                                                     <p className='text-nowrap mb-0 fs-6 fw-bold'><span>{patientDetails?.approxAge} years old</span></p>
                                                 </div>
-                                                <Col sm={6} className='p-0'>
+                                                {/* <Col sm={6} className='p-0'>
                                                     <div>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Patients Chart ID:</span><span className='ps-2 text-primary'>CH-{patientDetails?.chartNumber}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Phone:</span><span className='ps-2'>+1-{patientDetails?.cellPhone}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Email:</span><span className='ps-2'>{patientDetails?.email}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Address:</span><span className='ps-2'>{patientDetails?.address?.address?.length > 50 ? patientDetails?.address?.address?.slice(0, 49) + '...' : patientDetails?.address?.address}</span></p>
                                                     </div>
-                                                </Col>
-                                                <Col sm={6}>
+                                                </Col> */}
+                                                <Col sm={6} className='p-0'>
+                                                <div className='row'>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-3 pe-0'>
+                                                                <span className='fw-bold fs-6'>Patients Chart ID:</span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>CH-{patientDetails?.chartNumber}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                                <span><MdPhone className='fs-5 text-primary' /></span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>+1-{patientDetails?.cellPhone}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                                <span ><MdOutlineMarkEmailUnread className='fs-5 text-primary' /></span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientDetails?.email}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-3'>
+                                                                <span ><BiSolidLocationPlus className='fs-5 text-primary' /></span>
+                                                            </div>
+                                                            <div className='col-9'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientDetails?.address?.address?.length > 50 ? patientDetails?.address?.address?.slice(0, 49) + '...' : patientDetails?.address?.address}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                                {/* <Col sm={6}>
                                                     <div>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Primary Provider:</span><span className='ps-2'>{patientDetails?.primaryProvider?.userId?.firstName} {patientDetails?.primaryProvider?.userId?.lastName || ''}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Date Added:</span><span className='ps-2'>{new Date(patientDetails?.createdAt)?.toLocaleDateString('en-GB')}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Last Scheduled appt:</span><span className='ps-2 text-primary'>01/01/2025</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Next Scheduled appt:</span><span className='ps-2'>None</span></p>
                                                     </div>
-                                                </Col>
+                                                </Col> */}
+                                                <Col sm={6}>
+                                                <div className='row'>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                                <span className='fw-bold fs-6'>Primary Provider:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                                <span className='ps-2 text-primary fs-6' style={{ fontWeight: 600 }}>{patientDetails?.primaryProvider?.userId?.firstName} {patientDetails?.primaryProvider?.userId?.lastName || ''}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                                <span className='fw-bold fs-6'>Date Added:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{new Date(patientDetails?.createdAt)?.toLocaleDateString('en-GB')}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                                <span className='fw-bold fs-6'>Last Appointment Date:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>01/01/2025</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-12 mx-1 '>
+                                                        <div className='row'>
+                                                            <div className='col-5'>
+                                                                <span className='fw-bold fs-6'>Next Appointment Date:</span>
+                                                            </div>
+                                                            <div className='col-7'>
+                                                                <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>None</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </Col>
                                             </Row>
                                         </Col>
 
-                                        <Col sm={2} className='d-flex justify-content-center align-items-center'>
-                                            <div className='d-flex justify-content-center align-items-center flex-column'>
-                                                <Button className=' text-nowrap text-black d-flex justify-content-center align-items-center' onClick={() => navigate('/apps/appointments/newAppointment')} style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff' }}>New Appointment</Button>
-                                                <Button className=' text-nowrap mt-2 text-black d-flex justify-content-center align-items-center' style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff' }}>New Referral</Button>
+                                        <Col sm={2} className='d-flex justify-content-end pe-3'>
+                                            <div className='text-center'>
+                                                <Button className=' text-nowrap text-black d-flex justify-content-center align-items-center' onClick={() => navigate('/apps/appointments/newAppointment')} style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff', borderRadius:'10px' }}>New Appointment</Button>
+                                                <Button className=' text-nowrap mt-2 text-black d-flex justify-content-center align-items-center' style={{ width: '100%', fontSize: '12px', height: '30px', backgroundColor: '#ffffff', borderRadius:'10px' }}>New Referral</Button>
+
+                                                <div className='mt-2 d-flex justify-content-end gap-2 ps-2 '>
+                                                    <IoPrintSharp className='fs-3 text-black' />
+                                                    <LiaReceiptSolid className='fs-3 text-black' />
+                                                    {/* <TbHeartRateMonitor className='fs-4' /> */}
+                                                </div>
 
                                             </div>
+
                                         </Col>
+
                                     </Row>
                                 </Card.Body>
-                            </Card>
+                            </div>
                             <div className='mt-2' >
                                 <Card className='px-3'>
                                     <div className='d-flex justify-content-between align-items-center mt-1'>
@@ -185,7 +282,7 @@ const UpdatePatientIndex = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <Button className='custom-buttons' onClick={() => navigate(-1)}>Back</Button>
+                                        <Button className='custom-buttons btn-height' onClick={() => navigate(-1)}>Back</Button>
                                     </div>
 
                                     <div className="mt-2 px-2 scroll-container" style={{ height: '58vh', overflowY: 'scroll' }}>

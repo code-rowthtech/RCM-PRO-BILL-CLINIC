@@ -259,7 +259,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
                                     <option value={data?.name}>{data?.name}</option>
                                 ))}
                             </Form.Select>
-                            <Form.Control placeholder='Auto Accident Payer Address' {...register('autoAccidentPayerCity')} />
+                            {/* <Form.Control placeholder='Auto Accident Payer Address' {...register('autoAccidentPayerCity')} /> */}
                         </Form.Group>
                     </div>
                     <div className="col-3 mt-1">
@@ -310,7 +310,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
                         </Form.Group>
                     </div>
                     <hr className='mt-1 mb-0' />
-                    <div className="col-6 mt-1  d-flex align-items-center">
+                    <div className="col-6 mt-1 ">
                         <div className="row">
                             <div className="col-12 mt-1">
                                 <Form.Group className=''>
@@ -336,6 +336,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
                                     <Form.Label className='mb-0'>If yes, state when</Form.Label>
                                     <Form.Control type='date' {...register('when')}
                                         readOnly={!hasSimilarCondition}
+                                        className='w-100'
                                     />
                                     {errors.when && (
                                         <span className="text-danger">{errors.when.message}</span>
@@ -469,9 +470,9 @@ const AutoAccident = ({ patientId, activeTab }) => {
 
 
                 <div className="col-12 mt-1 d-flex align-items-center gap-2 justify-content-end">
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
                 </div>
             </Form>
         </div>

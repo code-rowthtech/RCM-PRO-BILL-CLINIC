@@ -214,25 +214,34 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
-                                                        minHeight: '30px',  // Reduce height
-                                                        height: '30px',
-                                                        padding: '0px',      // Remove extra padding
-                                                        fontSize: '14px',    // Adjust font size
+                                                        minHeight: '33px',
+                                                        height: '33px',
+                                                        padding: '0px',
+                                                        fontSize: '14px',
+                                                        border: '0px',            // Remove border
+                                                        backgroundColor: '#d9ddd6!important',     // Set background to red
+                                                        boxShadow: 'none',           // Remove any shadow effects
                                                     }),
                                                     valueContainer: (provided) => ({
                                                         ...provided,
-                                                        padding: '0px',      // Remove padding inside input
+                                                        padding: '0px',
                                                     }),
                                                     input: (provided) => ({
                                                         ...provided,
-                                                        margin: '0px',       // Ensure no additional margins
+                                                        margin: '0px',
                                                     }),
                                                     indicatorsContainer: (provided) => ({
                                                         ...provided,
-                                                        height: '30px',      // Keep indicators aligned
+                                                        height: '30px',
+                                                    }),
+                                                    placeholder: (provided) => ({
+                                                        ...provided,
+                                                        fontWeight: 600,
+                                                        color: '#0908084f',  // White text for contrast with red background
                                                     }),
                                                 }}
                                             />
+
 
 
                                             {/* Additional controls shown only in the "Appointments" tab */}

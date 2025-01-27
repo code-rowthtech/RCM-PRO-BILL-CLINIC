@@ -38,15 +38,27 @@ body {
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
+    border-radius: 10px;
     /* height: 30px !important; */
     /* display: flex;
     align-items: center;
     justify-content: center; */
 }
+.btn-height{
+    height: 30px!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .cancel-button {
     background-color: #5c636b !important;
     border: none !important;
     font-size: 14px;
+    height: 30px!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
 }
 
 .active_inactive_buttons {
@@ -54,6 +66,7 @@ body {
     font-weight: 400;
     width: 78px;
     height: 35px;
+    border-radius: 10px;
 }
 .input_search_box {
     height: 35px;
@@ -125,19 +138,22 @@ body {
 
 .form-label {
     color: black;
-    font-weight: 550 !important;
+    font-weight: 500 !important;
+    opacity: 0.4;
 }
 
 .form-control,
 .form-select {
     color: black !important;
     font-weight: 550 !important;
-    padding: 5px !important;
-    font-size: 14px;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color:#d9ddd6 !important;
+    border: 0px!important
 }
 
 .form-select {
-    color: #a9a9a9 !important;
+    color: #0908084f !important;
     font-weight: 550 !important;
 }
 
@@ -152,7 +168,7 @@ body {
 
 .custom-form-fields,
 .form-control::placeholder {
-    color: #a9a9a982 !important;
+    color: #0908084f !important;
     font-size: 12px;
 }
 
@@ -183,6 +199,11 @@ form textarea::placeholder {
     /* Ensure full visibility of placeholder */
 }
 
+.table > :not(caption) > * > * {
+    padding: 0.35rem 0.55rem!important;
+    font-size: 14px!important;
+}
+
 /* Optional: Specific for form-control class (Bootstrap inputs) */
 .custom-date-input::placeholder,
 .form-control::placeholder {
@@ -197,7 +218,11 @@ form textarea::placeholder {
     font-size: 14px;
     /* Adjust font size if needed */
 }
-
+.css-13cymwt-control {
+    border:none;
+    max-height: 33px;
+    height: 33px;
+}
 .custom-date-input-select {
     color: black !important;
     /* Set the input text color to black */
@@ -218,7 +243,10 @@ input,
 textarea,
 select,
 .select__control {
-    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
+    background-color: #d9ddd6!important;
+    /* max-height: 33px!important;
+    height: 33px!important; */
 }
 
 .input {
@@ -249,10 +277,11 @@ table {
 .custom-file-upload {
     display: flex;
     align-items: center;
-    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    border: none !important;
     border-radius: 4px;
-    padding: 8px 12px;
+    padding: 4px 8px;
     width: 100%;
+    background-color: #d9ddd6!important;
 }
 
 .file-upload-label {
@@ -481,3 +510,4 @@ table {
 .navbar-custom-top {
     background-color: #313a46 !important;
 }
+
