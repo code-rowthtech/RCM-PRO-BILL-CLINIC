@@ -678,12 +678,12 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
 
                         </Row>
                         <Modal.Footer className="border-0 py-0">
-                            <Button type="button" className="custom-buttons" onClick={close}>
+                            <Button type="button" className="cancel-button" onClick={close}>
                                 Cancel
                             </Button>
 
 
-                            <Button type="submit" variant="primary" className="ms-2" disabled={createLoading}>
+                            <Button type="submit" variant="primary" className="ms-2 custom-buttons btn-height" disabled={createLoading}>
                                 {createLoading ? (
                                     <>
                                         <Spinner

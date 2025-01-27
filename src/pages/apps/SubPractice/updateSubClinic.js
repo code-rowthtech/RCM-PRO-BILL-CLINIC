@@ -76,9 +76,9 @@ const SubUpdateClinic = () => {
     const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
 
-    useEffect(()=>{
+    useEffect(() => {
         setLogo(subClinicsDetailsGet?.logo?.url)
-    },[subClinicsDetailsGet]);
+    }, [subClinicsDetailsGet]);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -596,7 +596,7 @@ const SubUpdateClinic = () => {
         <>
             <div className='pt-1 pb-2'>
                 <div className="container-fluid mt-2 px-0">
-                    <Card className='px-md-3 py-md-2 px-0'>
+                    <Card className="px-md-2 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
@@ -805,12 +805,12 @@ const SubUpdateClinic = () => {
                                                         ? logoName.split('/').pop()
                                                         : 'Upload Logo'} */}
                                                     {
-                                                            logoUploading
-                                                                ? 'Uploading...'
-                                                                : typeof logoName === 'string' && logoName
-                                                                    ? logoName.split('/').pop().slice(0, 30) + "..."
-                                                                    : 'Upload Logo'
-                                                        }
+                                                        logoUploading
+                                                            ? 'Uploading...'
+                                                            : typeof logoName === 'string' && logoName
+                                                                ? logoName.split('/').pop().slice(0, 30) + "..."
+                                                                : 'Upload Logo'
+                                                    }
                                                     <div className="d-flex align-items-center gap-2">
                                                         {/* Eye Icon for Preview */}
                                                         {logo && (
@@ -1062,7 +1062,7 @@ const SubUpdateClinic = () => {
                                                     </Col>
                                                 </React.Fragment>
                                             ))}
-                                            <hr/>
+                                            <hr />
                                             <Col sm={12} className="position-relative">
                                                 <Form.Label ref={containerRef} className='mb-0'>
                                                     State of Licensure&nbsp;
@@ -1275,7 +1275,7 @@ const SubUpdateClinic = () => {
                                                                         State
                                                                     </Form.Label>
                                                                     <Form.Select
-                                                                    className='form-control'
+                                                                        className='form-control'
                                                                         {...register('stateName', {
                                                                             required: 'State is required',
                                                                         })} // Marked as required
@@ -1303,7 +1303,7 @@ const SubUpdateClinic = () => {
                                                                         City <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Select
-                                                                    className='form-control'
+                                                                        className='form-control'
                                                                         disabled={store?.getCitiesReducer?.loading}
                                                                         {...register('city', {
                                                                             required: 'City is required',

@@ -84,17 +84,17 @@ const AddHoliday = () => {
         }
     };
     return (
-        <div className="background_Color pt-1 pb-2">
-            <div className="container-fluid mt-4">
-                <Card className="px-3 py-2" style={{ height: "85vh" }}>
+        <div className="background_Color ">
+            <div className="container-fluid mt-2  px-0">
+                <Card className="px-md-3 py-md-2" style={{ height: "85vh" }}>
                     <div className="d-flex justify-content-between">
                         <p style={{ fontWeight: 600 }}>ADD HOLIDAY</p>
                         <div>
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="cancel-button" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
-                    <div className="px-2" style={{ height: '100%' }}>
+                    <div className="px-" >
                         {
                             store?.getDoctorsReducer?.loading ?
                                 <div className="d-flex justify-content-center align-items-center h-100">
@@ -103,7 +103,7 @@ const AddHoliday = () => {
                                 :
                                 <Form onSubmit={handleSubmit(onSubmit)}>
                                     <div className="row pb-2 mt-1">
-                                        <div className="col-6">
+                                        <div className="col-md-6 col-sm-6 col-12">
                                             <Form.Group className="mb-1 responnsible-party-select">
                                                 <Form.Label className="mb-0">
                                                     Doctor Name<span className="text-danger">*</span>
@@ -141,7 +141,7 @@ const AddHoliday = () => {
                                             </Form.Group>
                                         </div>
 
-                                        <div className="col-6">
+                                        <div className="col-md-6 col-sm-6 col-12">
                                             <Form.Group className="mb-1">
                                                 <Form.Label className="mb-0">
                                                     From Date<span className="text-danger">*</span>
@@ -176,10 +176,10 @@ const AddHoliday = () => {
                                     </div>
 
                                     <div className="d-flex gap-2 justify-content-end mb-2">
-                                        <Button variant="secondary" type="button" onClick={() => navigate(-1)}>
+                                        <Button className="cancel-button" type="button" onClick={() => navigate(-1)}>
                                             Cancel
                                         </Button>
-                                        <Button variant="primary" disabled={store?.createScheduleReducer?.loading} type="submit">
+                                        <Button className="custom-buttons" disabled={store?.createScheduleReducer?.loading} type="submit">
                                             {store?.createScheduleReducer?.loading ?
                                                 <Spinner className="spinner-border-sm" color="white" />
                                                 :

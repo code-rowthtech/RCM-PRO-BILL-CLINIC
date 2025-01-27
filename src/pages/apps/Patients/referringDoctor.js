@@ -125,7 +125,7 @@ const ReferringDoctor = ({ patientId }) => {
     return (
         <>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-                <Row>
+                <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
                     <Col sm={12}>
                         <span className='text-black fw-semibold form-label'>Personal Details</span>
                     </Col>
@@ -198,8 +198,7 @@ const ReferringDoctor = ({ patientId }) => {
 
 
                 </Row>
-                <hr />
-                <Row>
+                <Row style={{borderBottom:'1px solid #444141'}} className="mt-1 pb-2">
                     <Col sm={12}>
                         <span className='text-black fw-semibold form-label'>Address Details</span>
                     </Col>
@@ -369,8 +368,7 @@ const ReferringDoctor = ({ patientId }) => {
                         </Form.Group>
                     </Col>
                 </Row>
-                <hr />
-                <Row>
+                <Row className="mt-1">
                     <Col sm={12}>
                         <span className='text-black fw-semibold form-label'>Additional Information</span>
                     </Col>
@@ -386,11 +384,12 @@ const ReferringDoctor = ({ patientId }) => {
                                 Phone <span className="text-danger">*</span>
                             </Form.Label>
                             <InputGroup>
-                                <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
+                                <InputGroup.Text className="ps-3 pe-1 fw-bold text-black" style={{height:'33px'}}>
                                     &nbsp;+1
                                 </InputGroup.Text> {/* Prefix */}
                                 <Form.Control
                                     type="tel"
+                                    height='33px'
                                     {...register('phone', {
                                         required: 'This field is required',
                                         pattern: {
@@ -421,7 +420,7 @@ const ReferringDoctor = ({ patientId }) => {
                                         e.target.value = formattedValue; // Update input value
                                         clearErrors('phone'); // Clear validation errors
                                     }}
-                                    placeholder="(###)###-####"
+                                    placeholder="(XXX)XXX-XXXX"
                                     maxLength={14}
                                     onKeyPress={(event) => {
                                         // Only allow numeric characters (0-9)
@@ -469,8 +468,8 @@ const ReferringDoctor = ({ patientId }) => {
                     </Col>
                 </Row>
                 <Row className="mt-2">
-                    <Col sm={12} className="text-end">
-                        <Button className="custom-buttons" type="submit">Save</Button>
+                    <Col sm={12} className="d-flex justify-content-end">
+                        <Button className="custom-buttons btn-height" type="submit">Save</Button>
                     </Col>
                 </Row>
             </Form >

@@ -91,6 +91,8 @@ const NewPatient = () => {
             setLogoName(null);
             setPatientId(null);
             dispatch(stateEmptydAction());
+        } else if (createResponse === 201 && submissionType === 'save') {
+            setPatientId(createPatientResponse?._id)
         }
     }, [createResponse, submissionType])
     useEffect(() => {
@@ -234,9 +236,9 @@ const NewPatient = () => {
     };
 
     return (
-        <div className="background_Color pt-1 pb-2 px-0">
+        <div className="background_Color ">
             <div className="container-fluid mt-2 px-0">
-                <Card className="px-3 py-2">
+                <Card className="px-3 py-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
@@ -283,11 +285,10 @@ const NewPatient = () => {
                             </ul>
 
                         </div>
-                        <div>
+                        <div className="d-flex">
                             {activeTab === "responsible" && (
                                 <Button
-                                    className="me-2"
-                                    variant="primary"
+                                    className="me-2 custom-buttons btn-height"
                                     onClick={() => handleTabChange("responsible")}
                                 >
                                     Payment
@@ -300,15 +301,15 @@ const NewPatient = () => {
                             <Button className="me-2">
                                 Set Password
                             </Button> */}
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="cancel-button" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
                     <div className="px-2">
                         {/* Form Section */}
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row my-2">
-                                <div className="col-6">
+                            <div className="row my-1" style={{borderBottom:'1px solid #444141'}}>
+                                <div className="col-3">
                                     <Form.Group className="responnsible-party-select">
                                         <Form.Label className="mb-0">
                                             Primary Provider
@@ -331,10 +332,23 @@ const NewPatient = () => {
                                             name="doctorName"
                                             options={doctorOptions}
                                             placeholder="Select Doctor Name"
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '33px',
+                                                    minHeight: '33px',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize:'12px',
+                                                    paddingBottom:'5px'
+                                                }),
+                                            }}
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
                                         <Form.Select
@@ -350,7 +364,7 @@ const NewPatient = () => {
                                         </Form.Select>
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
                                         <Form.Select
@@ -367,7 +381,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
                                         <Form.Control
@@ -380,7 +394,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="middleName" className="mb-0">Middle Name</Form.Label>
                                         <Form.Control
@@ -393,7 +407,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
                                         <Form.Control
@@ -406,7 +420,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Previous Birth Name </Form.Label>
                                         <Form.Control
@@ -417,7 +431,7 @@ const NewPatient = () => {
                                         {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Suffix </Form.Label>
                                         <Form.Control
@@ -428,11 +442,12 @@ const NewPatient = () => {
                                         {errors.suffix && <span className="text-danger">{errors.suffix.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
-                                    <div className="mb-1 d-flex flex-column position-relative">
+                                <div className="col-3">
+                                    <div className="mb-2 d-flex flex-column position-relative">
                                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                                         <div
                                             onClick={() => logoFileInputRef.current.click()}
+                                            style={{height:'33px'}}
                                             className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
                                         >
                                             {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Chart Photo'}
@@ -443,6 +458,7 @@ const NewPatient = () => {
                                         <Form.Control
                                             type="file"
                                             className="d-none "
+                                            style={{height:'30px!important'}}
                                             {...register('profileImage', {
                                             })}
                                             accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
@@ -455,16 +471,16 @@ const NewPatient = () => {
                                     </div>
                                 </div>
                             </div>
-                            <hr />
                             <div className="row">
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Home Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('homePhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -494,7 +510,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('homePhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -505,7 +521,7 @@ const NewPatient = () => {
                                                 />
                                             </InputGroup>
                                         </Form.Group>
-                                        <div className='position-absolute' style={{ top: '52%', left: '1%' }}>
+                                        <div className='position-absolute' style={{ top: '48%', left: '1%' }}>
                                             <img
                                                 src={us}
                                                 alt="country code flag"
@@ -513,14 +529,15 @@ const NewPatient = () => {
                                         </div>
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Cell Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('cellPhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -550,7 +567,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('cellPhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -563,7 +580,7 @@ const NewPatient = () => {
                                         </Form.Group>
 
                                         <div
-                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                            className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                         >
                                             <img
                                                 src={us}
@@ -574,14 +591,15 @@ const NewPatient = () => {
 
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Office Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('officePhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -611,7 +629,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('officePhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -624,7 +642,7 @@ const NewPatient = () => {
                                         </Form.Group>
 
                                         <div
-                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                            className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                         >
                                             <img
                                                 src={us}
@@ -635,7 +653,7 @@ const NewPatient = () => {
 
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
                                         <Form.Control
@@ -645,7 +663,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Alternate Email</Form.Label>
                                         <Form.Control
@@ -657,7 +675,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                         <Form.Select
@@ -678,7 +696,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Reminder Language</Form.Label>
                                         <Form.Select
@@ -693,7 +711,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Medication History Concent</Form.Label>
                                         <Form.Select
@@ -707,7 +725,7 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
 
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Payment Profile</Form.Label>
                                         <Form.Select
@@ -725,7 +743,7 @@ const NewPatient = () => {
                                         {errors.paymentProfile && <span className="text-danger">{errors.paymentProfile.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
                                         <Form.Control
@@ -740,7 +758,7 @@ const NewPatient = () => {
                                         />
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
                                         <Form.Control
@@ -751,7 +769,7 @@ const NewPatient = () => {
                                         {errors.followupDate && <span className="text-danger">{errors.followupDate.message}</span>}
                                     </Form.Group>
                                 </div>
-                                <div className="col-6">
+                                <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Follow Up Reason</Form.Label>
                                         <Form.Control
@@ -765,25 +783,25 @@ const NewPatient = () => {
 
                             {/* Buttons */}
                             <div className="d-flex gap-2 justify-content-end my-2">
-                                <Button variant="secondary" onClick={() => {
+                                <Button className="cancel-button" onClick={() => {
                                     reset();
                                     setSelectedDoctor(null);
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button variant="primary" onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button  onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save & Add Another
                                 </Button>
-                                <Button variant="primary" onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button variant="primary" disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save
                                 </Button>
                             </div>
                         </Form>)}
                         {activeTab === "responsible" && <Responsiblle patientId={patientId} />}
-                        {activeTab === "insurance" && <Insurance />}
+                        {activeTab === "insurance" && <Insurance patientId={patientId} />}
                         {activeTab === "demographicDetails" && <Demographicdetails patientId={patientId} />}
                         {activeTab === "referringDoctor" && <ReferringDoctor patientId={patientId} />}
                     </div>

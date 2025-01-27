@@ -3,6 +3,7 @@ import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
+import logo from '../assets/images/logo.png';
 
 // actions
 import { changeSidebarType } from '../redux/actions';
@@ -107,12 +108,43 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
 
     return (
         <>
-
             <div className="wrapper">
+                {/* Fixed Navbar */}
+                <nav className="navbar navbar-expand-lg navbar-custom-top fixed-top d-none d-md-block py-1">
+                    <div className="container-fluid d-flex justify-content-between align-items-center">
+                        {/* Logo with margin/padding adjustment */}
+                        <div className="d-flex align-items-center ms-5 ps-1">
+                            <span className="logo-lg">
+                                <img src={logo} alt="logo" height="18" />
+                            </span>
+                        </div>
+
+                        {/* Centered Navigation Menu */}
+                        <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
+                            <ul className="navbar-nav text-center fw-bold">
+                                <li className="nav-item"><a className="nav-link text-white" href="#">File</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Tasks</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Patient</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Billing</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Modules</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Exports</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">System Setting</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Utilities</a></li>
+                                <li className="nav-item"><a className="nav-link text-white" href="#">Help</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+
+
+
+
                 <Suspense fallback={loading()}>
                     <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
                 </Suspense>
-                <div className="content-page">
+
+                {/* Add margin to push content below navbar */}
+                <div className="content-page ">
                     <div className="content">
                         <Suspense fallback={loading()}>
                             <Topbar openLeftMenuCallBack={openMenu} hideLogo={true} />
@@ -123,6 +155,7 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                     </div>
                 </div>
             </div>
+
             <Suspense fallback={loading()}>
                 <RightSidebar>
                     <ThemeCustomizer />

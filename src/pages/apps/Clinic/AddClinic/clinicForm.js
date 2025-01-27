@@ -53,7 +53,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState([''])
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo,'logo')
+    console.log(logo, 'logo')
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
@@ -240,7 +240,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             email: data?.email || clinicsDataGet?.userId?.email,
             phone: '+1' + data?.contact?.replace(/\D/g, '') || '+1' + clinicsDataGet?.userId?.phone,
             clinicType: data?.clinicType || clinicsDataGet?.clinicType,
-            taxIdOrEIN: data?.taxId,
+            taxIdOrEIN: data?.taxId?.replace(/\D/g, ''),
             npiNumber: data?.npi,
             CLIA_Number: data?.clia,
             medicareNumber: data?.medicare,
@@ -667,23 +667,42 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </Col>
                             <Col sm={3}>
                                 <Form.Group className="mb-1">
-                                    <Form.Label className='mb-0'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
+                                    <Form.Label className="mb-0">
+                                        Tax ID / EIN<span className="text-danger">*</span>
+                                    </Form.Label>
                                     <Form.Control
                                         type="text"
-                                        {...register('taxId', {
-                                            required: 'Tax ID / EIN is required',
-                                            pattern: {
-                                                value: /^\d{2}-\d{7}$/,
-                                                message: 'Tax ID / EIN must be in the format 12-3456789',
-                                            },
-                                        })}
                                         maxLength={10} // Includes the hyphen
                                         placeholder="Tax ID / EIN"
+                                        value={
+                                            getValues('taxId')?.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2$3') || '' // Format the value if necessary
+                                        }
+                                        {...register('taxId', {
+                                            required: 'Tax ID / EIN is required',
+                                            validate: (value) => {
+                                                const rawValue = value?.replace(/\D/g, ''); // Strip non-digit characters
+                                                return rawValue.length === 9 || 'Tax ID / EIN must be in the format 12-3456789';
+                                            },
+                                        })}
+                                        onChange={(e) => {
+                                            const rawValue = e.target.value.replace(/\D/g, ''); // Remove non-digits for storage
+                                            setValue('taxId', rawValue, { shouldValidate: true });
+                                            clearErrors('taxId'); // Clear validation errors
+                                        }}
+                                        onBlur={() => {
+                                            const rawValue = getValues('taxId')?.replace(/\D/g, ''); // Strip non-digit characters
+                                            if (rawValue && rawValue.length === 9) {
+                                                setValue(
+                                                    'taxId',
+                                                    rawValue.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2$3'), // Format the value on blur
+                                                    { shouldValidate: true }
+                                                );
+                                            }
+                                        }}
                                     />
                                     {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
                                 </Form.Group>
                             </Col>
-
                             <Col sm={6}>
                                 <Form.Group className="mb-0 position-relative"  >
                                     <Form.Label className="mb-0">
@@ -698,7 +717,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {...register('contact', {
                                                 required: 'This field is required',
                                                 pattern: {
-                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, 
                                                     message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                 },
                                                 maxLength: {
@@ -712,8 +731,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             }
                                             )}
                                             onChange={(e) => {
-                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                let rawValue = e.target.value.replace(/\D/g, ''); 
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); 
                                                 const formattedValue = rawValue.replace(
                                                     /(\d{1,3})(\d{0,3})(\d{0,4})/,
                                                     (match, p1, p2, p3) => {
@@ -721,9 +740,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         if (p2) return `(${p1})${p2}`;
                                                         return `(${p1}`;
                                                     }
-                                                ); // Format dynamically as (XXX)XXX-XXXX
-                                                e.target.value = formattedValue; // Update input value
-                                                clearErrors('phone'); // Clear validation errors
+                                                ); 
+                                                e.target.value = formattedValue; 
+                                                clearErrors('phone'); 
                                             }}
                                             placeholder="(123)456-7890"
                                             maxLength={14}
@@ -1833,7 +1852,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <td>{patient.name}</td>
                                                         <td>{(patient?.userId?.primaryAddress?.city?.state_code || 'N/A') + ' / ' + (patient?.userId?.primaryAddress?.city?.name || 'N/A')}</td>
                                                         <td>{patient.clinicType}</td>
-                                                        <td>{patient.practiceSpecialty}</td>
+                                                        <td>{patient.practiceSpecialty || 'N/A'}</td>
                                                         <td>
                                                             <Form.Switch checked={patient.status === patient.status} />
                                                         </td>

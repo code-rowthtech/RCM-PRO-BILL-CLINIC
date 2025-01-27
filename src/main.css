@@ -1,42 +1,72 @@
+body {
+    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen',
+        'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
 .cursor-pointer {
     cursor: pointer !important;
 }
+
 .btn:focus {
     outline: 0;
     box-shadow: 0;
 }
+
 /* Add this to your CSS file or inline style */
 /* In your CSS file or inline styles */
 .custom-multiselect .ms-choice,
 .custom-multiselect .ms-drop {
-    border: none !important; /* Remove border */
-    box-shadow: none !important; /* Remove box shadow */
-    outline: none !important; /* Remove outline */
+    border: none !important;
+    /* Remove border */
+    box-shadow: none !important;
+    /* Remove box shadow */
+    outline: none !important;
+    /* Remove outline */
 }
+
 .custom-multiselect {
-    border: none !important; /* Remove border */
+    border: none !important;
+    /* Remove border */
 }
 
 .headers {
     background-color: #010101 !important;
 }
-/* :root{
+
+:root {
     overflow: hidden;
-} */
+}
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
+    border-radius: 10px;
+    /* height: 30px !important; */
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
+.btn-height{
+    height: 30px!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .cancel-button {
     background-color: #5c636b !important;
     border: none !important;
     font-size: 14px;
+    height: 30px!important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
 }
+
 .active_inactive_buttons {
     font-size: 13px;
     font-weight: 400;
     width: 78px;
     height: 35px;
+    border-radius: 10px;
 }
 .input_search_box {
     height: 35px;
@@ -49,7 +79,7 @@
     font-weight: 700;
 }
 .custom-datepicker {
-    height: 30px;
+    height: 30px !important;
     line-height: 30px; /* Ensures vertical alignment */
     padding: 0 8px; /* Adds space inside the input */
     font-size: 14px; /* Matches the font size of the Select component */
@@ -60,9 +90,6 @@
 
 .plusicon {
     color: #6169d0;
-}
-.custom-datepicker {
-    height: 30px !important;
 }
 
 .light-border-bottom {
@@ -86,10 +113,13 @@
 }
 
 .flag-icon {
-    top: 50%; /* Center vertically */
-    left: 10px; /* Adjust based on your layout */
+    top: 50%;
+    /* Center vertically */
+    left: 10px;
+    /* Adjust based on your layout */
     transform: translateY(-50%);
-    pointer-events: none; /* Prevent interaction with the image */
+    pointer-events: none;
+    /* Prevent interaction with the image */
 }
 
 .upload-icon {
@@ -97,24 +127,33 @@
     width: 5vw;
     height: 5vw;
 }
+
 .custom-form-fields {
     color: #a9a9a9 !important;
 }
+
 .file-input {
     display: none;
 }
+
 .form-label {
     color: black;
-    font-weight: 650 !important;
+    font-weight: 500 !important;
+    opacity: 0.4;
 }
+
 .form-control,
 .form-select {
     color: black !important;
     font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color:#d9ddd6 !important;
+    border: 0px!important
 }
 
 .form-select {
-    color: #a9a9a9 !important;
+    color: #0908084f !important;
     font-weight: 550 !important;
 }
 
@@ -127,19 +166,12 @@
     color: black !important;
 }
 
-/* .form-select.empty {
-    color: red !important;
-} */
-
-/* .form-control::placeholder {
-    color: #a9a9a9;
-    opacity: 0.8;
-} */
-
 .custom-form-fields,
 .form-control::placeholder {
-    color: #a9a9a982 !important;
+    color: #0908084f !important;
+    font-size: 12px;
 }
+
 table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
@@ -150,35 +182,59 @@ table {
 .card {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
+
 .custom-date-input::placeholder {
-    color: grey; /* Set the placeholder color */
-    opacity: 1; /* Ensure the placeholder is fully visible */
+    color: grey;
+    /* Set the placeholder color */
+    opacity: 1;
+    /* Ensure the placeholder is fully visible */
 }
+
 /* Apply grey color to all input placeholders */
 form input::placeholder,
 form textarea::placeholder {
-    color: grey; /* Set placeholder text color to grey */
-    opacity: 1; /* Ensure full visibility of placeholder */
+    color: grey;
+    /* Set placeholder text color to grey */
+    opacity: 1;
+    /* Ensure full visibility of placeholder */
+}
+
+.table > :not(caption) > * > * {
+    padding: 0.35rem 0.55rem!important;
+    font-size: 14px!important;
 }
 
 /* Optional: Specific for form-control class (Bootstrap inputs) */
 .custom-date-input::placeholder,
 .form-control::placeholder {
-    color: grey; /* Grey color for placeholders */
+    color: grey;
+    /* Grey color for placeholders */
     opacity: 1;
 }
 
 .custom-date-input {
-    color: grey !important; /* Set the input text color to grey */
-    font-size: 14px; /* Adjust font size if needed */
+    color: grey !important;
+    /* Set the input text color to grey */
+    font-size: 14px;
+    /* Adjust font size if needed */
+}
+.css-13cymwt-control {
+    border:none;
+    max-height: 33px;
+    height: 33px;
 }
 .custom-date-input-select {
-    color: black !important; /* Set the input text color to black */
+    color: black !important;
+    /* Set the input text color to black */
 }
+
 .custom-date {
-    color: grey !important; /* Set the input text color to grey */
-    font-size: 14px; /* Adjust font size if needed */
+    color: grey !important;
+    /* Set the input text color to grey */
+    font-size: 14px;
+    /* Adjust font size if needed */
 }
+
 .scroll-container {
     overflow-y: auto;
 }
@@ -187,8 +243,12 @@ input,
 textarea,
 select,
 .select__control {
-    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
+    background-color: #d9ddd6!important;
+    /* max-height: 33px!important;
+    height: 33px!important; */
 }
+
 .input {
     border-radius: 4px !important;
 }
@@ -196,6 +256,7 @@ select,
 tbody tr:nth-child(even) {
     background-color: #efefef !important;
 }
+
 /* option{
     color: black;
 } */
@@ -208,6 +269,7 @@ table {
     width: 100%;
     border-collapse: collapse;
 }
+
 .box-shadow-none {
     box-shadow: none !important;
 }
@@ -215,10 +277,11 @@ table {
 .custom-file-upload {
     display: flex;
     align-items: center;
-    border: 1px solid rgba(15, 13, 13, 0.473) !important;
+    border: none !important;
     border-radius: 4px;
-    padding: 8px 12px;
+    padding: 4px 8px;
     width: 100%;
+    background-color: #d9ddd6!important;
 }
 
 .file-upload-label {
@@ -237,6 +300,7 @@ table {
 .file-input {
     display: none;
 }
+
 .custom-file-upload-icon {
     display: flex;
     justify-content: center;
@@ -249,17 +313,24 @@ table {
     position: relative;
     border: 1px solid red !important;
 }
+
 .form-check-input {
     cursor: pointer;
 }
+
 .scroll-container {
-    overflow: auto; /* Allow scrolling */
-    -ms-overflow-style: none; /* Hide scrollbar for Internet Explorer and Edge */
-    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    overflow: auto;
+    /* Allow scrolling */
+    -ms-overflow-style: none;
+    /* Hide scrollbar for Internet Explorer and Edge */
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
 }
+
 .offcanvas-family-history {
     width: 28vw !important;
 }
+
 .responnsible-party-select input {
     border: none !important;
 }
@@ -267,6 +338,7 @@ table {
 .plusicon {
     color: #6169d0;
 }
+
 .date-carousel {
     display: flex;
     align-items: center;
@@ -300,20 +372,23 @@ table {
 .date-carousel .arrow:hover {
     color: #000;
 }
+
 .slots {
     background-color: #d9d9d9 !important;
     font-weight: 600;
 }
 
 .react-datepicker__input-container input {
-    height: 2.3rem !important;
+    height: 30px !important;
     width: 14rem !important;
     padding: 0 0.5rem !important;
     border-radius: 3px;
 }
+
 .schedule-table {
     box-shadow: none !important;
 }
+
 /* media query */
 @media (min-width: 768px) and (max-width: 979px) {
     .custom-buttons {
@@ -361,6 +436,9 @@ table {
     .form-control.form-control {
         font-size: 10px;
     }
+    .form-control {
+        padding: 5px !important;
+    }
     .form_heading {
         font-size: 12px;
         font-weight: 700;
@@ -368,7 +446,15 @@ table {
     .input_search_box {
         height: 30px;
     }
+    .react-datepicker__input-container input {
+        height: 30px !important;
+        width: 10rem !important;
+        padding: 0 0.5rem !important;
+        border-radius: 3px;
+        font-size: 10px;
+    }
 }
+
 .chip {
     background-color: #6169d0 !important;
     border-radius: 11px;
@@ -380,6 +466,7 @@ table {
     margin-right: 5px;
     padding: 2px 4px;
 }
+
 .select--is-disabled {
     font-weight: 600 !important;
 }
@@ -404,3 +491,23 @@ table {
     color: black;
     transition: background-color 0.3s ease;
 }
+
+.navbar-custom {
+    margin-top: 50px !important;
+    /* height: 100px!important; */
+}
+
+/* .leftside-menu {
+    margin-top: 60px !important;
+} */
+
+/* .logo.logo-light {
+    margin-top: 60px !important;
+} */
+.content {
+    margin-top: 65px !important;
+}
+.navbar-custom-top {
+    background-color: #313a46 !important;
+}
+

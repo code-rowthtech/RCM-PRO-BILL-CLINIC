@@ -76,7 +76,7 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'))
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log({clinicsDataGet})
+    console.log({ clinicsDataGet })
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code
@@ -258,12 +258,12 @@ const NewPractice = () => {
             // setValue('contactPerson', clinicsDataGet?.userId?.phone?.startsWith("+1")
             //     ? clinicsDataGet.userId.phone.substring(2)
             //     : clinicsDataGet?.userId?.phone);
-                setValue('contactPerson', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
-                            .replace(/\+1/, '') // Remove all non-numeric characters
-                            .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                                p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
-                            )
-                            : '')
+            setValue('contactPerson', clinicsDataGet?.userId?.phone ? clinicsDataGet?.userId?.phone
+                .replace(/\+1/, '') // Remove all non-numeric characters
+                .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                    p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}` // Format dynamically as (XXX)XXX-XXXX
+                )
+                : '')
             setValue('npiNumber', clinicsDataGet?.npiNumber);
             setLogo(clinicsDataGet?.logo?.url);
             setValue('medicare', clinicsDataGet?.medicareNumber);
@@ -441,13 +441,13 @@ const NewPractice = () => {
             ...stateDetails && { stateOfLicensing: stateDetails },
             ...accreditationDetails && { accreditationDetails: accreditationDetails },
             // ...(logo ?
-                // {
-                    logo: {
-                        url: logo,
-                        fileName: logoName,
-                    },
-                // }
-                // : ''),
+            // {
+            logo: {
+                url: logo,
+                fileName: logoName,
+            },
+            // }
+            // : ''),
             primaryAddress: {
                 ...(formData?.address ? { address: formData?.address } : ''),
                 ...(formData?.city ? { city: formData?.city } : ''),
@@ -482,7 +482,7 @@ const NewPractice = () => {
             ...posDetails && { pos: posDetails },
         }
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }))
-        console.log({payload})
+        console.log({ payload })
     };
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {
@@ -606,8 +606,8 @@ const NewPractice = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-2">
-                    <Card className='px-md-3 py-md-2'>
+                <div className="container-fluid mt-2 px-0">
+                    <Card className="scroll-container px-md-2 py-md-2" style={{ height: '82vh', overflow: 'scroll' }}>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
@@ -1322,7 +1322,7 @@ const NewPractice = () => {
                                                                             State <span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
-                                                                        className='form-control'
+                                                                            className='form-control'
                                                                             {...register('stateName', {
                                                                                 required: 'State is required',
                                                                             })}
@@ -1350,7 +1350,7 @@ const NewPractice = () => {
                                                                             City<span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
-                                                                        className='form-control'
+                                                                            className='form-control'
                                                                             disabled={store?.getCitiesReducer?.loading}
                                                                             {...register('city', {
                                                                                 required: 'City is required',

@@ -433,33 +433,33 @@ const NewDoctor = () => {
 
     return (
         <>
-            <div className='pt-1 pb-2 px-0 px-md-2'>
-                <div className="container-fluid mt-2 px-0 px-md-2">
-                    <Card className='px-md-2 py-md-2'>
-                        <Card.Body className='py-0 px-0 px-md-2'>
+            <div className='pt-1 pb-2 px-0'>
+                <div className="container-fluid mt-2 px-0">
+                    <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body className='py-0 px-0'>
                             <div className="row">
                                 <div className="col-12">
                                     <div className="row d-flex justify-content-between align-items-center">
                                         {/* Tabs Section */}
                                         <div className="col-9 col-md-8 mb-md-1 mb-1 mb-md-0">
-                                                <ul className="nav nav-underline">
-                                                    <li className="nav-item">
-                                                        <button
-                                                            className={`text-black font_active_tabs nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
-                                                            onClick={() => handleTabChange("personalDetails")}
-                                                        >
-                                                            Personal Details
-                                                        </button>
-                                                    </li>
-                                                    <li className="nav-item">
-                                                        <button
-                                                            className={`text-black font_active_tabs nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
-                                                            onClick={() => handleTabChange("departmentDetails")}
-                                                        >
-                                                            Professional Information
-                                                        </button>
-                                                    </li>
-                                                </ul>
+                                            <ul className="nav nav-underline">
+                                                <li className="nav-item">
+                                                    <button
+                                                        className={`text-black font_active_tabs nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                        onClick={() => handleTabChange("personalDetails")}
+                                                    >
+                                                        Personal Details
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <button
+                                                        className={`text-black font_active_tabs nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
+                                                        onClick={() => handleTabChange("departmentDetails")}
+                                                    >
+                                                        Professional Information
+                                                    </button>
+                                                </li>
+                                            </ul>
                                         </div>
 
                                         <div className="col-3 col-md-4 d-flex justify-content-end align-items-center gap-md-2 gap-0 px-0">
@@ -483,11 +483,10 @@ const NewDoctor = () => {
                                                         </OverlayTrigger>
                                                     )}
                                                     <div className='d-none d-md-block'>
-                                                    <Button className='cancel-button' onClick={handleNewDoctor}>
-                                                        Back
-                                                    </Button>
+                                                        <Button className='cancel-button' onClick={handleNewDoctor}>
+                                                            Back
+                                                        </Button>
                                                     </div>
-                                                    
                                                 </>
                                             )}
                                         </div>
@@ -659,7 +658,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
                                                                 <Form.Select
-                                                                className='form-control'
+                                                                    className='form-control'
                                                                     {...register('department', { required: 'Department is required' })}
                                                                     onChange={(e) => {
                                                                         setFormData({ ...formData, departmentId: e.target.value });
@@ -761,7 +760,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Degree Name</Form.Label>
                                                                 <Form.Control
-                                                                className='form-control'
+                                                                    className='form-control'
                                                                     type="text"
                                                                     {...register('degreeName',
                                                                         // { required: 'Degree Name is required' }
@@ -814,7 +813,7 @@ const NewDoctor = () => {
                                                                     </p>
                                                                 </div>
                                                                 <Form.Control
-                                                                
+
                                                                     type="file"
                                                                     className="d-none "
                                                                     {...register('profileImage', {
@@ -1002,7 +1001,7 @@ const NewDoctor = () => {
                                                                                     State
                                                                                 </label>
                                                                                 <select
-                                                                                className='form-control'
+                                                                                    className='form-control'
                                                                                     id="state-select"
                                                                                     {...register("state1")}
                                                                                     onChange={(e) => {
@@ -1318,7 +1317,7 @@ const NewDoctor = () => {
                                                                                     <Form.Control readOnly={sameAsPrimary} value={cities1 && cities1.find((data) => data?._id === formData?.primaryAddress?.city)?.name} />
                                                                                     :
                                                                                     <Form.Select
-                                                                                    className='form-control'
+                                                                                        className='form-control'
                                                                                         disabled={store?.getCitiesReducer?.loading}
                                                                                         {...register('city2')}
                                                                                         onChange={(e) => {

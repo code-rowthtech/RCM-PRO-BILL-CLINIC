@@ -61,7 +61,6 @@ const Demographicdetails = ({ patientId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    console.log({ cities3 })
     const primaryState = watch('primaryStateName');
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
@@ -991,9 +990,10 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
+                                        height={'33px'}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -1071,9 +1071,10 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
+                                                        height={'33px'}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -1166,7 +1167,6 @@ const Demographicdetails = ({ patientId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                console.log(data, 'selectedAddress')
                                                                 setValue('employerZip', data?.components?.postcode)
                                                                 setValue('employerStateName', data?.components?.state_code)
                                                                 setValue('employerStreet', data?.components?.road)
@@ -1305,8 +1305,8 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                 </Row>
                 <Row className="my-2">
-                    <Col className="text-end">
-                        <Button className="custom-buttons" type="submit">Save</Button>
+                    <Col className="d-flex justify-content-end">
+                        <Button className="custom-buttons btn-height" type="submit">Save</Button>
                     </Col>
                 </Row>
             </Form >

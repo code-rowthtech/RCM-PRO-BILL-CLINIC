@@ -43,9 +43,9 @@ const Index = () => {
     return (
         <>
             <Row className="mt-2">
-                <Col xs={12}>
-                    <Card className="px-md-3 py-md-2">
-                        <Row className="mb-0">
+                <Col xs={12} className=''>
+                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex gap-3">
                                     {['clinic', 'billing', 'contract'].map((tab) => (

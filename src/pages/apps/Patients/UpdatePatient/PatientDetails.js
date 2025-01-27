@@ -167,13 +167,13 @@ const PatientDetails = ({ patientId }) => {
     <>
       <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="row my-2">
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group className="responnsible-party-select">
               <Form.Label className="mb-0">
                 Primary Provider
               </Form.Label>
               <Select
-                className="basic-single"
+                className="basic-single border-0"
                 classNamePrefix="select"
                 isLoading={store?.getDoctorsReducer?.loading}
                 isClearable={true}
@@ -192,7 +192,7 @@ const PatientDetails = ({ patientId }) => {
               />
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="patientstatus" className="mb-0">Status</Form.Label>
               <Form.Select
@@ -208,7 +208,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Select>
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
               <Form.Select
@@ -225,7 +225,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="firstName" className="mb-0">First Name <span className="text-danger">*</span></Form.Label>
               <Form.Control
@@ -238,7 +238,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="middleName" className="mb-0">Middle Name</Form.Label>
               <Form.Control
@@ -251,7 +251,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="lastName" className="mb-0">Last Name <span className="text-danger">*</span></Form.Label>
               <Form.Control
@@ -264,7 +264,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Previous Birth Name </Form.Label>
               <Form.Control
@@ -275,7 +275,7 @@ const PatientDetails = ({ patientId }) => {
               {errors.birthName && <span className="text-danger">{errors.birthName.message}</span>}
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Suffix </Form.Label>
               <Form.Control
@@ -286,43 +286,51 @@ const PatientDetails = ({ patientId }) => {
               {errors.suffix && <span className="text-danger">{errors.suffix.message}</span>}
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <div className="mb-1 d-flex flex-column position-relative">
               <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
               <div
                 onClick={() => logoFileInputRef.current.click()}
                 className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
+                style={{backgroundColor:'#d9ddd6'}}
               >
-                {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Chart Photo'}
+                {logoName
+                  ? logoName.length > 25
+                    ? `${logoName.substring(0, 22)}...`
+                    : logoName
+                  : profileUploading
+                    ? 'Uploading...'
+                    : 'Upload Patient Chart Photo'}
                 <p className="mb-0">
                   <FiUploadCloud />
                 </p>
               </div>
               <Form.Control
                 type="file"
-                className="d-none "
-                {...register('profileImage', {
-                })}
+                className="d-none  border-0"
+                {...register('profileImage', {})}
                 accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                 ref={logoFileInputRef}
                 onChange={handleFileChange}
-
               />
-              {errors.profileImage && (<span className="text-danger">{errors.profileImage.message}</span>
+              {errors.profileImage && (
+                <span className="text-danger">{errors.profileImage.message}</span>
               )}
             </div>
+
           </div>
         </div>
         <hr />
         <div className="row">
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group className="mb-1 position-relative">
               <Form.Label className='mb-0'>Home Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('homePhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -365,7 +373,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -376,14 +384,15 @@ const PatientDetails = ({ patientId }) => {
 
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group className="mb-1 position-relative">
               <Form.Label className='mb-0'>Cell Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('cellPhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -426,7 +435,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -437,14 +446,15 @@ const PatientDetails = ({ patientId }) => {
 
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group className="mb-1 position-relative">
               <Form.Label className='mb-0'>Office Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('officePhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -487,7 +497,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -498,7 +508,7 @@ const PatientDetails = ({ patientId }) => {
 
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="email" className="mb-0">Email ID</Form.Label>
               <Form.Control
@@ -508,7 +518,7 @@ const PatientDetails = ({ patientId }) => {
               />
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Alternate Email</Form.Label>
               <Form.Control
@@ -520,7 +530,7 @@ const PatientDetails = ({ patientId }) => {
               />
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Preferred Communication</Form.Label>
               <Form.Select
@@ -541,7 +551,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Reminder Language</Form.Label>
               <Form.Select
@@ -556,7 +566,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Medication History Concent</Form.Label>
               <Form.Select
@@ -570,7 +580,7 @@ const PatientDetails = ({ patientId }) => {
             </Form.Group>
           </div>
 
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Payment Profile</Form.Label>
               <Form.Select
@@ -588,7 +598,7 @@ const PatientDetails = ({ patientId }) => {
               {errors.paymentProfile && <span className="text-danger">{errors.paymentProfile.message}</span>}
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Patient's Copay (in $)</Form.Label>
               <Form.Control
@@ -603,7 +613,7 @@ const PatientDetails = ({ patientId }) => {
               />
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label htmlFor="DOB" className="mb-0">Follow Up Date</Form.Label>
               <Form.Control
@@ -614,7 +624,7 @@ const PatientDetails = ({ patientId }) => {
               {errors.followupDate && <span className="text-danger">{errors.followupDate.message}</span>}
             </Form.Group>
           </div>
-          <div className="col-6">
+          <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Follow Up Reason</Form.Label>
               <Form.Control
@@ -628,7 +638,7 @@ const PatientDetails = ({ patientId }) => {
 
         {/* Buttons */}
         <div className="d-flex gap-2 justify-content-end my-2">
-          <Button type="submit" className="custom-buttons" disabled={store?.updatePatientsReducer?.loading}>
+          <Button type="submit" className="custom-buttons btn-height" disabled={store?.updatePatientsReducer?.loading}>
             {store?.updatePatientsReducer?.loading ?
               <Spinner className="spinner-border-sm" color="white" />
               :

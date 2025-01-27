@@ -23,6 +23,11 @@ export const createResponsiblePartyAction = (data): AuthAction => ({
     data
 });
 
+export const updateResponsiblePartyAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_RESPONSIBLE_PARTY,
+    data
+});
+
 export const getResponsiblePartyAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_RESPONSIBLE_PARTY,
     data
@@ -33,6 +38,15 @@ export const updatePatientsAction = (data): AuthAction => ({
     data
 });
 
+export const createInsuranceAction = (data): AuthAction => ({
+    type: PatientsActionTypes.CREATE_INSURANCE,
+    data
+});
+
+export const updateInsuranceAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_INSURANCE,
+    data
+});
 export const stateEmptydAction = (): LayoutAction => ({
     type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
