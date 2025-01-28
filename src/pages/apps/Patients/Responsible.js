@@ -43,7 +43,6 @@ const Responsiblle = ({ patientId }) => {
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
-    console.log({ createResponse })
     useEffect(() => {
         if (createResponse === 201) {
             dispatch(stateEmptydAction())
@@ -203,22 +202,7 @@ const Responsiblle = ({ patientId }) => {
             contactNumber: data?.contactNumber,
             clinicId: clinicId,
             title: data?.title,
-            // patientsId: data?.patientsId,
-            // status: data?.status,
-            // billingInfo: data?.billingInfo,
-            // profile: {
-            //     url: logo?.url?.split('?')[0],
-            //     fileName: logoName
-            // },
-            // title: data?.title,
-            // chartNumber: data?.chartNumber,
-            // account: data?.account,
-            // note: data?.note,
-            // stateMent: data?.stateMent,
-            // accountType: data?.accountType,
-            // employer: data?.employer,
         }
-        console.log(payload, 'payyyyyyyyyyyyyyyyyyyyyyyyy')
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
 
     };
@@ -226,7 +210,6 @@ const Responsiblle = ({ patientId }) => {
         { type: 'Patient', values: Array(6).fill("0.00") },
         { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
     ];
-
     return (
         <>
             {/* Form Section */}
@@ -417,12 +400,12 @@ const Responsiblle = ({ patientId }) => {
                             </div>
                             <div className="col-6">
                                 <div className=" mb-1">
-                                    <Form.Label htmlFor="title" className="mb-0">Chart</Form.Label>
+                                    <Form.Label className="mb-0">Chart</Form.Label>
                                     <Form.Select
-                                        {...register('title',
+                                        {...register('chart',
                                             //  { required: "Title is required" }
                                         )}
-                                        aria-label="Select Title"
+                                        aria-label="Select Chart"
                                     >
                                         <option value="">Select Chart</option>
                                         <option value="Mr.">1</option>
@@ -449,8 +432,6 @@ const Responsiblle = ({ patientId }) => {
                                                 <th className='text-white '>Seq</th>
                                                 <th className='text-white '>Coverage</th>
                                                 <th className='text-white '>Carrier</th>
-                                                {/* <th className='text-white'>Email</th> */}
-                                                {/* <th className='text-white'>Status</th> */}
                                                 <th className='text-white '>Subscriber</th>
                                                 <th className='text-white '>Id#</th>
                                                 <th className='text-white '>Capay</th>
@@ -565,7 +546,6 @@ const Responsiblle = ({ patientId }) => {
                                                 <p
                                                     key={index}
                                                     onClick={() => {
-                                                        console.log(data)
                                                         setSelectedLocation(data)
                                                         setValue('zip', data?.components?.postcode)
                                                         setFocused(false); // Close dropdown after selection

@@ -3,6 +3,7 @@ import PrimaryInsurance from './PrimaryInsurance';
 import SecondaryInsurance from './SecondaryInsurance';
 import AutoAccident from './AutoAccident';
 import WorkersCamp from './WorkersCamp';
+import { useSearchParams } from 'react-router-dom';
 
 const Insurance = ({ patientId }) => {
     const [activeTab, setActiveTab] = useState("primaryInsurance");

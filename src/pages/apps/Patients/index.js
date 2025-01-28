@@ -35,7 +35,6 @@ const Patients = () => {
             limit: 10,
             search: search,
         }
-        // console.log(data, 'dataaa')
         dispatch(getPatientsAction({ key: encryptMessage(data) }));
     }, [dispatch, skip, search]);
     const handleShowDetails = () => {
@@ -89,19 +88,6 @@ const Patients = () => {
                         <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
                                 <Col sm={6}>
-                                    {/* <Button
-                                        onClick={() => setStatus(true)}
-                                        className={`me-2 ${status === true ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                    >
-                                        Active
-                                    </Button>
-
-                                    <Button
-                                        onClick={() => setStatus(false)}
-                                        className={`me-2 ${status === false ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                    >
-                                        Inactive
-                                    </Button> */}
                                 </Col>
 
 
@@ -151,9 +137,9 @@ const Patients = () => {
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
                                                             <td>CH-{data?.chartNumber}</td>
-                                                            <td className='text-capitalize'>{data?.firstName}</td>
-                                                            <td className='text-capitalize'>{data?.sex}</td>
-                                                            <td>{data?.cellPhone}</td>
+                                                            <td className='text-capitalize'>{data?.firstName || 'N/A'}</td>
+                                                            <td className='text-capitalize'>{data?.sex || 'N/A'}</td>
+                                                            <td>{data?.cellPhone || 'N/A'}</td>
                                                             <td>{data?.insuranceRange || 'N/A'}</td>
                                                             <td>{data?.lastVisit || 'N/A'}</td>
                                                             <td>{data?.nextVisit || 'N/A'}</td>
