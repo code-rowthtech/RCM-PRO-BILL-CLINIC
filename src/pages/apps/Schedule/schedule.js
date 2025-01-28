@@ -80,7 +80,7 @@ const Schedule = () => {
             setSelectedDoctor(selectedOption);
         }
     };
-    const handleAddHoliday =()=>{
+    const handleAddHoliday = () => {
         navigate("/apps/schedule/addHoliday");
     }
 
@@ -88,33 +88,33 @@ const Schedule = () => {
         <div className="schedule-container">
             <Row className="mt-2">
                 <Col xs={12}>
-                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                     <Card.Body>
+                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}
                                 <Col sm={4} xs={12} className="mb-3 mb-sm-0">
-                                        <ul className="nav nav-underline font_active_tabs">
-                                            {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
-                                                <li className="nav-item" key={index}>
-                                                    <a
-                                                        className={classNames(
-                                                            'nav-link fw-bold text-black',
-                                                            { active: activeTab === tab }
-                                                        )}
-                                                        href="#"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setActiveTab(tab);
-                                                        }}
-                                                    >
-                                                        {tab === 'DoctorHolidays' && 'Doctor Holidays'}
-                                                        {/* {tab === 'breaks' && 'Breaks'} */}
-                                                        {tab === 'schedules' && 'Schedules'}
-                                                    </a>
-                                                </li>
-                                            ))}
+                                    <ul className="nav nav-underline font_active_tabs">
+                                        {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
+                                            <li className="nav-item" key={index}>
+                                                <a
+                                                    className={classNames(
+                                                        'nav-link fw-bold text-black',
+                                                        { active: activeTab === tab }
+                                                    )}
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setActiveTab(tab);
+                                                    }}
+                                                >
+                                                    {tab === 'DoctorHolidays' && 'Doctor Holidays'}
+                                                    {/* {tab === 'breaks' && 'Breaks'} */}
+                                                    {tab === 'schedules' && 'Schedules'}
+                                                </a>
+                                            </li>
+                                        ))}
 
-                                        </ul>
+                                    </ul>
                                 </Col>
 
                                 {/* Controls Section */}
@@ -160,16 +160,16 @@ const Schedule = () => {
                                                 <Button
                                                     className="custom-buttons d-none d-md-block"
                                                     onClick={handleAddHoliday}
-                                                   
+
                                                 >
                                                     Add Holiday
                                                 </Button>
                                                 <Button
-                                                className="custom-buttons d-md-none py-1"
-                                                onClick={handleAddHoliday}
-                                            >
-                                                +
-                                            </Button>
+                                                    className="custom-buttons d-md-none py-1"
+                                                    onClick={handleAddHoliday}
+                                                >
+                                                    +
+                                                </Button>
                                             </div>
                                         )}
                                         {activeTab === 'breaks' && (

@@ -42,9 +42,9 @@ body {
     line-height: 10px;
     font-size: 13px;
     height: 30px !important;
-     display: flex;
+    display: flex;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
 }
 .btn-height {
     height: 30px !important;
@@ -96,19 +96,19 @@ body {
     border-radius: 4px; /* Ensures consistent rounded corners */
     width: 100%; /* Optional: Sets width to fit the parent container */
 }
-.active_tabs_link{
-    border-bottom: 3px solid #727CF5 ;
-    color: #727CF5;
+.active_tabs_link {
+    border-bottom: 3px solid #727cf5;
+    color: #727cf5;
 }
 select.form-control:not([size]):not([multiple]) {
     height: 30px;
 }
-.input-group-text{
+.input-group-text {
     height: 30px;
 }
 .nav-underline .nav-link.active {
-    border-bottom: 3px solid #727CF5 !important;
-    color:#727CF5 !important ;
+    border-bottom: 3px solid #727cf5 !important;
+    color: #727cf5 !important ;
 }
 
 .plusicon {
@@ -171,7 +171,7 @@ select.form-control:not([size]):not([multiple]) {
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
     border: 0px !important;
 }
 
@@ -267,7 +267,7 @@ textarea,
 select,
 .select__control {
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
     /* max-height: 33px!important;
     height: 33px!important; */
 }
@@ -304,7 +304,7 @@ table {
     border-radius: 4px;
     padding: 4px 8px;
     width: 100%;
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
 }
 
 .file-upload-label {
@@ -334,7 +334,6 @@ table {
     height: 11vh;
     cursor: pointer;
     position: relative;
-    border: 1px solid red !important;
 }
 
 .form-check-input {
@@ -520,7 +519,7 @@ table {
 }
 
 .navbar-custom {
-    margin-top: 50px ;
+    margin-top: 50px;
     /* height: 100px!important; */
 }
 

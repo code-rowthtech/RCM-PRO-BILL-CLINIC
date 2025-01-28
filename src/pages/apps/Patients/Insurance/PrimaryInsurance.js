@@ -63,6 +63,8 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
 
         if (id && primaryInsurance) {
             dispatch(updateInsuranceAction({ key: encryptMessage(payload) }))
+        } else if (id && !primaryInsurance) {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
         } else {
             dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
         }

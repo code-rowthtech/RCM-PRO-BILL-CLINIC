@@ -36,7 +36,6 @@ const Doctors = () => {
         doctor.userDetails?.status === status &&
         doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
-    console.log({ filteredDoctors })
 
     const handleStatusChange = () => {
         const payload = {
@@ -59,13 +58,13 @@ const Doctors = () => {
             );
         }
     }, [updateStatus]);
-    const handleNewDoctor =()=>{
+    const handleNewDoctor = () => {
         navigate("/apps/doctors/new-doctor")
     }
 
     return (
         <>
-            <Row className='mt-2'>
+            <Row className=''>
                 <Col xs={12} className='px-0'>
                     <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                         <Card.Body >
