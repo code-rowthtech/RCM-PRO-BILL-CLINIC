@@ -3,7 +3,7 @@ import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bo
 import { useForm } from "react-hook-form";
 import { FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3Action, updatePatientsAction } from "../../../../redux/actions";
 import us from '../../../../assets/images/flags/us.jpg'
 import { encryptMessage } from "../../../../cryptoUtils";
@@ -39,6 +39,8 @@ const Demographicdetails = ({ patientId }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
     const [age, setAge] = useState(null);
     const [longitude, setLongitude] = useState(null);
@@ -69,20 +71,6 @@ const Demographicdetails = ({ patientId }) => {
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])
-    // useEffect(() => {
-    //     if (primaryState) {
-    //         const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id
-    //         dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25, skip: '' }))
-    //     }
-    //     if (mailingState) {
-    //         const stateCity = statesData?.states?.find((data) => data?.state_code === mailingState)?.id
-    //         dispatch(getCities2Action({ state_code: stateCity, name: mailingCitySearch, limit: 25, skip: '' }))
-    //     }
-    //     if (employerState) {
-    //         const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id
-    //         dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }))
-    //     }
-    // }, [primaryState, mailingState, employerState])
     useEffect(() => {
         if (primaryCitySearch) {
             setValue('primaryCity', cities1 && cities1.find((data) => data?.name === primaryCitySearch)?.name)
@@ -167,18 +155,18 @@ const Demographicdetails = ({ patientId }) => {
             }
         }
     }, [statesData, patientDetails])
-    const handleStateSelection = (e, data) => {
+    const handleStateSelection = (code, data) => {
         if (data === 'primary') {
-            const stateCity1 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
-            dispatch(getCitiesAction({ state_code: stateCity1, name: '', limit: 25, skip: '' }))
+            const stateCity1 = statesData?.states?.find((data) => data?.state_code === code)?.id
+            dispatch(getCitiesAction({ state_code: stateCity1, name: primaryCitySearch ? primaryCitySearch : '', limit: 25, skip: '' }))
         }
         if (data === 'mailing') {
-            const stateCity2 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
-            dispatch(getCities2Action({ state_code: stateCity2, name: '', limit: 25, skip: '' }))
+            const stateCity2 = statesData?.states?.find((data) => data?.state_code === code)?.id
+            dispatch(getCities2Action({ state_code: stateCity2, name: mailingCitySearch ? mailingCitySearch : '', limit: 25, skip: '' }))
         }
         if (data === 'employer') {
-            const stateCity3 = statesData?.states?.find((data) => data?.state_code === e.target.value || e)?.id
-            dispatch(getCities3Action({ state_code: stateCity3, name: '', limit: 25, skip: '' }))
+            const stateCity3 = statesData?.states?.find((data) => data?.state_code === code)?.id
+            dispatch(getCities3Action({ state_code: stateCity3, name: employerCitySearch ? employerCitySearch : '', limit: 25, skip: '' }))
         }
     }
     useEffect(() => {
@@ -193,61 +181,9 @@ const Demographicdetails = ({ patientId }) => {
         }
     }, [cities1, cities2, cities3, patientDetails])
     const onSubmit = (data) => {
-        // const payload = {
-        //     id: patientId,
-        //     ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
-        //     ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-        //     ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
-        //     ...(data?.sex ? { sex: data?.sex } : {}),
-        //     ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
-        //     ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
-        //     ...(data?.race ? { race: data?.race } : {}),
-        //     ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
-        //     ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
-        //     ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
-        //     ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
-        //     ...(data?.notes ? { notes: data?.notes } : {}),
-        //     ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-        //     ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
-        //     ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
-        //     ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
-        //     ...(data?.emergencyContactPhone ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') } : {}),
-        //     ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
-        //     ...(data?.employerName ? { employerName: data?.employerName } : {}),
-        //     ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
-        //     employerAddress: {
-        //         address: data?.employerAddress,
-        //         street: data?.employerStreet,
-        //         city: data?.employerCity,
-        //         state: data?.employerStateName,
-        //         zip: data?.employerZip,
-        //         latitude: employerLatitude,
-        //         longitude: employerLongitude,
-        //         timeZone: data?.employerTimeZone
-        //     },
-        //     address: {
-        //         address: data?.primaryAddress,
-        //         street: data?.primaryStreet,
-        //         city: data?.primaryCity,
-        //         state: data?.primaryStateName,
-        //         zip: data?.primaryZip,
-        //         latitude: latitude,
-        //         longitude: longitude,
-        //         timeZone: data?.primaryTimeZone
-        //     },
-        //     mailingAddress: {
-        //         address: data?.mailingAddress,
-        //         street: data?.mailingStreet,
-        //         city: data?.mailingCity,
-        //         state: data?.mailingStateName,
-        //         zip: data?.mailingZip,
-        //         latitude: mailingLatitude,
-        //         longitude: mailingLongitude,
-        //         timeZone: data?.mailingTimeZone
-        //     },
-        // }
         const enrichedData = {
             ...data,
+            id: id,
             emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, ''), // Sanitize emergency contact phone
             employerPhone: data?.employerPhone?.replace(/\D/g, ''), // Sanitize employer phone
             address: {
@@ -260,16 +196,27 @@ const Demographicdetails = ({ patientId }) => {
                 longitude: longitude,
                 timeZone: data?.primaryTimeZone
             },
-            employerAddress: {
-                address: data?.employerAddress,
-                street: data?.employerStreet,
-                city: data?.employerCity,
-                state: data?.employerStateName,
-                zip: data?.employerZip,
-                latitude: employerLatitude,
-                longitude: employerLongitude,
-                timeZone: data?.employerTimeZone
-            },
+            employerAddress: sameAsPrimary ?
+                {
+                    address: data?.primaryAddress,
+                    street: data?.primaryStreet,
+                    city: data?.primaryCity,
+                    state: data?.primaryStateName,
+                    zip: data?.primaryZip,
+                    latitude: latitude,
+                    longitude: longitude,
+                    timeZone: data?.primaryTimeZone
+                }
+                : {
+                    address: data?.employerAddress,
+                    street: data?.employerStreet,
+                    city: data?.employerCity,
+                    state: data?.employerStateName,
+                    zip: data?.employerZip,
+                    latitude: employerLatitude,
+                    longitude: employerLongitude,
+                    timeZone: data?.employerTimeZone
+                },
             mailingAddress: {
                 address: data?.mailingAddress,
                 street: data?.mailingStreet,
@@ -281,8 +228,7 @@ const Demographicdetails = ({ patientId }) => {
                 timeZone: data?.mailingTimeZone
             }
         };
-        console.log(enrichedData, 'enrichedData')
-        // dispatch(updatePatientsAction({ key: encryptMessage(enrichedData) }))
+        dispatch(updatePatientsAction({ key: encryptMessage(enrichedData) }))
     };
 
     const getGeolocation = (e) => {
@@ -631,7 +577,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Label className='mb-0' >State</Form.Label>
                                             <Form.Select
                                                 {...register('primaryStateName')}
-                                                onChange={(e) => handleStateSelection(e, 'primary')}
+                                                onChange={(e) => handleStateSelection(e.target.value, 'primary')}
                                             >
                                                 <option value=''>State</option>
                                                 {statesData?.states?.map((data) => (
@@ -844,7 +790,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 <>
                                                     <Form.Select
                                                         {...register('mailingStateName')}
-                                                        onChange={(e) => handleStateSelection(e, 'mailing')}
+                                                        onChange={(e) => handleStateSelection(e.target.value, 'mailing')}
                                                     >
                                                         <option value=''>State</option>
                                                         {statesData?.states?.map((data) => (
@@ -990,7 +936,7 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
                                         height={'33px'}
@@ -1071,7 +1017,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
                                                         height={'33px'}

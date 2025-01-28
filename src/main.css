@@ -45,8 +45,8 @@ body {
     align-items: center;
     justify-content: center; 
 }
-.btn-height{
-    height: 30px!important;
+.btn-height {
+    height: 30px !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,7 +55,7 @@ body {
     background-color: #5c636b !important;
     border: none !important;
     font-size: 14px;
-    height: 30px!important;
+    height: 30px !important;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -170,8 +170,8 @@ select.form-control:not([size]):not([multiple]) {
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
-    background-color:#d9ddd6 !important;
-    border: 0px!important
+    background-color: #d9ddd6 !important;
+    border: 0px !important;
 }
 
 .form-select {
@@ -222,8 +222,8 @@ form textarea::placeholder {
 }
 
 .table > :not(caption) > * > * {
-    padding: 0.35rem 0.55rem!important;
-    font-size: 14px!important;
+    padding: 0.35rem 0.55rem !important;
+    font-size: 14px !important;
 }
 
 /* Optional: Specific for form-control class (Bootstrap inputs) */
@@ -241,7 +241,7 @@ form textarea::placeholder {
     /* Adjust font size if needed */
 }
 .css-13cymwt-control {
-    border:none;
+    border: none;
     max-height: 33px;
     height: 33px;
 }
@@ -266,7 +266,7 @@ textarea,
 select,
 .select__control {
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
-    background-color: #d9ddd6!important;
+    background-color: #d9ddd6 !important;
     /* max-height: 33px!important;
     height: 33px!important; */
 }
@@ -303,7 +303,7 @@ table {
     border-radius: 4px;
     padding: 4px 8px;
     width: 100%;
-    background-color: #d9ddd6!important;
+    background-color: #d9ddd6 !important;
 }
 
 .file-upload-label {
@@ -537,3 +537,12 @@ table {
     background-color: #313a46 !important;
 }
 
+.custom-btn-group button {
+    height: 30px !important;
+    line-height: normal;
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}

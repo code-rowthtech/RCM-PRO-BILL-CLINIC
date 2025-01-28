@@ -109,7 +109,6 @@ const PatientDetails = ({ patientId }) => {
 
     }
   }, [patientDetails && doctorDetails])
-
   const onSubmit = (data) => {
     const payload = {
       id: id,
@@ -292,7 +291,7 @@ const PatientDetails = ({ patientId }) => {
               <div
                 onClick={() => logoFileInputRef.current.click()}
                 className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
-                style={{backgroundColor:'#d9ddd6'}}
+                style={{ backgroundColor: '#d9ddd6' }}
               >
                 {logoName
                   ? logoName.length > 25
@@ -327,7 +326,7 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Home Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
                     height={'33px'}
@@ -389,7 +388,7 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Cell Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
                     height={'33px'}
@@ -451,7 +450,7 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Office Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
                     height={'33px'}

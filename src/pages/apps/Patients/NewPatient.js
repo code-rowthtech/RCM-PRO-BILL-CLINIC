@@ -216,12 +216,7 @@ const NewPatient = () => {
             ...(data?.followupReason ? { followupReason: data?.followupReason } : {}),
         }
 
-        // reset();
-        if (id) {
-            dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
-        } else {
-            dispatch(createPatientsAction({ key: encryptMessage(payload) }))
-        }
+        dispatch(createPatientsAction({ key: encryptMessage(payload) }))
     };
     const tableData = [
         { type: 'Patient', values: Array(6).fill("0.00") },
@@ -308,7 +303,7 @@ const NewPatient = () => {
                     <div className="px-2">
                         {/* Form Section */}
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row my-1" style={{borderBottom:'1px solid #444141'}}>
+                            <div className="row my-1" style={{ borderBottom: '1px solid #444141' }}>
                                 <div className="col-3">
                                     <Form.Group className="responnsible-party-select">
                                         <Form.Label className="mb-0">
@@ -341,8 +336,8 @@ const NewPatient = () => {
                                                 placeholder: (provided) => ({
                                                     ...provided,
                                                     fontWeight: 'bold',
-                                                    fontSize:'12px',
-                                                    paddingBottom:'5px'
+                                                    fontSize: '12px',
+                                                    paddingBottom: '5px'
                                                 }),
                                             }}
                                         />
@@ -447,7 +442,7 @@ const NewPatient = () => {
                                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                                         <div
                                             onClick={() => logoFileInputRef.current.click()}
-                                            style={{height:'33px'}}
+                                            style={{ height: '33px' }}
                                             className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
                                         >
                                             {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Chart Photo'}
@@ -458,7 +453,7 @@ const NewPatient = () => {
                                         <Form.Control
                                             type="file"
                                             className="d-none "
-                                            style={{height:'30px!important'}}
+                                            style={{ height: '30px!important' }}
                                             {...register('profileImage', {
                                             })}
                                             accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
@@ -789,7 +784,7 @@ const NewPatient = () => {
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button  onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save & Add Another
                                 </Button>
                                 <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">

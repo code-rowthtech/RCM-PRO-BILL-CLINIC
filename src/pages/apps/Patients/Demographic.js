@@ -69,6 +69,11 @@ const Demographicdetails = ({ patientId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])
     useEffect(() => {
+        if (age) {
+            setValue('approxAge', age);
+        }
+    }, [age]);
+    useEffect(() => {
         if (primaryState) {
             const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id
             dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25, skip: '' }))
@@ -147,7 +152,6 @@ const Demographicdetails = ({ patientId }) => {
                 timeZone: data?.mailingTimeZone
             },
         }
-        console.log(payload, 'detailsofpayload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
     };
 
@@ -236,7 +240,7 @@ const Demographicdetails = ({ patientId }) => {
     return (
         <>
             <Form className="mt-1" onSubmit={handleSubmit(onSubmit)}>
-                <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
+                <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
@@ -381,10 +385,10 @@ const Demographicdetails = ({ patientId }) => {
                         </Form.Group>
                     </Col>
                 </Row>
-               
+
                 <Row>
                     <Col sm={12}>
-                        <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
+                        <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
                             <Col sm={12} className='mt-1'>
                                 <span className='text-black fw-semibold form-label'>Primary Address</span>
                             </Col>
@@ -566,7 +570,7 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
+                <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
                     <Col sm={12}>
                         <Row>
                             <Col sm={12} className='mt-1'>
@@ -788,7 +792,7 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <Row style={{borderBottom:'1px solid #444141'}} className="mt-1 pb-2">
+                <Row style={{ borderBottom: '1px solid #444141' }} className="mt-1 pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Notes</Form.Label>
@@ -855,10 +859,10 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
-                                        style={{height:'33px'}}
+                                        style={{ height: '33px' }}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -935,10 +939,10 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
-                                                        style={{height:'33px'}}
+                                                        style={{ height: '33px' }}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -1031,7 +1035,6 @@ const Demographicdetails = ({ patientId }) => {
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                console.log(data, 'selectedAddress')
                                                                 setValue('employerZip', data?.components?.postcode)
                                                                 setValue('employerStateName', data?.components?.state_code)
                                                                 setValue('employerStreet', data?.components?.road)
