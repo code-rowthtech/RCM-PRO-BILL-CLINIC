@@ -1,15 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
 
 const AppointmentForm = () => {
+    const navigate = useNavigate();
+    const [selectedOption, setSelectedOption] = useState("");
+    const handleSelectChange = (e) => {
+        const value = e.target.value;
+
+        if (value === "new-patient") {
+            window.open(
+                "/apps/patients/new-patient", // The URL to open
+                "_blank", // Opens in a new tab or window
+                "width=800,height=600,scrollbars=yes,resizable=yes" // Specifies the popup dimensions and options
+            );
+        } else {
+            setSelectedOption(value);
+        }
+    };
     return (
         <div>
             <Row>
                 <Col sm={6}>
                     <Form.Group className="mb-1" controlId="patient">
                         <Form.Label className="mb-0">Patient</Form.Label>
-                        <Form.Control as="select">
+                        <Form.Control as="select" value={selectedOption} onChange={handleSelectChange}>
                             <option>Select Patient</option>
+                            <option value="new-patient">New Patient</option>
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
