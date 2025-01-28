@@ -68,7 +68,7 @@ if(createResponse===200){
                             <Col sm={12} className='text-center'>
                                 The Sub Practice will receive a Change and Set Password on this {formData?.userId?.email}.
                             </Col>
-                            <Col sm={12} className='text-center mt-2'>
+                            <Col sm={12} className='d-flex justify-content-center mt-2'>
                                 <Button type='submit' className='custom-buttons' disabled={store?.createSubClinicsReducer?.loading}>
                                     {store?.createSubClinicsReducer?.loading ? (
                                         <Spinner color='white' className='spinner-border-sm' />

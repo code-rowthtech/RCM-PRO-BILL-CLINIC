@@ -103,7 +103,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
     return (
         <>
-            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '53px' }} ref={menuNodeRef}>
+            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '60px' }} ref={menuNodeRef}>
                 {/* {!hideLogo && (
                     <>
                         <Link to="/" className="logo text-center logo-light">

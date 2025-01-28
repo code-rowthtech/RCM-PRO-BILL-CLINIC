@@ -445,7 +445,7 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`text-black font_active_tabs nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
                                                         onClick={() => handleTabChange("personalDetails")}
                                                     >
                                                         Personal Details
@@ -453,7 +453,7 @@ const NewDoctor = () => {
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`text-black font_active_tabs nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
                                                         onClick={() => handleTabChange("departmentDetails")}
                                                     >
                                                         Professional Information

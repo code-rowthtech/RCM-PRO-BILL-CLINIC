@@ -14,6 +14,7 @@ import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, up
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
 import { getMastersDataAction } from '../../../redux/settings/action';
+import { IoSearchSharp } from 'react-icons/io5';
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -165,35 +166,64 @@ const RoleManagement = () => {
     return (
         <Row className='mt-2'>
             <Col xs={12} className='px-0'>
-            <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <Card.Body className='' >
                         <Row className="mb-2">
                             <Col md={6} sm={6} xs={6}>
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${status ? 'custom-buttons text-white ' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                                    className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}
                                 >
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={` active_inactive_buttons ${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}
                                 >
                                     Inactive
                                 </Button>
                             </Col>
+
                             <Col md={6} sm={6} xs={6} className='text-end'>
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                     <Col xs="auto" className='d-flex gap-2'>
-                                        <FormInput
-                                            type="text"
-                                            placeholder="Search..."
-                                            value={searchQuery}  // Bind the input to the searchQuery state
-                                            onChange={handleSearchChange}
-                                            className='input_search_box'
-                                        />
+
+                                        <div
+                                            className="input_search_box"
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#d9ddd6 ",
+                                                padding: "0px 5px",
+                                            }}
+                                        >
+                                            <IoSearchSharp
+                                                style={{
+                                                    fontSize: "1.2rem",
+                                                    color: "black",
+                                                    marginRight: "10px",
+                                                }}
+                                            />
+                                            <FormInput
+                                                type="text"
+                                                onChange={handleSearchChange}
+                                                value={searchQuery}
+                                                className="input_search_box"
+                                                style={{
+                                                    border: "none",
+                                                    outline: "none",
+                                                    flex: 1,
+                                                    backgroundColor: "#ccc",
+
+                                                }}
+                                            />
+                                        </div>
                                         <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons d-none d-md-block py-1" >
                                             Add User
                                         </Button>
