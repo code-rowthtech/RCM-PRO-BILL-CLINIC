@@ -439,7 +439,7 @@ const NewPatient = () => {
                                 </div>
                                 <div className="col-3">
                                     <div className="mb-2 d-flex flex-column position-relative">
-                                        <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
+                                        <Form.Label className="mb-0">Patient Photo</Form.Label>
                                         <div
                                             onClick={() => logoFileInputRef.current.click()}
                                             style={{ height: '33px' }}
