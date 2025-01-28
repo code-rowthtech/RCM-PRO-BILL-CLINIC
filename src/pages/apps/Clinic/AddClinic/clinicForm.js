@@ -1850,7 +1850,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <td>{patient.name}</td>
                                                         <td>{(patient?.userId?.primaryAddress?.city?.state_code || 'N/A') + ' / ' + (patient?.userId?.primaryAddress?.city?.name || 'N/A')}</td>
                                                         <td>{patient.clinicType}</td>
-                                                        <td>{patient.practiceSpecialty}</td>
+                                                        <td>{patient.practiceSpecialty || 'N/A'}</td>
                                                         <td>
                                                             <Form.Switch checked={patient.status === patient.status} />
                                                         </td>

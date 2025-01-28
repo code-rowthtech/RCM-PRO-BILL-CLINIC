@@ -227,8 +227,8 @@ const ResponsibleParty = ({ patientId }) => {
                         </div>
                     </div>
                     <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                        <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="py-1">
+                        <div className="row ">
+                            <div className="pt-1">
                                 <Form.Label htmlFor="SSN" className="mb-0">SSN<span className='text-danger'>*</span></Form.Label>
                                 <div className="d-flex gap-2">
                                     <Form.Control
@@ -248,7 +248,7 @@ const ResponsibleParty = ({ patientId }) => {
                                 {errors.ssn && <span className="text-danger">{errors.ssn.message}</span>}
                             </div>
                         </div>
-                        <div className="row mb-1 mt-1 pb-1" style={{ borderBottom: "1px solid #444141" }}>
+                        <div className="row mb-1" >
                             <div className="col-4 mb-1">
                                 <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
@@ -263,9 +263,10 @@ const ResponsibleParty = ({ patientId }) => {
                                     <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                     <Form.Group>
                                         <InputGroup>
-                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'30px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                                             <Form.Control
                                                 type="tel"
+                                                height={'30px'}
                                                 {...register('contactNumber', !id ? {
                                                     required: 'This field is required',
                                                     pattern: {
@@ -303,7 +304,7 @@ const ResponsibleParty = ({ patientId }) => {
                                         {errors.contactNumber && <span className="text-danger">{errors.contactNumber.message}</span>}
                                     </Form.Group>
                                     <div
-                                        className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                        className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                     >
                                         <img
                                             src={us}
@@ -749,7 +750,7 @@ const ResponsibleParty = ({ patientId }) => {
 
                 {/* Buttons */}
                 <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
-                    <Button className="custom-buttons" variant="primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
+                    <Button className="custom-buttons btn-height"  data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
                         <div class="offcanvas-header">
                             <h4 class="offcanvas-title" id="offcanvasBottomLabel">Collections</h4>
@@ -810,11 +811,11 @@ const ResponsibleParty = ({ patientId }) => {
                             </Row>
                         </div>
                     </div>
-                    <Button className="custom-buttons" variant="primary" >Statement</Button>
+                    <Button className="custom-buttons btn-height" >Statement</Button>
                     <Button
-                        className="custom-buttons "
+                        className="custom-buttons btn-height "
                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
-                        variant="primary"  >
+                        >
                         Family history
                     </Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -957,8 +958,8 @@ const ResponsibleParty = ({ patientId }) => {
                                         </div>
                                     </Col>
                                     <Col sm={12} className='mb-2 d-flex justify-content-end gap-2'>
-                                        <Button className="custom-buttons">Reset</Button>
-                                        <Button className="custom-buttons">Apply</Button>
+                                        <Button className="custom-buttons btn-height">Reset</Button>
+                                        <Button className="custom-buttons btn-height">Apply</Button>
                                     </Col>
                                 </Row>
 
@@ -966,7 +967,7 @@ const ResponsibleParty = ({ patientId }) => {
                         </div>
                     </div>
 
-                    <Button className="custom-buttons" type="submit" disabled={store?.updateResponsiblePartyReducer?.loading}>
+                    <Button className="custom-buttons btn-height" type="submit" disabled={store?.updateResponsiblePartyReducer?.loading}>
                         {store?.updateResponsiblePartyReducer?.loading ?
                             <Spinner className="spinner-border-sm" color="white" />
                             :

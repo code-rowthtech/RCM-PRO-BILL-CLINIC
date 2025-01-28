@@ -285,11 +285,10 @@ const NewPatient = () => {
                             </ul>
 
                         </div>
-                        <div>
+                        <div className="d-flex">
                             {activeTab === "responsible" && (
                                 <Button
-                                    className="me-2"
-                                    variant="primary"
+                                    className="me-2 custom-buttons btn-height"
                                     onClick={() => handleTabChange("responsible")}
                                 >
                                     Payment
@@ -302,14 +301,14 @@ const NewPatient = () => {
                             <Button className="me-2">
                                 Set Password
                             </Button> */}
-                            <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
+                            <Button className="cancel-button" onClick={() => navigate(-1)}>Back</Button>
                         </div>
                     </div>
 
                     <div className="px-2">
                         {/* Form Section */}
                         {activeTab === "personalDetails" && (<Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                            <div className="row my-2">
+                            <div className="row my-1" style={{borderBottom:'1px solid #444141'}}>
                                 <div className="col-3">
                                     <Form.Group className="responnsible-party-select">
                                         <Form.Label className="mb-0">
@@ -333,6 +332,19 @@ const NewPatient = () => {
                                             name="doctorName"
                                             options={doctorOptions}
                                             placeholder="Select Doctor Name"
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '33px',
+                                                    minHeight: '33px',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize:'12px',
+                                                    paddingBottom:'5px'
+                                                }),
+                                            }}
                                         />
                                     </Form.Group>
                                 </div>
@@ -431,10 +443,11 @@ const NewPatient = () => {
                                     </Form.Group>
                                 </div>
                                 <div className="col-3">
-                                    <div className="mb-1 d-flex flex-column position-relative">
+                                    <div className="mb-2 d-flex flex-column position-relative">
                                         <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
                                         <div
                                             onClick={() => logoFileInputRef.current.click()}
+                                            style={{height:'33px'}}
                                             className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
                                         >
                                             {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Chart Photo'}
@@ -445,6 +458,7 @@ const NewPatient = () => {
                                         <Form.Control
                                             type="file"
                                             className="d-none "
+                                            style={{height:'30px!important'}}
                                             {...register('profileImage', {
                                             })}
                                             accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
@@ -457,16 +471,16 @@ const NewPatient = () => {
                                     </div>
                                 </div>
                             </div>
-                            <hr />
                             <div className="row">
                                 <div className="col-3">
                                     <Form.Group className="mb-1 position-relative">
                                         <Form.Label className='mb-0'>Home Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('homePhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -496,7 +510,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('homePhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -507,7 +521,7 @@ const NewPatient = () => {
                                                 />
                                             </InputGroup>
                                         </Form.Group>
-                                        <div className='position-absolute' style={{ top: '52%', left: '1%' }}>
+                                        <div className='position-absolute' style={{ top: '48%', left: '1%' }}>
                                             <img
                                                 src={us}
                                                 alt="country code flag"
@@ -520,9 +534,10 @@ const NewPatient = () => {
                                         <Form.Label className='mb-0'>Cell Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('cellPhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -552,7 +567,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('cellPhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -565,7 +580,7 @@ const NewPatient = () => {
                                         </Form.Group>
 
                                         <div
-                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                            className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                         >
                                             <img
                                                 src={us}
@@ -581,9 +596,10 @@ const NewPatient = () => {
                                         <Form.Label className='mb-0'>Office Phone</Form.Label>
                                         <Form.Group>
                                             <InputGroup>
-                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                                 <Form.Control
                                                     type="tel"
+                                                    style={{ height: '30px!important' }}
                                                     {...register('officePhone', !id ? {
                                                         pattern: {
                                                             value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -613,7 +629,7 @@ const NewPatient = () => {
                                                         e.target.value = formattedValue; // Update input value
                                                         clearErrors('officePhone'); // Clear validation errors
                                                     }}
-                                                    placeholder="(###)###-####"
+                                                    placeholder="(XXX)XXX-XXXX"
                                                     maxLength={14}
                                                     onKeyPress={(event) => {
                                                         // Only allow numeric characters (0-9)
@@ -626,7 +642,7 @@ const NewPatient = () => {
                                         </Form.Group>
 
                                         <div
-                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                            className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                         >
                                             <img
                                                 src={us}
@@ -767,19 +783,19 @@ const NewPatient = () => {
 
                             {/* Buttons */}
                             <div className="d-flex gap-2 justify-content-end my-2">
-                                <Button variant="secondary" onClick={() => {
+                                <Button className="cancel-button" onClick={() => {
                                     reset();
                                     setSelectedDoctor(null);
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button variant="primary" onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button  onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save & Add Another
                                 </Button>
-                                <Button variant="primary" onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button variant="primary" onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
+                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
                                     Save
                                 </Button>
                             </div>

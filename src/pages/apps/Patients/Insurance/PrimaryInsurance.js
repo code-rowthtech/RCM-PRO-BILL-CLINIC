@@ -174,7 +174,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Insurance Photo Front</Form.Label>
                             <div
-                                className='custom-file-upload justify-content-between cursor-pointer'>
+                                className='custom-file-upload justify-content-between cursor-pointer py-0' style={{height:'33px'}}>
                                 <p className="mb-0">
                                     Upload
                                 </p>
@@ -184,14 +184,14 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                             </div>
                             <Form.Control
                                 type="file"
-                                className="d-none "
+                                className="d-none"
                             />
                         </div>
                     </div>
                     <div className="col-6 mt-1">
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Insurance Photo Back</Form.Label>
-                            <div className='custom-file-upload justify-content-between cursor-pointer'>
+                            <div className='custom-file-upload justify-content-between cursor-pointer py-0' style={{height:'33px'}}>
                                 <p className="mb-0">
                                     Upload
                                 </p>
@@ -299,9 +299,9 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                 </Row>
 
                 <div className="col-12 d-flex align-items-center gap-2 justify-content-end">
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
                 </div>
             </Form>
         </div>

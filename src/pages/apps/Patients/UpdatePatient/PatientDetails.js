@@ -173,7 +173,7 @@ const PatientDetails = ({ patientId }) => {
                 Primary Provider
               </Form.Label>
               <Select
-                className="basic-single"
+                className="basic-single border-0"
                 classNamePrefix="select"
                 isLoading={store?.getDoctorsReducer?.loading}
                 isClearable={true}
@@ -292,6 +292,7 @@ const PatientDetails = ({ patientId }) => {
               <div
                 onClick={() => logoFileInputRef.current.click()}
                 className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}
+                style={{backgroundColor:'#d9ddd6'}}
               >
                 {logoName
                   ? logoName.length > 25
@@ -306,7 +307,7 @@ const PatientDetails = ({ patientId }) => {
               </div>
               <Form.Control
                 type="file"
-                className="d-none"
+                className="d-none  border-0"
                 {...register('profileImage', {})}
                 accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
                 ref={logoFileInputRef}
@@ -326,9 +327,10 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Home Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('homePhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -371,7 +373,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -387,9 +389,10 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Cell Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('cellPhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -432,7 +435,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -448,9 +451,10 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className='mb-0'>Office Phone</Form.Label>
               <Form.Group>
                 <InputGroup>
-                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                  <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'style={{height:'33px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
                   <Form.Control
                     type="tel"
+                    height={'33px'}
                     {...register('officePhone', !id ? {
                       pattern: {
                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -493,7 +497,7 @@ const PatientDetails = ({ patientId }) => {
               </Form.Group>
 
               <div
-                className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                className='position-absolute ' style={{ top: '48%', left: '1%' }}
               >
                 <img
                   src={us}
@@ -634,7 +638,7 @@ const PatientDetails = ({ patientId }) => {
 
         {/* Buttons */}
         <div className="d-flex gap-2 justify-content-end my-2">
-          <Button type="submit" className="custom-buttons" disabled={store?.updatePatientsReducer?.loading}>
+          <Button type="submit" className="custom-buttons btn-height" disabled={store?.updatePatientsReducer?.loading}>
             {store?.updatePatientsReducer?.loading ?
               <Spinner className="spinner-border-sm" color="white" />
               :

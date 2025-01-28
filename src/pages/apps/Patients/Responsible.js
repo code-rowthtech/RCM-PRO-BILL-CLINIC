@@ -284,9 +284,9 @@ const Responsiblle = ({ patientId }) => {
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
                     </div>
-                    <div className="col-6" style={{ borderRight: "1px solid #444141" }}>
-                        <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="py-1">
+                    <div className="col-6" style={{ borderRight: "1px solid #212529" }}>
+                        <div className="row " >
+                            <div className="pt-1">
                                 <Form.Label htmlFor="SSN" className="mb-0">SSN<span className='text-danger'>*</span></Form.Label>
                                 <div className="d-flex gap-2">
                                     <Form.Control
@@ -306,8 +306,8 @@ const Responsiblle = ({ patientId }) => {
                                 {errors.SSN && <span className="text-danger">{errors.SSN.message}</span>}
                             </div>
                         </div>
-                        <div className="row mb-1 mt-1 pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-4 mb-1">
+                        <div className="row" >
+                            <div className="col-4 ">
                                 <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="email"
@@ -321,9 +321,10 @@ const Responsiblle = ({ patientId }) => {
                                     <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                     <Form.Group>
                                         <InputGroup>
-                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                             <Form.Control
                                                 type="tel"
+                                                style={{ height: '30px!important' }}
                                                 {...register('contactNumber', !id ? {
                                                     required: 'This field is required',
                                                     pattern: {
@@ -344,7 +345,7 @@ const Responsiblle = ({ patientId }) => {
                                                     clearErrors('contactNumber')
                                                     setFormData({ ...formData, phone: e.target.value })
                                                 }}
-                                                placeholder="1234-234-234"
+                                                placeholder="(XXX)XXX-XXXX"
                                                 maxLength={10}
                                             // onKeyPress={(event) => handleFirstSpace(event, 0)}
                                             />
@@ -352,7 +353,7 @@ const Responsiblle = ({ patientId }) => {
                                         {errors.contactNumber && <span className="text-danger">{errors.contactNumber.message}</span>}
                                     </Form.Group>
                                     <div
-                                        className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                        className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                     >
                                         <img
                                             src={us}
@@ -371,7 +372,7 @@ const Responsiblle = ({ patientId }) => {
                             </div>
                         </div>
                         <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-6 mb-1">
+                            <div className="col-6">
                                 <div>
                                     <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
                                     <div className="d-flex gap-2">
@@ -392,7 +393,7 @@ const Responsiblle = ({ patientId }) => {
 
                                 </div>
                             </div>
-                            <div className="col-6 mb-1">
+                            <div className="col-6 ">
                                 <div>
                                     <Form.Label htmlFor="status" className="mb-0">Status</Form.Label>
                                     <div className="d-flex gap-2">
@@ -445,14 +446,14 @@ const Responsiblle = ({ patientId }) => {
                                     <Table responsive className="table-centered table-nowrap mb-0 mt-1">
                                         <thead className="text-white">
                                             <tr>
-                                                <th className='text-white'>Seq</th>
-                                                <th className='text-white'>Coverage</th>
-                                                <th className='text-white'>Carrier</th>
+                                                <th className='text-white '>Seq</th>
+                                                <th className='text-white '>Coverage</th>
+                                                <th className='text-white '>Carrier</th>
                                                 {/* <th className='text-white'>Email</th> */}
                                                 {/* <th className='text-white'>Status</th> */}
-                                                <th className='text-white'>Subscriber</th>
-                                                <th className='text-white'>Id#</th>
-                                                <th className='text-white'>Capay</th>
+                                                <th className='text-white '>Subscriber</th>
+                                                <th className='text-white '>Id#</th>
+                                                <th className='text-white '>Capay</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -478,13 +479,13 @@ const Responsiblle = ({ patientId }) => {
                                     <Table responsive className="table-centered table-nowrap mb-0 mt-1 ">
                                         <thead className="text-white">
                                             <tr>
-                                                <th className="text-white"></th>
-                                                <th className="text-white">0-30</th>
-                                                <th className="text-white">31-60</th>
-                                                <th className="text-white">61-90</th>
-                                                <th className="text-white">91-120</th>
-                                                <th className="text-white">121+</th>
-                                                <th className="text-white">Total</th>
+                                                <th className="text-white "></th>
+                                                <th className="text-white ">0-30</th>
+                                                <th className="text-white ">31-60</th>
+                                                <th className="text-white ">61-90</th>
+                                                <th className="text-white ">91-120</th>
+                                                <th className="text-white ">121+</th>
+                                                <th className="text-white ">Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -515,7 +516,7 @@ const Responsiblle = ({ patientId }) => {
                     <div className="col-6">
                         <div className="row pb-1  px-0" style={{ borderBottom: "1px solid #444141" }}>
 
-                            <div className=" my-1">
+                            <div className=" mt-1">
                                 <Form.Label htmlFor="fileName" className="mb-0">Account <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="text"
@@ -528,7 +529,7 @@ const Responsiblle = ({ patientId }) => {
                             </div>
                             <Col sm={12}>
 
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-0">
                                     <Form.Label className="mb-0">Address</Form.Label>
                                     <div style={{ position: 'relative' }}>
                                         <Form.Control
@@ -587,7 +588,7 @@ const Responsiblle = ({ patientId }) => {
 
                             <Col sm={12}>
 
-                                <Form.Group className="mb-1">
+                                <Form.Group className="mb-0">
                                     <Form.Label className='mb-0' >State</Form.Label>
                                     <Form.Select
                                         {...register('stateName')}
@@ -628,7 +629,7 @@ const Responsiblle = ({ patientId }) => {
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
-                                        <Form.Group className="mb-1">
+                                        <Form.Group className="mb-0">
                                             <Form.Label className='mb-0'>Zip</Form.Label>
                                             <Form.Control
                                                 type="text"
@@ -798,7 +799,7 @@ const Responsiblle = ({ patientId }) => {
 
                 {/* Buttons */}
                 <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
-                    <Button className="custom-buttons" variant="primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
+                    <Button className="custom-buttons btn-height" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
                         <div class="offcanvas-header">
                             <h4 class="offcanvas-title" id="offcanvasBottomLabel">Collections</h4>
@@ -859,11 +860,11 @@ const Responsiblle = ({ patientId }) => {
                             </Row>
                         </div>
                     </div>
-                    <Button className="custom-buttons" variant="primary" >Statement</Button>
+                    <Button className="custom-buttons btn-height" >Statement</Button>
                     <Button
-                        className="custom-buttons "
+                        className="custom-buttons btn-height "
                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
-                        variant="primary"  >
+                    >
                         Family history
                     </Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -1006,17 +1007,17 @@ const Responsiblle = ({ patientId }) => {
                                         </div>
                                     </Col>
                                     <Col sm={12} className='mb-2 d-flex justify-content-end gap-2'>
-                                        <Button className="custom-buttons">Reset</Button>
-                                        <Button className="custom-buttons">Apply</Button>
+                                        <Button className="custom-buttons btn-height">Reset</Button>
+                                        <Button className="custom-buttons btn-height">Apply</Button>
                                     </Col>
                                 </Row>
 
                             </Form>
                         </div>
                     </div>
-                    <Button className="custom-buttons" variant="primary" >Credit cards</Button>
-                    <Button className="custom-buttons" variant="primary" > Previous </Button>
-                    <Button className="custom-buttons" disabled={store?.createResponsiblePartyReducer?.loading} type="submit">
+                    <Button className="custom-buttons btn-height"  >Credit cards</Button>
+                    <Button className="custom-buttons btn-height"  > Previous </Button>
+                    <Button className="custom-buttons btn-height" disabled={store?.createResponsiblePartyReducer?.loading} type="submit">
                         {store?.createResponsiblePartyReducer?.loading ?
                             <Spinner color="white" className="spinner-border-sm" />
                             :

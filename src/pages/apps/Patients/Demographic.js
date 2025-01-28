@@ -235,8 +235,8 @@ const Demographicdetails = ({ patientId }) => {
     }
     return (
         <>
-            <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-                <Row>
+            <Form className="mt-1" onSubmit={handleSubmit(onSubmit)}>
+                <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
@@ -381,11 +381,11 @@ const Demographicdetails = ({ patientId }) => {
                         </Form.Group>
                     </Col>
                 </Row>
-                <hr />
+               
                 <Row>
                     <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className=''>
+                        <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
+                            <Col sm={12} className='mt-1'>
                                 <span className='text-black fw-semibold form-label'>Primary Address</span>
                             </Col>
                             <Col sm={6}>
@@ -566,11 +566,10 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <hr />
-                <Row>
+                <Row style={{borderBottom:'1px solid #444141'}} className="pb-2">
                     <Col sm={12}>
                         <Row>
-                            <Col sm={12} className=''>
+                            <Col sm={12} className='mt-1'>
                                 <span className='text-black fw-semibold form-label'>Mailing Address</span>
                                 <Form.Check
                                     type="checkbox"
@@ -789,8 +788,7 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <hr />
-                <Row>
+                <Row style={{borderBottom:'1px solid #444141'}} className="mt-1 pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Notes</Form.Label>
@@ -857,9 +855,10 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
+                                        style={{height:'33px'}}
                                         {...register('emergencyContactPhone', {
                                             pattern: {
                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -888,7 +887,7 @@ const Demographicdetails = ({ patientId }) => {
                                             e.target.value = formattedValue; // Update input value
                                             clearErrors('emergencyContactPhone'); // Clear validation errors
                                         }}
-                                        placeholder="(123)456-7890"
+                                        placeholder="(XXX)XXX-XXXX"
                                         maxLength={14}
                                         onKeyPress={(event) => {
                                             // Only allow numeric characters (0-9)
@@ -901,7 +900,7 @@ const Demographicdetails = ({ patientId }) => {
                             </Form.Group>
 
                             <div
-                                className='position-absolute ' style={{ top: '50%', left: '1%' }}
+                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
                             >
                                 <img
                                     src={us}
@@ -917,11 +916,10 @@ const Demographicdetails = ({ patientId }) => {
                         </Form.Group>
                     </Col>
                 </Row>
-                <hr />
-                <Row>
+                <Row >
                     <Col sm={12}>
                         <Row>
-                            <Col sm={12} className=''>
+                            <Col sm={12} className='mt-1'>
                                 <span className='text-black fw-semibold form-label'>Employer Details</span>
                             </Col>
                             <Col sm={12}>
@@ -937,9 +935,10 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'33px'}}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
+                                                        style={{height:'33px'}}
                                                         {...register('employerPhone', {
                                                             pattern: {
                                                                 value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
@@ -968,7 +967,7 @@ const Demographicdetails = ({ patientId }) => {
                                                             e.target.value = formattedValue; // Update input value
                                                             clearErrors('employerPhone'); // Clear validation errors
                                                         }}
-                                                        placeholder="(123)456-7890"
+                                                        placeholder="(XXX)XXX-XXXX"
                                                         maxLength={14}
                                                         onKeyPress={(event) => {
                                                             if (!/[0-9]/.test(event.key)) {
@@ -980,7 +979,7 @@ const Demographicdetails = ({ patientId }) => {
                                             </Form.Group>
 
                                             <div
-                                                className='position-absolute ' style={{ top: '50%', left: '1%' }}
+                                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
                                             >
                                                 <img
                                                     src={us}
@@ -1170,8 +1169,8 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col className="text-end">
-                        <Button className="custom-buttons" type="submit">Save</Button>
+                    <Col className="d-flex justify-content-end">
+                        <Button className="custom-buttons btn-height" type="submit">Save</Button>
                     </Col>
                 </Row>
             </Form >

@@ -158,9 +158,9 @@ const WorkersCamp = ({ patientId, activeTab }) => {
                 </div>
 
                 <div className="col-12 d-flex my-2 align-items-center gap-2 justify-content-end">
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
-                    <Button className='custom-buttons' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and add another</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} >Save and continue editing</Button>
+                    <Button className='custom-buttons btn-height' disabled={store?.createInsuranceReducer?.loading} type='submit' >Save</Button>
                 </div>
             </Form>
         </div>
