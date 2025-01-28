@@ -41,7 +41,7 @@ const Demographicdetails = ({ patientId }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue, clearErrors, watch, getValues } = useForm();
     const [age, setAge] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
@@ -67,7 +67,11 @@ const Demographicdetails = ({ patientId }) => {
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-
+    useEffect(() => {
+        if (age) {
+            setValue('approxAge', age)
+        }
+    }, [age])
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])

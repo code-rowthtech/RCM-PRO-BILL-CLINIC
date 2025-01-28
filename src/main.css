@@ -39,10 +39,6 @@ body {
     background-color: #6169d0 !important;
     border: none !important;
     border-radius: 10px;
-    /* height: 30px !important; */
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
 }
 .btn-height {
     height: 30px !important;
@@ -148,7 +144,7 @@ body {
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
     border: 0px !important;
 }
 
@@ -244,7 +240,7 @@ textarea,
 select,
 .select__control {
     /* border: 1px solid rgba(15, 13, 13, 0.473) !important; */
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
     /* max-height: 33px!important;
     height: 33px!important; */
 }
@@ -281,7 +277,7 @@ table {
     border-radius: 4px;
     padding: 4px 8px;
     width: 100%;
-    background-color: #d9ddd6 !important;
+    background-color: #e8f0fe !important;
 }
 
 .file-upload-label {
@@ -311,7 +307,6 @@ table {
     height: 11vh;
     cursor: pointer;
     position: relative;
-    border: 1px solid red !important;
 }
 
 .form-check-input {

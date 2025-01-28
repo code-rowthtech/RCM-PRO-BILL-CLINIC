@@ -351,7 +351,7 @@ const NewPatient = () => {
                                             id="patientstatus"
                                             {...register('patientStatus')}
                                         >
-                                            <option value="">Select status</option>  {/* Default option */}
+                                            <option value="" hidden>Select status</option>  {/* Default option */}
                                             <option value="Active">Active</option>
                                             <option value="Inactive">Inactive</option>
                                             <option value="Inactive-Deceased">Inactive-Deceased</option>
@@ -366,7 +366,7 @@ const NewPatient = () => {
                                             {...register('title')}
                                             aria-label="Select Title"
                                         >
-                                            <option value="">Select Title</option>
+                                            <option value="" hidden>Select Title</option>
                                             <option value="Mr.">Mr.</option>
                                             <option value="Mrs.">Mrs.</option>
                                             <option value="Miss">Miss</option>
@@ -677,7 +677,7 @@ const NewPatient = () => {
                                             {...register('preferredCommunication')}
                                             aria-label="Select Title"
                                         >
-                                            <option value="">Select Preferred Communication</option>
+                                            <option value="" hidden>Select Preferred Communication</option>
                                             <option value="Home Phone">Home Phone</option>
                                             <option value="Work Phone">Work Phone</option>
                                             <option value="Cell Phone">Cell Phone</option>
@@ -698,7 +698,7 @@ const NewPatient = () => {
                                             {...register('reminderLanguage',
                                             )}
                                         >
-                                            <option value="">Select Reminder Language</option>
+                                            <option value="" hidden>Select Reminder Language</option>
                                             <option value="English">English</option>
                                             <option value="Spanish">Spanish</option>
                                             <option value="French">French</option>
@@ -713,7 +713,7 @@ const NewPatient = () => {
                                             {...register('medicationHistoryConsent',
                                             )}
                                         >
-                                            <option value="">Select Medication History Concent</option>
+                                            <option value="" hidden>Select Medication History Concent</option>
                                             <option value={'true'}>Yes</option>
                                             <option value={'false'}>No</option>
                                         </Form.Select>
@@ -727,7 +727,7 @@ const NewPatient = () => {
                                             {...register('paymentProfile')}
                                             aria-label="Payment Profile"
                                         >
-                                            <option value="">Select Payment Profile</option>
+                                            <option value="" hidden>Select Payment Profile</option>
                                             <option value="Cash">Cash</option>
                                             <option value="Insurance">Insurance</option>
                                             <option value="Insurance Out of Network">Insurance Out of Network</option>

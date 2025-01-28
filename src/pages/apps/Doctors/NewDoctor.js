@@ -434,7 +434,7 @@ const NewDoctor = () => {
     return (
         <>
             <div className='pt-1 pb-2 px-0'>
-                <div className="container-fluid mt-2 px-0">
+                <div className="container-fluid  px-0">
                     <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                         <Card.Body className='py-0 px-0'>
                             <div className="row">

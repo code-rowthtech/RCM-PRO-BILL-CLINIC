@@ -33,7 +33,6 @@ const Doctors = () => {
         doctor.userDetails?.status === status &&
         doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
     );
-    console.log({ filteredDoctors })
 
     const handleStatusChange = () => {
         const payload = {
@@ -59,10 +58,10 @@ const Doctors = () => {
 
     return (
         <>
-            <Row className='mt-2'>
+            <Row className=''>
                 <Col xs={12} className='px-0'>
-                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                     <Card.Body >
+                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body >
                             <Row className="mb-2">
                                 <Col sm={6} xs={6}>
                                     <Button
@@ -85,12 +84,12 @@ const Doctors = () => {
                                             <FormInput
                                                 type="text"
                                                 value={search}
-                                                onChange={(e) => setSearch(e.target.value)} 
+                                                onChange={(e) => setSearch(e.target.value)}
                                                 placeholder="Search..."
                                                 className='input_search_box'
-                                              
+
                                             />
-                                             <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py- d-none d-md-block" >
+                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py- d-none d-md-block" >
                                                 New Doctor
                                             </Button>
                                             <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py d-block d-md-none">
@@ -149,7 +148,7 @@ const Doctors = () => {
                                                                     }}
                                                                 />
                                                             </td>
-                                                            <td className='py-1 'style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className='d-flex gap-2'>
                                                                     <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />

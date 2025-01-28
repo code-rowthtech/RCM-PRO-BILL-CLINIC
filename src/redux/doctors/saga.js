@@ -75,7 +75,6 @@ function* createDoctorsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             ToastHandle(decryptedData.message, 'success')
-
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
                 payload: { ...decryptedData },
@@ -159,7 +158,8 @@ function* addReferringDoctorFunction(data) {
         });
         const response = yield call(addReferringDoctorApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
+        if (response.status === 201) {
+            ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_SUCCESS,
                 payload: { ...decryptedData },
@@ -171,6 +171,7 @@ function* addReferringDoctorFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: DoctorsActionTypes.ADD_REFERRING_DOCTOR_ERROR,
             payload: error,

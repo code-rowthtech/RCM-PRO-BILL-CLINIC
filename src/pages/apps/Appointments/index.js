@@ -219,7 +219,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         padding: '0px',
                                                         fontSize: '14px',
                                                         border: '0px',            // Remove border
-                                                        backgroundColor: '#d9ddd6!important',     // Set background to red
+                                                        backgroundColor: '#E8F0FE!important',     // Set background to red
                                                         boxShadow: 'none',           // Remove any shadow effects
                                                     }),
                                                     valueContainer: (provided) => ({
