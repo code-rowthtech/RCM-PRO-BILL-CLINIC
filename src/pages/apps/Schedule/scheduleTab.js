@@ -366,7 +366,7 @@ const ScheduleTab = () => {
       </Table>
 
       <div className="d-flex justify-content-end">
-        <Button variant="primary" disabled={store?.createScheduleReducer?.loading} type="submit">
+        <Button className="custom-buttons" disabled={store?.createScheduleReducer?.loading} type="submit">
           {store?.updateTimingsReducer?.loading || store?.createTimingsReducer?.loading ?
             < Spinner className="spinner-border-sm" color="white" />
             :

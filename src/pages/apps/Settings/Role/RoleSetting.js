@@ -12,6 +12,7 @@ import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
 import { getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
+import { IoSearchSharp } from 'react-icons/io5'
 
 const RoleSetting = () => {
     const [showModal, setShowModal] = useState(false);
@@ -109,7 +110,7 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${status === true ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
+                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                                     >
                                         Active
                                     </Button>
@@ -117,7 +118,7 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`active_inactive_buttons ${status === false ? 'custom-buttons text-light' : 'bg-none border-primary'} me-2 py-1`}
+                                        className={`active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                                     >
                                         Inactive
                                     </Button>
@@ -125,30 +126,56 @@ const RoleSetting = () => {
                                 <Col xs={6}>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
                                         <Col xs="auto" className="d-flex gap-2">
-                                            <FormInput
-                                                type="text"
-                                                onChange={(e) => {
-                                                    setSearch(e.target.value);
-                                                    setSkip(1);
-                                                    dispatch(
-                                                        getRoleDataAction({
-                                                            clinicId: clinicId,
-                                                            limit: 10,
-                                                            search: search,
-                                                            createdById: '',
-                                                            page: 1,
-                                                            status: true,
-                                                        })
-                                                    );
+                                            <div
+                                                className="input_search_box"
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                    backgroundColor:"#d9ddd6 ",
+                                                    padding: "0px 5px", 
                                                 }}
-                                                placeholder="Search..."
-                                                className='input_search_box'
-                                            />
+                                            >
+                                                <IoSearchSharp
+                                                    style={{
+                                                        fontSize: "1.2rem",
+                                                        color: "black",
+                                                        marginRight: "10px", 
+                                                    }}
+                                                />
+                                                <FormInput
+                                                    type="text"
+                                                    onChange={(e) => {
+                                                        setSearch(e.target.value);
+                                                        setSkip(1);
+                                                        dispatch(
+                                                            getRoleDataAction({
+                                                                clinicId: clinicId,
+                                                                limit: 10,
+                                                                search: search,
+                                                                createdById: '',
+                                                                page: 1,
+                                                                status: true,
+                                                            })
+                                                        );
+                                                    }}
+                                                    className="input_search_box"
+                                                    style={{
+                                                        border: "none",
+                                                        outline: "none",
+                                                        flex: 1, 
+                                                        backgroundColor: "#ccc",
+
+                                                    }}
+                                                />
+                                            </div>
+
                                             <Button
                                                 className="custom-buttons py-1 d-none d-md-block"
                                                 onClick={() => setShowModal(true)}
                                             >
-                                                <span className="uil-plus"></span> Add New Role
+                                             Add New Role
                                             </Button>
                                             <Button
                                                 className="custom-buttons d-md-none py-1"

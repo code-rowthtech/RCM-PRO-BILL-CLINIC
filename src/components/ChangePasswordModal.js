@@ -1,34 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordAction } from '../redux/actions';
-import { encryptMessage } from '../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../cryptoUtils';
 import ToastHandle from '../helpers/ToastMessage';
-import { handleFirstSpace } from '../helpers/noSpace';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
-  const store = useSelector((state) => state);
   const dispatch = useDispatch();
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm();
 
   const newPassword = watch('newPassword');
   const oldPassword = watch('oldPassword');
-
+  const { loading, changeConfirmPasswordSuccess } = useSelector((state) => ({
+    loading: state.Auth.loading,
+    changeConfirmPasswordSuccess: state.Auth.changeConfirmPasswordSuccess,
+  }));
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const changeData = store?.Auth;
+
+  useEffect(() => {
+    if (changeConfirmPasswordSuccess?.data) {
+      try {
+        const decrypted = JSON.parse(decryptMessage(changeConfirmPasswordSuccess.data));
+        if (decrypted?.status === 200) {
+          closeModal();
+          reset();
+        }
+      } catch (error) {
+      }
+    }
+  }, [changeConfirmPasswordSuccess, closeModal, reset]);
 
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
     dispatch(confirmPasswordAction({ key: encryptMessage(payload) }));
-    closeModal();
-    reset();
   };
-
 
   return (
     <Modal centered size="md" show={show} onHide={closeModal}>
@@ -43,17 +59,15 @@ const ChangePasswordModal = ({ show, closeModal }) => {
           </Col>
         </Row>
         <Form onSubmit={handleSubmit(changePasswordSubmit)}>
-          {/* Old Password */}
           <Row>
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-3 w-100 position-relative">
+            {/* Old Password */}
+            <Col md={12}>
+              <Form.Group className="mb-3 position-relative">
                 <Form.Label>Old Password</Form.Label>
                 <Form.Control
                   type={showOldPassword ? 'text' : 'password'}
                   placeholder="Enter old password"
-                  {...register('oldPassword', {
-                    required: 'Old password is required',
-                  })}
+                  {...register('oldPassword', { required: 'Old password is required' })}
                   onCopy={(e) => e.preventDefault()}
                   onCut={(e) => e.preventDefault()}
                   onPaste={(e) => e.preventDefault()}
@@ -70,8 +84,8 @@ const ChangePasswordModal = ({ show, closeModal }) => {
             </Col>
 
             {/* New Password */}
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-3 w-100 position-relative">
+            <Col md={12}>
+              <Form.Group className="mb-3 position-relative">
                 <Form.Label>New Password</Form.Label>
                 <Form.Control
                   type={showNewPassword ? 'text' : 'password'}
@@ -83,8 +97,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
                       value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
                       message: 'Password must include uppercase, lowercase, number, and special character',
                     },
-
-                    validate: value =>
+                    validate: (value) =>
                       value !== oldPassword || 'New password cannot be the same as the old password',
                   })}
                   onCopy={(e) => e.preventDefault()}
@@ -102,16 +115,16 @@ const ChangePasswordModal = ({ show, closeModal }) => {
               </Form.Group>
             </Col>
 
-            {/* Confirm New Password */}
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-2 w-100 position-relative">
+            {/* Confirm Password */}
+            <Col md={12}>
+              <Form.Group className="mb-2 position-relative">
                 <Form.Label>Confirm New Password</Form.Label>
                 <Form.Control
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
                   {...register('confirmPassword', {
                     required: 'Please confirm your new password',
-                    validate: value => value === newPassword || 'Passwords do not match',
+                    validate: (value) => value === newPassword || 'Passwords do not match',
                   })}
                   onCopy={(e) => e.preventDefault()}
                   onCut={(e) => e.preventDefault()}
@@ -128,9 +141,9 @@ const ChangePasswordModal = ({ show, closeModal }) => {
               </Form.Group>
             </Col>
 
-            <Col sm={12} className="text-center mt-2">
-              <Button className="custom-buttons" type="submit">
-                Change Password
+            <Col sm={12} className="d-flex justify-content-center mt-2">
+              <Button className="custom-buttons" type="submit" disabled={loading}>
+                {loading ? 'Loading...' : 'Change Password'}
               </Button>
             </Col>
           </Row>

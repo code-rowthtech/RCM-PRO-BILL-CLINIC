@@ -434,7 +434,7 @@ const NewDoctor = () => {
     return (
         <>
             <div className='pt-1 pb-2 px-0'>
-                <div className="container-fluid mt-2 px-0">
+                <div className="container-fluid  px-0">
                     <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                         <Card.Body className='py-0 px-0'>
                             <div className="row">
@@ -445,7 +445,7 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`text-black font_active_tabs nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === "personalDetails" ? "active" : ""}`}
                                                         onClick={() => handleTabChange("personalDetails")}
                                                     >
                                                         Personal Details
@@ -453,7 +453,7 @@ const NewDoctor = () => {
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`text-black font_active_tabs nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === "departmentDetails" ? "active" : ""}`}
                                                         onClick={() => handleTabChange("departmentDetails")}
                                                     >
                                                         Professional Information

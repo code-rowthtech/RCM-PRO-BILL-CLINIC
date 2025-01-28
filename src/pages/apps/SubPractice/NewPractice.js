@@ -606,7 +606,7 @@ const NewPractice = () => {
     return (
         <>
             <div className='pt-1 pb-2'>
-                <div className="container-fluid mt-2 px-0">
+                <div className="container-fluid mt- px-0">
                     <Card className="scroll-container px-md-2 py-md-2" style={{ height: '82vh', overflow: 'scroll' }}>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
@@ -630,7 +630,7 @@ const NewPractice = () => {
                                                     Email to Sub Practice
                                                 </Button>
                                            */}
-                                            <Button className='custom-buttons' as={Link} to={'/apps/crm/addclinic'}>
+                                            <Button className='cancel-button' as={Link} to={'/apps/crm/addclinic'}>
                                                 Back
                                             </Button>
                                         </>

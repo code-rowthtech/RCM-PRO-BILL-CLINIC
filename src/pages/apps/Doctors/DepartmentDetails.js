@@ -623,7 +623,7 @@ const DepartmentDetails = ({ docId }) => {
               </div>
 
               <div className="d-flex justify-content-end gap-2 mt-1">
-                <Button className="" variant="secondary">
+                <Button className="cancel-button">
                   Cancel
                 </Button>
                 {/* <Button className="" type="submit">

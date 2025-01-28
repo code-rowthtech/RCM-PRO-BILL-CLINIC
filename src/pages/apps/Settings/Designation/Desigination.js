@@ -15,6 +15,7 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
+import { IoSearchSharp } from 'react-icons/io5';
 
 const Designation = () => {
   const store = useSelector((state) => state);
@@ -106,21 +107,21 @@ const Designation = () => {
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>
-      <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+        <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
           <Card.Body  >
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
                   variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={` active_inactive_buttons ${status ? 'custom-buttons text-light ' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                 >
                   Active
                 </Button>
                 <Button
                   variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={`active_inactive_buttons ${!status ? 'custom-buttons text-light' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                 >
                   Inactive
                 </Button>
@@ -128,12 +129,37 @@ const Designation = () => {
               <Col sm={6} className='text-end mt-md-0 mt-2 mt-sm-0'>
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className='d-flex gap-2'>
-                    <FormInput
-                      type="text"
-                      onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
-                      placeholder="Search..."
-                      className='input_search_box'
-                    />
+                    <div
+                      className="input_search_box"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        backgroundColor: "#d9ddd6 ",
+                        padding: "0px 5px",
+                      }}
+                    >
+                      <IoSearchSharp
+                        style={{
+                          fontSize: "1.2rem",
+                          color: "black",
+                          marginRight: "10px",
+                        }}
+                      />
+                      <FormInput
+                        type="text"
+                        onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
+                        className="input_search_box"
+                        style={{
+                          border: "none",
+                          outline: "none",
+                          flex: 1,
+                          backgroundColor: "#ccc",
+
+                        }}
+                      />
+                    </div>
                     <Button className="custom-buttons py-0" ><FiFilter className='fs-5' /></Button>
                     <Button className="custom-buttons py-0" ><FiFileText className='fs-5' /></Button>
                     <Button onClick={() => { setAddDesiginationModal(true); setEdit(null) }} className="custom-buttons py-1">
@@ -150,11 +176,11 @@ const Designation = () => {
             >
               <thead className="text-white">
                 <tr className=''>
-                  <th className='text-white py-2' style={{fontSize:'13px'}}>S.No.</th>
-                  <th className='text-white py-2' style={{fontSize:'13px'}}>Department Name</th>
-                  <th className='text-white py-2' style={{fontSize:'13px'}}>Created Date</th>
-                  <th className='text-white py-2' style={{fontSize:'13px'}}>Status</th>
-                  <th className='text-white py-2' style={{fontSize:'13px'}}>Action</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>S.No.</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Department Name</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Created Date</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
+                  <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                 </tr>
               </thead>
               <tbody >
@@ -167,16 +193,16 @@ const Designation = () => {
                 ) : tableGetData?.length ? (
                   tableGetData?.map((data, index) => (
                     <tr key={data._id} className="border-bottom">
-                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{index + 1}</td>
-                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}</td>
-                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>{formatDate(data.createdAt)}</td>
-                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.name?.charAt(0).toUpperCase() + data?.name?.slice(1)}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{formatDate(data.createdAt)}</td>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                         <Form.Switch
                           checked={data.isActive}
                           onChange={() => handleUpdate(data)}
                         />
                       </td>
-                      <td className='py-1' style={{fontSize:'13px', fontWeight:'400'}}>
+                      <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                         <i
                           className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
                           onClick={() => handleEdit(data)}
@@ -186,10 +212,10 @@ const Designation = () => {
                   ))
                 ) : (
                   <tr key={''}>
-                  <td colSpan={7} className='text-center'>
+                    <td colSpan={7} className='text-center'>
                       <h3 className='my-5'>No Data Found</h3>
-                  </td>
-              </tr>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </Table>
@@ -271,9 +297,9 @@ const Designation = () => {
               <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
-                 <div class="spinner-border spinner-border-sm" role="status">
-                 <span class="visually-hidden">Loading...</span>
-               </div>
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
 
                 ) : (
                   'Submit'

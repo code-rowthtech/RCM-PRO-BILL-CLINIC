@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import DoctorHoliday from './doctorHoliday';
 import Breaks from './breaks';
 import ScheduleTab from './scheduleTab';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch } from 'react-icons/fi';
 import DatePicker from "react-datepicker";
 import { encryptMessage } from '../../../cryptoUtils';
@@ -25,7 +25,7 @@ const Schedule = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
-
+    const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
         label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
@@ -80,6 +80,9 @@ const Schedule = () => {
             setSelectedDoctor(selectedOption);
         }
     };
+    const handleAddHoliday =()=>{
+        navigate("/apps/schedule/addHoliday");
+    }
 
     return (
         <div className="schedule-container">
@@ -155,16 +158,15 @@ const Schedule = () => {
                                                     className="date-picker-input"
                                                 />
                                                 <Button
-                                                    className="custom-buttons d-none d-md-block py-1"
-                                                    as={Link}
-                                                    to="/apps/schedule/addHoliday"
+                                                    className="custom-buttons d-none d-md-block"
+                                                    onClick={handleAddHoliday}
+                                                   
                                                 >
                                                     Add Holiday
                                                 </Button>
                                                 <Button
                                                 className="custom-buttons d-md-none py-1"
-                                                as={Link}
-                                                to="/apps/schedule/addHoliday"
+                                                onClick={handleAddHoliday}
                                             >
                                                 +
                                             </Button>

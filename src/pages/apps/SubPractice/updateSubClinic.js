@@ -614,7 +614,7 @@ const SubUpdateClinic = () => {
                                 <div className='d-flex gap-2  d-none d-md-block'>
                                     {btnShow && (
                                         <>
-                                            <Button as={Link} to={'/apps/crm/addclinic'}>
+                                            <Button as={Link} className='cancel-button' to={'/apps/crm/addclinic'}>
                                                 Back
                                             </Button>
                                         </>

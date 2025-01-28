@@ -187,7 +187,7 @@ const SetPassword = (): React$Element<any> => {
                                     onCut={(e) => e.preventDefault()}
                                     onPaste={(e) => e.preventDefault()}
                                 />
-                                <div className="mb-3 mb-0 text-center">
+                                <div className="mb-3 mb-0 d-flex justify-content-center">
                                     <Button
                                         variant="primary"
                                         className="custom-buttons"

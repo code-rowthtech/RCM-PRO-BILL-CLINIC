@@ -287,7 +287,7 @@ const PatientDetails = ({ patientId }) => {
           </div>
           <div className="col-3">
             <div className="mb-1 d-flex flex-column position-relative">
-              <Form.Label className="mb-0">Patient Chart Photo</Form.Label>
+              <Form.Label className="mb-0">Patient Photo</Form.Label>
               <div
                 onClick={() => logoFileInputRef.current.click()}
                 className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'}`}

@@ -7,7 +7,9 @@ import { RxCross2 } from "react-icons/rx";
 import { createDoctorAction, createDoctorDetailAction, getDoctorsAction, stateEmptydAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { IoSearchSharp } from "react-icons/io5";
+
 
 const Doctors = () => {
     const [detailsModal, setDetailsModal] = useState(false);
@@ -15,6 +17,7 @@ const Doctors = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
+    const navigate = useNavigate('');
 
     const dispatch = useDispatch();
 
@@ -56,13 +59,16 @@ const Doctors = () => {
             );
         }
     }, [updateStatus]);
+    const handleNewDoctor =()=>{
+        navigate("/apps/doctors/new-doctor")
+    }
 
     return (
         <>
             <Row className='mt-2'>
                 <Col xs={12} className='px-0'>
-                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                     <Card.Body >
+                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body >
                             <Row className="mb-2">
                                 <Col sm={6} xs={6}>
                                     <Button
@@ -73,7 +79,7 @@ const Doctors = () => {
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
-                                        className={`me-md-2 ms-1 ms-xs-0 ms-md-0 active_inactive_buttons ${!status ? 'custom-buttons text-white py-' : 'bg-white border-primary text-dark py-'}`}
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'}`}
                                     >
                                         Inactive
                                     </Button>
@@ -82,18 +88,43 @@ const Doctors = () => {
                                 <Col sm={6} xs={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end ">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput
-                                                type="text"
-                                                value={search}
-                                                onChange={(e) => setSearch(e.target.value)} 
-                                                placeholder="Search..."
-                                                className='input_search_box'
-                                              
-                                            />
-                                             <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py- d-none d-md-block" >
+
+                                            <div
+                                                className="input_search_box"
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    border: "1px solid #ccc",
+                                                    borderRadius: "4px",
+                                                    backgroundColor: "#d9ddd6 ",
+                                                    padding: "0px 5px",
+                                                }}
+                                            >
+                                                <IoSearchSharp
+                                                    style={{
+                                                        fontSize: "1.2rem",
+                                                        color: "black",
+                                                        marginRight: "10px",
+                                                    }}
+                                                />
+                                                <FormInput
+                                                    type="text"
+                                                    value={search}
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    className="input_search_box"
+                                                    style={{
+                                                        border: "none",
+                                                        outline: "none",
+                                                        flex: 1,
+                                                        backgroundColor: "#ccc",
+
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button onClick={handleNewDoctor} className="custom-buttons py- d-none d-md-block" >
                                                 New Doctor
                                             </Button>
-                                            <Button as={Link} to='/apps/doctors/new-doctor' className="custom-buttons py d-block d-md-none">
+                                            <Button onClick={handleNewDoctor} className="custom-buttons py d-block d-md-none">
                                                 +
                                             </Button>
                                         </Col>
@@ -149,7 +180,7 @@ const Doctors = () => {
                                                                     }}
                                                                 />
                                                             </td>
-                                                            <td className='py-1 'style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className='d-flex gap-2'>
                                                                     <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />
