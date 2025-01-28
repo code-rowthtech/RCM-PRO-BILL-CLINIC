@@ -73,7 +73,7 @@ const Doctors = () => {
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
-                                        className={`me-md-2 ms-1 ms-xs-0 ms-md-0 active_inactive_buttons ${!status ? 'custom-buttons text-white py-' : 'bg-white border-primary text-dark py-'}`}
+                                        className={`me-md-2 ms-sm-1  active_inactive_buttons ${!status ? 'custom-buttons text-white py-' : 'bg-white border-primary text-dark py-'}`}
                                     >
                                         Inactive
                                     </Button>

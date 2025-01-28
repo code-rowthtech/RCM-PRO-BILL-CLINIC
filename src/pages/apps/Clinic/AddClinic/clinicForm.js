@@ -1815,9 +1815,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     }
                                 </Button>
                             </Col>
-                            <Col>
-                                <ChangePasswordModal show={showModal} closeModal={closeModal} />
-                            </Col>
+                           
                         </Row >
                     </Form >
                     <Row className='mt-2'>
@@ -1894,6 +1892,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                             </div>
                         </Modal.Body>
                     </Modal>
+                    <ChangePasswordModal show={showModal} closeModal={closeModal} />
                 </>
 
             )

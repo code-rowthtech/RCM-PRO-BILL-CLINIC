@@ -370,7 +370,7 @@ table {
         height: 30px;
     }
 }
-@media (max-width: 768px) and (min-width: 320px) {
+@media screen and (min-width: 320px) and (max-width: 720px) {
     .card {
         box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
     }
@@ -408,7 +408,7 @@ table {
         font-size: 10px;
     }
     .form-control {
-        padding: 5px !important;
+        padding: 8px !important;
     }
     .form_heading {
         font-size: 12px;
@@ -423,6 +423,10 @@ table {
         padding: 0 0.5rem !important;
         border-radius: 3px;
         font-size: 10px;
+    }
+    .navbar-custom {
+        margin-top: 0px !important;
+        /* height: 100px!important; */
     }
 }
 
@@ -464,7 +468,7 @@ table {
 }
 
 .navbar-custom {
-    margin-top: 50px !important;
+    margin-top: 50px ;
     /* height: 100px!important; */
 }
 
