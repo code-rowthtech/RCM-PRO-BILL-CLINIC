@@ -630,7 +630,7 @@ const NewPractice = () => {
                                                     Email to Sub Practice
                                                 </Button>
                                            */}
-                                            <Button className='custom-buttons' as={Link} to={'/apps/crm/addclinic'}>
+                                            <Button className='cancel-button' as={Link} to={'/apps/crm/addclinic'}>
                                                 Back
                                             </Button>
                                         </>

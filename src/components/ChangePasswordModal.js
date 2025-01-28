@@ -141,7 +141,7 @@ const ChangePasswordModal = ({ show, closeModal }) => {
               </Form.Group>
             </Col>
 
-            <Col sm={12} className="text-center mt-2">
+            <Col sm={12} className="d-flex justify-content-center mt-2">
               <Button className="custom-buttons" type="submit" disabled={loading}>
                 {loading ? 'Loading...' : 'Change Password'}
               </Button>

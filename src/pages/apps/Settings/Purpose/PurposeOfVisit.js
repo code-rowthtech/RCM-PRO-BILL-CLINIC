@@ -16,6 +16,7 @@ import {
 import { IoMdClose } from 'react-icons/io';
 import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
+import { IoSearchSharp } from 'react-icons/io5';
 
 const POV = () => {
   const store = useSelector((state) => state);
@@ -107,21 +108,21 @@ const POV = () => {
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>
-      <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+        <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
           <Card.Body >
             <Row className="mb-2">
               <Col sm={6}>
                 <Button
                   variant={status === false ? 'outlined' : ''}
                   onClick={() => handleStatusChange(true)}
-                  className={`active_inactive_buttons ${status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                 >
                   Active
                 </Button>
                 <Button
                   variant={status === true ? 'outlined' : ''}
                   onClick={() => handleStatusChange(false)}
-                  className={` active_inactive_buttons ${!status ? 'custom-buttons text-white' : 'bg-none border-primary text-dark'} me-2 py-1`}
+                  className={` active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
                 >
                   Inactive
                 </Button>
@@ -129,12 +130,37 @@ const POV = () => {
               <Col sm={6} className='text-end mt-md-0 mt-2 mt-sm-0'>
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className='d-flex gap-2'>
-                    <FormInput
-                      type="text"
-                      onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
-                      placeholder="Search..."
-                      className='input_search_box'
-                    />
+                    <div
+                      className="input_search_box"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        backgroundColor: "#d9ddd6 ",
+                        padding: "0px 5px",
+                      }}
+                    >
+                      <IoSearchSharp
+                        style={{
+                          fontSize: "1.2rem",
+                          color: "black",
+                          marginRight: "10px",
+                        }}
+                      />
+                      <FormInput
+                        type="text"
+                        onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
+                        className="input_search_box"
+                        style={{
+                          border: "none",
+                          outline: "none",
+                          flex: 1,
+                          backgroundColor: "#ccc",
+
+                        }}
+                      />
+                    </div>
                     <Button className="custom-buttons"><FiFilter className='fs-4' /></Button>
                     <Button className="custom-buttons"><FiFileText className='fs-4' /></Button>
                     <Button onClick={() => { setPurposeOfVisit(true); setEdit(null) }} className="custom-buttons">
