@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
+import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { createResponsibleParty } from '../../helpers/api/apiEndpoints';
@@ -160,7 +160,6 @@ function* getResponsiblePartyFunction(data) {
         const response = yield call(getResponsiblePartyApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
-            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_SUCCESS,
                 payload: { ...decryptedData },
@@ -187,7 +186,7 @@ function* updatePatientsFunction(data) {
         });
         const response = yield call(updatePatientsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
+        console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -217,7 +216,7 @@ function* updateInsuranceFunction(data) {
         });
         const response = yield call(updateInsuranceApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
+        console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -268,9 +267,37 @@ function* createInsuranceFunction(data) {
         });
     }
 }
-export function* callStateEmpty() {
+
+function* getInsuranceByPatientIdFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_INSURANCE_BY_ID_LOADING,
+            payload: {},
+        });
+        const response = yield call(getInsuranceByIdApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_INSURANCE_BY_ID_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_INSURANCE_BY_ID_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_INSURANCE_BY_ID_ERROR,
+            payload: error,
+        });
+    }
+}
+export function* callResetUpdate() {
     put({
-        type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
+        type: PatientsActionTypes.RESET_UPDATE_STATUS,
         payload: {},
     });
 
@@ -307,12 +334,16 @@ export function* watchUpdatePatients() {
 export function* watchCreateInsurance() {
     yield takeEvery(PatientsActionTypes.CREATE_INSURANCE, createInsuranceFunction);
 }
+
+export function* watchGetInsuranceByPatientId() {
+    yield takeEvery(PatientsActionTypes.GET_INSURANCE_BY_ID, getInsuranceByPatientIdFunction);
+}
 export function* watchUpdateInsurance() {
     yield takeEvery(PatientsActionTypes.UPDATE_INSURANCE, updateInsuranceFunction);
 }
 
 export function* watchresetState() {
-    yield takeEvery(PatientsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
+    yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
 }
 
 function* patientsSaga() {
@@ -324,6 +355,7 @@ function* patientsSaga() {
         fork(watchUpdateResponsibleParty),
         fork(watchGetResponsibleParty),
         fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
+        fork(watchGetInsuranceByPatientId),
         fork(watchresetState),
     ]);
 }

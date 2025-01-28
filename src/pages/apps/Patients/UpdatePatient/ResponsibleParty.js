@@ -25,14 +25,13 @@ const ResponsibleParty = ({ patientId }) => {
     const [selectedCity, setSelectedCity] = useState(null);
     const [stateToSelect, setStateToSelect] = useState('');
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-    console.log(patientDetails, 'patientDetails')
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
     useEffect(() => {
         if (patientDetails && statesData) {
             setValue('fullName', patientDetails?.responsibleParty?.fullName);
             setValue('title', patientDetails?.responsibleParty?.title);
             setValue('gender', patientDetails?.responsibleParty?.gender);
-            setValue('dateOfBirth', new Date(patientDetails?.responsibleParty?.dateOfBirth)?.toISOString().split('T')[0]);
+            setValue('dateOfBirth', patientDetails?.responsibleParty?.dateOfBirth ? new Date(patientDetails?.responsibleParty?.dateOfBirth)?.toISOString().split('T')[0] : '');
             setValue('ssn', patientDetails?.responsibleParty?.ssn);
             setValue('account', patientDetails?.responsibleParty?.account);
             setValue('email', patientDetails?.responsibleParty?.email);
@@ -143,7 +142,7 @@ const ResponsibleParty = ({ patientId }) => {
             return age;
         };
         const payload = {
-            id: patientDetails?.responsibleParty?._id,
+            ...(patientDetails?.responsibleParty?._id ? { id: patientDetails.responsibleParty._id } : {}),
             patientId: patientId,
             fullName: data?.fullName,
             account: data?.account,
@@ -161,7 +160,11 @@ const ResponsibleParty = ({ patientId }) => {
                 zip: data?.zip
             }
         }
-        dispatch(updateResponsiblePartyAction({ key: encryptMessage(payload) }))
+        if (patientDetails?.responsibleParty?._id) {
+            dispatch(updateResponsiblePartyAction({ key: encryptMessage(payload) }))
+        } else {
+            dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
+        }
 
     };
     const tableData = [
@@ -263,7 +266,7 @@ const ResponsibleParty = ({ patientId }) => {
                                     <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                     <Form.Group>
                                         <InputGroup>
-                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{height:'30px'}}>&nbsp;&nbsp;+1</InputGroup.Text>
+                                            <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '30px' }}>&nbsp;&nbsp;+1</InputGroup.Text>
                                             <Form.Control
                                                 type="tel"
                                                 height={'30px'}
@@ -516,7 +519,6 @@ const ResponsibleParty = ({ patientId }) => {
                                                 <p
                                                     key={index}
                                                     onClick={() => {
-                                                        console.log(data)
                                                         setSelectedLocation(data)
                                                         setValue('zip', data?.components?.postcode)
                                                         setFocused(false); // Close dropdown after selection
@@ -750,7 +752,7 @@ const ResponsibleParty = ({ patientId }) => {
 
                 {/* Buttons */}
                 <div className="d-flex gap-2 justify-content-end mb-1 mt-1">
-                    <Button className="custom-buttons btn-height"  data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
+                    <Button className="custom-buttons btn-height" data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom" >Collections</Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
                         <div class="offcanvas-header">
                             <h4 class="offcanvas-title" id="offcanvasBottomLabel">Collections</h4>
@@ -815,7 +817,7 @@ const ResponsibleParty = ({ patientId }) => {
                     <Button
                         className="custom-buttons btn-height "
                         data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"
-                        >
+                    >
                         Family history
                     </Button>
                     <div class="offcanvas offcanvas-end offcanvas-family-history" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
@@ -967,11 +969,12 @@ const ResponsibleParty = ({ patientId }) => {
                         </div>
                     </div>
 
-                    <Button className="custom-buttons btn-height" type="submit" disabled={store?.updateResponsiblePartyReducer?.loading}>
+                    <Button className="custom-buttons btn-height" type="submit" disabled={store?.updateResponsiblePartyReducer?.loading || store?.createResponsiblePartyReducer?.loading}>
                         {store?.updateResponsiblePartyReducer?.loading ?
                             <Spinner className="spinner-border-sm" color="white" />
                             :
-                            'Update'
+                            patientDetails?.responsibleParty?._id ?
+                                'Update' : 'Create'
                         }
                     </Button>
                 </div>

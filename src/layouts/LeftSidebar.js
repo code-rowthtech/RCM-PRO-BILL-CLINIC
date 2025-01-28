@@ -66,6 +66,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState('Today')
     const id = searchParams.get('id');
     /**
      * Handle the click anywhere in doc
@@ -86,8 +87,10 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         };
     }, []);
 
+    const createPatientsResponse = store?.createPatientsReducer?.data?.status;
+
     useEffect(() => {
-        if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient') {
+        if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' || createPatientsResponse === 201) {
             const data = {
                 clinicId: clinicId,
                 page: skip,
@@ -96,7 +99,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             }
             dispatch(getPatientsAction({ key: encryptMessage(data) }));
         }
-    }, [location.pathname, dispatch, skip, search])
+    }, [location.pathname, dispatch, skip, search, createPatientsResponse])
 
     return (
         <>
@@ -143,6 +146,26 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         </Button>
                                     </Link>
                                 </li>
+                                <div className="btn-group px-1 d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
+                                    <button
+                                        className={`btn btn-primary ${activeTab === "Today" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("Today")}
+                                    >
+                                        Today's
+                                    </button>
+                                    <button
+                                        className={`btn btn-primary ${activeTab === "Upcoming" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("Upcoming")}
+                                    >
+                                        Upcoming
+                                    </button>
+                                    <button
+                                        className={`btn btn-primary ${activeTab === "History" ? "active" : ""}`}
+                                        onClick={() => setActiveTab("History")}
+                                    >
+                                        History
+                                    </button>
+                                </div>
                                 {store?.getPatientsReducer?.loading ?
                                     <div className='text-center my-5'>
                                         <Spinner color='white' />
@@ -153,14 +176,14 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         <li
                                             key={index}
                                             className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                            style={{ borderBottom: '1px solid grey' }}
                                             onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
                                         >
                                             <div className="d-flex gap-2 align-items-center">
                                                 <img
                                                     height='40'
                                                     width='40'
-                                                    src={data?.patientChartPhoto?.url}
-                                                    // style={{ height: '5vh' }}
+                                                    src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
                                                     className="rounded-circle border border-black"
                                                     alt="profile image"
                                                 />
