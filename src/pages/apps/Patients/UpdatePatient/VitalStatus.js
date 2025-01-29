@@ -147,35 +147,37 @@ const VitalStatus = ({ patientId }) => {
                                     </Form.Group>
                                 </Col>
                             </Row>
-
-                            <Row className='' >
-                                <Col className='px-0'
-                                ><p className='m-0  fw-bold'>Name</p></Col>
-                                {previousVitals && previousVitals?.map((data) => (
-                                    <Col key={data?._id} style={{ background: '#E6EBFF' }}>
-                                        <p className='m-0 fw-bold'>
-                                            {new Date(data?.date).toISOString().split('T')[0]}
-                                        </p>
+                            <div className='px-2'>
+                                <Row className='' >
+                                    <Col className='px-0'
+                                    ><p className='m-0  fw-bold'>Name</p></Col>
+                                    {previousVitals && previousVitals?.map((data) => (
+                                        <Col key={data?._id} style={{ background: '#E6EBFF' }}>
+                                            <p className='m-0 fw-bold'>
+                                                {new Date(data?.date).toISOString().split('T')[0]}
+                                            </p>
+                                        </Col>
+                                    ))}
+                                    <Col className='text-center px-0'
+                                        style={{ background: '#E6EBFF' }}
+                                    >
+                                        <p className='m-0 fw-bold'>{todayDate.toISOString().split('T')[0]}</p>
                                     </Col>
-                                ))}
-                                <Col className='text-center px-0'
-                                    style={{ background: '#E6EBFF' }}
-                                >
-                                    <p className='m-0 fw-bold'>{todayDate.toISOString().split('T')[0]}</p>
-                                </Col>
-                            </Row>
+                                </Row>
+                            </div>
+
 
                             {vitalsList.map((vital, index) => (
                                 <React.Fragment key={index}>
                                     {/* Vital Name & Today's Data */}
-                                    <Row className='border-bottom'>
+                                    <Row className='border-bottom px-2'>
                                         <Col className='px-0'>
                                             <p className='mb-0'>{vital.label} <span className='text-secondary'>{vital.unit}</span></p>
                                         </Col>
 
                                         {/* Display previous vitals under respective sections */}
                                         {previousVitals?.map((prev, idx) => (
-                                            <Col key={idx} className="px-0 text-center" style={{ background: idx % 2 === 0 ? '#F9F9F9' : '#E6EBFF' }}>
+                                            <Col key={idx} className="px-0 text-center" style={{ background: idx % 2 === 0 ? '#E6EBFF' : '#E6EBFF' }}>
                                                 {/* Check if the vital is blood_pressure and render systolic and diastolic */}
                                                 {vital.key === 'systolic' ? (
                                                     prev.blood_pressure?.systolic || '—'
@@ -210,7 +212,7 @@ const VitalStatus = ({ patientId }) => {
 
                         </div>
                     </div>
-                    <Row><Col className='d-flex justify-content-end mt-2'><Button onClick={handleSubmit}>Mark as Done</Button></Col></Row>
+                    <Row><Col className='d-flex justify-content-end  mt-2'><Button onClick={handleSubmit} className='custom-buttons'>Mark as Done</Button></Col></Row>
                 </div>
             }
         </>

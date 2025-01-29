@@ -171,33 +171,37 @@ const PatientDetails = ({ patientId }) => {
   };
 
   return (
-    <>
+    <div style={{ height: '70vh', overflow: "scroll" }} className="scroll-container">
+
+
       <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
         <div className="row my-2">
           <div className="col-3">
-            <Form.Group className="responnsible-party-select">
-              <Form.Label className="mb-0">
-                Primary Provider
-              </Form.Label>
-              <Select
-                className="basic-single border-0"
-                classNamePrefix="select"
-                isLoading={store?.getDoctorsReducer?.loading}
-                isClearable={true}
-                value={selectedDoctor}
-                isSearchable={true}
+            <Form.Group controlId="doctorName">
+              <Form.Label className="mb-0">Select Doctor Name</Form.Label>
+              <Form.Control
+                as="select"
+                className="border-0"
                 {...register('selectedDoctor')}
-                onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
-                onChange={(data) => {
-                  setValue('selectedDoctor', data);
-                  handleChange(data);
-                  clearErrors('selectedDoctor')
+                value={selectedDoctor ? selectedDoctor.value : ''}
+                onChange={(e) => {
+                  const selectedOption = doctorOptions.find((option) => option.value === e.target.value);
+                  setValue('selectedDoctor', selectedOption);
+                  handleChange(selectedOption);
+                  clearErrors('selectedDoctor');
                 }}
-                name="doctorName"
-                options={doctorOptions}
-                placeholder="Select Doctor Name"
-              />
+              >
+                <option value=""  hidden>
+                  Select Doctor Name
+                </option>
+                {doctorOptions && doctorOptions?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </Form.Control>
             </Form.Group>
+
           </div>
           <div className="col-3">
             <Form.Group>
@@ -673,7 +677,7 @@ const PatientDetails = ({ patientId }) => {
           </Button>
         </div>
       </Form>
-    </>
+    </div>
 
 
   );
