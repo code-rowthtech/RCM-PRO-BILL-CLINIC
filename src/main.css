@@ -179,7 +179,6 @@ select.form-control:not([size]):not([multiple]) {
     color: #0908084f !important;
     font-weight: 550 !important;
 }
-
 .form-control:focus,
 .form-select:focus {
     color: black !important;
