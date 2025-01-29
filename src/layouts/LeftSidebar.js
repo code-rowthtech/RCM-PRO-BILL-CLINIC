@@ -62,8 +62,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const patientsData = store?.getPatientsReducer?.data?.patients;
-    console.log(store?.getPatientsByAppointmentReducer?.data, 'store?.getPatientsByAppointmentReducer?.data')
+    const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log(store?.getPatientsByAppointmentReducer, 'store?.getPatientsByAppointmentReducer?.data')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -113,7 +113,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             }
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
-    }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor])
+    }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
     useEffect(() => {
         const payload = { status: true, search: doctorSearch }
         dispatch(getDoctorsAction({ key: encryptMessage(payload) }));
@@ -258,31 +258,36 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         <Spinner color='white' />
                                     </div>
                                     :
-                                    patientsData &&
-                                    patientsData.map((data, index) => (
-                                        <li
-                                            key={index}
-                                            className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
-                                            style={{ borderBottom: '1px solid grey' }}
-                                            onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
-                                        >
-                                            <div className="d-flex gap-2 align-items-center">
-                                                <img
-                                                    height='40'
-                                                    width='40'
-                                                    src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
-                                                    className="rounded-circle border border-black"
-                                                    alt="profile image"
-                                                />
-                                                <div>
-                                                    <p className="mb-0 text-capitalize">
-                                                        {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
-                                                    </p>
-                                                    <p className="mb-0">{data?.sex}</p>
-                                                </div>
-                                            </div>
+                                    patientsData?.length === 0 ?
+                                        <li className='text-white text-center py-5'>
+                                            No Appointments Found
                                         </li>
-                                    ))
+                                        :
+                                        patientsData &&
+                                        patientsData.map((data, index) => (
+                                            <li
+                                                key={index}
+                                                className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                                style={{ borderBottom: '1px solid grey' }}
+                                                onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
+                                            >
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <img
+                                                        height='40'
+                                                        width='40'
+                                                        src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
+                                                        className="rounded-circle border border-black"
+                                                        alt="profile image"
+                                                    />
+                                                    <div>
+                                                        <p className="mb-0 text-capitalize">
+                                                            {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
+                                                        </p>
+                                                        <p className="mb-0">{data?.sex}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))
                                 }
                                 <Modal centered size="lg" show={filter} onHide={closeModal}>
                                     <Modal.Body className="p-4">

@@ -191,7 +191,7 @@ const PatientDetails = ({ patientId }) => {
                   clearErrors('selectedDoctor');
                 }}
               >
-                <option value=""  hidden>
+                <option value="" hidden>
                   Select Doctor Name
                 </option>
                 {doctorOptions && doctorOptions?.map((option) => (
@@ -279,6 +279,7 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
               <Form.Control
                 type="date"
+                max={new Date().toISOString().split("T")[0]} // Restricts future dates
                 {...register('dateOfBirth')}
                 onChange={(e) => {
                   const calculatedAge = calculateAge(e.target.value);

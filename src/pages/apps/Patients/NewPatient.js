@@ -456,6 +456,7 @@ const NewPatient = () => {
                                                 const calculatedAge = calculateAge(e.target.value);
                                                 setAge(calculatedAge);
                                             }}
+                                            max={new Date().toISOString().split("T")[0]} // Restricts future dates
                                         />
                                     </Form.Group>
                                 </Col>

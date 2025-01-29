@@ -294,9 +294,9 @@ const AppointmentForm = () => {
                             </option>
                             <option value="new-patient">Add New Patient</option>
                             {patientsData &&
-                                patientsData.map((patient,index) => (
+                                patientsData.map((patient, index) => (
                                     <option key={patient._id} value={patient._id}>
-                                       {patient.firstName} {patient.lastName}
+                                        {patient.firstName} {patient.lastName}
                                     </option>
                                 ))}
                         </Form.Control>
@@ -628,6 +628,7 @@ const AppointmentForm = () => {
                                         <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
                                         <Form.Control
                                             type="date"
+                                            max={new Date().toISOString().split("T")[0]} // Restricts future dates
                                             {...register('dateOfBirth')}
                                             onChange={(e) => {
                                                 const calculatedAge = calculateAge(e.target.value);
