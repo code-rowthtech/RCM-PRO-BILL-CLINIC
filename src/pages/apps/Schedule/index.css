@@ -19,7 +19,7 @@
     text-align: center;
     cursor: pointer;
 }
-.input-container input::before{
+.input-container input::before {
     border: 1px solid white !important;
 }
 
@@ -48,7 +48,6 @@
     justify-content: center;
     width: 250px;
     border: 1px solid #827f7f !important;
-
 }
 .custom-date-input {
     border: none !important;
@@ -59,4 +58,3 @@
     padding: 0px; /* Optional for spacing */
     font-size: 14px; /* Optional for consistency */
 }
-
