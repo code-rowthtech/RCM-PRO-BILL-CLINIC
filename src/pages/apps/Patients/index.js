@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
@@ -11,8 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPatientsAction, updatePatientsAction } from '../../../redux/patients/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Paginations from '../../../helpers/Paginations';
+import { IoSearchSharp } from 'react-icons/io5';
 
 const Patients = () => {
+    const navigate = useNavigate('');
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
     const [status, setStatus] = useState(true);
@@ -76,7 +78,9 @@ const Patients = () => {
         setSelectedDetails(null);
     };
 
-
+const handleNewPatients = () => {
+  navigate('/apps/patients/new-patient')
+}
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -94,8 +98,37 @@ const Patients = () => {
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{ height: '30px' }} />
-                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
+                                            <div
+                                                className="input_search_box"
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    borderRadius: "4px",
+                                                    backgroundColor: "#e8f0fe",
+                                                    padding: "0px 5px",
+                                                }}
+                                            >
+                                                <IoSearchSharp
+                                                    style={{
+                                                        fontSize: "1.2rem",
+                                                        color: "black",
+                                                        marginRight: "10px",
+                                                    }}
+                                                />
+                                                <FormInput
+                                                    type="text"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    className="input_search_box"
+                                                    style={{
+                                                        border: "none",
+                                                        outline: "none",
+                                                        flex: 1,
+                                                        backgroundColor: "#ccc",
+
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button  onClick={handleNewPatients} className="custom-buttons py-1" >
                                                 New Patient
                                             </Button>
                                         </Col>

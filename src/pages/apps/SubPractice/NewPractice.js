@@ -675,7 +675,7 @@ const NewPractice = () => {
                                                             className='form-control'
                                                             defaultValue=""
                                                         >
-                                                            <option value="">Select Clinic type</option>
+                                                            <option value="" hidden>Select Clinic type</option>
                                                             {clinectypes?.map((data) => (
                                                                 <option key={data?._id} value={data?.name}>
                                                                     {data?.name}
@@ -1328,7 +1328,7 @@ const NewPractice = () => {
                                                                             })}
                                                                             onChange={(e) => handleStateSelection(e)}
                                                                         >
-                                                                            <option value={''}>State</option>
+                                                                            <option value={''} hidden>State</option>
                                                                             {statesData?.states?.map((data) => (
                                                                                 <option
                                                                                     key={data?.id} // Unique key for each option
@@ -1357,7 +1357,7 @@ const NewPractice = () => {
                                                                             })}
                                                                             onChange={(e) => handleCitySelection(e)}
                                                                         >
-                                                                            <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                                            <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                                             {cities?.map((data) => (
                                                                                 <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
                                                                                     {data?.name}
@@ -1587,7 +1587,7 @@ const NewPractice = () => {
                                                                                 onChange={(e) => handleStateSelection(e)}
                                                                                 disabled={usePrimaryAsMailing}
                                                                             >
-                                                                                <option value={''}>State</option>
+                                                                                <option value={''} hidden>State</option>
                                                                                 {statesData?.states?.map((data) => (
                                                                                     <option key={data?.id} value={data?._id}>
                                                                                         {data?.name}
@@ -1623,7 +1623,7 @@ const NewPractice = () => {
                                                                                 })}
                                                                                 onChange={(e) => handleCitySelection(e)}
                                                                             >
-                                                                                <option value="">
+                                                                                <option value="" hidden>
                                                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                                                 </option>
                                                                                 {cities2?.map((data) => (

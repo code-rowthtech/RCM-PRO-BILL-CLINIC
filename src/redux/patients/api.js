@@ -8,6 +8,11 @@ export function getPatientsApi(params: any): any {
     return api.create(URL.getPatients, data);
 }
 
+export function getPatientsByAppointmentApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.getPatientsByAppointment, data);
+}
+
 export function getPatientByIdApi(params: any): any {
     const { data } = params;
     return api.create(URL.getPatientById, data);

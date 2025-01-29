@@ -135,7 +135,7 @@ const MenuItemLink = ({ item, className }) => {
                         <div className="card-body text-center">
                             <h4 className="card-title">Are you sure you want to logout!</h4>
                             <div className="d-flex justify-content-center gap-3">
-                                <Button type="button" className="btn btn-secondary" onClick={closeModal}>
+                                <Button className="cancel-button" onClick={closeModal}>
                                     Cancel
                                 </Button>
                                 <Button type="button" className="custom-buttons " onClick={handleLogout}>

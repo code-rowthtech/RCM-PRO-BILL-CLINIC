@@ -179,7 +179,7 @@ const UpdatePatientIndex = () => {
                                                                     <span ><BiSolidLocationPlus className='fs-5 text-primary' /></span>
                                                                 </div>
                                                                 <div className='col-9'>
-                                                                    <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientDetails?.address?.address ? patientDetails?.address?.address?.length > 50 ? patientDetails?.address?.address?.slice(0, 49) + '...' : patientDetails?.address?.address : 'N/A'}</span>
+                                                                    <span className='ps-2 fs-6' style={{ fontWeight: 600 }}>{patientDetails?.address?.address ? patientDetails?.address?.address?.length > 30 ? patientDetails?.address?.address?.slice(0, 29) + '...' : patientDetails?.address?.address : 'N/A'}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -292,7 +292,7 @@ const UpdatePatientIndex = () => {
                                         {activeTab === 'Patient Details' && <PatientDetails />}
                                         {activeTab === 'Demographics' && <Demographics />}
                                         {activeTab === 'Insurances' && <Insurance patientId={patientDetails?._id} />}
-                                        {activeTab === 'Vital Status' && <VitalStatus />}
+                                        {activeTab === 'Vital Status' && <VitalStatus patientId={patientDetails?._id} />}
                                         {activeTab === 'Eligibility' && <p>Eligibility Content</p>}
                                         {activeTab === 'Authorizations' && <p>Authorizations Content</p>}
                                         {activeTab === 'Balance' && <p>Balance Content</p>}

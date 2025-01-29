@@ -1,10 +1,11 @@
 // @flow
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Form, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import classNames from 'classnames';
 
 import { getMenuItems } from '../helpers/menu';
+import { BiSearch } from "react-icons/bi";
 
 // components
 import AppMenu from './Menu';
@@ -17,12 +18,12 @@ import logo from '../assets/images/logo.png';
 import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPatientsAction } from '../redux/actions';
+import { getDoctorsAction, getPatientsAction, getPatientsByAppointmentAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import { FormInput } from '../components';
 import Spinner from '../constants/Spinner';
-import { Button } from 'react-bootstrap';
-import { IoMdAdd } from 'react-icons/io';
+import { Button, Col, Dropdown, Modal, Row } from 'react-bootstrap';
+import { IoMdAdd, IoMdClose } from 'react-icons/io';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -61,12 +62,16 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const patientsData = store?.getPatientsReducer?.data?.patients;
+    const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log(store?.getPatientsByAppointmentReducer, 'store?.getPatientsByAppointmentReducer?.data')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
-    const [activeTab, setActiveTab] = useState('Today')
+    const [activeTab, setActiveTab] = useState('today')
+    const [filter, setFilter] = useState(false);
+    const [doctorSearch, setDoctorSearch] = useState('')
+
     const id = searchParams.get('id');
     /**
      * Handle the click anywhere in doc
@@ -88,49 +93,128 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     }, []);
 
     const createPatientsResponse = store?.createPatientsReducer?.data?.status;
+    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const appointmentDetails = [];
+    const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
+    const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
+    const [selectedAppointment, setSelectedAppointment] = useState(null); // Store selected appointment ID
+
+    // Handle selection (only one at a time)
+    const handleSelectDoctor = (id) => setSelectedDoctor(id);
+    const handleSelectAppointment = (id) => setSelectedAppointment(id);
 
     useEffect(() => {
         if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' || createPatientsResponse === 201) {
-            const data = {
+            const payload = {
+                doctorId: selectedDoctor || '',
                 clinicId: clinicId,
-                page: skip,
-                limit: 10,
-                search: search,
+                status: activeTab,
+                search: search
             }
-            dispatch(getPatientsAction({ key: encryptMessage(data) }));
+            dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
-    }, [location.pathname, dispatch, skip, search, createPatientsResponse])
+    }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
+    useEffect(() => {
+        const payload = { status: true, search: doctorSearch }
+        dispatch(getDoctorsAction({ key: encryptMessage(payload) }));
+    }, [dispatch, doctorSearch])
 
+    const closeModal = () => {
+        setFilter(false);
+    }
+
+
+    // Render the correct filter list based on active category
+    const renderFilterList = () => {
+        if (activeFilter === "Doctors") {
+            return (
+                <>
+                    <div className="position-relative mb-2">
+                        {/* <BiSearch className="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary" /> */}
+                        <input
+                            type="text"
+                            placeholder="Search doctors..."
+                            className="ps-4 form-control"
+                            onChange={(e) => setDoctorSearch(e.target.value)}
+                            style={{ borderRadius: "20px", border: "1px solid #ccc" }}
+                        />
+                    </div>
+                    <div className='scroll-container' style={{ height: "15rem", overflow: 'scroll' }}>
+                        {store?.getDoctorsReducer?.loading ?
+                            <div className='d-flex justify-content-center align-items-center'>
+                                <Spinner />
+                            </div>
+                            :
+                            <ul className="list-unstyled">
+                                {doctorDetails?.length ? (
+                                    doctorDetails.map((data) => (
+                                        <li
+                                            key={data?._id}
+                                            className={`py-2 px-3 rounded ${selectedDoctor === data?._id ? "bg-primary text-white" : "hover-effect"
+                                                }`}
+                                            style={{ cursor: "pointer", transition: "0.3s" }}
+                                            onClick={() => handleSelectDoctor(data?._id)}
+                                        >
+                                            {data?.userDetails?.firstName} {data?.userDetails?.lastName}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p className="text-muted">No doctors found</p>
+                                )}
+                            </ul>
+                        }
+                    </div>
+
+
+                </>
+            );
+        } else if (activeFilter === "Appointments") {
+            return (
+                <div className='scroll-container' style={{ height: "15rem", overflow: 'scroll' }}>
+                    <ul className="list-unstyled">
+                        {appointmentDetails?.length ? (
+                            appointmentDetails.map((data) => (
+                                <li
+                                    key={data?._id}
+                                    className={`py-2 px-3 rounded ${selectedAppointment === data?._id ? "bg-primary text-white" : "hover-effect"
+                                        }`}
+                                    style={{ cursor: "pointer", transition: "0.3s" }}
+                                    onClick={() => handleSelectAppointment(data?._id)}
+                                >
+                                    {data?.appointmentType}
+                                </li>
+                            ))
+                        ) : (
+                            <p className="text-muted">No appointments found</p>
+                        )}
+                    </ul>
+                </div>
+            );
+        }
+    };
+
+    const getAppointments = () => {
+        closeModal();
+        if (selectedDoctor) {
+            const payload = {
+                doctorId: selectedDoctor,
+                clinicId: clinicId,
+                status: activeTab,
+                search: search
+            }
+            dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
+        }
+    }
     return (
         <>
             <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '60px' }} ref={menuNodeRef}>
-                {/* {!hideLogo && (
-                    <>
-                        <Link to="/" className="logo text-center logo-light">
-                            <span className="logo-lg">
-                                <img src={isLight ? logoDark : logo} alt="logo" height="16" />
-                            </span>
-                            <span className="logo-sm">
-                                <img src={isLight ? logoSm : logo} alt="logo" height="12" />
-                            </span>
-                        </Link>
-
-                        <Link to="/" className="logo text-center logo-dark">
-                            <span className="logo-lg">
-                                <img src={isLight ? logoDark : logo} alt="logo" height="16" />
-                            </span>
-                            <span className="logo-sm">
-                                <img src={isLight ? logoSm : logoDarkSm} alt="logo" height="16" />
-                            </span>
-                        </Link>
-                    </>
-                )} */}
                 {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
                     <>
                         {!isCondensed && (
                             <ul style={{ listStyle: 'none' }} className='px-0'>
-                                <li className='px-1 mb-1'>
-                                    <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
+                                <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
+                                    <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
+                                    <Button className='custom-buttons' onClick={() => setFilter(true)}><i class="bi bi-filter"></i></Button>
                                 </li>
                                 <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
                                     <Link to='/apps/patients/new-patient'>
@@ -146,22 +230,25 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         </Button>
                                     </Link>
                                 </li>
-                                <div className="btn-group px-1 d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
+                                <div className="px-1 mb-1 btn-group d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
                                     <button
-                                        className={`btn btn-primary ${activeTab === "Today" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Today")}
+                                        className={`btn  ${activeTab === "today" ? "active btn-light text-black" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("today")}
+                                        style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         Today's
                                     </button>
                                     <button
-                                        className={`btn btn-primary ${activeTab === "Upcoming" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("Upcoming")}
+                                        className={`btn ${activeTab === "upcoming" ? "active text-black btn-light" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("upcoming")}
+                                        style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         Upcoming
                                     </button>
                                     <button
-                                        className={`btn btn-primary ${activeTab === "History" ? "active" : ""}`}
-                                        onClick={() => setActiveTab("History")}
+                                        className={`btn ${activeTab === "past" ? "active text-black btn-light" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("past")}
+                                        style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         History
                                     </button>
@@ -171,33 +258,93 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         <Spinner color='white' />
                                     </div>
                                     :
-                                    patientsData &&
-                                    patientsData.map((data, index) => (
-                                        <li
-                                            key={index}
-                                            className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
-                                            style={{ borderBottom: '1px solid grey' }}
-                                            onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
-                                        >
-                                            <div className="d-flex gap-2 align-items-center">
-                                                <img
-                                                    height='40'
-                                                    width='40'
-                                                    src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
-                                                    className="rounded-circle border border-black"
-                                                    alt="profile image"
-                                                />
-                                                <div>
-                                                    <p className="mb-0 text-capitalize">
-                                                        {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
-                                                    </p>
-                                                    <p className="mb-0">{data?.sex}</p>
-                                                </div>
-                                            </div>
+                                    patientsData?.length === 0 ?
+                                        <li className='text-white text-center py-5'>
+                                            No Appointments Found
                                         </li>
-                                    ))
+                                        :
+                                        patientsData &&
+                                        patientsData.map((data, index) => (
+                                            <li
+                                                key={index}
+                                                className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                                style={{ borderBottom: '1px solid grey' }}
+                                                onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
+                                            >
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <img
+                                                        height='40'
+                                                        width='40'
+                                                        src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
+                                                        className="rounded-circle border border-black"
+                                                        alt="profile image"
+                                                    />
+                                                    <div>
+                                                        <p className="mb-0 text-capitalize">
+                                                            {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
+                                                        </p>
+                                                        <p className="mb-0">{data?.sex}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))
                                 }
+                                <Modal centered size="lg" show={filter} onHide={closeModal}>
+                                    <Modal.Body className="p-4">
+                                        {/* Header */}
+
+                                        <Row className="border-bottom pb-2 ">
+                                            <Col sm={12} className="text-end">
+                                                <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
+                                            </Col>
+                                            <Col sm={12}>
+                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
+                                            </Col>
+
+                                        </Row>
+
+                                        {/* Main Content */}
+                                        <Row className="">
+                                            {/* Sidebar: Filter Categories */}
+                                            <Col md={4} className="border-end">
+                                                <ul className="list-unstyled ps-3">
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => setActiveFilter("Doctors")}
+                                                    >
+                                                        Doctors
+                                                    </li>
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => {
+                                                            setActiveFilter("Appointments");
+                                                            setDoctorSearch('')
+                                                        }}
+                                                    >
+                                                        Appointments
+                                                    </li>
+                                                </ul>
+                                            </Col>
+
+                                            {/* Filter Selection */}
+                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
+                                        </Row>
+
+                                        <Row className=" border-top">
+                                            <Col className="d-flex mt-3 justify-content-end">
+                                                <Button variant="primary" className='custom-buttons' onClick={() => {
+                                                    getAppointments()
+                                                }}>
+                                                    Apply
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Modal.Body>
+                                </Modal>
                             </ul>
+
                         )}
                     </>
                     :

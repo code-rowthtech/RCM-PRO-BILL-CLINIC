@@ -8,31 +8,6 @@ import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3
 import us from '../../../assets/images/flags/us.jpg'
 import { encryptMessage } from "../../../cryptoUtils";
 
-const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-
-    // Adjust if the current month/day is before the birth month/day
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-        years--;
-        months += 12; // Add 12 months to the negative month difference
-    }
-
-    // Adjust the month difference for the day of the month
-    if (today.getDate() < birthDate.getDate()) {
-        months--;
-    }
-
-    // Ensure months is non-negative after adjustment
-    if (months < 0) {
-        months += 12;
-    }
-
-    return `${years}.${months}`;
-};
 
 
 const Demographicdetails = ({ patientId }) => {
@@ -40,7 +15,6 @@ const Demographicdetails = ({ patientId }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
-    const [age, setAge] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -68,11 +42,7 @@ const Demographicdetails = ({ patientId }) => {
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])
-    useEffect(() => {
-        if (age) {
-            setValue('approxAge', age);
-        }
-    }, [age]);
+
     useEffect(() => {
         if (primaryState) {
             const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id
@@ -245,26 +215,6 @@ const Demographicdetails = ({ patientId }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
                             <Form.Control placeholder="Patient National ID Number" type="text" {...register('nationalIdNumber')} />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
-                            <Form.Control
-                                type="date"
-                                {...register('dateOfBirth')}
-                                onChange={(e) => {
-                                    const calculatedAge = calculateAge(e.target.value);
-                                    setAge(calculatedAge);
-                                }}
-                            />
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
-                            <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
@@ -501,7 +451,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Select
                                                 {...register('primaryStateName')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value='' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -523,7 +473,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('primaryCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities1?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -712,7 +662,7 @@ const Demographicdetails = ({ patientId }) => {
                                                     <Form.Select
                                                         {...register('mailingStateName')}
                                                     >
-                                                        <option value=''>State</option>
+                                                        <option value='' hidden >State</option>
                                                         {statesData?.states?.map((data) => (
                                                             <option
                                                                 key={data?.name}
@@ -742,7 +692,7 @@ const Demographicdetails = ({ patientId }) => {
                                                         {...register('mailingCity')}
 
                                                     >
-                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                        <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities2?.map((data) => (
                                                             <option key={data?.name} value={data?.name}>
                                                                 {data?.name}
@@ -1102,7 +1052,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Select
                                                 {...register('employerStateName')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value='' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -1124,7 +1074,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option hidden value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities3?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}

@@ -18,6 +18,32 @@ import Insurance from "./Insurance/Insurance";
 import Demographicdetails from "./Demographic";
 import ReferringDoctor from "./referringDoctor";
 
+const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+
+    // Adjust if the current month/day is before the birth month/day
+    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+        years--;
+        months += 12; // Add 12 months to the negative month difference
+    }
+
+    // Adjust the month difference for the day of the month
+    if (today.getDate() < birthDate.getDate()) {
+        months--;
+    }
+
+    // Ensure months is non-negative after adjustment
+    if (months < 0) {
+        months += 12;
+    }
+
+    return `${years}.${months}`;
+};
+
 
 const NewPatient = () => {
     const dispatch = useDispatch();
@@ -41,6 +67,7 @@ const NewPatient = () => {
     const [timeoutId, setTimeoutId] = useState(null);
     const [showTooltip, setShowTooltip] = useState(false);
     const [patientId, setPatientId] = useState(null);
+    const [age, setAge] = useState(null);
     const [formData, setFormData] = useState({
         role: doctorRoleId,
     });
@@ -78,6 +105,11 @@ const NewPatient = () => {
 
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    useEffect(() => {
+        if (age) {
+            setValue('approxAge', age);
+        }
+    }, [age]);
     useEffect(() => {
         if (createResponse === 201 && submissionType === 'saveAndNext') {
             reset();
@@ -233,7 +265,7 @@ const NewPatient = () => {
     return (
         <div className="background_Color ">
             <div className="container-fluid mt-2 px-0">
-                <Card className="px-3 py-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
@@ -283,7 +315,7 @@ const NewPatient = () => {
                         <div className="d-flex">
                             {activeTab === "responsible" && (
                                 <Button
-                                    className="me-2 custom-buttons btn-height"
+                                    className="me-2 custom-buttons "
                                     onClick={() => handleTabChange("responsible")}
                                 >
                                     Payment
@@ -330,8 +362,8 @@ const NewPatient = () => {
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
-                                                    height: '33px',
-                                                    minHeight: '33px',
+                                                    height: '30px',
+                                                    minHeight: '30px',
                                                 }),
                                                 placeholder: (provided) => ({
                                                     ...provided,
@@ -414,7 +446,27 @@ const NewPatient = () => {
                                         {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
                                     </Form.Group>
                                 </div>
+                                <Col sm={3}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            {...register('dateOfBirth')}
+                                            onChange={(e) => {
+                                                const calculatedAge = calculateAge(e.target.value);
+                                                setAge(calculatedAge);
+                                            }}
+                                            max={new Date().toISOString().split("T")[0]} // Restricts future dates
+                                        />
+                                    </Form.Group>
+                                </Col>
 
+                                <Col sm={3}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Approx age (if DOB is unknown)</Form.Label>
+                                        <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
+                                    </Form.Group>
+                                </Col>
                                 <div className="col-3">
                                     <Form.Group>
                                         <Form.Label className="mb-0">Previous Birth Name </Form.Label>
@@ -784,13 +836,13 @@ const NewPatient = () => {
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save & Add Another
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save
                                 </Button>
                             </div>

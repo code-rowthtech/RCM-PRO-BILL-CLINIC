@@ -18,6 +18,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
     const id = searchParams.get('id');
     const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
     const primaryInsurance = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === 'Primary Ins')
+    console.log({ primaryInsurance })
     useEffect(() => {
         if (id && insuranceByPatient) {
             setValue('insuredPersonIsPatient', primaryInsurance?.insuredPersonIsPatient);
@@ -32,10 +33,10 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
             setValue('insurancePlanType', primaryInsurance?.insurancePlanType);
             setValue('insuranceClaimOfficeNumber', primaryInsurance?.insuranceClaimOfficeNumber);
             setValue('numberVisitsAllowedPerYear', primaryInsurance?.numberVisitsAllowedPerYear);
-            setValue('cardIssuedDate', new Date(primaryInsurance?.cardIssuedDate).toISOString().split('T')[0]);
+            setValue('cardIssuedDate', primaryInsurance?.cardIssuedDate ? new Date(primaryInsurance?.cardIssuedDate).toISOString().split('T')[0] : '');
             setValue('insuranceNotes', primaryInsurance?.insuranceNotes);
-            setValue('defaultOnsetDate', new Date(primaryInsurance?.hcfaOptions?.defaultOnsetDate).toISOString().split('T')[0]);
-            setValue('defaultInitialVisitDate', new Date(primaryInsurance?.hcfaOptions?.defaultInitialVisitDate).toISOString().split('T')[0]);
+            setValue('defaultOnsetDate', primaryInsurance?.hcfaOptions?.defaultOnsetDate ? new Date(primaryInsurance?.hcfaOptions?.defaultOnsetDate).toISOString().split('T')[0] : '');
+            setValue('defaultInitialVisitDate', primaryInsurance?.hcfaOptions?.defaultInitialVisitDate ? new Date(primaryInsurance?.hcfaOptions?.defaultInitialVisitDate).toISOString().split('T')[0] : '');
         }
     }, [insuranceByPatient, id])
     const onSubmit = (data) => {

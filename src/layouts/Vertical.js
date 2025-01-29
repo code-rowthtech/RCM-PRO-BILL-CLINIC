@@ -1,6 +1,6 @@
 // @flow
 import React, { Suspense, useCallback, useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import logo from '../assets/images/logo.png';
@@ -122,23 +122,19 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                         {/* Centered Navigation Menu */}
                         <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
                             <ul className="navbar-nav text-center fw-bold">
-                                <li className="nav-item"><a className="nav-link text-white" href="#">File</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Tasks</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Patient</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Billing</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Modules</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Exports</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">System Setting</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Utilities</a></li>
-                                <li className="nav-item"><a className="nav-link text-white" href="#">Help</a></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">File</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Tasks</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="/apps/patients/list">Patient</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Billing</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Modules</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Exports</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">System Setting</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Utilities</Link></li>
+                                <li className="nav-item"><Link className="nav-link text-white" to="#">Help</Link></li>
                             </ul>
                         </div>
                     </div>
                 </nav>
-
-
-
-
                 <Suspense fallback={loading()}>
                     <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
                 </Suspense>

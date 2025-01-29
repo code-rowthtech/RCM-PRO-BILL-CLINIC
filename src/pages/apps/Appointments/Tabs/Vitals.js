@@ -92,9 +92,7 @@ const Vitals = () => {
             <Row>
                 <Col className='d-flex justify-content-end mt-2'>
                     <Button
-                        variant='success'
-                        className='fs-6 d-flex align-items-center justify-content-center'
-                        style={{ height: '30px', padding: '0 15px' }}
+                        className='fs-6 d-flex align-items-center justify-content-center custom-buttons'
                     >
                         Mark as Done
                     </Button>

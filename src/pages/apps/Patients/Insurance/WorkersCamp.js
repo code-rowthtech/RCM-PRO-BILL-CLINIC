@@ -41,7 +41,7 @@ const WorkersCamp = ({ patientId, activeTab }) => {
             setValue('workerCampLongitude', workersComp?.workerCampLongitude)
             setValue('workerCampTimeZone', workersComp?.workerCampTimeZone)
             setValue('workersCompNotes', workersComp?.workersCompNotes)
-            setValue('dateOfAccident', new Date(workersComp?.dateOfAccident).toISOString().split('T')[0]);
+            setValue('dateOfAccident', workersComp?.dateOfAccident ? new Date(workersComp?.dateOfAccident).toISOString().split('T')[0] : "");
         }
     }, [insuranceByPatient, id])
 

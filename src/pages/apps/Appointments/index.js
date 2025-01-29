@@ -151,7 +151,11 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const handleInputChange = (data, type) => {
         setDoctorSearch(data)
     }
-
+    const handleSearchInputChange = (selectedOption, type) => {
+        if (type === 'doctor') {
+            setSelectedDoctor(selectedOption);
+        }
+    };
     const handleChange = (selectedOption, type) => {
         setSelectedDoctor(selectedOption, 'Selected Option');
     };
@@ -188,12 +192,10 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <Col sm={8} className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col
-                                            xs={12} // Full-width on extra-small screens
-                                            sm="auto" // Auto width on small screens and above
-                                            className="d-flex flex-wrap gap-2 align-items-center justify-content-between responnsible-party-select"
-                                            style={{ overflowX: 'auto' }} // Enable horizontal scrolling on smaller screens
+                                            xs={12} 
+                                            sm="auto" 
+                                            className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select"
                                         >
-                                            {/* Search input shown in both tabs */}
                                             <Select
                                                 className="basic-single"
                                                 classNamePrefix="select"
@@ -210,17 +212,18 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 }}
                                                 name="doctorName"
                                                 options={doctorOptions}
-                                                placeholder="Select Doctor Name"
+                                                placeholder="Select Doctor"
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
-                                                        minHeight: '33px',
-                                                        height: '33px',
+                                                        minHeight: '30px',
+                                                        height:'30px',
+                                                        width:'200px',
                                                         padding: '0px',
                                                         fontSize: '14px',
-                                                        border: '0px',            // Remove border
-                                                        backgroundColor: '#E8F0FE!important',     // Set background to red
-                                                        boxShadow: 'none',           // Remove any shadow effects
+                                                        border: '0px',          
+                                                        backgroundColor: '#E8F0FE!important',  
+                                                        boxShadow: 'none',        
                                                     }),
                                                     valueContainer: (provided) => ({
                                                         ...provided,
@@ -237,52 +240,54 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     placeholder: (provided) => ({
                                                         ...provided,
                                                         fontWeight: 600,
-                                                        color: '#0908084f',  // White text for contrast with red background
+                                                        color: '#0908084f', 
                                                     }),
                                                 }}
                                             />
 
+                                         
 
 
-                                            {/* Additional controls shown only in the "Appointments" tab */}
-                                            {activeTab === 'appointments' && (
-                                                <>
-                                                    <Button className="custom-buttons">
-                                                        <FiFilter className="fs-5" />
-                                                    </Button>
-                                                    <FormInput
-                                                        type="date"
-                                                        placeholder="Search..."
-                                                        className="input_search_box"
-                                                        style={{ minWidth: '150px' }} // Add a minimum width for better alignment
-                                                    />
-                                                    <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
-                                                        <IoCalendarOutline className="fs-5 " />
-                                                    </Button>
-                                                    <Button
-                                                        as={Link}
-                                                        to="/apps/appointments/newAppointment"
-                                                        className="custom-buttons"
-                                                    >
-                                                        New Appointment
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </Col>
-                                    </Row>
+
+                                        {/* Additional controls shown only in the "Appointments" tab */}
+                                        {activeTab === 'appointments' && (
+                                            <>
+                                                <Button className="custom-buttons">
+                                                    <FiFilter className="fs-5" />
+                                                </Button>
+                                                <FormInput
+                                                    type="date"
+                                                    placeholder="Search..."
+                                                    className="input_search_box"
+                                                    style={{ minWidth: '150px' }} // Add a minimum width for better alignment
+                                                />
+                                                <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
+                                                    <IoCalendarOutline className="fs-5 " />
+                                                </Button>
+                                                <Button
+                                                    as={Link}
+                                                    to="/apps/appointments/newAppointment"
+                                                    className="custom-buttons"
+                                                >
+                                                    New Appointment
+                                                </Button>
+                                            </>
+                                        )}
                                 </Col>
                             </Row>
+                        </Col>
+                    </Row>
 
-                            {/* Render table based on active tab */}
-                            {activeTab === 'appointments' ? (
-                                <AppointmentsList patientsData={patientsData} />
-                            ) : (
-                                <AppointmentsTransactionList patientsData={patientsData} />
-                            )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                    {/* Render table based on active tab */}
+                    {activeTab === 'appointments' ? (
+                        <AppointmentsList patientsData={patientsData} />
+                    ) : (
+                        <AppointmentsTransactionList patientsData={patientsData} />
+                    )}
+                </Card.Body>
+            </Card>
+        </Col >
+            </Row >
         </>
     );
 };

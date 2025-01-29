@@ -135,14 +135,32 @@ const Schedule = () => {
                                                         options={doctorOptions}
                                                         placeholder="Select Doctor"
                                                         styles={{
-                                                            control: (base) => ({
-                                                                ...base,
-                                                                height: '30px',
+                                                            control: (provided) => ({
+                                                                ...provided,
                                                                 minHeight: '30px',
+                                                                width: '200px',
+                                                                padding: '0px',
+                                                                fontSize: '14px',
+                                                                border: '0px',
+                                                                backgroundColor: '#E8F0FE!important',
+                                                                boxShadow: 'none',
                                                             }),
-                                                            valueContainer: (base) => ({
-                                                                ...base,
-                                                                padding: '0 8px',
+                                                            valueContainer: (provided) => ({
+                                                                ...provided,
+                                                                padding: '0px',
+                                                            }),
+                                                            input: (provided) => ({
+                                                                ...provided,
+                                                                margin: '0px',
+                                                            }),
+                                                            indicatorsContainer: (provided) => ({
+                                                                ...provided,
+                                                                height: '30px',
+                                                            }),
+                                                            placeholder: (provided) => ({
+                                                                ...provided,
+                                                                fontWeight: 600,
+                                                                color: '#0908084f',
                                                             }),
                                                         }}
                                                     />
@@ -155,7 +173,7 @@ const Schedule = () => {
                                                     selectsRange
                                                     isClearable
                                                     placeholderText="Select a date range"
-                                                    className="date-picker-input"
+                                                    className="date-picker-input border-0"
                                                 />
                                                 <Button
                                                     className="custom-buttons d-none d-md-block"

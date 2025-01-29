@@ -516,7 +516,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                         </div>
                                                     </div>) : (
                                                     <>
-                                                        <option value="" className='select'>Select Designation</option>
+                                                        <option value="" className='select' hidden>Select Designation</option>
                                                         {tableGetData?.map((data) => (
                                                             <option key={data?._id} className='text-dark' value={data?.name}>
                                                                 {data?.name}
@@ -549,6 +549,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                         borderRadius: "4px",
                                                         fontWeight: "600",
                                                     }}
+                                                    hidden
                                                 >
                                                     Select Department
                                                 </Dropdown.Toggle>
@@ -587,7 +588,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                 className={`text-dark border border-secondary ${department ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
-                                                <option value="">Select Department</option>
+                                                <option value="" hidden>Select Department</option>
                                                 {departmentGetData?.map((data) => (
                                                     <option key={data?._id} value={data.name}>
                                                         {data?.name}
@@ -658,7 +659,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                 className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
-                                                <option value="">Select Role</option>
+                                                <option value="" hidden>Select Role</option>
                                                 {decryptedRolesData?.map((data) => (
                                                     <option key={data._id} value={data._id}>
                                                         {data.name}

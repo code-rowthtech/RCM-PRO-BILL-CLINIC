@@ -274,7 +274,7 @@ const ReferringDoctor = ({ patientId }) => {
                             <Form.Select
                                 {...register('primaryStateName')}
                             >
-                                <option value=''>State</option>
+                                <option value='' hidden>State</option>
                                 {statesData?.states?.map((data) => (
                                     <option
                                         key={data?.name}
@@ -296,7 +296,7 @@ const ReferringDoctor = ({ patientId }) => {
                                 disabled={store?.getCitiesReducer?.loading}
                                 {...register('primaryCity')}
                             >
-                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                 {cities1?.map((data) => (
                                     <option key={data?.name} value={data?._id}>
                                         {data?.name}
