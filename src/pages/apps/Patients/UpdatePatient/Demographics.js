@@ -7,34 +7,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3Action, updatePatientsAction } from "../../../../redux/actions";
 import us from '../../../../assets/images/flags/us.jpg'
 import { encryptMessage } from "../../../../cryptoUtils";
-
-const calculateAge = (dob) => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-
-    // Adjust if the current month/day is before the birth month/day
-    if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-        years--;
-        months += 12; // Add 12 months to the negative month difference
-    }
-
-    // Adjust the month difference for the day of the month
-    if (today.getDate() < birthDate.getDate()) {
-        months--;
-    }
-
-    // Ensure months is non-negative after adjustment
-    if (months < 0) {
-        months += 12;
-    }
-
-    return `${years}.${months}`;
-};
-
-
 const Demographicdetails = ({ patientId }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
@@ -42,7 +14,6 @@ const Demographicdetails = ({ patientId }) => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const { register, handleSubmit, formState: { errors }, setValue, clearErrors, watch, getValues } = useForm();
-    const [age, setAge] = useState(null);
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -67,11 +38,7 @@ const Demographicdetails = ({ patientId }) => {
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-    useEffect(() => {
-        if (age) {
-            setValue('approxAge', age)
-        }
-    }, [age])
+
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])
@@ -97,8 +64,7 @@ const Demographicdetails = ({ patientId }) => {
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus)
             setValue('nationalIdNumber', patientDetails?.nationalIdNumber)
             setValue('preferredLanguage', patientDetails?.preferredLanguage)
-            setValue('dateOfBirth', patientDetails?.dateOfBirth ? new Date(patientDetails?.dateOfBirth)?.toISOString().split('T')[0] : '')
-            setValue('approxAge', patientDetails?.approxAge)
+
             setValue('ethnicity', patientDetails?.ethnicity)
             setValue('notes', patientDetails?.notes)
             setValue('maritalStatus', patientDetails?.maritalStatus)
@@ -325,26 +291,6 @@ const Demographicdetails = ({ patientId }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
                             <Form.Control placeholder="Patient National ID Number" type="text" {...register('nationalIdNumber')} />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
-                            <Form.Control
-                                type="date"
-                                {...register('dateOfBirth')}
-                                onChange={(e) => {
-                                    const calculatedAge = calculateAge(e.target.value);
-                                    setAge(calculatedAge);
-                                }}
-                            />
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Approx age</Form.Label>
-                            <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>

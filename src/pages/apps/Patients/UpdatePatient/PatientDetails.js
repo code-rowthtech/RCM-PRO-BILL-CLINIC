@@ -48,6 +48,7 @@ const PatientDetails = ({ patientId }) => {
   const [doctorSearch, setDoctorSearch] = useState('');
   const logoFileInputRef = useRef(null);
   const [logo, setLogo] = useState(null);
+  const [age, setAge] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const doctorDetails = store?.getDoctorsReducer?.data?.response;
   const patientDetails = store?.getPatientByIdReducer?.data?.patient;
@@ -62,6 +63,11 @@ const PatientDetails = ({ patientId }) => {
     dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
   }, [dispatch])
   useEffect(() => {
+    if (age) {
+      setValue('approxAge', age);
+    }
+  }, [age]);
+  useEffect(() => {
     if (patientDetails && doctorDetails) {
       const doctor = doctorOptions && doctorOptions?.find((data) => data?.value === patientDetails?.primaryProvider?._id);
       setSelectedDoctor(doctor);
@@ -72,6 +78,8 @@ const PatientDetails = ({ patientId }) => {
       setValue('title', patientDetails?.title);
       setValue('birthName', patientDetails?.birthName);
       setValue('suffix', patientDetails?.suffix);
+      setValue('dateOfBirth', patientDetails?.dateOfBirth ? new Date(patientDetails?.dateOfBirth)?.toISOString().split('T')[0] : '')
+      setValue('approxAge', patientDetails?.approxAge)
       setValue('homePhone', patientDetails?.homePhone
         ? patientDetails?.homePhone.replace(/\D/g, '')
           .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
@@ -262,7 +270,26 @@ const PatientDetails = ({ patientId }) => {
               {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
             </Form.Group>
           </div>
+          <Col sm={3}>
+            <Form.Group>
+              <Form.Label className="mb-0">Patient Date of Birth</Form.Label>
+              <Form.Control
+                type="date"
+                {...register('dateOfBirth')}
+                onChange={(e) => {
+                  const calculatedAge = calculateAge(e.target.value);
+                  setAge(calculatedAge);
+                }}
+              />
+            </Form.Group>
+          </Col>
 
+          <Col sm={3}>
+            <Form.Group>
+              <Form.Label className="mb-0">Approx age</Form.Label>
+              <Form.Control type="text" placeholder="Approx. age" {...register('approxAge')} />
+            </Form.Group>
+          </Col>
           <div className="col-3">
             <Form.Group>
               <Form.Label className="mb-0">Previous Birth Name </Form.Label>

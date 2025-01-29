@@ -46,13 +46,13 @@ const AutoAccident = ({ patientId, activeTab }) => {
             setValue('autoAccidentNotes', autoAccident?.autoAccidentNotes);
             setValue('notDeterminable', autoAccident?.permanentDisfigurement?.notDeterminable === true ? 'Yes' : 'No');
             setValue('description', autoAccident?.permanentDisfigurement?.description);
-            setValue('from', new Date(autoAccident?.permanentDisfigurement?.from).toISOString().split('T')[0]);
-            setValue('to', new Date(autoAccident?.permanentDisfigurement?.to).toISOString().split('T')[0]);
-            setValue('returnToWork', new Date(autoAccident?.permanentDisfigurement?.returnToWork).toISOString().split('T')[0]);
+            setValue('from', autoAccident?.permanentDisfigurement?.from ? new Date(autoAccident?.permanentDisfigurement?.from).toISOString().split('T')[0] : '');
+            setValue('to', autoAccident?.permanentDisfigurement?.to ? new Date(autoAccident?.permanentDisfigurement?.to).toISOString().split('T')[0] : '');
+            setValue('returnToWork', autoAccident?.permanentDisfigurement?.returnToWork ? new Date(autoAccident?.permanentDisfigurement?.returnToWork).toISOString().split('T')[0] : "");
             setValue('requiresRehab', autoAccident?.rehabilitationDetails?.requiresRehab);
             setValue('recommendation', autoAccident?.rehabilitationDetails?.recommendation);
             setValue('hasSimilarCondition', autoAccident?.similarConditionDetails?.hasSimilarCondition);
-            setValue('when', new Date(autoAccident?.similarConditionDetails?.when).toISOString().split('T')[0]);
+            setValue('when', autoAccident?.similarConditionDetails?.when ? new Date(autoAccident?.similarConditionDetails?.when).toISOString().split('T')[0] : '');
             setValue('why', autoAccident?.similarConditionDetails?.why);
             setValue('isPatientStillUnderCare', autoAccident?.isPatientStillUnderCare);
             setValue('estimatedDuration', autoAccident?.estimatedDuration);

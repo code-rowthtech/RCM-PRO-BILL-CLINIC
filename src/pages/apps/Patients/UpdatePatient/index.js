@@ -292,7 +292,7 @@ const UpdatePatientIndex = () => {
                                         {activeTab === 'Patient Details' && <PatientDetails />}
                                         {activeTab === 'Demographics' && <Demographics />}
                                         {activeTab === 'Insurances' && <Insurance patientId={patientDetails?._id} />}
-                                        {activeTab === 'Vital Status' && <VitalStatus />}
+                                        {activeTab === 'Vital Status' && <VitalStatus patientId={patientDetails?._id} />}
                                         {activeTab === 'Eligibility' && <p>Eligibility Content</p>}
                                         {activeTab === 'Authorizations' && <p>Authorizations Content</p>}
                                         {activeTab === 'Balance' && <p>Balance Content</p>}

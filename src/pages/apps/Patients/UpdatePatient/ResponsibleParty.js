@@ -570,7 +570,7 @@ const ResponsibleParty = ({ patientId }) => {
                                                 {...register('city')}
                                                 onChange={(e) => handleCitySelection(e)}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
                                                     <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?.name}>
 

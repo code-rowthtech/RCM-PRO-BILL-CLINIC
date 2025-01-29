@@ -32,7 +32,7 @@ const SecondaryInsuance = ({ patientId, activeTab }) => {
             setValue('secondaryInsuranceTypeCode', secondaryInsurance?.secondaryInsuranceTypeCode);
             setValue('insuranceClaimOfficeNumber', secondaryInsurance?.insuranceClaimOfficeNumber);
             setValue('insuranceNotes', secondaryInsurance?.insuranceNotes);
-            setValue('cardIssuedDate', new Date(secondaryInsurance?.cardIssuedDate).toISOString().split('T')[0]);
+            setValue('cardIssuedDate', secondaryInsurance?.cardIssuedDate ? new Date(secondaryInsurance?.cardIssuedDate).toISOString().split('T')[0] : '');
         }
     }, [insuranceByPatient, id])
     const onSubmit = (data) => {
