@@ -265,7 +265,7 @@ const NewPatient = () => {
     return (
         <div className="background_Color ">
             <div className="container-fluid mt-2 px-0">
-                <Card className="px-3 py-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">
@@ -315,7 +315,7 @@ const NewPatient = () => {
                         <div className="d-flex">
                             {activeTab === "responsible" && (
                                 <Button
-                                    className="me-2 custom-buttons btn-height"
+                                    className="me-2 custom-buttons "
                                     onClick={() => handleTabChange("responsible")}
                                 >
                                     Payment
@@ -362,8 +362,8 @@ const NewPatient = () => {
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
-                                                    height: '33px',
-                                                    minHeight: '33px',
+                                                    height: '30px',
+                                                    minHeight: '30px',
                                                 }),
                                                 placeholder: (provided) => ({
                                                     ...provided,
@@ -835,13 +835,13 @@ const NewPatient = () => {
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save & Add Another
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons " type="submit">
                                     Save
                                 </Button>
                             </div>

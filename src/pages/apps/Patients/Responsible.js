@@ -574,7 +574,7 @@ const Responsiblle = ({ patientId }) => {
                                         {...register('stateName')}
                                         onChange={(e) => handleStateSelection(e)}
                                     >
-                                        <option value=''>State</option>
+                                        <option value='' hidden>State</option>
                                         {statesData?.states?.map((data) => (
                                             <option
                                                 key={data?.id} // Unique key for each option
@@ -597,7 +597,7 @@ const Responsiblle = ({ patientId }) => {
                                                 {...register('city')}
                                                 onChange={(e) => handleCitySelection(e)}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities?.map((data) => (
                                                     <option data-key={JSON.stringify({ _id: data?._id })} key={data?._id} value={data?.name}>
 
@@ -861,7 +861,7 @@ const Responsiblle = ({ patientId }) => {
                                                 Date Type:
                                             </Form.Label>
                                             <Form.Select>
-                                                <option value=''>Select</option>
+                                                <option value='' hidden>Select</option>
                                                 <option value='1'>1</option>
                                                 <option value='2'>2</option>
                                                 <option value='3'>3</option>
@@ -898,7 +898,7 @@ const Responsiblle = ({ patientId }) => {
                                                 Provider:
                                             </Form.Label>
                                             <Form.Select>
-                                                <option value=''>Select</option>
+                                                <option value='' hidden>Select</option>
                                                 <option value='1'>1</option>
                                                 <option value='2'>2</option>
                                                 <option value='3'>3</option>

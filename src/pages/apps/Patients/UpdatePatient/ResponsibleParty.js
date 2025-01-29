@@ -173,7 +173,7 @@ const ResponsibleParty = ({ patientId }) => {
     ];
 
     return (
-        <>
+        <div className="scroll-container" style={{overflow:"scroll", height:"80vh"}}>
             {/* Form Section */}
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row px-0 " >
@@ -547,7 +547,7 @@ const ResponsibleParty = ({ patientId }) => {
                                         {...register('stateName')}
                                         onChange={(e) => handleStateSelection(e)}
                                     >
-                                        <option value=''>State</option>
+                                        <option value='' hidden>State</option>
                                         {statesData?.states?.map((data) => (
                                             <option
                                                 key={data?.id} // Unique key for each option
@@ -834,7 +834,7 @@ const ResponsibleParty = ({ patientId }) => {
                                                 Date Type:
                                             </Form.Label>
                                             <Form.Select>
-                                                <option value=''>Select</option>
+                                                <option value='' hidden>Select</option>
                                                 <option value='1'>1</option>
                                                 <option value='2'>2</option>
                                                 <option value='3'>3</option>
@@ -871,7 +871,7 @@ const ResponsibleParty = ({ patientId }) => {
                                                 Provider:
                                             </Form.Label>
                                             <Form.Select>
-                                                <option value=''>Select</option>
+                                                <option value='' hidden>Select</option>
                                                 <option value='1'>1</option>
                                                 <option value='2'>2</option>
                                                 <option value='3'>3</option>
@@ -980,7 +980,7 @@ const ResponsibleParty = ({ patientId }) => {
                 </div>
             </Form>
 
-        </>
+        </div>
 
 
     );

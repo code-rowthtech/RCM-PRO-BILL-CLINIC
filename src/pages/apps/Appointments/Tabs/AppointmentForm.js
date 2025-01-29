@@ -491,7 +491,7 @@ const AppointmentForm = () => {
                         <div className="d-flex">
                             {activeTab === "responsible" && (
                                 <Button
-                                    className="me-2 custom-buttons btn-height"
+                                    className="me-2 custom-buttons"
                                     onClick={() => handleTabChange("responsible")}
                                 >
                                     Payment
@@ -1013,13 +1013,13 @@ const AppointmentForm = () => {
                                     setLogo(null);
                                     setLogoName(null);
                                 }}>Clear</Button>
-                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndReset')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save & Add Another
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveAndNext')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save & Continue Editing
                                 </Button>
-                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                                <Button onClick={() => setSubmissionType('saveOnly')} disabled={store?.createPatientsReducer?.loading || store?.updatePatientsReducer?.loading} className="custom-buttons" type="submit">
                                     Save
                                 </Button>
                             </div>

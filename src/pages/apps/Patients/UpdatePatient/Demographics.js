@@ -284,7 +284,7 @@ const Demographicdetails = ({ patientId }) => {
             });
     }
     return (
-        <>
+        <div className="scroll-container" style={{overflow:"scroll" , height:"65vh"}}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={3}>
@@ -529,7 +529,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 {...register('primaryStateName')}
                                                 onChange={(e) => handleStateSelection(e.target.value, 'primary')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value='' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -551,7 +551,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('primaryCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value=''  hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities1?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -742,7 +742,7 @@ const Demographicdetails = ({ patientId }) => {
                                                         {...register('mailingStateName')}
                                                         onChange={(e) => handleStateSelection(e.target.value, 'mailing')}
                                                     >
-                                                        <option value=''>State</option>
+                                                        <option value='' hidden>State</option>
                                                         {statesData?.states?.map((data) => (
                                                             <option
                                                                 key={data?.name}
@@ -772,7 +772,7 @@ const Demographicdetails = ({ patientId }) => {
                                                         {...register('mailingCity')}
 
                                                     >
-                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                        <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities2?.map((data) => (
                                                             <option key={data?.name} value={data?.name}>
                                                                 {data?.name}
@@ -1131,7 +1131,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 {...register('employerStateName')}
                                                 onChange={(e) => handleStateSelection(e, 'employer')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value=' ' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -1153,7 +1153,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value=''  hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities3?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -1207,7 +1207,7 @@ const Demographicdetails = ({ patientId }) => {
                 </Row>
             </Form >
 
-        </>
+        </div>
 
 
     );

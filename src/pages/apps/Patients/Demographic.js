@@ -451,7 +451,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Select
                                                 {...register('primaryStateName')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value='' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -473,7 +473,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('primaryCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities1?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -662,7 +662,7 @@ const Demographicdetails = ({ patientId }) => {
                                                     <Form.Select
                                                         {...register('mailingStateName')}
                                                     >
-                                                        <option value=''>State</option>
+                                                        <option value='' hidden >State</option>
                                                         {statesData?.states?.map((data) => (
                                                             <option
                                                                 key={data?.name}
@@ -692,7 +692,7 @@ const Demographicdetails = ({ patientId }) => {
                                                         {...register('mailingCity')}
 
                                                     >
-                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                        <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities2?.map((data) => (
                                                             <option key={data?.name} value={data?.name}>
                                                                 {data?.name}
@@ -1052,7 +1052,7 @@ const Demographicdetails = ({ patientId }) => {
                                             <Form.Select
                                                 {...register('employerStateName')}
                                             >
-                                                <option value=''>State</option>
+                                                <option value='' hidden>State</option>
                                                 {statesData?.states?.map((data) => (
                                                     <option
                                                         key={data?.name}
@@ -1074,7 +1074,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}
                                             >
-                                                <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option hidden value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities3?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
