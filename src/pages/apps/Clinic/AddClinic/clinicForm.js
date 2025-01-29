@@ -631,7 +631,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}
                                     >
-                                        <option value="">Select Practice type</option>
+                                        <option value="" hidden hidden >Select Practice type</option>
                                         {clinectypes?.map((data) => (
                                             <option key={data?._id} value={data?.name}>{data?.name}</option>
                                         ))}
@@ -1287,7 +1287,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
                                                     >
-                                                        <option value=''>State</option>
+                                                        <option value='' hidden>State</option>
                                                         {statesData?.states?.map((data) => (
                                                             <option
                                                                 key={data?.id}
@@ -1312,7 +1312,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         disabled={store?.getCitiesReducer?.loading}
                                                         {...register("city", { required: "City is required" })}
                                                     >
-                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                        <option value=''hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities1?.map((data) => (
                                                             <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
@@ -1538,7 +1538,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             onChange={(e) => handleStateSelection(e)}
                                                             disabled={usePrimaryAsMailing}
                                                         >
-                                                            <option value="">State</option>
+                                                            <option value="" hidden>State</option>
                                                             {statesData?.states?.map((data) => (
                                                                 <option key={data?._id} value={data?._id}>
                                                                     {data?.name}
@@ -1568,7 +1568,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 required: 'City is required',
                                                             })}
                                                         >
-                                                            <option value="">
+                                                            <option value="" hidden>
                                                                 {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                             </option>
                                                             {cities2?.map((data) => (

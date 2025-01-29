@@ -135,9 +135,8 @@ const POV = () => {
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        border: "1px solid #ccc",
                         borderRadius: "4px",
-                        backgroundColor: "#d9ddd6 ",
+                        backgroundColor: "#e8f0fe",
                         padding: "0px 5px",
                       }}
                     >
