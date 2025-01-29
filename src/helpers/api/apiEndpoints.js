@@ -100,3 +100,5 @@ export const getVitals = 'api/v1/clinic/getAllVitals';
 export const getVitalsByPatientId = 'api/v1/clinic/vitalsByPatientId';
 export const getVitalsByAppointmentId = 'api/v1/clinic/vitalsByAppointmentId';
 export const updateVitals = 'api/v1/clinic/updateVitals';
+
+export const getPatientsByAppointment = 'api/v1/clinics/getPatientsByAppointments'

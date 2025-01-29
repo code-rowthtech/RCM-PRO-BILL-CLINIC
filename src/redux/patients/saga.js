@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
+import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { createResponsibleParty } from '../../helpers/api/apiEndpoints';
@@ -32,6 +32,33 @@ function* getPatientsFunction(data) {
     } catch (error) {
         yield put({
             type: PatientsActionTypes.GET_PATIENTS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getPatientsByAppointmentFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT_LOADING,
+            payload: {},
+        });
+        const response = yield call(getPatientsByAppointmentApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT_ERROR,
             payload: error,
         });
     }
@@ -308,6 +335,10 @@ export function* watchGetPatients() {
     yield takeEvery(PatientsActionTypes.GET_PATIENTS, getPatientsFunction);
 }
 
+export function* watchGetPatientsByAppointment() {
+    yield takeEvery(PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT, getPatientsByAppointmentFunction);
+}
+
 export function* watchGetPatientById() {
     yield takeEvery(PatientsActionTypes.GET_PATIENTS_BY_ID, getPatientByIdFunction);
 }
@@ -349,6 +380,7 @@ export function* watchresetState() {
 function* patientsSaga() {
     yield all([
         fork(watchGetPatients),
+        fork(watchGetPatientsByAppointment),
         fork(watchGetPatientById),
         fork(watchCreatePatients),
         fork(watchCreateResponsibleParty),
