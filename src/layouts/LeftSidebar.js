@@ -63,12 +63,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
-    console.log(store?.getPatientsByAppointmentReducer, 'store?.getPatientsByAppointmentReducer?.data')
+    console.log(store?.getPatientsByAppointmentReducer?.data?.appointments, 'store?.getPatientsByAppointmentReducer?.data')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
-    const [activeTab, setActiveTab] = useState('today')
+    const [activeTab, setActiveTab] = useState('Today')
     const [filter, setFilter] = useState(false);
     const [doctorSearch, setDoctorSearch] = useState('')
 
@@ -112,6 +112,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 search: search
             }
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
+            console.log({ payload })
         }
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
     useEffect(() => {
@@ -232,22 +233,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                 </li>
                                 <div className="px-1 mb-1 btn-group d-flex justify-content-center align-items-center custom-btn-group" style={{ height: '30px' }}>
                                     <button
-                                        className={`btn  ${activeTab === "today" ? "active btn-light text-black" : "btn-transparent text-white"}`}
-                                        onClick={() => setActiveTab("today")}
+                                        className={`btn  ${activeTab === "Today" ? "active btn-light text-black" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("Today")}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         Today's
                                     </button>
                                     <button
-                                        className={`btn ${activeTab === "upcoming" ? "active text-black btn-light" : "btn-transparent text-white"}`}
-                                        onClick={() => setActiveTab("upcoming")}
+                                        className={`btn ${activeTab === "Upcoming" ? "active text-black btn-light" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("Upcoming")}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         Upcoming
                                     </button>
                                     <button
-                                        className={`btn ${activeTab === "past" ? "active text-black btn-light" : "btn-transparent text-white"}`}
-                                        onClick={() => setActiveTab("past")}
+                                        className={`btn ${activeTab === "History" ? "active text-black btn-light" : "btn-transparent text-white"}`}
+                                        onClick={() => setActiveTab("History")}
                                         style={{ border: '1px solid white', boxShadow: 'none' }}
                                     >
                                         History
@@ -264,29 +265,47 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         </li>
                                         :
                                         patientsData &&
-                                        patientsData.map((data, index) => (
+                                        patientsData?.map((item, index) => (
                                             <li
                                                 key={index}
-                                                className={`py-1 cursor-pointer patient-item px-1 ${id === data?._id ? 'active-patient-item' : ''}`}
+                                                className={`py-1 cursor-pointer patient-item px-1 ${id === item?.patient?._id ? 'active-patient-item' : ''}`}
                                                 style={{ borderBottom: '1px solid grey' }}
-                                                onClick={() => navigate(`/apps/patients/update-patient?id=${data?._id}`)}
+                                                onClick={() => navigate(`/apps/patients/update-patient?id=${item?.patient?._id}`)}
                                             >
-                                                <div className="d-flex gap-2 align-items-center">
-                                                    <img
-                                                        height='40'
-                                                        width='40'
-                                                        src={data?.patientChartPhoto?.url ? data?.patientChartPhoto?.url : profileImg}
-                                                        className="rounded-circle border border-black"
-                                                        alt="profile image"
-                                                    />
-                                                    <div>
-                                                        <p className="mb-0 text-capitalize">
-                                                            {data?.title} {data?.firstName} {data?.middleName || ''} {data?.lastName}
+                                                <div className="d-flex flex-row justify-content-start align-items-center">
+
+                                                    <div className='col-8 d-flex flex-row'>
+                                                        <div className='ms-1'> <img
+                                                            height='40'
+                                                            width='40'
+                                                            src={item?.patient?.patientChartPhoto?.url ? item?.patient?.patientChartPhoto?.url : profileImg}
+                                                            className="rounded-circle border border-black"
+                                                            alt="profile image"
+                                                        /></div>
+                                                        <div className='ms-2'><p className="mb-0 text-capitalize" style={{ fontSize: "10px" }}>
+                                                            {item?.title} {item?.patient?.firstName} {item?.patient?.middleName || ''} {item?.patient?.lastName}
                                                         </p>
-                                                        <p className="mb-0">{data?.sex}</p>
+                                                            <p className="mb-0 text-capitalize" style={{ fontSize: "10px" }}>
+                                                                {item?.title} {item?.doctor?.userId?.firstName} {item?.doctor?.userId?.middleName || ''} {item?.doctor?.uerId?.lastName}
+                                                            </p>
+                                                            </div>
+
                                                     </div>
+                                                    <div className=''>
+
+                                                        <p className="mb-0" style={{ fontSize: '10px' }}>
+                                                            {new Date(item?.date).toLocaleDateString('en-US', {
+                                                                year: 'numeric',
+                                                                month: 'long',
+                                                                day: 'numeric',
+                                                            })}
+                                                        </p>
+                                                        <p style={{ fontSize: '10px' }}>{item?.reason}</p>
+                                                    </div>
+
                                                 </div>
                                             </li>
+
                                         ))
                                 }
                                 <Modal centered size="lg" show={filter} onHide={closeModal}>
