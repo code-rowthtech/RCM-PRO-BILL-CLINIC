@@ -272,7 +272,7 @@ const AppointmentForm = () => {
         const payload = {
             patient: data.patient,
             clinic: clinicId,
-            doctor: data.doctor?._id,
+            doctor: data?.doctorName,
             startTime: data?.startTime,
             endTime: addDurationToTime(data?.startTime, data?.duration),
             office: data?.office,

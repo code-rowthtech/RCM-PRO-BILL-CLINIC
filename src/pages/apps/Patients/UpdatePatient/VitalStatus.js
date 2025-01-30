@@ -12,11 +12,9 @@ const VitalStatus = ({ patientId }) => {
     const [todayDate, setTodayDate] = useState(new Date());
     const [yesterdayDate, setYesterdayDate] = useState(new Date());
     const [previousVitals, setPreviousVitals] = useState();
-    console.log({ previousVitals })
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.vitals;
-    console.log(patientVitals, 'patientVitals')
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: patientId }) }))
     }, [patientId, dispatch]);
@@ -79,7 +77,7 @@ const VitalStatus = ({ patientId }) => {
             weight: { value: todayVitals.weight, unit: 'lbs' },
             bmi: { value: todayVitals.bmi, unit: 'kg/m²' },
             pain_level: { value: todayVitals.pain_level, unit: 'scale (0-10)' },
-            smoking_status: todayVitals.smoking_status,
+            ...(todayVitals.smoking_status !== '' ? { smoking_status: todayVitals.smoking_status } : {}),
             head_circumference: { value: todayVitals.head_circumference, unit: 'in' },
             weight_for_length_percentile: { value: todayVitals.weight_for_length_percentile, unit: '%' },
             bmi_percentile: { value: todayVitals.bmi_percentile, unit: '%' },
@@ -212,7 +210,8 @@ const VitalStatus = ({ patientId }) => {
 
                         </div>
                     </div>
-                    <Row><Col className='d-flex justify-content-end  mt-2'><Button onClick={handleSubmit} className='custom-buttons'>Mark as Done</Button></Col></Row>
+                    <Row><Col className='d-flex justify-content-end  mt-2'><Button disabled={store?.createVitalsReducer?.loading}
+                        onClick={handleSubmit} className='custom-buttons'>Mark as Done</Button></Col></Row>
                 </div>
             }
         </>

@@ -72,8 +72,8 @@ const Demographicdetails = ({ patientId }) => {
         const payload = {
             id: patientId,
             ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
-            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
+            // ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
+            // ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
             ...(data?.sex ? { sex: data?.sex } : {}),
             ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
             ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
@@ -219,10 +219,10 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select
-                                {...register('sex', { required: "Sex is required" })} >
-                                <option value="">Select Sex</option>
+                                {...register('sex')} >
+                                <option value="" hidden>Select Sex</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
@@ -232,10 +232,10 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Gender Identity<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Gender Identity</Form.Label>
                             <Form.Select
-                                {...register('genderIdentity', { required: "Gender identity is required" })} >
-                                <option value="">Select Gender Identity</option>
+                                {...register('genderIdentity')} >
+                                <option value="" hidden>Select Gender Identity</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Male-to-Female (MTF)/Transgender Female/Trans Woman">
@@ -254,10 +254,10 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
                             <Form.Select
-                                {...register('sexualOrientation', { required: "Sexual Orientation is required" })} >
-                                <option value="">Select Sexual Orientation</option>
+                                {...register('sexualOrientation')} >
+                                <option value="" hidden>Select Sexual Orientation</option>
                                 <option value="Heterosexual">Heterosexual</option>
                                 <option value="Lesbian or gay">Lesbian or gay</option>
                                 <option value="Bisexual">Bisexual</option>
@@ -270,9 +270,9 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Race<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Race</Form.Label>
                             <Form.Select
-                                {...register('race', { required: "Race is required" })} >
+                                {...register('race')} >
                                 <option value="">Select Race</option>
                                 <option value="American Indian or Alaska Native'">American Indian or Alaska Native'</option>
                                 <option value="Asian">Asian</option>
@@ -806,7 +806,7 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Control {...register('emergencyContactPhone')} type="text" placeholder="Enter Emergency Contact Phone" />
                         </Form.Group> */}
                         <Form.Group className="mb-0 position-relative">
-                            <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className='mb-0'>Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
@@ -886,7 +886,7 @@ const Demographicdetails = ({ patientId }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
+                                            <Form.Label className='mb-0'>Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
                                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
@@ -1123,7 +1123,9 @@ const Demographicdetails = ({ patientId }) => {
                 </Row>
                 <Row>
                     <Col className="d-flex justify-content-end">
-                        <Button className="custom-buttons btn-height" type="submit">Save</Button>
+                        <Button disabled={store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
+                            Save
+                        </Button>
                     </Col>
                 </Row>
             </Form >

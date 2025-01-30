@@ -226,6 +226,8 @@ const NewPatient = () => {
             ...(data?.lastName ? { lastName: data?.lastName } : {}),
             ...(data?.birthName ? { birthName: data?.birthName } : {}),
             ...(data?.suffix ? { suffix: data?.suffix } : {}),
+            ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
+            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
             ...(logo?.url === null
                 ? {}
                 : {
@@ -376,6 +378,7 @@ const NewPatient = () => {
                                                 const calculatedAge = calculateAge(e.target.value);
                                                 setAge(calculatedAge);
                                             }}
+                                            max={new Date().toISOString().split("T")[0]} // Restricts future dates
                                         />
                                     </Form.Group>
                                 </Col>

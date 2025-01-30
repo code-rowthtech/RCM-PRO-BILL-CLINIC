@@ -9,6 +9,11 @@ export const getPatientsAction = (data): AuthAction => ({
     data
 });
 
+export const getPatientsByAppointmentAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT,
+    data
+});
+
 export const getPatientByIdAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_PATIENTS_BY_ID,
     data

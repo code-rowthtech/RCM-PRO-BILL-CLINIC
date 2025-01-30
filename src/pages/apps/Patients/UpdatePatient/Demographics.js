@@ -284,7 +284,7 @@ const Demographicdetails = ({ patientId }) => {
             });
     }
     return (
-        <div className="scroll-container" style={{overflow:"scroll" , height:"65vh"}}>
+        <div className="scroll-container" style={{ overflow: "scroll", height: "65vh" }}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={3}>
@@ -295,9 +295,9 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sex<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select
-                                {...register('sex', { required: "Sex is required" })} >
+                                {...register('sex')} >
                                 <option value="">Select Sex</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -308,9 +308,9 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Gender Identity<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Gender Identity</Form.Label>
                             <Form.Select
-                                {...register('genderIdentity', { required: "Gender identity is required" })} >
+                                {...register('genderIdentity')} >
                                 <option value="">Select Gender Identity</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
@@ -330,9 +330,9 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
                             <Form.Select
-                                {...register('sexualOrientation', { required: "Sexual Orientation is required" })} >
+                                {...register('sexualOrientation')} >
                                 <option value="">Select Sexual Orientation</option>
                                 <option value="Heterosexual">Heterosexual</option>
                                 <option value="Lesbian or gay">Lesbian or gay</option>
@@ -346,9 +346,9 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Race<span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className="mb-0">Race</Form.Label>
                             <Form.Select
-                                {...register('race', { required: "Race is required" })} >
+                                {...register('race')} >
                                 <option value="">Select Race</option>
                                 <option value="American Indian or Alaska Native'">American Indian or Alaska Native'</option>
                                 <option value="Asian">Asian</option>
@@ -551,7 +551,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('primaryCity')}
                                             >
-                                                <option value=''  hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities1?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -883,7 +883,7 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group className="mb-0 position-relative">
-                            <Form.Label className='mb-0'>Emergency Contact Phone <span className='text-danger'>*</span></Form.Label>
+                            <Form.Label className='mb-0'>Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
@@ -964,7 +964,7 @@ const Demographicdetails = ({ patientId }) => {
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className='mb-0'>Employer Phone <span className='text-danger'>*</span></Form.Label>
+                                            <Form.Label className='mb-0'>Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
                                                     <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
@@ -1153,7 +1153,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 disabled={store?.getCitiesReducer?.loading}
                                                 {...register('employerCity')}
                                             >
-                                                <option value=''  hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                 {cities3?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
@@ -1202,7 +1202,7 @@ const Demographicdetails = ({ patientId }) => {
                 </Row>
                 <Row className="my-2">
                     <Col className="d-flex justify-content-end">
-                        <Button className="custom-buttons btn-height" type="submit">Save</Button>
+                        <Button className="custom-buttons btn-height" disabled={store?.updatePatientsReducer?.loading} type="submit">Save</Button>
                     </Col>
                 </Row>
             </Form >
