@@ -78,9 +78,9 @@ const Patients = () => {
         setSelectedDetails(null);
     };
 
-const handleNewPatients = () => {
-  navigate('/apps/patients/new-patient')
-}
+    const handleNewPatients = () => {
+        navigate('/apps/patients/new-patient')
+    }
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -128,7 +128,7 @@ const handleNewPatients = () => {
                                                     }}
                                                 />
                                             </div>
-                                            <Button  onClick={handleNewPatients} className="custom-buttons py-1" >
+                                            <Button onClick={handleNewPatients} className="custom-buttons py-1" >
                                                 New Patient
                                             </Button>
                                         </Col>

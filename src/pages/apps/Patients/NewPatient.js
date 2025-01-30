@@ -226,6 +226,8 @@ const NewPatient = () => {
             ...(data?.lastName ? { lastName: data?.lastName } : {}),
             ...(data?.birthName ? { birthName: data?.birthName } : {}),
             ...(data?.suffix ? { suffix: data?.suffix } : {}),
+            ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
+            ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
             ...(logo?.url === null
                 ? {}
                 : {
