@@ -631,7 +631,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}
                                     >
-                                        <option value="" hidden hidden >Select Practice type</option>
+                                        <option value="" hidden  >Select Practice type</option>
                                         {clinectypes?.map((data) => (
                                             <option key={data?._id} value={data?.name}>{data?.name}</option>
                                         ))}
