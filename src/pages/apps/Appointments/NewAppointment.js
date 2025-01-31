@@ -49,8 +49,7 @@ const NewAppointment = () => {
                     </Col>
                     <Col sm={2} className="d-flex justify-content-end">
                         <Button
-                            className='fs-6 d-flex align-items-center justify-content-center cancel-button'
-                            style={{ height: '30px' }}
+                            className='cancel-button'
                             onClick={handleAppointment}
                         >
                             Back

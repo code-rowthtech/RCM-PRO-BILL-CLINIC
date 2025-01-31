@@ -34,8 +34,9 @@ const AppointmentForm = () => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
+    const getAppointment = store?.createAppointmentReducer;
+    console.log(getAppointment, 'getAppointment')
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
-    console.log(doctorDetails, 'doctor')
     const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -65,16 +66,6 @@ const AppointmentForm = () => {
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [selectedOption, setSelectedOption] = useState("");
     const [showModal, setShowModal] = useState(false);
-
-    const handleSelectChange = (e) => {
-        const value = e.target.value;
-
-        if (value === "new-patient") {
-            setShowModal(true);
-        } else {
-            setSelectedOption(value);
-        }
-    };
     const handlePlusIconClick = () => {
         setShowModal(true);
     }
@@ -87,56 +78,12 @@ const AppointmentForm = () => {
             setValue('approxAge', age);
         }
     }, [age]);
-    const options = responsibleParties?.map((party) => ({
-        value: party._id,
-        label: party.fullName,
-    }));
-
-    const doctorOptions = doctorDetails?.map((data) => ({
-        value: data?._id,
-        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
-    }));
-    const handleTabChange = (tab) => {
-        setActiveTab(tab);
-        if (tab === "personalDetails") {
-            setBtnShow(true);
-        } else {
-            setBtnShow(false);
-        }
-    };
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
-    useEffect(() => {
-        if (createResponse === 201 && submissionType === 'saveAndNext') {
-            reset();
-            setActiveTab('demographicDetails');
-            setPatientId(createPatientResponse?._id);
-            dispatch(stateEmptydAction());
-        } else if (createResponse === 201 && submissionType === 'saveAndReset') {
-            reset();
-            setSelectedDoctor(null);
-            setLogo(null);
-            setLogoName(null);
-            setPatientId(null);
-            dispatch(stateEmptydAction());
-        } else if (createResponse === 201 && submissionType === 'save') {
-            setPatientId(createPatientResponse?._id)
-        }
-    }, [createResponse, submissionType])
+    const { register, handleSubmit, watch, formState: { errors }, setValue, reset, clearErrors } = useForm();
     useEffect(() => {
 
-        const payload = {
-            clinicId: clinicId,
-            search: doctorSearch,
-            limit: 20
-        }
-        if (activeTab === 'personalDetails') {
-            dispatch(getResponsiblePartyAction({ key: encryptMessage(payload) }))
-        }
         const doctorPayload = { status: true, search: doctorSearch, departmentId: '' }
         dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
-    }, [dispatch, doctorSearch, activeTab])
-
-    // get all 
+    }, [dispatch, doctorSearch])
 
     useEffect(() => {
         const data = {
@@ -150,108 +97,7 @@ const AppointmentForm = () => {
 
     const patientsData = store?.getPatientsReducer?.data?.patients;
     console.log('patientsData', patientsData)
-
-    useEffect(() => {
-        if (createResponse === 201) {
-            setPatientId(createPatientResponse?._id)
-        }
-    }, [createResponse])
-    useEffect(() => {
-        if (id) {
-            const payload = {
-                id: id,
-            }
-            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
-        }
-    }, [id])
-    useEffect(() => {
-        if (id) {
-            setSelectedParty(options && options?.find((option) => option.value === patientDetails?.responsibleParty?._id));
-        }
-    }, [id, patientDetails, responsibleParties])
-
-    useEffect(() => {
-        if (selectedLocation) {
-            setValue('address', selectedLocation?.formatted)
-            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setValue('stateName', selectedState)
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
-        }
-    }, [selectedLocation, setValue, statesData, dispatch])
-    useEffect(() => {
-        if (cities) {
-            const selectedCounty = cities && cities.find((data) => data?.name === selectedLocation?.components?.county || patientDetails?.address?.city?.name)?._id;
-            setValue('city', selectedCounty)
-        }
-    }, [cities])
-
-    const [profileUploading, setProfileUploading] = useState(false);
-    const handleFileChange = async (e) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setProfileUploading);
-            setLogo(url);
-            setLogoName(selectedFile?.name);
-            clearErrors('profileImage')
-        } catch (error) {
-        }
-    };
-    useEffect(() => {
-        dispatch(getStatesByCountryAction());
-    }, [dispatch]);
-
-    const [stateCode, setStateCode] = useState()
-
-
-    useEffect(() => {
-        if (stateToSelect) {
-            dispatch(getSubClinicCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
-        }
-    }, [stateToSelect]);
-
-    const calculateAge = (dob) => {
-        const birthDate = new Date(dob);
-        const today = new Date();
-
-        let years = today.getFullYear() - birthDate.getFullYear();
-        let months = today.getMonth() - birthDate.getMonth();
-
-        // Adjust if the current month/day is before the birth month/day
-        if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
-            years--;
-            months += 12; // Add 12 months to the negative month difference
-        }
-
-        // Adjust the month difference for the day of the month
-        if (today.getDate() < birthDate.getDate()) {
-            months--;
-        }
-
-        // Ensure months is non-negative after adjustment
-        if (months < 0) {
-            months += 12;
-        }
-
-        return `${years}.${months}`;
-    };
-
-
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-   
-    const tableData = [
-        { type: 'Patient', values: Array(6).fill("0.00") },
-        { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
-    ];
-
-    const handleInputChange = (data) => {
-        setDoctorSearch(data)
-    }
-    const handleChange = (selectedOption) => {
-        setSelectedDoctor(selectedOption);
-    };
-
     function addDurationToTime(time, duration) {
         let [hours, minutes] = time?.split(':').map(Number);
         minutes += duration;
@@ -262,13 +108,11 @@ const AppointmentForm = () => {
         if (hours >= 24) {
             hours = hours % 24;
         }
-    
-        // Format the result to match "HH:MM"
+
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
     const onSubmit = (data) => {
-        console.log(data,"43546576879809-")
         const payload = {
             patient: data.patient,
             clinic: clinicId,
@@ -286,9 +130,19 @@ const AppointmentForm = () => {
 
         }
         dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
+        reset()
         console.log({ payload })
     }
+    useEffect(() => {
+        if (getAppointment === 201) {
+            reset();
 
+        }
+    }, [getAppointment])
+
+    const handleDeleteAll = () =>{
+        reset();
+    }
 
     return (
         <div>
@@ -300,10 +154,12 @@ const AppointmentForm = () => {
                             <div style={{ position: "relative" }}>
                                 <Form.Control
                                     as="select"
+                                    data-has-value={!!watch('patient')}
+                                    className=''
                                     {...register("patient", { required: "Patient is required" })}
                                     style={{ paddingRight: "40px" }}
                                 >
-                                    <option value="" >
+                                    <option className='testing_select' value="" hidden>
                                         Select Patient
                                     </option>
                                     {patientsData &&
@@ -324,21 +180,24 @@ const AppointmentForm = () => {
                                         cursor: "pointer",
                                         color: "#007bff",
                                         fontSize: "20px",
-                                    }}
+                             }}
                                     onClick={handlePlusIconClick}
                                 />
                             </div>
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="patient">
+                        <Form.Group className="mb-1" controlId="doctorName">
                             <Form.Label className="mb-0">Select Doctor</Form.Label>
                             <div>
                                 <Form.Control
                                     as="select"
+                                    className='form-select'
+                                    data-has-value={!!watch('doctorName')}
+
                                     {...register("doctorName", { required: "Doctor is required" })}
                                 >
-                                    <option value="">Select Doctor</option>
+                                    <option value="" hidden>Select Doctor</option>
                                     {doctorDetails?.map((doctor) => (
                                         <option key={doctor?._id} value={doctor?._id}>
                                             {doctor?.userDetails?.firstName} {doctor?.userDetails?.lastName}
@@ -352,62 +211,73 @@ const AppointmentForm = () => {
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="office">
                             <Form.Label className="mb-0">Office</Form.Label>
-                            <Form.Control as="select" {...register("office",
-                                // { required: "Office is required" }
-                            )}>
-                                <option value="">Select Office</option>
+                            <Form.Control as="select"
+                                data-has-value={!!watch('office')}
+
+                                className='form-select' {...register("office",
+                                    { required: "Office is required" }
+                                )}>
+                                <option value="" hidden>Select Office</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
                                 <option value="4">4</option>
                             </Form.Control>
-                            {/* {errors.office && <p className="text-danger">{errors.office.message}</p>} */}
+                            {errors.office && <p className="text-danger">{errors.office.message}</p>}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="reason">
                             <Form.Label className="mb-0">Reason</Form.Label>
                             <Form.Control
+                                data-has-value={!!watch('reason')}
+                                placeholder='Reason'
                                 type="text"
                                 {...register("reason",
-                                    //  { required: "Reason is required" }
+                                    { required: "Reason is required" }
                                 )}
                             />
-                            {/* {errors.reason && <p className="text-danger">{errors.reason.message}</p>} */}
+                            {errors.reason && <p className="text-danger">{errors.reason.message}</p>}
                         </Form.Group>
                     </Col>
                     <Col sm={6} className="d-flex gap-2">
                         <Form.Group className="mb-1" style={{ width: "150px" }} controlId="scheduled">
                             <Form.Label className="mb-0">Scheduled</Form.Label>
                             <Form.Control
+                                className=''
+                                data-has-value={!!watch('scheduled')}
                                 type="date"
                                 {...register("scheduled",
-                                    // { required: "Scheduled date is required" }
+                                    { required: "Scheduled date is required" }
                                 )}
                             />
-                            {/* {errors.scheduled && <p className="text-danger">{errors.scheduled.message}</p>} */}
+                            {errors.scheduled && <p className="text-danger">{errors.scheduled.message}</p>}
                         </Form.Group>
                         <Form.Group className="mb-1" style={{ width: "100px" }} controlId="starttime">
                             <Form.Label className="mb-0">Start Time</Form.Label>
                             <Form.Control
                                 type="time"
+                                data-has-value={!!watch('starttime')}
                                 {...register("startTime",
-                                    //  { required: "Time is required" }
+                                    { required: "Time is required" }
                                 )}
                             />
-                            {/* {errors.time && <p className="text-danger">{errors.time.message}</p>} */}
+                            {errors.time && <p className="text-danger">{errors.time.message}</p>}
                         </Form.Group>
 
                         <div className="d-flex">
                             <Form.Group className="mb-1" style={{ width: "100px" }} controlId="duration">
                                 <Form.Label className="mb-0">Duration</Form.Label>
                                 <Form.Control
+                                    data-has-value={!!watch('duration')}
+
+                                    className=""
                                     type="number"
                                     {...register("duration",
-                                        // { required: "Duration is required" }
+                                        { required: "Duration is required" }
                                     )}
                                 />
-                                {/* {errors.duration && <p className="text-danger">{errors.duration.message}</p>} */}
+                                {errors.duration && <p className="text-danger">{errors.duration.message}</p>}
                             </Form.Group>
                             <span className="text-secondary fs-6 fw-bold mt-3 pt-1 ps-2">minutes</span>
                         </div>
@@ -415,14 +285,18 @@ const AppointmentForm = () => {
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="profile">
                             <Form.Label className="mb-0">Profile</Form.Label>
-                            <Form.Control as="select" {...register("profile",
-                                // { required: "Profile is required" }
-                            )}>
-                                <option value="">Select Profile</option>
+                            <Form.Control
+                                data-has-value={!!watch('profile')}
+
+                                className="form-select"
+                                as="select" {...register("profile",
+                                    { required: "Profile is required" }
+                                )}>
+                                <option value="" hidden>Select Profile</option>
                                 <option value="New Patient Visit">New Patient Visit</option>
                                 <option value="Followup Visit">Follow up Visit</option>
                             </Form.Control>
-                            {/* {errors.profile && <p className="text-danger">{errors.profile.message}</p>} */}
+                            {errors.profile && <p className="text-danger">{errors.profile.message}</p>}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
@@ -430,56 +304,62 @@ const AppointmentForm = () => {
                             <Form.Label className="mb-0">Consultation Room</Form.Label>
                             <Form.Control
                                 as="select"
+                                data-has-value={!!watch('consultationRoom')}
+                                className="form-select"
                                 {...register('consultationRoom',
-                                    //  { required: 'Consultation room is required' }
+                                    { required: 'Consultation room is required' }
                                 )}
                             >
-                                <option value="">Select Consultation Room</option>
+                                <option value="" hidden>Select Consultation Room</option>
                                 <option value="1">Room 1</option>
                                 <option value="2">Room 2</option>
                                 <option value="3">Room 3</option>
                                 <option value="4">Room 4</option>
                             </Form.Control>
-                            {/* {errors.consultationRoom && (
-              <p className="text-danger">{errors.consultationRoom.message}</p>
-            )} */}
+                            {errors.consultationRoom && (
+                                <p className="text-danger">{errors.consultationRoom.message}</p>
+                            )}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="consentForms">
+                        <Form.Group className="mb-1" >
                             <Form.Label className="mb-0">Consent Forms</Form.Label>
                             <Form.Control
                                 as="select"
+                                data-has-value={!!watch('consentForms')}
+                                className="form-select"
                                 {...register('consentForms',
-                                    // { required: 'Consent form selection is required' }
+                                    { required: 'Consent form selection is required' }
                                 )}
                             >
-                                <option value="">Select Consent Forms</option>
+                                <option value="" hidden>Select Consent Forms</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
                                 <option value="4">4</option>
                             </Form.Control>
-                            {/* {errors.consentForms && (
-              <p className="text-danger">{errors.consentForms.message}</p>
-            )} */}
+                            {errors.consentForms && (
+                                <p className="text-danger">{errors.consentForms.message}</p>
+                            )}
                         </Form.Group>
                     </Col>
                     <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="consentForms">
-                            <Form.Label className="mb-0">Status</Form.Label>
+                        <Form.Group className="mb-3">
+                            <Form.Label className="mb-1 ">Status</Form.Label>
                             <Form.Control
                                 as="select"
-                                {...register('status',
-                                    // { required: 'Consent form selection is required' }
-                                )}
+                                data-has-value={!!watch('status')}
+                                className="form-select"
+                                {...register('status', {
+                                    required: 'Status is required',
+                                })}
                             >
-                                <option value="">Status</option>
+                                <option value="" hidden>Select Status</option>
                                 <option value="Scheduled">Scheduled</option>
                                 <option value="Completed">Completed</option>
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Rescheduled">Rescheduled</option>
-                                <option value="Noshow'">No-Show</option>
+                                <option value="Noshow">No-Show</option>
                                 <option value="Arrived">Arrived</option>
                                 <option value="Checkedin">Checked In</option>
                                 <option value="Checkedinonline">Checked In Online</option>
@@ -487,18 +367,19 @@ const AppointmentForm = () => {
                                 <option value="Insession">In Session</option>
                                 <option value="Confirmed">Confirmed</option>
                                 <option value="Notconfirmed">Not Confirmed</option>
-                                <option value="Cancelled">Cancelled</option>
                             </Form.Control>
-                            {/* {errors.consentForms && (
-              <p className="text-danger">{errors.consentForms.message}</p>
-            )} */}
+                            {errors.status && (
+                                <p className="text-danger mt-1 text-sm">{errors.status.message}</p>
+                            )}
                         </Form.Group>
                     </Col>
+
                 </Row>
                 <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
                         <Button
                             className="custom-buttons"
+                            onClick={handleDeleteAll}
                         >
                             Delete
                         </Button>
@@ -511,6 +392,7 @@ const AppointmentForm = () => {
                         <Button
 
                             className="custom-buttons"
+                            type='submit'
                         >
                             Save
                         </Button>
@@ -540,7 +422,7 @@ const AppointmentForm = () => {
                            display: none; /* Chrome, Safari, and Edge */
                            }`}
                     </style>
-                    <div className="d-flex justify-content-between">
+                    {/* <div className="d-flex justify-content-between">
                        
                         <div className="d-flex">
                             {activeTab === "responsible" && (
@@ -552,19 +434,19 @@ const AppointmentForm = () => {
                                 </Button>
                             )}
 
-                            {/* <Button className="me-2">
+                            <Button className="me-2">
                                 Clear
                             </Button>
                             <Button className="me-2">
                                 Set Password
-                            </Button> */}
-                            {/* <Button className="cancel-button" onClick={() => navigate(-1)}>Back</Button> */}
+                            </Button>
+                            <Button className="cancel-button" onClick={() => navigate(-1)}>Back</Button>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="px-2">
                         {/* Form Section */}
-                        {activeTab === "personalDetails" && < NewPatient patientId= {patientId}/>}
+                        {activeTab === "personalDetails" && < NewPatient patientId={patientId} />}
                         {activeTab === "responsible" && <Responsiblle patientId={patientId} />}
                         {activeTab === "insurance" && <Insurance patientId={patientId} />}
                         {activeTab === "demographicDetails" && <Demographicdetails patientId={patientId} />}

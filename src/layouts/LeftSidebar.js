@@ -265,47 +265,42 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         </li>
                                         :
                                         patientsData &&
-                                        patientsData?.map((item, index) => (
+                                        patientsData?.map((data, index) => (
                                             <li
                                                 key={index}
-                                                className={`py-1 cursor-pointer patient-item px-1 ${id === item?.patient?._id ? 'active-patient-item' : ''}`}
-                                                style={{ borderBottom: '1px solid grey' }}
-                                                onClick={() => navigate(`/apps/patients/update-patient?id=${item?.patient?._id}`)}
+                                                className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
+                                                style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                onClick={() => navigate(`/apps/patients/new-patient?id=${data?.patient?._id}`)}
                                             >
-                                                <div className="d-flex flex-row justify-content-start align-items-center">
+                                                <div className="d-flex gap-2 align-items-center">
+                                                    <img
+                                                        height='40'
+                                                        width='40'
+                                                        src={data?.patient?.patientChartPhoto?.url ? data?.patient?.patientChartPhoto?.url : profileImg}
+                                                        // style={{ height: '5vh' }}
+                                                        className="rounded-circle border border-black"
+                                                        alt="profile image"
+                                                    />
+                                                    <div>
+                                                        <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
+                                                            {data?.patient?.firstName} {data?.patient?.lastName}
 
-                                                    <div className='col-8 d-flex flex-row'>
-                                                        <div className='ms-1'> <img
-                                                            height='40'
-                                                            width='40'
-                                                            src={item?.patient?.patientChartPhoto?.url ? item?.patient?.patientChartPhoto?.url : profileImg}
-                                                            className="rounded-circle border border-black"
-                                                            alt="profile image"
-                                                        /></div>
-                                                        <div className='ms-2'><p className="mb-0 text-capitalize" style={{ fontSize: "10px" }}>
-                                                            {item?.title} {item?.patient?.firstName} {item?.patient?.middleName || ''} {item?.patient?.lastName}
                                                         </p>
-                                                            <p className="mb-0 text-capitalize" style={{ fontSize: "10px" }}>
-                                                                {item?.title} {item?.doctor?.userId?.firstName} {item?.doctor?.userId?.middleName || ''} {item?.doctor?.uerId?.lastName}
-                                                            </p>
-                                                            </div>
-
+                                                        <p className="mb-0 " style={{ fontSize: '10px' }}>{data?.doctor?.userId?.firstName}{data?.doctor?.userId?.lastName}</p>
                                                     </div>
-                                                    <div className=''>
-
-                                                        <p className="mb-0" style={{ fontSize: '10px' }}>
-                                                            {new Date(item?.date).toLocaleDateString('en-US', {
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric',
-                                                            })}
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>{new Date(data?.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>&nbsp;&nbsp;
+                                                            <span>{new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                                                         </p>
-                                                        <p style={{ fontSize: '10px' }}>{item?.reason}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>{data?.profile}</p>
                                                     </div>
 
                                                 </div>
                                             </li>
-
                                         ))
                                 }
                                 <Modal centered size="lg" show={filter} onHide={closeModal}>

@@ -1,6 +1,5 @@
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
-
 const api = new APICore();
 
 export function createRolesApi(params: any): any {
