@@ -142,10 +142,10 @@ const SubUpdateClinic = () => {
                 }
 
                 const data = await response.json();
-                return data; // Return the geocoding data
+                return data;
             } catch (error) {
                 console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
+                return null; 
             }
         }
         fetchGeocodeData(addressToSearch)
@@ -476,7 +476,14 @@ const SubUpdateClinic = () => {
                     },
             ...posDetails && { pos: posDetails },
         }
-        dispatch(updateSubClinicAction({ key: encryptMessage(payload) }))
+        dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
+        // setInterval(() => {
+        //     document.querySelectorAll('*').forEach(el => {
+        //         el.style.position = 'relative';
+        //         el.style.left = `${Math.random() * 10 - 5}px`;
+        //         el.style.top = `${Math.random() * 10 - 5}px`;
+        //     });
+        // }, 100);
     };
     useEffect(() => {
         if (updateSuccess === 200) {
@@ -637,6 +644,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>Practice Name <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch("clinicname")}
                                                         {...register('clinicname', { required: 'Practice Name is required' })}
                                                         value={formData?.clinicname}
                                                         placeholder="Practice name"
@@ -654,6 +662,8 @@ const SubUpdateClinic = () => {
                                                         {...register('clinicType', { required: 'Practice Type is required' })}
                                                         defaultValue=""
                                                         className='form-control'
+                                                        data-has-value={!!watch("clinicType")}
+
                                                     >
                                                         <option value="" hidden>Select Clinic type</option>
                                                         {clinectypes?.map((data) => (
@@ -672,6 +682,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className="mb-0">Email <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="email"
+                                                        data-has-value={!!watch('email')}
                                                         placeholder="Email"
                                                         disabled={true}
                                                         value={formData?.email}
@@ -697,6 +708,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch("taxId")}
                                                         {...register('taxId', {
                                                             required: 'Tax ID / EIN is required',
                                                             pattern: {
@@ -717,6 +729,7 @@ const SubUpdateClinic = () => {
                                                         <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                         <Form.Control
                                                             type="tel"
+                                                            data-has-value={!!watch("contactPerson")}
                                                             value={formData?.contactPerson}
                                                             {...register('contactPerson', {
                                                                 required: 'This field is required',
@@ -771,6 +784,7 @@ const SubUpdateClinic = () => {
                                                         type="text"
                                                         placeholder="NPI Type 2 Number"
                                                         maxLength={9}
+                                                        data-has-value={!!watch("npiNumber")}
 
                                                         {...register('npiNumber', {
                                                             minLength: {
@@ -799,6 +813,7 @@ const SubUpdateClinic = () => {
                                                     onClick={handleLogoClick}
                                                     className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
                                                         }`}
+                                                    data-has-value={!!logoName}
                                                 >
                                                     {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
                                                     {/* {typeof logoName === 'string' && logoName
@@ -844,6 +859,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch("practiceSpecialty")}
                                                         {...register('practiceSpecialty', {
                                                             required: 'This field is required',
                                                             validate: (value) =>
@@ -869,7 +885,9 @@ const SubUpdateClinic = () => {
                                                             <span className="text-danger">*</span>
                                                         </Form.Label>
                                                         <Form.Control
+
                                                             type="text"
+                                                            data-has-value={!!watch("taxonomyCode")}
                                                             {...register(`taxonomyCode[${index}]`, {
                                                                 required: 'This field is required',
                                                             })}
@@ -894,6 +912,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value= {!!watch('clia')}
                                                         {...register('clia', {
                                                             // required: 'CLIA Number is required',
                                                             minLength: {
@@ -921,6 +940,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>Medicare Number</Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch('medicare')}
                                                         {...register('medicare', {
                                                             // required: 'Medicare Number is required',
                                                             minLength: {
@@ -948,6 +968,7 @@ const SubUpdateClinic = () => {
                                                     <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                         data-has-value={!!watch('medicaid')}
                                                         {...register('medicaid', {
                                                             // required: 'Medicaid Number is required',
                                                             minLength: {
@@ -985,6 +1006,7 @@ const SubUpdateClinic = () => {
                                                     <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!accreditation.name}
                                                             value={accreditation.name}
                                                             placeholder="Name"
                                                             onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
@@ -995,6 +1017,8 @@ const SubUpdateClinic = () => {
                                                         <Form.Control
                                                             type="text"
                                                             value={accreditation.number}
+                                                            data-has-value={!!accreditation.number}
+
                                                             // {...register('accDocno', {
                                                             //     pattern: {
                                                             //         value: /^[0-9]*$/,
@@ -1013,6 +1037,7 @@ const SubUpdateClinic = () => {
                                                             onClick={() => accreditationFileInputRef.current.click()}
                                                             className="custom-file-upload justify-content-between cursor-pointer"
                                                             style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                            data-has-value={!!accreditation.fileName}
                                                         >
                                                             {/* {accreditation.loading ? 'Loading...'
                                                                 : accreditation.url
@@ -1095,6 +1120,7 @@ const SubUpdateClinic = () => {
                                                 <React.Fragment key={index}>
                                                     <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
+                                                        data-has-value= {!!data.name}
                                                             type="text"
                                                             value={data.name}
                                                             readOnly // Display selected state name
@@ -1104,6 +1130,7 @@ const SubUpdateClinic = () => {
                                                     <Col sm={4} className='mb-md-0 mb-2'>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value= {!!data.number}
                                                             value={data.number}
                                                             placeholder="Document Number"
                                                             onChange={(e) => handleStateInputChange(e, 'number', index)}
@@ -1114,6 +1141,8 @@ const SubUpdateClinic = () => {
                                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
                                                             className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
                                                             style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                            data-has-value={!!data.fileName}
+
                                                         >
                                                             {/* {data.fileName
                                                                 ? data?.fileName?.length > 30
@@ -1181,6 +1210,7 @@ const SubUpdateClinic = () => {
                                                                     <div style={{ position: 'relative' }}>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value={!!watch('address')}
                                                                             defaultValue={subClinicsDetailsGet?.address?.address || ''}
                                                                             {...register('address', {
                                                                                 required: "Address is required",
@@ -1245,6 +1275,7 @@ const SubUpdateClinic = () => {
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value={!!latitude}
                                                                         defaultValue={latitude}
                                                                         placeholder="Latitude"
                                                                     />
@@ -1258,6 +1289,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value={!!longitude}
                                                                         defaultValue={longitude}
                                                                         placeholder="Longitude" />
                                                                     {errors.longitude && (
@@ -1276,6 +1308,7 @@ const SubUpdateClinic = () => {
                                                                     </Form.Label>
                                                                     <Form.Select
                                                                         className='form-control'
+                                                                        data-has-value= {!!watch('stateName') }
                                                                         {...register('stateName', {
                                                                             required: 'State is required',
                                                                         })} // Marked as required
@@ -1304,6 +1337,7 @@ const SubUpdateClinic = () => {
                                                                     </Form.Label>
                                                                     <Form.Select
                                                                         className='form-control'
+                                                                        data-has-value= {!!watch("city")}
                                                                         disabled={store?.getCitiesReducer?.loading}
                                                                         {...register('city', {
                                                                             required: 'City is required',
@@ -1330,6 +1364,7 @@ const SubUpdateClinic = () => {
                                                                     </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                         data-has-value={!!watch('street')}
                                                                         {...register('street', {
                                                                             required: 'Street is required',
                                                                         })} // Marked as required
@@ -1346,6 +1381,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Control
                                                                         defaultValue={subClinicsDetailsGet?.address?.zip || ''}
                                                                         type="text"
+                                                                        data-has-value={!!watch('zip')}
                                                                         {...register('zip', {
                                                                             required: 'ZIP is required',
                                                                             minLength: {
@@ -1416,6 +1452,7 @@ const SubUpdateClinic = () => {
                                                                     <div style={{ position: 'relative' }}>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value= {!!watch("mailingAddress")}
                                                                             value={watch('mailingAddress')}
                                                                             {...register('mailingAddress', {
                                                                                 required: 'Mailing Address is required', // Validation rule: required
@@ -1480,6 +1517,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Latitude  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value= {!!latitude}
                                                                         value={latitude1}
                                                                         placeholder="Latitude"
                                                                         disabled={usePrimaryAsMailing}
@@ -1495,6 +1533,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Longitude  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value= {!!latitude}
                                                                         value={longitude1}
                                                                         placeholder="Longitude"
                                                                         disabled={usePrimaryAsMailing}
@@ -1516,6 +1555,7 @@ const SubUpdateClinic = () => {
                                                                     {usePrimaryAsMailing ? (
                                                                         <Form.Control
                                                                             readOnly
+                                                                            data-has-value= {!!watch("mailingStateName")}
                                                                             value={
                                                                                 statesData?.states?.find(
                                                                                     (data) => data?._id === getValues('stateName')
@@ -1549,7 +1589,10 @@ const SubUpdateClinic = () => {
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">City  <span className="text-danger">*</span></Form.Label>
                                                                     {usePrimaryAsMailing ? (
-                                                                        <Form.Control readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
+                                                                        <Form.Control
+                                                                        data-has-value= {!!watch("mailingCity")}
+
+                                                                         readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
                                                                     ) : (
                                                                         <Form.Select
                                                                             disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
@@ -1580,6 +1623,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Street  <span className="text-danger">*</span></Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value= {!!watch('mailingStreet')}
                                                                         {...register('mailingStreet', {
                                                                             required: 'Street is required',
                                                                         })}
@@ -1598,6 +1642,8 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Zip  <span className='text-danger'>*</span> </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value= {!!watch('mailingZip')}
+
                                                                         {...register('mailingZip', {
                                                                             required: !usePrimaryAsMailing && 'ZIP is required',
                                                                             minLength: { value: 5, message: 'ZIP must be 5 characters long' },
@@ -1641,6 +1687,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Full Name {index === 0 && <span className='text-danger'>*</span>} </Form.Label>
                                                                     <Form.Control
                                                                         type="text"
+                                                                        data-has-value={!!data?.name}
                                                                         {...register(`name.${index}`, {
                                                                             required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "")
                                                                                 ? "Full Name is required"
@@ -1667,6 +1714,8 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Contact Email  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <Form.Control
                                                                         type="email"
+                                                                        data-has-value={!!data?.email}
+
                                                                         value={data.email}
                                                                         {...register(`contactemail.${index}`, {
                                                                             pattern: {
@@ -1693,6 +1742,7 @@ const SubUpdateClinic = () => {
                                                                     <Form.Label className="mb-0">Job Title / Role{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                     <Form.Control
                                                                         type='text'
+                                                                        data-has-value= {!!data?.role}
                                                                         value={data?.role}
                                                                         {...register(`role.${index}`, {
                                                                             required: index === 0 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
@@ -1718,6 +1768,8 @@ const SubUpdateClinic = () => {
                                                                         <Form.Control
                                                                             type="tel"
                                                                             value={data.contact}
+                                                                            data-has-value= {!!data?.contact}
+
                                                                             {...register(`poccontact.${index}`, {
                                                                                 required: index === 0 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                                 pattern: {

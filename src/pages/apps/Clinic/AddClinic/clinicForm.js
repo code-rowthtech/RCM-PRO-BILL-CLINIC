@@ -608,6 +608,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>Practice Name <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('clinicname')}
+
                                         {...register('clinicname', {
                                             required: 'This field is required',
                                             validate: (value) =>
@@ -628,6 +630,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>Practice type <span className='text-danger'>*</span></Form.Label>
                                     <Form.Select
                                         className='form-control'
+                                        data-has-value={!!watch('clinicType')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}
                                     >
@@ -645,6 +648,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Control
                                         disabled={true}
                                         type="text"
+                                        data-has-value={!!watch('email')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.email : ''}
                                         {...register('email', {
                                             required: 'This field is required',
@@ -674,6 +678,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         type="text"
                                         maxLength={10} // Includes the hyphen
                                         placeholder="Tax ID / EIN"
+                                        data-has-value={!!watch('taxId')}
                                         value={
                                             getValues('taxId')?.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2$3') || '' // Format the value if necessary
                                         }
@@ -714,10 +719,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         </InputGroup.Text> {/* Prefix */}
                                         <Form.Control
                                             type="tel"
+                                            data-has-value={!!watch('contact')}
                                             {...register('contact', {
                                                 required: 'This field is required',
                                                 pattern: {
-                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, 
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/,
                                                     message: 'Contact must be in the format (XXX)XXX-XXXX',
                                                 },
                                                 maxLength: {
@@ -731,8 +737,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             }
                                             )}
                                             onChange={(e) => {
-                                                let rawValue = e.target.value.replace(/\D/g, ''); 
-                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); 
+                                                let rawValue = e.target.value.replace(/\D/g, '');
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
                                                 const formattedValue = rawValue.replace(
                                                     /(\d{1,3})(\d{0,3})(\d{0,4})/,
                                                     (match, p1, p2, p3) => {
@@ -740,9 +746,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         if (p2) return `(${p1})${p2}`;
                                                         return `(${p1}`;
                                                     }
-                                                ); 
-                                                e.target.value = formattedValue; 
-                                                clearErrors('phone'); 
+                                                );
+                                                e.target.value = formattedValue;
+                                                clearErrors('phone');
                                             }}
                                             placeholder="(123)456-7890"
                                             maxLength={14}
@@ -773,6 +779,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('npi')}
                                         {...register('npi', {
                                             minLength: {
                                                 value: 10,
@@ -802,6 +809,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     onClick={handleLogoClick}
                                     className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
                                         }`}
+                                    data-has-value={!!logoName}
                                 >
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
                                     {/* {typeof logoName === 'string' && logoName
@@ -850,6 +858,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('practiceSpecialty')}
+
                                         {...register('practiceSpecialty', {
                                             required: 'This field is required',
                                             validate: (value) => {
@@ -889,6 +899,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             </Form.Label>
                                             <Form.Control
                                                 type="text"
+                                                data-has-value={!!watch('taxonomyCode')}
                                                 {...register(`taxonomyCode[${index}]`, {
                                                     required: 'This field is required',
                                                     validate: (value) =>
@@ -922,6 +933,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('clia')}
+
                                         {...register('clia', {
                                             // required: 'CLIA Number is required',
                                             minLength: {
@@ -948,6 +961,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>Medicare Number </Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('medicare')}
                                         {...register('medicare', {
                                             // required: 'Medicare Number is required',
                                             minLength: {
@@ -976,6 +990,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                     <Form.Control
                                         type="text"
+                                        data-has-value={!!watch('medicaid')}
                                         {...register('medicaid', {
                                             // required: 'Medicaid Number is required',
                                             minLength: {
@@ -1012,6 +1027,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <React.Fragment key={index}>
                                     <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
+                                            data-has-value={!!accreditation?.name}
                                             type="text"
                                             value={accreditation?.name || ''}
                                             placeholder="Name"
@@ -1021,6 +1037,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
                                             type="text"
+                                            data-has-value={!!accreditation?.number}
                                             value={accreditation?.number}
                                             // {...register('accDocno', {
                                             //     pattern: {
@@ -1039,6 +1056,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onClick={(e) => document.getElementById(`fileInput-accreditation=${index}`).click()}
                                             className="custom-file-upload justify-content-between cursor-pointer d-flex align-items-center form-control"
                                             style={{ paddingTop: '6px', paddingBottom: '6px', border: '1px solid #ddd', borderRadius: '5px', backgroundColor: '#f9f9f9' }}
+                                            data-has-value={!!accreditation?.fileName}
                                         >
                                             <span style={{ flex: 1 }} className=''>
                                                 {
@@ -1083,7 +1101,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             style={{ right: '-2%', top: '20%' }}
                                             className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                         >
-                                            &#x2716;
+                                           
                                         </span>
                                     </Col>
 
@@ -1122,6 +1140,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <React.Fragment key={index}>
                                     <Col sm={4} className='mb-md-0 mb-2'>
                                         <Form.Control
+                                            data-has-value={!!data.name}
                                             type="text"
                                             value={data.name}
                                             readOnly // Display selected state name
@@ -1132,6 +1151,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Control
                                             type="text"
                                             value={data.number}
+                                            data-has-value={!!data.number}
                                             placeholder="Document Number"
                                             onChange={(e) => handleStateInputChange(e, 'number', index)}
                                         />
@@ -1141,6 +1161,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
                                             className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
                                             style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                            data-has-value={!!data.fileName}
                                         >
                                             {stateLogoUpload
                                                 ? 'Uploading...'
@@ -1195,6 +1216,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">Primary Address  <span className="text-danger">*</span></Form.Label>
                                                     <div style={{ position: 'relative' }}>
                                                         <Form.Control
+                                                            data-has-value={!!watch('address')}
                                                             type="text"
                                                             defaultValue={updatePage ? clinicDataToUpdate?.address?.address : ''}
                                                             {...register('address', { required: "Primary Address is required" })}
@@ -1255,8 +1277,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Latitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!latitude}
                                                         defaultValue={latitude}
                                                         placeholder="Latitude"
+
                                                     />
                                                     {errors.latitude && (
                                                         <span className="text-danger">{errors.latitude.message}</span>
@@ -1268,6 +1292,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!longitude}
                                                         defaultValue={longitude}
                                                         placeholder="Longitude" />
                                                     {errors.longitude && (
@@ -1286,6 +1311,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         className='form-control'
                                                         {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
+                                                        data-has-value={!!watch('stateName')}
+
                                                     >
                                                         <option value='' hidden>State</option>
                                                         {statesData?.states?.map((data) => (
@@ -1302,17 +1329,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <span className="text-danger">{errors.stateName.message}</span>
                                                     )}
                                                 </Form.Group>
-
                                             </Col>
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0'>City <span className="text-danger">*</span></Form.Label>
                                                     <Form.Select
                                                         className='form-control'
+                                                        data-has-value={!!watch('city')}
+
                                                         disabled={store?.getCitiesReducer?.loading}
                                                         {...register("city", { required: "City is required" })}
                                                     >
-                                                        <option value=''hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                        <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                         {cities1?.map((data) => (
                                                             <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
 
@@ -1325,12 +1353,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     )}
                                                 </Form.Group>
                                             </Col>
-
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0'>Street <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch('street')}
+
                                                         {...register('street', {
                                                             required: "Street is required",
                                                         })}
@@ -1346,6 +1375,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Control
                                                         defaultValue={updatePage ? clinicDataToUpdate?.address?.zip : ''}
                                                         type="text"
+                                                        data-has-value={!!watch('zip')}
+
                                                         {...register('zip', {
                                                             required: 'Zip is requried',
                                                             minLength: {
@@ -1374,12 +1405,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={12} className="mb-0">
                                         <span className="text-black fw-semibold form-label">Mailing Address Details </span>
                                     </Col>
-
                                     {/* Checkbox for using primary address */}
                                     <Col sm={12} className="mb-1">
                                         <Form.Check
                                             type="checkbox"
                                             style={{ cursor: "pointer", color: "#6c757d" }}
+
                                             label="Same as Primary Address"
                                             // disabled={!getValues('zip')}
                                             checked={usePrimaryAsMailing}
@@ -1415,6 +1446,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">Mailing Address <span className="text-danger">*</span></Form.Label>
                                                     <div style={{ position: 'relative' }}>
                                                         <Form.Control
+                                                            data-has-value={!!watch('mailingAddress')}
                                                             type="text"
                                                             value={watch('mailingAddress')}
                                                             {...register('mailingAddress', {
@@ -1478,7 +1510,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     )}
                                                 </Form.Group>
                                             </Col>
-
                                             {/* Latitude and Longitude */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
@@ -1486,6 +1517,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Control
                                                         type="text"
                                                         value={latitude1}
+                                                        data-has-value={!!latitude1}
                                                         placeholder="Latitude"
                                                         readOnly
                                                         defaultValue={latitude1}
@@ -1495,12 +1527,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     )}
                                                 </Form.Group>
                                             </Col>
-
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
                                                     <Form.Label className="mb-0">Longitude <span className="text-danger">*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!longitude1}
                                                         value={longitude1}
                                                         placeholder="Longitude"
                                                         readOnly
@@ -1523,6 +1555,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">State <span className="text-danger">*</span></Form.Label>
                                                     {usePrimaryAsMailing ? (
                                                         <Form.Control
+                                                        data-has-value={!!watch('mailingStateName')}
                                                             readOnly
                                                             value={
                                                                 statesData?.states?.find(
@@ -1532,6 +1565,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         />
                                                     ) : (
                                                         <Form.Select
+
                                                             {...register('mailingStateName', {
                                                                 required: 'State is required',
                                                             })}
@@ -1558,6 +1592,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">City <span className="text-danger">*</span></Form.Label>
                                                     {usePrimaryAsMailing ? (
                                                         <Form.Control
+                                                        data-has-value={!!watch('mailingCity')}
                                                             readOnly
                                                             value={cities1 && cities1?.find((data) => data?._id === getValues('city'))?.name || ''}
                                                         />
@@ -1583,9 +1618,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     )}
                                                 </Form.Group>
                                             </Col>
-
-
-
                                             {/* Street */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
@@ -1593,6 +1625,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         Street <span className="text-danger">*</span>
                                                     </Form.Label>
                                                     <Form.Control
+                                                        data-has-value={!!watch('mailingStreet')}
                                                         type="text"
                                                         {...register('mailingStreet', {
                                                             required: 'Street is required',
@@ -1605,14 +1638,13 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     )}
                                                 </Form.Group>
                                             </Col>
-
-
                                             {/* ZIP */}
                                             <Col sm={6}>
                                                 <Form.Group className="mb-2">
                                                     <Form.Label className="mb-0">Zip <span className='text-danger'>*</span></Form.Label>
                                                     <Form.Control
                                                         type="text"
+                                                        data-has-value={!!watch('mailingZip')}
                                                         {...register('mailingZip', {
                                                             required: !usePrimaryAsMailing && 'ZIP is required',
                                                             minLength: { value: 5, message: 'ZIP must be 5 characters long' },
@@ -1659,6 +1691,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Control
                                                         type="text"
                                                         value={data?.name}
+                                                        data-has-value={!!data?.name}
                                                         {...register(`name.${index}`, {
                                                             required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "") ? 'Full Name is required' : false,
 
@@ -1684,6 +1717,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Control
                                                         type="email"
                                                         value={data?.email}
+                                                        data-has-value={!!data?.email}
                                                         {...register(`contactemail.${index}`, {
                                                             pattern: {
                                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -1713,6 +1747,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Control
                                                         type="text"
                                                         value={data?.role}
+                                                        data-has-value={!!data?.role}
                                                         {...register(`role.${index}`, {
                                                             required: index !== 1 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
 
@@ -1744,6 +1779,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <Form.Control
                                                             type="tel"
                                                             value={data.contact}
+                                                            data-has-value={!!data?.contact}
                                                             {...register(`poccontact.${index}`, {
                                                                 required: index !== 1 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                 pattern: {
@@ -1815,7 +1851,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     }
                                 </Button>
                             </Col>
-                           
+
                         </Row >
                     </Form >
                     <Row className='mt-2'>

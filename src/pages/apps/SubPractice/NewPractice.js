@@ -655,6 +655,8 @@ const NewPractice = () => {
                                                         <Form.Label className='mb-0'>Practice Name <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!watch('clinicname')}
+
                                                             {...register('clinicname', { required: 'Practice Name is required' })}
                                                             onChange={(e) => formDataChange('clinicname', e.target.value)}
                                                             value={formData?.clinicname}
@@ -670,6 +672,8 @@ const NewPractice = () => {
                                                             Practice type <span className="text-danger">*</span>
                                                         </Form.Label>
                                                         <Form.Select
+                                                            data-has-value={!!watch('clinicType')}
+
                                                             {...register('clinicType', { required: 'Practice Type is required' })}
                                                             onChange={(e) => formDataChange('clinicType', e.target.value)}
                                                             className='form-control'
@@ -692,6 +696,7 @@ const NewPractice = () => {
                                                         <Form.Label className="mb-0">Email <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="email"
+                                                            data-has-value={!!watch('email')}
                                                             placeholder="Email"
                                                             value={formData?.email}
                                                             {...register('email', {
@@ -710,6 +715,8 @@ const NewPractice = () => {
                                                     <Form.Group className="mb-1">
                                                         <Form.Label className='mb-0'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
+                                                            data-has-value={!!watch('taxId')}
+
                                                             type="text"
                                                             {...register('taxId', {
                                                                 required: 'Tax ID / EIN is required',
@@ -731,6 +738,7 @@ const NewPractice = () => {
                                                             <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
                                                             <Form.Control
                                                                 type="tel"
+                                                                data-has-value={!!watch('contactPerson')}
                                                                 // value={formData?.contactPerson}
                                                                 {...register('contactPerson', {
                                                                     required: 'This field is required',
@@ -786,7 +794,7 @@ const NewPractice = () => {
                                                             type="text"
                                                             placeholder="NPI Type 2 Number"
                                                             maxLength={9}
-
+                                                            data-has-value={!!watch('npiNumber')}
                                                             {...register('npiNumber', {
                                                                 minLength: {
                                                                     value: 9,
@@ -813,6 +821,8 @@ const NewPractice = () => {
                                                     <div
                                                         onClick={handleLogoClick}
                                                         className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'}`}
+                                                        data-has-value={!!logoName}
+
                                                     >
                                                         {/* {
                                                             logoUploading
@@ -863,6 +873,7 @@ const NewPractice = () => {
                                                         <Form.Label className='mb-0'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!watch('practiceSpecialty')}
                                                             {...register('practiceSpecialty', {
                                                                 required: 'This field is required',
                                                                 validate: (value) =>
@@ -873,38 +884,6 @@ const NewPractice = () => {
                                                         {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
                                                     </Form.Group>
                                                 </Col>
-                                                {/* {taxonomyCodes && taxonomyCodes.map((code, index) => (
-                                                    <Col sm={3} key={index}>
-                                                        <Form.Group className="mb-1">
-                                                            <Form.Label className="mb-0">
-                                                                Taxonomy Code(s)
-                                                                {index === taxonomyCodes.length - 1 && (
-                                                                    <span
-                                                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                                        onClick={handleAddTaxonomy}
-                                                                    >
-                                                                    </span>
-                                                                )}
-                                                                <span className="text-danger">*</span>
-                                                            </Form.Label>
-                                                            <Form.Control
-                                                                type="text"
-                                                                {...register(`taxonomyCode[${index}]`, {
-                                                                    required: 'This field is required',
-                                                                })}
-                                                                placeholder="Taxonomy Code"
-                                                                maxLength={10}
-                                                                onKeyUp={(event) => handleFirstSpace(event, index)}
-                                                                onChange={(e) => {
-                                                                    handleTaxonomyChange(index, e.target.value)
-                                                                }}
-                                                            />
-                                                            {errors.taxonomyCode?.[index] && (
-                                                                <span className="text-danger">{errors.taxonomyCode[index].message}</span>
-                                                            )}
-                                                        </Form.Group>
-                                                    </Col>
-                                                ))} */}
                                                 {taxonomyCodes.map((code, index) => (
                                                     <Col sm={3} key={index}>
                                                         <Form.Group className="mb-2 position-relative" style={{ minHeight: '80px' }}>
@@ -920,6 +899,8 @@ const NewPractice = () => {
                                                                 <span className="text-danger">*</span>
                                                             </Form.Label>
                                                             <Form.Control
+                                                                data-has-value={!!watch('taxonomyCode')}
+
                                                                 type="text"
                                                                 {...register(`taxonomyCode[${index}]`, {
                                                                     required: 'This field is required'
@@ -950,6 +931,7 @@ const NewPractice = () => {
                                                         <Form.Label className='mb-0'>CLIA Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!watch('clia')}
                                                             {...register('clia', {
                                                                 // required: 'CLIA Number is required',
                                                                 minLength: {
@@ -977,6 +959,8 @@ const NewPractice = () => {
                                                         <Form.Label className='mb-0'>Medicare Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!watch('medicare')}
+
                                                             {...register('medicare', {
                                                                 // required: 'Medicare Number is required',
                                                                 minLength: {
@@ -1003,6 +987,7 @@ const NewPractice = () => {
                                                         <Form.Label className='mb-0'>Medicaid Number </Form.Label>
                                                         <Form.Control
                                                             type="text"
+                                                            data-has-value={!!watch('medicaid')}
                                                             {...register('medicaid', {
                                                                 // required: 'Medicaid Number is required',
                                                                 minLength: {
@@ -1040,6 +1025,7 @@ const NewPractice = () => {
                                                         <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
+                                                                data-has-value={!!accreditation.name}
                                                                 value={accreditation.name}
                                                                 placeholder="Name"
                                                                 // onKeyPress={handleFirstSpace}
@@ -1051,6 +1037,7 @@ const NewPractice = () => {
                                                         <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
+                                                                data-has-value={!!accreditation.number}
                                                                 value={accreditation.number}
                                                                 // {...register('accDocno', {
                                                                 //     pattern: {
@@ -1069,6 +1056,7 @@ const NewPractice = () => {
                                                                 onClick={() => accreditationFileInputRef.current.click()}
                                                                 className="custom-file-upload justify-content-between cursor-pointer form-control"
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                                data-has-value={!!accreditation?.fileName}
                                                             >
                                                                 <span style={{ flex: 1 }} >
                                                                     {
@@ -1150,6 +1138,7 @@ const NewPractice = () => {
                                                         <Col sm={4} className='mb-md-0 mb-2'>
                                                             <Form.Control
                                                                 type="text"
+                                                                data-has-value={!!data.name}
                                                                 value={data.name}
                                                                 readOnly // Display selected state name
                                                                 placeholder="State"
@@ -1159,6 +1148,7 @@ const NewPractice = () => {
                                                             <Form.Control
                                                                 type="text"
                                                                 value={data.number}
+                                                                data-has-value={!!data.number}
                                                                 placeholder="Document Number"
                                                                 onChange={(e) => handleStateInputChange(e, 'number', index)}
                                                             />
@@ -1168,6 +1158,7 @@ const NewPractice = () => {
                                                                 onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
                                                                 className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
                                                                 style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                                data-has-value={!!data.fileName}
                                                             >
                                                                 {stateLogoUpload
                                                                     ? 'Uploading...'
@@ -1224,6 +1215,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <div style={{ position: 'relative' }}>
                                                                             <Form.Control
+                                                                                data-has-value={!!watch('address')}
                                                                                 type="text"
                                                                                 defaultValue={clinicsDataGet?.address?.address || ''}
                                                                                 {...register('address', {
@@ -1290,6 +1282,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value={!!latitude}
                                                                             defaultValue={latitude}
                                                                             placeholder="Latitude"
                                                                         />
@@ -1305,6 +1298,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value={!!longitude}
                                                                             defaultValue={longitude}
                                                                             placeholder="Longitude" />
                                                                         {errors.longitude && (
@@ -1322,6 +1316,8 @@ const NewPractice = () => {
                                                                             State <span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
+                                                                            data-has-value={!!watch('stateName')}
+
                                                                             className='form-control'
                                                                             {...register('stateName', {
                                                                                 required: 'State is required',
@@ -1350,6 +1346,7 @@ const NewPractice = () => {
                                                                             City<span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Select
+                                                                            data-has-value={!!watch('city')}
                                                                             className='form-control'
                                                                             disabled={store?.getCitiesReducer?.loading}
                                                                             {...register('city', {
@@ -1376,6 +1373,7 @@ const NewPractice = () => {
                                                                             Street <span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Control
+                                                                            data-has-value={!!watch("street")}
                                                                             type="text"
                                                                             {...register('street', {
                                                                                 required: 'Street is required',
@@ -1393,6 +1391,7 @@ const NewPractice = () => {
                                                                             Zip<span className='text-danger'>*</span>
                                                                         </Form.Label>
                                                                         <Form.Control
+                                                                            data-has-value={!!watch("zip")}
                                                                             defaultValue={clinicsDataGet?.address?.zip || ''}
                                                                             type="text"
                                                                             {...register('zip', {
@@ -1427,7 +1426,7 @@ const NewPractice = () => {
                                                         <Col sm={12} className="mb-1">
                                                             <Form.Check
                                                                 type="checkbox"
-                                                                style={{ cursor: "pointer", color: "#6c757d" }}
+                                                                style={{ cursor: "pointer", color: "#6c757d",backgroundColor:'' }}
                                                                 label="Same as Primary Address"
                                                                 // disabled={!getValues('')}
                                                                 checked={usePrimaryAsMailing}
@@ -1464,6 +1463,8 @@ const NewPractice = () => {
                                                                         <Form.Label className="mb-0">Mailing Address <span className='text-danger'>*</span></Form.Label>
                                                                         <div style={{ position: 'relative' }}>
                                                                             <Form.Control
+                                                                                data-has-value={!!watch("mailingAddress")}
+
                                                                                 type="text"
                                                                                 value={watch('mailingAddress')}
                                                                                 {...register('mailingAddress', {
@@ -1533,6 +1534,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value={!!latitude}
                                                                             value={latitude1}
                                                                             placeholder="Latitude"
                                                                             disabled={usePrimaryAsMailing}
@@ -1550,6 +1552,7 @@ const NewPractice = () => {
                                                                             Longitude <span className="text-danger">*</span>
                                                                         </Form.Label>
                                                                         <Form.Control
+                                                                        data-has-value={!!longitude}
                                                                             type="text"
                                                                             value={longitude1}
                                                                             placeholder="Longitude"
@@ -1572,6 +1575,7 @@ const NewPractice = () => {
                                                                         <Form.Label className="mb-0" value=''>State <span className='text-danger'>*</span></Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control
+                                                                            data-has-value={!!watch("mailingStateName")}
                                                                                 readOnly
                                                                                 value={
                                                                                     statesData?.states?.find(
@@ -1609,6 +1613,7 @@ const NewPractice = () => {
                                                                         </Form.Label>
                                                                         {usePrimaryAsMailing ? (
                                                                             <Form.Control
+                                                                            data-has-value={!!watch("mailingCity")}
                                                                                 readOnly
                                                                                 value={
                                                                                     cities &&
@@ -1646,6 +1651,7 @@ const NewPractice = () => {
                                                                         <Form.Label className="mb-0">Street <span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value= {!!watch("mailingStreet")}
                                                                             {...register('mailingStreet', {
                                                                                 required: 'Street is required',
                                                                             })}
@@ -1662,6 +1668,8 @@ const NewPractice = () => {
                                                                         <Form.Label className="mb-0">Zip <span className='text-danger'>*</span></Form.Label>
                                                                         <Form.Control
                                                                             type="text"
+                                                                            data-has-value= {!!watch("mailingZip")}
+
                                                                             {...register('mailingZip', {
 
                                                                                 minLength: { value: 5, message: 'ZIP must be 5 characters long' },
@@ -1705,6 +1713,7 @@ const NewPractice = () => {
                                                                     <Form.Group className="mb-1">
                                                                         <Form.Label className="mb-0">Full Name  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
                                                                         <Form.Control
+                                                                             data-has-value={!!data?.name}
                                                                             type="text"
                                                                             {...register(`name.${index}`, {
                                                                                 required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "") ? 'Full Name is required' : false,
@@ -1731,6 +1740,7 @@ const NewPractice = () => {
                                                                         <Form.Control
                                                                             type="email"
                                                                             value={data?.email}
+                                                                            data-has-value={!!data?.email}
                                                                             {...register(`contactemail.${index}`, {
                                                                                 pattern: {
                                                                                     value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -1758,6 +1768,7 @@ const NewPractice = () => {
                                                                         <Form.Control
                                                                             type='text'
                                                                             value={data?.role}
+                                                                            data-has-value={!!data.role}
                                                                             {...register(`role.${index}`, {
                                                                                 required: index === 0 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
                                                                                 onChange: (e) => {
@@ -1782,6 +1793,7 @@ const NewPractice = () => {
                                                                             <Form.Control
                                                                                 type="tel"
                                                                                 value={data.contact}
+                                                                                data-has-value={!!data.contact}
                                                                                 {...register(`poccontact.${index}`, {
                                                                                     required: index === 0 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
                                                                                     pattern: {
