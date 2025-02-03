@@ -3,7 +3,7 @@ import { Button, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Select from 'react-select';
 import { createPatientsAction, updatePatientsAction, getPatientByIdAction, getResponsiblePartyAction, getPatientsAction } from "../../../../redux/patients/actions";
-import { createAppointmentAction, getCitiesAction, getDoctorsAction, getStatesByCountryAction, getSubClinicCitiesAction, stateEmptydAction } from "../../../../redux/actions";
+import { createAppointmentAction, getCitiesAction, getDoctorsAction, getStatesByCountryAction, getSubClinicCitiesAction, rescheduleAppointmentAction, stateEmptydAction } from "../../../../redux/actions";
 import { useForm } from "react-hook-form";
 import { FiUploadCloud } from 'react-icons/fi';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -18,6 +18,8 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { duration } from 'moment/moment';
 import PatientDetails from '../../Patients/UpdatePatient/PatientDetails';
 import NewPatient from '../../Patients/NewPatient';
+import { rescheduleAppointment } from '../../../../helpers/api/apiEndpoints';
+import Spinner from '../../../../constants/Spinner';
 
 
 
@@ -34,9 +36,10 @@ const AppointmentForm = () => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
-    const getAppointment = store?.createAppointmentReducer;
-    console.log(getAppointment, 'getAppointment')
+    const getAppointment = store?.createAppointmentReducer?.data?.appointment;
+    // console.log({ getAppointment })
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const appointmentDetails = store?.getAppointmentByIdReducer?.data?.data;
     const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -96,7 +99,6 @@ const AppointmentForm = () => {
     }, [dispatch, skip, search]);
 
     const patientsData = store?.getPatientsReducer?.data?.patients;
-    console.log('patientsData', patientsData)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     function addDurationToTime(time, duration) {
         let [hours, minutes] = time?.split(':').map(Number);
@@ -112,8 +114,22 @@ const AppointmentForm = () => {
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
+    useEffect(() => {
+        if (appointmentDetails && id) {
+            setValue('patient', appointmentDetails?.patient?._id)
+            setValue('doctorName', appointmentDetails?.doctor?._id)
+            setValue('reason', appointmentDetails?.reason)
+            setValue('consultationRoom', appointmentDetails?.examRoom)
+            setValue('duration', appointmentDetails?.duration)
+            setValue('startTime', appointmentDetails?.startTime)
+            setValue('profile', appointmentDetails?.profile)
+            setValue('status', appointmentDetails?.status)
+            setValue('scheduled', appointmentDetails?.date ? new Date(appointmentDetails?.date).toISOString().split('T')[0] : '')
+        }
+    }, [appointmentDetails, id])
     const onSubmit = (data) => {
         const payload = {
+            ...(id && appointmentDetails ? { id: id } : {}),
             patient: data.patient,
             clinic: clinicId,
             doctor: data?.doctorName,
@@ -129,23 +145,25 @@ const AppointmentForm = () => {
             slot: data?.startTime
 
         }
-        dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
-        reset()
-        console.log({ payload })
+        if (id && appointmentDetails) {
+            dispatch(rescheduleAppointmentAction({ id: id, key: encryptMessage(payload) }))
+        } else {
+            dispatch(createAppointmentAction({ key: encryptMessage(payload) }))
+        }
     }
     useEffect(() => {
         if (getAppointment === 201) {
             reset();
-
         }
     }, [getAppointment])
 
-    const handleDeleteAll = () =>{
+    const handleDeleteAll = () => {
         reset();
     }
 
     return (
         <div>
+
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row>
                     <Col sm={6}>
@@ -180,7 +198,7 @@ const AppointmentForm = () => {
                                         cursor: "pointer",
                                         color: "#007bff",
                                         fontSize: "20px",
-                             }}
+                                    }}
                                     onClick={handlePlusIconClick}
                                 />
                             </div>
@@ -215,7 +233,7 @@ const AppointmentForm = () => {
                                 data-has-value={!!watch('office')}
 
                                 className='form-select' {...register("office",
-                                    { required: "Office is required" }
+                                    // { required: "Office is required" }
                                 )}>
                                 <option value="" hidden>Select Office</option>
                                 <option value="1">1</option>
@@ -329,7 +347,7 @@ const AppointmentForm = () => {
                                 data-has-value={!!watch('consentForms')}
                                 className="form-select"
                                 {...register('consentForms',
-                                    { required: 'Consent form selection is required' }
+                                    // { required: 'Consent form selection is required' }
                                 )}
                             >
                                 <option value="" hidden>Select Consent Forms</option>
@@ -380,12 +398,14 @@ const AppointmentForm = () => {
                         <Button
                             className="custom-buttons"
                             onClick={handleDeleteAll}
+                            disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                         >
                             Delete
                         </Button>
                         <Button
                             type="submit"
                             className="custom-buttons"
+                            disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                         >
                             Save and close
                         </Button>
@@ -393,17 +413,21 @@ const AppointmentForm = () => {
 
                             className="custom-buttons"
                             type='submit'
+                            disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                         >
                             Save
                         </Button>
                         <Button
                             className="cancel-button"
+                            disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                         >
                             Cancel
                         </Button>
                     </Col>
                 </Row>
             </Form>
+
+
             <Modal show={showModal} onHide={handleCloseModal} size="xl" centered>
                 <Modal.Header className='py-0 px-2 ' closeButton>
                     <Modal.Title className='px-0 py-0'>Add New Patient</Modal.Title>

@@ -203,6 +203,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 status: activeTab,
                 search: search
             }
+            console.log({ payload })
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
     }
@@ -254,7 +255,10 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                         History
                                     </button>
                                 </div>
-                                {store?.getPatientsReducer?.loading ?
+                                <div className={`text-end text-white me-1 ${selectedDoctor ? '' : 'd-none'}`}>
+                                    <u className='cursor-pointer' onClick={() => setSelectedDoctor(null)}>Clear filters</u>
+                                </div>
+                                {store?.getPatientsByAppointmentReducer?.loading ?
                                     <div className='text-center my-5'>
                                         <Spinner color='white' />
                                     </div>

@@ -36,7 +36,6 @@ type VerticalLayoutState = {
 
 const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayoutState): React$Element<any> => {
     const dispatch = useDispatch();
-
     const { layoutColor, leftSideBarTheme, leftSideBarType, layoutWidth } = useSelector((state) => ({
         layoutColor: state.Layout.layoutColor,
         layoutWidth: state.Layout.layoutWidth,
@@ -115,7 +114,9 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                         {/* Logo with margin/padding adjustment */}
                         <div className="d-flex align-items-center ms-5 ps-1">
                             <span className="logo-lg">
-                                <img src={logo} alt="logo" height="18" />
+                                <Link to='/'>
+                                    <img src={logo} alt="logo" height="18" />
+                                </Link>
                             </span>
                         </div>
 

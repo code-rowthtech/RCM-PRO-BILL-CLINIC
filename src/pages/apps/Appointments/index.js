@@ -1,7 +1,7 @@
 // @flow
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
@@ -40,7 +40,6 @@ type OrderListProps = {
 const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     return (
         <Table responsive className="table-centered table-nowrap mb-0  rounded"
@@ -72,7 +71,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                             <td className='text-capitalize'>{data?.patient?.firstName}</td>
                             <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
                             <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
-                            <td className='text-capitalize'>{data?.purposeOfVisit}</td>
+                            <td className='text-capitalize'>{data?.reason || 'N/A'}</td>
                             <td>{data?.startTime} - {data?.endTime}</td>
                             <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
                             <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
@@ -192,8 +191,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <Col sm={8} className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col
-                                            xs={12} 
-                                            sm="auto" 
+                                            xs={12}
+                                            sm="auto"
                                             className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select"
                                         >
                                             <Select
@@ -217,13 +216,13 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     control: (provided) => ({
                                                         ...provided,
                                                         minHeight: '30px',
-                                                        height:'30px',
-                                                        width:'200px',
+                                                        height: '30px',
+                                                        width: '200px',
                                                         padding: '0px',
                                                         fontSize: '14px',
-                                                        border: '0px',          
-                                                        backgroundColor: '#E8F0FE!important',  
-                                                        boxShadow: 'none',        
+                                                        border: '0px',
+                                                        backgroundColor: '#E8F0FE!important',
+                                                        boxShadow: 'none',
                                                     }),
                                                     valueContainer: (provided) => ({
                                                         ...provided,
@@ -240,53 +239,53 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     placeholder: (provided) => ({
                                                         ...provided,
                                                         fontWeight: 600,
-                                                        color: '#0908084f', 
+                                                        color: '#0908084f',
                                                     }),
                                                 }}
                                             />
 
-                                         
 
 
 
-                                        {/* Additional controls shown only in the "Appointments" tab */}
-                                        {activeTab === 'appointments' && (
-                                            <>
-                                                <Button className="custom-buttons">
-                                                    <FiFilter className="fs-5" />
-                                                </Button>
-                                                <FormInput
-                                                    type="date"
-                                                    placeholder="Search..."
-                                                    className="input_search_box"
-                                                    style={{ minWidth: '150px' }} // Add a minimum width for better alignment
-                                                />
-                                                <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
-                                                    <IoCalendarOutline className="fs-5 " />
-                                                </Button>
-                                                <Button
-                                                    as={Link}
-                                                    to="/apps/appointments/newAppointment"
-                                                    className="custom-buttons"
-                                                >
-                                                    New Appointment
-                                                </Button>
-                                            </>
-                                        )}
+
+                                            {/* Additional controls shown only in the "Appointments" tab */}
+                                            {activeTab === 'appointments' && (
+                                                <>
+                                                    <Button className="custom-buttons">
+                                                        <FiFilter className="fs-5" />
+                                                    </Button>
+                                                    <FormInput
+                                                        type="date"
+                                                        placeholder="Search..."
+                                                        className="input_search_box"
+                                                        style={{ minWidth: '150px' }} // Add a minimum width for better alignment
+                                                    />
+                                                    <Button className="custom-buttons py-0 " style={{ height: '30px' }} onClick={() => navigate("/apps/appointments/appointmentCalendar")}>
+                                                        <IoCalendarOutline className="fs-5 " />
+                                                    </Button>
+                                                    <Button
+                                                        as={Link}
+                                                        to="/apps/appointments/newAppointment"
+                                                        className="custom-buttons"
+                                                    >
+                                                        New Appointment
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </Col>
+                                    </Row>
                                 </Col>
                             </Row>
-                        </Col>
-                    </Row>
 
-                    {/* Render table based on active tab */}
-                    {activeTab === 'appointments' ? (
-                        <AppointmentsList patientsData={patientsData} />
-                    ) : (
-                        <AppointmentsTransactionList patientsData={patientsData} />
-                    )}
-                </Card.Body>
-            </Card>
-        </Col >
+                            {/* Render table based on active tab */}
+                            {activeTab === 'appointments' ? (
+                                <AppointmentsList patientsData={patientsData} />
+                            ) : (
+                                <AppointmentsTransactionList patientsData={patientsData} />
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col >
             </Row >
         </>
     );

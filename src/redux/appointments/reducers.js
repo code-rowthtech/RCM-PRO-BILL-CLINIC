@@ -72,11 +72,14 @@ export const rescheduleAppointmentReducer = (state = RESCHEDULE_APPOINTMENTS_INI
                 data: action.payload,
                 loading: false
             }
-        case AppointmentActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case AppointmentActionTypes.RESET_UPDATE_STATUS:
             return {
-                data: [],
-                loading: false
-            }
+                ...state,
+                data: {
+                    ...state.data,
+                    status: null, // or whatever the initial state should be
+                },
+            };
         default: return state
     }
 }
