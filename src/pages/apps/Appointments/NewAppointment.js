@@ -1,13 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Row, Col } from 'react-bootstrap';
 import AppointmentForm from './Tabs/AppointmentForm';
 import Vitals from './Tabs/Vitals';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAppointmentByIdAction, resetUpdateAction } from '../../../redux/actions';
+import Spinner from '../../../constants/Spinner';
+
 
 const NewAppointment = () => {
 
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Appointments');
+    const [searchParams] = useSearchParams();
+    const dispatch = useDispatch();
+    const id = searchParams.get('updateid');
+    const store = useSelector((state) => state);
+    const rescheduleResponse = store?.rescheduleAppointmentReducer?.data?.status;
+    console.log({ rescheduleResponse })
+    useEffect(() => {
+        if (id) {
+            dispatch(getAppointmentByIdAction({ id: id }))
+        }
+    }, [id])
+
+    useEffect(() => {
+        if (rescheduleResponse === 200) {
+            dispatch(getAppointmentByIdAction({ id: id }));
+            dispatch(resetUpdateAction());
+        }
+    }, [rescheduleResponse])
 
     const tabs = [
         'Appointments',
@@ -56,17 +78,22 @@ const NewAppointment = () => {
                         </Button>
                     </Col>
                 </Row>
+                {
+                    store?.getPatientByIdReducer?.loading ?
+                        <Spinner />
+                        :
+                        <div className=" ">
+                            {activeTab === 'Appointments' && <AppointmentForm />}
+                            {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
+                            {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
+                            {activeTab === 'Vitals' && <Vitals />}
+                            {activeTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
+                            {activeTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
+                            {activeTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
+                            {activeTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
+                        </div>
+                }
 
-                <div className=" ">
-                    {activeTab === 'Appointments' && <AppointmentForm />}
-                    {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
-                    {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
-                    {activeTab === 'Vitals' && <Vitals />}
-                    {activeTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
-                    {activeTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
-                    {activeTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
-                    {activeTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>}
-                </div>
             </Card>
         </div>
     );

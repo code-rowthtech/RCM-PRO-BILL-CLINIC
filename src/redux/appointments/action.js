@@ -34,3 +34,6 @@ export const getAppointmentByIdAction = (data): AuthAction => ({
     data
 });
 
+export const resetUpdateAction = (): LayoutAction => ({
+    type: AppointmentActionTypes.RESET_UPDATE_STATUS,
+});
