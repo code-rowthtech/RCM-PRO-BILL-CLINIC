@@ -9,7 +9,6 @@ import { useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const DepartmentDetails = ({ docId }) => {
-
   const [showPassword, setShowPassword] = useState(false);
   const [showCAQHPassword, setShowCAQHPassword] = useState(false);
   const dispatch = useDispatch();

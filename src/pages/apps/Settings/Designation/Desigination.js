@@ -197,6 +197,7 @@ const Designation = () => {
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{formatDate(data.createdAt)}</td>
                       <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                         <Form.Switch
+                          className={data.isActive ? "custom-active" : ""}
                           checked={data.isActive}
                           onChange={() => handleUpdate(data)}
                         />

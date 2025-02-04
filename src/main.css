@@ -168,7 +168,7 @@ select.form-control:not([size]):not([multiple]) {
 
 .form-control,
 .form-select {
-    color: #0908084f !important; 
+    color: #0908084f !important;
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
@@ -177,7 +177,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 .form-control:focus,
 .form-select:focus {
-    color: black !important; 
+    color: black !important;
 }
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
@@ -185,7 +185,7 @@ select.form-control:not([size]):not([multiple]) {
 }
 .custom-form-fields,
 .form-control::placeholder {
-    color: #0908084f !important; 
+    color: #0908084f !important;
     font-size: 12px;
 }
 
@@ -333,7 +333,6 @@ table {
 .form-check-input {
     cursor: pointer;
 }
-
 
 .scroll-container {
     overflow: auto;
@@ -540,4 +539,8 @@ table {
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+.custom-active .form-check-input {
+    background-color: #6168d0 !important;
+    border-color: white !important;
 }
