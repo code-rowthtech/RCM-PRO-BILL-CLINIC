@@ -37,7 +37,6 @@ const AppointmentForm = () => {
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
-    // console.log({ getAppointment })
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const appointmentDetails = store?.getAppointmentByIdReducer?.data?.data;
     const [focused, setFocused] = useState(false);
@@ -124,6 +123,7 @@ const AppointmentForm = () => {
             setValue('startTime', appointmentDetails?.startTime)
             setValue('profile', appointmentDetails?.profile)
             setValue('status', appointmentDetails?.status)
+            setValue('office', appointmentDetails?.office)
             setValue('scheduled', appointmentDetails?.date ? new Date(appointmentDetails?.date).toISOString().split('T')[0] : '')
         }
     }, [appointmentDetails, id])
