@@ -123,7 +123,9 @@ const Roles = () => {
                                                         {data?.permissions}
                                                     </td> */}
                                                             <td>
-                                                                <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === 'active'} />
+                                                                <Form.Switch
+                                                                    className={data?.status === 'active' ? "custom-active" : ""}
+                                                                    onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === 'active'} />
                                                             </td>
                                                             <td>
                                                                 <Link to="#" className="action-icon" onClick={() => {

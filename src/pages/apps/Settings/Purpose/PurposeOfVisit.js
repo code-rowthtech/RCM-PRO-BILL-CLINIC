@@ -200,6 +200,7 @@ const POV = () => {
                       <td>{formatDate(data.createdAt)}</td>
                       <td>
                         <Form.Switch
+                          className={data.isActive ? "custom-active" : ""}
                           checked={data.isActive}
                           onChange={() => handleUpdate(data)}
                         />

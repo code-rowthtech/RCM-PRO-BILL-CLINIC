@@ -269,7 +269,9 @@ const RoleManagement = () => {
                                                         {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
                                                     </td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                        <Form.Switch onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
+                                                        <Form.Switch
+                                                            className={data?.status === true ? "custom-active" : ""}
+                                                            onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
                                                     </td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
