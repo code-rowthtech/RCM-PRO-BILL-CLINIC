@@ -62,12 +62,8 @@ const DepartmentDetails = ({ docId }) => {
 
         }
       ],
-      // clinicId: id,
-      // userId: docId,
-      // id: id ,
-      // departmentId: data?.department,
+
     }
-    // console.log('Form Submitted:', payload);
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
 

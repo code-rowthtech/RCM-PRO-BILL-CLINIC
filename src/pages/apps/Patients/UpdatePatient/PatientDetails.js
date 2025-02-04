@@ -212,6 +212,7 @@ const PatientDetails = ({ patientId }) => {
                 as="select"  // Use 'select' to make it a dropdown
                 id="patientstatus"
                 {...register('patientStatus')}
+                data-has-value={!!watch('patientStatus')}
               >
                 <option value="">Select status</option>  {/* Default option */}
                 <option value="Active">Active</option>
@@ -226,6 +227,7 @@ const PatientDetails = ({ patientId }) => {
               <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
               <Form.Select
                 {...register('title')}
+                data-has-value={!!watch('title')}
                 aria-label="Select Title"
               >
                 <option value="">Select Title</option>

@@ -104,7 +104,7 @@ const NewPatient = () => {
     };
 
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch } = useForm();
     useEffect(() => {
         if (age) {
             setValue('approxAge', age);
@@ -552,6 +552,7 @@ const NewPatient = () => {
                                             as="select"  // Use 'select' to make it a dropdown
                                             id="patientstatus"
                                             {...register('patientStatus')}
+                                            data-has-value={!!watch('patientStatus')}
                                         >
                                             <option value="" hidden>Select status</option>  {/* Default option */}
                                             <option value="Active">Active</option>
@@ -566,6 +567,7 @@ const NewPatient = () => {
                                         <Form.Label htmlFor="title" className="mb-0">Title</Form.Label>
                                         <Form.Select
                                             {...register('title')}
+                                            data-has-value={!!watch('title')}
                                             aria-label="Select Title"
                                         >
                                             <option value="" hidden>Select Title</option>
@@ -736,6 +738,7 @@ const NewPatient = () => {
                                         <Form.Label className="mb-0">Preferred Communication</Form.Label>
                                         <Form.Select
                                             {...register('preferredCommunication')}
+                                            data-has-value={!!watch('preferredCommunication')}
                                             aria-label="Select Title"
                                         >
                                             <option value="" hidden>Select Preferred Communication</option>
@@ -758,6 +761,7 @@ const NewPatient = () => {
                                         <Form.Select
                                             {...register('reminderLanguage',
                                             )}
+                                            data-has-value={!!watch('reminderLanguage')}
                                         >
                                             <option value="" hidden>Select Reminder Language</option>
                                             <option value="English">English</option>
@@ -773,6 +777,7 @@ const NewPatient = () => {
                                         <Form.Select
                                             {...register('medicationHistoryConsent',
                                             )}
+                                            data-has-value={!!watch('medicationHistoryConsent')}
                                         >
                                             <option value="" hidden>Select Medication History Concent</option>
                                             <option value={'true'}>Yes</option>
@@ -787,6 +792,7 @@ const NewPatient = () => {
                                         <Form.Select
                                             {...register('paymentProfile')}
                                             aria-label="Payment Profile"
+                                            data-has-value={!!watch('paymentProfile')}
                                         >
                                             <option value="" hidden>Select Payment Profile</option>
                                             <option value="Cash">Cash</option>
