@@ -17,7 +17,6 @@ const NewAppointment = () => {
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
     const rescheduleResponse = store?.rescheduleAppointmentReducer?.data?.status;
-    console.log({ rescheduleResponse })
     useEffect(() => {
         if (id) {
             dispatch(getAppointmentByIdAction({ id: id }))

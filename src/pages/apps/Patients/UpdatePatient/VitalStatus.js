@@ -148,7 +148,7 @@ const VitalStatus = ({ patientId }) => {
                             <div className='px-2'>
                                 <Row className='' >
                                     <Col className='px-0'
-                                    ><p className='m-0  fw-bold'>Name</p></Col>
+                                    ><p className='m-0  fw-bold'></p></Col>
                                     {previousVitals && previousVitals?.map((data) => (
                                         <Col key={data?._id} style={{ background: '#E6EBFF' }}>
                                             <p className='m-0 fw-bold'>
