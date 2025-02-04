@@ -166,7 +166,14 @@ select.form-control:not([size]):not([multiple]) {
     font-size: 13px;
 }
 
-.form-control,
+.form-control {
+    color: black !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+}
 .form-select {
     color: #0908084f !important;
     font-weight: 550 !important;
