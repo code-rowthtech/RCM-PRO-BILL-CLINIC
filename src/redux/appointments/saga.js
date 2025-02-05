@@ -183,7 +183,13 @@ function* getAppointmentByIdFunction(data) {
 }
 
 
+export function* callResetUpdate() {
+    put({
+        type: AppointmentActionTypes.RESET_UPDATE_STATUS,
+        payload: {},
+    });
 
+}
 
 export function* watchCreateAppointment() {
     yield takeEvery(AppointmentActionTypes.CREATE_APPOINTMENT, createAppointmentFunction);

@@ -174,7 +174,7 @@ select.form-control:not([size]):not([multiple]) {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
-.form-select{
+.form-select {
     color: #0908084f !important;
     font-weight: 550 !important;
     padding: 6px !important;
@@ -403,13 +403,26 @@ table {
 
 .react-datepicker__input-container input {
     height: 30px !important;
-    width: 14rem !important;
+    width: 13rem !important;
     padding: 0 0.5rem !important;
     border-radius: 3px;
 }
 
 .schedule-table {
     box-shadow: none !important;
+}
+/* right side bar */
+.collapsed-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.patient-menu-item{
+    padding: 10px;
+}
+.patient-menu-item:hover {
+  background-color: #e9ecef;
+ 
 }
 
 /* media query */
@@ -546,4 +559,8 @@ table {
     justify-content: center;
     align-items: center;
     text-align: center;
+}
+.custom-active .form-check-input {
+    background-color: #6168d0 !important;
+    border-color: white !important;
 }

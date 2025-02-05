@@ -171,6 +171,7 @@ const Doctors = () => {
                                                             </td>
                                                             <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
+                                                                    className={data?.userDetails?.status ? "custom-active" : ""}
                                                                     checked={data?.userDetails?.status}
                                                                     onChange={() => {
                                                                         setSelectedDoctor(data);

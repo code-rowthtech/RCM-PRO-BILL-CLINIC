@@ -1101,7 +1101,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             style={{ right: '-2%', top: '20%' }}
                                             className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
                                         >
-                                           
+
                                         </span>
                                     </Col>
 
@@ -1554,7 +1554,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">State <span className="text-danger">*</span></Form.Label>
                                                     {usePrimaryAsMailing ? (
                                                         <Form.Control
-                                                        data-has-value={!!watch('mailingStateName')}
+                                                            data-has-value={!!watch('mailingStateName')}
                                                             readOnly
                                                             value={
                                                                 statesData?.states?.find(
@@ -1591,7 +1591,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <Form.Label className="mb-0">City <span className="text-danger">*</span></Form.Label>
                                                     {usePrimaryAsMailing ? (
                                                         <Form.Control
-                                                        data-has-value={!!watch('mailingCity')}
+                                                            data-has-value={!!watch('mailingCity')}
                                                             readOnly
                                                             value={cities1 && cities1?.find((data) => data?._id === getValues('city'))?.name || ''}
                                                         />
@@ -1887,7 +1887,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <td>{patient.clinicType}</td>
                                                         <td>{patient.practiceSpecialty || 'N/A'}</td>
                                                         <td>
-                                                            <Form.Switch checked={patient.status === patient.status} />
+                                                            <Form.Switch
+                                                                className={patient.status ? "custom-active" : ""}
+                                                                checked={patient.status === patient.status} />
                                                         </td>
                                                         <td>
                                                             <div className="text-center">

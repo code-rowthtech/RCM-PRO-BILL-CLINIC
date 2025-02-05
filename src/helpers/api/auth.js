@@ -5,7 +5,7 @@ const api = new APICore();
 
 // account
 function login(params: any): any {
-    const baseUrl = '/api/v1/clinic/signIn';
+    const baseUrl = '/api/v1/clinic/sign-in';
     return api.create(`${baseUrl}`, params);
 }
 
@@ -20,27 +20,27 @@ function signup(params: any): any {
 }
 
 function forgotPassword(params: any): any {
-    const baseUrl = '/api/v1/clinic/forgotPassword';
+    const baseUrl = '/api/v1/clinic/forgot-password';
     return api.create(`${baseUrl}`, params);
 }
 
 function forgotPasswordConfirm(params: any): any {
-    const baseUrl = '/api/v1/clinic/resetPassword';
+    const baseUrl = '/api/v1/clinic/reset-password';
     return api.create(`${baseUrl}`, params);
 }
 
 function verifyToken(params: any): any {
-    const baseUrl = '/api/v1/clinic/emailVerified';
+    const baseUrl = '/api/v1/clinic/email-verified';
     return api.create(`${baseUrl}`, params);
 }
 
 function setPasswordApi(params: any): any {
-    const baseUrl = '/api/v1/clinic/setPassword';
+    const baseUrl = '/api/v1/clinic/set-password';
     return api.create(`${baseUrl}`, params);
 }
 
 function confirmPasswordApi(params: any): any {
-    const baseUrl = 'api/v1/clinic/changePassword';
+    const baseUrl = 'api/v1/clinic/change-password';
     return api.create(`${baseUrl}`, params);
 }
 

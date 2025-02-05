@@ -95,12 +95,6 @@ const RoleSetting = () => {
 
     return (
         <div>
-            {/* <PageTitle
-                breadCrumbItems={[
-                    { label: 'Roles', path:'/apps/Roles/list', active: true },
-                ]}
-                title={'Roles'}
-            /> */}
             <Row className='mt-2'>
                 <Col xs={12} className='px-0'>
                     <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
@@ -133,14 +127,14 @@ const RoleSetting = () => {
                                                     alignItems: "center",
                                                     borderRadius: "4px",
                                                     backgroundColor: "#e8f0fe",
-                                                    padding: "0px 5px", 
+                                                    padding: "0px 5px",
                                                 }}
                                             >
                                                 <IoSearchSharp
                                                     style={{
                                                         fontSize: "1.2rem",
                                                         color: "black",
-                                                        marginRight: "10px", 
+                                                        marginRight: "10px",
                                                     }}
                                                 />
                                                 <FormInput
@@ -163,7 +157,7 @@ const RoleSetting = () => {
                                                     style={{
                                                         border: "none",
                                                         outline: "none",
-                                                        flex: 1, 
+                                                        flex: 1,
                                                         backgroundColor: "#ccc",
 
                                                     }}
@@ -174,7 +168,7 @@ const RoleSetting = () => {
                                                 className="custom-buttons py-1 d-none d-md-block"
                                                 onClick={() => setShowModal(true)}
                                             >
-                                             Add New Role
+                                                Add New Role
                                             </Button>
                                             <Button
                                                 className="custom-buttons d-md-none py-1"
@@ -263,6 +257,7 @@ const RoleSetting = () => {
                                                             </td>
                                                             <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
+                                                                    className={data?.status === true ? "custom-active" : ""}
                                                                     onClick={() => handleUpdateDoctorStatus(data)}
                                                                     checked={data?.status === true}
                                                                 />

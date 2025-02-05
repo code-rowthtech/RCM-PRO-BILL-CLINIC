@@ -818,7 +818,7 @@ const NewDoctor = () => {
                                                                     className="d-none "
                                                                     {...register('profileImage', {
                                                                     })}
-                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                                    accept=".png, .jpg, .jpeg, .svg" 
                                                                     ref={logoFileInputRef}
                                                                     onChange={handleFileChange}
                                                                 />

@@ -118,7 +118,9 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
                                         <span className='me-0'>$</span>{billingData?.totalAmount}
                                     </td>
                                     <td>
-                                        <Form.Switch checked={billingData?.isActive} />
+                                        <Form.Switch
+                                            className={billingData?.isActive ? "custom-active" : ""}
+                                            checked={billingData?.isActive} />
                                     </td>
                                 </tr>
                             </tbody>
