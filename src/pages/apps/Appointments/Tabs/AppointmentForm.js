@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Select from 'react-select';
 import { createPatientsAction, updatePatientsAction, getPatientByIdAction, getResponsiblePartyAction, getPatientsAction } from "../../../../redux/patients/actions";
 import { createAppointmentAction, getCitiesAction, getDoctorsAction, getStatesByCountryAction, getSubClinicCitiesAction, rescheduleAppointmentAction, stateEmptydAction } from "../../../../redux/actions";
-import { useForm } from "react-hook-form";
+import { useForm, } from "react-hook-form";
 import { FiUploadCloud } from 'react-icons/fi';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { handleUpload } from '../../../../helpers/HandleUpload';
@@ -20,6 +20,7 @@ import PatientDetails from '../../Patients/UpdatePatient/PatientDetails';
 import NewPatient from '../../Patients/NewPatient';
 import { rescheduleAppointment } from '../../../../helpers/api/apiEndpoints';
 import Spinner from '../../../../constants/Spinner';
+import DatePicker from 'react-date-picker';
 
 
 
@@ -80,7 +81,13 @@ const AppointmentForm = () => {
             setValue('approxAge', age);
         }
     }, [age]);
-    const { register, handleSubmit, watch, formState: { errors }, setValue, reset, clearErrors } = useForm();
+    const { register, handleSubmit, watch, formState: { errors }, control, setValue, reset, clearErrors } = useForm({
+        defaultValues: {
+            scheduled: new Date(), // Default date: today
+            startTime: "10:00", // Default start time: 9:00 AM
+            duration: 30, // Default duration: 30 minutes
+        },
+    });
     useEffect(() => {
 
         const doctorPayload = { status: true, search: doctorSearch, departmentId: '' }
@@ -204,60 +211,6 @@ const AppointmentForm = () => {
                             </div>
                         </Form.Group>
                     </Col>
-                    <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="doctorName">
-                            <Form.Label className="mb-0">Select Doctor</Form.Label>
-                            <div>
-                                <Form.Control
-                                    as="select"
-                                    className='form-select'
-                                    data-has-value={!!watch('doctorName')}
-
-                                    {...register("doctorName", { required: "Doctor is required" })}
-                                >
-                                    <option value="" hidden>Select Doctor</option>
-                                    {doctorDetails?.map((doctor) => (
-                                        <option key={doctor?._id} value={doctor?._id}>
-                                            {doctor?.userDetails?.firstName} {doctor?.userDetails?.lastName}
-                                        </option>
-                                    ))}
-                                </Form.Control>
-                                {errors.doctorName && <p className="text-danger">{errors.doctorName.message}</p>}
-                            </div>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="office">
-                            <Form.Label className="mb-0">Office</Form.Label>
-                            <Form.Control as="select"
-                                data-has-value={!!watch('office')}
-
-                                className='form-select' {...register("office",
-                                    // { required: "Office is required" }
-                                )}>
-                                <option value="" hidden>Select Office</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </Form.Control>
-                            {errors.office && <p className="text-danger">{errors.office.message}</p>}
-                        </Form.Group>
-                    </Col>
-                    <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="reason">
-                            <Form.Label className="mb-0">Reason</Form.Label>
-                            <Form.Control
-                                data-has-value={!!watch('reason')}
-                                placeholder='Reason'
-                                type="text"
-                                {...register("reason",
-                                    { required: "Reason is required" }
-                                )}
-                            />
-                            {errors.reason && <p className="text-danger">{errors.reason.message}</p>}
-                        </Form.Group>
-                    </Col>
                     <Col sm={6} className="d-flex gap-2">
                         <Form.Group className="mb-1" style={{ width: "150px" }} controlId="scheduled">
                             <Form.Label className="mb-0">Scheduled</Form.Label>
@@ -301,16 +254,72 @@ const AppointmentForm = () => {
                         </div>
                     </Col>
                     <Col sm={6}>
+                        <Form.Group className="mb-1" controlId="doctorName">
+                            <Form.Label className="mb-0">Select Doctor</Form.Label>
+                            <div>
+                                <Form.Control
+                                    as="select"
+                                    className='form-select'
+                                    data-has-value={!!watch('doctorName')}
+
+                                    {...register("doctorName", { required: "Doctor is required" })}
+                                >
+                                    <option value="" hidden>Select Doctor</option>
+                                    {doctorDetails?.map((doctor) => (
+                                        <option key={doctor?._id} value={doctor?._id}>
+                                            {doctor?.userDetails?.firstName} {doctor?.userDetails?.lastName}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                {errors.doctorName && <p className="text-danger">{errors.doctorName.message}</p>}
+                            </div>
+                        </Form.Group>
+                    </Col>
+
+                    <Col sm={6}>
+                        <Form.Group className="mb-1" controlId="office">
+                            <Form.Label className="mb-0">Office</Form.Label>
+                            <Form.Control as="select"
+                                data-has-value={!!watch('office')}
+
+                                className='form-select' {...register("office",
+                                    // { required: "Office is required" }
+                                )}>
+                                <option value="" hidden>Select Office</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </Form.Control>
+                            {errors.office && <p className="text-danger">{errors.office.message}</p>}
+                        </Form.Group>
+                    </Col>
+                    <Col sm={6}>
+                        <Form.Group className="mb-1" controlId="reason">
+                            <Form.Label className="mb-0">Reason</Form.Label>
+                            <Form.Control
+                                data-has-value={!!watch('reason')}
+                                placeholder='Reason'
+                                type="text"
+                                {...register("reason",
+                                    { required: "Reason is required" }
+                                )}
+                            />
+                            {errors.reason && <p className="text-danger">{errors.reason.message}</p>}
+                        </Form.Group>
+                    </Col>
+
+                    <Col sm={6}>
                         <Form.Group className="mb-1" controlId="profile">
-                            <Form.Label className="mb-0">Profile</Form.Label>
+                            <Form.Label className="mb-0">Visit Type</Form.Label>
                             <Form.Control
                                 data-has-value={!!watch('profile')}
 
                                 className="form-select"
                                 as="select" {...register("profile",
-                                    { required: "Profile is required" }
+                                    { required: "Visit Type is required" }
                                 )}>
-                                <option value="" hidden>Select Profile</option>
+                                <option value="" hidden> Visit Type</option>
                                 <option value="New Patient Visit">New Patient Visit</option>
                                 <option value="Followup Visit">Follow up Visit</option>
                             </Form.Control>

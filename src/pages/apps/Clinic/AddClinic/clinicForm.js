@@ -105,7 +105,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [latitude1, setLatitude1] = useState(null);
     const [stateToSelect, setStateToSelect] = useState(null);
     const [nextClicked, setNextClicked] = useState(false);
-    const clinectypes = store?.getClinicTypeReducer?.data?.result
+    const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const createResponse = store?.createClinicsReducer?.data?.status;
     const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
@@ -998,8 +998,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 message: 'Medicaid Number must be 8 characters long',
                                             },
                                             maxLength: {
-                                                value: 12,
-                                                message: 'Medicaid Number must be 12 characters long',
+                                                value: 10,
+                                                message: 'Medicaid Number must be 10 characters long',
                                             },
                                             pattern: {
                                                 value: /^[0-9]+$/,
@@ -1007,7 +1007,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             },
                                         })}
                                         placeholder="Medicaid Number"
-                                        maxLength={12}
+                                        maxLength={10}
                                     />
                                     {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
                                 </Form.Group>
@@ -1312,7 +1312,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         {...register("stateName", { required: "State is required" })}
                                                         onChange={(e) => handleStateSelection(e)}
                                                         data-has-value={!!watch('stateName')}
-
                                                     >
                                                         <option value='' hidden>State</option>
                                                         {statesData?.states?.map((data) => (

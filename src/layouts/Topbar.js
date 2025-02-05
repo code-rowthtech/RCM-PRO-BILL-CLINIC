@@ -58,7 +58,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/Practice/new-practice': 'Add New Practice Location',
         '/apps/doctors/new-doctor': 'New Doctors',
         '/apps/patients/list': 'Patients',
-        '/apps/patients/new-patient': 'New Patients',
+        '/apps/patients/new-patient': 'New Patient',
         '/apps/role-management/list': 'Role Management',
         '/apps/crm/addclinic': 'Practice',
         '/apps/settings/department': 'Department',

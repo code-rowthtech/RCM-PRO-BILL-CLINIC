@@ -97,7 +97,7 @@ const UpdatePatientIndex = () => {
             ],
         },
         { label: 'Drug Interactions', icon: <AiOutlineInteraction /> },
-        { label: 'Care Quality Indicators (CQIs)', icon: <FaUserDoctor /> },
+        { label: 'CQIs', icon: <FaUserDoctor /> },
         { label: 'Lab Request', icon: <TbReportSearch /> },
         { label: 'Vaccinations', icon: <TbVaccine /> },
         { label: 'Patient Access', icon: <SiPrivateinternetaccess /> },
@@ -372,9 +372,7 @@ const UpdatePatientIndex = () => {
                                                 </div>
 
                                             </div>
-
                                         </Col>
-
                                     </Row>
                                 </Card.Body>
                             </div>
@@ -407,7 +405,7 @@ const UpdatePatientIndex = () => {
                                         <Button className='custom-buttons btn-height' onClick={() => navigate(-1)}>Back</Button>
                                     </div>
 
-                                    <div className="mt-2 px-2 scroll-container" style={{ height: '58vh', overflowY: 'scroll' }}>
+                                    <div className="mt-2 px-2 scroll-container" style={{ height: '55vh', overflowY: 'scroll' }}>
                                         {activeTab === 'Patient Details' && <PatientDetails />}
                                         {activeTab === 'Demographics' && <Demographics />}
                                         {activeTab === 'Insurances' && <Insurance patientId={patientDetails?._id} />}
@@ -528,75 +526,100 @@ const UpdatePatientIndex = () => {
                                                 )
                                             ))}
                                         </div> */}
-                                        <div className="card-body p-0 scroll-container" style={{ height: '76.8vh', overflow: 'auto' }}>
-                                            {patientMenuItems.map((item, index) => (
+                                        <div
+                                            className={`card-body p-0 scroll-container ${isSidebarCollapsed ? 'collapsed-sidebar' : ''}`}
+                                            style={{ height: '76.8vh', overflow: 'auto' }}
+                                        >
+                                            {patientMenuItems.map((item, index) =>
                                                 item.subItems ? (
-                                                    <div key={index} className='ms-0'>
+                                                    <div key={index} className="ms-0">
                                                         <p
-                                                            className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : 'd-flex justify-content-between align-items-center'}`}
+                                                            className={`patient-menu-item text-black mb-0 ps-2 pe-2 border-bottom py-1 ${isSidebarCollapsed ? 'text-center fw-bold' : 'd-flex justify-content-between align-items-center'
+                                                                }`}
                                                             onClick={handleClinicalReviewToggle}
                                                             style={{
                                                                 cursor: 'pointer',
                                                                 backgroundColor: isClinicalReviewExpanded ? '#f8f9fa' : 'transparent',
                                                             }}
+                                                            title={isSidebarCollapsed ? item.label : ''}
                                                         >
-                                                            <span className='text-center'>
-                                                                {item?.icon}&nbsp;{item.label}
+                                                            <span className="d-flex align-items-center">
+                                                                {item?.icon}
+                                                                {!isSidebarCollapsed && <span className="ms-2">{item.label}</span>}
                                                             </span>
-                                                            <i
-                                                                className={`bi ${isClinicalReviewExpanded
-                                                                    ? 'bi-chevron-up'
-                                                                    : 'bi-chevron-down'
-                                                                    }
-                                                           ${isSidebarCollapsed ? 'd-none' : ''}     
-                                                                `}
-                                                            ></i>
+                                                            {!isSidebarCollapsed && (
+                                                                <i
+                                                                    className={`bi ${isClinicalReviewExpanded ? 'bi-chevron-up' : 'bi-chevron-down'
+                                                                        }`}
+                                                                ></i>
+                                                            )}
                                                         </p>
                                                         {isClinicalReviewExpanded && (
                                                             <div className="ms-0">
                                                                 {item.subItems.map((subItem, subIndex) => (
-                                                                    <div className='d-flex justify-content-between align-items-center ps-4 border-bottom py-1 pe-2'>
-                                                                        <p
-                                                                            key={subIndex}
-                                                                            className="text-black mb-0"
-                                                                            onClick={() => handleTabClick(subItem.label)}
-                                                                            style={{
-                                                                                cursor: 'pointer',
-                                                                                backgroundColor:
-                                                                                    activeTab === subItem.label ? '#e9ecef' : 'transparent',
-                                                                                fontWeight: activeTab === subItem.label ? 'bold' : 'normal',
-                                                                            }}
-                                                                        >
-                                                                            {subItem.label}
-
-                                                                        </p>
-                                                                        <p className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                                                            style={{ width: '20px', height: '20px', fontSize: '10px', lineHeight: '20px' }}>
-                                                                            {subItem.icon}
-                                                                        </p>
-
+                                                                    <div
+                                                                        key={subIndex}
+                                                                        className={`d-flex  align-items-center ${isSidebarCollapsed ? 'text-center justify-content-center' : 'ps-4 justify-content-between pe-2'
+                                                                            } border-bottom py-1 `}
+                                                                        title={isSidebarCollapsed ? subItem.label : ''} // Show tooltip in collapsed mode
+                                                                    >
+                                                                        {isSidebarCollapsed ? (
+                                                                            <p
+                                                                                className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                                style={{ width: '20px', height: '20px', fontSize: '10px', lineHeight: '20px' }}
+                                                                            >
+                                                                                {subIndex + 1} {/* Display subitem number */}
+                                                                            </p>
+                                                                        ) : (
+                                                                            <>
+                                                                                <p
+                                                                                    className="text-black mb-0"
+                                                                                    onClick={() => handleTabClick(subItem.label)}
+                                                                                    style={{
+                                                                                        cursor: 'pointer',
+                                                                                        backgroundColor: activeTab === subItem.label ? '#e9ecef' : 'transparent',
+                                                                                        fontWeight: activeTab === subItem.label ? 'bold' : 'normal',
+                                                                                    }}
+                                                                                >
+                                                                                    {subItem.label}
+                                                                                </p>
+                                                                                <p
+                                                                                    className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                                    style={{ width: '20px', height: '20px', fontSize: '10px', lineHeight: '20px' }}
+                                                                                >
+                                                                                    {subItem.icon}
+                                                                                </p>
+                                                                            </>
+                                                                        )}
                                                                     </div>
                                                                 ))}
                                                             </div>
                                                         )}
+
+
                                                     </div>
                                                 ) : (
                                                     <p
                                                         key={index}
-                                                        className={`patient-menu-item text-black mb-0 ps-2 py-1 d-flex align-items-center ${isSidebarCollapsed ? ' fw-bold' : ''}`}
-                                                        // onClick={() => handleTabClick(item.label)}
+                                                        className={`patient-menu-item text-black mb-0 d-flex align-items-center ${isSidebarCollapsed ? 'fw-bold text-center' : ''
+                                                            }`}
+                                                        onClick={() => handleTabClick(item.label)}
                                                         style={{
                                                             cursor: 'pointer',
                                                             backgroundColor: activeTab === item.label ? '#f8f9fa' : 'transparent',
                                                             fontWeight: activeTab === item.label ? 'bold' : 'normal',
                                                         }}
+                                                        title={isSidebarCollapsed ? item.label : ''}
                                                     >
-                                                        {item?.icon}&nbsp;{item.label}
-                                                        {/* {/ <i className={`${item.icon}`}></i > <span className={`${isSidebarCollapsed ? 'd-none' : ''}`}>{item.label}</span> /} */}
+                                                        <span className="d-flex align-items-center">
+                                                            {item?.icon}
+                                                            {!isSidebarCollapsed && <span className="ms-2">{item.label}</span>}
+                                                        </span>
                                                     </p>
                                                 )
-                                            ))}
+                                            )}
                                         </div>
+
                                     </div>
                                 </div>
                             </div>

@@ -818,7 +818,7 @@ const NewDoctor = () => {
                                                                     className="d-none "
                                                                     {...register('profileImage', {
                                                                     })}
-                                                                    accept=".png, .jpg, .jpeg, .svg" // Allow only specific file types
+                                                                    accept=".png, .jpg, .jpeg, .svg" 
                                                                     ref={logoFileInputRef}
                                                                     onChange={handleFileChange}
                                                                 />
@@ -832,23 +832,25 @@ const NewDoctor = () => {
                                                                 <Form.Label className="mb-0">
                                                                     Gender <span className="text-danger">*</span>
                                                                 </Form.Label>
-                                                                <Form.Control
+                                                                <Form.Select
                                                                     as="select"
+                                                                    data-has-value={!!watch('gender')}
                                                                     {...register("gender", { required: "Gender is required" })}
                                                                     onChange={(e) => {
                                                                         clearErrors("gender");
                                                                         setFormData((prev) => ({ ...prev, gender: e.target.value }));
                                                                     }}
-                                                                // className="mt-1"
+                                                                    className="custom-select form-control"
                                                                 >
-                                                                    <option value="">Select Gender</option>
+                                                                    <option value="" hidden>Select Gender</option>
                                                                     <option value="Male">Male</option>
                                                                     <option value="Female">Female</option>
                                                                     <option value="Other">Other</option>
-                                                                </Form.Control>
+                                                                </Form.Select>
                                                                 {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                                             </Form.Group>
                                                         </div>
+
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Specialist <span className='text-danger'>*</span></Form.Label>
@@ -997,13 +999,10 @@ const NewDoctor = () => {
                                                                     <Row>
                                                                         <Col sm={6}>
                                                                             <Form.Group className="mb-1">
-                                                                                <label htmlFor="state-select" className='fw-bold mb-0' style={{ display: "block", marginBottom: "6px" }}>
-                                                                                    State
-                                                                                </label>
-                                                                                <select
+                                                                                <Form.Label className='mb-0' >State </Form.Label>
+                                                                                <Form.Select
                                                                                     className='form-control'
-                                                                                    id="state-select"
-                                                                                    {...register("state1")}
+                                                                                    {...register("stateName")}
                                                                                     onChange={(e) => {
                                                                                         setFormData((prevState) => ({
                                                                                             ...prevState,
@@ -1013,39 +1012,32 @@ const NewDoctor = () => {
                                                                                             }
                                                                                         }));
                                                                                         handleStateSelection(e);
-                                                                                    }}
-                                                                                    style={{
-                                                                                        width: "100%",
-                                                                                        padding: "7px ",
-                                                                                        borderRadius: "4px",
-                                                                                        border: "1px solid #ccc",
-                                                                                        color: getValues('state1')?.length === 0 ? "#a9a9a9" : "black", // Black if state is selected, gray otherwise
-                                                                                    }}
+                                                                                    }} data-has-value={!!watch('stateName')}
                                                                                 >
-                                                                                    <option value="" disabled>
-                                                                                        Select state
-                                                                                    </option>
+                                                                                    <option value='' hidden>State</option>
                                                                                     {statesData?.states?.map((data) => (
                                                                                         <option
-                                                                                            key={data?.id} // Unique key for each option
-                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id, name: data?.name })} // Store the key as a data attribute
+                                                                                            key={data?.id}
+                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })}
                                                                                             value={data?._id}
                                                                                         >
                                                                                             {data?.name}
                                                                                         </option>
                                                                                     ))}
-                                                                                </select>
-
+                                                                                </Form.Select>
+                                                                                {errors.stateName && (
+                                                                                    <span className="text-danger">{errors.stateName.message}</span>
+                                                                                )}
                                                                             </Form.Group>
-
                                                                         </Col>
                                                                         <Col sm={6}>
                                                                             <Form.Group className="mb-1">
                                                                                 <Form.Label className='mb-0'>City</Form.Label>
 
-                                                                                <select
+                                                                                <Form.Select
                                                                                     disabled={store?.getCitiesReducer?.loading}
                                                                                     {...register('city1')}
+                                                                                    data-has-value={!!watch('city1')}
                                                                                     onChange={(e) => {
                                                                                         // setFormData({ ...formData, city: e.target.value })
                                                                                         setFormData((prevState) => ({
@@ -1057,13 +1049,7 @@ const NewDoctor = () => {
                                                                                         }));
                                                                                     }}
                                                                                     className='form-control'
-                                                                                    style={{
-                                                                                        width: "100%",
-                                                                                        padding: "7px ",
-                                                                                        borderRadius: "4px",
-                                                                                        border: "1px solid #ccc",
-                                                                                        color: getValues('city1')?.length === 0 ? "#a9a9a9" : "black",
-                                                                                    }}
+
                                                                                 >
                                                                                     <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
                                                                                     {cities1?.map((data) => (
@@ -1071,7 +1057,7 @@ const NewDoctor = () => {
                                                                                             {data?.name}
                                                                                         </option>
                                                                                     ))}
-                                                                                </select>
+                                                                                </Form.Select>
 
                                                                             </Form.Group>
                                                                         </Col>
@@ -1287,6 +1273,7 @@ const NewDoctor = () => {
                                                                                     <Form.Control readOnly={sameAsPrimary} value={statesData?.states.find((data) => data?._id === formData?.primaryAddress?.state)?.name} />
                                                                                     :
                                                                                     <Form.Select
+                                                                                        data-has-value={!!watch('state2')}
                                                                                         {...register('state2')}
                                                                                         onChange={(e) => {
                                                                                             setFormData({ ...formData, state: e.target.value });
@@ -1318,6 +1305,7 @@ const NewDoctor = () => {
                                                                                     :
                                                                                     <Form.Select
                                                                                         className='form-control'
+                                                                                        data-has-value= {!!watch('city2')}
                                                                                         disabled={store?.getCitiesReducer?.loading}
                                                                                         {...register('city2')}
                                                                                         onChange={(e) => {

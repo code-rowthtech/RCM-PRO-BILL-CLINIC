@@ -216,7 +216,7 @@ const Responsiblle = ({ patientId }) => {
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row px-0 " >
                     <div className="row  pb-2 pt-1 pe-0" style={{ borderBottom: "1px solid #444141" }}>
-                        <div className="col-3 ">
+                        <div className="col-md-3 col-12">
                             <Form.Label htmlFor="fileName" className="mb-0">Full Name <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="text"
@@ -225,7 +225,7 @@ const Responsiblle = ({ patientId }) => {
                             />
                             {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
                         </div>
-                        <div className="col-3 pe-1">
+                        <div className="col-md-3 col-12 pe-1">
                             <Form.Label className="mb-0">Title <span className="text-danger">*</span></Form.Label>
                             <Form.Select
                                 {...register('title', { required: "This field is required" })}
@@ -239,7 +239,7 @@ const Responsiblle = ({ patientId }) => {
                             </Form.Select>
                             {errors.title && <span className="text-danger">{errors.title.message}</span>}
                         </div>
-                        <div className="col-3">
+                        <div className="col-md-3 col-12">
                             <Form.Label htmlFor="gender" className="mb-0">Gender <span className='text-danger'>*</span></Form.Label>
                             <div className="d-flex gap-2">
                                 <Form.Select
@@ -257,7 +257,7 @@ const Responsiblle = ({ patientId }) => {
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
 
                         </div>
-                        <div className="col-3 pe-0">
+                        <div className="col-md-3 col-12 pe-0">
                             <Form.Label htmlFor="DOB" className="mb-0">Date of Birth <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                                 type="date"  // Change type to "date" for date input
@@ -267,7 +267,7 @@ const Responsiblle = ({ patientId }) => {
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
                     </div>
-                    <div className="col-6" style={{ borderRight: "1px solid #212529" }}>
+                    <div className="col-md-6" style={{ borderRight: "1px solid #212529" }}>
                         <div className="row " >
                             <div className="pt-1">
                                 <Form.Label htmlFor="SSN" className="mb-0">SSN<span className='text-danger'>*</span></Form.Label>
@@ -290,7 +290,7 @@ const Responsiblle = ({ patientId }) => {
                             </div>
                         </div>
                         <div className="row" >
-                            <div className="col-4 ">
+                            <div className="col-md-4 ">
                                 <Form.Label htmlFor="email" className="mb-0">Email ID <span className="text-danger">*</span></Form.Label>
                                 <Form.Control
                                     type="email"
@@ -299,7 +299,7 @@ const Responsiblle = ({ patientId }) => {
                                 />
                                 {errors.email && <span className="text-danger">{errors.email.message}</span>}
                             </div>
-                            <div className=' col-4'>
+                            <div className=' col-md-4 col-12'>
                                 <Form.Group className="mb-0 position-relative">
                                     <Form.Label className='mb-0'>Phone{!id && <span className='text-danger'>*</span>}</Form.Label>
                                     <Form.Group>
@@ -345,7 +345,7 @@ const Responsiblle = ({ patientId }) => {
                                     </div>
                                 </Form.Group>
                             </div>
-                            <div className="col-4 ">
+                            <div className="col-md-4 col-12">
                                 <Form.Label htmlFor="note" className="mb-0">Note (Text)</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -355,7 +355,7 @@ const Responsiblle = ({ patientId }) => {
                             </div>
                         </div>
                         <div className="row pb-1" style={{ borderBottom: "1px solid #444141" }}>
-                            <div className="col-6">
+                            <div className="col-md-6 col-12">
                                 <div>
                                     <Form.Label htmlFor="employer" className="mb-0">Employer</Form.Label>
                                     <div className="d-flex gap-2">
@@ -376,7 +376,7 @@ const Responsiblle = ({ patientId }) => {
 
                                 </div>
                             </div>
-                            <div className="col-6 ">
+                            <div className="col-6 col-12">
                                 <div>
                                     <Form.Label htmlFor="status" className="mb-0">Status</Form.Label>
                                     <div className="d-flex gap-2">
@@ -398,7 +398,7 @@ const Responsiblle = ({ patientId }) => {
 
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-md-6 col-12">
                                 <div className=" mb-1">
                                     <Form.Label className="mb-0">Chart</Form.Label>
                                     <Form.Select
@@ -414,7 +414,7 @@ const Responsiblle = ({ patientId }) => {
                                     </Form.Select>
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-md-6 col-12">
                                 <Form.Label htmlFor="patientName" className="mb-0">Patient Name</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -494,7 +494,7 @@ const Responsiblle = ({ patientId }) => {
                         </div>
 
                     </div>
-                    <div className="col-6">
+                    <div className="col-md-6 col-12">
                         <div className="row pb-1  px-0" style={{ borderBottom: "1px solid #444141" }}>
 
                             <div className=" mt-1">
@@ -710,7 +710,7 @@ const Responsiblle = ({ patientId }) => {
                                     <option value="false">2</option>
                                 </Form.Control>
                             </div>
-                            <div className="col-3 mb-1">
+                            <div className="col-md-3 col-12 mb-1">
                                 <Form.Label htmlFor="" className="text-nowrap mb-0">Last patient payment</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -720,7 +720,7 @@ const Responsiblle = ({ patientId }) => {
                                     )}
                                 />
                             </div>
-                            <div className="col-3 mb-1 " style={{ marginTop: '21px' }}>
+                            <div className="col-md-3 col-12 mb-1 " style={{ marginTop: '21px' }}>
                                 {/* <Form.Label htmlFor="holdReason">Hold Reason</Form.Label> */}
                                 <Form.Control
                                     type="text"
@@ -728,7 +728,7 @@ const Responsiblle = ({ patientId }) => {
                                 // {...register('holdReason', { required: "holdReason formate is required" })}
                                 />
                             </div>
-                            <div className="col-3 mb-1">
+                            <div className="col-md-3 col-12 mb-1">
                                 <Form.Label htmlFor="holdReason" className="mb-0">Last statement</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -738,16 +738,16 @@ const Responsiblle = ({ patientId }) => {
                                     )}
                                 />
                             </div>
-                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
+                            <div className="col-md-3 col-12 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""
                                 />
                             </div>
-                            <div className="col-3 mt-3 pt-1">
+                            <div className="col-md-3 col-12 mt-3 pt-1">
                                 <p className="text-nowrap " style={{ fontWeight: 600 }}>Legacy credit card on file</p>
                             </div>
-                            <div className="col-3 mb-1">
+                            <div className="col-md-3 col-12 mb-1">
                                 <Form.Label htmlFor="holdReason" className="mb-0">Card</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -757,7 +757,7 @@ const Responsiblle = ({ patientId }) => {
                                     )}
                                 />
                             </div>
-                            <div className="col-3 mb-1">
+                            <div className="col-md-3 col-12 mb-1">
                                 <Form.Label htmlFor="holdReason" className="mb-0">Expiry</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -767,7 +767,7 @@ const Responsiblle = ({ patientId }) => {
                                     )}
                                 />
                             </div>
-                            <div className="col-3 mb-1" style={{ marginTop: '21px' }}>
+                            <div className="col-md-3 col-12 mb-1" style={{ marginTop: '21px' }}>
                                 <Form.Control
                                     type="text"
                                     placeholder=""

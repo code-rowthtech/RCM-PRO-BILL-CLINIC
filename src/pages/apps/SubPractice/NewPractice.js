@@ -673,7 +673,6 @@ const NewPractice = () => {
                                                         </Form.Label>
                                                         <Form.Select
                                                             data-has-value={!!watch('clinicType')}
-
                                                             {...register('clinicType', { required: 'Practice Type is required' })}
                                                             onChange={(e) => formDataChange('clinicType', e.target.value)}
                                                             className='form-control'

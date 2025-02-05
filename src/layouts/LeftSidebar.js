@@ -98,10 +98,19 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
     const [selectedAppointment, setSelectedAppointment] = useState(null); // Store selected appointment ID
-
+    const filterDropdownRef = useRef(null);
     // Handle selection (only one at a time)
     const handleSelectDoctor = (id) => setSelectedDoctor(id);
     const handleSelectAppointment = (id) => setSelectedAppointment(id);
+
+    const [showFilterDropDown, setShowFilterDropDown] = useState(false);
+
+    const togglePriorityDropdown = () => {
+        setShowFilterDropDown(!showFilterDropDown);
+    };
+
+
+
 
     useEffect(() => {
         if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' || createPatientsResponse === 201) {
@@ -124,8 +133,19 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         setFilter(false);
     }
 
-
-    // Render the correct filter list based on active category
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target))
+            ) {
+                setShowFilterDropDown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
     const renderFilterList = () => {
         if (activeFilter === "Doctors") {
             return (
@@ -151,7 +171,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                     doctorDetails.map((data) => (
                                         <li
                                             key={data?._id}
-                                            className={`py-2 px-3 rounded ${selectedDoctor === data?._id ? "bg-primary text-white" : "hover-effect"
+                                            className={`py-2  rounded ${selectedDoctor === data?._id ? "bg-primary text-white" : "hover-effect"
                                                 }`}
                                             style={{ cursor: "pointer", transition: "0.3s" }}
                                             onClick={() => handleSelectDoctor(data?._id)}
@@ -212,11 +232,11 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
             <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '60px' }} ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
                     <>
-                        {!isCondensed && (
+                        {!isCondensed ? 
                             <ul style={{ listStyle: 'none' }} className='px-0'>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
                                     <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-                                    <Button className='custom-buttons' onClick={() => setFilter(true)}><i class="bi bi-filter"></i></Button>
+                                    <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i class="bi bi-filter"></i></Button>
                                 </li>
                                 <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
                                     <Link to='/apps/patients/new-patient'>
@@ -307,9 +327,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                             </li>
                                         ))
                                 }
-                                <Modal centered size="lg" show={filter} onHide={closeModal}>
+                                {/* <Modal centered size="lg" show={filter} onHide={closeModal}>
                                     <Modal.Body className="p-4">
-                                        {/* Header */}
 
                                         <Row className="border-bottom pb-2 ">
                                             <Col sm={12} className="text-end">
@@ -321,9 +340,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
 
                                         </Row>
 
-                                        {/* Main Content */}
                                         <Row className="">
-                                            {/* Sidebar: Filter Categories */}
                                             <Col md={4} className="border-end">
                                                 <ul className="list-unstyled ps-3">
                                                     <li
@@ -346,7 +363,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                                 </ul>
                                             </Col>
 
-                                            {/* Filter Selection */}
                                             <Col md={8} className='pt-2' >{renderFilterList()}</Col>
                                         </Row>
 
@@ -360,10 +376,209 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                             </Col>
                                         </Row>
                                     </Modal.Body>
-                                </Modal>
-                            </ul>
+                                </Modal> */}
+                                {showFilterDropDown && (
+                                    <div
+                                        ref={filterDropdownRef}
+                                        className="position-absolute bg-white border p-1 rounded shadow-sm"
+                                        style={{ top: "15vh", left: "15vw", zIndex: 1002 , width: '500px' }}
+                                    >
+                                        <Row className=" pb-2 ">
+                                            <Col sm={12} className="text-end">
+                                            </Col>
+                                            <Col sm={12} className=''>
+                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
+                                            </Col>
 
-                        )}
+                                        </Row>
+
+                                        <Row className="">
+                                            <Col md={4} className="">
+                                                <ul className="list-unstyled ps-3">
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => setActiveFilter("Doctors")}
+                                                    >
+                                                        Doctors
+                                                    </li>
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => {
+                                                            setActiveFilter("Appointments");
+                                                            setDoctorSearch('')
+                                                        }}
+                                                    >
+                                                        Appointments
+                                                    </li>
+                                                </ul>
+                                            </Col>
+
+                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
+                                        </Row>
+
+                                        <Row className=" ">
+                                            <Col className="d-flex mb-1 justify-content-end">
+                                                <Button variant="primary" className='custom-buttons' onClick={() => {
+                                                    getAppointments()
+                                                }}>
+                                                    Apply
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                )}
+                            </ul>
+                            :
+                            // small side bar
+                            <ul style={{ listStyle: 'none' }} className='px-0 mt-5'>
+                                <div className={`text-end text-white me-1 ${selectedDoctor ? '' : 'd-none'}`}>
+                                    <u className='cursor-pointer' onClick={() => setSelectedDoctor(null)}>Clear filters</u>
+                                </div>
+                                {store?.getPatientsByAppointmentReducer?.loading ?
+                                    <div className='text-center my-5'>
+                                        <Spinner color='white' />
+                                    </div>
+                                    :
+                                    patientsData?.length === 0 ?
+                                        <li className='text-white text-center py-5'>
+                                            No Appointments Found
+                                        </li>
+                                        :
+                                        patientsData &&
+                                        patientsData?.map((data, index) => (
+                                            <li
+                                                key={index}
+                                                className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
+                                                style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                onClick={() => navigate(`/apps/patients/new-patient?id=${data?.patient?._id}`)}
+                                            >
+                                                <div className="text-center">
+                                                    <img
+                                                        height='40'
+                                                        width='40'
+                                                        src={data?.patient?.patientChartPhoto?.url ? data?.patient?.patientChartPhoto?.url : profileImg}
+                                                        // style={{ height: '5vh' }}
+                                                        className="rounded-circle border border-black"
+                                                        alt="profile image"
+                                                    />
+                                                    <div>
+                                                        <p className="mb-0 mt-1 text-capitalize" style={{ fontSize: '12px' }}>
+                                                            {data?.patient?.firstName} 
+
+                                                        </p>
+                                                        <p className="mb-0 " style={{ fontSize: '10px' }}>Dr.{data?.doctor?.userId?.firstName} </p>
+                                                    </div>
+                                                </div>
+                                              
+                                            </li>
+                                        ))
+                                }
+                                {/* <Modal centered size="lg" show={filter} onHide={closeModal}>
+                                    <Modal.Body className="p-4">
+
+                                        <Row className="border-bottom pb-2 ">
+                                            <Col sm={12} className="text-end">
+                                                <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
+                                            </Col>
+                                            <Col sm={12}>
+                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
+                                            </Col>
+
+                                        </Row>
+
+                                        <Row className="">
+                                            <Col md={4} className="border-end">
+                                                <ul className="list-unstyled ps-3">
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => setActiveFilter("Doctors")}
+                                                    >
+                                                        Doctors
+                                                    </li>
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => {
+                                                            setActiveFilter("Appointments");
+                                                            setDoctorSearch('')
+                                                        }}
+                                                    >
+                                                        Appointments
+                                                    </li>
+                                                </ul>
+                                            </Col>
+
+                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
+                                        </Row>
+
+                                        <Row className=" border-top">
+                                            <Col className="d-flex mt-3 justify-content-end">
+                                                <Button variant="primary" className='custom-buttons' onClick={() => {
+                                                    getAppointments()
+                                                }}>
+                                                    Apply
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </Modal.Body>
+                                </Modal> */}
+                                {showFilterDropDown && (
+                                    <div
+                                        ref={filterDropdownRef}
+                                        className="position-absolute bg-white border p-1 rounded shadow-sm"
+                                        style={{ top: "15vh", left: "15vw", zIndex: 1002 , width: '500px' }}
+                                    >
+                                        <Row className=" pb-2 ">
+                                            <Col sm={12} className="text-end">
+                                            </Col>
+                                            <Col sm={12} className=''>
+                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
+                                            </Col>
+
+                                        </Row>
+
+                                        <Row className="">
+                                            <Col md={4} className="">
+                                                <ul className="list-unstyled ps-3">
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => setActiveFilter("Doctors")}
+                                                    >
+                                                        Doctors
+                                                    </li>
+                                                    <li
+                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
+                                                        style={{ cursor: "pointer" }}
+                                                        onClick={() => {
+                                                            setActiveFilter("Appointments");
+                                                            setDoctorSearch('')
+                                                        }}
+                                                    >
+                                                        Appointments
+                                                    </li>
+                                                </ul>
+                                            </Col>
+
+                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
+                                        </Row>
+
+                                        <Row className=" ">
+                                            <Col className="d-flex mb-1 justify-content-end">
+                                                <Button variant="primary" className='custom-buttons' onClick={() => {
+                                                    getAppointments()
+                                                }}>
+                                                    Apply
+                                                </Button>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                )}
+                            </ul>
+}
                     </>
                     :
                     <>
