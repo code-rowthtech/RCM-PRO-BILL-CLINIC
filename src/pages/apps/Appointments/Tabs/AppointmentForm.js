@@ -83,9 +83,9 @@ const AppointmentForm = () => {
     }, [age]);
     const { register, handleSubmit, watch, formState: { errors }, control, setValue, reset, clearErrors } = useForm({
         defaultValues: {
-            scheduled: new Date(), // Default date: today
-            startTime: "10:00", // Default start time: 9:00 AM
-            duration: 30, // Default duration: 30 minutes
+            scheduled: new Date().toISOString().split("T")[0],
+             startTime: "10:00",
+            duration: 30, 
         },
     });
     useEffect(() => {
@@ -173,6 +173,23 @@ const AppointmentForm = () => {
 
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row>
+                <Col sm={6}>
+                        <Form.Group className="mb-1" controlId="profile">
+                            <Form.Label className="mb-0">Visit Type</Form.Label>
+                            <Form.Control
+                                data-has-value={!!watch('profile')}
+
+                                className="form-select"
+                                as="select" {...register("profile",
+                                    { required: "Visit Type is required" }
+                                )}>
+                                <option value="" hidden> Visit Type</option>
+                                <option value="New Patient Visit">New Patient Visit</option>
+                                <option value="Followup Visit">Follow up Visit</option>
+                            </Form.Control>
+                            {errors.profile && <p className="text-danger">{errors.profile.message}</p>}
+                        </Form.Group>
+                    </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="patient">
                             <Form.Label className="mb-0">Patient</Form.Label>
@@ -309,23 +326,7 @@ const AppointmentForm = () => {
                         </Form.Group>
                     </Col>
 
-                    <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="profile">
-                            <Form.Label className="mb-0">Visit Type</Form.Label>
-                            <Form.Control
-                                data-has-value={!!watch('profile')}
-
-                                className="form-select"
-                                as="select" {...register("profile",
-                                    { required: "Visit Type is required" }
-                                )}>
-                                <option value="" hidden> Visit Type</option>
-                                <option value="New Patient Visit">New Patient Visit</option>
-                                <option value="Followup Visit">Follow up Visit</option>
-                            </Form.Control>
-                            {errors.profile && <p className="text-danger">{errors.profile.message}</p>}
-                        </Form.Group>
-                    </Col>
+                    
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="consultationRoom">
                             <Form.Label className="mb-0">Consultation Room</Form.Label>
