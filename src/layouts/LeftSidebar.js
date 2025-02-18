@@ -63,7 +63,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
-    console.log(store?.getPatientsByAppointmentReducer?.data?.appointments, 'store?.getPatientsByAppointmentReducer?.data')
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -121,7 +120,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 search: search
             }
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
-            console.log({ payload })
         }
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
     useEffect(() => {
@@ -223,7 +221,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                 status: activeTab,
                 search: search
             }
-            console.log({ payload })
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
     }
@@ -236,7 +233,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                             <ul style={{ listStyle: 'none' }} className='px-0'>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
                                     <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-                                    <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i class="bi bi-filter"></i></Button>
+                                    <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i className="bi bi-filter"></i></Button>
                                 </li>
                                 <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
                                     <Link to='/apps/patients/new-patient'>

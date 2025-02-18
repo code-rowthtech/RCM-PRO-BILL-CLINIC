@@ -564,3 +564,6 @@ table {
     background-color: #6168d0 !important;
     border-color: white !important;
 }
+.offcanvas{
+    width: 35vw !important;
+}

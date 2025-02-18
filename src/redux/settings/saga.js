@@ -66,6 +66,37 @@ function* getMastersDataFunction(data) {
     }
 }
 
+function* getMastersData2Function(data) {
+    try {
+        yield put({
+            type: SettingsActionTypes.GET_MASTERS2_DATA_LOADING,
+            payload: {},
+        });
+        const response = yield call(getMastersDataApi, data);
+        console.log(response,'responseresponseresponseresponseresponse')
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,'responseresponseresponseresponseresponse')
+
+
+        if (response.status === 200) {
+            yield put({
+                type: SettingsActionTypes.GET_MASTERS2_DATA_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: SettingsActionTypes.GET_MASTERS2_DATA_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: SettingsActionTypes.GET_MASTERS2_DATA_ERROR,
+            payload: error,
+        });
+    }
+}
+
 function* getDepartmentDataFunction(data) {
     try {
         yield put({
@@ -102,7 +133,6 @@ function* updateMastersDataFunction(data) {
         });
         const response = yield call(updateMastersDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success')
             yield put({
@@ -138,6 +168,10 @@ export function* watchCreateMastersData() {
 export function* watchGetMastersData() {
     yield takeEvery(SettingsActionTypes.GET_MASTERS_DATA, getMastersDataFunction);
 }
+
+export function* watchGetMasters2Data() {
+    yield takeEvery(SettingsActionTypes.GET_MASTERS2_DATA, getMastersData2Function);
+}
 export function* watchGetDepartmentData() {
     yield takeEvery(SettingsActionTypes.GET_DEPARTMENT_DATA, getDepartmentDataFunction);
 }
@@ -157,7 +191,8 @@ function* settingsSaga() {
         fork(watchGetMastersData),
         fork(watchGetDepartmentData),
         fork(watchUpdateMastersData),
-        fork(watchresetState)
+        fork(watchresetState),
+        fork(watchGetMasters2Data) 
     ]);
 }
 export default settingsSaga;

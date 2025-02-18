@@ -11,3 +11,4 @@ export * from './patients/actions';
 export * from './subscriptions/actions';
 export * from './appointments/action';
 export * from './vitals/actions';
+export * from './assigntasks/action';

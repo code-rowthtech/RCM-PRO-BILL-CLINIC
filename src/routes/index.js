@@ -76,6 +76,9 @@ const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
 const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
 const PurposeOfVisit = React.lazy(() => import('../pages/apps/Settings/Purpose/PurposeOfVisit'));
+const ConsultationRoom = React.lazy(() => import ('../pages/apps/Settings/Consultation Room/ConsultationRoom'));
+const Office = React.lazy(() => import ('../pages/apps/Settings/Office/Office'));
+
 
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
@@ -445,6 +448,22 @@ const AllRoutes = () => {
                                     path: 'purposeofvisit',
                                     element: hasPermission('view desigination settings') ? (
                                         <LoadComponent component={PurposeOfVisit} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'consultationroom',
+                                    element: hasPermission('view consultationroom settings') ? (
+                                        <LoadComponent component={ConsultationRoom} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'office',
+                                    element: hasPermission('view office settings') ? (
+                                        <LoadComponent component={Office} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
                                     ),

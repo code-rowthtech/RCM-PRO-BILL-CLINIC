@@ -24,8 +24,6 @@ export const getStatedByCountry =  `${BaseRoute}/states/US`;
 export const getCityByState = `${BaseRoute}/cities/`;
 export const getClinicType = `${BaseRoute}/getClinicTypes`;
 
-
-
 // SUB CLINIC
 export const createSubClinic =  `${BaseRoute}/createSubClinics`;
 export const getSubClinic = `${BaseRoute}/getSubClinics`;
@@ -44,7 +42,6 @@ export const addMastersData = `${BaseRoute}/createOrUpdateMasterData`;
 export const getMastersData = `${BaseRoute}/getmasterData`;
 export const getDepartmentData = `${BaseRoute}/getmasterData`;
 export const updateMastersData = `${BaseRoute}/createOrUpdateMasterData`;
-
 export const addRoleData = `${BaseRoute}/roles/create`;
 export const getRoleData = `${BaseRoute}/getAllRoles`;
 export const updateRoleData = `${BaseRoute}/roles/edit`;
@@ -94,6 +91,33 @@ export const getPractitionerSchedule = `${BaseRoute}/getPractitionerSchedule`;
 export const getAppointments = `${BaseRoute}/appointment/getAll/`;
 export const getAppointmentById = `${BaseRoute}/appointment/`;
 export const getPractitionerSlots = `${BaseRoute}/practitioner/slots`;
+export const getPatientsByAppointment = `${BaseRoute}/getPatientsByAppointments`;
+
+// ASSIGN NOTES
+export const getClinicEmployees = `${BaseRoute}/getClinicEmployees`;
+export const createTask = `${BaseRoute}/createTask`;
+export const getAllTasks = `${BaseRoute}/getAllTasks`;
+export const updateTask = `${BaseRoute}/updateTask`;
+export const getTaskDetails = `${BaseRoute}/getTaskDetails`;
+
+// Problem List
+export const getProblemList = `${BaseRoute}/getPatientProblems`;
+export const createProblemList = `${BaseRoute}/createProblems`;
+export const updateProblemList = `${BaseRoute}/updateProblems`;
+export const deleteProblemList = `${BaseRoute}/deleteProblems`;
+export const allCodes = `${BaseRoute}/codes/search`;
+export const getPatientAppointment = `${BaseRoute}/getPatientAppointments`;
+export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
+
+
+// Allergy List
+// export const getAllergylist = `${BaseRoute}/getAllergiesList`;
+export const createAllergy = `${BaseRoute}/addAllergy`;
+export const updateAllergy = `${BaseRoute}/updateAllergy`;
+// export const deleteProblemList = `${BaseRoute}/deleteAllergy`;
+export const getAllergiesOfAPatient = `${BaseRoute}/getAllergiesOfAPatient`;
+export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
+
 
 // vitals
 export const createVitals = `${BaseRoute}/addVitals`;
@@ -102,4 +126,3 @@ export const getVitalsByPatientId = `${BaseRoute}/vitalsByPatientId`;
 export const getVitalsByAppointmentId = `${BaseRoute}/vitalsByAppointmentId`;
 export const updateVitals = `${BaseRoute}/updateVitals`;
 
-export const getPatientsByAppointment = `${BaseRoute}/getPatientsByAppointments`;

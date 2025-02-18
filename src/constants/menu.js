@@ -97,6 +97,18 @@ const MENU_ITEMS = [
                 parentKey: 'setting',
             },
             {
+                key: 'consultationroom',
+                label: 'Consultation Room',
+                url: '/apps/settings/consultationroom',
+                parentKey: 'setting',
+            },
+            {
+                key: 'office',
+                label: 'Office',
+                url: '/apps/settings/office',
+                parentKey: 'setting',
+            },
+            {
                 key: 'rolesetting',
                 label: 'Role',
                 url: '/apps/settings/role',

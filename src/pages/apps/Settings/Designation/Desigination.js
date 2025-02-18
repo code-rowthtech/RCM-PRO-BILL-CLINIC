@@ -29,8 +29,8 @@ const Designation = () => {
   const [status, setStatus] = useState(true);
   const [skip, setSkip] = useState(1);
   const createResponse = store?.createMastersDataReducer?.data?.status;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
-  const pagination = store?.getMastersDataReducer?.data;
+  const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
+  const pagination = store?.getMastersDataReducer?.data1?.data;
 
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   const closeAddModal = () => {
@@ -101,7 +101,7 @@ const Designation = () => {
   };
 
   const handleUpdate = (data) => {
-    const payload = { id: data?._id, isActive: !data?.isActive };
+    const payload = { id: data?._id, isActive: !data?.isActive , category: 'Desigination'};
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
   return (
@@ -183,7 +183,7 @@ const Designation = () => {
                 </tr>
               </thead>
               <tbody >
-                {store?.getMastersDataReducer?.loading ? (
+                {store?.getMastersDataReducer?.data1?.loading ? (
                   <tr>
                     <td colSpan={6} className="text-center">
                       <Spinner />

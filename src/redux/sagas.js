@@ -16,11 +16,14 @@ import scheduleSaga from './schedule/saga';
 import settingsRoleSaga from './settings/rolesetting/saga';
 import appointentsSaga from './appointments/saga';
 import vitalsSaga from './vitals/saga';
+import clinicNotesSaga from './assigntasks/saga';
+import ProblemListSaga from './ProblemList/saga';
+import alleryListSaga from './allergyList/saga';
 
 
 export default function* rootSaga(): any {
     yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(),
-    dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga()]);
+    dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga(),clinicNotesSaga(),ProblemListSaga(),alleryListSaga(),]);
 }
 // export default function* rootSaga(): any {
 //     yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(),settingsSaga(),scheduleSaga() ]);

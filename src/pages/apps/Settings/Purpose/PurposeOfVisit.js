@@ -66,7 +66,7 @@ const POV = () => {
   };
 
   const createResponse = store?.createMastersDataReducer?.data?.status;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
 
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
@@ -100,7 +100,7 @@ const POV = () => {
   };
 
   const handleUpdate = (data) => {
-    const payload = { id: data?._id, isActive: !data?.isActive };
+    const payload = { id: data?._id, isActive: !data?.isActive,category:'purposeOfVisit' };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
@@ -185,7 +185,7 @@ const POV = () => {
                 </tr>
               </thead>
               <tbody >
-                {store?.getMastersDataReducer?.loading ? (
+                {store?.getMastersDataReducer?.data1?.loading ? (
                   <tr>
                     <td colSpan={6} className="text-center">
                       <Spinner />
@@ -227,7 +227,7 @@ const POV = () => {
               <Col className='mt-2 d-flex justify-content-end'>
                 <Paginations
                   currentPage={skip}
-                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
+                  totalPages={store?.getMastersDataReducer?.data1?.data?.totalPages}
                   onPageChange={handlePageChange}
                 />
               </Col>

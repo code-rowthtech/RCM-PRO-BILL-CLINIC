@@ -20,7 +20,6 @@ import { IoSearchSharp } from 'react-icons/io5';
 
 const Department = () => {
   const store = useSelector((state) => state);
-  console.log(store, 'stoed')
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -67,7 +66,7 @@ const Department = () => {
   };
 
   const createResponse = store?.createMastersDataReducer?.data?.status;
-  const tableGetData = store?.getMastersDataReducer?.data?.result;
+  const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
 
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
@@ -102,7 +101,7 @@ const Department = () => {
   };
 
   const handleUpdate = (data) => {
-    const payload = { id: data?._id, isActive: !data?.isActive };
+    const payload = { id: data?._id, isActive: !data?.isActive, category:'Department' };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
@@ -190,7 +189,7 @@ const Department = () => {
                 </tr>
               </thead>
               <tbody >
-                {store?.getMastersDataReducer?.loading ? (
+                {store?.getMastersDataReducer?.data1?.loading ? (
                   <tr>
                     <td colSpan={6} className="text-center">
                       <Spinner />

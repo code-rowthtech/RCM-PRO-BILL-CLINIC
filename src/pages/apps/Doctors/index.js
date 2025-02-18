@@ -145,11 +145,13 @@ const Doctors = () => {
                                             </tr>
                                         </thead>
                                         {store?.getDoctorsReducer?.loading ? (
+                                            <tbody>
                                             <tr>
                                                 <td className='text-center' colSpan={6}>
                                                     <Spinner className=" my-5 " />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         ) : (
                                             <tbody>
                                                 {filteredDoctors.length === 0 ? (
