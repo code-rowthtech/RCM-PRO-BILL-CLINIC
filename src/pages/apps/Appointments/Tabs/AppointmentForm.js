@@ -51,7 +51,7 @@ const AppointmentForm = () => {
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
-    console.log(getAppointment,'getAppointment')
+    console.log(getAppointment, 'getAppointment');
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const appointmentDetails = store?.getAppointmentByIdReducer?.data?.data;
     const [focused, setFocused] = useState(false);
@@ -119,13 +119,11 @@ const AppointmentForm = () => {
 
     useEffect(() => {
         dispatch(
-            getMastersDataAction({ status:true, category: 'Consultation Room', limit: 10, skip, search: search })
+            getMastersDataAction({ status: true, category: 'Consultation Room', limit: 10, skip, search: search })
         );
     }, [dispatch, search, skip]);
     useEffect(() => {
-        dispatch(
-            getMastersDataAction2({ status: true, category: 'Office', limit: 10, skip, search: search })
-        );
+        dispatch(getMastersDataAction2({ status: true, category: 'Office', limit: 10, skip, search: search }));
     }, [dispatch, search, skip]);
 
     const consultationRoomData = store?.getMastersDataReducer?.data1?.data?.result;
@@ -340,7 +338,7 @@ const AppointmentForm = () => {
                                 {officeData &&
                                     officeData.map((office) => (
                                         <option key={office?._id} value={office?._id}>
-                                            {office?.name} 
+                                            {office?.name}
                                         </option>
                                     ))}
                             </Form.Control>
@@ -372,9 +370,9 @@ const AppointmentForm = () => {
                                     Select Consultation Room
                                 </option>
                                 {consultationRoomData &&
-                                    consultationRoomData.map((room,) => (
+                                    consultationRoomData.map((room) => (
                                         <option key={room?._id} value={room?._id}>
-                                            {room?.name} 
+                                            {room?.name}
                                         </option>
                                     ))}
                             </Form.Control>
@@ -445,31 +443,39 @@ const AppointmentForm = () => {
                             }>
                             Delete
                         </Button>
-                        <Button
+                        {/* <Button
                             type="submit"
                             className="custom-buttons"
                             disabled={
                                 store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
                             }>
-                            Save and close
-                        </Button>
+                                 {store?.createAppointmentReducer?.loading ? (
+                                <Spinner color="white" className="spinner-border-sm" />
+                            ) : (
+                                'Save and close'
+                            )}
+                        </Button> */}
                         <Button
                             className="custom-buttons"
                             type="submit"
                             disabled={
                                 store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
                             }>
-                            Save
+                            {store?.createAppointmentReducer?.loading ? (
+                                <Spinner color="white" className="spinner-border-sm" />
+                            ) : (
+                                'Save'
+                            )}
                         </Button>
+
                         <Button
                             className="cancel-button"
                             disabled={
                                 store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
                             }
-                            onClick={()=>{
+                            onClick={() => {
                                 reset();
-                            }}
-                            >
+                            }}>
                             Cancel
                         </Button>
                     </Col>
