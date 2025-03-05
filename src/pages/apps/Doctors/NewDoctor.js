@@ -14,6 +14,7 @@ import us from '../../../assets/images/flags/us.jpg'
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
+import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 
 
 const NewDoctor = () => {
@@ -59,6 +60,7 @@ const NewDoctor = () => {
     const password = watch('password');
 
     const statesData = store?.getStatesReducer?.data;
+    console.log(statesData, 'statesData')
     const role = store?.getDoctorsRolesReducer?.data
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -77,7 +79,7 @@ const NewDoctor = () => {
         const payload = {
             id: updateId
         }
-        dispatch(getDoctorDetailsAction({ key: encryptMessage(payload) }));
+        dispatch(getDoctorDetailsAction(payload));
         dispatch(getStatesByCountryAction())
     }, [dispatch]);
 
@@ -88,6 +90,7 @@ const NewDoctor = () => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    console.log(doctorDetails, 'doctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
@@ -116,10 +119,10 @@ const NewDoctor = () => {
         if (doctorDetails && updateId) {
             const cityName = doctorDetails?.userId?.address?.city?.name || ''; // Fallback to an empty string if name is missing
             // setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
-            setValue('firstName', doctorDetails?.userId?.firstName)
-            setValue('lastName', doctorDetails?.userId?.lastName)
+            setValue('firstName', doctorDetails?.name?.[0]?.given)
+            setValue('lastName', doctorDetails?.name?.[0]?.family)
             setValue('email', doctorDetails?.userId?.email)
-            setValue('phone', doctorDetails?.userId?.phone)
+            setValue('phone', doctorDetails?.telecom?.[0]?.value)
             setValue('gender', doctorDetails?.userId?.gender)
             setValue('department', doctorDetails?.departmentId?._id)
             // setValue('city', cityName)
@@ -132,8 +135,10 @@ const NewDoctor = () => {
             setMailingLatitude(doctorDetails?.userId?.mailingAddress?.latitude)
             setMailingLongitude(doctorDetails?.userId?.mailingAddress?.longitude)
             setValue('degreeName', doctorDetails?.degree?.[0]?.name);
-            setValue('address1', doctorDetails?.userId?.primaryAddress?.address)
-            setValue('address2', doctorDetails?.userId?.mailingAddress?.address)
+            setValue('specialist', doctorDetails?.specialities?.[0]);
+            if (doctorDetails?.address) {
+                setAddresses(doctorDetails.address);
+            }
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
                 : '';
@@ -190,23 +195,41 @@ const NewDoctor = () => {
         }
     };
     // console.log(logo)
+
+
     const submitData = (data) => {
         const payload = {
-            ...(updateId ? { id: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add `id` if `updateId` exists
+            ...(updateId ? { doctorId: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add id if updateId exists
             // clinicId: clinicId,
-            firstName: data?.firstName,
-            lastName: data?.lastName,
             email: data?.email,
-            departmentId: data?.department,
+            ...(!updateId ? { password: data?.password } : {}),
             dob: data?.dateOfBirth,
             gender: data?.gender,
-            ...(!updateId ? { password: data?.password } : {}),
-            phone: data?.phone,
-            specialities: [data?.specialist],
             profileImage: {
                 url: logo?.url?.split('?')[0] || logo,
                 fileName: logoName,
             },
+            name: {
+                use: "official",
+                text: `${data?.firstName || ""} ${data?.lastName || ""}`.trim(),
+                family: data?.lastName,
+                given: data?.firstName,
+                prefix: [''],
+                suffix: [],
+            },
+            telecom: [
+                {
+                    system: "phone",
+                    value: data?.phone,
+                    use: "work"
+                },
+                {
+                    system: "email",
+                    value: data?.email,
+                    use: "work"
+                }
+            ],
+            specialities: [data?.specialist],
             degree: [{
                 name: data?.degreeName,
                 uploadedDocument: {
@@ -214,35 +237,36 @@ const NewDoctor = () => {
                     fileName: degreeName,
                 }
             }],
-            role: doctorRoleId,
-            primaryAddress: {
-                ...(data?.address1 ? { address: data?.address1 } : {}),
-                ...(data?.street1 ? { street: data?.street1 } : {}),
-                ...(data?.state1 ? { state: data?.state1 } : {}),
-                ...(data?.zip1 ? { zip: data?.zip1 } : {}),
-                ...(latitude ? { latitude: latitude } : {}),
-                ...(longitude ? { longitude: longitude } : {}),
-                ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
-            },
-            mailingAddress: sameAsPrimary ?
-                {
-                    ...(data?.address1 ? { address: data?.address1 } : {}),
-                    ...(data?.street1 ? { street: data?.street1 } : {}),
-                    ...(data?.state1 ? { state: data?.state1 } : {}),
-                    ...(data?.zip1 ? { zip: data?.zip1 } : {}),
-                    ...(latitude ? { latitude: latitude } : {}),
-                    ...(longitude ? { longitude: longitude } : {}),
-                    ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
-                }
-                : {
-                    ...(data?.address2 ? { address: data?.address2 } : {}),
-                    ...(data?.street2 ? { street: data?.street2 } : {}),
-                    ...(data?.state2 ? { state: data?.state2 } : {}),
-                    ...(data?.zip2 ? { zip: data?.zip2 } : {}),
-                    ...(mailingLatitude ? { latitude: mailingLatitude } : {}),
-                    ...(mailingLongitude ? { longitude: mailingLongitude } : {}),
-                    ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
-                }
+            address: addresses,
+            // role: doctorRoleId,
+            // primaryAddress: {
+            //     ...(data?.address1 ? { address: data?.address1 } : {}),
+            //     ...(data?.street1 ? { street: data?.street1 } : {}),
+            //     ...(data?.state1 ? { state: data?.state1 } : {}),
+            //     ...(data?.zip1 ? { zip: data?.zip1 } : {}),
+            //     ...(latitude ? { latitude: latitude } : {}),
+            //     ...(longitude ? { longitude: longitude } : {}),
+            //     ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
+            // },
+            // mailingAddress: sameAsPrimary ?
+            //     {
+            //         ...(data?.address1 ? { address: data?.address1 } : {}),
+            //         ...(data?.street1 ? { street: data?.street1 } : {}),
+            //         ...(data?.state1 ? { state: data?.state1 } : {}),
+            //         ...(data?.zip1 ? { zip: data?.zip1 } : {}),
+            //         ...(latitude ? { latitude: latitude } : {}),
+            //         ...(longitude ? { longitude: longitude } : {}),
+            //         ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
+            //     }
+            //     : {
+            //         ...(data?.address2 ? { address: data?.address2 } : {}),
+            //         ...(data?.street2 ? { street: data?.street2 } : {}),
+            //         ...(data?.state2 ? { state: data?.state2 } : {}),
+            //         ...(data?.zip2 ? { zip: data?.zip2 } : {}),
+            //         ...(mailingLatitude ? { latitude: mailingLatitude } : {}),
+            //         ...(mailingLongitude ? { longitude: mailingLongitude } : {}),
+            //         ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
+            //     }
         };
         if (updateId) {
             console.log({ payload })
@@ -252,6 +276,8 @@ const NewDoctor = () => {
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
     };
+
+
 
 
     const handleTabChange = (tab) => {
@@ -290,6 +316,39 @@ const NewDoctor = () => {
                 }
             });
     }
+    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const [addresses, setAddresses] = useState(doctorDetails?.address || [
+        { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }
+    ]);
+
+    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
+    const [addressFocused, setAddressFocused] = useState(false);
+
+    const addAddress = () => {
+        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
+    };
+    const removeAddress = (index) => {
+        if (addresses.length > 1) {
+            setAddresses(addresses.filter((_, i) => i !== index));
+        }
+    };
+    const handleAddressChange = (index, field, value) => {
+        setAddresses((prevAddresses) => {
+            const updatedAddresses = [...prevAddresses];
+
+            if (field === 'line') {
+                updatedAddresses[index] = { ...updatedAddresses[index], line: value };
+            } else {
+                updatedAddresses[index] = { ...updatedAddresses[index], [field]: value };
+            }
+
+            return updatedAddresses;
+        });
+
+        // Sync with React Hook Form
+        setValue(`address[${index}].${field}`, value);
+    };
+
 
     const getMailingGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -354,32 +413,33 @@ const NewDoctor = () => {
     useEffect(() => {
         if (cities1) {
             const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
-            setValue('city1', selectedCounty)
-            setFormData((prevState) => ({
-                ...prevState,
-                primaryAddress: {
-                    ...prevState.primaryAddress,
-                    city: selectedCounty,
-                }
-            }));
+            setValue('city', selectedCounty)
+            // setFormData((prevState) => ({
+            //     ...prevState,
+            //     primaryAddress: {
+            //         ...prevState.primaryAddress,
+            //         city: selectedCounty,
+            //     }
+            // }));
         }
         if (cities2) {
             const selectedCounty = cities2 && cities2.find((data) => data?.name === selectedMailingLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
             setValue('city2', selectedCounty)
-            setFormData((prevState) => ({
-                ...prevState,
-                mailingAddress: {
-                    ...prevState.mailingAddress,
-                    city: selectedCounty,
-                }
-            }));
+            // setFormData((prevState) => ({
+            //     ...prevState,
+            //     mailingAddress: {
+            //         ...prevState.mailingAddress,
+            //         city: selectedCounty,
+            //     }
+            // }));
         }
     }, [cities1, cities2])
 
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }))
+        console.log("key", key);
+        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }))
     };
     const handleMailingStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
@@ -482,7 +542,7 @@ const NewDoctor = () => {
                                                             </span>
                                                         </OverlayTrigger>
                                                     )}
-                                                    <div className='d-none d-md-block'>
+                                                    <div className='d-none d-md-block me-2'>
                                                         <Button className='cancel-button' onClick={handleNewDoctor}>
                                                             Back
                                                         </Button>
@@ -507,7 +567,7 @@ const NewDoctor = () => {
                                             :
                                             <>
                                                 <div className="col-12 mt-1">
-                                                    <div className="row" style={{ borderBottom: '1px solid #444141' }}>
+                                                    <div className="row" >
                                                         <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
@@ -519,12 +579,12 @@ const NewDoctor = () => {
                                                                     {...register('firstName', {
                                                                         required: 'First name is required',
                                                                         pattern: {
-                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
+                                                                            value: /^[a-zA-Z]{3,}$/,
                                                                             message: 'First name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
                                                                     onChange={(e) => {
-                                                                        clearErrors('firstName'); // Clears validation errors for 'dateOfBirth'
+                                                                        clearErrors('firstName');
                                                                         setFormData({ ...formData, firstName: e.target.value });
                                                                     }}
                                                                     placeholder="Enter first name"
@@ -543,7 +603,7 @@ const NewDoctor = () => {
                                                                     {...register('lastName', {
                                                                         required: 'Last name is required',
                                                                         pattern: {
-                                                                            value: /^[a-zA-Z]{3,}$/, // Regex: Only letters, at least 3 characters
+                                                                            value: /^[a-zA-Z]{3,}$/,
                                                                             message: 'Last name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
@@ -655,25 +715,26 @@ const NewDoctor = () => {
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
-                                                            <Form.Group className="mb-2">
-                                                                <Form.Label className="mb-0">Department <span className='text-danger'>*</span></Form.Label>
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">
+                                                                    Gender <span className="text-danger">*</span>
+                                                                </Form.Label>
                                                                 <Form.Select
-                                                                    className='form-control'
-                                                                    {...register('department', { required: 'Department is required' })}
+                                                                    as="select"
+                                                                    data-has-value={!!watch('gender')}
+                                                                    {...register("gender", { required: "Gender is required" })}
                                                                     onChange={(e) => {
-                                                                        setFormData({ ...formData, departmentId: e.target.value });
+                                                                        clearErrors("gender");
+                                                                        setFormData((prev) => ({ ...prev, gender: e.target.value }));
                                                                     }}
+                                                                    className="custom-select form-control"
                                                                 >
-                                                                    <option value="">Select Department</option>
-                                                                    {departmentGetData?.map((data) => (
-                                                                        <option key={data?._id} value={data?._id}>
-                                                                            {data.name}
-                                                                        </option>
-                                                                    ))}
+                                                                    <option value="" hidden>Select Gender</option>
+                                                                    <option value="Male">Male</option>
+                                                                    <option value="Female">Female</option>
+                                                                    <option value="Other">Other</option>
                                                                 </Form.Select>
-                                                                {errors.department && (
-                                                                    <span className="text-danger fs-6">{errors.department.message}</span>
-                                                                )}
+                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className='col-md-6 col-lg-3 col-sm-6 col-12'>
@@ -756,6 +817,7 @@ const NewDoctor = () => {
                                                                 </div>
                                                             </Form.Group>
                                                         </div>
+                                                        <hr className='my-1 ' />
                                                         <div className="col-md-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Degree Name</Form.Label>
@@ -818,7 +880,7 @@ const NewDoctor = () => {
                                                                     className="d-none "
                                                                     {...register('profileImage', {
                                                                     })}
-                                                                    accept=".png, .jpg, .jpeg, .svg" 
+                                                                    accept=".png, .jpg, .jpeg, .svg"
                                                                     ref={logoFileInputRef}
                                                                     onChange={handleFileChange}
                                                                 />
@@ -827,37 +889,14 @@ const NewDoctor = () => {
                                                                 }
                                                             </div>
                                                         </div>
-                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
-                                                            <Form.Group className="mb-1">
-                                                                <Form.Label className="mb-0">
-                                                                    Gender <span className="text-danger">*</span>
-                                                                </Form.Label>
-                                                                <Form.Select
-                                                                    as="select"
-                                                                    data-has-value={!!watch('gender')}
-                                                                    {...register("gender", { required: "Gender is required" })}
-                                                                    onChange={(e) => {
-                                                                        clearErrors("gender");
-                                                                        setFormData((prev) => ({ ...prev, gender: e.target.value }));
-                                                                    }}
-                                                                    className="custom-select form-control"
-                                                                >
-                                                                    <option value="" hidden>Select Gender</option>
-                                                                    <option value="Male">Male</option>
-                                                                    <option value="Female">Female</option>
-                                                                    <option value="Other">Other</option>
-                                                                </Form.Select>
-                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
-                                                            </Form.Group>
-                                                        </div>
 
-                                                        <div className="col-md-6 col-lg-3 col-sm-6 col-12">
+                                                        <div className="col-md-6 col-12">
                                                             <Form.Group className="mb-1">
-                                                                <Form.Label className="mb-0">Specialist <span className='text-danger'>*</span></Form.Label>
+                                                                <Form.Label className="mb-0">Specialist </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
                                                                     {...register('specialist',
-                                                                        { required: 'Specialist Name is required' }
+                                                                        // { required: 'Specialist Name is required' }
                                                                     )}
                                                                     onChange={(e) => {
                                                                         clearErrors('specialist');
@@ -865,508 +904,114 @@ const NewDoctor = () => {
                                                                     }}
                                                                     placeholder="Enter Specialist Name"
                                                                 />
-                                                                {errors.specialist && <span className="text-danger">{errors?.specialist?.message}</span>}
+                                                                {/* {errors.specialist && <span className="text-danger">{errors?.specialist?.message}</span>} */}
                                                             </Form.Group>
                                                         </div>
+                                                        <hr className='mb-1' />
                                                     </div>
-                                                    <div className='row mt-1'>
-                                                        <Col sm={12} className='pb-1' style={{ borderBottom: '1px solid #444141' }}>
-                                                            <Row>
-                                                                <Col sm={12} className=''>
-                                                                    <span className='text-black fw-semibold form-label'>Primary Address</span>
-                                                                </Col>
-                                                                <Col sm={6}>
-                                                                    <Row className='position-relative'>
-                                                                        <Col sm={12}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className="mb-0">Address</Form.Label>
-                                                                                <div style={{ position: 'relative' }}>
-                                                                                    <Form.Control
-                                                                                        type="text"
-                                                                                        defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.address : ''}
-                                                                                        {...register('address1')}
-                                                                                        onChange={(e) => {
-                                                                                            // setFormData({ ...formData, address: e.target.value });
-
-                                                                                            setFormData((prevState) => ({
-                                                                                                ...prevState,
-                                                                                                primaryAddress: {
-                                                                                                    ...prevState.primaryAddress,
-                                                                                                    address: e.target.value,
-                                                                                                }
-                                                                                            }));
-                                                                                            getGeolocation(e);
-                                                                                            setFocused(true); // Open dropdown on input
-                                                                                        }}
-                                                                                        onFocus={() => setFocused(true)} // Open dropdown when the field is focused
-                                                                                        onBlur={() => {
-                                                                                            setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
-                                                                                        }}
-                                                                                        placeholder="Search for address"
-                                                                                        autoComplete="off"
-                                                                                    />
-                                                                                    {/* {/ Dropdown suggestions /} */}
-                                                                                    <div
-                                                                                        style={{
-                                                                                            position: 'absolute',
-                                                                                            top: '100%',
-                                                                                            left: 0,
-                                                                                            width: '100%',
-                                                                                            maxHeight: '150px',
-                                                                                            overflow: 'auto',
-                                                                                            zIndex: 111,
-                                                                                            backgroundColor: '#fff',
-                                                                                            border: '1px solid #ced4da',
-                                                                                            borderTop: 'none',
-                                                                                        }}
-                                                                                        className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                                                    >
-                                                                                        {searchedLocations?.map((data, index) => (
-                                                                                            <p
-                                                                                                key={index}
-                                                                                                onClick={() => {
-                                                                                                    setSelectedLocation(data)
-                                                                                                    setValue('zip1', data?.components?.postcode || '')    // Update only the address field
-                                                                                                    setFormData((prevState) => ({
-                                                                                                        ...prevState,
-                                                                                                        primaryAddress: {
-                                                                                                            ...prevState.primaryAddress,
-                                                                                                            address: data?.formatted,
-                                                                                                            ...(data?.bounds?.southwest?.lat ? { latitude: data?.bounds?.southwest?.lat } : {}),
-                                                                                                            ...(data?.bounds?.southwest?.lng ? { longitude: data?.bounds?.southwest?.lng } : {}),
-                                                                                                            ...(data?.components?.postcode ? { zip: data?.components?.postcode } : {}),     // Update only the address field
-                                                                                                        }
-                                                                                                    }));
-                                                                                                    setFocused(false); // Close dropdown after selection
-                                                                                                }}
-                                                                                                style={{
-                                                                                                    margin: 0,
-                                                                                                    padding: '8px 12px',
-                                                                                                    cursor: 'pointer',
-                                                                                                }}
-                                                                                                className="hover-bg-change text-black"
-                                                                                            >
-                                                                                                {data?.formatted}
-                                                                                            </p>
-                                                                                        ))}
-                                                                                        {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    defaultValue={latitude}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                latitude: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                    }}
-                                                                                    placeholder="Latitude"
-                                                                                />
-                                                                                {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    defaultValue={longitude}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                longitude: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                    }} placeholder="Longitude" />
-                                                                                {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Col>
-                                                                <Col sm={6}>
-                                                                    <Row>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0' >State </Form.Label>
-                                                                                <Form.Select
-                                                                                    className='form-control'
-                                                                                    {...register("stateName")}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                state: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                        handleStateSelection(e);
-                                                                                    }} data-has-value={!!watch('stateName')}
-                                                                                >
-                                                                                    <option value='' hidden>State</option>
-                                                                                    {statesData?.states?.map((data) => (
-                                                                                        <option
-                                                                                            key={data?.id}
-                                                                                            data-key={JSON.stringify({ id: data?.id, _id: data?._id })}
-                                                                                            value={data?._id}
-                                                                                        >
-                                                                                            {data?.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-                                                                                {errors.stateName && (
-                                                                                    <span className="text-danger">{errors.stateName.message}</span>
-                                                                                )}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>City</Form.Label>
-
-                                                                                <Form.Select
-                                                                                    disabled={store?.getCitiesReducer?.loading}
-                                                                                    {...register('city1')}
-                                                                                    data-has-value={!!watch('city1')}
-                                                                                    onChange={(e) => {
-                                                                                        // setFormData({ ...formData, city: e.target.value })
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                city: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                    }}
-                                                                                    className='form-control'
-
-                                                                                >
-                                                                                    <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                                    {cities1?.map((data) => (
-                                                                                        <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
-                                                                                            {data?.name}
-                                                                                        </option>
-                                                                                    ))}
-                                                                                </Form.Select>
-
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Street</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    {...register('street1')}
-                                                                                    onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                street: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                    }}
-                                                                                    placeholder="Street" />
-
-                                                                                {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
-                                                                                <Form.Control
-                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.primaryAddress?.zip : ''}
-                                                                                    type="text"
-                                                                                    {...register('zip1', {
-                                                                                        minLength: {
-                                                                                            value: 5,
-                                                                                            message: 'ZIP code must be at least 5 characters long',
-                                                                                        },
-                                                                                        pattern: {
-                                                                                            value: /^[0-9]+$/,
-                                                                                            message: 'ZIP code must contain numbers only',
-                                                                                        },
-                                                                                    })}
-                                                                                    onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => {
-                                                                                        setFormData((prevState) => ({
-                                                                                            ...prevState,
-                                                                                            primaryAddress: {
-                                                                                                ...prevState.primaryAddress,
-                                                                                                zip: e.target.value,
-                                                                                            }
-                                                                                        }));
-                                                                                    }}
-                                                                                    placeholder="Zip"
-                                                                                    maxLength={5}
-                                                                                />
-                                                                                {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Col>
-                                                            </Row>
-                                                        </Col>
-                                                    </div>
-
-                                                    <div className='row mt-1'>
-
+                                                    <Row>
                                                         <Col sm={12}>
-                                                            <Row>
-                                                                <Col sm={12} className='mb-2'>
-                                                                    <span className='text-black fw-semibold form-label'>Mailing Address</span>
-                                                                    <Form.Check
-                                                                        type="checkbox"
-                                                                        label="Same as Primary Address"
-                                                                        disabled={
-                                                                            !(
-                                                                                formData?.primaryAddress?.address && formData?.primaryAddress?.zip &&
-                                                                                formData?.primaryAddress?.state && formData?.primaryAddress?.city &&
-                                                                                formData?.primaryAddress?.street
-                                                                            )
-                                                                        }
-
-                                                                        // style={{ cursor: getValues('zip') === '' ? 'not-allowed' : '' }}
-                                                                        onChange={(e) => {
-
-                                                                            if (e.target.checked) {
-                                                                                setSameAsPrimary(true);
-                                                                                setValue('address2', getValues('address1'));
-                                                                                setValue('zip2', getValues('zip1'));
-                                                                                setValue('street2', getValues('street1'));
-                                                                                setMailingLatitude(latitude);
-                                                                                setMailingLongitude(longitude);
-                                                                                setFormData((prevState) => ({
-                                                                                    ...prevState,
-                                                                                    mailingAddress: {
-                                                                                        ...prevState.mailingAddress,
-                                                                                        address: formData?.primaryAddress?.address,
-                                                                                        state: formData?.primaryAddress?.state,
-                                                                                        city: formData?.primaryAddress?.city,
-                                                                                        latitude: formData?.primaryAddress?.latitude,
-                                                                                        longitude: formData?.primaryAddress?.longitude,
-                                                                                        street: formData?.primaryAddress?.street,
-                                                                                        zip: formData?.primaryAddress?.zip,
-                                                                                    }
-                                                                                }));
-                                                                            } else {
-                                                                                setSameAsPrimary(false)
-                                                                                setValue('address2', '');
-                                                                                setValue('zip2', '');
-                                                                                setValue('street2', '');
-                                                                                setMailingLatitude(null);
-                                                                                setMailingLongitude(null);
-                                                                                setFormData((prevState) => {
-                                                                                    const updatedState = { ...prevState };
-                                                                                    delete updatedState.mailingAddress; // Remove mailingAddress
-                                                                                    return updatedState;
-                                                                                });
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                </Col>
-                                                                <Col sm={6}>
-                                                                    <Row className='position-relative'>
-                                                                        <Col sm={12}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className="mb-0">Address</Form.Label>
-                                                                                <div style={{ position: 'relative' }}>
-                                                                                    <Form.Control
-                                                                                        type="text"
-                                                                                        defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.address : ''}
-                                                                                        {...register('address2')}
-                                                                                        onChange={(e) => {
-                                                                                            setFormData({ ...formData, address: e.target.value });
-                                                                                            getMailingGeolocation(e);
-                                                                                            setMailingFocused(true); // Open dropdown on input
-                                                                                        }}
-                                                                                        readOnly={sameAsPrimary}
-                                                                                        onFocus={() => setMailingFocused(true)} // Open dropdown when the field is focused
-                                                                                        onBlur={() => {
-                                                                                            setTimeout(() => setMailingFocused(false), 200); // Delay to allow selection before hiding dropdown
-                                                                                        }}
-                                                                                        placeholder="Search for mailing address"
-                                                                                        autoComplete="off"
-                                                                                    />
-                                                                                    {/* {/ Dropdown suggestions /} */}
-                                                                                    <div
-                                                                                        style={{
-                                                                                            position: 'absolute',
-                                                                                            top: '100%',
-                                                                                            left: 0,
-                                                                                            width: '100%',
-                                                                                            maxHeight: '150px',
-                                                                                            overflow: 'auto',
-                                                                                            zIndex: 111,
-                                                                                            backgroundColor: '#fff',
-                                                                                            border: '1px solid #ced4da',
-                                                                                            borderTop: 'none',
-                                                                                        }}
-                                                                                        className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !mailingFocused ? 'd-none' : ''}`}
-                                                                                    >
-                                                                                        {searchedMailingLocations?.map((data, index) => (
-                                                                                            <p
-                                                                                                key={index}
-                                                                                                onClick={() => {
-                                                                                                    setSelectedMailingLocation(data)
-                                                                                                    setMailingFocused(false); // Close dropdown after selection
-                                                                                                }}
-                                                                                                style={{
-                                                                                                    margin: 0,
-                                                                                                    padding: '8px 12px',
-                                                                                                    cursor: 'pointer',
-                                                                                                }}
-                                                                                                className="hover-bg-change text-black"
-                                                                                            >
-                                                                                                {data?.formatted}
-                                                                                            </p>
-                                                                                        ))}
-                                                                                        {searchedMailingLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                                                    </div>
-                                                                                </div>
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Latitude</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    defaultValue={mailingLatitude}
-                                                                                    readOnly={sameAsPrimary}
-                                                                                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                                                                                    placeholder="Latitude"
-                                                                                />
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Longitude</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    defaultValue={mailingLongitude}
-                                                                                    readOnly={sameAsPrimary}
-                                                                                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                                                                                    placeholder="Longitude" />
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Col>
-                                                                <Col sm={6}>
-                                                                    <Row>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0' >State</Form.Label>
-                                                                                {sameAsPrimary ?
-                                                                                    <Form.Control readOnly={sameAsPrimary} value={statesData?.states.find((data) => data?._id === formData?.primaryAddress?.state)?.name} />
-                                                                                    :
-                                                                                    <Form.Select
-                                                                                        data-has-value={!!watch('state2')}
-                                                                                        {...register('state2')}
-                                                                                        onChange={(e) => {
-                                                                                            setFormData({ ...formData, state: e.target.value });
-                                                                                            handleMailingStateSelection(e);
-                                                                                        }}
-                                                                                        className='form-control'
-                                                                                    >
-                                                                                        <option value=''>State</option>
-                                                                                        {statesData?.states?.map((data) => (
-                                                                                            <option
-                                                                                                key={data?.id} // Unique key for each option
-                                                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
-                                                                                                value={data?._id}
-                                                                                            >
-                                                                                                {data?.name}
-                                                                                            </option>
-                                                                                        ))}
-                                                                                    </Form.Select>
-                                                                                }
-
-                                                                            </Form.Group>
-
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>City</Form.Label>
-                                                                                {sameAsPrimary ?
-                                                                                    <Form.Control readOnly={sameAsPrimary} value={cities1 && cities1.find((data) => data?._id === formData?.primaryAddress?.city)?.name} />
-                                                                                    :
-                                                                                    <Form.Select
-                                                                                        className='form-control'
-                                                                                        data-has-value= {!!watch('city2')}
-                                                                                        disabled={store?.getCitiesReducer?.loading}
-                                                                                        {...register('city2')}
-                                                                                        onChange={(e) => {
-                                                                                            setFormData({ ...formData, city: e.target.value })
-                                                                                        }}
-                                                                                    >
-                                                                                        <option value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                                                        {cities2?.map((data) => (
-                                                                                            <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
-                                                                                                {data?.name}
-                                                                                            </option>
-                                                                                        ))}
-                                                                                    </Form.Select>
-                                                                                }
-                                                                            </Form.Group>
-                                                                        </Col>
-
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Street</Form.Label>
-                                                                                <Form.Control
-                                                                                    type="text"
-                                                                                    {...register('street2')}
-                                                                                    readOnly={sameAsPrimary}
-                                                                                    onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                                                                                    placeholder="Street" />
-
-                                                                                {/* {/ {errors.street && <span className="text-danger">{errors.street.message}</span>} /} */}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                        <Col sm={6}>
-                                                                            <Form.Group className="mb-1">
-                                                                                <Form.Label className='mb-0'>Zip</Form.Label>
-                                                                                <Form.Control
-                                                                                    readOnly={sameAsPrimary}
-                                                                                    defaultValue={updatePage ? clinicDataToUpdate?.mailingAddress?.zip : ''}
-                                                                                    type="text"
-                                                                                    {...register('zip2', {
-                                                                                        minLength: {
-                                                                                            value: 5,
-                                                                                            message: 'ZIP code must be at least 5 characters long',
-                                                                                        },
-                                                                                        pattern: {
-                                                                                            value: /^[0-9]+$/,
-                                                                                            message: 'ZIP code must contain numbers only',
-                                                                                        },
-                                                                                    })}
-                                                                                    onKeyPress={handleFirstSpace}
-                                                                                    onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
-                                                                                    placeholder="Zip"
-                                                                                    maxLength={5}
-                                                                                />
-                                                                                {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                                                            </Form.Group>
-                                                                        </Col>
-                                                                    </Row>
-                                                                </Col>
-                                                            </Row>
+                                                            <h5>
+                                                                Address Details
+                                                                <span
+                                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                                    onClick={addAddress}></span>
+                                                            </h5>
                                                         </Col>
-                                                    </div>
+                                                    </Row>
+                                                    {addresses.map((item, index) => (
+                                                        <Row key={index} className="mb-2">
+                                                            {/* Address Use Field */}
+                                                            <Col sm={4} className="mb-2">
+                                                                <Form.Label className="mb-1">Use</Form.Label>
+                                                                <Form.Select
+                                                                    {...register(`address[${index}].use`)}
+                                                                    value={watch(`address[${index}].use`) || item.use || ""}
+                                                                    onChange={(e) => handleAddressChange(index, 'use', e.target.value)}
+                                                                >
+                                                                    <option value="">Select</option>
+                                                                    {addressUses.map((use) => (
+                                                                        <option key={use} className="text-capitalize" value={use}>
+                                                                            {use}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Col>
+
+                                                            {/* Address Line */}
+                                                            <Col sm={4} className="mb-2 position-relative">
+                                                                <Form.Label className="mb-1">Address</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    placeholder="Street Address"
+                                                                    {...register(`address[${index}].line[0]`)}
+                                                                    value={watch(`address[${index}].line[0]`) || item.line?.[0] || ""}
+                                                                    onChange={(e) => handleAddressChange(index, 'line', [e.target.value, item.line?.[1] || ""])}
+                                                                />
+                                                            </Col>
+
+                                                            {/* City */}
+                                                            <Col sm={4} className="mb-2">
+                                                                <Form.Label className="mb-1">City</Form.Label>
+                                                                <Form.Select
+                                                                    {...register(`address[${index}].city`)}
+                                                                    value={watch(`address[${index}].city`) || item.city || ""}
+                                                                    onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
+                                                                >
+                                                                    <option value="">Select City</option>
+                                                                    {cities1?.map((data) => (
+                                                                        <option key={data?.name} value={data?._id}>
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Col>
+
+                                                            {/* State */}
+                                                            <Col sm={4} className="mb-2">
+                                                                <Form.Label className="mb-1">State</Form.Label>
+                                                                <Form.Select
+                                                                    {...register(`address[${index}].state`)}
+                                                                    value={watch(`address[${index}].state`) || item.state || ""}
+                                                                    onChange={(e) => handleAddressChange(index, 'state', e.target.value)}
+                                                                >
+                                                                    <option value="">Select State</option>
+                                                                    {statesData?.states?.map((data) => (
+                                                                        <option key={data?.name} value={data?.state_code}>
+                                                                            {data?.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </Form.Select>
+                                                            </Col>
+
+                                                            {/* Postal Code */}
+                                                            <Col sm={4}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className="mb-1">Postal Code</Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        placeholder="Postal Code"
+                                                                        {...register(`address[${index}].postalCode`)}
+                                                                        value={watch(`address[${index}].postalCode`) || item.postalCode || ""}
+                                                                        onChange={(e) => handleAddressChange(index, 'postalCode', e.target.value)}
+                                                                    />
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            {/* Country */}
+                                                            <Col sm={4} className="position-relative">
+                                                                <Form.Label className="mb-1">Country</Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    placeholder="Country"
+                                                                    {...register(`address[${index}].country`)}
+                                                                    value={watch(`address[${index}].country`) || item.country || ""}
+                                                                    onChange={(e) => handleAddressChange(index, 'country', e.target.value)}
+                                                                />
+                                                            </Col>
+                                                        </Row>
+                                                    ))}
+
                                                 </div>
                                                 <div className="col-12 d-flex justify-content-end gap-2 mt-1">
                                                     <Button className='cancel-button'>Cancel</Button>

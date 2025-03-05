@@ -47,11 +47,11 @@ export const getRoleData = `${BaseRoute}/getAllRoles`;
 export const updateRoleData = `${BaseRoute}/roles/edit`;
 
 // DOCTORS
-export const getDoctor = `${BaseRoute}/getClinicDoctors`;
-export const createDoctor = `${BaseRoute}/practitioner/add`;
+export const getDoctor = `${BaseRoute}/practitioner/list`;
+export const createDoctor = `${BaseRoute}/practitioner/create`;
 export const getDoctorRoles = `${BaseRoute}/roles`;
 export const createDoctorDetail = `${BaseRoute}/practitioner/update`;
-export const getDoctorDetails = `${BaseRoute}/getDoctorDetails`;
+export const getDoctorDetails = `${BaseRoute}/practitioner/details`;
 export const addReferringDoctor = `${BaseRoute}/add/referringDoc`;
 
 // PATIENTS
