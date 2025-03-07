@@ -27,7 +27,10 @@ body {
     border: none !important;
     /* Remove border */
 }
+hr {
+    color: #726e6e8a !important;
 
+}
 .headers {
     background-color: #010101 !important;
 }
@@ -162,7 +165,7 @@ select.form-control:not([size]):not([multiple]) {
 .form-label {
     color: black;
     font-weight: 500 !important;
-    opacity: 0.4;
+    opacity: 0.6;
     font-size: 13px;
 }
 
@@ -367,6 +370,7 @@ table {
     align-items: center;
     border-top: 1px solid #ddd;
 }
+
 
 .date-carousel .day {
     width: 40px;

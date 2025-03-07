@@ -266,113 +266,113 @@ const NewPractice = () => {
         contactPerson: '',
     });
     const setField = (key, value) => value && setValue(key, value);
-   useEffect(() => {
-          if (clinicsDataGet) {
-              if (clinicsDataGet?.orgType) {
-                  setValue('clinicType', clinicsDataGet?.orgType);
-              }
-              setField('clinicname', clinicsDataGet?.name);
-              setField('email', clinicsDataGet?.userId?.email);
-              if (clinicsDataGet?.orgLogo) {
-                  setLogoName(clinicsDataGet.orgLogo.fileName);
-              }
-  
-              // ✅ Ensure at least 'NPI', 'CLIA', 'NAIC' are set
-              let identifiers =
-                  clinicsDataGet?.identifier?.map((data) => ({
-                      type: data.identifierType || '',
-                      number: data?.value || '',
-                      // file: data?.file|| '',
-                      file: data?.documents?.[0]
-                          ? {
-                                url: data?.documents?.[0], // Store URL
-                                name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
-                            }
-                          : '',
-                      expiry: data?.expirationDate || '',
-                      issuingAuthority: data.issuingAuthority || '',
-                      use: data.use || '',
-                  })) || [];
-              // If no identifiers exist, default to 'NPI', 'CLIA', 'NAIC'
-              if (identifiers.length === 0) {
-                  identifiers = defaultIdentifiers?.map((type) => ({
-                      type,
-                      number: '',
-                      file: '',
-                      expiry: '',
-                      issuingAuthority: '',
-                      use: '',
-                  }));
-              }
-  
-              setConstantIdentifiers(identifiers);
-  
-              // ✅ Ensure at least 'phone' and 'email' are set
-              let contacts =
-                  clinicsDataGet.telecom?.map((contact) => ({
-                      system: contact.system || '',
-                      value: contact.value || '',
-                      use: contact.use || '',
-                  })) || [];
-  
-              if (contacts.length === 0) {
-                  contacts = contactDetails.map((system) => ({
-                      system,
-                      value: '',
-                      use: '',
-                  }));
-              }
-  
-              setConstantContact(contacts);
-  
-              // ✅ Set Addresses
-              setAddresses(
-                  clinicsDataGet?.address?.map((addr) => ({
-                      use: addr.use || '',
-                      line: addr.line && Array.isArray(addr.line) ? addr.line : [''], // Ensure array
-                      city: addr.city || '',
-                      state: addr.state || '',
-                      postalCode: addr.postalCode || '',
-                      country: addr.country || '',
-                  })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]
-              );
-  
-              // ✅ Set POCs (Point of Contacts)
-              setPocs(
-                  clinicsDataGet?.poc?.map((pocs) => ({
-                      name: {
-                          use: pocs.name?.use || '',
-                          text: pocs.name?.text || '',
-                          family: pocs.name?.family || '',
-                          given: pocs.name?.given || [''], // Ensure array
-                          prefix: pocs.name?.prefix || [''], // Ensure array
-                          suffix: pocs.name?.suffix || [], // Ensure array
-                      },
-                      email: pocs.email || '',
-                      role: pocs.role || '',
-                      telecom: pocs.telecom?.map((tele) => ({
-                          system: tele.system || '',
-                          value: tele.value || '',
-                          use: tele.use || '',
-                      })) || [{ system: '', value: '', use: '' }], // Default telecom
-                  })) || [
-                      {
-                          name: {
-                              use: '',
-                              text: '',
-                              family: '',
-                              given: [''],
-                              prefix: [''],
-                              suffix: [],
-                          },
-                          email: '',
-                          role: '',
-                          telecom: [{ system: '', value: '', use: '' }],
-                      },
-                  ]
-              );
-          }
-      }, [clinicsDataGet, setValue]);
+    useEffect(() => {
+        if (clinicsDataGet) {
+            if (clinicsDataGet?.orgType) {
+                setValue('clinicType', clinicsDataGet?.orgType);
+            }
+            setValue('clinicname', clinicsDataGet?.name);
+            setValue('email', clinicsDataGet?.userId?.email);
+            if (clinicsDataGet?.orgLogo) {
+                setLogoName(clinicsDataGet.orgLogo.fileName);
+            }
+
+            // ✅ Ensure at least 'NPI', 'CLIA', 'NAIC' are set
+            let identifiers =
+                clinicsDataGet?.identifier?.map((data) => ({
+                    type: data.identifierType || '',
+                    number: data?.value || '',
+                    // file: data?.file|| '',
+                    file: data?.documents?.[0]
+                        ? {
+                              url: data?.documents?.[0], // Store URL
+                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
+                          }
+                        : '',
+                    expiry: data?.expirationDate || '',
+                    issuingAuthority: data.issuingAuthority || '',
+                    use: data.use || '',
+                })) || [];
+            // If no identifiers exist, default to 'NPI', 'CLIA', 'NAIC'
+            if (identifiers.length === 0) {
+                identifiers = defaultIdentifiers?.map((type) => ({
+                    type,
+                    number: '',
+                    file: '',
+                    expiry: '',
+                    issuingAuthority: '',
+                    use: '',
+                }));
+            }
+
+            setConstantIdentifiers(identifiers);
+
+            // ✅ Ensure at least 'phone' and 'email' are set
+            let contacts =
+                clinicsDataGet.telecom?.map((contact) => ({
+                    system: contact.system || '',
+                    value: contact.value || '',
+                    use: contact.use || '',
+                })) || [];
+
+            if (contacts.length === 0) {
+                contacts = contactDetails.map((system) => ({
+                    system,
+                    value: '',
+                    use: '',
+                }));
+            }
+
+            setConstantContact(contacts);
+
+            // ✅ Set Addresses
+            setAddresses(
+                clinicsDataGet?.address?.map((addr) => ({
+                    use: addr.use || '',
+                    line: addr.line && Array.isArray(addr.line) ? addr.line : [''], // Ensure array
+                    city: addr.city || '',
+                    state: addr.state || '',
+                    postalCode: addr.postalCode || '',
+                    country: addr.country || '',
+                })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]
+            );
+
+            // ✅ Set POCs (Point of Contacts)
+            setPocs(
+                clinicsDataGet?.poc?.map((pocs) => ({
+                    name: {
+                        use: pocs.name?.use || '',
+                        text: pocs.name?.text || '',
+                        family: pocs.name?.family || '',
+                        given: pocs.name?.given || [''], // Ensure array
+                        prefix: pocs.name?.prefix || [''], // Ensure array
+                        suffix: pocs.name?.suffix || [], // Ensure array
+                    },
+                    email: pocs.email || '',
+                    role: pocs.role || '',
+                    telecom: pocs.telecom?.map((tele) => ({
+                        system: tele.system || '',
+                        value: tele.value || '',
+                        use: tele.use || '',
+                    })) || [{ system: '', value: '', use: '' }], // Default telecom
+                })) || [
+                    {
+                        name: {
+                            use: '',
+                            text: '',
+                            family: '',
+                            given: [''],
+                            prefix: [''],
+                            suffix: [],
+                        },
+                        email: '',
+                        role: '',
+                        telecom: [{ system: '', value: '', use: '' }],
+                    },
+                ]
+            );
+        }
+    }, [clinicsDataGet, setValue]);
 
     const formDataChange = (field, value) => {
         const updatedFormData = { ...formData, [field]: value };
@@ -500,11 +500,11 @@ const NewPractice = () => {
             flag: 'subClinic',
             ...(posDetails && { pos: posDetails }),
         };
-    
+
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
         console.log({ newPayload });
     };
-    
+
     useEffect(() => {
         if (createResponseOfSubClinics === 200) {
             if (!isModalRequest) {
@@ -1503,8 +1503,10 @@ const NewPractice = () => {
                                                                                                 components.state_code ||
                                                                                                 '',
                                                                                             postalCode:
-                                                                                                components.postcode ||
-                                                                                                '',
+                                                                                                data?.components
+                                                                                                    .postcode ||
+                                                                                                item.postalCode ||
+                                                                                                '', // Auto-fill or keep user input
                                                                                             country:
                                                                                                 components.country ||
                                                                                                 '',
@@ -1574,6 +1576,7 @@ const NewPractice = () => {
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">Postal Code</Form.Label>
                                                                 <Form.Control
+                                                                    value={item.postalCode} // Bind postal code value
                                                                     type="text"
                                                                     placeholder="Postal Code"
                                                                     {...register(`postalCode`, {
@@ -1601,7 +1604,6 @@ const NewPractice = () => {
 
                                                         <Col sm={4} className="position-relative">
                                                             <Form.Label className="mb-1">Country</Form.Label>
-
                                                             <Form.Control
                                                                 type="text"
                                                                 placeholder="Country"
@@ -1637,7 +1639,7 @@ const NewPractice = () => {
                                                     </Col>
                                                 </Row>
                                                 {pocs.map((poc, pocIndex) => (
-                                                    <div key={pocIndex} className="p-1">
+                                                    <div key={pocIndex} className="p-2">
                                                         <Row>
                                                             <Col sm={6}>
                                                                 <Form.Group className="mb-2">

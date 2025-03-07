@@ -31,6 +31,7 @@ import { handleFirstSpace } from '../../../../helpers/noSpace';
 import { getDoctorsAction, getSubClinicAction } from '../../../../redux/actions';
 import { FormInput } from '../../../../components';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
+import { components } from 'react-select';
 
 const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const {
@@ -115,6 +116,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+    console.log(cities1, 'cities');
 
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
@@ -589,38 +591,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         });
     };
 
-    const getGeolocation2 = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations2(data?.results);
-            } else {
-                console.log('No data returned.');
-            }
-        });
-    };
     const [selectedLocation, setSelectedLocation] = useState(null);
-    const [selectedLocation2, setSelectedLocation2] = useState(null);
 
     useEffect(() => {
         if (selectedLocation) {
@@ -637,21 +608,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             const countyName = selectedLocation?.components?.county;
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
         }
-        if (selectedLocation2) {
-            setLatitude1(selectedLocation2?.bounds?.southwest?.lat);
-            setLongitude1(selectedLocation2?.bounds?.southwest?.lng);
-            setValue('mailingAddress', selectedLocation2?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation2?.components?.state_code)?._id;
-            setValue('mailingStateName', selectedState);
-            const countyName = selectedLocation2?.components?.county;
-            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-    }, [selectedLocation, selectedLocation2, setValue, statesData, dispatch]);
+    }, [selectedLocation, setValue, statesData, dispatch]);
     useEffect(() => {
         if (cities1) {
             const selectedCounty =
@@ -663,17 +620,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 )?._id;
             setValue('city', selectedCounty);
         }
-        if (cities2) {
-            const selectedCounty1 =
-                cities2 &&
-                cities2.find(
-                    (data) =>
-                        data?.name === selectedLocation2?.components?.county ||
-                        clinicsDataGet?.userId?.mailingAddress?.city?.name
-                )?._id;
-            setValue('mailingCity', selectedCounty1);
-        }
-    }, [cities1, cities2]);
+    }, [cities1]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
     console.log(getTableData, 'getTableData');
     // const [selectedStates, setSelectedStates] = useState([]);
@@ -852,9 +799,36 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
     const handleContactChange = (index, field, value) => {
         const updatedContacts = [...constantContact];
-        updatedContacts[index][field] = value;
+
+        if (field === 'value' && updatedContacts[index].system === 'phone') {
+            // Remove non-numeric characters
+            let rawValue = value.replace(/\D/g, '');
+            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+
+            // Format as (XXX)XXX-XXXX
+            const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+                if (p3) return `(${p1})${p2}-${p3}`;
+                if (p2) return `(${p1})${p2}`;
+                return `(${p1}`;
+            });
+
+            updatedContacts[index][field] = formattedValue; // Store formatted phone number
+        } else {
+            updatedContacts[index][field] = value; // Store other fields as they are
+        }
+
         setConstantContact(updatedContacts);
     };
+    const formatDisplayValue = (value) => {
+        if (!value) return '';
+        const rawValue = value.replace(/\D/g, '');
+        return rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+            if (p3) return `(${p1})${p2}-${p3}`;
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+    };
+
     const handleAddressChange = (index, field, value) => {
         const updatedAddresses = [...addresses];
         if (field === 'line') {
@@ -905,9 +879,20 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
     // Function to handle Telecom (Contact) field changes inside POCs
     const handleTelecomChange = (pocIndex, telecomIndex, field, value) => {
-        const updatedPocs = [...pocs];
-        updatedPocs[pocIndex].telecom[telecomIndex][field] = value;
-        setPocs(updatedPocs);
+        const updatedPoc = [...pocs]; // Assuming pocList is your state
+        let rawValue = value.replace(/\D/g, ''); // Remove non-numeric characters
+
+        // Limit to 10 digits
+        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+
+        // Format as (XXX)XXXXXXX
+        const formattedValue = rawValue.replace(/(\d{1,3})(\d{0,7})/, (match, p1, p2) => {
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+
+        updatedPoc[pocIndex].telecom[telecomIndex][field] = formattedValue; // Store formatted number
+        setPocs(updatedPoc);
     };
 
     // Function to add a new POC
@@ -1358,14 +1343,50 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 </Form.Select>
                                             </Col>
                                             <Col sm={4}>
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="value"
-                                                    value={item.value}
-                                                    onChange={(e) =>
-                                                        handleContactChange(index, 'value', e.target.value)
-                                                    }
-                                                />
+                                                {item.system === 'phone' ? (
+                                                    <InputGroup className="position-relative">
+                                                        {/* Country Code Prefix */}
+                                                        <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
+                                                            +1
+                                                        </InputGroup.Text>
+
+                                                        {/* Phone Input */}
+                                                        <Form.Control
+                                                            type="tel"
+                                                            placeholder="(123)456-7890"
+                                                            value={formatDisplayValue(item.value)}
+                                                            onChange={(e) =>
+                                                                handleContactChange(index, 'value', e.target.value)
+                                                            }
+                                                            maxLength={14}
+                                                            onKeyPress={(event) => {
+                                                                if (!/[0-9]/.test(event.key)) event.preventDefault();
+                                                            }}
+                                                            style={{ paddingLeft: '40px' }}
+                                                        />
+                                                        {/* Flag Icon */}
+                                                        <div
+                                                            className="position-absolute"
+                                                            style={{
+                                                                left: '10px',
+                                                                top: '50%',
+                                                                transform: 'translateY(-50%)',
+                                                            }}>
+                                                            <img src={us} alt="flag" width={20} />
+                                                        </div>
+                                                    </InputGroup>
+                                                ) : (
+                                                    <Form.Control
+                                                        type={item.system === 'email' ? 'email' : 'text'}
+                                                        placeholder={
+                                                            item.system === 'email' ? 'Enter email' : 'Enter value'
+                                                        }
+                                                        value={item.value || ''}
+                                                        onChange={(e) =>
+                                                            handleContactChange(index, 'value', e.target.value)
+                                                        }
+                                                    />
+                                                )}
                                             </Col>
 
                                             <Col sm={4} className="position-relative">
@@ -1626,6 +1647,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Col>
                                 </Row>
                             </Col> */}
+
                             <Row>
                                 <Col sm={12}>
                                     <h5>
@@ -1704,10 +1726,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 // Extract the necessary fields from the API response
                                                                 const formatted = data.formatted || '';
                                                                 const components = data.components || {};
+                                                                console.log(components, 'comp');
                                                                 // Build the new address object with auto-populated fields
                                                                 const newAddress = {
                                                                     use: item.use, // preserve existing use
-                                                                    line: [components.road || formatted],
+                                                                    line: [data?.formatted ? data?.formatted : ''],
                                                                     city:
                                                                         components.city ||
                                                                         components.town ||
@@ -1725,6 +1748,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 // Clear suggestions and remove focus
                                                                 setSearchedLocations([]);
                                                                 setAddressFocused(false);
+                                                                setValue(
+                                                                    `address[${index}].state`,
+                                                                    components?.state_code
+                                                                );
+                                                                setValue(`postalCode`, components?.postcode);
+                                                                setSelectedState(components?.state_code);
                                                             }}
                                                             style={{
                                                                 margin: 0,
@@ -1757,7 +1786,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Select
                                             data-has-value={!!getValues(`address[${index}].city`)}
                                             {...register(`address[${index}].city`)}
-                                            disabled={!selectedState || store?.getCitiesReducer?.loading}>
+                                            // disabled={
+                                            //     !selectedState
+                                            // }
+                                        >
                                             <option value="">
                                                 {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
                                             </option>
@@ -1850,14 +1882,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onChange={(e) => handlePocChange(pocIndex, 'role', e.target.value)}
                                                 />
                                             </Form.Group>
-                                            {pocs.length > 1 && (
-                                                <span
-                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                    style={{ right: '-1%', top: '50%' }}
-                                                    onClick={() => removePoc(pocIndex)}>
-                                                    <CiCircleMinus />
-                                                </span>
-                                            )}
                                         </Col>
 
                                         <Col sm={6}>
@@ -1871,22 +1895,45 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 />
                                             </Form.Group>
                                         </Col>
-                                        {poc.telecom.map((telecom, telecomIndex) => (
+                                        {poc?.telecom?.map((telecom, telecomIndex) => (
                                             <Col sm={6} key={telecomIndex}>
-                                                <Form.Label>Phone Number</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="Enter Value"
-                                                    value={telecom.value}
-                                                    onChange={(e) =>
-                                                        handleTelecomChange(
-                                                            pocIndex,
-                                                            telecomIndex,
-                                                            'value',
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                />
+                                                <Form.Group className="mb-2 position-relative">
+                                                    <Form.Label className="mb-1">Phone Number</Form.Label>
+                                                    <InputGroup>
+                                                        {/* Country Code Prefix */}
+                                                        <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
+                                                            &nbsp;&nbsp;+1
+                                                        </InputGroup.Text>
+
+                                                        {/* Phone Input Field */}
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder="Phone Number"
+                                                            value={formatDisplayValue(telecom.value)} // Apply formatting
+                                                            onChange={(e) =>
+                                                                handleTelecomChange(
+                                                                    pocIndex,
+                                                                    telecomIndex,
+                                                                    'value',
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                            maxLength={14} // To accommodate formatted (XXX)XXXXXXX
+                                                            onKeyPress={(event) => {
+                                                                if (!/[0-9]/.test(event.key)) {
+                                                                    event.preventDefault(); // Prevent non-numeric input
+                                                                }
+                                                            }}
+                                                        />
+                                                    </InputGroup>
+
+                                                    {/* Flag Icon */}
+                                                    <div
+                                                        className="position-absolute"
+                                                        style={{ top: '52%', left: '1%' }}>
+                                                        <img src={us} alt="country code flag" width={20} />
+                                                    </div>
+                                                </Form.Group>
                                             </Col>
                                         ))}
                                     </Row>
@@ -1948,9 +1995,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <tr key={patient?.id || `patient-${index}`}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient?.name}</td>
-                                                        <td>
-                                                           {patient?.address?.[0]?.line?.[0] || 'N/A'}
-                                                        </td>
+                                                        <td>{patient?.address?.[0]?.line?.[0] || 'N/A'}</td>
                                                         <td>{patient.orgType}</td>
                                                         {/* <td>{patient.practiceSpecialty || 'N/A'}</td> */}
                                                         <td>

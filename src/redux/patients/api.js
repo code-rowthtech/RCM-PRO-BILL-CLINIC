@@ -44,7 +44,7 @@ export function updateResponsiblePartyApi(params: any): any {
 
 export function updatePatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updatePatients, data);
+    return api.update(URL.updatePatients, data);
 }
 
 export function createInsuranceApi(params: any): any {

@@ -1,20 +1,46 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import { FiUploadCloud } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3Action, updatePatientsAction } from "../../../redux/actions";
-import us from '../../../assets/images/flags/us.jpg'
-import { encryptMessage } from "../../../cryptoUtils";
-
-
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import {
+    getStatesByCountryAction,
+    getCitiesAction,
+    getCities2Action,
+    getCities3Action,
+    updatePatientsAction,
+    stateEmptydAction,
+} from '../../../redux/actions';
+import us from '../../../assets/images/flags/us.jpg';
+import { encryptMessage } from '../../../cryptoUtils';
+import { handleUpload } from '../../../helpers/HandleUpload';
+import { CiCircleMinus } from 'react-icons/ci';
+import { raceOptions } from '../../../utils/DataSets/race.data';
+import { ethnicityOptions } from '../../../utils/DataSets/enthnicity.data';
+import Select from 'react-select';
+import { genderIdentityOptions } from '../../../utils/DataSets/genderIdentities';
+import { sexAssignedAtBirthOptions } from '../../../utils/DataSets/sex';
+import { sexParameterOptions } from '../../../utils/DataSets/SexParameterforClinicalUse';
+import { personalPronounsOptions } from '../../../utils/DataSets/personalPronouns';
+import { tribalEntitiesOptions } from '../../../utils/DataSets/tribalEntities';
+import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
 
 const Demographicdetails = ({ patientId }) => {
+    console.log(patientId, 'patientId');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors }, setValue, reset, clearErrors, watch, getValues } = useForm();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        reset,
+        clearErrors,
+        watch,
+        getValues,
+    } = useForm();
     const [longitude, setLongitude] = useState(null);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
@@ -28,108 +54,305 @@ const Demographicdetails = ({ patientId }) => {
     const [primaryCitySearch, setPrimaryCitySearch] = useState(null);
     const [mailingCitySearch, setMailingCitySearch] = useState(null);
     const [employerCitySearch, setEmployerCitySearch] = useState(null);
+    const [submissionType, setSubmissionType] = useState(null);
     const [searchedMailingLocations, setSearchedMailingLocations] = useState(null);
     const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
+    const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
+    const [activeTab, setActiveTab] = useState('personalDetails');
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-
+    const updateResponse = store?.updatePatientsReducer
+    console.log(updateResponse)
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const primaryState = watch('primaryStateName');
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
     useEffect(() => {
         dispatch(getStatesByCountryAction());
-    }, [dispatch])
+    }, [dispatch]);
 
     useEffect(() => {
         if (primaryState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id
-            dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25, skip: '' }))
+            const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id;
+            dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25, skip: '' }));
         }
         if (mailingState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === mailingState)?.id
-            dispatch(getCities2Action({ state_code: stateCity, name: mailingCitySearch, limit: 25, skip: '' }))
+            const stateCity = statesData?.states?.find((data) => data?.state_code === mailingState)?.id;
+            dispatch(getCities2Action({ state_code: stateCity, name: mailingCitySearch, limit: 25, skip: '' }));
         }
         if (employerState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id
-            dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }))
+            const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
+            dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
         }
-    }, [primaryState, mailingState, employerState])
+    }, [primaryState, mailingState, employerState]);
     useEffect(() => {
         if (primaryCitySearch) {
-            setValue('primaryCity', primaryCitySearch)
+            setValue('primaryCity', primaryCitySearch);
         }
         if (mailingCitySearch) {
-            setValue('mailingCity', mailingCitySearch)
+            setValue('mailingCity', mailingCitySearch);
         }
         if (employerCitySearch) {
-            setValue('employerCity', employerCitySearch)
+            setValue('employerCity', employerCitySearch);
         }
-    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3])
+    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3]);
+    // const onSubmit = (data) => {
+    //     const payload = {
+    //         id: patientId,
+    //         ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
+    //         // ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
+    //         // ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
+    //         ...(data?.sex ? { sex: data?.sex } : {}),
+    //         ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
+    //         ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
+    //         ...(data?.race ? { race: data?.race } : {}),
+    //         ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
+    //         ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
+    //         ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
+    //         ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
+    //         ...(data?.notes ? { notes: data?.notes } : {}),
+    //         ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
+    //         ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
+    //         ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
+    //         ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
+    //         ...(data?.emergencyContactPhone
+    //             ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') }
+    //             : {}),
+    //         ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
+    //         ...(data?.employerName ? { employerName: data?.employerName } : {}),
+    //         ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
+    //         employerAddress: {
+    //             address: data?.employerAddress,
+    //             street: data?.employerStreet,
+    //             city: data?.employerCity,
+    //             state: data?.employerStateName,
+    //             zip: data?.employerZip,
+    //             latitude: employerLatitude,
+    //             longitude: employerLongitude,
+    //             timeZone: data?.employerTimeZone,
+    //         },
+    //         identifier: constantIdentifiers.map((item) => ({
+    //             identifierType: item.type,
+    //             use: item.use,
+    //             value: item.number,
+    //             // documents: item.file ? {  url: item.file.url,fileName: item.file.name || '' } : null,
+    //             documents: [item?.file?.url],
+    //             expirationDate: item.expiry,
+    //             status: 'active',
+    //             system: 'urn:oid:2.16.840.1.113883.4.7',
+    //             sliceName: item.type,
+    //             issuingAuthority: item.issuingAuthority,
+    //         })),
+    //         address: addresses,
+
+    //     };
+    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+    // };
+    // const onSubmit = (data) => {
+    //     const payload = {
+    //         id: patientId,
+
+    //         ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
+    //         ...(data?.sex && { birthSex: { code: data.sex } }),
+    //         ...(data?.genderIdentity && { gender: data.genderIdentity }),
+    //         ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
+    //         ...(data?.race && [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }]),
+    //         ...(data?.ethnicity && [{ system: 'http://hl7.org/fhir/v3/Ethnicity', code: data.ethnicity }]),
+    //         ...(data?.maritalStatus && {
+    //             maritalStatus: {
+    //                 coding: [
+    //                     {
+    //                         system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
+    //                         code: data.maritalStatus,
+    //                         display: data.maritalStatusDisplay || '',
+    //                     },
+    //                 ],
+    //             },
+    //         }),
+    //         ...(data?.preferredLanguage && {
+    //             communication: [
+    //                 {
+    //                     language: {
+    //                         coding: [
+    //                             {
+    //                                 system: 'urn:ietf:bcp:47',
+    //                                 code: data.preferredLanguage,
+    //                                 display: data.languageDisplay || '',
+    //                             },
+    //                         ],
+    //                     },
+    //                     preferred: true,
+    //                 },
+    //             ],
+    //         }),
+    //         ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
+    //         ...(data?.notes && { notes: data.notes }),
+    //         ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
+    //         ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
+    //         ...(data?.emergencyContactName && { emergencyContactName: data.emergencyContactName }),
+    //         ...(data?.emergencyContactPhone && {
+    //             emergencyContactPhone: data.emergencyContactPhone.replace(/\D/g, ''),
+    //         }),
+    //         ...(data?.emergencyContactRelation && { emergencyContactRelation: data.emergencyContactRelation }),
+    //         ...(data?.employerName && { employerName: data.employerName }),
+    //         ...(data?.employerPhone && { employerPhone: data.employerPhone.replace(/\D/g, '') }),
+
+    //         employerAddress: {
+    //             use: 'work',
+    //             type: 'physical',
+    //             text: data?.employerAddress,
+    //             line: [data?.employerStreet].filter(Boolean),
+    //             city: data?.employerCity,
+    //             state: data?.employerStateName,
+    //             postalCode: data?.employerZip,
+    //             country: 'US',
+    //             latitude: employerLatitude,
+    //             longitude: employerLongitude,
+    //             timeZone: data?.employerTimeZone,
+    //         },
+    //         address: addresses,
+    //         identifier: constantIdentifiers.map((item) => ({
+    //             use: item.use,
+    //             system: item.system || 'urn:oid:2.16.840.1.113883.4.7',
+    //             value: item.number,
+    //             period: {
+    //                 start: item.startDate,
+    //                 end: item.expiry,
+    //             },
+    //             documents: item?.file?.url ? [{ url: item.file.url, fileName: item.file.name || '' }] : [],
+    //             status: 'active',
+    //             sliceName: item.type,
+    //             issuingAuthority: item.issuingAuthority,
+    //         })),
+    //     };
+    //     console.log('hit hua ', payload);
+
+    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+    // };
     const onSubmit = (data) => {
         const payload = {
             id: patientId,
-            ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
-            // ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-            // ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
-            ...(data?.sex ? { sex: data?.sex } : {}),
-            ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
-            ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
-            ...(data?.race ? { race: data?.race } : {}),
-            ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
-            ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
-            ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
-            ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
-            ...(data?.notes ? { notes: data?.notes } : {}),
-            ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-            ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
-            ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
-            ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
-            ...(data?.emergencyContactPhone ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') } : {}),
-            ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
-            ...(data?.employerName ? { employerName: data?.employerName } : {}),
-            ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
-            employerAddress: {
-                address: data?.employerAddress,
-                street: data?.employerStreet,
-                city: data?.employerCity,
-                state: data?.employerStateName,
-                zip: data?.employerZip,
-                latitude: employerLatitude,
-                longitude: employerLongitude,
-                timeZone: data?.employerTimeZone
+
+            ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
+            ...(data?.sex && { birthSex: { code: data.sex } }),
+            ...(data?.genderIdentity && { gender: data.genderIdentity }),
+            ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
+
+            // ✅ Fixing Race & Ethnicity Structure
+            ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
+            ...(data?.ethnicity && {
+                ethnicity: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', code: data.ethnicity }],
+            }),
+
+            // ✅ Fixing Marital Status Structure
+            ...(data?.maritalStatus && {
+                maritalStatus: {
+                    coding: [
+                        {
+                            system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
+                            code: data.maritalStatus,
+                            display: data.maritalStatusDisplay || '',
+                        },
+                    ],
+                },
+            }),
+
+            // ✅ Fixing Preferred Language Structure
+            ...(data?.preferredLanguage && {
+                communication: [
+                    {
+                        language: {
+                            coding: [
+                                {
+                                    system: 'urn:ietf:bcp:47',
+                                    code: data.preferredLanguage,
+                                    display: data.languageDisplay || '',
+                                },
+                            ],
+                        },
+                        preferred: true,
+                    },
+                ],
+            }),
+
+            ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
+            ...(data?.notes && { notes: data.notes }),
+            ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
+            ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
+
+            // ✅ Fixing Emergency Contact Field
+            ...(data?.emergencyContactName && {
+                contact: [
+                    {
+                        relationship: [{ text: data?.emergencyContactRelation }],
+                        name: { text: data?.emergencyContactName },
+                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone.replace(/\D/g, '') }],
+                    },
+                ],
+            }),
+
+            ...(data?.employerName && { employerName: data.employerName }),
+            ...(data?.employerPhone && { employerPhone: data.employerPhone.replace(/\D/g, '') }),
+
+            // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
+            employerDetails: {
+                employerName: data?.employerName,
+                employerPhone: data?.employerPhone.replace(/\D/g, ''),
+                employmentStatus: data?.employmentStatus,
+                occupation: data?.occupation,
+                workLocation: {
+                    address: {
+                        city: data?.employerCity,
+                        state: data?.employerStateName,
+                        postalCode: data?.employerZip,
+                        country: 'US',
+                    },
+                },
             },
-            address: {
-                address: data?.primaryAddress,
-                street: data?.primaryStreet,
-                city: data?.primaryCity,
-                state: data?.primaryStateName,
-                zip: data?.primaryZip,
-                latitude: latitude,
-                longitude: longitude,
-                timeZone: data?.primaryTimeZone
-            },
-            mailingAddress: {
-                address: data?.mailingAddress,
-                street: data?.mailingStreet,
-                city: data?.mailingCity,
-                state: data?.mailingStateName,
-                zip: data?.mailingZip,
-                latitude: mailingLatitude,
-                longitude: mailingLongitude,
-                timeZone: data?.mailingTimeZone
-            },
-        }
-        dispatch(updatePatientsAction({ key: encryptMessage(payload) }))
+
+            address: addresses,
+
+            // ✅ Fixing Identifier Structure
+            identifier: constantIdentifiers.map((item) => ({
+                use: item.use,
+                system: item.system || 'urn:oid:2.16.840.1.113883.4.7',
+                value: item.number,
+                period: {
+                    start: item.startDate,
+                    end: item.expiry,
+                },
+                documents: item?.file?.url ? [{ url: item.file.url, fileName: item.file.name || '' }] : [],
+                status: 'active',
+                sliceName: item.type,
+                issuingAuthority: item.issuingAuthority,
+            })),
+        };
+
+        console.log('Payload:', payload);
+        dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
+        useEffect(() => {
+            if (updateResponse === 201) {
+                if (submissionType === 'saveAndNext') {
+                    reset(); 
+                    setActiveTab('responsible');
+                    dispatch(stateEmptydAction());
+                } else if (submissionType === 'saveAndReset') {
+                    reset(); 
+                    dispatch(stateEmptydAction());
+                }
+            }
+        }, [updateResponse]);
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -139,24 +362,25 @@ const Demographicdetails = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedLocations(data?.results);
+            } else {
+                console.log('No data returned.');
+            }
+        });
+    };
     const getMailingGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -166,25 +390,26 @@ const Demographicdetails = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedMailingLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedMailingLocations(data?.results);
+            } else {
+                console.log('No data returned.');
+            }
+        });
+    };
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
         async function fetchGeocodeData(location) {
             const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
+                location
+            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
 
             try {
                 const response = await fetch(url);
@@ -194,115 +419,470 @@ const Demographicdetails = ({ patientId }) => {
                 const data = await response.json();
                 return data;
             } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
+                console.error('Failed to fetch geocode data:', error);
                 return null;
             }
         }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedEmployerLocations(data?.results);
-                } else {
-                    console.log("No data returned.");
-                }
+        fetchGeocodeData(addressToSearch).then((data) => {
+            if (data) {
+                setSearchedEmployerLocations(data?.results);
+            } else {
+                console.log('No data returned.');
+            }
+        });
+    };
+    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
+    const [addressFocused, setAddressFocused] = useState(false);
+    const defaultIdentifiers = ['SSN'];
+    // const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const addressUses = ['postal', 'physical', 'both'];
+    const [addresses, setAddresses] = useState([
+        { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
+    ]);
+    const defaultIssuingAuthority = [
+        'NPPES',
+        'CLIA',
+        'State Licensing Authority',
+        'IRS',
+        'CMS',
+        'The Joint Commission',
+        'Dun & Bradstreet',
+        'Other',
+    ];
+    const identifierOptions = [
+        { label: 'Social Security Number (SSN)', value: 'http://hl7.org/fhir/sid/us-ssn', code: 'SSN' },
+        { label: 'Medical Record Number (MRN)', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' },
+        { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
+        { label: 'Driver’s License Number', value: 'urn:oid:2.16.840.1.113883.4.3.25', code: 'DL' },
+        { label: 'Health Plan Beneficiary Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'HPI' },
+        { label: 'Passport Number', value: 'urn:oid:2.16.840.1.113883.4.3.2', code: 'PPN' },
+        { label: 'State Medicaid ID', value: 'http://hl7.org/fhir/sid/us-medicaid', code: 'Medicaid' },
+        { label: 'Veterans Affairs ID (VA ID)', value: 'http://va.gov/fhir/sid/va', code: 'VA' },
+    ];
+    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+    const [identifierDocument, setIdentifierDocumnent] = useState(false);
+    const addAddress = () => {
+        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
+    };
+    const removeAddress = (index) => {
+        if (addresses.length > 1) {
+            setAddresses(addresses.filter((_, i) => i !== index));
+        }
+    };
+    const handleAddressChange = (index, field, value) => {
+        const updatedAddresses = [...addresses];
+        if (field === 'line') {
+            updatedAddresses[index].line[0] = value; // update street address
+        } else {
+            updatedAddresses[index][field] = value;
+        }
+        setAddresses(updatedAddresses);
+    };
+    useEffect(() => {
+        setConstantIdentifiers(
+            defaultIdentifiers.map((type) => ({
+                type,
+                number: '',
+                file: '',
+                expiry: '',
+                issuingAuthority: '',
+                use: '',
+            }))
+        );
+    }, []);
+    const addIdentifier = () => {
+        setConstantIdentifiers([
+            ...constantIdentifiers,
+            { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
+        ]);
+    };
+    const removeIdentifier = (index) => {
+        if (index < defaultIdentifiers.length) return;
+        setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
+    };
+    const handleChange = (index, field, value) => {
+        const updatedIdentifiers = [...constantIdentifiers];
+        updatedIdentifiers[index][field] = value;
+        setConstantIdentifiers(updatedIdentifiers);
+    };
+    const handleIdentifierFileChange = async (e, index) => {
+        const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+        try {
+            const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
+            setConstantIdentifiers((prevDetails) => {
+                const updatedDetails = [...prevDetails];
+                console.log(url, 'constantIdentifierurl');
+                updatedDetails[index] = {
+                    ...updatedDetails[index],
+                    file: {
+                        url: url?.url?.split('?')[0],
+                        name: selectedFile.name,
+                    },
+                };
+                return updatedDetails;
             });
-    }
+        } catch (error) {
+            console.error('Error during file upload:', error);
+        }
+    };
+    const handleStateSelection = (e) => {
+        const selectedOption = e.target.selectedOptions[0];
+        const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        setSelectedState(e.target.value);
+        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25 }));
+    };
+    const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
+        value: ethnicity, // Code as the value
+        label: ethnicity.display, // Display text as the label
+    }));
+    const formattedTribleOptions = tribalEntitiesOptions.map((tribal) => ({
+        value: tribal, // Code as the value
+        label: tribal.display, // Display text as the label
+    }));
+
+    const handleEthnicityChange = (selectedOption) => {
+        console.log(selectedOption, 'selectedOption');
+        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+    };
+
+    const handleTribalChange = (selectedOption) => {
+        console.log(selectedOption, 'selectedOption');
+        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+    };
+
     return (
         <>
             <Form className="mt-1" onSubmit={handleSubmit(onSubmit)}>
-                <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
-                    <Col sm={3}>
+                <Row className="pb-2">
+                    <Col sm={12}>
+                        <Row>
+                            <Col sm={12}>
+                                <h5>
+                                    Identifiers
+                                    <span
+                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                        onClick={addIdentifier}></span>
+                                </h5>
+                            </Col>
+                        </Row>
+
+                        {/* Table Header */}
+                        <Row className="fw-bold">
+                            <Col>
+                                <Form.Label>Identifier Type</Form.Label>
+                            </Col>
+                            <Col>
+                                <Form.Label>Identifier Number</Form.Label>
+                            </Col>
+                            <Col>
+                                <Form.Label>Identifier Document</Form.Label>
+                            </Col>
+                            <Col>
+                                <Form.Label>Issuing Authority</Form.Label>
+                            </Col>
+                            <Col>
+                                <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
+                            </Col>
+                        </Row>
+
+                        {/* Dynamic Identifier Fields */}
+                        {constantIdentifiers.map((item, index) => (
+                            <Row key={index} className="mb-2">
+                                {/* Identifier Type */}
+                                <Col>
+                                    <Form.Select
+                                        value={item.type}
+                                        data-has-value={!!watch(`identifiers[${index}].type`)}
+                                        {...register(
+                                            `identifiers[${index}].type`
+                                            //  { required: 'Identifier Type is required' }
+                                        )}
+                                        onChange={(e) => handleChange(index, 'type', e.target.value)}
+                                        disabled={defaultIdentifiers.includes(item.type)}>
+                                        <option value="" disabled>
+                                            Select Identifier Type
+                                        </option>
+                                        {identifierOptions.map((option) => (
+                                            <option key={option.code} className="" value={option}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors?.[index]?.type && (
+                                        <span className="text-danger">This field is required</span>
+                                    )}
+                                </Col>
+
+                                {/* Identifier Number */}
+                                <Col>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="Document Number"
+                                        value={item.number}
+                                        maxLength={
+                                            item.type === 'NPI' || item.type === 'CLIA'
+                                                ? 10
+                                                : item.type === 'NAIC'
+                                                ? 5
+                                                : undefined
+                                        }
+                                        {...register(`identifiers[${index}].number`, {
+                                            // required: defaultIdentifiers.includes(item.type)
+                                            //     ? 'Document Number is required'
+                                            //     : false,
+                                            validate: (value) => {
+                                                if (!value) return true; // Skip validation if field is empty (for dynamic fields)
+
+                                                if (item.type === 'NPI' && !/^[0-9]{10}$/.test(value)) {
+                                                    return 'NPI number must be exactly 10 digits long';
+                                                }
+                                                if (item.type === 'CLIA' && !/^[A-Z0-9]{2}D[0-9]{7}$/.test(value)) {
+                                                    return 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits';
+                                                }
+                                                if (item.type === 'NAIC' && !/^[0-9]{5}$/.test(value)) {
+                                                    return 'NAIC number must be exactly 5 digits long';
+                                                }
+                                                return true; // No validation for other types (like DUNS, etc.)
+                                            },
+                                        })}
+                                        onChange={(e) => {
+                                            let value = e.target.value;
+
+                                            // Enforce length limit only for NPI, CLIA, and NAIC
+                                            if (item.type === 'NPI' || item.type === 'CLIA') {
+                                                value = value.slice(0, 10);
+                                            } else if (item.type === 'NAIC') {
+                                                value = value.slice(0, 5);
+                                            }
+
+                                            handleChange(index, 'number', value);
+                                        }}
+                                    />
+                                    {errors.identifiers?.[index]?.number && (
+                                        <span className="text-danger">{errors.identifiers[index].number.message}</span>
+                                    )}
+                                </Col>
+
+                                {/* File Upload */}
+                                <Col className="mb-2 position-relative">
+                                    <div
+                                        onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
+                                        className={`custom-file-upload justify-content-between cursor-pointer ${
+                                            item.file ? 'form-control' : 'custom-form-fields'
+                                        }`}>
+                                        {item.file?.name
+                                            ? item.file.name.length > 30
+                                                ? item.file.name.slice(0, 25) + '...'
+                                                : item.file.name
+                                            : 'Upload Document'}
+                                        <p className="mb-0">
+                                            <FiDownloadCloud />
+                                        </p>
+                                    </div>
+                                    <Form.Control
+                                        type="file"
+                                        id={`fileInput-identifier-${index}`}
+                                        style={{ display: 'none' }}
+                                        accept=".png, .jpg, .jpeg, .pdf"
+                                        onChange={(e) => handleIdentifierFileChange(e, index)}
+                                    />
+                                    {errors?.[index]?.file && (
+                                        <span className="text-danger">Please upload a document</span>
+                                    )}
+                                </Col>
+
+                                {/* Issuing Authority */}
+                                <Col>
+                                    <Form.Select
+                                        value={item.issuingAuthority}
+                                        data-has-value={!!watch(`identifiers[${index}].issuingAuthority`)}
+                                        {...register(`identifiers[${index}].issuingAuthority`)}
+                                        onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
+                                        <option value="" hidden>
+                                            Select Issuing Authority
+                                        </option>
+                                        {defaultIssuingAuthority.map((option) => (
+                                            <option key={option} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors?.[index]?.issuingAuthority && (
+                                        <span className="text-danger">This field is required</span>
+                                    )}
+                                </Col>
+                                {/* Expiry Date */}
+                                <Col className="position-relative">
+                                    <Form.Control
+                                        type="date"
+                                        value={item.expiry}
+                                        onChange={(e) => handleChange(index, 'expiry', e.target.value)}
+                                    />
+                                    {errors?.[index]?.expiry && (
+                                        <span className="text-danger">Select a valid expiry date</span>
+                                    )}
+
+                                    {/* Remove Identifier Button */}
+                                    {index >= defaultIdentifiers.length && (
+                                        <span
+                                            className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                            style={{ right: '-2%', top: '12%' }}
+                                            onClick={() => removeIdentifier(index)}>
+                                            <CiCircleMinus />
+                                        </span>
+                                    )}
+                                </Col>
+                            </Row>
+                        ))}
+                    </Col>
+                </Row>
+                <hr className="mt-0" />
+                <Row className="pb-2">
+                    {/* <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
-                            <Form.Control placeholder="Patient National ID Number" type="text" {...register('nationalIdNumber')} />
+                            <Form.Control
+                                placeholder="Patient National ID Number"
+                                type="text"
+                                {...register('nationalIdNumber')}
+                            />
                         </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
-                            <Form.Select
-                                {...register('sex')} >
-                                <option value="" hidden>Select Sex</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-
+                            <Form.Select {...register('sex')}>
+                                <option value="" hidden>
+                                    Select Sex
+                                </option>
+                                {sexAssignedAtBirthOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Gender Identity</Form.Label>
-                            <Form.Select
-                                {...register('genderIdentity')} >
-                                <option value="" hidden>Select Gender Identity</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Male-to-Female (MTF)/Transgender Female/Trans Woman">
-                                    Male-to-Female (MTF)/Transgender Female/Trans Woman
+                            <Form.Select {...register('genderIdentity')}>
+                                <option value="" hidden>
+                                    Select
                                 </option>
-                                <option value="Female-to-Male (FTM)/Transgender Male/Trans Man">
-                                    Female-to-Male (FTM)/Transgender Male/Trans Man
-                                </option>
-                                <option value="Genderqueer">Genderqueer</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
-
+                                {genderIdentityOptions?.map((option) => (
+                                    <option key={option?.value} value={option?.value}>
+                                        {option?.show}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
+
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Sexual Orientation</Form.Label>
-                            <Form.Select
-                                {...register('sexualOrientation')} >
-                                <option value="" hidden>Select Sexual Orientation</option>
+                            <Form.Select {...register('sexualOrientation')}>
+                                <option value="" hidden>
+                                    Select
+                                </option>
                                 <option value="Heterosexual">Heterosexual</option>
                                 <option value="Lesbian or gay">Lesbian or gay</option>
                                 <option value="Bisexual">Bisexual</option>
                                 <option value="Other">Other</option>
                                 <option value="Unknown">Unknown</option>
                                 <option value="Choose not to disclose">Choose not to disclose</option>
-
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
+                            <Form.Select {...register('sexParameter')}>
+                                <option value="" hidden>
+                                    Select
+                                </option>
+                                {sexParameterOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.show}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Personal Pronouns</Form.Label>
+                            <Form.Select {...register('personalPronouns')}>
+                                <option value="" hidden>
+                                    Select Pronouns
+                                </option>
+                                {personalPronounsOptions?.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.show}
+                                    </option>
+                                ))}
                             </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Race</Form.Label>
-                            <Form.Select
-                                {...register('race')} >
+                            <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
-                                <option value="American Indian or Alaska Native'">American Indian or Alaska Native'</option>
-                                <option value="Asian">Asian</option>
-                                <option value="Black or African American">Black or African American</option>
-                                <option value="Native Hawaiian or Other Pacific Islander">Native Hawaiian or Other Pacific Islander</option>
-                                <option value="White">White</option>
-                                <option value="Other Race">Other Race</option>
+                                {raceOptions.map((race) => (
+                                    <option key={race.code} value={race.display}>
+                                        {race.display}
+                                    </option>
+                                ))}
                                 <option value="Declined To Specify">Declined To Specify</option>
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
+                    {/* <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Race SubCategories</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Race SubCategories" {...register('raceSubcategories')} />
+                            <Form.Control
+                                type="text"
+                                placeholder="Enter Race SubCategories"
+                                {...register('raceSubcategories')}
+                            />
                         </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Ethnicity</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Ethnicity" {...register('ethnicity')} />
+                            <Select
+                                options={formattedEthnicityOptions} // Use the formatted array
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select "
+                                onChange={handleEthnicityChange}
+                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select
-                                {...register('preferredLanguage',
-                                )}
-                            >
+                            <Form.Select {...register('preferredLanguage')}>
                                 <option value="">Select Preferred Language</option>
                                 <option value="English">English</option>
                                 <option value="Chinese">Chinese</option>
@@ -321,11 +901,36 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
+                            <Form.Label className="mb-0">Tribal Entity</Form.Label>
+                            <Select
+                                options={formattedTribleOptions} // Use the formatted array
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select "
+                                onChange={handleTribalChange}
+                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
+                        </Form.Group>
+                    </Col>
+                    {/* <Col sm={3}>
+                        <Form.Group>
                             <Form.Label className="mb-0">Patient Student Status</Form.Label>
-                            <Form.Select
-                                {...register('patientStudentStatus',
-                                )}
-                            >
+                            <Form.Select {...register('patientStudentStatus')}>
                                 <option value="">Select Patient Student Status</option>
                                 <option value="Employed">Employed</option>
                                 <option value="Full-time Student">Full-time Student</option>
@@ -333,416 +938,209 @@ const Demographicdetails = ({ patientId }) => {
                                 <option value="Part-time Student">Part-time Student</option>
                             </Form.Select>
                         </Form.Group>
-                    </Col>
+                    </Col> */}
                 </Row>
-
+                <hr />
                 <Row>
                     <Col sm={12}>
-                        <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
-                            <Col sm={12} className='mt-1'>
-                                <span className='text-black fw-semibold form-label'>Primary Address</span>
-                            </Col>
-                            <Col sm={6}>
-                                <Row className='position-relative'>
-                                    <Col sm={12}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('primaryAddress', {
-                                                    })}
-                                                    // value={searchedLocations}
-                                                    onChange={(e) => {
-                                                        getGeolocation(e);
-                                                        setFocused(true);
-                                                        clearErrors('primaryAddress');
-                                                    }}
-
-                                                    onFocus={() => setFocused(true)}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setFocused(false), 200);
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
-                                                />
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
-                                                >
-                                                    {searchedLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setValue('primaryZip', data?.components?.postcode)
-                                                                setValue('primaryStateName', data?.components?.state_code)
-                                                                setValue('primaryStreet', data?.components?.road)
-                                                                setLatitude(data?.bounds?.southwest?.lat);
-                                                                setPrimaryCitySearch(data?.components?.county)
-                                                                setLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('primaryAddress', data?.formatted)
-                                                                setFocused(false);
-                                                                setValue('primaryTimeZone', data?.annotations?.timezone?.name)
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black"
-                                                        >
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                </div>
-                                            </div>
-                                            {errors.address && <span className="text-danger">{errors.address.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={latitude}
-                                                placeholder="Latitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={longitude}
-                                                placeholder="Longitude" />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.primaryTimeZone && <span className="text-danger">{errors.primaryTimeZone.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            <Form.Select
-                                                {...register('primaryStateName')}
-                                            >
-                                                <option value='' hidden>State</option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.name}
-                                                        data-key={data?.id}
-                                                        value={data?.state_code}
-                                                    >
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.stateName && <span className="text-danger">{errors.stateName.message}</span>}
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('primaryCity')}
-                                            >
-                                                <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities1?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.city && <span className="text-danger">{errors.city.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryStreet')}
-                                                placeholder="Street" />
-                                            {errors.primaryStreet && <span className="text-danger">{errors.primaryStreet.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('primaryZip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.primaryZip && <span className="text-danger">{errors.primaryZip.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
+                        <h5>
+                            Address Details
+                            <span
+                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                onClick={addAddress}></span>
+                        </h5>
                     </Col>
                 </Row>
-                <Row style={{ borderBottom: '1px solid #444141' }} className="pb-2">
-                    <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className='mt-1'>
-                                <span className='text-black fw-semibold form-label'>Mailing Address</span>
-                                <Form.Check
-                                    type="checkbox"
-                                    label="Same as Primary Address"
-                                    onChange={(e) => {
-
-                                        if (e.target.checked) {
-                                            setSameAsPrimary(true);
-                                            setValue('mailingAddress', getValues('primaryAddress'));
-                                            setValue('mailingZip', getValues('primaryZip'));
-                                            setValue('mailingStreet', getValues('primaryStreet'));
-                                            setValue('mailingTimeZone', getValues('primaryTimeZone'));
-                                            setMailingLatitude(latitude);
-                                            setMailingLongitude(longitude);
-                                        } else {
-                                            setSameAsPrimary(false)
-                                            setValue('mailingAddress', '');
-                                            setValue('mailingZip', '');
-                                            setValue('mailingStreet', '');
-                                            setValue('mailingTimeZone', '');
-                                            setMailingLatitude(null);
-                                            setMailingLongitude(null);
+                {addresses.map((item, index) => (
+                    <Row key={index} className="mb-2">
+                        <Col sm={4} className="mb-2">
+                            <Form.Label className="mb-1">Type</Form.Label>
+                            <Form.Select
+                                value={item.use}
+                                className="text-capitalize"
+                                data-has-value={!!watch(`address[${index}].use`)}
+                                {...register(`address[${index}].use`)}
+                                onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
+                                <option value="" hidden>
+                                    Select
+                                </option>
+                                {addressUses.map((use) => (
+                                    <option key={use} className="text-capitalize" value={use}>
+                                        {use}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                        <Col sm={4} className="mb-2 position-relative">
+                            <Form.Label className="mb-1">Address</Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Street Address"
+                                value={item.line[0]}
+                                onChange={(e) => {
+                                    handleAddressChange(index, 'line', e.target.value);
+                                    // Set active index so suggestions appear for this address
+                                    setActiveAddressIndex(index);
+                                    setAddressFocused(true);
+                                    // Call your geolocation API with the current input value
+                                    getGeolocation(e)?.then((data) => {
+                                        // Expecting your getGeolocation to return an object with results
+                                        if (data && data.results) {
+                                            setSearchedLocations(data.results);
                                         }
-                                    }}
+                                    });
+                                }}
+                                onFocus={() => {
+                                    setActiveAddressIndex(index);
+                                    setAddressFocused(true);
+                                }}
+                                onBlur={() => {
+                                    setTimeout(() => setAddressFocused(false), 200);
+                                }}
+                            />
+                            {activeAddressIndex === index && addressFocused && searchedLocations?.length > 0 && (
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: 0,
+                                        width: '100%',
+                                        maxHeight: '150px',
+                                        overflowY: 'auto',
+                                        zIndex: 111,
+                                        backgroundColor: '#fff',
+                                        border: '1px solid #ced4da',
+                                        borderTop: 'none',
+                                    }}>
+                                    {searchedLocations.map((data, suggestionIndex) => (
+                                        <p
+                                            key={suggestionIndex}
+                                            onClick={() => {
+                                                console.log(data, 'data12456');
+                                                // Extract the necessary fields from the API response
+                                                // const formatted = data.formatted || '';
+                                                // const components = data.components || {};
+                                                // Build the new address object with auto-populated fields
+                                                const newAddress = {
+                                                    use: item.use, // preserve existing use
+                                                    line: [data?.formatted ? data?.formatted : ''],
+                                                    city:
+                                                        data?.components.city ||
+                                                        data?.components.town ||
+                                                        data?.components.village ||
+                                                        '',
+                                                    state: data?.components.state
+                                                        ? data?.components.state
+                                                        : data?.components.state_code,
+                                                    postalCode: data?.components.postcode || item.postalCode || '', // Auto-fill or keep user input
+                                                    country: data?.components?.country || '',
+                                                };
+                                                // Update the specific address entry
+                                                const updatedAddresses = [...addresses];
+                                                console.log(updatedAddresses, 'updatedAddresses11');
+                                                updatedAddresses[index] = newAddress;
+                                                setAddresses(updatedAddresses);
+                                                // Clear suggestions and remove focus
+                                                setSearchedLocations([]);
+                                                setAddressFocused(false);
+                                            }}
+                                            style={{
+                                                margin: 0,
+                                                padding: '8px 12px',
+                                                cursor: 'pointer',
+                                            }}
+                                            className="hover-bg-change text-black">
+                                            {data.formatted}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
+                        </Col>
+
+                        <Col sm={4} className="mb-2">
+                            <Form.Label className="mb-1">State</Form.Label>
+                            <Form.Select
+                                {...register(`address[${index}].state`)}
+                                data-has-value={!!getValues(`address[${index}].state`)}
+                                onChange={handleStateSelection}>
+                                <option value="">Select State</option>
+                                {statesData?.states?.map((data) => (
+                                    <option
+                                        selected={data?.name == addresses[0]?.state}
+                                        key={data?.name}
+                                        data-key={data?.id}
+                                        value={addresses[0]?.state}>
+                                        {data?.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                        <Col sm={4} className="mb-2">
+                            <Form.Label className="mb-1">City</Form.Label>
+                            <Form.Select
+                                data-has-value={!!getValues(`address[${index}].city`)}
+                                {...register(`address[${index}].city`)}
+                                // disabled={!selectedState || store?.getCitiesReducer?.loading}
+                            >
+                                <option value="">
+                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
+                                </option>
+                                {cities1?.map((data) => (
+                                    <option
+                                        selected={data?.name == addresses[0]?.city}
+                                        key={data?.name}
+                                        value={data?._id}>
+                                        {data?.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                        <Col sm={4}>
+                            <Form.Group className="mb-2">
+                                <Form.Label className="mb-1">Postal Code</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={item.postalCode} // Bind postal code value
+                                    placeholder="Postal Code"
+                                    {...register(`postalCode`, {
+                                        minLength: {
+                                            value: 5,
+                                            message: 'Postal code must be at least 5 characters long',
+                                        },
+                                        pattern: {
+                                            value: /^[0-9]+$/,
+                                            message: 'Postal code must contain numbers only',
+                                        },
+                                    })}
+                                    maxLength={5}
                                 />
-                            </Col>
-                            <Col sm={6}>
-                                <Row className='position-relative'>
-                                    <Col sm={12}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('mailingAddress', {
-                                                    })}
-                                                    onChange={(e) => {
-                                                        getMailingGeolocation(e);
-                                                        setMailingFocused(true);
-                                                        clearErrors('address');
-                                                    }}
+                                {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
+                            </Form.Group>
+                        </Col>
 
-                                                    onFocus={() => setMailingFocused(true)}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setMailingFocused(false), 200);
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
-                                                />
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedMailingLocations?.length === 0 || !mailingFocused ? 'd-none' : ''}`}
-                                                >
-                                                    {searchedMailingLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setValue('mailingZip', data?.components?.postcode)
-                                                                setValue('mailingStateName', data?.components?.state_code)
-                                                                setMailingLatitude(data?.bounds?.southwest?.lat);
-                                                                setMailingCitySearch(data?.components?.county)
-                                                                setMailingLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('mailingAddress', data?.formatted)
-                                                                setMailingFocused(false);
-                                                                setValue('mailingStreet', data?.components?.road)
-                                                                setValue('mailingTimeZone', data?.annotations?.timezone?.name)
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black"
-                                                        >
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedMailingLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
-                                                </div>
-                                            </div>
-                                            {errors.mailingAddress && <span className="text-danger">{errors.mailingAddress.message}</span>}
-                                        </Form.Group>
-                                    </Col>
+                        <Col sm={4} className="position-relative">
+                            <Form.Label className="mb-1">Country</Form.Label>
 
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={mailingLatitude}
-                                                placeholder="Latitude"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={mailingLongitude}
-                                                placeholder="Longitude" />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.mailingTimeZone && <span className="text-danger">{errors.mailingTimeZone.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            {sameAsPrimary ?
-                                                <Form.Control value={statesData?.states?.find((data) => data?.state_code === getValues('primaryStateName'))?.name} readOnly />
-                                                :
-                                                <>
-                                                    <Form.Select
-                                                        {...register('mailingStateName')}
-                                                    >
-                                                        <option value='' hidden >State</option>
-                                                        {statesData?.states?.map((data) => (
-                                                            <option
-                                                                key={data?.name}
-                                                                data-key={data?.id}
-                                                                value={data?.state_code}
-                                                            >
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                    {errors.stateName && <span className="text-danger">{errors.stateName.message}</span>}
-                                                </>
-                                            }
+                            <Form.Control
+                                type="text"
+                                placeholder="Country"
+                                value={item.country}
+                                onChange={(e) => handleAddressChange(index, 'country', e.target.value)}
+                            />
+                            {addresses.length > 1 && index !== 0 && (
+                                <span
+                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                    style={{ right: '-2%', top: '50%' }}
+                                    onClick={() => removeAddress(index)}>
+                                    <CiCircleMinus />
+                                </span>
+                            )}
+                        </Col>
+                    </Row>
+                ))}
+                <hr />
 
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            {sameAsPrimary ?
-                                                <Form.Control value={getValues('primaryCity')} readOnly />
-                                                :
-                                                <>
-                                                    <Form.Select
-                                                        disabled={store?.getCitiesReducer?.loading}
-                                                        {...register('mailingCity')}
-
-                                                    >
-                                                        <option value='' hidden>{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                        {cities2?.map((data) => (
-                                                            <option key={data?.name} value={data?.name}>
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                    {errors.city && <span className="text-danger">{errors.city.message}</span>}
-                                                </>
-                                            }
-
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingStreet')}
-                                                placeholder="Street" />
-                                            {errors.street && <span className="text-danger">{errors.street.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('mailingZip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-                <Row style={{ borderBottom: '1px solid #444141' }} className="mt-1 pb-2">
+                <Row className="mt-1 pb-2">
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Notes</Form.Label>
@@ -751,39 +1149,40 @@ const Demographicdetails = ({ patientId }) => {
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label htmlFor="marital" className="mb-0">Marital Status</Form.Label>
-                            <Form.Select
-                                id="marital"
-                                {...register('maritalStatus')}
-                            >
+                            <Form.Label htmlFor="marital" className="mb-0">
+                                Marital Status
+                            </Form.Label>
+                            <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
-                                <option value="Single">Single</option>
-                                <option value="Married">Married</option>
-                                <option value="Divorced">Divorced</option>
-                                <option value="Widowed">Widowed</option>
-                                <option value="Other">Other</option>
+                                {maritalStatusOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.show}
+                                    </option>
+                                ))}
                             </Form.Select>
-                            {errors.maritalStatus && <span className="text-danger">{errors.maritalStatus.message}</span>}
+                            {errors.maritalStatus && (
+                                <span className="text-danger">{errors.maritalStatus.message}</span>
+                            )}
                         </Form.Group>
                     </Col>
-                    <Col sm={3}>
+                    {/* <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">EPSDT Services</Form.Label>
-                            <Form.Select
-                                {...register('epsdtServices')}
-                            >
+                            <Form.Select {...register('epsdtServices')}>
                                 <option value="">Select EPSDT Services</option>
                                 <option value="Children">Children</option>
                                 <option value="Family Planning">Family Planning</option>
                                 <option value="Children / Family Planning">Children / Family Planning</option>
                             </Form.Select>
-                            {errors.epsdtServices && <span className="text-danger">{errors.epsdtServices.message}</span>}
+                            {errors.epsdtServices && (
+                                <span className="text-danger">{errors.epsdtServices.message}</span>
+                            )}
                         </Form.Group>
-                    </Col>
-                    <Col sm={3}>
+                    </Col> */}
+                    {/* <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">EPSDT Referral Condition </Form.Label>
-                            <Form.Select {...register('epsdtReferralCondition')} >
+                            <Form.Select {...register('epsdtReferralCondition')}>
                                 <option value="">Select EPSDT Referral Condition</option>
                                 <option value="AV">Available - Not Used</option>
                                 <option value="NU">Not Used</option>
@@ -791,13 +1190,19 @@ const Demographicdetails = ({ patientId }) => {
                                 <option value="ST">New Services Requested</option>
                                 <option value="Other">Other</option>
                             </Form.Select>
-                            {errors.epsdtReferralCondition && <span className="text-danger">{errors.epsdtReferralCondition.message}</span>}
+                            {errors.epsdtReferralCondition && (
+                                <span className="text-danger">{errors.epsdtReferralCondition.message}</span>
+                            )}
                         </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
-                            <Form.Control {...register('emergencyContactName')} type="text" placeholder="Enter Emergency Contact Name" />
+                            <Form.Control
+                                {...register('emergencyContactName')}
+                                type="text"
+                                placeholder="Enter Emergency Contact Name"
+                            />
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
@@ -806,10 +1211,15 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Control {...register('emergencyContactPhone')} type="text" placeholder="Enter Emergency Contact Phone" />
                         </Form.Group> */}
                         <Form.Group className="mb-0 position-relative">
-                            <Form.Label className='mb-0'>Emergency Contact Phone </Form.Label>
+                            <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
                             <Form.Group>
                                 <InputGroup>
-                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                    <InputGroup.Text
+                                        className="ps-3 pe-1 fw-bold text-black"
+                                        style={{ height: '33px' }}>
+                                        &nbsp;+1
+                                    </InputGroup.Text>{' '}
+                                    {/* This is the prefix */}
                                     <Form.Control
                                         type="tel"
                                         style={{ height: '33px' }}
@@ -820,12 +1230,12 @@ const Demographicdetails = ({ patientId }) => {
                                             },
                                             maxLength: {
                                                 value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                message: 'Contact must not exceed 13 characters'
+                                                message: 'Contact must not exceed 13 characters',
                                             },
                                             minLength: {
                                                 value: 13,
-                                                message: 'Contact must not be less than 13 characters'
-                                            }
+                                                message: 'Contact must not be less than 13 characters',
+                                            },
                                         })}
                                         onChange={(e) => {
                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -853,43 +1263,52 @@ const Demographicdetails = ({ patientId }) => {
                                 </InputGroup>
                             </Form.Group>
 
-                            <div
-                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
-                            >
-                                <img
-                                    src={us}
-                                    alt="country code flag"
-                                    width={20} />
+                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                <img src={us} alt="country code flag" width={20} />
                             </div>
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
-                            <Form.Control {...register('emergencyContactRelation')} type="text" placeholder="Enter Emergency Contact Relation" />
+                            <Form.Control
+                                {...register('emergencyContactRelation')}
+                                type="text"
+                                placeholder="Enter Emergency Contact Relation"
+                            />
                         </Form.Group>
                     </Col>
                 </Row>
-                <Row >
+                <hr />
+                <Row>
                     <Col sm={12}>
                         <Row>
-                            <Col sm={12} className='mt-1'>
-                                <span className='text-black fw-semibold form-label'>Employer Details</span>
+                            <Col sm={12} className="mt-1">
+                                <span className="text-black fw-semibold form-label">Employer Details</span>
                             </Col>
                             <Col sm={12}>
                                 <Row>
-                                    <Col sm={6}>
+                                    <Col sm={3}>
                                         <Form.Group>
                                             <Form.Label className="mb-0">Employer Name</Form.Label>
-                                            <Form.Control {...register('employerName')} type="text" placeholder="Enter Employer Name" />
+                                            <Form.Control
+                                                {...register('employerName')}
+                                                type="text"
+                                                placeholder="Enter Employer Name"
+                                            />
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    <Col sm={3}>
                                         <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className='mb-0'>Employer Phone </Form.Label>
+                                            <Form.Label className="mb-0">Employer Phone </Form.Label>
                                             <Form.Group>
                                                 <InputGroup>
-                                                    <InputGroup.Text className='ps-3 pe-1 fw-bold text-black' style={{ height: '33px' }}>&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                    <InputGroup.Text
+                                                        className="ps-3 pe-1 fw-bold text-black"
+                                                        style={{ height: '33px' }}>
+                                                        &nbsp;+1
+                                                    </InputGroup.Text>{' '}
+                                                    {/* This is the prefix */}
                                                     <Form.Control
                                                         type="tel"
                                                         style={{ height: '33px' }}
@@ -900,12 +1319,12 @@ const Demographicdetails = ({ patientId }) => {
                                                             },
                                                             maxLength: {
                                                                 value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                                message: 'Contact must not exceed 13 characters'
+                                                                message: 'Contact must not exceed 13 characters',
                                                             },
                                                             minLength: {
                                                                 value: 13,
-                                                                message: 'Contact must not be less than 13 characters'
-                                                            }
+                                                                message: 'Contact must not be less than 13 characters',
+                                                            },
                                                         })}
                                                         onChange={(e) => {
                                                             let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
@@ -932,34 +1351,62 @@ const Demographicdetails = ({ patientId }) => {
                                                 </InputGroup>
                                             </Form.Group>
 
-                                            <div
-                                                className='position-absolute ' style={{ top: '48%', left: '1%' }}
-                                            >
-                                                <img
-                                                    src={us}
-                                                    alt="country code flag"
-                                                    width={20} />
+                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                                <img src={us} alt="country code flag" width={20} />
                                             </div>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Employment Status</Form.Label>
+                                            <Form.Select {...register('employmentStatus')}>
+                                                <option value="">Select Employment Status</option>
+                                                <option value="employed">Employed</option>
+                                                <option value="self-employed">Self-Employed</option>
+                                                <option value="unemployed">Unemployed</option>
+                                                <option value="retired">Retired</option>
+                                                <option value="student">Student</option>
+                                                <option value="unknown">Unknown</option>
+                                            </Form.Select>
+                                            {errors.employmentStatus && (
+                                                <span className="text-danger">{errors.employmentStatus.message}</span>
+                                            )}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={3}>
+                                        <Form.Group className="mb-2">
+                                            <Form.Label className="mb-1">Occupation</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Enter Occupation"
+                                                {...register('occupation', {
+                                                    minLength: {
+                                                        value: 2,
+                                                        message: 'Occupation must be at least 2 characters long',
+                                                    },
+                                                })}
+                                            />
+                                            {errors.occupation && (
+                                                <span className="text-danger">{errors.occupation.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
                             </Col>
                             <Col sm={6}>
-                                <Row className='position-relative'>
+                                <Row className="position-relative">
                                     <Col sm={12}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Address</Form.Label>
                                             <div style={{ position: 'relative' }}>
                                                 <Form.Control
                                                     type="text"
-                                                    {...register('employerAddress', {
-                                                    })}
+                                                    {...register('employerAddress', {})}
                                                     onChange={(e) => {
                                                         getEmployerGeolocation(e);
                                                         setEmployerFocused(true);
                                                         clearErrors('employerAddress');
                                                     }}
-
                                                     onFocus={() => setEmployerFocused(true)}
                                                     onBlur={() => {
                                                         setTimeout(() => setEmployerFocused(false), 200);
@@ -979,20 +1426,29 @@ const Demographicdetails = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused ? 'd-none' : ''}`}
-                                                >
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
                                                             onClick={() => {
-                                                                setValue('employerZip', data?.components?.postcode)
-                                                                setValue('employerStateName', data?.components?.state_code)
-                                                                setValue('employerStreet', data?.components?.road)
-                                                                setValue('employerTimeZone', data?.annotations?.timezone?.name)
-                                                                setEmployerCitySearch(data?.components?.county)
+                                                                setValue('employerZip', data?.components?.postcode);
+                                                                setValue(
+                                                                    'employerStateName',
+                                                                    data?.components?.state_code
+                                                                );
+                                                                setValue('employerStreet', data?.components?.road);
+                                                                setValue(
+                                                                    'employerTimeZone',
+                                                                    data?.annotations?.timezone?.name
+                                                                );
+                                                                setEmployerCitySearch(data?.components?.county);
                                                                 setEmployerLatitude(data?.bounds?.southwest?.lat);
                                                                 setEmployerLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('employerAddress', data?.formatted)
+                                                                setValue('employerAddress', data?.formatted);
                                                                 setEmployerFocused(false);
                                                             }}
                                                             style={{
@@ -1000,46 +1456,59 @@ const Demographicdetails = ({ patientId }) => {
                                                                 padding: '8px 12px',
                                                                 cursor: 'pointer',
                                                             }}
-                                                            className="hover-bg-change text-black"
-                                                        >
+                                                            className="hover-bg-change text-black">
                                                             {data?.formatted}
                                                         </p>
                                                     ))}
-                                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                    {searchedLocations?.length === 0 && (
+                                                        <p className="text-muted px-2 py-1">No results found</p>
+                                                    )}
                                                 </div>
                                             </div>
-                                            {errors.employerAddress && <span className="text-danger">{errors.employerAddress.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Latitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={employerLatitude}
-                                                placeholder="Latitude"
-                                            />
+                                            {errors.employerAddress && (
+                                                <span className="text-danger">{errors.employerAddress.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0'>Longitude</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                defaultValue={employerLongitude}
-                                                placeholder="Longitude" />
+                                            <Form.Label className="mb-0">State</Form.Label>
+                                            <Form.Select {...register('employerStateName')}>
+                                                <option value="" hidden>
+                                                    State
+                                                </option>
+                                                {statesData?.states?.map((data) => (
+                                                    <option
+                                                        key={data?.name}
+                                                        data-key={data?.id}
+                                                        value={data?.state_code}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {errors.employerStateName && (
+                                                <span className="text-danger">{errors.employerStateName.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0'>Time Zone</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerTimeZone')}
-                                                placeholder="Time Zone"
-                                            />
-                                            {errors.employerTimeZone && <span className="text-danger">{errors.employerTimeZone.message}</span>}
+                                            <Form.Label className="mb-0">City</Form.Label>
+                                            <Form.Select
+                                                disabled={store?.getCitiesReducer?.loading}
+                                                {...register('employerCity')}>
+                                                <option hidden value="">
+                                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                </option>
+                                                {cities3?.map((data) => (
+                                                    <option key={data?.name} value={data?.name}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                            {errors.employerCity && (
+                                                <span className="text-danger">{errors.employerCity.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -1048,56 +1517,7 @@ const Demographicdetails = ({ patientId }) => {
                                 <Row>
                                     <Col sm={6}>
                                         <Form.Group className="">
-                                            <Form.Label className='mb-0' >State</Form.Label>
-                                            <Form.Select
-                                                {...register('employerStateName')}
-                                            >
-                                                <option value='' hidden>State</option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.name}
-                                                        data-key={data?.id}
-                                                        value={data?.state_code}
-                                                    >
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerStateName && <span className="text-danger">{errors.employerStateName.message}</span>}
-                                        </Form.Group>
-
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>City</Form.Label>
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('employerCity')}
-                                            >
-                                                <option hidden value='' >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
-                                                {cities3?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerCity && <span className="text-danger">{errors.employerCity.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Street</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerStreet')}
-                                                placeholder="Street" />
-                                            {errors.employerStreet && <span className="text-danger">{errors.employerStreet.message}</span>}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className='mb-0'>Zip</Form.Label>
+                                            <Form.Label className="mb-0">Zip</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 {...register('employerZip', {
@@ -1113,7 +1533,22 @@ const Demographicdetails = ({ patientId }) => {
                                                 placeholder="Zip"
                                                 maxLength={5}
                                             />
-                                            {errors.employerZip && <span className="text-danger">{errors.employerZip.message}</span>}
+                                            {errors.employerZip && (
+                                                <span className="text-danger">{errors.employerZip.message}</span>
+                                            )}
+                                        </Form.Group>
+                                    </Col>
+                                    <Col sm={6}>
+                                        <Form.Group className="">
+                                            <Form.Label className="mb-0">Time Zone</Form.Label>
+                                            <Form.Control
+                                                type="text"
+                                                {...register('employerTimeZone')}
+                                                placeholder="Time Zone"
+                                            />
+                                            {errors.employerTimeZone && (
+                                                <span className="text-danger">{errors.employerTimeZone.message}</span>
+                                            )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
@@ -1121,18 +1556,40 @@ const Demographicdetails = ({ patientId }) => {
                         </Row>
                     </Col>
                 </Row>
-                <Row>
+                <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
+                    <Button className="cancel-button" onClick={() => reset()}>
+                        Clear
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setSubmissionType('saveAndReset');
+                        }}
+                        className="custom-buttons"
+                        type="submit">
+                        Save & Add Another
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setSubmissionType('saveAndNext');
+                        }}
+                        disabled={store?.updatePatientsReducer?.loading}
+                        className="custom-buttons"
+                        type="submit">
+                        Save & Continue Editing
+                    </Button>
+                </div>
+                {/* <Row>
                     <Col className="d-flex justify-content-end">
-                        <Button disabled={store?.updatePatientsReducer?.loading} className="custom-buttons btn-height" type="submit">
-                            Save
+                        <Button
+                            disabled={store?.updatePatientsReducer?.loading}
+                            className="custom-buttons btn-height"
+                            type="submit">
+                            Save & Continue
                         </Button>
                     </Col>
-                </Row>
-            </Form >
-
+                </Row> */}
+            </Form>
         </>
-
-
     );
 };
 
