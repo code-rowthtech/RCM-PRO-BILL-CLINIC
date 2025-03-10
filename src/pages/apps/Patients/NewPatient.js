@@ -285,7 +285,7 @@ const NewPatient = () => {
             {
                 given: [data?.firstName || '', data?.middleName || ''].filter(Boolean),
                 family: data?.lastName || '',
-                preferred: 'true',
+                preferred: true,
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 use: 'official',
                 suffix: [data?.suffix || ''],
@@ -1122,9 +1122,9 @@ const NewPatient = () => {
                                 </div>
                             </Form>
                         )}
-                        {activeTab === 'responsible' && <Responsiblle patientId={patientId} />}
+                        {activeTab === 'responsible' && <Responsiblle patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />}
                         {activeTab === 'insurance' && <Insurance patientId={patientId} />}
-                        {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} />}
+                        {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab}/>}
                         {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
                     </div>
                 </Card>

@@ -25,8 +25,9 @@ import { sexParameterOptions } from '../../../utils/DataSets/SexParameterforClin
 import { personalPronounsOptions } from '../../../utils/DataSets/personalPronouns';
 import { tribalEntitiesOptions } from '../../../utils/DataSets/tribalEntities';
 import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
+import AddressForm from '../Common Pages/AddressForm';
 
-const Demographicdetails = ({ patientId }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     console.log(patientId, 'patientId');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
@@ -46,6 +47,9 @@ const Demographicdetails = ({ patientId }) => {
     const [mailingLongitude, setMailingLongitude] = useState(null);
     const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
+    const [demographicAddresses, setDemographicAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' }
+    ]);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
     const [mailingFocused, setMailingFocused] = useState(false);
@@ -60,44 +64,29 @@ const Demographicdetails = ({ patientId }) => {
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
-    const [activeTab, setActiveTab] = useState('personalDetails');
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const updateResponse = store?.updatePatientsReducer
-    console.log(updateResponse)
+    console.log(statesData, 'statesData');
+    // const [activeTab, setActiveTab] = useState('personalDetails');
+  
+    const updateResponse = store?.updatePatientsReducer?.data?.status;
+    console.log(updateResponse, 'updateResponse');
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const primaryState = watch('primaryStateName');
-    const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
     useEffect(() => {
-        if (primaryState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === primaryState)?.id;
-            dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25, skip: '' }));
-        }
-        if (mailingState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === mailingState)?.id;
-            dispatch(getCities2Action({ state_code: stateCity, name: mailingCitySearch, limit: 25, skip: '' }));
-        }
         if (employerState) {
             const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
             dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
         }
-    }, [primaryState, mailingState, employerState]);
+    }, [employerState]);
     useEffect(() => {
-        if (primaryCitySearch) {
-            setValue('primaryCity', primaryCitySearch);
-        }
-        if (mailingCitySearch) {
-            setValue('mailingCity', mailingCitySearch);
-        }
+    
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
         }
-    }, [primaryCitySearch, cities1, mailingCitySearch, cities2, employerCitySearch, cities3]);
+    }, [  employerCitySearch, cities3]);
     // const onSubmit = (data) => {
     //     const payload = {
     //         id: patientId,
@@ -234,12 +223,10 @@ const Demographicdetails = ({ patientId }) => {
     const onSubmit = (data) => {
         const payload = {
             id: patientId,
-
             ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
             ...(data?.sex && { birthSex: { code: data.sex } }),
             ...(data?.genderIdentity && { gender: data.genderIdentity }),
             ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
-
             // ✅ Fixing Race & Ethnicity Structure
             ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
             ...(data?.ethnicity && {
@@ -312,7 +299,6 @@ const Demographicdetails = ({ patientId }) => {
                 },
             },
 
-            address: addresses,
 
             // ✅ Fixing Identifier Structure
             identifier: constantIdentifiers.map((item) => ({
@@ -328,80 +314,28 @@ const Demographicdetails = ({ patientId }) => {
                 sliceName: item.type,
                 issuingAuthority: item.issuingAuthority,
             })),
+            address:demographicAddresses,
         };
 
         console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
-        useEffect(() => {
-            if (updateResponse === 201) {
-                if (submissionType === 'saveAndNext') {
-                    reset(); 
-                    setActiveTab('responsible');
-                    dispatch(stateEmptydAction());
-                } else if (submissionType === 'saveAndReset') {
-                    reset(); 
-                    dispatch(stateEmptydAction());
-                }
-            }
-        }, [updateResponse]);
+    useEffect(() => {
+        if (updateResponse === 200) {
+            if (submissionType === 'saveAndNext') {
+                reset();
+                setActiveTab('responsible');
+                dispatch(stateEmptydAction());
+            } else if (submissionType === 'saveAndReset') {
+                setActiveTab('personelDetails');
 
-    const getGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
+                dispatch(stateEmptydAction());
             }
         }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedLocations(data?.results);
-            } else {
-                console.log('No data returned.');
-            }
-        });
-    };
-    const getMailingGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed';
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(
-                location
-            )}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+    }, [updateResponse, submissionType]);
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Failed to fetch geocode data:', error);
-                return null;
-            }
-        }
-        fetchGeocodeData(addressToSearch).then((data) => {
-            if (data) {
-                setSearchedMailingLocations(data?.results);
-            } else {
-                console.log('No data returned.');
-            }
-        });
-    };
+   
+   
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -431,14 +365,9 @@ const Demographicdetails = ({ patientId }) => {
             }
         });
     };
-    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
-    const [addressFocused, setAddressFocused] = useState(false);
+  
     const defaultIdentifiers = ['SSN'];
-    // const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressUses = ['postal', 'physical', 'both'];
-    const [addresses, setAddresses] = useState([
-        { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
-    ]);
+   
     const defaultIssuingAuthority = [
         'NPPES',
         'CLIA',
@@ -461,23 +390,8 @@ const Demographicdetails = ({ patientId }) => {
     ];
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
-    const addAddress = () => {
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
-    };
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            setAddresses(addresses.filter((_, i) => i !== index));
-        }
-    };
-    const handleAddressChange = (index, field, value) => {
-        const updatedAddresses = [...addresses];
-        if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
-        } else {
-            updatedAddresses[index][field] = value;
-        }
-        setAddresses(updatedAddresses);
-    };
+
+ 
     useEffect(() => {
         setConstantIdentifiers(
             defaultIdentifiers.map((type) => ({
@@ -941,203 +855,7 @@ const Demographicdetails = ({ patientId }) => {
                     </Col> */}
                 </Row>
                 <hr />
-                <Row>
-                    <Col sm={12}>
-                        <h5>
-                            Address Details
-                            <span
-                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                onClick={addAddress}></span>
-                        </h5>
-                    </Col>
-                </Row>
-                {addresses.map((item, index) => (
-                    <Row key={index} className="mb-2">
-                        <Col sm={4} className="mb-2">
-                            <Form.Label className="mb-1">Type</Form.Label>
-                            <Form.Select
-                                value={item.use}
-                                className="text-capitalize"
-                                data-has-value={!!watch(`address[${index}].use`)}
-                                {...register(`address[${index}].use`)}
-                                onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                {addressUses.map((use) => (
-                                    <option key={use} className="text-capitalize" value={use}>
-                                        {use}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                        <Col sm={4} className="mb-2 position-relative">
-                            <Form.Label className="mb-1">Address</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Street Address"
-                                value={item.line[0]}
-                                onChange={(e) => {
-                                    handleAddressChange(index, 'line', e.target.value);
-                                    // Set active index so suggestions appear for this address
-                                    setActiveAddressIndex(index);
-                                    setAddressFocused(true);
-                                    // Call your geolocation API with the current input value
-                                    getGeolocation(e)?.then((data) => {
-                                        // Expecting your getGeolocation to return an object with results
-                                        if (data && data.results) {
-                                            setSearchedLocations(data.results);
-                                        }
-                                    });
-                                }}
-                                onFocus={() => {
-                                    setActiveAddressIndex(index);
-                                    setAddressFocused(true);
-                                }}
-                                onBlur={() => {
-                                    setTimeout(() => setAddressFocused(false), 200);
-                                }}
-                            />
-                            {activeAddressIndex === index && addressFocused && searchedLocations?.length > 0 && (
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        left: 0,
-                                        width: '100%',
-                                        maxHeight: '150px',
-                                        overflowY: 'auto',
-                                        zIndex: 111,
-                                        backgroundColor: '#fff',
-                                        border: '1px solid #ced4da',
-                                        borderTop: 'none',
-                                    }}>
-                                    {searchedLocations.map((data, suggestionIndex) => (
-                                        <p
-                                            key={suggestionIndex}
-                                            onClick={() => {
-                                                console.log(data, 'data12456');
-                                                // Extract the necessary fields from the API response
-                                                // const formatted = data.formatted || '';
-                                                // const components = data.components || {};
-                                                // Build the new address object with auto-populated fields
-                                                const newAddress = {
-                                                    use: item.use, // preserve existing use
-                                                    line: [data?.formatted ? data?.formatted : ''],
-                                                    city:
-                                                        data?.components.city ||
-                                                        data?.components.town ||
-                                                        data?.components.village ||
-                                                        '',
-                                                    state: data?.components.state
-                                                        ? data?.components.state
-                                                        : data?.components.state_code,
-                                                    postalCode: data?.components.postcode || item.postalCode || '', // Auto-fill or keep user input
-                                                    country: data?.components?.country || '',
-                                                };
-                                                // Update the specific address entry
-                                                const updatedAddresses = [...addresses];
-                                                console.log(updatedAddresses, 'updatedAddresses11');
-                                                updatedAddresses[index] = newAddress;
-                                                setAddresses(updatedAddresses);
-                                                // Clear suggestions and remove focus
-                                                setSearchedLocations([]);
-                                                setAddressFocused(false);
-                                            }}
-                                            style={{
-                                                margin: 0,
-                                                padding: '8px 12px',
-                                                cursor: 'pointer',
-                                            }}
-                                            className="hover-bg-change text-black">
-                                            {data.formatted}
-                                        </p>
-                                    ))}
-                                </div>
-                            )}
-                        </Col>
-
-                        <Col sm={4} className="mb-2">
-                            <Form.Label className="mb-1">State</Form.Label>
-                            <Form.Select
-                                {...register(`address[${index}].state`)}
-                                data-has-value={!!getValues(`address[${index}].state`)}
-                                onChange={handleStateSelection}>
-                                <option value="">Select State</option>
-                                {statesData?.states?.map((data) => (
-                                    <option
-                                        selected={data?.name == addresses[0]?.state}
-                                        key={data?.name}
-                                        data-key={data?.id}
-                                        value={addresses[0]?.state}>
-                                        {data?.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                        <Col sm={4} className="mb-2">
-                            <Form.Label className="mb-1">City</Form.Label>
-                            <Form.Select
-                                data-has-value={!!getValues(`address[${index}].city`)}
-                                {...register(`address[${index}].city`)}
-                                // disabled={!selectedState || store?.getCitiesReducer?.loading}
-                            >
-                                <option value="">
-                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
-                                </option>
-                                {cities1?.map((data) => (
-                                    <option
-                                        selected={data?.name == addresses[0]?.city}
-                                        key={data?.name}
-                                        value={data?._id}>
-                                        {data?.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                        <Col sm={4}>
-                            <Form.Group className="mb-2">
-                                <Form.Label className="mb-1">Postal Code</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    value={item.postalCode} // Bind postal code value
-                                    placeholder="Postal Code"
-                                    {...register(`postalCode`, {
-                                        minLength: {
-                                            value: 5,
-                                            message: 'Postal code must be at least 5 characters long',
-                                        },
-                                        pattern: {
-                                            value: /^[0-9]+$/,
-                                            message: 'Postal code must contain numbers only',
-                                        },
-                                    })}
-                                    maxLength={5}
-                                />
-                                {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
-                            </Form.Group>
-                        </Col>
-
-                        <Col sm={4} className="position-relative">
-                            <Form.Label className="mb-1">Country</Form.Label>
-
-                            <Form.Control
-                                type="text"
-                                placeholder="Country"
-                                value={item.country}
-                                onChange={(e) => handleAddressChange(index, 'country', e.target.value)}
-                            />
-                            {addresses.length > 1 && index !== 0 && (
-                                <span
-                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                    style={{ right: '-2%', top: '50%' }}
-                                    onClick={() => removeAddress(index)}>
-                                    <CiCircleMinus />
-                                </span>
-                            )}
-                        </Col>
-                    </Row>
-                ))}
+                <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
                 <hr />
 
                 <Row className="mt-1 pb-2">
