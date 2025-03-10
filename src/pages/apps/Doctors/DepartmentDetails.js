@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { createDoctorDetailAction } from "../../../redux/actions";
@@ -7,14 +7,14 @@ import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FiDownloadCloud } from "react-icons/fi";
+import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
 import { handleUpload } from "../../../helpers/HandleUpload";
 
 const DepartmentDetails = ({ docId }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showCAQHPassword, setShowCAQHPassword] = useState(false);
-  const defaultIdentifiers = ['NPI', 'CLIA', 'NAIC'];
+  const defaultIdentifiers = ['NPI'];
   const [constantIdentifiers, setConstantIdentifiers] = useState([]);
   const [identifierDocument, setIdentifierDocumnent] = useState(false);
 
@@ -32,7 +32,7 @@ const DepartmentDetails = ({ docId }) => {
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-  // console.log(doctorDetails,'doctorDetails')
+  console.log(doctorDetails,'doctorDetails')
   const id = doctorDetails?._id
   const {
     register,
@@ -41,6 +41,7 @@ const DepartmentDetails = ({ docId }) => {
     reset,
     setValue,
     watch,
+    clearErrors,
   } = useForm();
 
 
@@ -65,7 +66,34 @@ const DepartmentDetails = ({ docId }) => {
     //   }))
     // );
   }, []);
-
+  const logoFileInputRef = useRef(null);
+  const degreeFileInputRef = useRef(null);
+  const [logo, setLogo] = useState(null);
+  const [logoName, setLogoName] = useState('');
+  const [degree, setDegree] = useState(null);
+  const [degreeName, setDegreeName] = useState('');
+  const [logoUploading, setLogoUploading] = useState(false)
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    try {
+      const url = await handleUpload(selectedFile, setLogoUploading);
+      setLogo(url);
+      setLogoName(selectedFile?.name)
+    } catch (error) {
+      // console.error('Error during file upload:', error);
+    }
+  };
+  const [degreeUploading, setDegreeUploading] = useState(false);
+  const handleFileChangeDegree = async (e) => {
+    const selectedFile = e.target.files[0];
+    try {
+      const url = await handleUpload(selectedFile, setDegreeUploading);
+      setDegree(url);
+      setDegreeName(selectedFile?.name)
+    } catch (error) {
+      // console.error('Error during file upload:', error);
+    }
+  };
   const addIdentifier = () => {
     setConstantIdentifiers([
       ...constantIdentifiers,
@@ -82,17 +110,15 @@ const DepartmentDetails = ({ docId }) => {
     setConstantIdentifiers(updatedIdentifiers);
   };
   const identifierOptions = [
-    'NPI',
-    'TIN',
-    'NAIC',
-    'Medicare',
-    'Medicaid',
-    'State License',
-    'Accreditation',
-    'CLIA',
-    'DUNS',
-    'Facility ID',
+    { label: "National Provider Identifier (NPI)", value: "http://hl7.org/fhir/sid/us-npi", code: "NPI" },
+    { label: "State Medical License", value: "http://terminology.hl7.org/CodeSystem/v2-0203", code: "MED-LIC" },
+    { label: "DEA Number (Controlled Substances)", value: "http://www.nabp.pharmacy/DEA", code: "DEA" },
+    { label: "Board Certification", value: "http://www.abms.org/certification", code: "BOARD-CERT" },
+    { label: "Tax Identification Number (TIN)", value: "http://hl7.org/fhir/sid/us-tin", code: "TIN" },
+    { label: "Medicare Provider Number", value: "http://hl7.org/fhir/sid/us-medicare", code: "Medicare" },
+    { label: "Medicaid Provider Number", value: "http://hl7.org/fhir/sid/us-medicaid", code: "Medicaid" }
   ];
+
   const handleIdentifierFileChange = async (e, index) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -130,6 +156,18 @@ const DepartmentDetails = ({ docId }) => {
         sliceName: item.type,
         issuingAuthority: item.issuingAuthority,
       })),
+      profileImage: {
+        url: logo?.url?.split('?')[0] || logo,
+        fileName: logoName,
+      },
+      degree: [{
+        name: data?.degreeName,
+        uploadedDocument: {
+          url: degree?.url?.split('?')[0] || degree,
+          fileName: degreeName,
+        }
+      }],
+      specialities: [data?.specialist],
 
     }
     console.log(payload, 'payload')
@@ -138,35 +176,37 @@ const DepartmentDetails = ({ docId }) => {
 
   useEffect(() => {
     if (doctorDetails && updateId) {
-      setValue('TIN_SSN', doctorDetails?.TIN_SSN)
-      setValue('NPI', doctorDetails?.NPI)
-      setValue('NPIUsername', doctorDetails?.NPIUsername)
-      setValue('CAQH_ID', doctorDetails?.CAQH_ID)
-      setValue('CAQHUsername', doctorDetails?.CAQHUsername)
-      setValue('medicarePTAN', doctorDetails?.medicarePTAN)
-      setValue('medicaidID', doctorDetails?.medicaidID)
-      // setValue('department', doctorDetails?.departmentId?._id)
-      setValue('Medicare_SPOT_Logins', doctorDetails?.Medicare_SPOT_Logins)
-      setValue('Medicare_PECOS_Logins', doctorDetails?.Medicare_PECOS_Logins)
-      setValue('stateLicense', doctorDetails?.LicensingInformation?.[0]?.stateLicense)
-      setValue('stateLicenseProvider', doctorDetails?.LicensingInformation?.[0]?.stateLicenseProvider)
-      setValue('stateLicenseObtained', doctorDetails?.LicensingInformation?.[0]?.stateLicenseObtained)
-      setValue('DEA', doctorDetails?.DEA)
-      setValue('CLIA', doctorDetails?.CLIA)
+      setValue('degreeName', doctorDetails?.degree?.[0]?.name);
+      setValue('specialist', doctorDetails?.specialities?.[0]);
+      // setValue('TIN_SSN', doctorDetails?.TIN_SSN)
+      // setValue('NPI', doctorDetails?.NPI)
+      // setValue('NPIUsername', doctorDetails?.NPIUsername)
+      // setValue('CAQH_ID', doctorDetails?.CAQH_ID)
+      // setValue('CAQHUsername', doctorDetails?.CAQHUsername)
+      // setValue('medicarePTAN', doctorDetails?.medicarePTAN)
+      // setValue('medicaidID', doctorDetails?.medicaidID)
+      // // setValue('department', doctorDetails?.departmentId?._id)
+      // setValue('Medicare_SPOT_Logins', doctorDetails?.Medicare_SPOT_Logins)
+      // setValue('Medicare_PECOS_Logins', doctorDetails?.Medicare_PECOS_Logins)
+      // setValue('stateLicense', doctorDetails?.LicensingInformation?.[0]?.stateLicense)
+      // setValue('stateLicenseProvider', doctorDetails?.LicensingInformation?.[0]?.stateLicenseProvider)
+      // setValue('stateLicenseObtained', doctorDetails?.LicensingInformation?.[0]?.stateLicenseObtained)
+      // setValue('DEA', doctorDetails?.DEA)
+      // setValue('CLIA', doctorDetails?.CLIA)
 
-      const formattedDEAIssueDate = doctorDetails?.DEA_IssueDate
-        ? new Date(doctorDetails?.DEA_IssueDate).toISOString().split('T')[0]
-        : '';
-      const formattedStateLicenseIssueDate = doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate
-        ? new Date(doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate).toISOString().split('T')[0]
-        : '';
-      const formattedLicenseExpirationDate = doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate
-        ? new Date(doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate).toISOString().split('T')[0]
-        : '';
+      // const formattedDEAIssueDate = doctorDetails?.DEA_IssueDate
+      //   ? new Date(doctorDetails?.DEA_IssueDate).toISOString().split('T')[0]
+      //   : '';
+      // const formattedStateLicenseIssueDate = doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate
+      //   ? new Date(doctorDetails?.LicensingInformation?.[0]?.stateLicenseIssueDate).toISOString().split('T')[0]
+      //   : '';
+      // const formattedLicenseExpirationDate = doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate
+      //   ? new Date(doctorDetails?.LicensingInformation?.[0]?.licenseExpirationDate).toISOString().split('T')[0]
+      //   : '';
 
-      setValue('DEA_IssueDate', formattedDEAIssueDate);
-      setValue('stateLicenseIssueDate', formattedStateLicenseIssueDate);
-      setValue('licenseExpirationDate', formattedLicenseExpirationDate);
+      // setValue('DEA_IssueDate', formattedDEAIssueDate);
+      // setValue('stateLicenseIssueDate', formattedStateLicenseIssueDate);
+      // setValue('licenseExpirationDate', formattedLicenseExpirationDate);
     }
   }, [doctorDetails, setValue])
 
@@ -200,6 +240,95 @@ const DepartmentDetails = ({ docId }) => {
               <Row>
                 <Col sm={12}>
                   <Row>
+                    <div className="col-md-6 col-12">
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">Degree Name</Form.Label>
+                        <Form.Control
+                          className='form-control'
+                          type="text"
+                          {...register('degreeName',
+                            // { required: 'Degree Name is required' }
+                          )}
+                          onChange={(e) => {
+                            clearErrors('degreeName');
+                            // setFormData({ ...formData, degreeName: e.target.value });
+                          }}
+                          // value={formData.Degree Name}
+                          placeholder="Enter Degree Name"
+                        />
+                        {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-6 col-12">
+                      <div className="mb-1 d-flex flex-column position-relative">
+                        <Form.Label className="mb-0">Degree</Form.Label>
+                        <div
+                          onClick={() => degreeFileInputRef.current.click()}
+                          className={`custom-file-upload justify-content-between cursor-pointer form-control ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
+                        >
+                          {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
+                          <p className="mb-0">
+                            <FiUploadCloud />
+                          </p>
+                        </div>
+                        <Form.Control
+                          type="file"
+                          className="d-none "
+                          {...register('degreeDoc', {
+                          })}
+                          ref={degreeFileInputRef}
+                          onChange={handleFileChangeDegree}
+                        />
+                        {errors.degreeDoc && (
+                          <p className="text-danger">{errors.degreeDoc.message}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-md-6 col-12 ">
+                      <div className="mb-2 d-flex flex-column position-relative">
+                        <Form.Label className="mb-0">Profile Image</Form.Label>
+                        <div
+                          onClick={() => logoFileInputRef.current.click()}
+                          className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
+                        >
+                          {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
+                          <p className="mb-0">
+                            <FiUploadCloud />
+                          </p>
+                        </div>
+                        <Form.Control
+
+                          type="file"
+                          className="d-none "
+                          {...register('profileImage', {
+                          })}
+                          accept=".png, .jpg, .jpeg, .svg"
+                          ref={logoFileInputRef}
+                          onChange={handleFileChange}
+                        />
+                        {errors.profileImage &&
+                          <p className="text-danger">{errors.profileImage.message}</p>
+                        }
+                      </div>
+                    </div>
+
+                    <div className="col-md-6 col-12">
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">Specialist </Form.Label>
+                        <Form.Control
+                          type="text"
+                          {...register('specialist',
+                            // { required: 'Specialist Name is required' }
+                          )}
+                          onChange={(e) => {
+                            clearErrors('specialist');
+                            // setFormData({ ...formData, specialties: e.target.value });
+                          }}
+                          placeholder="Enter Specialist Name"
+                        />
+                        {/* {errors.specialist && <span className="text-danger">{errors?.specialist?.message}</span>} */}
+                      </Form.Group>
+                    </div>
                     <Col sm={12}>
                       <h5>
                         Identifiers
@@ -236,19 +365,14 @@ const DepartmentDetails = ({ docId }) => {
                       <Col>
                         <Form.Select
                           value={item.type}
-                          data-has-value={!!watch(`identifiers[${index}].type`)}
-                          {...register(
-                            `identifiers[${index}].type`
-                            //  { required: 'Identifier Type is required' }
-                          )}
-                          onChange={(e) => handleChange(index, 'type', e.target.value)}
-                          disabled={defaultIdentifiers.includes(item.type)}>
-                          <option value="" disabled>
-                            Select Identifier Type
-                          </option>
+                          {...register(`identifiers[${index}].type`)}
+                          onChange={(e) => handleChange(index, "type", e.target.value)}
+                          disabled={defaultIdentifiers.includes(item.type)}
+                        >
+                          <option value="" disabled>Select Identifier Type</option>
                           {identifierOptions.map((option) => (
-                            <option key={option} className="" value={option}>
-                              {option}
+                            <option key={option.code} value={option.value}>
+                              {option.label}
                             </option>
                           ))}
                         </Form.Select>

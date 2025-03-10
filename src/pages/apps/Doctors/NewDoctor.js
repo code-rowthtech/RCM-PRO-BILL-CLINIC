@@ -205,17 +205,13 @@ const NewDoctor = () => {
             ...(!updateId ? { password: data?.password } : {}),
             dob: data?.dateOfBirth,
             gender: data?.gender,
-            profileImage: {
-                url: logo?.url?.split('?')[0] || logo,
-                fileName: logoName,
-            },
             name: {
                 use: "official",
                 text: `${data?.firstName || ""} ${data?.lastName || ""}`.trim(),
                 family: data?.lastName,
-                given: data?.firstName,
-                prefix: [''],
-                suffix: [],
+                given: [data?.firstName?data?.firstName:''],
+                // prefix: [''],
+                // suffix: [],
             },
             telecom: [
                 {
@@ -229,14 +225,6 @@ const NewDoctor = () => {
                     use: "work"
                 }
             ],
-            specialities: [data?.specialist],
-            degree: [{
-                name: data?.degreeName,
-                uploadedDocument: {
-                    url: degree?.url?.split('?')[0] || degree,
-                    fileName: degreeName,
-                }
-            }],
             address: addresses,
             // role: doctorRoleId,
             // primaryAddress: {
