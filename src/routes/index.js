@@ -509,6 +509,7 @@ const AllRoutes = () => {
                                         <div className="disabled-content">You don't have permission to create a new patient.</div>
                                     ),
                                 },
+                               
                                 {
                                     path: 'update-patient',
                                     element: hasPermission("UPDATE_A_PATIENT") ? (

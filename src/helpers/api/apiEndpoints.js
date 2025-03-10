@@ -55,10 +55,10 @@ export const getDoctorDetails = `${BaseRoute}/practitioner/details`;
 export const addReferringDoctor = `${BaseRoute}/add/referringDoc`;
 
 // PATIENTS
-export const getPatients = `${BaseRoute}/patient-get`;
-export const getPatientById = `${BaseRoute}/patient-getById`;
-export const createPatients = `${BaseRoute}/patient-onboard`;
-export const updatePatients = `${BaseRoute}/patient-edit`;
+export const getPatients = `${BaseRoute}/Patient-get`;
+export const getPatientById = `${BaseRoute}/Patient-getById`;
+export const createPatients = `${BaseRoute}/Patient/add`;
+export const updatePatients = `${BaseRoute}/Patient/update`;
 export const createResponsibleParty = `${BaseRoute}/responsible-party-add`;
 export const updateResponsibleParty = `${BaseRoute}/responsible-party-edit`;
 export const getResponsibleParty = `${BaseRoute}/responsible-party-get`;

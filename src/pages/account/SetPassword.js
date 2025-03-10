@@ -75,6 +75,7 @@ const SetPassword = (): React$Element<any> => {
     const handleClose = () => setPopup(false);
 
     const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
+    console.log(tokenResponse)
     let verifyResponse;
     if (tokenResponse) {
         verifyResponse = JSON.parse(decryptMessage(tokenResponse));

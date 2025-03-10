@@ -99,6 +99,7 @@ function* createPatientsFunction(data) {
         });
         const response = yield call(createPatientsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        console.log(decryptedData,"decryptedData ")
         if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
