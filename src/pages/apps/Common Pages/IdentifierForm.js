@@ -4,11 +4,22 @@ import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 
-const IdentifierForm = () => {
-    const [identifiers, setIdentifiers] = useState([]);
-    const defaultIdentifiers = ['NPI', 'CLIA', 'NAIC'];
-    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    const [identifierDocument, setIdentifierDocumnent] = useState(false);
+const IdentifierForm = ({ defaultIdentifiers = []  }) => {
+    const identifierOptions = [
+        { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
+        { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
+        { label: 'DEA Number (Controlled Substances)', value: 'http://www.nabp.pharmacy/DEA', code: 'DEA' },
+        { label: 'Board Certification', value: 'http://www.abms.org/certification', code: 'BOARD-CERT' },
+        { label: 'Tax Identification Number (TIN)', value: 'http://hl7.org/fhir/sid/us-tin', code: 'TIN' },
+        { label: 'Medicare Provider Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'Medicare' },
+        { label: 'Medicaid Provider Number', value: 'http://hl7.org/fhir/sid/us-medicaid', code: 'Medicaid' },
+        { label: 'Medical Record Number (MRN)', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' },
+        { label: 'Social Security Number (SSN)', value: 'http://hl7.org/fhir/sid/us-ssn', code: 'SSN' },
+        { label: 'Driver’s License Number', value: 'urn:oid:2.16.840.1.113883.4.3.25', code: 'DL' },
+        { label: 'Health Plan Beneficiary Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'HPI' },
+        { label: 'Passport Number', value: 'urn:oid:2.16.840.1.113883.4.3.2', code: 'PPN' },
+        { label: 'Veterans Affairs ID (VA ID)', value: 'http://va.gov/fhir/sid/va', code: 'VA' },
+    ];
 
     const defaultIssuingAuthority = [
         'NPPES',
@@ -20,20 +31,12 @@ const IdentifierForm = () => {
         'Dun & Bradstreet',
         'Other',
     ];
-    const identifierOptions = [
-        'NPI',
-        'TIN',
-        'NAIC',
-        'Medicare',
-        'Medicaid',
-        'State License',
-        'Accreditation',
-        'CLIA',
-        'DUNS',
-        'Facility ID',
-    ];
+
+    const [identifiers, setIdentifiers] = useState([]);
+    const [identifierDocument, setIdentifierDocument] = useState(false);
 
     useEffect(() => {
+        // Initialize identifiers with default types
         setIdentifiers(
             defaultIdentifiers.map((type) => ({
                 type,
@@ -46,11 +49,11 @@ const IdentifierForm = () => {
     }, []);
 
     const addIdentifier = () => {
-        setIdentifiers([...identifiers, { type: '', number: '', file: null, expiry: '', issuingAuthority: '' }]);
+        setIdentifiers([...identifiers, { type: null, number: '', file: null, expiry: '', issuingAuthority: '' }]);
     };
 
     const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return;
+        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
         setIdentifiers(identifiers.filter((_, i) => i !== index));
     };
 
@@ -65,18 +68,13 @@ const IdentifierForm = () => {
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
-            setConstantIdentifiers((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    file: {
-                        url: url?.url?.split('?')[0],
-                        name: selectedFile.name,
-                    },
-                };
-                return updatedDetails;
-            });
+            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
+            const updatedIdentifiers = [...identifiers];
+            updatedIdentifiers[index].file = {
+                url: url?.url?.split('?')[0],
+                name: selectedFile.name,
+            };
+            setIdentifiers(updatedIdentifiers);
         } catch (error) {
             console.error('Error during file upload:', error);
         }
@@ -120,15 +118,18 @@ const IdentifierForm = () => {
                     {/* Identifier Type */}
                     <Col>
                         <Form.Select
-                            value={item.type}
-                            onChange={(e) => handleChange(index, 'type', e.target.value)}
-                            disabled={defaultIdentifiers.includes(item.type)}>
+                            value={item.type?.value || ''}
+                            onChange={(e) => {
+                                const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
+                                handleChange(index, 'type', selectedType);
+                            }}
+                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
                             <option value="" disabled>
                                 Select Identifier Type
                             </option>
                             {identifierOptions.map((option) => (
-                                <option key={option} value={option}>
-                                    {option}
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
                                 </option>
                             ))}
                         </Form.Select>
@@ -185,10 +186,7 @@ const IdentifierForm = () => {
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
                         {index >= defaultIdentifiers.length && (
-                            <span
-                                className="text-danger cursor-pointer"
-                                style={{ position: 'absolute', right: '-2%', top: '12%' }}
-                                onClick={() => removeIdentifier(index)}>
+                            <span className="text-danger cursor-pointer" onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>
                         )}

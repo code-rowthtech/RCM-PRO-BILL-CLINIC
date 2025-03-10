@@ -26,6 +26,7 @@ import { personalPronounsOptions } from '../../../utils/DataSets/personalPronoun
 import { tribalEntitiesOptions } from '../../../utils/DataSets/tribalEntities';
 import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
 import AddressForm from '../Common Pages/AddressForm';
+import IdentifierForm from '../Common Pages/IdentifierForm';
 
 const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     console.log(patientId, 'patientId');
@@ -48,7 +49,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' }
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
@@ -66,7 +67,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const statesData = store?.getStatesReducer?.data;
     console.log(statesData, 'statesData');
     // const [activeTab, setActiveTab] = useState('personalDetails');
-  
+
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     console.log(updateResponse, 'updateResponse');
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
@@ -82,11 +83,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         }
     }, [employerState]);
     useEffect(() => {
-    
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
         }
-    }, [  employerCitySearch, cities3]);
+    }, [employerCitySearch, cities3]);
     // const onSubmit = (data) => {
     //     const payload = {
     //         id: patientId,
@@ -299,7 +299,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 },
             },
 
-
             // ✅ Fixing Identifier Structure
             identifier: constantIdentifiers.map((item) => ({
                 use: item.use,
@@ -314,7 +313,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 sliceName: item.type,
                 issuingAuthority: item.issuingAuthority,
             })),
-            address:demographicAddresses,
+            address: demographicAddresses,
         };
 
         console.log('Payload:', payload);
@@ -333,9 +332,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             }
         }
     }, [updateResponse, submissionType]);
-
-   
-   
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -365,9 +361,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             }
         });
     };
-  
+
     const defaultIdentifiers = ['SSN'];
-   
+
     const defaultIssuingAuthority = [
         'NPPES',
         'CLIA',
@@ -391,7 +387,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
 
- 
     useEffect(() => {
         setConstantIdentifiers(
             defaultIdentifiers.map((type) => ({
@@ -468,189 +463,31 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     return (
         <>
             <Form className="mt-1" onSubmit={handleSubmit(onSubmit)}>
-                <Row className="pb-2">
-                    <Col sm={12}>
-                        <Row>
-                            <Col sm={12}>
-                                <h5>
-                                    Identifiers
-                                    <span
-                                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                        onClick={addIdentifier}></span>
-                                </h5>
-                            </Col>
-                        </Row>
+                <IdentifierForm
+                    defaultIdentifiers={[
+                        {
+                            label: 'National Provider Identifier (NPI)',
+                            value: 'http://hl7.org/fhir/sid/us-npi',
+                            code: 'NPI',
+                        },
+                        {
+                            label: 'DEA Number (Controlled Substances)',
+                            value: 'http://www.nabp.pharmacy/DEA',
+                            code: 'DEA',
+                        },
+                        {
+                            label: 'Board Certification',
+                            value: 'http://www.abms.org/certification',
+                            code: 'BOARD-CERT',
+                        },
+                        {
+                            label: 'Tax Identification Number (TIN)',
+                            value: 'http://hl7.org/fhir/sid/us-tin',
+                            code: 'TIN',
+                        },
+                    ]}
+                />
 
-                        {/* Table Header */}
-                        <Row className="fw-bold">
-                            <Col>
-                                <Form.Label>Identifier Type</Form.Label>
-                            </Col>
-                            <Col>
-                                <Form.Label>Identifier Number</Form.Label>
-                            </Col>
-                            <Col>
-                                <Form.Label>Identifier Document</Form.Label>
-                            </Col>
-                            <Col>
-                                <Form.Label>Issuing Authority</Form.Label>
-                            </Col>
-                            <Col>
-                                <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
-                            </Col>
-                        </Row>
-
-                        {/* Dynamic Identifier Fields */}
-                        {constantIdentifiers.map((item, index) => (
-                            <Row key={index} className="mb-2">
-                                {/* Identifier Type */}
-                                <Col>
-                                    <Form.Select
-                                        value={item.type}
-                                        data-has-value={!!watch(`identifiers[${index}].type`)}
-                                        {...register(
-                                            `identifiers[${index}].type`
-                                            //  { required: 'Identifier Type is required' }
-                                        )}
-                                        onChange={(e) => handleChange(index, 'type', e.target.value)}
-                                        disabled={defaultIdentifiers.includes(item.type)}>
-                                        <option value="" disabled>
-                                            Select Identifier Type
-                                        </option>
-                                        {identifierOptions.map((option) => (
-                                            <option key={option.code} className="" value={option}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors?.[index]?.type && (
-                                        <span className="text-danger">This field is required</span>
-                                    )}
-                                </Col>
-
-                                {/* Identifier Number */}
-                                <Col>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="Document Number"
-                                        value={item.number}
-                                        maxLength={
-                                            item.type === 'NPI' || item.type === 'CLIA'
-                                                ? 10
-                                                : item.type === 'NAIC'
-                                                ? 5
-                                                : undefined
-                                        }
-                                        {...register(`identifiers[${index}].number`, {
-                                            // required: defaultIdentifiers.includes(item.type)
-                                            //     ? 'Document Number is required'
-                                            //     : false,
-                                            validate: (value) => {
-                                                if (!value) return true; // Skip validation if field is empty (for dynamic fields)
-
-                                                if (item.type === 'NPI' && !/^[0-9]{10}$/.test(value)) {
-                                                    return 'NPI number must be exactly 10 digits long';
-                                                }
-                                                if (item.type === 'CLIA' && !/^[A-Z0-9]{2}D[0-9]{7}$/.test(value)) {
-                                                    return 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits';
-                                                }
-                                                if (item.type === 'NAIC' && !/^[0-9]{5}$/.test(value)) {
-                                                    return 'NAIC number must be exactly 5 digits long';
-                                                }
-                                                return true; // No validation for other types (like DUNS, etc.)
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let value = e.target.value;
-
-                                            // Enforce length limit only for NPI, CLIA, and NAIC
-                                            if (item.type === 'NPI' || item.type === 'CLIA') {
-                                                value = value.slice(0, 10);
-                                            } else if (item.type === 'NAIC') {
-                                                value = value.slice(0, 5);
-                                            }
-
-                                            handleChange(index, 'number', value);
-                                        }}
-                                    />
-                                    {errors.identifiers?.[index]?.number && (
-                                        <span className="text-danger">{errors.identifiers[index].number.message}</span>
-                                    )}
-                                </Col>
-
-                                {/* File Upload */}
-                                <Col className="mb-2 position-relative">
-                                    <div
-                                        onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                            item.file ? 'form-control' : 'custom-form-fields'
-                                        }`}>
-                                        {item.file?.name
-                                            ? item.file.name.length > 30
-                                                ? item.file.name.slice(0, 25) + '...'
-                                                : item.file.name
-                                            : 'Upload Document'}
-                                        <p className="mb-0">
-                                            <FiDownloadCloud />
-                                        </p>
-                                    </div>
-                                    <Form.Control
-                                        type="file"
-                                        id={`fileInput-identifier-${index}`}
-                                        style={{ display: 'none' }}
-                                        accept=".png, .jpg, .jpeg, .pdf"
-                                        onChange={(e) => handleIdentifierFileChange(e, index)}
-                                    />
-                                    {errors?.[index]?.file && (
-                                        <span className="text-danger">Please upload a document</span>
-                                    )}
-                                </Col>
-
-                                {/* Issuing Authority */}
-                                <Col>
-                                    <Form.Select
-                                        value={item.issuingAuthority}
-                                        data-has-value={!!watch(`identifiers[${index}].issuingAuthority`)}
-                                        {...register(`identifiers[${index}].issuingAuthority`)}
-                                        onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
-                                        <option value="" hidden>
-                                            Select Issuing Authority
-                                        </option>
-                                        {defaultIssuingAuthority.map((option) => (
-                                            <option key={option} value={option}>
-                                                {option}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {errors?.[index]?.issuingAuthority && (
-                                        <span className="text-danger">This field is required</span>
-                                    )}
-                                </Col>
-                                {/* Expiry Date */}
-                                <Col className="position-relative">
-                                    <Form.Control
-                                        type="date"
-                                        value={item.expiry}
-                                        onChange={(e) => handleChange(index, 'expiry', e.target.value)}
-                                    />
-                                    {errors?.[index]?.expiry && (
-                                        <span className="text-danger">Select a valid expiry date</span>
-                                    )}
-
-                                    {/* Remove Identifier Button */}
-                                    {index >= defaultIdentifiers.length && (
-                                        <span
-                                            className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                            style={{ right: '-2%', top: '12%' }}
-                                            onClick={() => removeIdentifier(index)}>
-                                            <CiCircleMinus />
-                                        </span>
-                                    )}
-                                </Col>
-                            </Row>
-                        ))}
-                    </Col>
-                </Row>
                 <hr className="mt-0" />
                 <Row className="pb-2">
                     {/* <Col sm={3}>
