@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Form, InputGroup, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { useDispatch, useSelector } from 'react-redux';
 import { createDoctorAction, createDoctorDetailAction, getCities2Action, getCitiesAction, getDoctorDetailsAction, getRoleDataAction, getStatesByCountryAction } from '../../../redux/actions';
 import EmailToDoctorModal from './EmailToDoctorModal';
@@ -13,8 +12,8 @@ import { encryptMessage } from '../../../cryptoUtils';
 import us from '../../../assets/images/flags/us.jpg'
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
-import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
-import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
+import { getDepartmentDataAction } from '../../../redux/settings/action';
+import AddressForm from '../Common Pages/AddressForm';
 
 
 const NewDoctor = () => {
@@ -30,38 +29,23 @@ const NewDoctor = () => {
     } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const [sameAsPrimary, setSameAsPrimary] = useState(false);
     // const daaa=watch('state1')
     // console.log(,'daa')
     const [activeTab, setActiveTab] = useState("personalDetails");
     const [show, setShow] = useState(false);
-    const logoFileInputRef = useRef(null);
-    const degreeFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
-    const [logoName, setLogoName] = useState('');
-    const [degree, setDegree] = useState(null);
-    const [degreeName, setDegreeName] = useState('');
     const [docId, setDocId] = useState(null);
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
-    const [mailingLongitude, setMailingLongitude] = useState(null);
-    const [mailingLatitude, setMailingLatitude] = useState(null);
-    const [stateToSelect, setStateToSelect] = useState(null);
-    const [focused, setFocused] = useState(false);
-    const [mailingFocused, setMailingFocused] = useState(false);
-    const [updatePage, setUpdatePage] = useState(false);
-    const [selectedState, setSelectedState] = useState(null);
-    const [selectedCity, setSelectedCity] = useState(null);
     const store = useSelector((state) => state);
-    const [stateId, setStateId] = useState(null);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const password = watch('password');
-
+    const [demographicAddresses, setDemographicAddresses] = useState([
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    ]);
+console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
     const statesData = store?.getStatesReducer?.data;
     console.log(statesData, 'statesData')
-    const role = store?.getDoctorsRolesReducer?.data
     const dispatch = useDispatch();
     const navigate = useNavigate();
     // If you want to remove any prefix (like "check")
@@ -83,22 +67,11 @@ const NewDoctor = () => {
         dispatch(getStatesByCountryAction())
     }, [dispatch]);
 
-    // http://192.168.1.26:9001/api/v1/clinic/getAllRoles?search=&clinicId=677f4ab193938994008638c9&createdById=&status=true&page=1&limit=10
-
-
-    const cities = store?.getCitiesReducer?.data?.cities;
-    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
     console.log(doctorDetails, 'doctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
-    const createData = store?.createtDoctorsReducer?.data?.doctor?._id;
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-    const doctorRole = store?.getRoleDataReducer?.data;
-    const clinicDataToUpdate = store?.getClinicByIdReducer?.data?.clinic;
-    const clinicsList = store?.getClinicsByParentReducer?.data?.data;
-    const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {
@@ -117,7 +90,6 @@ const NewDoctor = () => {
 
     useEffect(() => {
         if (doctorDetails && updateId) {
-            const cityName = doctorDetails?.userId?.address?.city?.name || ''; // Fallback to an empty string if name is missing
             // setValue('stateName', statesData?.states && statesData?.states?.find((data) => data?.id === doctorDetails?.userId?.address?.state?.id))
             setValue('firstName', doctorDetails?.name?.[0]?.given)
             setValue('lastName', doctorDetails?.name?.[0]?.family)
@@ -125,17 +97,6 @@ const NewDoctor = () => {
             setValue('phone', doctorDetails?.telecom?.[0]?.value)
             setValue('gender', doctorDetails?.userId?.gender)
             setValue('department', doctorDetails?.departmentId?._id)
-            // setValue('city', cityName)
-            setValue('zip1', doctorDetails?.userId?.primaryAddress?.zip)
-            setValue('zip2', doctorDetails?.userId?.mailingAddress?.zip)
-            setValue('street1', doctorDetails?.userId?.primaryAddress?.street)
-            setValue('street2', doctorDetails?.userId?.mailingAddress?.street)
-            setLongitude(doctorDetails?.userId?.primaryAddress?.longitude)
-            setLatitude(doctorDetails?.userId?.primaryAddress?.latitude)
-            setMailingLatitude(doctorDetails?.userId?.mailingAddress?.latitude)
-            setMailingLongitude(doctorDetails?.userId?.mailingAddress?.longitude)
-            setValue('degreeName', doctorDetails?.degree?.[0]?.name);
-            setValue('specialist', doctorDetails?.specialities?.[0]);
             if (doctorDetails?.address) {
                 setAddresses(doctorDetails.address);
             }
@@ -144,58 +105,13 @@ const NewDoctor = () => {
                 : '';
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
-            const state = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.primaryAddress?.state?._id)?._id;
-            if (state) {
-                dispatch(getCitiesAction({ state_code: doctorDetails?.userId?.primaryAddress?.state?.id, name: doctorDetails?.userId?.primaryAddress?.city?.name, skip: '', limit: '' }))
-            }
-            setValue('state1', doctorDetails?.userId?.primaryAddress?.state?._id);
-            const state2 = statesData?.states && statesData?.states.find((data) => data?._id === doctorDetails?.userId?.mailingAddress?.state?._id)?._id;
-            if (state2) {
-                dispatch(getCities2Action({ state_code: doctorDetails?.userId?.mailingAddress?.state?.id, name: doctorDetails?.userId?.mailingAddress?.city?.name, skip: '', limit: '' }))
-            }
-            setValue('state2', doctorDetails?.userId?.mailingAddress?.state?._id);
-            if (doctorDetails?.userId?.profileImage) {
-                setLogoName(doctorDetails?.userId?.profileImage?.fileName)
-                setLogo(doctorDetails?.userId?.profileImage?.url)
-            }
-            if (doctorDetails?.degree) {
-                setDegreeName(doctorDetails?.degree?.[0]?.uploadedDocument?.fileName);
-                setDegree(doctorDetails?.degree?.[0]?.uploadedDocument?.url);
-            }
         }
     }, [doctorDetails, setValue])
-
-
 
     const handleNewDoctor = () => {
         navigate('/apps/doctors/list');
         reset()
     };
-
-    const [logoUploading, setLogoUploading] = useState(false)
-    const handleFileChange = async (e) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url);
-            setLogoName(selectedFile?.name)
-        } catch (error) {
-            // console.error('Error during file upload:', error);
-        }
-    };
-    const [degreeUploading, setDegreeUploading] = useState(false);
-    const handleFileChangeDegree = async (e) => {
-        const selectedFile = e.target.files[0];
-        try {
-            const url = await handleUpload(selectedFile, setDegreeUploading);
-            setDegree(url);
-            setDegreeName(selectedFile?.name)
-        } catch (error) {
-            // console.error('Error during file upload:', error);
-        }
-    };
-    // console.log(logo)
-
 
     const submitData = (data) => {
         const payload = {
@@ -209,7 +125,7 @@ const NewDoctor = () => {
                 use: "official",
                 text: `${data?.firstName || ""} ${data?.lastName || ""}`.trim(),
                 family: data?.lastName,
-                given: [data?.firstName?data?.firstName:''],
+                given: [data?.firstName ? data?.firstName : ''],
                 // prefix: [''],
                 // suffix: [],
             },
@@ -225,36 +141,7 @@ const NewDoctor = () => {
                     use: "work"
                 }
             ],
-            address: addresses,
-            // role: doctorRoleId,
-            // primaryAddress: {
-            //     ...(data?.address1 ? { address: data?.address1 } : {}),
-            //     ...(data?.street1 ? { street: data?.street1 } : {}),
-            //     ...(data?.state1 ? { state: data?.state1 } : {}),
-            //     ...(data?.zip1 ? { zip: data?.zip1 } : {}),
-            //     ...(latitude ? { latitude: latitude } : {}),
-            //     ...(longitude ? { longitude: longitude } : {}),
-            //     ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
-            // },
-            // mailingAddress: sameAsPrimary ?
-            //     {
-            //         ...(data?.address1 ? { address: data?.address1 } : {}),
-            //         ...(data?.street1 ? { street: data?.street1 } : {}),
-            //         ...(data?.state1 ? { state: data?.state1 } : {}),
-            //         ...(data?.zip1 ? { zip: data?.zip1 } : {}),
-            //         ...(latitude ? { latitude: latitude } : {}),
-            //         ...(longitude ? { longitude: longitude } : {}),
-            //         ...(selectedCity || data?.city1 ? { city: selectedCity || data?.city1 } : {}),
-            //     }
-            //     : {
-            //         ...(data?.address2 ? { address: data?.address2 } : {}),
-            //         ...(data?.street2 ? { street: data?.street2 } : {}),
-            //         ...(data?.state2 ? { state: data?.state2 } : {}),
-            //         ...(data?.zip2 ? { zip: data?.zip2 } : {}),
-            //         ...(mailingLatitude ? { latitude: mailingLatitude } : {}),
-            //         ...(mailingLongitude ? { longitude: mailingLongitude } : {}),
-            //         ...(selectedCity || data?.city2 ? { city: selectedCity || data?.city2 } : {}),
-            //     }
+            address: demographicAddresses,
         };
         if (updateId) {
             console.log({ payload })
@@ -265,175 +152,13 @@ const NewDoctor = () => {
         }
     };
 
-
-
-
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
 
-    const [searchedLocations, setSearchedLocations] = useState(null)
-    const [searchedMailingLocations, setSearchedMailingLocations] = useState(null)
-
-    const getGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return data; // Return the geocoding data
-            } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
-            }
-        }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedLocations(data?.results)
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const [addresses, setAddresses] = useState(doctorDetails?.address || [
         { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }
     ]);
-
-    const [activeAddressIndex, setActiveAddressIndex] = useState(null);
-    const [addressFocused, setAddressFocused] = useState(false);
-
-    const addAddress = () => {
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
-    };
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            setAddresses(addresses.filter((_, i) => i !== index));
-        }
-    };
-    const handleAddressChange = (index, field, value) => {
-        setAddresses((prevAddresses) => {
-            const updatedAddresses = [...prevAddresses];
-
-            if (field === 'line') {
-                updatedAddresses[index] = { ...updatedAddresses[index], line: value };
-            } else {
-                updatedAddresses[index] = { ...updatedAddresses[index], [field]: value };
-            }
-
-            return updatedAddresses;
-        });
-
-        // Sync with React Hook Form
-        setValue(`address[${index}].${field}`, value);
-    };
-
-
-    const getMailingGeolocation = (e) => {
-        const addressToSearch = e.target.value;
-        async function fetchGeocodeData(location) {
-            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
-            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
-
-            try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                return data; // Return the geocoding data
-            } catch (error) {
-                console.error("Failed to fetch geocode data:", error);
-                return null; // Return null in case of error
-            }
-        }
-        fetchGeocodeData(addressToSearch)
-            .then((data) => {
-                if (data) {
-                    setSearchedMailingLocations(data?.results)
-                } else {
-                    console.log("No data returned.");
-                }
-            });
-    }
-    const [selectedLocation, setSelectedLocation] = useState(null);
-    const [selectedMailingLocation, setSelectedMailingLocation] = useState(null);
-    useEffect(() => {
-        if (selectedLocation) {
-            setLatitude(selectedLocation?.bounds?.southwest?.lat);
-            setLongitude(selectedLocation?.bounds?.southwest?.lng);
-            setValue('address1', selectedLocation?.formatted)
-            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setFormData((prevState) => ({
-                ...prevState,
-                primaryAddress: {
-                    ...prevState.primaryAddress,
-                    state: selectedState,
-                }
-            }));
-            setValue('state1', selectedState)
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }))
-        }
-        if (selectedMailingLocation) {
-            setMailingLatitude(selectedMailingLocation?.bounds?.southwest?.lat);
-            setMailingLongitude(selectedMailingLocation?.bounds?.southwest?.lng);
-            setValue('address2', selectedMailingLocation?.formatted)
-            const stateId = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?.id;
-            const selectedState = statesData?.states && statesData?.states.find((data) => data?.state_code === selectedMailingLocation?.components?.state_code)?._id;
-            setValue('state2', selectedState)
-            const countyName = selectedMailingLocation?.components?.county;
-            dispatch(getCities2Action({ state_code: stateId, name: countyName, limit: '', skip: '' }))
-        }
-    }, [selectedLocation, selectedMailingLocation, setValue, statesData, dispatch])
-    useEffect(() => {
-        if (cities1) {
-            const selectedCounty = cities1 && cities1.find((data) => data?.name === selectedLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
-            setValue('city', selectedCounty)
-            // setFormData((prevState) => ({
-            //     ...prevState,
-            //     primaryAddress: {
-            //         ...prevState.primaryAddress,
-            //         city: selectedCounty,
-            //     }
-            // }));
-        }
-        if (cities2) {
-            const selectedCounty = cities2 && cities2.find((data) => data?.name === selectedMailingLocation?.components?.county || doctorDetails?.userId?.primaryAddress?.city?.name)?._id;
-            setValue('city2', selectedCounty)
-            // setFormData((prevState) => ({
-            //     ...prevState,
-            //     mailingAddress: {
-            //         ...prevState.mailingAddress,
-            //         city: selectedCounty,
-            //     }
-            // }));
-        }
-    }, [cities1, cities2])
-
-    const handleStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        console.log("key", key);
-        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }))
-    };
-    const handleMailingStateSelection = (e) => {
-        const selectedOption = e.target.selectedOptions[0];
-        const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        dispatch(getCities2Action({ state_code: key?.id, name: '', limit: 25, skip: '' }))
-    };
 
     const [formData, setFormData] = useState({
         role: doctorRoleId,
@@ -805,200 +530,9 @@ const NewDoctor = () => {
                                                                 </div>
                                                             </Form.Group>
                                                         </div>
-                                                        <hr className='my-1 ' />
-                                                        <div className="col-md-6 col-12">
-                                                            <Form.Group className="mb-1">
-                                                                <Form.Label className="mb-0">Degree Name</Form.Label>
-                                                                <Form.Control
-                                                                    className='form-control'
-                                                                    type="text"
-                                                                    {...register('degreeName',
-                                                                        // { required: 'Degree Name is required' }
-                                                                    )}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('degreeName');
-                                                                        setFormData({ ...formData, degreeName: e.target.value });
-                                                                    }}
-                                                                    // value={formData.Degree Name}
-                                                                    placeholder="Enter Degree Name"
-                                                                />
-                                                                {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
-                                                            </Form.Group>
-                                                        </div>
-                                                        <div className="col-md-6 col-12">
-                                                            <div className="mb-1 d-flex flex-column position-relative">
-                                                                <Form.Label className="mb-0">Degree</Form.Label>
-                                                                <div
-                                                                    onClick={() => degreeFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
-                                                                >
-                                                                    {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
-                                                                    <p className="mb-0">
-                                                                        <FiUploadCloud />
-                                                                    </p>
-                                                                </div>
-                                                                <Form.Control
-                                                                    type="file"
-                                                                    className="d-none "
-                                                                    {...register('degreeDoc', {
-                                                                    })}
-                                                                    ref={degreeFileInputRef}
-                                                                    onChange={handleFileChangeDegree}
-                                                                />
-                                                                {errors.degreeDoc && (
-                                                                    <p className="text-danger">{errors.degreeDoc.message}</p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-6 col-12 ">
-                                                            <div className="mb-2 d-flex flex-column position-relative">
-                                                                <Form.Label className="mb-0">Profile Image</Form.Label>
-                                                                <div
-                                                                    onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
-                                                                >
-                                                                    {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
-                                                                    <p className="mb-0">
-                                                                        <FiUploadCloud />
-                                                                    </p>
-                                                                </div>
-                                                                <Form.Control
-
-                                                                    type="file"
-                                                                    className="d-none "
-                                                                    {...register('profileImage', {
-                                                                    })}
-                                                                    accept=".png, .jpg, .jpeg, .svg"
-                                                                    ref={logoFileInputRef}
-                                                                    onChange={handleFileChange}
-                                                                />
-                                                                {errors.profileImage &&
-                                                                    <p className="text-danger">{errors.profileImage.message}</p>
-                                                                }
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="col-md-6 col-12">
-                                                            <Form.Group className="mb-1">
-                                                                <Form.Label className="mb-0">Specialist </Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    {...register('specialist',
-                                                                        // { required: 'Specialist Name is required' }
-                                                                    )}
-                                                                    onChange={(e) => {
-                                                                        clearErrors('specialist');
-                                                                        setFormData({ ...formData, specialties: e.target.value });
-                                                                    }}
-                                                                    placeholder="Enter Specialist Name"
-                                                                />
-                                                                {/* {errors.specialist && <span className="text-danger">{errors?.specialist?.message}</span>} */}
-                                                            </Form.Group>
-                                                        </div>
-                                                        <hr className='mb-1' />
+                                                        <hr className='my-1' />
                                                     </div>
-                                                    <Row>
-                                                        <Col sm={12}>
-                                                            <h5>
-                                                                Address Details
-                                                                <span
-                                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                                    onClick={addAddress}></span>
-                                                            </h5>
-                                                        </Col>
-                                                    </Row>
-                                                    {addresses.map((item, index) => (
-                                                        <Row key={index} className="mb-2">
-                                                            {/* Address Use Field */}
-                                                            <Col sm={4} className="mb-2">
-                                                                <Form.Label className="mb-1">Use</Form.Label>
-                                                                <Form.Select
-                                                                    {...register(`address[${index}].use`)}
-                                                                    value={watch(`address[${index}].use`) || item.use || ""}
-                                                                    onChange={(e) => handleAddressChange(index, 'use', e.target.value)}
-                                                                >
-                                                                    <option value="">Select</option>
-                                                                    {addressUses.map((use) => (
-                                                                        <option key={use} className="text-capitalize" value={use}>
-                                                                            {use}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
-                                                            </Col>
-
-                                                            {/* Address Line */}
-                                                            <Col sm={4} className="mb-2 position-relative">
-                                                                <Form.Label className="mb-1">Address</Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    placeholder="Street Address"
-                                                                    {...register(`address[${index}].line[0]`)}
-                                                                    value={watch(`address[${index}].line[0]`) || item.line?.[0] || ""}
-                                                                    onChange={(e) => handleAddressChange(index, 'line', [e.target.value, item.line?.[1] || ""])}
-                                                                />
-                                                            </Col>
-
-                                                            {/* City */}
-                                                            <Col sm={4} className="mb-2">
-                                                                <Form.Label className="mb-1">City</Form.Label>
-                                                                <Form.Select
-                                                                    {...register(`address[${index}].city`)}
-                                                                    value={watch(`address[${index}].city`) || item.city || ""}
-                                                                    onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
-                                                                >
-                                                                    <option value="">Select City</option>
-                                                                    {cities1?.map((data) => (
-                                                                        <option key={data?.name} value={data?._id}>
-                                                                            {data?.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
-                                                            </Col>
-
-                                                            {/* State */}
-                                                            <Col sm={4} className="mb-2">
-                                                                <Form.Label className="mb-1">State</Form.Label>
-                                                                <Form.Select
-                                                                    {...register(`address[${index}].state`)}
-                                                                    value={watch(`address[${index}].state`) || item.state || ""}
-                                                                    onChange={(e) => handleAddressChange(index, 'state', e.target.value)}
-                                                                >
-                                                                    <option value="">Select State</option>
-                                                                    {statesData?.states?.map((data) => (
-                                                                        <option key={data?.name} value={data?.state_code}>
-                                                                            {data?.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </Form.Select>
-                                                            </Col>
-
-                                                            {/* Postal Code */}
-                                                            <Col sm={4}>
-                                                                <Form.Group className="mb-2">
-                                                                    <Form.Label className="mb-1">Postal Code</Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        placeholder="Postal Code"
-                                                                        {...register(`address[${index}].postalCode`)}
-                                                                        value={watch(`address[${index}].postalCode`) || item.postalCode || ""}
-                                                                        onChange={(e) => handleAddressChange(index, 'postalCode', e.target.value)}
-                                                                    />
-                                                                </Form.Group>
-                                                            </Col>
-
-                                                            {/* Country */}
-                                                            <Col sm={4} className="position-relative">
-                                                                <Form.Label className="mb-1">Country</Form.Label>
-                                                                <Form.Control
-                                                                    type="text"
-                                                                    placeholder="Country"
-                                                                    {...register(`address[${index}].country`)}
-                                                                    value={watch(`address[${index}].country`) || item.country || ""}
-                                                                    onChange={(e) => handleAddressChange(index, 'country', e.target.value)}
-                                                                />
-                                                            </Col>
-                                                        </Row>
-                                                    ))}
+                                                    <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
 
                                                 </div>
                                                 <div className="col-12 d-flex justify-content-end gap-2 mt-1">

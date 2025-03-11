@@ -150,7 +150,7 @@ const Doctors = () => {
                                         {store?.getDoctorsReducer?.loading ? (
                                             <tbody>
                                                 <tr>
-                                                    <td className='text-center' colSpan={6}>
+                                                    <td className='text-center' colSpan={7}>
                                                         <Spinner className=" my-3 " />
                                                     </td>
                                                 </tr>
@@ -159,7 +159,7 @@ const Doctors = () => {
                                             <tbody>
                                                 {filteredDoctors.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={6} className='text-center'>
+                                                        <td colSpan={7} className='text-center'>
                                                             <h3 className='my-3'>No Data Found  for {status === true ? 'Active' : 'Inactive'}</h3>
                                                         </td>
                                                     </tr>
