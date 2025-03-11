@@ -255,7 +255,7 @@ const NewPatient = () => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: data?.medicationHistoryConsent || '',
+            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
             patientCopayAmount: data?.patientCopayAmount || '0',
             photo: logo?.url
                 ? [

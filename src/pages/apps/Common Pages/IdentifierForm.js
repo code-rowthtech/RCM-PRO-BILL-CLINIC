@@ -5,7 +5,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
 
-const IdentifierForm = ({ defaultIdentifiers, onChange }) => {
+const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, identifiers }) => {
     const {
         register,
         handleSubmit,
@@ -17,7 +17,7 @@ const IdentifierForm = ({ defaultIdentifiers, onChange }) => {
         setError,
         clearErrors,
     } = useForm();
-    console.log(defaultIdentifiers, 'defaultIdentifiersdefaultIdentifiers');
+
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
         { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
@@ -45,22 +45,20 @@ const IdentifierForm = ({ defaultIdentifiers, onChange }) => {
         'Other',
     ];
 
-    const [identifiers, setIdentifiers] = useState([]);
-    const [identifierDocument, setIdentifierDocument] = useState(false);
-
     useEffect(() => {
-        // Initialize identifiers with default types
-        setIdentifiers(
-            defaultIdentifiers.map((type) => ({
-                type,
-                number: '',
-                file: null,
-                expiry: '',
-                issuingAuthority: '',
-            }))
-        );
-    }, []);
-    // Update the parent component whenever identifiers change
+        if (identifiers.length === 0) {
+            setIdentifiers(
+                defaultIdentifiers.map((type) => ({
+                    type,
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                }))
+            );
+        }
+    }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
+
     useEffect(() => {
         onChange?.(identifiers);
     }, [identifiers, onChange]);
@@ -79,35 +77,6 @@ const IdentifierForm = ({ defaultIdentifiers, onChange }) => {
         updatedIdentifiers[index][field] = value;
         setIdentifiers(updatedIdentifiers);
     };
-const handleIdentifierFileChange = async (e, index) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-
-    try {
-        const uploadedFile = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
-        
-        setIdentifiers((prevIdentifiers) => {
-            const updatedIdentifiers = [...prevIdentifiers];
-            updatedIdentifiers[index] = {
-                ...updatedIdentifiers[index],
-                file: {
-                    url: uploadedFile?.url?.split('?')[0], // Store only necessary part of URL
-                    name: selectedFile.name, // Store file name
-                },
-            };
-            return updatedIdentifiers;
-        });
-
-    } catch (error) {
-        console.error('Error during file upload:', error);
-    }
-};
-
-    const formatDateForInput = (dateString) => {
-        if (!dateString) return ''; // Return empty if no date
-        const date = new Date(dateString);
-        return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
-    };
 
     return (
         <>
@@ -124,38 +93,25 @@ const handleIdentifierFileChange = async (e, index) => {
 
             {/* Table Header */}
             <Row className="fw-bold">
-                <Col>
-                    <Form.Label>Identifier Type</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Number</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Document</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Issuing Authority</Form.Label>
-                </Col>
-                <Col>
-                    <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
-                </Col>
+                <Col><Form.Label>Identifier Type</Form.Label></Col>
+                <Col><Form.Label>Identifier Number</Form.Label></Col>
+                <Col><Form.Label>Identifier Document</Form.Label></Col>
+                <Col><Form.Label>Issuing Authority</Form.Label></Col>
+                <Col><Form.Label>Identifier Expiry (If Applicable)</Form.Label></Col>
             </Row>
 
             {/* Dynamic Identifier Fields */}
             {identifiers.map((item, index) => (
                 <Row key={index} className="mb-2">
-                    {/* Identifier Type */}
                     <Col>
                         <Form.Select
-                            value={item?.value || ''}
+                            value={item?.type?.value || ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 handleChange(index, 'type', selectedType);
                             }}
                             disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>
-                                Select Identifier Type
-                            </option>
+                            <option value="" disabled>Select Identifier Type</option>
                             {identifierOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -164,7 +120,6 @@ const handleIdentifierFileChange = async (e, index) => {
                         </Form.Select>
                     </Col>
 
-                    {/* Identifier Number */}
                     <Col>
                         <Form.Control
                             type="text"
@@ -174,40 +129,11 @@ const handleIdentifierFileChange = async (e, index) => {
                         />
                     </Col>
 
-                    {/* File Upload */}
-                    <Col className="mb-2 position-relative">
-                        <div
-                            onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item.file ? 'form-control' : 'custom-form-fields'
-                            }`}>
-                            {item.file?.name
-                                ? item.file.name.length > 30
-                                    ? item.file.name.slice(0, 25) + '...'
-                                    : item.file.name
-                                : 'Upload Document'}
-                            <p className="mb-0">
-                                <FiDownloadCloud />
-                            </p>
-                        </div>
-                        <Form.Control
-                            type="file"
-                            id={`fileInput-identifier-${index}`}
-                            style={{ display: 'none' }}
-                            accept=".png, .jpg, .jpeg, .pdf"
-                            onChange={(e) => handleIdentifierFileChange(e, index)}
-                        />
-                        {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
-                    </Col>
-
-                    {/* Issuing Authority */}
                     <Col>
                         <Form.Select
                             value={item.issuingAuthority}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
-                            <option value="" disabled>
-                                Select Issuing Authority
-                            </option>
+                            <option value="" disabled>Select Issuing Authority</option>
                             {defaultIssuingAuthority.map((option) => (
                                 <option key={option} value={option}>
                                     {option}
@@ -216,10 +142,10 @@ const handleIdentifierFileChange = async (e, index) => {
                         </Form.Select>
                     </Col>
 
-                    <Col className="position-relative">
+                    <Col>
                         <Form.Control
                             type="date"
-                            value={item?.expiry ? formatDateForInput(item.expiry) : ''}
+                            value={item?.expiry || ''}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
                         {index >= defaultIdentifiers?.length && (
