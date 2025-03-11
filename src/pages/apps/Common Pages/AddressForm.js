@@ -27,10 +27,6 @@ const AddressForm = ({addresses,setAddresses}) => {
         formState: { errors },
         watch,
     } = useForm();
-
-    // const [addresses, setAddresses] = useState([
-    //     { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
-    // ]);
     const addAddress = () => {
         setAddresses([
             ...addresses,
