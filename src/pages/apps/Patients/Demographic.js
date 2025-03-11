@@ -299,20 +299,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 },
             },
 
-            // ✅ Fixing Identifier Structure
-            identifier: constantIdentifiers.map((item) => ({
-                use: item.use,
-                system: item.system || 'urn:oid:2.16.840.1.113883.4.7',
-                value: item.number,
-                period: {
-                    start: item.startDate,
-                    end: item.expiry,
-                },
-                documents: item?.file?.url ? [{ url: item.file.url, fileName: item.file.name || '' }] : [],
-                status: 'active',
-                sliceName: item.type,
-                issuingAuthority: item.issuingAuthority,
-            })),
+         
             address: demographicAddresses,
         };
 
@@ -362,79 +349,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         });
     };
 
-    const defaultIdentifiers = ['SSN'];
-
-    const defaultIssuingAuthority = [
-        'NPPES',
-        'CLIA',
-        'State Licensing Authority',
-        'IRS',
-        'CMS',
-        'The Joint Commission',
-        'Dun & Bradstreet',
-        'Other',
-    ];
-    const identifierOptions = [
-        { label: 'Social Security Number (SSN)', value: 'http://hl7.org/fhir/sid/us-ssn', code: 'SSN' },
-        { label: 'Medical Record Number (MRN)', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MR' },
-        { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
-        { label: 'Driver’s License Number', value: 'urn:oid:2.16.840.1.113883.4.3.25', code: 'DL' },
-        { label: 'Health Plan Beneficiary Number', value: 'http://hl7.org/fhir/sid/us-medicare', code: 'HPI' },
-        { label: 'Passport Number', value: 'urn:oid:2.16.840.1.113883.4.3.2', code: 'PPN' },
-        { label: 'State Medicaid ID', value: 'http://hl7.org/fhir/sid/us-medicaid', code: 'Medicaid' },
-        { label: 'Veterans Affairs ID (VA ID)', value: 'http://va.gov/fhir/sid/va', code: 'VA' },
-    ];
-    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    const [identifierDocument, setIdentifierDocumnent] = useState(false);
-
-    useEffect(() => {
-        setConstantIdentifiers(
-            defaultIdentifiers.map((type) => ({
-                type,
-                number: '',
-                file: '',
-                expiry: '',
-                issuingAuthority: '',
-                use: '',
-            }))
-        );
-    }, []);
-    const addIdentifier = () => {
-        setConstantIdentifiers([
-            ...constantIdentifiers,
-            { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
-        ]);
-    };
-    const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return;
-        setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
-    };
-    const handleChange = (index, field, value) => {
-        const updatedIdentifiers = [...constantIdentifiers];
-        updatedIdentifiers[index][field] = value;
-        setConstantIdentifiers(updatedIdentifiers);
-    };
-    const handleIdentifierFileChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        if (!selectedFile) return;
-        try {
-            const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
-            setConstantIdentifiers((prevDetails) => {
-                const updatedDetails = [...prevDetails];
-                console.log(url, 'constantIdentifierurl');
-                updatedDetails[index] = {
-                    ...updatedDetails[index],
-                    file: {
-                        url: url?.url?.split('?')[0],
-                        name: selectedFile.name,
-                    },
-                };
-                return updatedDetails;
-            });
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
-    };
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -470,21 +384,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             value: 'http://hl7.org/fhir/sid/us-npi',
                             code: 'NPI',
                         },
-                        {
-                            label: 'DEA Number (Controlled Substances)',
-                            value: 'http://www.nabp.pharmacy/DEA',
-                            code: 'DEA',
-                        },
-                        {
-                            label: 'Board Certification',
-                            value: 'http://www.abms.org/certification',
-                            code: 'BOARD-CERT',
-                        },
-                        {
-                            label: 'Tax Identification Number (TIN)',
-                            value: 'http://hl7.org/fhir/sid/us-tin',
-                            code: 'TIN',
-                        },
+                    
                     ]}
                 />
 

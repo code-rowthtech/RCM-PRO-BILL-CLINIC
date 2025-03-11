@@ -5,7 +5,8 @@ const api = new APICore();
 
 export function getPatientsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatients, data);
+    return api.get(URL.getPatients, data);
+    
 }
 
 export function getPatientsByAppointmentApi(params: any): any {

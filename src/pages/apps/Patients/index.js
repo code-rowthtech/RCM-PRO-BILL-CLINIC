@@ -37,7 +37,7 @@ const Patients = () => {
             limit: 10,
             search: search,
         }
-        dispatch(getPatientsAction({ key: encryptMessage(data) }));
+        dispatch(getPatientsAction(data));
     }, [dispatch, skip, search]);
     const handleShowDetails = () => {
         setSmShow(true);
@@ -72,7 +72,8 @@ const Patients = () => {
         }
     };
 
-    const patientsData = store?.getPatientsReducer?.data?.patients;
+    const patientsData = store?.getPatientsReducer?.data?.data;
+    console.log( store?.getPatientsReducer,'patientsData')
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);
@@ -146,7 +147,7 @@ const Patients = () => {
                                                 <th className='text-white'>Patient Name</th>
                                                 <th className='text-white'>Gender</th>
                                                 <th className='text-white'>Phone</th>
-                                                <th className='text-white'>Insurance Range</th>
+                                                <th className='text-white'>Address</th>
                                                 <th className='text-white'>Last Visit</th>
                                                 <th className='text-white'>Next Visit</th>
                                                 <th className='text-white'>Action</th>
@@ -171,10 +172,10 @@ const Patients = () => {
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
                                                             <td>CH-{data?.chartNumber}</td>
-                                                            <td className='text-capitalize'>{data?.firstName || 'N/A'}</td>
-                                                            <td className='text-capitalize'>{data?.sex || 'N/A'}</td>
-                                                            <td>{data?.cellPhone || 'N/A'}</td>
-                                                            <td>{data?.insuranceRange || 'N/A'}</td>
+                                                            <td className='text-capitalize'>{data?.name?.[0]?.text || 'N/A'}</td>
+                                                            <td className='text-capitalize'>{data?.gender || 'N/A'}</td>
+                                                            <td>{data?.telecom?.[1]?.value || 'N/A'}</td>
+                                                            <td>{data?.address?.[0]?.city || data?.address?.[0]?.state || 'N/A'}</td>
                                                             <td>{data?.lastVisit || 'N/A'}</td>
                                                             <td>{data?.nextVisit || 'N/A'}</td>
                                                             <td>

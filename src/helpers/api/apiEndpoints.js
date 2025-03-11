@@ -55,7 +55,7 @@ export const getDoctorDetails = `${BaseRoute}/practitioner/details`;
 export const addReferringDoctor = `${BaseRoute}/add/referringDoc`;
 
 // PATIENTS
-export const getPatients = `${BaseRoute}/Patient-get`;
+export const getPatients = `${BaseRoute}/Patients`;
 export const getPatientById = `${BaseRoute}/Patient-getById`;
 export const createPatients = `${BaseRoute}/Patient/add`;
 export const updatePatients = `${BaseRoute}/Patient/update`;

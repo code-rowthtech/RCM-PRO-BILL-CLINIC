@@ -3,8 +3,21 @@ import { Row, Col, Form } from 'react-bootstrap';
 import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
+import { useForm } from 'react-hook-form';
 
-const IdentifierForm = ({ defaultIdentifiers = []  }) => {
+const IdentifierForm = ({ defaultIdentifiers, onChange }) => {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        watch,
+        setValue,
+        getValues,
+        setError,
+        clearErrors,
+    } = useForm();
+    console.log(defaultIdentifiers, 'defaultIdentifiersdefaultIdentifiers');
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
         { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
@@ -47,6 +60,10 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
             }))
         );
     }, []);
+    // Update the parent component whenever identifiers change
+    useEffect(() => {
+        onChange?.(identifiers);
+    }, [identifiers, onChange]);
 
     const addIdentifier = () => {
         setIdentifiers([...identifiers, { type: null, number: '', file: null, expiry: '', issuingAuthority: '' }]);
@@ -62,22 +79,34 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
         updatedIdentifiers[index][field] = value;
         setIdentifiers(updatedIdentifiers);
     };
+const handleIdentifierFileChange = async (e, index) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
-    const handleIdentifierFileChange = async (e, index) => {
-        const selectedFile = e.target.files[0];
-        if (!selectedFile) return;
-
-        try {
-            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
-            const updatedIdentifiers = [...identifiers];
-            updatedIdentifiers[index].file = {
-                url: url?.url?.split('?')[0],
-                name: selectedFile.name,
+    try {
+        const uploadedFile = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
+        
+        setIdentifiers((prevIdentifiers) => {
+            const updatedIdentifiers = [...prevIdentifiers];
+            updatedIdentifiers[index] = {
+                ...updatedIdentifiers[index],
+                file: {
+                    url: uploadedFile?.url?.split('?')[0], // Store only necessary part of URL
+                    name: selectedFile.name, // Store file name
+                },
             };
-            setIdentifiers(updatedIdentifiers);
-        } catch (error) {
-            console.error('Error during file upload:', error);
-        }
+            return updatedIdentifiers;
+        });
+
+    } catch (error) {
+        console.error('Error during file upload:', error);
+    }
+};
+
+    const formatDateForInput = (dateString) => {
+        if (!dateString) return ''; // Return empty if no date
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
 
     return (
@@ -118,7 +147,7 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
                     {/* Identifier Type */}
                     <Col>
                         <Form.Select
-                            value={item.type?.value || ''}
+                            value={item?.value || ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 handleChange(index, 'type', selectedType);
@@ -146,12 +175,20 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
                     </Col>
 
                     {/* File Upload */}
-                    <Col>
+                    <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className="custom-file-upload cursor-pointer">
-                            {item.file?.name || 'Upload Document'}
-                            <FiDownloadCloud />
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item.file ? 'form-control' : 'custom-form-fields'
+                            }`}>
+                            {item.file?.name
+                                ? item.file.name.length > 30
+                                    ? item.file.name.slice(0, 25) + '...'
+                                    : item.file.name
+                                : 'Upload Document'}
+                            <p className="mb-0">
+                                <FiDownloadCloud />
+                            </p>
                         </div>
                         <Form.Control
                             type="file"
@@ -160,6 +197,7 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
                             accept=".png, .jpg, .jpeg, .pdf"
                             onChange={(e) => handleIdentifierFileChange(e, index)}
                         />
+                        {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
                     </Col>
 
                     {/* Issuing Authority */}
@@ -178,15 +216,17 @@ const IdentifierForm = ({ defaultIdentifiers = []  }) => {
                         </Form.Select>
                     </Col>
 
-                    {/* Expiry Date */}
-                    <Col>
+                    <Col className="position-relative">
                         <Form.Control
                             type="date"
-                            value={item.expiry}
+                            value={item?.expiry ? formatDateForInput(item.expiry) : ''}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
-                        {index >= defaultIdentifiers.length && (
-                            <span className="text-danger cursor-pointer" onClick={() => removeIdentifier(index)}>
+                        {index >= defaultIdentifiers?.length && (
+                            <span
+                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                style={{ right: '-2%', top: '12%' }}
+                                onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>
                         )}
