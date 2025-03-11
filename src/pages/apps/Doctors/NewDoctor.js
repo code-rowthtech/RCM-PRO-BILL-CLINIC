@@ -14,6 +14,7 @@ import { handleFirstSpace } from '../../../helpers/noSpace';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visibility toggle
 import { getDepartmentDataAction } from '../../../redux/settings/action';
 import AddressForm from '../Common Pages/AddressForm';
+import { FiUploadCloud } from 'react-icons/fi';
 
 
 const NewDoctor = () => {
@@ -32,8 +33,11 @@ const NewDoctor = () => {
     // const daaa=watch('state1')
     // console.log(,'daa')
     const [activeTab, setActiveTab] = useState("personalDetails");
+    const logoFileInputRef = useRef(null);
     const [show, setShow] = useState(false);
     const [logo, setLogo] = useState(null);
+    const [logoName, setLogoName] = useState('');
+    const [logoUploading, setLogoUploading] = useState(false)
     const [docId, setDocId] = useState(null);
     const store = useSelector((state) => state);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -43,7 +47,7 @@ const NewDoctor = () => {
     const [demographicAddresses, setDemographicAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
+    console.log(demographicAddresses, 'demographicAddressesdemographicAddresses')
     const statesData = store?.getStatesReducer?.data;
     console.log(statesData, 'statesData')
     const dispatch = useDispatch();
@@ -87,6 +91,19 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
     const closeModal = () => {
         setShow(false);
     };
+    const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+
+
+    const handleFileChange = async (e) => {
+        const selectedFile = e.target.files[0];
+        try {
+            const url = await handleUpload(selectedFile, setLogoUploading);
+            setLogo(url);
+            setLogoName(selectedFile?.name)
+        } catch (error) {
+            // console.error('Error during file upload:', error);
+        }
+    };
 
     useEffect(() => {
         if (doctorDetails && updateId) {
@@ -98,7 +115,10 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
             setValue('gender', doctorDetails?.userId?.gender)
             setValue('department', doctorDetails?.departmentId?._id)
             if (doctorDetails?.address) {
-                setAddresses(doctorDetails.address);
+                setDemographicAddresses(doctorDetails.address);
+            }
+            if (doctorDetails?.photo) {
+                setLogoName(doctorDetails.photo?.[0]?.title);
             }
             const formattedDateOfBirth = doctorDetails?.userId?.dob
                 ? new Date(doctorDetails?.userId?.dob).toISOString().split('T')[0]
@@ -106,7 +126,22 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
         }
-    }, [doctorDetails, setValue])
+        console.log(doctorDetails?.address, 'addresssss')
+    }, [doctorDetails, setValue, cities1])
+    useEffect(() => {
+        if (doctorDetails && updateId && statesData) {
+            const state = statesData?.states?.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id
+            console.log(state, 'state324234')
+            dispatch(getCitiesAction({ state_code: state, name: doctorDetails?.address?.[0]?.city, limit: 10, skip: 1 }))
+        }
+    }, [statesData, doctorDetails])
+
+    // useEffect(() => {
+    //     if (doctorDetails && updateId && cities1) {
+    //         setValue('city1', cities1?.find((data) => data?.name === doctorDetails?.address?.[0]?.city))
+    //     }
+    // }, [statesData, doctorDetails])
+
 
     const handleNewDoctor = () => {
         navigate('/apps/doctors/list');
@@ -114,6 +149,7 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
     };
 
     const submitData = (data) => {
+        console.log(data, '8754567890')
         const payload = {
             ...(updateId ? { doctorId: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add id if updateId exists
             // clinicId: clinicId,
@@ -125,10 +161,18 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
                 use: "official",
                 text: `${data?.firstName || ""} ${data?.lastName || ""}`.trim(),
                 family: data?.lastName,
-                given: [data?.firstName ? data?.firstName : ''],
+                given: data?.firstName
                 // prefix: [''],
                 // suffix: [],
             },
+            photo: [{
+                contentType: logo?.type || 'image/jpeg',
+                url: logo?.url?.split('?')[0] || logo, 
+                data: logo?.data || null, // Assuming `data` contains base64 or buffer
+                hash: logo?.hash || null, // You may need to generate or pass the hash
+                title: logoName || null, // Use `logoName` as the title
+                creation: new Date() // Automatically sets the creation date
+            }],
             telecom: [
                 {
                     system: "phone",
@@ -380,7 +424,7 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Date of Birth <span className='text-danger'>*</span>
+                                                                    Date of Birth {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
@@ -430,7 +474,7 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Gender <span className="text-danger">*</span>
+                                                                    Gender {!id && <span className="text-danger">*</span>}
                                                                 </Form.Label>
                                                                 <Form.Select
                                                                     as="select"
@@ -529,6 +573,33 @@ console.log(demographicAddresses,'demographicAddressesdemographicAddresses')
                                                                     {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
                                                                 </div>
                                                             </Form.Group>
+                                                        </div>
+                                                        <div className="col-md-3 col-12 ">
+                                                            <div className="mb-1 d-flex flex-column position-relative">
+                                                                <Form.Label className="mb-0">Profile Image</Form.Label>
+                                                                <div
+                                                                    onClick={() => logoFileInputRef.current.click()}
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
+                                                                >
+                                                                    {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
+                                                                    <p className="mb-0">
+                                                                        <FiUploadCloud />
+                                                                    </p>
+                                                                </div>
+                                                                <Form.Control
+
+                                                                    type="file"
+                                                                    className="d-none "
+                                                                    {...register('profileImage', {
+                                                                    })}
+                                                                    accept=".png, .jpg, .jpeg, .svg"
+                                                                    ref={logoFileInputRef}
+                                                                    onChange={handleFileChange}
+                                                                />
+                                                                {errors.profileImage &&
+                                                                    <p className="text-danger">{errors.profileImage.message}</p>
+                                                                }
+                                                            </div>
                                                         </div>
                                                         <hr className='my-1' />
                                                     </div>

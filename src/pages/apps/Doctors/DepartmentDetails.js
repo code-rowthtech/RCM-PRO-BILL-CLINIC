@@ -11,6 +11,8 @@ import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
 import { handleUpload } from "../../../helpers/HandleUpload";
 import IdentifierForm from "../Common Pages/IdentifierForm";
+import Select from 'react-select';
+import { qualificationsData } from "../../../utils/DataSets/qualification.data";
 
 const DepartmentDetails = ({ docId }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -56,7 +58,6 @@ const DepartmentDetails = ({ docId }) => {
     //   }))
     // );
   }, []);
-  const logoFileInputRef = useRef(null);
   const degreeFileInputRef = useRef(null);
   const [logo, setLogo] = useState(null);
   const [logoName, setLogoName] = useState('');
@@ -132,22 +133,61 @@ const DepartmentDetails = ({ docId }) => {
     }
   };
 
+  const QualificationOptions = qualificationsData?.map((qualification) => ({
+    value: qualification, // Code as the value
+    label: qualification.display, // Display text as the label
+  }))
+  const [code,setCode]=useState([])
+console.log(code,'32435')
+const handleQualificationChange = (selectedOption) => {
+  console.log(selectedOption, 'selectedOption');
+  
+  const { definition, ...rest } = selectedOption.value; // Remove `definition`
+  
+  setCode(prevState => [
+      ...prevState,
+      { 
+          ...rest,
+          url: '' // Add or update the `url` property
+      }
+  ]);
+
+  setValue('degreeName', selectedOption ? selectedOption.display : '');
+};
   const onsubmit = (data) => {
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
-      identifiers:identifiers,
-      profileImage: {
-        url: logo?.url?.split('?')[0] || logo,
-        fileName: logoName,
-      },
-      degree: [{
-        name: data?.degreeName,
-        uploadedDocument: {
+      identifier: identifiers,
+      qualification: [{
+        // identifier: [{
+        //   use: "", // Example: "official", "usual", etc.
+        //   system: "", // Example: "https://example.com/degree-system"
+        //   value: data?.degreeName, // Degree name
+        //   period: {
+        //     start: "", 
+        //     end: "" 
+        //   }
+        // }],
+        code: {
+          system: "http://hl7.org/fhir/ValueSet/degreeLicenseCertificate",
+          code: "", // Example: "MD"
+          display: "", // Degree display name
+          url: "" // Degree document URL
+        },
+        // period: {
+        //   start: "", 
+        //   end: "" 
+        // },
+        issuer: {
+          reference: "test" // Example: "Organization/12345" (Reference to issuing organization)
+        },
+        documents: [{
           url: degree?.url?.split('?')[0] || degree,
           fileName: degreeName,
-        }
-      }],
-      specialities: [data?.specialist],
+        }] // Degree file name(s)
+      }]
+      ,
+      specialities: data?.specialist,
 
     }
     console.log(payload, 'payload')
@@ -158,6 +198,7 @@ const DepartmentDetails = ({ docId }) => {
     if (doctorDetails && updateId) {
       setValue('degreeName', doctorDetails?.degree?.[0]?.name);
       setValue('specialist', doctorDetails?.specialities?.[0]);
+
     }
   }, [doctorDetails, setValue])
 
@@ -190,27 +231,56 @@ const DepartmentDetails = ({ docId }) => {
             <>
               <Row>
                 <Col sm={12}>
+                  <IdentifierForm
+                    defaultIdentifiers={[
+                      {
+                        label: 'National Provider Identifier (NPI)',
+                        value: 'http://hl7.org/fhir/sid/us-npi',
+                        code: 'NPI',
+                      },
+                    ]}
+                    identifiers={identifiers}
+                    setIdentifiers={setIdentifiers}
+                    onChange={(data) => console.log('Updated Identifiers:', data)}
+                  />
                   <Row>
-                    <div className="col-md-6 col-12">
+                    <h5>
+                      Qualifications
+                      <span
+                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                      // onClick={addIdentifier}
+                      >
+                      </span>
+                    </h5>
+                    <div className="col-md-4 col-12">
                       <Form.Group className="mb-1">
-                        <Form.Label className="mb-0">Degree Name</Form.Label>
-                        <Form.Control
-                          className='form-control'
-                          type="text"
-                          {...register('degreeName',
-                            // { required: 'Degree Name is required' }
-                          )}
-                          onChange={(e) => {
-                            clearErrors('degreeName');
-                            // setFormData({ ...formData, degreeName: e.target.value });
+                        <Form.Label className="mb-0">Select Degree Name</Form.Label>
+                        <Select
+                          options={QualificationOptions} // Use the formatted array
+                          isSearchable
+                          className="basic-single"
+                          classNamePrefix="select"
+                          placeholder="&nbsp; Select "
+                          onChange={handleQualificationChange}
+                          onMenuOpen={() => console.log('Dropdown Opened')}
+                          styles={{
+                            control: (provided) => ({
+                              ...provided,
+                              height: '30px',
+                              minHeight: '30px',
+                              border: '0px',
+                            }),
+                            placeholder: (provided) => ({
+                              ...provided,
+                              fontWeight: 'bold',
+                              fontSize: '12px',
+                              paddingBottom: '5px',
+                            }),
                           }}
-                          // value={formData.Degree Name}
-                          placeholder="Enter Degree Name"
                         />
-                        {errors.email && <span className="text-danger">{errors?.degreeName?.message}</span>}
                       </Form.Group>
                     </div>
-                    <div className="col-md-6 col-12">
+                    <div className="col-md-4 col-12">
                       <div className="mb-1 d-flex flex-column position-relative">
                         <Form.Label className="mb-0">Degree</Form.Label>
                         <div
@@ -235,35 +305,26 @@ const DepartmentDetails = ({ docId }) => {
                         )}
                       </div>
                     </div>
-                    <div className="col-md-6 col-12 ">
-                      <div className="mb-2 d-flex flex-column position-relative">
-                        <Form.Label className="mb-0">Profile Image</Form.Label>
-                        <div
-                          onClick={() => logoFileInputRef.current.click()}
-                          className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading ? '' : 'custom-form-fields'}`}
-                        >
-                          {logoName ? logoName : logoUploading ? 'Uploading...' : 'Upload Profile Image'}
-                          <p className="mb-0">
-                            <FiUploadCloud />
-                          </p>
-                        </div>
+
+                    <div className="col-md-4 col-12">
+                      <Form.Group className="mb-1">
+                        <Form.Label className="mb-0">Issuer Organisation </Form.Label>
                         <Form.Control
-
-                          type="file"
-                          className="d-none "
-                          {...register('profileImage', {
-                          })}
-                          accept=".png, .jpg, .jpeg, .svg"
-                          ref={logoFileInputRef}
-                          onChange={handleFileChange}
+                          type="text"
+                          {...register('issuerOrganisation',
+                            // { required: 'Specialist Name is required' }
+                          )}
+                          onChange={(e) => {
+                            clearErrors('issuerOrganisation');
+                            // setFormData({ ...formData, specialties: e.target.value });
+                          }}
+                          placeholder="Enter Issuer Organisation"
                         />
-                        {errors.profileImage &&
-                          <p className="text-danger">{errors.profileImage.message}</p>
-                        }
-                      </div>
+                      </Form.Group>
                     </div>
-
-                    <div className="col-md-6 col-12">
+                  </Row>
+                  <Row>
+                  <div className="col-md-6 col-12">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Specialist </Form.Label>
                         <Form.Control
@@ -281,18 +342,7 @@ const DepartmentDetails = ({ docId }) => {
                     </div>
                   </Row>
 
-                  <IdentifierForm
-                    defaultIdentifiers={[
-                      {
-                        label: 'National Provider Identifier (NPI)',
-                        value: 'http://hl7.org/fhir/sid/us-npi',
-                        code: 'NPI',
-                      },
-                    ]}
-                    identifiers={identifiers}
-                    setIdentifiers={setIdentifiers}
-                    onChange={(data) => console.log('Updated Identifiers:', data)}
-                  />
+
                 </Col>
               </Row>
 
