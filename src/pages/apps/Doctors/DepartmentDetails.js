@@ -63,6 +63,7 @@ const DepartmentDetails = ({ docId }) => {
   const [degree, setDegree] = useState(null);
   const [degreeName, setDegreeName] = useState('');
   const [logoUploading, setLogoUploading] = useState(false)
+  const [identifiers, setIdentifiers] = useState([]);
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     try {
@@ -134,18 +135,7 @@ const DepartmentDetails = ({ docId }) => {
   const onsubmit = (data) => {
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
-      identifier: constantIdentifiers.map((item) => ({
-        identifierType: item.type,
-        use: item.use,
-        value: item.number,
-        // documents: item.file ? {  url: item.file.url,fileName: item.file.name || '' } : null,
-        documents: [item?.file?.url],
-        expirationDate: item.expiry,
-        status: 'active',
-        system: 'urn:oid:2.16.840.1.113883.4.7',
-        sliceName: item.type,
-        issuingAuthority: item.issuingAuthority,
-      })),
+      identifiers:identifiers,
       profileImage: {
         url: logo?.url?.split('?')[0] || logo,
         fileName: logoName,
@@ -298,8 +288,10 @@ const DepartmentDetails = ({ docId }) => {
                         value: 'http://hl7.org/fhir/sid/us-npi',
                         code: 'NPI',
                       },
-
                     ]}
+                    identifiers={identifiers}
+                    setIdentifiers={setIdentifiers}
+                    onChange={(data) => console.log('Updated Identifiers:', data)}
                   />
                 </Col>
               </Row>

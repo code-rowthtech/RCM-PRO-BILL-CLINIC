@@ -18,6 +18,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         clearErrors,
     } = useForm();
 
+    const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
+    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
         { label: 'State Medical License', value: 'http://terminology.hl7.org/CodeSystem/v2-0203', code: 'MED-LIC' },
@@ -44,6 +47,30 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         'Dun & Bradstreet',
         'Other',
     ];
+    const handleIdentifierFileChange = async (e, index) => {
+        const selectedFile = e.target.files[0];
+        if (!selectedFile) return;
+
+        try {
+            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
+            setIdentifiers((prevDetails) => {
+                const updatedDetails = [...prevDetails];
+                updatedDetails[index] = {
+                    ...updatedDetails[index],
+                    file: {
+                        url: url?.url?.split('?')[0],
+                        name: selectedFile.name,
+                    },
+                };
+                return updatedDetails;
+            });
+        } catch (error) {
+            console.error('Error during file upload:', error);
+        }
+    };
+
+   
+
 
     useEffect(() => {
         if (identifiers.length === 0) {
@@ -127,6 +154,29 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             value={item.number}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
+                    </Col>
+                    <Col className="mb-2 position-relative">
+                        <div
+                            onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
+                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
+                            {item?.file?.name
+                                ? item.file.name.length > 30
+                                    ? item.file.name.slice(0, 25) + '...'
+                                    : item.file.name
+                                : 'Upload Document'}
+                            <p className="mb-0">
+                                <FiDownloadCloud />
+                            </p>
+                        </div>
+                        <Form.Control
+                            type="file"
+                            id={`fileInput-identifier-${index}`}
+                            style={{ display: 'none' }}
+                            accept=".png, .jpg, .jpeg, .pdf"
+                            onChange={(e) => handleIdentifierFileChange(e, index)}
+                        />
+                        {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
                     </Col>
 
                     <Col>
