@@ -47,7 +47,7 @@ export const getRoleData = `${BaseRoute}/getAllRoles`;
 export const updateRoleData = `${BaseRoute}/roles/edit`;
 
 // DOCTORS
-export const getDoctor = `${BaseRoute}/getClinicDoctors`;
+export const getDoctor = `${BaseRoute}/practitioner/list`;
 export const createDoctor = `${BaseRoute}/practitioner/add`;
 export const getDoctorRoles = `${BaseRoute}/roles`;
 export const createDoctorDetail = `${BaseRoute}/practitioner/update`;
