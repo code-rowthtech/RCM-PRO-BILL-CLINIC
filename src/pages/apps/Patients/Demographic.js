@@ -66,8 +66,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
     console.log(statesData, 'statesData');
-    // const [activeTab, setActiveTab] = useState('personalDetails');
-
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     console.log(updateResponse, 'updateResponse');
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
@@ -298,8 +296,8 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     },
                 },
             },
+            identifiers:identifiers,
 
-         
             address: demographicAddresses,
         };
 
@@ -373,6 +371,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
+    const [identifiers, setIdentifiers] = useState([]);
 
     return (
         <>
@@ -384,8 +383,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             value: 'http://hl7.org/fhir/sid/us-npi',
                             code: 'NPI',
                         },
-                    
                     ]}
+                    identifiers={identifiers}
+                    setIdentifiers={setIdentifiers}
+                    onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
