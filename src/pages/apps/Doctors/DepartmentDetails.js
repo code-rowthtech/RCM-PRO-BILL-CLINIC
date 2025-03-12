@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FiDownloadCloud, FiUploadCloud } from "react-icons/fi";
+import { FiDownloadCloud, FiUploadCloud, FiTrash2 } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
 import { handleUpload } from "../../../helpers/HandleUpload";
 import IdentifierForm from "../Common Pages/IdentifierForm";
@@ -39,6 +39,47 @@ const DepartmentDetails = ({ docId }) => {
 
   const [searchParams] = useSearchParams();
   const updateId = searchParams.get('id');
+
+  const [qualifications, setQualifications] = useState([{ id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
+  const degreeFileInputRef = useRef(null);
+  console.log(qualifications, 'qualificationsqualificationsqualifications')
+  // Add a new qualification
+  const addQualification = () => {
+    const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
+    setQualifications([...qualifications, newQualification]);
+  };
+
+  // Remove a qualification by its ID, but ensure the first row is not deleted
+  const removeQualification = (id) => {
+    if (qualifications.length > 1) { // Ensure at least one row remains
+      const updatedQualifications = qualifications.filter((qual) => qual.id !== id);
+      setQualifications(updatedQualifications);
+    }
+  };
+
+  // Handle changes in qualification fields
+  const handleQualificationChange = (index, field, value) => {
+    console.log({ index, field, value }, 'index, field, value')
+
+    const updatedQualifications = qualifications.map((qual, i) =>
+      i === index ? { ...qual, [field]: field === 'degreeName' ? value?.data : value } : qual
+    );
+    setQualifications(updatedQualifications);
+  };
+
+  // Handle file upload for degree
+  const handleFileChangeDegree = async (index, event) => {
+    const file = event.target.files[0];
+    try {
+
+      const url = await handleUpload(file, setDegreeUploading);
+      const fileName = file.name
+      handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
+    } catch (error) {
+
+    }
+  };
+
   useEffect(() => {
     setConstantIdentifiers(
       defaultIdentifiers.map((type) => ({
@@ -58,13 +99,13 @@ const DepartmentDetails = ({ docId }) => {
     //   }))
     // );
   }, []);
-  const degreeFileInputRef = useRef(null);
   const [logo, setLogo] = useState(null);
   const [logoName, setLogoName] = useState('');
   const [degree, setDegree] = useState(null);
   const [degreeName, setDegreeName] = useState('');
   const [logoUploading, setLogoUploading] = useState(false)
   const [identifiers, setIdentifiers] = useState([]);
+
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files[0];
     try {
@@ -76,16 +117,16 @@ const DepartmentDetails = ({ docId }) => {
     }
   };
   const [degreeUploading, setDegreeUploading] = useState(false);
-  const handleFileChangeDegree = async (e) => {
-    const selectedFile = e.target.files[0];
-    try {
-      const url = await handleUpload(selectedFile, setDegreeUploading);
-      setDegree(url);
-      setDegreeName(selectedFile?.name)
-    } catch (error) {
-      // console.error('Error during file upload:', error);
-    }
-  };
+  // const handleFileChangeDegree = async (e) => {
+  //   const selectedFile = e.target.files[0];
+  //   try {
+  //     const url = await handleUpload(selectedFile, setDegreeUploading);
+  //     setDegree(url);
+  //     setDegreeName(selectedFile?.name)
+  //   } catch (error) {
+  //     // console.error('Error during file upload:', error);
+  //   }
+  // };
   const addIdentifier = () => {
     setConstantIdentifiers([
       ...constantIdentifiers,
@@ -132,61 +173,70 @@ const DepartmentDetails = ({ docId }) => {
       console.error('Error during file upload:', error);
     }
   };
+  console.log(qualificationsData, 'qualificationsData76543567899')
 
-  const QualificationOptions = qualificationsData?.map((qualification) => ({
-    value: qualification, // Code as the value
-    label: qualification.display, // Display text as the label
-  }))
-  const [code,setCode]=useState([])
-console.log(code,'32435')
-const handleQualificationChange = (selectedOption) => {
-  console.log(selectedOption, 'selectedOption');
-  
-  const { definition, ...rest } = selectedOption.value; // Remove `definition`
-  
-  setCode(prevState => [
-      ...prevState,
-      { 
-          ...rest,
-          url: '' // Add or update the `url` property
-      }
-  ]);
+  const QualificationOptions = qualificationsData.map((qualification) => ({
+    value: qualification.code,
+    label: qualification.display,
+    data: qualification, // Store full object for later use
+  }));
 
-  setValue('degreeName', selectedOption ? selectedOption.display : '');
-};
+  const [code, setCode] = useState([])
+  console.log(code, '32435')
+  // const handleQualificationChange = (selectedOption) => {
+  //   console.log(selectedOption, 'selectedOption');
+
+  //   const { definition, ...rest } = selectedOption.value; // Remove `definition`
+
+  //   setCode(prevState => [
+  //     ...prevState,
+  //     {
+  //       ...rest,
+  //       url: '' // Add or update the `url` property
+  //     }
+  //   ]);
+
+  //   setValue('degreeName', selectedOption ? selectedOption.display : '');
+  // };
   const onsubmit = (data) => {
+    const datta = qualifications?.map((item) => ({
+      code: item?.degreeName,
+      documents: item?.degreeFile,
+      issuer: item?.issuerOrganisation,
+    }))
+    console.log(datta, 'dattaaa')
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
       identifier: identifiers,
-      qualification: [{
-        // identifier: [{
-        //   use: "", // Example: "official", "usual", etc.
-        //   system: "", // Example: "https://example.com/degree-system"
-        //   value: data?.degreeName, // Degree name
-        //   period: {
-        //     start: "", 
-        //     end: "" 
-        //   }
-        // }],
-        code: {
-          system: "http://hl7.org/fhir/ValueSet/degreeLicenseCertificate",
-          code: "", // Example: "MD"
-          display: "", // Degree display name
-          url: "" // Degree document URL
-        },
-        // period: {
-        //   start: "", 
-        //   end: "" 
-        // },
-        issuer: {
-          reference: "test" // Example: "Organization/12345" (Reference to issuing organization)
-        },
-        documents: [{
-          url: degree?.url?.split('?')[0] || degree,
-          fileName: degreeName,
-        }] // Degree file name(s)
-      }]
-      ,
+      // qualification: [{
+      //   // identifier: [{
+      //   //   use: "", // Example: "official", "usual", etc.
+      //   //   system: "", // Example: "https://example.com/degree-system"
+      //   //   value: data?.degreeName, // Degree name
+      //   //   period: {
+      //   //     start: "", 
+      //   //     end: "" 
+      //   //   }
+      //   // }],
+      //   code: {
+      //     system: "http://hl7.org/fhir/ValueSet/degreeLicenseCertificate",
+      //     code: "", // Example: "MD"
+      //     display: "", // Degree display name
+      //     url: "" // Degree document URL
+      //   },
+      //   // period: {
+      //   //   start: "", 
+      //   //   end: "" 
+      //   // },
+      //   issuer: {
+      //     reference: "test" // Example: "Organization/12345" (Reference to issuing organization)
+      //   },
+      //   documents: [{
+      //     url: degree?.url?.split('?')[0] || degree,
+      //     fileName: degreeName,
+      //   }] // Degree file name(s)
+      // }]
+      qualification: datta,
       specialities: data?.specialist,
 
     }
@@ -198,6 +248,13 @@ const handleQualificationChange = (selectedOption) => {
     if (doctorDetails && updateId) {
       setValue('degreeName', doctorDetails?.degree?.[0]?.name);
       setValue('specialist', doctorDetails?.specialities?.[0]);
+      if (doctorDetails?.identifier) {
+        setIdentifiers(doctorDetails?.identifier);
+    }
+    if (doctorDetails?.qualification) {
+      setQualifications(doctorDetails?.qualification
+      );
+  }
 
     }
   }, [doctorDetails, setValue])
@@ -248,83 +305,109 @@ const handleQualificationChange = (selectedOption) => {
                       Qualifications
                       <span
                         className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                      // onClick={addIdentifier}
-                      >
-                      </span>
+                        onClick={addQualification}
+                      ></span>
                     </h5>
-                    <div className="col-md-4 col-12">
-                      <Form.Group className="mb-1">
-                        <Form.Label className="mb-0">Select Degree Name</Form.Label>
-                        <Select
-                          options={QualificationOptions} // Use the formatted array
-                          isSearchable
-                          className="basic-single"
-                          classNamePrefix="select"
-                          placeholder="&nbsp; Select "
-                          onChange={handleQualificationChange}
-                          onMenuOpen={() => console.log('Dropdown Opened')}
-                          styles={{
-                            control: (provided) => ({
-                              ...provided,
-                              height: '30px',
-                              minHeight: '30px',
-                              border: '0px',
-                            }),
-                            placeholder: (provided) => ({
-                              ...provided,
-                              fontWeight: 'bold',
-                              fontSize: '12px',
-                              paddingBottom: '5px',
-                            }),
-                          }}
-                        />
-                      </Form.Group>
-                    </div>
-                    <div className="col-md-4 col-12">
-                      <div className="mb-1 d-flex flex-column position-relative">
-                        <Form.Label className="mb-0">Degree</Form.Label>
-                        <div
-                          onClick={() => degreeFileInputRef.current.click()}
-                          className={`custom-file-upload justify-content-between cursor-pointer form-control ${degreeName || degreeUploading ? '' : 'custom-form-fields'}`}
-                        >
-                          {degreeName ? degreeName : degreeUploading ? 'Uploading...' : 'Upload Degree'}
-                          <p className="mb-0">
-                            <FiUploadCloud />
-                          </p>
+                    {qualifications?.map((qualification, index) => (
+                      <React.Fragment key={index}>
+                        {console.log({ qualification, index })}
+                        <div className="col-md-4 col-12">
+                          <Form.Group className="mb-1">
+                            <Form.Label className="mb-0">Select Degree Name</Form.Label>
+                            <Select
+                              options={QualificationOptions}
+                              isSearchable
+                              className="basic-single"
+                              classNamePrefix="select"
+                              placeholder="&nbsp; Select "
+                              onChange={(selectedOption) =>
+                                handleQualificationChange(index, 'degreeName', selectedOption) // Access the full object from 'data'
+                              }
+                              onMenuOpen={() => console.log('Dropdown Opened')}
+                              styles={{
+                                control: (provided) => ({
+                                  ...provided,
+                                  height: '30px',
+                                  minHeight: '30px',
+                                  border: '0px',
+                                }),
+                                placeholder: (provided) => ({
+                                  ...provided,
+                                  fontWeight: 'bold',
+                                  fontSize: '12px',
+                                  paddingBottom: '5px',
+                                }),
+                              }}
+                            />
+                          </Form.Group>
                         </div>
-                        <Form.Control
-                          type="file"
-                          className="d-none "
-                          {...register('degreeDoc', {
-                          })}
-                          ref={degreeFileInputRef}
-                          onChange={handleFileChangeDegree}
-                        />
-                        {errors.degreeDoc && (
-                          <p className="text-danger">{errors.degreeDoc.message}</p>
+                        <div className="col-md-4 col-12">
+                          <div className="mb-1 d-flex flex-column position-relative">
+                            <Form.Label className="mb-0">Degree</Form.Label>
+                            <div
+                              onClick={() => degreeFileInputRef.current.click()}
+                              className={`custom-file-upload justify-content-between cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile ? '' : 'custom-form-fields'}`}
+                            >
+                              {degreeUploading ? 'Uploading...' : qualification.degreeFile?.fileName ? qualification.degreeFile.fileName : 'Upload Degree'}
+                              {/* {qualification.degreeFile ? qualification.degreeFile.name : 'Upload Degree'} */}
+                              <p className="mb-0">
+                                <FiUploadCloud />
+                              </p>
+                            </div>
+                            <Form.Control
+                              type="file"
+                              className="d-none"
+                              ref={degreeFileInputRef}
+                              onChange={(event) => handleFileChangeDegree(index, event)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-4 col-12">
+                          <Form.Group className="mb-1">
+                            <Form.Label className="mb-0">Issuer Organisation</Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={qualification.issuerOrganisation}
+                              onChange={(e) => handleQualificationChange(index, 'issuerOrganisation', e.target.value)}
+                              placeholder="Enter Issuer Organisation"
+                            />
+                          </Form.Group>
+                        </div>
+                        {/* Delete Button */}
+                        {/* {index > 0 && ( // Only show delete button for added rows
+                        
+                          <div className="d-flex justify-content-end">
+                            <span
+                              className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                              style={{ right: '0.5%', top: '58.5%' }}
+                              onClick={() => removeQualification(qualification.id)}>
+                              <CiCircleMinus />
+                            </span>
+                          </div>
+                        )} */}
+                        {index > 0 && ( // Only show delete button for added rows
+                          <div className="col-md-12 text-end">
+                            {/* <Button
+                              variant="danger"
+                              size="sm"
+                              onClick={() => removeQualification(qualification.id)}
+                            >
+                              <FiTrash2 /> Remove
+                            </Button> */}
+                             <span
+                              className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                              style={{ marginTop:'-35px' }}
+                              onClick={() => removeQualification(qualification.id)}>
+                              <CiCircleMinus />
+                            </span>
+                          </div>
                         )}
-                      </div>
-                    </div>
-
-                    <div className="col-md-4 col-12">
-                      <Form.Group className="mb-1">
-                        <Form.Label className="mb-0">Issuer Organisation </Form.Label>
-                        <Form.Control
-                          type="text"
-                          {...register('issuerOrganisation',
-                            // { required: 'Specialist Name is required' }
-                          )}
-                          onChange={(e) => {
-                            clearErrors('issuerOrganisation');
-                            // setFormData({ ...formData, specialties: e.target.value });
-                          }}
-                          placeholder="Enter Issuer Organisation"
-                        />
-                      </Form.Group>
-                    </div>
+                      </React.Fragment>
+                    ))}
                   </Row>
                   <Row>
-                  <div className="col-md-6 col-12">
+                    <hr className="my-1" />
+                    <div className="col-md-4 col-12">
                       <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Specialist </Form.Label>
                         <Form.Control
