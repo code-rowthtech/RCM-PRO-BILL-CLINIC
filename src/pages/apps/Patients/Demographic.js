@@ -27,6 +27,7 @@ import { tribalEntitiesOptions } from '../../../utils/DataSets/tribalEntities';
 import { maritalStatusOptions } from '../../../utils/DataSets/maritalStatus';
 import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
+import { dataList } from '../../../utils/DataSets/relations.data';
 
 const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     console.log(patientId, 'patientId');
@@ -85,139 +86,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             setValue('employerCity', employerCitySearch);
         }
     }, [employerCitySearch, cities3]);
-    // const onSubmit = (data) => {
-    //     const payload = {
-    //         id: patientId,
-    //         ...(data?.nationalIdNumber ? { nationalIdNumber: data?.nationalIdNumber } : {}),
-    //         // ...(data?.dateOfBirth ? { dateOfBirth: data?.dateOfBirth } : {}),
-    //         // ...(data?.approxAge ? { approxAge: data?.approxAge } : {}),
-    //         ...(data?.sex ? { sex: data?.sex } : {}),
-    //         ...(data?.genderIdentity ? { genderIdentity: data?.genderIdentity } : {}),
-    //         ...(data?.sexualOrientation ? { sexualOrientation: data?.sexualOrientation } : {}),
-    //         ...(data?.race ? { race: data?.race } : {}),
-    //         ...(data?.raceSubcategories ? { raceSubcategories: data?.raceSubcategories } : {}),
-    //         ...(data?.ethnicity ? { ethnicity: data?.ethnicity } : {}),
-    //         ...(data?.preferredLanguage ? { preferredLanguage: data?.preferredLanguage } : {}),
-    //         ...(data?.patientStudentStatus ? { patientStudentStatus: data?.patientStudentStatus } : {}),
-    //         ...(data?.notes ? { notes: data?.notes } : {}),
-    //         ...(data?.maritalStatus ? { maritalStatus: data?.maritalStatus } : {}),
-    //         ...(data?.epsdtServices ? { epsdtServices: data?.epsdtServices } : {}),
-    //         ...(data?.epsdtReferralCondition ? { epsdtReferralCondition: data?.epsdtReferralCondition } : {}),
-    //         ...(data?.emergencyContactName ? { emergencyContactName: data?.emergencyContactName } : {}),
-    //         ...(data?.emergencyContactPhone
-    //             ? { emergencyContactPhone: data?.emergencyContactPhone?.replace(/\D/g, '') }
-    //             : {}),
-    //         ...(data?.emergencyContactRelation ? { emergencyContactRelation: data?.emergencyContactRelation } : {}),
-    //         ...(data?.employerName ? { employerName: data?.employerName } : {}),
-    //         ...(data?.employerPhone ? { employerPhone: data?.employerPhone?.replace(/\D/g, '') } : {}),
-    //         employerAddress: {
-    //             address: data?.employerAddress,
-    //             street: data?.employerStreet,
-    //             city: data?.employerCity,
-    //             state: data?.employerStateName,
-    //             zip: data?.employerZip,
-    //             latitude: employerLatitude,
-    //             longitude: employerLongitude,
-    //             timeZone: data?.employerTimeZone,
-    //         },
-    //         identifier: constantIdentifiers.map((item) => ({
-    //             identifierType: item.type,
-    //             use: item.use,
-    //             value: item.number,
-    //             // documents: item.file ? {  url: item.file.url,fileName: item.file.name || '' } : null,
-    //             documents: [item?.file?.url],
-    //             expirationDate: item.expiry,
-    //             status: 'active',
-    //             system: 'urn:oid:2.16.840.1.113883.4.7',
-    //             sliceName: item.type,
-    //             issuingAuthority: item.issuingAuthority,
-    //         })),
-    //         address: addresses,
 
-    //     };
-    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-    // };
-    // const onSubmit = (data) => {
-    //     const payload = {
-    //         id: patientId,
-
-    //         ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
-    //         ...(data?.sex && { birthSex: { code: data.sex } }),
-    //         ...(data?.genderIdentity && { gender: data.genderIdentity }),
-    //         ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
-    //         ...(data?.race && [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }]),
-    //         ...(data?.ethnicity && [{ system: 'http://hl7.org/fhir/v3/Ethnicity', code: data.ethnicity }]),
-    //         ...(data?.maritalStatus && {
-    //             maritalStatus: {
-    //                 coding: [
-    //                     {
-    //                         system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
-    //                         code: data.maritalStatus,
-    //                         display: data.maritalStatusDisplay || '',
-    //                     },
-    //                 ],
-    //             },
-    //         }),
-    //         ...(data?.preferredLanguage && {
-    //             communication: [
-    //                 {
-    //                     language: {
-    //                         coding: [
-    //                             {
-    //                                 system: 'urn:ietf:bcp:47',
-    //                                 code: data.preferredLanguage,
-    //                                 display: data.languageDisplay || '',
-    //                             },
-    //                         ],
-    //                     },
-    //                     preferred: true,
-    //                 },
-    //             ],
-    //         }),
-    //         ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
-    //         ...(data?.notes && { notes: data.notes }),
-    //         ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
-    //         ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
-    //         ...(data?.emergencyContactName && { emergencyContactName: data.emergencyContactName }),
-    //         ...(data?.emergencyContactPhone && {
-    //             emergencyContactPhone: data.emergencyContactPhone.replace(/\D/g, ''),
-    //         }),
-    //         ...(data?.emergencyContactRelation && { emergencyContactRelation: data.emergencyContactRelation }),
-    //         ...(data?.employerName && { employerName: data.employerName }),
-    //         ...(data?.employerPhone && { employerPhone: data.employerPhone.replace(/\D/g, '') }),
-
-    //         employerAddress: {
-    //             use: 'work',
-    //             type: 'physical',
-    //             text: data?.employerAddress,
-    //             line: [data?.employerStreet].filter(Boolean),
-    //             city: data?.employerCity,
-    //             state: data?.employerStateName,
-    //             postalCode: data?.employerZip,
-    //             country: 'US',
-    //             latitude: employerLatitude,
-    //             longitude: employerLongitude,
-    //             timeZone: data?.employerTimeZone,
-    //         },
-    //         address: addresses,
-    //         identifier: constantIdentifiers.map((item) => ({
-    //             use: item.use,
-    //             system: item.system || 'urn:oid:2.16.840.1.113883.4.7',
-    //             value: item.number,
-    //             period: {
-    //                 start: item.startDate,
-    //                 end: item.expiry,
-    //             },
-    //             documents: item?.file?.url ? [{ url: item.file.url, fileName: item.file.name || '' }] : [],
-    //             status: 'active',
-    //             sliceName: item.type,
-    //             issuingAuthority: item.issuingAuthority,
-    //         })),
-    //     };
-    //     console.log('hit hua ', payload);
-
-    //     dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-    // };
     const onSubmit = (data) => {
         const payload = {
             id: patientId,
@@ -296,11 +165,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     },
                 },
             },
-            identifiers:identifiers,
+            identifiers: identifiers,
 
             address: demographicAddresses,
         };
-
         console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
@@ -361,8 +229,16 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         value: tribal, // Code as the value
         label: tribal.display, // Display text as the label
     }));
+    const relationshipOption = dataList?.map((relation) => ({
+        value: relation, // Code as the value
+        label: relation.display, // Display text as the label
+    }));
 
     const handleEthnicityChange = (selectedOption) => {
+        console.log(selectedOption, 'selectedOption');
+        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+    };
+    const handleRelationChange = (selectedOption) => {
         console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
@@ -391,16 +267,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
 
                 <hr className="mt-0" />
                 <Row className="pb-2">
-                    {/* <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient National ID Number</Form.Label>
-                            <Form.Control
-                                placeholder="Patient National ID Number"
-                                type="text"
-                                {...register('nationalIdNumber')}
-                            />
-                        </Form.Group>
-                    </Col> */}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
@@ -493,16 +359,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    {/* <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Race SubCategories</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter Race SubCategories"
-                                {...register('raceSubcategories')}
-                            />
-                        </Form.Group>
-                    </Col> */}
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Ethnicity</Form.Label>
@@ -579,30 +435,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             />
                         </Form.Group>
                     </Col>
-                    {/* <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Patient Student Status</Form.Label>
-                            <Form.Select {...register('patientStudentStatus')}>
-                                <option value="">Select Patient Student Status</option>
-                                <option value="Employed">Employed</option>
-                                <option value="Full-time Student">Full-time Student</option>
-                                <option value="Not a Student">Not a Student</option>
-                                <option value="Part-time Student">Part-time Student</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */}
-                </Row>
-                <hr />
-                <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
-                <hr />
-
-                <Row className="mt-1 pb-2">
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
-                        </Form.Group>
-                    </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label htmlFor="marital" className="mb-0">
@@ -621,36 +453,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             )}
                         </Form.Group>
                     </Col>
-                    {/* <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">EPSDT Services</Form.Label>
-                            <Form.Select {...register('epsdtServices')}>
-                                <option value="">Select EPSDT Services</option>
-                                <option value="Children">Children</option>
-                                <option value="Family Planning">Family Planning</option>
-                                <option value="Children / Family Planning">Children / Family Planning</option>
-                            </Form.Select>
-                            {errors.epsdtServices && (
-                                <span className="text-danger">{errors.epsdtServices.message}</span>
-                            )}
-                        </Form.Group>
-                    </Col> */}
-                    {/* <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">EPSDT Referral Condition </Form.Label>
-                            <Form.Select {...register('epsdtReferralCondition')}>
-                                <option value="">Select EPSDT Referral Condition</option>
-                                <option value="AV">Available - Not Used</option>
-                                <option value="NU">Not Used</option>
-                                <option value="S2">Under Treatment</option>
-                                <option value="ST">New Services Requested</option>
-                                <option value="Other">Other</option>
-                            </Form.Select>
-                            {errors.epsdtReferralCondition && (
-                                <span className="text-danger">{errors.epsdtReferralCondition.message}</span>
-                            )}
-                        </Form.Group>
-                    </Col> */}
+                </Row>
+                <hr />
+                <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
+                <hr />
+
+                <Row className="mt-1 pb-2">
+                    <Col sm={12}>
+                        <h5>Emergency Contact Details</h5>
+                    </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
@@ -662,10 +473,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         </Form.Group>
                     </Col>
                     <Col sm={3}>
-                        {/* <Form.Group>
-                            <Form.Label className="mb-0">Emergency Contact Phone</Form.Label>
-                            <Form.Control {...register('emergencyContactPhone')} type="text" placeholder="Enter Emergency Contact Phone" />
-                        </Form.Group> */}
                         <Form.Group className="mb-0 position-relative">
                             <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
                             <Form.Group>
@@ -727,10 +534,28 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
-                            <Form.Control
-                                {...register('emergencyContactRelation')}
-                                type="text"
-                                placeholder="Enter Emergency Contact Relation"
+                            <Select
+                                options={relationshipOption} // Use the formatted array
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select "
+                                onChange={handleRelationChange}
+                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
                             />
                         </Form.Group>
                     </Col>
@@ -740,7 +565,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     <Col sm={12}>
                         <Row>
                             <Col sm={12} className="mt-1">
-                                <span className="text-black fw-semibold form-label">Employer Details</span>
+                                <h5>Employer Details</h5>
                             </Col>
                             <Col sm={12}>
                                 <Row>
@@ -1012,6 +837,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         </Row>
                     </Col>
                 </Row>
+                <hr />
+                <Row>
+                    <Col sm={6}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Notes</Form.Label>
+                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
+                        </Form.Group>
+                    </Col>
+                </Row>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
                     <Button className="cancel-button" onClick={() => reset()}>
                         Clear
@@ -1034,16 +868,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         Save & Continue Editing
                     </Button>
                 </div>
-                {/* <Row>
-                    <Col className="d-flex justify-content-end">
-                        <Button
-                            disabled={store?.updatePatientsReducer?.loading}
-                            className="custom-buttons btn-height"
-                            type="submit">
-                            Save & Continue
-                        </Button>
-                    </Col>
-                </Row> */}
             </Form>
         </>
     );

@@ -17,6 +17,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setError,
         clearErrors,
     } = useForm();
+   
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
@@ -47,6 +48,46 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         'Dun & Bradstreet',
         'Other',
     ];
+
+   
+
+
+    useEffect(() => {
+        if (identifiers.length === 0) {
+            setIdentifiers(
+                defaultIdentifiers.map((type) => ({
+                    type,
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                    system: '',
+                }))
+            );
+        }
+    }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
+
+    useEffect(() => {
+        onChange?.(identifiers);
+    }, [identifiers, onChange]);
+
+    const addIdentifier = () => {
+        setIdentifiers([
+            ...identifiers,
+            { type: null, number: '', file: null, expiry: '', issuingAuthority: '', system: '' },
+        ]);
+    };
+
+    const removeIdentifier = (index) => {
+        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
+        setIdentifiers(identifiers.filter((_, i) => i !== index));
+    };
+
+    const handleChange = (index, field, value) => {
+        const updatedIdentifiers = [...identifiers];
+        updatedIdentifiers[index][field] = value;
+        setIdentifiers(updatedIdentifiers);
+    };
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
@@ -68,43 +109,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
             console.error('Error during file upload:', error);
         }
     };
-
-   
-
-
-    useEffect(() => {
-        if (identifiers.length === 0) {
-            setIdentifiers(
-                defaultIdentifiers.map((type) => ({
-                    type,
-                    number: '',
-                    file: null,
-                    expiry: '',
-                    issuingAuthority: '',
-                }))
-            );
-        }
-    }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
-
-    useEffect(() => {
-        onChange?.(identifiers);
-    }, [identifiers, onChange]);
-
-    const addIdentifier = () => {
-        setIdentifiers([...identifiers, { type: null, number: '', file: null, expiry: '', issuingAuthority: '' }]);
-    };
-
-    const removeIdentifier = (index) => {
-        if (index < defaultIdentifiers.length) return; // Prevent removing default identifiers
-        setIdentifiers(identifiers.filter((_, i) => i !== index));
-    };
-
-    const handleChange = (index, field, value) => {
-        const updatedIdentifiers = [...identifiers];
-        updatedIdentifiers[index][field] = value;
-        setIdentifiers(updatedIdentifiers);
-    };
-
     return (
         <>
             <Row>
@@ -120,11 +124,21 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
 
             {/* Table Header */}
             <Row className="fw-bold">
-                <Col><Form.Label>Identifier Type</Form.Label></Col>
-                <Col><Form.Label>Identifier Number</Form.Label></Col>
-                <Col><Form.Label>Identifier Document</Form.Label></Col>
-                <Col><Form.Label>Issuing Authority</Form.Label></Col>
-                <Col><Form.Label>Identifier Expiry (If Applicable)</Form.Label></Col>
+                <Col>
+                    <Form.Label>Identifier Type</Form.Label>
+                </Col>
+                <Col>
+                    <Form.Label>Identifier Number</Form.Label>
+                </Col>
+                <Col>
+                    <Form.Label>Identifier Document</Form.Label>
+                </Col>
+                <Col>
+                    <Form.Label>Issuing Authority</Form.Label>
+                </Col>
+                <Col>
+                    <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
+                </Col>
             </Row>
 
             {/* Dynamic Identifier Fields */}
@@ -138,7 +152,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                                 handleChange(index, 'type', selectedType);
                             }}
                             disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>Select Identifier Type</option>
+                            <option value="" disabled>
+                                Select Identifier Type
+                            </option>
                             {identifierOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
@@ -158,8 +174,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
                             {item?.file?.name
                                 ? item.file.name.length > 30
                                     ? item.file.name.slice(0, 25) + '...'
@@ -183,7 +200,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         <Form.Select
                             value={item.issuingAuthority}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
-                            <option value="" disabled>Select Issuing Authority</option>
+                            <option value="" disabled>
+                                Select Issuing Authority
+                            </option>
                             {defaultIssuingAuthority.map((option) => (
                                 <option key={option} value={option}>
                                     {option}

@@ -69,7 +69,8 @@ const NewPatient = () => {
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
-    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log(store?.getDoctorsReducer,'doctorDetails')
     const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -83,6 +84,8 @@ const NewPatient = () => {
     const [formData, setFormData] = useState({
         role: doctorRoleId,
     });
+    const [status, setStatus] = useState(true);
+    const [search, setSearch] = useState('');
     const [partySearch, setPartySearch] = useState('');
     const [selectedParty, setSelectedParty] = useState(null);
     const [doctorSearch, setDoctorSearch] = useState('');
@@ -105,7 +108,7 @@ const NewPatient = () => {
 
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+        label: data?.name?.[0]?.text ,
     }));
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -162,8 +165,8 @@ const NewPatient = () => {
         if (activeTab === 'personalDetails') {
             dispatch(getResponsiblePartyAction({ key: encryptMessage(payload) }));
         }
-        const doctorPayload = { status: true, search: doctorSearch, departmentId: '' };
-        dispatch(getDoctorsAction({ key: encryptMessage(doctorPayload) }));
+        const doctorPayload = { status: status, search: search };
+        dispatch(getDoctorsAction(doctorPayload));
     }, [dispatch, doctorSearch, activeTab]);
     useEffect(() => {
         if (createResponse === 201) {
@@ -175,7 +178,7 @@ const NewPatient = () => {
             const payload = {
                 id: id,
             };
-            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+            dispatch(getPatientByIdAction(payload ));
         }
     }, [id]);
     useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { BiEdit } from 'react-icons/bi';
 import { FiUploadCloud } from 'react-icons/fi';
@@ -7,18 +7,22 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import AddressForm from '../Common Pages/AddressForm';
 import TelecomFrom from '../Common Pages/TelecomFrom';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from "../../../cryptoUtils";
-import { createResponsiblePartyAction } from '../../../redux/actions';
+import { encryptMessage } from '../../../cryptoUtils';
+import { createResponsiblePartyAction, stateEmptydAction } from '../../../redux/actions';
+import { dataList } from '../../../utils/DataSets/relations.data';
+import Select from 'react-select';
 
-const Responsiblle = ({ patientId,activeTab, setActiveTab  }) => {
-    const [submissionType, setSubmissionType] = useState(null);
+
+const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const [submissionType, setSubmissionType] = useState(null);
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const dispatch = useDispatch();
     const [responsibleAddresses, setResponsibleAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' }
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    
+    const createResponse = store?.createResponsiblePartyReducer?.data?.status;
+
     const {
         register,
         handleSubmit,
@@ -32,14 +36,14 @@ const Responsiblle = ({ patientId,activeTab, setActiveTab  }) => {
             patientId: patientId,
             name: [
                 {
-                    use: "official", // You can set this dynamically if needed
+                    use: 'official', // You can set this dynamically if needed
                     text: data?.fullName,
-                    family: data?.lastName || "", // Assuming you have a last name field
-                    given: [data?.firstName || "", data?.middleName || ""], // Assuming first & middle name exist
-                    prefix: [data?.title || ""], // Using title as prefix
+                    family: data?.lastName || '', // Assuming you have a last name field
+                    given: [data?.firstName || '', data?.middleName || ''], // Assuming first & middle name exist
+                    prefix: [data?.title || ''], // Using title as prefix
                     suffix: [], // Add suffix if available
                     preferred: true,
-                }
+                },
             ],
             account: data?.account,
             address: responsibleAddresses,
@@ -51,26 +55,41 @@ const Responsiblle = ({ patientId,activeTab, setActiveTab  }) => {
             clinicId: clinicId,
             title: data?.title,
         };
-        dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }))
-        console.log(payload,'ResponsiblePartypayload')
+        dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'ResponsiblePartypayload');
     };
-
+    useEffect(() => {
+        if (createResponse === 201) {
+            dispatch(stateEmptydAction());
+            reset();
+        }
+    }, [createResponse]);
+    useEffect(() => {
+        if (createResponse === 201) {
+            if (submissionType === 'saveAndNext') {
+                reset(); // Reset the form
+                setActiveTab('referringDoctor');
+                dispatch(stateEmptydAction());
+            } else if (submissionType === 'saveAndReset') {
+                reset();
+                dispatch(stateEmptydAction());
+                setActiveTab('personalDetails');
+            }
+        }
+    }, [createResponse]);
+    const relationshipOption = dataList?.map((relation) => ({
+        value: relation, // Code as the value
+        label: relation.display, // Display text as the label
+    }));
+    const handleRelationChange = (selectedOption) => {
+        console.log(selectedOption, 'selectedOption');
+        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+    };
     return (
         <>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row px-0 ">
                     <div className="row  pb-2 pt-1 pe-0">
-                        <div className="col-md-3 col-12">
-                            <Form.Label htmlFor="fileName" className="mb-0">
-                                Full Name <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Full Name"
-                                {...register('fullName', { required: 'Full name is required' })}
-                            />
-                            {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
-                        </div>
                         <div className="col-md-3 col-12 pe-1">
                             <Form.Label className="mb-0">
                                 Title <span className="text-danger">*</span>
@@ -85,6 +104,18 @@ const Responsiblle = ({ patientId,activeTab, setActiveTab  }) => {
                             </Form.Select>
                             {errors.title && <span className="text-danger">{errors.title.message}</span>}
                         </div>
+                        <div className="col-md-3 col-12">
+                            <Form.Label htmlFor="fileName" className="mb-0">
+                                Full Name <span className="text-danger">*</span>
+                            </Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Full Name"
+                                {...register('fullName', { required: 'Full name is required' })}
+                            />
+                            {errors.fullName && <span className="text-danger">{errors.fullName.message}</span>}
+                        </div>
+
                         <div className="col-md-3 col-12">
                             <Form.Label htmlFor="gender" className="mb-0">
                                 Gender <span className="text-danger">*</span>
@@ -112,13 +143,38 @@ const Responsiblle = ({ patientId,activeTab, setActiveTab  }) => {
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
+                        <Col sm={3} className='mb-2'>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
+                                <Select
+                                    options={relationshipOption} // Use the formatted array
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select "
+                                    onChange={handleRelationChange}
+                                    onMenuOpen={() => console.log('Dropdown Opened')}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
                     </div>
                     <hr />
-                    <AddressForm 
-                    addresses={responsibleAddresses} 
-                    setAddresses={setResponsibleAddresses} 
-                />
-                     <hr />
+                    <AddressForm addresses={responsibleAddresses} setAddresses={setResponsibleAddresses} />
+                    <hr />
                     <TelecomFrom />
                 </div>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
