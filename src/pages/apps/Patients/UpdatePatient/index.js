@@ -57,7 +57,8 @@ const UpdatePatientIndex = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const patientDetails = store?.getPatientByIdReducer?.data?.patient;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    console.log(patientDetails, 'store?.getPatientByIdReducer');
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const updateResponsibleParty = store?.updateResponsiblePartyReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
@@ -79,14 +80,14 @@ const UpdatePatientIndex = () => {
             id: id,
         };
         if (id) {
-            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+            dispatch(getPatientByIdAction(payload));
         }
         if (
             updateSuccess === 200 ||
             updateResponsibleParty === 200 ||
             store?.createResponsiblePartyReducer?.data?.status === 201
         ) {
-            dispatch(getPatientByIdAction({ key: encryptMessage(payload) }));
+            dispatch(getPatientByIdAction(payload));
             dispatch(resetUpdateAction());
             setLogo(null);
             setLogoName('');
@@ -254,8 +255,8 @@ const UpdatePatientIndex = () => {
                                                                 src={
                                                                     logo?.url
                                                                         ? logo.url.split('?')[0]
-                                                                        : patientDetails?.patientChartPhoto?.url
-                                                                        ? patientDetails.patientChartPhoto.url
+                                                                        : patientDetails?.photo[0]?.url
+                                                                        ? patientDetails.photo[0]?.url
                                                                         : profilePhoto
                                                                 }
                                                                 alt="Patient Profile"
@@ -317,11 +318,11 @@ const UpdatePatientIndex = () => {
                                                             <span
                                                                 className="fw-bold text-capitalize"
                                                                 style={{ color: '#f9a004' }}>
-                                                                {patientDetails?.firstName
-                                                                    ? patientDetails.firstName
+                                                                {patientDetails?.name[0]?.given[0]
+                                                                    ? patientDetails?.name[0]?.given[0]
                                                                     : ''}
-                                                                {patientDetails?.middleName
-                                                                    ? ' ' + patientDetails.middleName
+                                                                {patientDetails?.name[0]?.given[1]
+                                                                    ? ' ' + patientDetails.name[0]?.given[1]
                                                                     : ''}
                                                                 {patientDetails?.lastName
                                                                     ? ' ' + patientDetails.lastName
@@ -331,18 +332,17 @@ const UpdatePatientIndex = () => {
                                                         <p
                                                             style={{ borderRight: '1px solid black' }}
                                                             className="text-nowrap  fs-6 pe-2 fw-bold">
-                                                            <span className="fs-6">
-                                                                {' '}
-                                                                {patientDetails?.sex || 'N/A'}
+                                                            <span className="fs-6 text-capitalize">
+                                                                {patientDetails?.gender || 'N/A'}
                                                             </span>
                                                         </p>
                                                         <p
                                                             style={{ borderRight: '1px solid black' }}
                                                             className="text-nowrap fs-6 pe-2 fw-bold">
                                                             <span>
-                                                                {patientDetails?.dateOfBirth
+                                                                {patientDetails?.birthDate
                                                                     ? new Date(
-                                                                          patientDetails?.dateOfBirth
+                                                                          patientDetails?.birthDate
                                                                       )?.toLocaleDateString('en-GB')
                                                                     : 'N/A'}
                                                             </span>
@@ -385,7 +385,7 @@ const UpdatePatientIndex = () => {
                                                                         <span
                                                                             className="ps-2 fs-6"
                                                                             style={{ fontWeight: 600 }}>
-                                                                            +1-{patientDetails?.cellPhone}
+                                                                            +1-{patientDetails?.telecom[1]?.value}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -401,7 +401,7 @@ const UpdatePatientIndex = () => {
                                                                         <span
                                                                             className="ps-2 fs-6"
                                                                             style={{ fontWeight: 600 }}>
-                                                                            {patientDetails?.email}
+                                                                            {patientDetails?.telecom[3]?.value}
                                                                         </span>
                                                                     </div>
                                                                 </div>

@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row, InputGroup } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStatesByCountryAction, getCitiesAction, addReferringDoctorAction } from '../../../redux/actions';
+import { getStatesByCountryAction, getCitiesAction, addReferringDoctorAction, stateEmptydAction } from '../../../redux/actions';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
 
-const ReferringDoctor = ({ patientId,activeTab, setActiveTab }) => {
+const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const {
@@ -15,6 +15,7 @@ const ReferringDoctor = ({ patientId,activeTab, setActiveTab }) => {
         handleSubmit,
         formState: { errors },
         setValue,
+        reset,
         clearErrors,
         watch,
     } = useForm();
@@ -22,21 +23,21 @@ const ReferringDoctor = ({ patientId,activeTab, setActiveTab }) => {
         { line: [''], city: '', state: '', postalCode: '', country: 'USA' },
     ]);
     const [submissionType, setSubmissionType] = useState(null);
-    const updateResponse = store?.updatePatientsReducer?.data?.status;
+    const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
 
-        useEffect(() => {
-            // if (updateResponse === 200) {
-            //     if (submissionType === 'saveAndNext') {
-            //         // reset();
-            //         setActiveTab('responsible');
-            //         dispatch(stateEmptydAction());
-            //     } else if (submissionType === 'saveAndReset') {
-            //         setActiveTab('personelDetails');
-    
-            //         dispatch(stateEmptydAction());
-            //     }
-            // }
-        }, [updateResponse, submissionType]);
+
+    useEffect(() => {
+        if (createResponseReferring === 200) {
+            if (submissionType === 'saveAndNext') {
+                reset();
+                setActiveTab('insurance');
+                dispatch(stateEmptydAction());
+            } else if (submissionType === 'saveAndReset') {
+                setActiveTab('personelDetails');
+                dispatch(stateEmptydAction());
+            }
+        }
+    }, [createResponseReferring, submissionType]);
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -157,20 +158,6 @@ const ReferringDoctor = ({ patientId,activeTab, setActiveTab }) => {
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Specialty</Form.Label>
-                        <Form.Control {...register('speciality')} placeholder="Specialty" type="text" />
-                    </Form.Group>
-                </Col>
-            </Row>
-            <hr />
-            <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
-            <hr />
-            <Row className="mt-1">
-                <Col sm={12}>
-                    <span className="text-black fw-semibold form-label">Additional Information</span>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
                         <Form.Label className="mb-0">Email</Form.Label>
                         <Form.Control {...register('email')} placeholder="Email" type="email" />
                     </Form.Group>
@@ -210,24 +197,28 @@ const ReferringDoctor = ({ patientId,activeTab, setActiveTab }) => {
                     </Form.Group>
                 </Col>
             </Row>
+            <hr />
+            <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             <Row className="mt-2">
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                    <Button className="cancel-button" 
-                    // onClick={() => reset()}
+                    <Button
+                        className="cancel-button"
+                        onClick={() => reset()}
                     >
                         Clear
                     </Button>
-                    <Button
-                       
-                        className="custom-buttons"
-                        type="submit">
+                    <Button className="custom-buttons" type="submit"
+                     onClick={() => {
+                        setSubmissionType('saveAndReset');
+                    }}>
+                        
                         Save & Add Another
                     </Button>
                     <Button
                         onClick={() => {
                             setSubmissionType('saveAndNext');
                         }}
-                        // disabled={store?.updatePatientsReducer?.loading}
+                        // disabled={store?.updatePatientsReducer?.loading
                         className="custom-buttons"
                         type="submit">
                         Save & Continue Editing

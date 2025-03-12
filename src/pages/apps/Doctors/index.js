@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiEdit, FiTrash } from "react-icons/fi";
@@ -9,6 +9,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { IoSearchSharp } from "react-icons/io5";
+import { Info } from 'lucide-react';
 
 
 const Doctors = () => {
@@ -24,37 +25,38 @@ const Doctors = () => {
     useEffect(() => {
         const payload = { status: status, search: search }
         dispatch(
-            getDoctorsAction({ key: encryptMessage(payload) })
+            getDoctorsAction(payload)
 
         );
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
-    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.response) || [];
+    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result) || [];
+    console.log(doctorDetails, 'doctorDetails')
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
+    console.log(updateStatus,'updateStatusupdateStatus')
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
     const filteredDoctors = doctorDetails.filter((doctor) =>
         doctor.userDetails?.status === status &&
-        doctor.userDetails?.firstName.toLowerCase().includes(search.toLowerCase())
+        (doctor.userDetails?.firstName?.toLowerCase() || "").includes(search?.toLowerCase() || "")
     );
+
 
     const handleStatusChange = () => {
         const payload = {
-            id: selectedDoctor?._id,
+            doctorId: selectedDoctor?._id,
             status: !selectedDoctor?.userDetails?.status,
         }
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         closeStatusModal();
-        dispatch(stateEmptydAction());
     };
 
     useEffect(() => {
-        const payload = {
-            id: selectedDoctor?.userId,
-            status: status,
-        }
         if (updateStatus === 200) {
+            dispatch(stateEmptydAction())
+            const payload = { status: status, search: search }
             dispatch(
-                getDoctorsAction({ key: encryptMessage(payload) })
+                getDoctorsAction(payload)
+    
             );
         }
     }, [updateStatus]);
@@ -78,7 +80,7 @@ const Doctors = () => {
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'}`}
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'}`}
                                     >
                                         Inactive
                                     </Button>
@@ -133,31 +135,32 @@ const Doctors = () => {
                             <Row>
                                 <Col>
                                     <Table responsive className="table-centered table-nowrap mb-0  rounded"
-                                        style={{ height: filteredDoctors?.length === 0 ? '100vh' : 'auto' }}>
+                                        style={{ height: filteredDoctors?.length === 0 ? '75vh' : 'auto' }}>
                                         <thead className="text-white">
                                             <tr>
                                                 <th className='text-white py-2' style={{ fontSize: '13px' }}>S.No.</th>
                                                 <th className='text-white py-2' style={{ fontSize: '13px' }}>Doctor Name</th>
                                                 <th className='text-white py-2' style={{ fontSize: '13px' }}>Specialist</th>
-                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Department Name</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Email</th>
+                                                <th className='text-white py-2' style={{ fontSize: '13px' }}>Contact No.</th>
                                                 <th className='text-white py-2' style={{ fontSize: '13px' }}>Status</th>
                                                 <th className='text-white py-2' style={{ fontSize: '13px' }}>Action</th>
                                             </tr>
                                         </thead>
                                         {store?.getDoctorsReducer?.loading ? (
                                             <tbody>
-                                            <tr>
-                                                <td className='text-center' colSpan={6}>
-                                                    <Spinner className=" my-5 " />
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td className='text-center' colSpan={7}>
+                                                        <Spinner className=" my-3 " />
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         ) : (
                                             <tbody>
                                                 {filteredDoctors.length === 0 ? (
                                                     <tr>
-                                                        <td colSpan={6} className='text-center'>
-                                                            <h3 className='my-5'>No Data Found  for {status === true ? 'Active' : 'Inactive'}</h3>
+                                                        <td colSpan={7} className='text-center'>
+                                                            <h3 className='my-3'>No Data Found  for {status === true ? 'Active' : 'Inactive'}</h3>
                                                         </td>
                                                     </tr>
                                                 ) : (
@@ -165,11 +168,39 @@ const Doctors = () => {
                                                         <tr key={index}>
                                                             <td className='py1' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
                                                             <td className='text-capitalize py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {data?.userDetails?.firstName} {data?.userDetails?.lastName}
+                                                                {(data?.name?.[0]?.given || []).join(" ")} {data?.name?.[0]?.family || ""}
                                                             </td>
-                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.departmentDetails?.specialist || 'N/A'}</td>
-                                                            <td className='text-uppercase py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {data?.departmentDetails?.name || 'N/A'}
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                {data?.specialities?.[0] || 'N/A'}
+
+                                                                {data?.specialities?.length > 1 && (
+                                                                    <OverlayTrigger
+                                                                        placement="top"
+                                                                        overlay={
+                                                                            <Tooltip id={`tooltip-${data?._id}`}>
+                                                                            <ul className="m-0 p-0">
+                                                                                {data?.specialities?.slice(0).map((specialty, index) => (
+                                                                                    <li key={index} style={{ listStyleType: "disc", marginLeft: "10px" }}>
+                                                                                        {specialty}
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </Tooltip>
+                                                                        
+
+                                                                        }
+                                                                    >
+                                                                        <span className="ms-2 cursor-pointer">
+                                                                            <Info size={18} className="text-primary" />
+                                                                        </span>
+                                                                    </OverlayTrigger>
+                                                                )}
+                                                            </td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                {data?.userDetails?.email || 'N/A'}
+                                                            </td>
+                                                            <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                                {data?.telecom?.[0]?.value || 'N/A'}
                                                             </td>
                                                             <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
@@ -183,7 +214,7 @@ const Doctors = () => {
                                                             </td>
                                                             <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className='d-flex gap-2'>
-                                                                    <Link to={`/apps/doctors/new-doctor?id=${data?.userId}`} className='text-black cursor-pointer ps-2'>
+                                                                    <Link to={`/apps/doctors/new-doctor?id=${data?._id}`} className='text-black cursor-pointer ps-2'>
                                                                         <FiEdit className="fs-4 cursor-pointer" />
                                                                     </Link>
                                                                 </div>

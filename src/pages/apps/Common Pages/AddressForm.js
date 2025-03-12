@@ -16,7 +16,7 @@ const AddressForm = ({addresses,setAddresses}) => {
     const statesData = store?.getStatesReducer?.data;
     console.log(statesData, 'statesData');
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log(cities1, 'cities');
+    console.log(addresses, 'addressessssssssssssssssss');
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,

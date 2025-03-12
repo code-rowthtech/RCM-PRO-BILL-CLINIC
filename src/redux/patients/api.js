@@ -16,7 +16,7 @@ export function getPatientsByAppointmentApi(params: any): any {
 
 export function getPatientByIdApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatientById, data);
+    return api.get(`${URL.getPatientById}?id=${data?.id}`);
 }
 
 export function createPatientsApi(params: any): any {

@@ -35,6 +35,10 @@ hr {
     background-color: #010101 !important;
 }
 
+hr {
+    color: #726e6e8a !important;
+}
+
 :root {
     overflow: hidden;
 }
@@ -571,3 +575,6 @@ table {
 .offcanvas{
     width: 35vw !important;
 }
+
+
+  

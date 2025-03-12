@@ -17,7 +17,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setError,
         clearErrors,
     } = useForm();
-    const [identifierDocument, setIdentifierDocumnent] = useState(false);
+   
+
+    const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
 
     const identifierOptions = [
@@ -46,6 +48,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         'Dun & Bradstreet',
         'Other',
     ];
+
+   
+
 
     useEffect(() => {
         if (identifiers.length === 0) {
@@ -88,7 +93,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         if (!selectedFile) return;
 
         try {
-            const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
+            const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
             setIdentifiers((prevDetails) => {
                 const updatedDetails = [...prevDetails];
                 updatedDetails[index] = {

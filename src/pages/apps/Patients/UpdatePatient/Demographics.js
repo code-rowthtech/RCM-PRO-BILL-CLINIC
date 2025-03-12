@@ -7,6 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { getStatesByCountryAction, getCitiesAction, getCities2Action, getCities3Action, updatePatientsAction } from "../../../../redux/actions";
 import us from '../../../../assets/images/flags/us.jpg'
 import { encryptMessage } from "../../../../cryptoUtils";
+import IdentifierForm from "../../Common Pages/IdentifierForm";
 const Demographicdetails = ({ patientId }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Demographicdetails = ({ patientId }) => {
     const id = searchParams.get('id');
     const { register, handleSubmit, formState: { errors }, setValue, clearErrors, watch, getValues } = useForm();
     const [longitude, setLongitude] = useState(null);
+    const [identifiers, setIdentifiers] = useState([]);
     const [latitude, setLatitude] = useState(null);
     const [mailingLongitude, setMailingLongitude] = useState(null);
     const [mailingLatitude, setMailingLatitude] = useState(null);
@@ -286,7 +288,9 @@ const Demographicdetails = ({ patientId }) => {
     return (
         <div className="scroll-container" style={{ overflow: "scroll", height: "65vh" }}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
+           
                 <Row>
+             
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Patient National ID Number</Form.Label>
