@@ -30,7 +30,6 @@ import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
 const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
-    console.log(patientId, 'patientId');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -66,9 +65,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesData');
     const updateResponse = store?.updatePatientsReducer?.data?.status;
-    console.log(updateResponse, 'updateResponse');
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const employerState = watch('employerStateName');
     useEffect(() => {
@@ -88,17 +85,67 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     }, [employerCitySearch, cities3]);
 
     const onSubmit = (data) => {
+        let parsedSex = null;
+        try {
+            parsedSex = data?.sex ? JSON.parse(data.sex) : null;
+        } catch (error) {
+            console.error("Error parsing sex:", error);
+        }
+        console.log(data, 'dattaaa');
+        let finalIdentifiers = [];
+        identifiers.forEach((element) => {
+            console.log(element, 'element');
+            data = {
+                type: element?.type?.code,
+                system: element?.type?.value,
+                value: element?.number,
+                issuingAuthority: element?.issuingAuthority,
+                file: element?.file,
+                expiry: element?.expiry,
+            };
+            finalIdentifiers.push(data);
+        });
         const payload = {
             id: patientId,
-            ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
-            ...(data?.sex && { birthSex: { code: data.sex } }),
+            // birthSex: {
+            //     system:data?.birthSex?.system,
+            //     code: data?.birthSex?.value,
+            //     display: data?.birthSex?.label,
+            // },
+            // race: [
+            //     {
+            //         system: data?.race?.system,
+            //         code: data?.race?.code,
+            //         display: data?.race?.display,
+            //         text: data?.race?.display,
+            //     }
+            // ],
+            // ethnicity: [{
+            //     system: data?.ethnicity?.system,
+            //     code: data?.ethnicity?.code,
+            //     display: data?.ethnicity?.display,
+
+            // }],
+            // birthSex: {
+            //     system: data?.sex?.system,
+            //     code: data?.sex?.value,
+            //     display: data?.sex?.label,
+            // },
+            birthSex: parsedSex
+            ? {
+                  system: parsedSex.system,
+                  code: parsedSex.value,
+                  display: parsedSex.label,
+              }
+            : undefined,
+
             ...(data?.genderIdentity && { gender: data.genderIdentity }),
             ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
             // ✅ Fixing Race & Ethnicity Structure
             ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
-            ...(data?.ethnicity && {
-                ethnicity: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', code: data.ethnicity }],
-            }),
+            ethnicity: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-Ethnicity', display: eth }],
+            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: tri }],
+            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: rela }],
 
             // ✅ Fixing Marital Status Structure
             ...(data?.maritalStatus && {
@@ -142,18 +189,19 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     {
                         relationship: [{ text: data?.emergencyContactRelation }],
                         name: { text: data?.emergencyContactName },
-                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone.replace(/\D/g, '') }],
+                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
                     },
                 ],
             }),
 
             ...(data?.employerName && { employerName: data.employerName }),
-            ...(data?.employerPhone && { employerPhone: data.employerPhone.replace(/\D/g, '') }),
-
+            ...(data?.employerPhone && {
+                employerPhone: data?.employerPhone ? data.employerPhone?.replace(/\D/g, '') : '', // ✅ Fixed
+            }),
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
                 employerName: data?.employerName,
-                employerPhone: data?.employerPhone.replace(/\D/g, ''),
+                employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
                 workLocation: {
@@ -165,8 +213,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     },
                 },
             },
-            identifiers: identifiers,
-
+            identifier: finalIdentifiers,
             address: demographicAddresses,
         };
         console.log('Payload:', payload);
@@ -234,18 +281,19 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         label: relation.display, // Display text as the label
     }));
 
+    const [eth, setEth] = useState(null);
     const handleEthnicityChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
-        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+        setEth('ethnicity', selectedOption ? selectedOption.display : '');
     };
+    const [rela, setRela] = useState(null); // Store selected relationship
+
     const handleRelationChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
-        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+        setRela('relation', selectedOption ? selectedOption.display : '');
     };
+    const [tri, setTri] = useState(null); // Store selected tribal entity
 
     const handleTribalChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
-        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+        setTri('tribal', selectedOption ? selectedOption.display : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
 
@@ -271,15 +319,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-                                <option value="" hidden>
-                                    Select Sex
-                                </option>
-                                {sexAssignedAtBirthOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
+    <option value="" hidden>
+        Select Sex
+    </option>
+    {sexAssignedAtBirthOptions.map((option) => (
+        <option key={option.value} value={JSON.stringify(option)}>
+            {option.label}
+        </option>
+    ))}
+</Form.Select>
                         </Form.Group>
                     </Col>
 
@@ -291,7 +339,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select
                                 </option>
                                 {genderIdentityOptions?.map((option) => (
-                                    <option key={option?.value} value={option?.value}>
+                                    <option key={option?.value} value={option}>
                                         {option?.show}
                                     </option>
                                 ))}
@@ -301,29 +349,13 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
-                            <Form.Select {...register('sexualOrientation')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                <option value="Heterosexual">Heterosexual</option>
-                                <option value="Lesbian or gay">Lesbian or gay</option>
-                                <option value="Bisexual">Bisexual</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
                             <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
                             <Form.Select {...register('sexParameter')}>
                                 <option value="" hidden>
                                     Select
                                 </option>
                                 {sexParameterOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option key={option.value} value={option}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -338,7 +370,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select Pronouns
                                 </option>
                                 {personalPronounsOptions?.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option key={option.value} value={option}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -351,7 +383,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display}>
+                                    <option key={race.code} value={race}>
                                         {race.display}
                                     </option>
                                 ))}
@@ -368,6 +400,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
+                                value={
+                                    formattedEthnicityOptions.find((option) => option?.value?.display === eth) || null
+                                } // Show selected value
                                 onChange={handleEthnicityChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -416,6 +451,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
+                                value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
                                 onChange={handleTribalChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -443,7 +479,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
                                 {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option key={option.value} value={option}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -540,6 +576,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
+                                value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 onChange={handleRelationChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
