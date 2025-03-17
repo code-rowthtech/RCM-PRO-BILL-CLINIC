@@ -1,87 +1,41 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import Select from 'react-select';
+import React, { useEffect, useState } from 'react';
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
 import {
-    createPatientsAction,
-    updatePatientsAction,
-    getPatientByIdAction,
-    getResponsiblePartyAction,
     getPatientsAction,
 } from '../../../../redux/patients/actions';
 import {
     createAppointmentAction,
-    getCitiesAction,
     getDoctorsAction,
-    getStatesByCountryAction,
-    getSubClinicCitiesAction,
     rescheduleAppointmentAction,
-    stateEmptydAction,
 } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
-import { FiUploadCloud } from 'react-icons/fi';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { handleUpload } from '../../../../helpers/HandleUpload';
 import { useDispatch, useSelector } from 'react-redux';
-import us from '../../../../assets/images/flags/us.jpg';
 import Responsiblle from '../../Patients/Responsible';
 import Insurance from '../../Patients/Insurance/Insurance';
 import Demographicdetails from '../../Patients/Demographic';
 import ReferringDoctor from '../../Patients/referringDoctor';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { duration } from 'moment/moment';
-import PatientDetails from '../../Patients/UpdatePatient/PatientDetails';
 import NewPatient from '../../Patients/NewPatient';
-import { rescheduleAppointment } from '../../../../helpers/api/apiEndpoints';
 import Spinner from '../../../../constants/Spinner';
-import DatePicker from 'react-date-picker';
 import { getMastersDataAction, getMastersDataAction2 } from '../../../../redux/settings/action';
 
 const AppointmentForm = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
-    const createResponse = store?.createPatientsReducer?.data?.status;
-    const createPatientResponse = store?.createPatientsReducer?.data?.patient;
-    const statesData = store?.getStatesReducer?.data;
-    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
-    const patientDetails = store?.getPatientByIdReducer?.data?.patient;
-    const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const appointmentDetails = store?.getAppointmentByIdReducer?.data?.data;
-    const [focused, setFocused] = useState(false);
-    const [submissionType, setSubmissionType] = useState(null);
-    const [smShow, setSmShow] = useState(false);
     const [age, setAge] = useState(null);
-    const [password, setPassword] = useState('');
-    const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
-    const [timeoutId, setTimeoutId] = useState(null);
-    const [showTooltip, setShowTooltip] = useState(false);
     const [patientId, setPatientId] = useState(null);
-    const [formData, setFormData] = useState({
-        role: doctorRoleId,
-    });
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState(true);
     const [skip, setSkip] = useState(1);
-    const [partySearch, setPartySearch] = useState('');
-    const [selectedParty, setSelectedParty] = useState(null);
     const [doctorSearch, setDoctorSearch] = useState('');
-    const logoFileInputRef = useRef(null);
-    const [logoName, setLogoName] = useState('');
-    const [logo, setLogo] = useState(null);
-    const [searchedLocations, setSearchedLocations] = useState(null);
-    const [selectedLocation, setSelectedLocation] = useState(null);
     const [activeTab, setActiveTab] = useState('personalDetails');
-    const [btnShow, setBtnShow] = useState(true);
-    const [stateToSelect, setStateToSelect] = useState('');
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const [selectedOption, setSelectedOption] = useState('');
     const [showModal, setShowModal] = useState(false);
     const handlePlusIconClick = () => {
         setShowModal(true);
@@ -100,10 +54,8 @@ const AppointmentForm = () => {
         handleSubmit,
         watch,
         formState: { errors },
-        control,
         setValue,
         reset,
-        clearErrors,
     } = useForm({
         defaultValues: {
             scheduled: new Date().toISOString().split('T')[0],

@@ -14,7 +14,6 @@ import FullLayout from '../layouts/Full';
 import schedule from '../pages/apps/Schedule/schedule';
 import AddHoliday from '../pages/apps/Schedule/AddHoliday';
 import AddBreak from '../pages/apps/Schedule/AddBreak';
-import ToastHandle from '../helpers/ToastMessage';
 
 // lazy load all the views
 
@@ -42,9 +41,6 @@ const LockScreen2 = React.lazy(() => import('../pages/account2/LockScreen2'));
 const ProjectDashboard = React.lazy(() => import('../pages/dashboard/Project'));
 // const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
 const AddClinics = React.lazy(() => import('../pages/apps/Clinic/AddClinic/index'));
-const ClinicForm = React.lazy(() => import('../pages/apps/Clinic/AddClinic/clinicForm'));
-const Billing = React.lazy(() => import('../pages/apps/Clinic/AddClinic/billing'));
-const Contract = React.lazy(() => import('../pages/apps/Clinic/AddClinic/contract'));
 
 // const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
 const AppointmentsList = React.lazy(() => import('../pages/apps/Appointments/index'));
@@ -138,9 +134,6 @@ const LogoutModel = React.lazy(() => import('../components/LogoutModel'));
 // const Ratings = React.lazy(() => import('../pages/uikit/Ratings'));
 
 // icons
-const Dripicons = React.lazy(() => import('../pages/icons/Dripicons'));
-const MDIIcons = React.lazy(() => import('../pages/icons/MDIIcons'));
-const Unicons = React.lazy(() => import('../pages/icons/Unicons'));
 
 // forms
 // const BasicForms = React.lazy(() => import('../pages/forms/Basic'));

@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import PageTitle from '../../../components/PageTitle'
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap'
-import { FormInput } from '../../../components'
+import { Button, Card, Col, Row, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Paginations from '../../../helpers/Paginations'
@@ -10,7 +8,6 @@ import { getSubscriptionsAction } from '../../../redux/subscriptions/actions'
 import AddSubscriptions from './Addsubscriptions'
 const Subscriptions = () => {
     const [skip, setSkip] = useState(1);
-    const [search, setSearch] = useState('');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [showModal, setShowModal] = useState(false);

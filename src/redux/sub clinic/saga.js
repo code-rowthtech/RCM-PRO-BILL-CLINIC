@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SubClinicsActionTypes } from './constants';
 import { createSubClinicApi, createUpgradeApi, getSubClinicApi, getSubClinicTypeApi, getSubscriptionApi, updateSubClinicApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';

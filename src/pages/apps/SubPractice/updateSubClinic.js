@@ -1,37 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from 'react-icons/fi';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Card, Col, Form,  Modal, Row, Spinner } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { FiDownloadCloud,  FiEye } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
-import us from '../../../assets/images/flags/us.jpg';
 import { updateSubClinicAction } from '../../../redux/sub clinic/actions';
-import ResetPassword from './ResetPassword';
-import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
+import { CiCircleMinus } from 'react-icons/ci';
 
 import {
     getCities2Action,
     getCitiesAction,
     getClinicAction,
     getClinicTypeAction,
-    getDoctorsrolesAction,
     getStatesByCountryAction,
 } from '../../../redux/actions';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
-import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked, MdVerified } from 'react-icons/md';
+import { MdVerified } from 'react-icons/md';
 import { stateEmptydAction } from '../../../redux/clinics/actions';
-import ChangePasswordModal from '../../../components/ChangePasswordModal';
 import EmailToDoctorModal from './EmailToSubClinicModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
-    const location = useLocation();
     const idUpdateDataSubClinics = searchParams.get('id');
     const clinicId = searchParams.get('clinicId');
-    const [show, setShow] = useState(false);
-    // const [passShow, setPassShow] = useState(false);
     const logoFileInputRef = useRef(null);
     const [logo, setLogo] = useState(null);
     const [logoName, setLogoName] = useState('');
@@ -73,13 +66,10 @@ const SubUpdateClinic = () => {
     const [stateDetails, setStateDetails] = useState([{ name: '', number: '', url: null, fileName: '' }]);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const accreditationFileInputRef = useRef([]);
     const [taxonomyCodes, setTaxonomyCodes] = useState(['']);
-    const [usePrimaryAsMailing, setUsePrimaryAsMailing] = useState(false);
     const store = useSelector((state) => state);
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
-    const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
@@ -88,14 +78,11 @@ const SubUpdateClinic = () => {
     }, [subClinicsDetailsGet]);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
-    const statecode = statesData?.states?.state_code;
-    const createLoading = store?.createSubClinicsReducer?.loading;
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const updateSuccess = store?.updateSubClinicReducer?.data?.status;
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null);
     const [focused, setFocused] = useState(false);
-    const [focused2, setFocused2] = useState(false);
     const [latitude, setLatitude] = useState('');
     const [latitude1, setLatitude1] = useState(null);
     const [longitude, setLongitude] = useState('');

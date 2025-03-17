@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Form, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, Col, Dropdown, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import classNames from 'classnames';
 import { FaUserCircle } from 'react-icons/fa';
@@ -29,17 +29,9 @@ type ProfileDropdownState = {
 
 const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownState): React$Element<any> => {
     const {
-        register,
         handleSubmit,
-        formState: { errors },
-        reset,
-        watch,
-        setValue,
-        getValues,
-        setError,
-        clearErrors
+        // formState: { errors },
     } = useForm();
-    const profilePic = props.profilePic || null;
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [show, setShow] = useState(false);
     const dispatch = useDispatch();
@@ -89,7 +81,6 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
         }
     };
     const onSubmit = () => {
-        const otpString = otp.join('');
     }
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>

@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SettingsActionTypes } from './constants';
 import { createMastersDataApi, getDepartmentDataApi, getMastersDataApi, updateMastersDataApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -152,7 +152,7 @@ function* updateMastersDataFunction(data) {
 }
 
 export function* callStateEmpty() {
-    put({
+   yield put({
         type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });

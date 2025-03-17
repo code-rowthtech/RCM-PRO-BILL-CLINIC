@@ -1,7 +1,4 @@
-import React, { useState, useEffect } from 'react';
 import { Store } from 'react-notifications-component';
-
-
 
 const ToastHandle = (message, type) => {
     Store.addNotification({

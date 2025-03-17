@@ -1,14 +1,8 @@
 // @flow
 import React from 'react';
-import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import {  Card, Col,  Row, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
-import { patientsData } from '../Appointments/data';
-import { GrDocumentText } from 'react-icons/gr';
-import Dropdown from 'react-bootstrap/Dropdown';
-import { FiFileText, FiFilter } from 'react-icons/fi';
 
 // Define the types for each order item
 type OrderListItems = {

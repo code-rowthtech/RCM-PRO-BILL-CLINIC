@@ -7,7 +7,7 @@ import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissi
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer, viewPasswordReducer } from './roles/reducers';
 import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, getDepartmentDataReducer } from './settings/reducers';
 import {
-    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer,
+    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer, changeEmailReducer
 } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer } from './doctors/reducers';
