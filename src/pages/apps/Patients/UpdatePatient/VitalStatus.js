@@ -7,7 +7,6 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 
 const VitalStatus = ({ patientId }) => {
-    console.log({patientId})
     const [yesterdayVitals, setYesterdayVitals] = useState({});
     const [todayVitals, setTodayVitals] = useState({ weight: '', height: '', bmi: '', smoking_status: '' });
     const [todayDate, setTodayDate] = useState(new Date());
@@ -65,7 +64,6 @@ const VitalStatus = ({ patientId }) => {
     };
 
     const handleSubmit = () => {
-        // console.log(todayVitals);
 
         const payload = {
             patientId: patientId,

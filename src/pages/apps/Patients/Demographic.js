@@ -67,17 +67,16 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const statesData = store?.getStatesReducer?.data;
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const employerState = watch('employerStateName');
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (employerState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
-            dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
-        }
-    }, [employerState]);
+    // useEffect(() => {
+    //     if (employerStateName) {
+    //         const stateCity = statesData?.states?.find((data) => data?.state_code === employerStateName)?.id;
+    //         dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
+    //     }
+    // }, [employerStateName]);
     useEffect(() => {
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
@@ -216,7 +215,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             identifier: finalIdentifiers,
             address: demographicAddresses,
         };
-        console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {
@@ -257,7 +255,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             if (data) {
                 setSearchedEmployerLocations(data?.results);
             } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -310,7 +307,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -404,7 +400,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     formattedEthnicityOptions.find((option) => option?.value?.display === eth) || null
                                 } // Show selected value
                                 onChange={handleEthnicityChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -453,7 +448,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 placeholder="&nbsp; Select "
                                 value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
                                 onChange={handleTribalChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -578,7 +572,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 placeholder="&nbsp; Select "
                                 value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 onChange={handleRelationChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,

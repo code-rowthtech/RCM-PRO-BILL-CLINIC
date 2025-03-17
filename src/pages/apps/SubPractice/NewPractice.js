@@ -87,9 +87,7 @@ const NewPractice = () => {
     const citiesData = [store?.getSubClinicCityReducer];
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
-    console.log(clinic_MainId, 'clinic_MainId');
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log({ clinicsDataGet });
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
@@ -169,7 +167,6 @@ const NewPractice = () => {
             if (data) {
                 setSearchedLocations2(data?.results);
             } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -502,7 +499,6 @@ const NewPractice = () => {
         };
 
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
-        console.log({ newPayload });
     };
 
     useEffect(() => {

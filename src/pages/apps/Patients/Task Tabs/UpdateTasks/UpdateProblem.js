@@ -13,7 +13,6 @@ import { useSearchParams } from 'react-router-dom';
 import Spinner from '../../../../../constants/Spinner';
 
 const UpdateProblem = ({ onCancel, problem }) => {
-    console.log(problem, 'problemproblemproblem');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const [showDropdown, setShowDropdown] = useState(false);
@@ -34,7 +33,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
     const updateStatus = store?.updateProblemListReducer?.data?.status;
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
 
-    console.log(problemDetails, 'ProblemDetails');
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -116,7 +114,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
         };
 
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'Final Payload');
     };
     useEffect(() => {
         if (updateStatus === 200) {

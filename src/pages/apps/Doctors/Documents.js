@@ -57,7 +57,6 @@ const Documents = () => {
         licenseExpirationDate: data?.expiryDate,
       }],
     }
-    console.log(payload);
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     // Proceed with form submission logic
   };

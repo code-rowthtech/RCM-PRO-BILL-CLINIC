@@ -48,7 +48,6 @@ const FilterDropdown = () => {
         };
         dispatch(getTaskAction(data));
         setShowFilterDropdown(false);
-        console.log(data, 'Filter Data');
     };
 
     // Close dropdown if clicking outside

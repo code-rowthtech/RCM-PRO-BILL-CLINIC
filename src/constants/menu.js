@@ -1,7 +1,3 @@
-import { Children } from "react";
-import { IoMdLogOut } from "react-icons/io";
-
-
 const MENU_ITEMS = [
     // { key: 'navigation', label: 'Navigation', isTitle: true },
     {

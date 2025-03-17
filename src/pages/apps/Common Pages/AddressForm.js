@@ -14,9 +14,7 @@ const AddressForm = ({addresses,setAddresses}) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesData');
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log(addresses, 'addressessssssssssssssssss');
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,
@@ -72,15 +70,30 @@ const AddressForm = ({addresses,setAddresses}) => {
         });
     };
 
+    // const handleAddressChange = (index, field, value) => {
+    //     const updatedAddresses = [...addresses];
+    //     if (field === 'line') {
+    //         updatedAddresses[index].line[0] = value; // update street address
+    //     } else {
+    //         updatedAddresses[index][field] = value;
+    //     }
+    //     setAddresses(updatedAddresses);
+    // };
+
     const handleAddressChange = (index, field, value) => {
-        const updatedAddresses = [...addresses];
-        if (field === 'line') {
-            updatedAddresses[index].line[0] = value; // update street address
-        } else {
-            updatedAddresses[index][field] = value;
-        }
-        setAddresses(updatedAddresses);
+        setAddresses((prev) => {
+            const updated = [...prev];
+            if (field === 'line') {
+                updated[index].line[0] = value;
+            } else {
+                updated[index][field] = value;
+            }
+            // Sync with react-hook-form's setValue
+            setValue(`address[${index}].${field}`, value);
+            return updated;
+        });
     };
+    
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted);
@@ -209,7 +222,8 @@ const AddressForm = ({addresses,setAddresses}) => {
                                             // const components = data.components || {};
                                             // Build the new address object with auto-populated fields
                                             const newAddress = {
-                                                use: item.use, // preserve existing use
+                                                type:item?.type,
+                                                use: item?.use, // preserve existing use
                                                 line: [data?.formatted ? data?.formatted : ''],
                                                 city:
                                                     data?.components.city ||
@@ -224,7 +238,6 @@ const AddressForm = ({addresses,setAddresses}) => {
                                             };
                                             // Update the specific address entry
                                             const updatedAddresses = [...addresses];
-                                            console.log(updatedAddresses, 'updatedAddresses11');
                                             updatedAddresses[index] = newAddress;
                                             setAddresses(updatedAddresses);
                                             // Clear suggestions and remove focus
@@ -261,13 +274,17 @@ const AddressForm = ({addresses,setAddresses}) => {
                     <Col sm={3} className="mb-2">
                         <Form.Label className="mb-1">City</Form.Label>
                         <Form.Select
+                        value={item?.city}
                             data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
+                            onChange={(e) => {
+                                handleAddressChange(index, 'city', e.target.value);
+                            }}
                         >
                             <option value="">{store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}</option>
                             {cities1?.map((data) => (
-                                <option selected={data?.name == addresses[0]?.city} key={data?.name} value={data?._id}>
+                                <option  key={data?.name} value={data?.name}>
                                     {data?.name}
                                 </option>
                             ))}

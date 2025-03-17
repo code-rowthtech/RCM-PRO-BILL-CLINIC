@@ -23,12 +23,9 @@ const AddProblem = ({ onCancel }) => {
     const [filteredICDCodes, setFilteredICDCodes] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    console.log(allCodeICDs, 'iccccd');
     const patientAppointmentproblem = store?.getPatientAppointmentReducer?.data?.appointments || [];
-    console.log(store?.getPatientAppointmentReducer, 'patientAppointmentproblem');
     const responseStatus = store?.createProblemListReducer?.data?.status;
     const [selectedAppointment, setSelectedAppointment] = useState('');
-    console.log(responseStatus, 'responses');
 
     const {
         register,
@@ -89,7 +86,6 @@ const AddProblem = ({ onCancel }) => {
         };
 
         dispatch(createProblemListAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     // **Handle success response (status 201)**

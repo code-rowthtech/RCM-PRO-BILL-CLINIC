@@ -2,6 +2,7 @@ body {
     font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen',
         'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
+
 .cursor-pointer {
     cursor: pointer !important;
 }
@@ -27,10 +28,12 @@ body {
     border: none !important;
     /* Remove border */
 }
+
 hr {
     color: #726e6e8a !important;
 
 }
+
 .headers {
     background-color: #010101 !important;
 }
@@ -42,6 +45,7 @@ hr {
 :root {
     overflow: hidden;
 }
+
 .custom-buttons {
     background-color: #6169d0 !important;
     border: none !important;
@@ -53,12 +57,14 @@ hr {
     align-items: center;
     justify-content: center;
 }
+
 .btn-height {
     height: 30px !important;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 .cancel-button {
     background-color: #5c636b !important;
     border: none !important;
@@ -84,38 +90,52 @@ hr {
     background-color: #6169d0;
     color: #ffffff;
 }
+
 .input_search_box {
     height: 30px;
 }
+
 .font_active_tabs {
     font-size: 14.4px;
 }
+
 .form_heading {
     font-size: 16px;
     font-weight: 700;
 }
+
 .custom-datepicker {
     height: 30px !important;
-    line-height: 30px; /* Ensures vertical alignment */
-    padding: 0 8px; /* Adds space inside the input */
-    font-size: 14px; /* Matches the font size of the Select component */
-    border: 1px solid #ced4da; /* Matches default input borders */
-    border-radius: 4px; /* Ensures consistent rounded corners */
-    width: 100%; /* Optional: Sets width to fit the parent container */
+    line-height: 30px;
+    /* Ensures vertical alignment */
+    padding: 0 8px;
+    /* Adds space inside the input */
+    font-size: 14px;
+    /* Matches the font size of the Select component */
+    border: 1px solid #ced4da;
+    /* Matches default input borders */
+    border-radius: 4px;
+    /* Ensures consistent rounded corners */
+    width: 100%;
+    /* Optional: Sets width to fit the parent container */
 }
+
 .active_tabs_link {
     border-bottom: 3px solid #727cf5;
     color: #727cf5;
 }
+
 select.form-control:not([size]):not([multiple]) {
     height: 30px;
 }
+
 .input-group-text {
     height: 30px;
 }
+
 .nav-underline .nav-link.active {
     border-bottom: 3px solid #727cf5 !important;
-    color: #727cf5 !important ;
+    color: #727cf5 !important;
 }
 
 .plusicon {
@@ -181,6 +201,7 @@ select.form-control:not([size]):not([multiple]) {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+
 .form-select {
     color: #0908084f !important;
     font-weight: 550 !important;
@@ -189,14 +210,17 @@ select.form-control:not([size]):not([multiple]) {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+
 .form-control:focus,
 .form-select:focus {
     color: black !important;
 }
+
 .form-control[data-has-value='true'],
 .form-select[data-has-value='true'] {
     color: black !important;
 }
+
 .custom-form-fields,
 .form-control::placeholder {
     color: #0908084f !important;
@@ -230,7 +254,7 @@ form textarea::placeholder {
     /* Ensure full visibility of placeholder */
 }
 
-.table > :not(caption) > * > * {
+.table> :not(caption)>*>* {
     padding: 0.35rem 0.55rem !important;
     font-size: 14px !important;
 }
@@ -249,11 +273,13 @@ form textarea::placeholder {
     font-size: 14px;
     /* Adjust font size if needed */
 }
+
 .css-13cymwt-control {
     border: none;
     max-height: 33px;
     height: 33px;
 }
+
 .custom-date-input-select {
     color: black !important;
     /* Set the input text color to black */
@@ -310,7 +336,7 @@ table {
     align-items: center;
     border: none !important;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 6px 8px;
     width: 100%;
     background-color: #e8f0fe !important;
 }
@@ -414,23 +440,28 @@ table {
     width: 13rem !important;
     padding: 0 0.5rem !important;
     border-radius: 3px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .schedule-table {
     box-shadow: none !important;
 }
+
 /* right side bar */
 .collapsed-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.patient-menu-item{
+
+.patient-menu-item {
     padding: 10px;
 }
+
 .patient-menu-item:hover {
-  background-color: #e9ecef;
- 
+    background-color: #e9ecef;
+
 }
 
 /* media query */
@@ -438,58 +469,74 @@ table {
     .custom-buttons {
         font-size: 9px;
     }
+
     .cancel-button {
         font-size: 10px;
         height: 30px;
     }
 }
+
 @media screen and (min-width: 320px) and (max-width: 720px) {
     .card {
         box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1) !important;
     }
+
     .card-body {
         padding: 0rem 0rem;
     }
+
     .form-label {
         font-size: 10px;
     }
+
     .font_active_tabs {
         font-size: 13px;
     }
+
     .custom-buttons {
         font-size: 10px;
     }
+
     .content-page {
         background-color: white !important;
     }
+
     .cancel-button {
         font-size: 10px;
         height: 30px;
     }
+
     .active_inactive_buttons {
         font-size: 10px;
         font-weight: 400;
         width: 78px;
         height: 30px;
     }
+
     .form-control::placeholder {
-        color: grey; /* Grey color for placeholders */
+        color: grey;
+        /* Grey color for placeholders */
         opacity: 1;
         font-size: 10px;
     }
+
     .form-control.form-control {
         font-size: 10px;
     }
+
     .form-control {
         padding: 8px !important;
     }
+
     .form_heading {
         font-size: 12px;
         font-weight: 700;
     }
+
     .input_search_box {
         height: 30px;
     }
+
     .react-datepicker__input-container input {
         height: 30px !important;
         width: 10rem !important;
@@ -497,6 +544,7 @@ table {
         border-radius: 3px;
         font-size: 10px;
     }
+
     .navbar-custom {
         margin-top: 0px !important;
         /* height: 100px!important; */
@@ -555,6 +603,7 @@ table {
 .content {
     margin-top: 65px !important;
 }
+
 .navbar-custom-top {
     background-color: #313a46 !important;
 }
@@ -568,13 +617,41 @@ table {
     align-items: center;
     text-align: center;
 }
+
 .custom-active .form-check-input {
     background-color: #6168d0 !important;
     border-color: white !important;
 }
-.offcanvas{
+
+.offcanvas {
     width: 35vw !important;
 }
 
+.css-c1flly-control {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
 
-  
+.css-1xc3v61-indicatorContainer {
+    padding-top: 0% !important;
+    padding-bottom: 0% !important;
+}
+
+.css-13cymwt-control {
+    min-height: 30px !important;
+    height: 30px !important;
+    border-style: none !important;
+}
+
+.css-hlgwow {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+.css-1k8uk7m-control {
+    font-size: 12px !important;
+}
+.css-15plnj5-control {
+    font-size: 12px !important;
+
+}

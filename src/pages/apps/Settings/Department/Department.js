@@ -56,10 +56,8 @@ const Department = () => {
     };
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("Updated", payload);
     } else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("create", payload);
 
     }
 

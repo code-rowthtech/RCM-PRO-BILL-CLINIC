@@ -16,7 +16,6 @@ const AddHoliday = () => {
     const [status, setStatus] = useState(true);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    // console.log({ selectedDoctor })
     const addResponse = store?.createScheduleReducer?.data?.response?.status;
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const doctorOptions = doctorDetails?.map((data) => ({
@@ -56,7 +55,6 @@ const AddHoliday = () => {
             // name: selectedDoctor?.label,
             reason: data?.reason,
         };
-        // console.log({ payload })
         dispatch(createScheduleAction({ key: encryptMessage(payload) }));
     };
 

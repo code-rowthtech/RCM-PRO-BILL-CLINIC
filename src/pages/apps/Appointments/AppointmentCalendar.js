@@ -21,15 +21,12 @@ const AppointmentCalendar = () => {
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [show, setShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null)
-    console.log({ selectedEvent })
-
     useEffect(() => {
         dispatch(getAppointmentsAction({ clinicId: clinicId }));
     }, [dispatch, clinicId]);
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList.map((data) => {
-                console.log({ data })
                 try {
                     // Parse the date string into a base Date object
                     const baseDate = new Date(data.date);

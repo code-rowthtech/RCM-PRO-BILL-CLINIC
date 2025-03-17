@@ -18,7 +18,6 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
     const id = searchParams.get('id');
     const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
     const primaryInsurance = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === 'Primary Ins')
-    console.log({ primaryInsurance })
     useEffect(() => {
         if (id && insuranceByPatient) {
             setValue('insuredPersonIsPatient', primaryInsurance?.insuredPersonIsPatient);

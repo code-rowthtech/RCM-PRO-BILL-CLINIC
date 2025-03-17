@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordAction } from '../redux/actions';
 import { decryptMessage, encryptMessage } from '../cryptoUtils';
-import ToastHandle from '../helpers/ToastMessage';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
   const dispatch = useDispatch();

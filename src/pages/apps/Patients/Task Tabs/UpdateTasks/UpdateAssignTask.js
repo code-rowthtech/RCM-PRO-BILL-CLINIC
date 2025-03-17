@@ -39,10 +39,8 @@ const UpdateAsignTask = ({ taskId }) => {
     const [profileUploading, setProfileUploading] = useState(false);
     const logoFileInputRef = useRef(null);
     // const taskDataById = store?.updateTaskReducer || [];
-    // console.log(taskDataById, 'taskDataById');
 
     const taskDetails = store?.getTaskDetailsReducer?.data?.task;
-    console.log(taskDetails, 'taskDetails');
     const employees = store?.getClinicEmployeesReducer?.data?.result;
 
     useEffect(() => {
@@ -132,7 +130,6 @@ const UpdateAsignTask = ({ taskId }) => {
 
         dispatch(updateTaskAction({ key: encryptMessage(payload) }));
         // reset();
-        console.log(payload, 'Final Payload');
     };
 
     return (

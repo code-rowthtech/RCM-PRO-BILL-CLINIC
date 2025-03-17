@@ -114,7 +114,6 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
             department: data.department,
             role: data.role,
         };
-        console.log('Form Data:', payload);
 
 
         dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));

@@ -20,7 +20,6 @@ export const handleUpload = async (file, setLoading) => {
         // Extract the URL
         let url = decryptMessage(response.data?.data);
         url = JSON.parse(url);
-        // console.log(url?.url, "url?.url");
         // if (!url) {
         //     console.error('No URL returned in response data:', response.data);
         //     return null;
@@ -28,7 +27,6 @@ export const handleUpload = async (file, setLoading) => {
 
         // if (url && typeof url === 'string') {
         //     const directUrl = url.split('?')[0];  // Safe to call split() after checking if url is defined
-        //     console.log(directUrl);
         // } else {
         //     console.error('URL is undefined or not a valid string');
         // }
@@ -42,14 +40,13 @@ export const handleUpload = async (file, setLoading) => {
         //         'Content-Type': file.type,
         //     },
         // });
-        const uploadResponse = await fetch(url?.url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': file.type,
-            },
-            body: file,
-        });
-        console.log(uploadResponse, "uploadResponse");
+        // const uploadResponse = await fetch(url?.url, {
+        //     method: 'PUT',
+        //     headers: {
+        //         'Content-Type': file.type,
+        //     },
+        //     body: file,
+        // });
         // if (uploadResponse.status === 200) {
         //     return url; // Ensure this line returns the URL correctly
         // } else {

@@ -85,7 +85,6 @@ const AddAsignTask = () => {
 
         dispatch(createTaskAction({ key: encryptMessage(payload) }));
         reset();
-        console.log(payload, 'Final Payload');
     };
 
     return (

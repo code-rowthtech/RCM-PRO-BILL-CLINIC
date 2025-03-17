@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SettingsActionTypes } from './constants';
 import { createMastersDataApi, getDepartmentDataApi, getMastersDataApi, updateMastersDataApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -73,9 +73,7 @@ function* getMastersData2Function(data) {
             payload: {},
         });
         const response = yield call(getMastersDataApi, data);
-        console.log(response,'responseresponseresponseresponseresponse')
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'responseresponseresponseresponseresponse')
 
 
         if (response.status === 200) {
@@ -154,7 +152,7 @@ function* updateMastersDataFunction(data) {
 }
 
 export function* callStateEmpty() {
-    put({
+   yield put({
         type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });

@@ -24,8 +24,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const patientId = searchParams.get('id');
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
     const updateAllergyStatus = store?.updateAllergyReducer?.data?.status;
-    console.log(updateAllergyStatus,'updateAllergyStatus')
-    console.log(allergyDetails, 'Allergy Details');
 
     useEffect(() => {
         setValue('allergyType', allergyDetails?.allergyType);
@@ -50,7 +48,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         };
 
         dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'Update Payload');
     };
 
     useEffect(() => {

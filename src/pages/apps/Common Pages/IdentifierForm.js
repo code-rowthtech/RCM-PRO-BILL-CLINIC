@@ -4,6 +4,7 @@ import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 
 const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, identifiers }) => {
     const {
@@ -17,10 +18,11 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setError,
         clearErrors,
     } = useForm();
-   
+const store=useSelector((state)=>state);   
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
 
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
@@ -106,6 +108,11 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
             console.error('Error during file upload:', error);
         }
     };
+    useEffect(()=>{
+if(doctorDetails){
+    setIdentifiers(doctorDetails?.identifier)
+}
+    },[doctorDetails])
     return (
         <>
             <Row>

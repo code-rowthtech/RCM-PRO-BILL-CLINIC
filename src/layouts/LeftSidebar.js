@@ -1,29 +1,21 @@
 // @flow
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
-import classNames from 'classnames';
 
 import { getMenuItems } from '../helpers/menu';
-import { BiSearch } from "react-icons/bi";
 
 // components
 import AppMenu from './Menu';
 
 // images
-import logoSm from '../assets/images/logo_sm.png';
-import logoDark from '../assets/images/logo-dark.png';
-import logoDarkSm from '../assets/images/logo_sm_dark.png';
-import logo from '../assets/images/logo.png';
-import helpBoxImage from '../assets/images/help-icon.svg';
 import profileImg from '../assets/images/users/avatar-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDoctorsAction, getPatientsAction, getPatientsByAppointmentAction } from '../redux/actions';
+import { getDoctorsAction, getPatientsByAppointmentAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
-import { FormInput } from '../components';
 import Spinner from '../constants/Spinner';
-import { Button, Col, Dropdown, Modal, Row } from 'react-bootstrap';
-import { IoMdAdd, IoMdClose } from 'react-icons/io';
+import { Button, Col,  Row } from 'react-bootstrap';
+import { IoMdAdd } from 'react-icons/io';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -56,7 +48,7 @@ type LeftSidebarProps = {
     isCondensed: boolean,
 };
 
-const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
+const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
@@ -64,14 +56,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
     const [search, setSearch] = useState('');
-    const [skip, setSkip] = useState(1);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState('Today')
-    const [filter, setFilter] = useState(false);
+    // const [filter, setFilter] = useState(false);
     const [doctorSearch, setDoctorSearch] = useState('')
 
-    const id = searchParams.get('id');
     /**
      * Handle the click anywhere in doc
      */
@@ -108,9 +98,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
         setShowFilterDropDown(!showFilterDropDown);
     };
 
-
-
-
     useEffect(() => {
         if (location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' || createPatientsResponse === 201) {
             const payload = {
@@ -128,7 +115,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
     }, [dispatch, doctorSearch])
 
     const closeModal = () => {
-        setFilter(false);
+        // setFilter(false);
     }
 
     useEffect(() => {
@@ -324,56 +311,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                             </li>
                                         ))
                                 }
-                                {/* <Modal centered size="lg" show={filter} onHide={closeModal}>
-                                    <Modal.Body className="p-4">
-
-                                        <Row className="border-bottom pb-2 ">
-                                            <Col sm={12} className="text-end">
-                                                <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
-                                            </Col>
-                                            <Col sm={12}>
-                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
-                                            </Col>
-
-                                        </Row>
-
-                                        <Row className="">
-                                            <Col md={4} className="border-end">
-                                                <ul className="list-unstyled ps-3">
-                                                    <li
-                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => setActiveFilter("Doctors")}
-                                                    >
-                                                        Doctors
-                                                    </li>
-                                                    <li
-                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => {
-                                                            setActiveFilter("Appointments");
-                                                            setDoctorSearch('')
-                                                        }}
-                                                    >
-                                                        Appointments
-                                                    </li>
-                                                </ul>
-                                            </Col>
-
-                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
-                                        </Row>
-
-                                        <Row className=" border-top">
-                                            <Col className="d-flex mt-3 justify-content-end">
-                                                <Button variant="primary" className='custom-buttons' onClick={() => {
-                                                    getAppointments()
-                                                }}>
-                                                    Apply
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Modal.Body>
-                                </Modal> */}
+                                
                                 {showFilterDropDown && (
                                     <div
                                         ref={filterDropdownRef}
@@ -472,56 +410,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideLogo, hideUserProfile }: LeftSi
                                             </li>
                                         ))
                                 }
-                                {/* <Modal centered size="lg" show={filter} onHide={closeModal}>
-                                    <Modal.Body className="p-4">
-
-                                        <Row className="border-bottom pb-2 ">
-                                            <Col sm={12} className="text-end">
-                                                <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
-                                            </Col>
-                                            <Col sm={12}>
-                                                <h4 className="mb-0 text-center fw-bold">Filter Patients</h4>
-                                            </Col>
-
-                                        </Row>
-
-                                        <Row className="">
-                                            <Col md={4} className="border-end">
-                                                <ul className="list-unstyled ps-3">
-                                                    <li
-                                                        className={`py-2 fw-bold ${activeFilter === "Doctors" ? "text-primary" : "text-dark"}`}
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => setActiveFilter("Doctors")}
-                                                    >
-                                                        Doctors
-                                                    </li>
-                                                    <li
-                                                        className={`py-2 fw-bold ${activeFilter === "Appointments" ? "text-primary" : "text-dark"}`}
-                                                        style={{ cursor: "pointer" }}
-                                                        onClick={() => {
-                                                            setActiveFilter("Appointments");
-                                                            setDoctorSearch('')
-                                                        }}
-                                                    >
-                                                        Appointments
-                                                    </li>
-                                                </ul>
-                                            </Col>
-
-                                            <Col md={8} className='pt-2' >{renderFilterList()}</Col>
-                                        </Row>
-
-                                        <Row className=" border-top">
-                                            <Col className="d-flex mt-3 justify-content-end">
-                                                <Button variant="primary" className='custom-buttons' onClick={() => {
-                                                    getAppointments()
-                                                }}>
-                                                    Apply
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Modal.Body>
-                                </Modal> */}
+                                
                                 {showFilterDropDown && (
                                     <div
                                         ref={filterDropdownRef}

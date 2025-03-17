@@ -56,7 +56,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
             title: data?.title,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'ResponsiblePartypayload');
     };
     useEffect(() => {
         if (createResponse === 201) {
@@ -82,7 +81,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         label: relation.display, // Display text as the label
     }));
     const handleRelationChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
     return (
@@ -153,7 +151,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                     classNamePrefix="select"
                                     placeholder="&nbsp; Select "
                                     onChange={handleRelationChange}
-                                    onMenuOpen={() => console.log('Dropdown Opened')}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
@@ -546,7 +543,6 @@ export default Responsiblle;
 //                                                             <p
 //                                                                 key={suggestionIndex}
 //                                                                 onClick={() => {
-//                                                                     console.log(data, 'data12456');
 //                                                                     // Extract the necessary fields from the API response
 //                                                                     // const formatted = data.formatted || '';
 //                                                                     // const components = data.components || {};
@@ -567,7 +563,6 @@ export default Responsiblle;
 //                                                                     };
 //                                                                     // Update the specific address entry
 //                                                                     const updatedAddresses = [...addresses];
-//                                                                     console.log(updatedAddresses, 'updatedAddresses11');
 //                                                                     updatedAddresses[index] = newAddress;
 //                                                                     setAddresses(updatedAddresses);
 //                                                                     // Clear suggestions and remove focus

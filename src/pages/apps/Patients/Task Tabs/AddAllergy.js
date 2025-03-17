@@ -37,7 +37,6 @@ const AddAllergy = ({ onCancel }) => {
         };
 
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'Allergy created');
     };
 
     useEffect(() => {

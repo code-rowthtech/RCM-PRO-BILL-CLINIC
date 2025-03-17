@@ -42,7 +42,6 @@ const ResetPassword = (): React$Element<any> => {
         // Get the current URL
         const url = window.location.href;
         const tokenFromUrl = url.split('/').pop(); // Gets the last segment of the URL
-        // console.log({ tokenFromUrl })
         setToken(tokenFromUrl);
         dispatch(verifyToken({ token: tokenFromUrl }));
 

@@ -11,7 +11,6 @@ import us from '../../../assets/images/flags/us.jpg'
 import { useSearchParams } from 'react-router-dom';
 
 const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, setUpdateDepartmentModal }) => {
-    console.log({ currentUser });
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -28,7 +27,6 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
 
     const roleDataLoading = store?.getRolesDataReducer?.loading;
     const [showPassword, setShowPassword] = useState(false);
-    console.log({ reportingTo })
     const { register, reset, setValue, watch, handleSubmit, formState: { errors }, getValues } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -98,7 +96,6 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
             department: data.department,
         };
 
-        console.log('edit', payload);
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
         getValues('');
         reset();
