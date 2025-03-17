@@ -127,7 +127,7 @@ const NewDoctor = () => {
             setValue('dateOfBirth', formattedDateOfBirth);
         }
         console.log(doctorDetails?.address, 'addresssss')
-    }, [doctorDetails, setValue, cities1])
+    }, [doctorDetails, setValue])
     useEffect(() => {
         if (doctorDetails && updateId && statesData) {
             const state = statesData?.states?.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id

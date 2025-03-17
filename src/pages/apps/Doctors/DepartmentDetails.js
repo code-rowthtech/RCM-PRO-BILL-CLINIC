@@ -199,15 +199,31 @@ const DepartmentDetails = ({ docId }) => {
   //   setValue('degreeName', selectedOption ? selectedOption.display : '');
   // };
   const onsubmit = (data) => {
-    const datta = qualifications?.map((item) => ({
+    const qualificationData = qualifications?.map((item) => ({
       code: item?.degreeName,
       documents: item?.degreeFile,
       issuer: item?.issuerOrganisation,
     }))
-    console.log(datta, 'dattaaa')
+    console.log(identifiers, 'identifiers123456');
+    let finalIdentifiersData = [];
+    if(identifiers){
+      identifiers.forEach((element)=>{
+        let data = {
+          identifierType: element?.type?.label,
+          sliceName: element?.type?.code,
+          system: element?.type?.value,
+          value: element?.number,
+          status: 'active',
+          issuingAuthority: element?.issuingAuthority,
+          expirationDate: element?.expiry,
+          documents: [element?.file]
+        };
+        finalIdentifiersData.push(data);
+      })
+    }
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
-      identifier: identifiers,
+      identifier: finalIdentifiersData,
       // qualification: [{
       //   // identifier: [{
       //   //   use: "", // Example: "official", "usual", etc.
@@ -236,28 +252,32 @@ const DepartmentDetails = ({ docId }) => {
       //     fileName: degreeName,
       //   }] // Degree file name(s)
       // }]
-      qualification: datta,
-      specialities: data?.specialist,
+      qualification: qualificationData,
+      specialties: [data?.specialist],
 
     }
     console.log(payload, 'payload')
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
-
-  useEffect(() => {
-    if (doctorDetails && updateId) {
-      setValue('degreeName', doctorDetails?.degree?.[0]?.name);
-      setValue('specialist', doctorDetails?.specialities?.[0]);
-      if (doctorDetails?.identifier) {
-        setIdentifiers(doctorDetails?.identifier);
-    }
-    if (doctorDetails?.qualification) {
-      setQualifications(doctorDetails?.qualification
-      );
+console.log(qualifications,'qualifications')
+useEffect(() => {
+  if (doctorDetails && updateId) {
+    // Set qualifications data
+    const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
+      id: index + 1,
+      degreeName: {
+        code:item?.code?.code,
+        display:item?.code?.display,
+        definition:item?.code?.display,
+        system:item?.code?.system
+      },
+      specialist:item?.specialties?.[0] || 'N/A',
+      degreeFile: item?.documents?.[0] || null, // Use the first document if available
+      issuerOrganisation: item?.issuer?.reference || '', // Use the issuer reference if available
+    }));
+    setQualifications(updatedQualifications);
   }
-
-    }
-  }, [doctorDetails, setValue])
+}, [doctorDetails, setValue, updateId]);
 
   useEffect(() => {
     dispatch(
@@ -320,6 +340,7 @@ const DepartmentDetails = ({ docId }) => {
                               className="basic-single"
                               classNamePrefix="select"
                               placeholder="&nbsp; Select "
+                              value={QualificationOptions.find(option => option.value === qualification?.degreeName?.code)}
                               onChange={(selectedOption) =>
                                 handleQualificationChange(index, 'degreeName', selectedOption) // Access the full object from 'data'
                               }
