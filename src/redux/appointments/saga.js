@@ -145,6 +145,7 @@ function* getAppointmentsFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: AppointmentActionTypes.GET_APPOINTMENT_ERROR,
             payload: error,
@@ -182,7 +183,13 @@ function* getAppointmentByIdFunction(data) {
 }
 
 
+export function* callResetUpdate() {
+    put({
+        type: AppointmentActionTypes.RESET_UPDATE_STATUS,
+        payload: {},
+    });
 
+}
 
 export function* watchCreateAppointment() {
     yield takeEvery(AppointmentActionTypes.CREATE_APPOINTMENT, createAppointmentFunction);

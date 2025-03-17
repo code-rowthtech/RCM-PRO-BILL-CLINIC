@@ -1,0 +1,145 @@
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Link, useSearchParams } from 'react-router-dom';
+import { FiEdit, FiPlus } from 'react-icons/fi';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { MdDeleteOutline } from 'react-icons/md';
+import { FaEye } from 'react-icons/fa';
+import AddProblem from './AddProblem';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    deleteProblemListAction,
+    getProblemDetailsAction,
+    getProblemListAction,
+} from '../../../../redux/ProblemList/action';
+import Spinner from '../../../../constants/Spinner';
+import UpdateProblem from './UpdateTasks/UpdateProblem';
+
+const ProblemList = () => {
+    const dispatch = useDispatch();
+    const [showAddProblem, setShowAddProblem] = useState(false);
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const [showUpdateProblem, setShowUpdateProblem] = useState(false);
+    const [selectedProblem, setSelectedProblem] = useState(null);
+    const store = useSelector((state) => state);
+    const problemList = store?.getProblemListReducer?.data?.problems;
+    const isLoading = store?.getProblemListReducer?.loading;
+
+    useEffect(() => {
+        if (patientId) {
+            dispatch(getProblemListAction({ patientId }));
+        }
+    }, [dispatch, patientId]);
+    const handleEditClick = (problem) => {
+        setSelectedProblem(problem);
+        setShowUpdateProblem(true);
+    };
+    // delete function
+    // const handleDelete = (data) =>{
+    //     console.log({data})
+    //     dispatch(deleteProblemListAction({id:data?._id} ));
+    // }
+    return (
+        <div>
+            {showAddProblem ? (
+                <AddProblem onCancel={() => setShowAddProblem(false)} />
+            ) : showUpdateProblem ? (
+                <UpdateProblem problem={selectedProblem} onCancel={() => setShowUpdateProblem(false)} />
+            ) : (
+                <Row>
+                    <Col sm={12} className="d-flex justify-content-between">
+                        <h4>Active Problem</h4>
+                        <div className="d-flex gap-2">
+                            <p className="mb-0 mt-1">
+                                <input className="form-check-input bg-primary me-1" type="checkbox" />
+                                Show Inactive Problem
+                            </p>
+                            <p className="mb-0 mt-1">
+                                <input className="form-check-input bg-primary me-1" type="checkbox" />
+                                Patient has no known active problem
+                            </p>
+                            <Button className="custom-buttons text-nowrap" onClick={() => setShowAddProblem(true)}>
+                                <FiPlus className="fs-5 text-white" />
+                                &nbsp; Problem
+                            </Button>
+                        </div>
+                    </Col>
+                    <Col sm={12}>
+                        <Table responsive className="table-centered table-nowrap mb-0">
+                            <thead className="text-white bg-dark">
+                                <tr>
+                                    <th className="text-white">Problem</th>
+                                    <th className="text-white">Codes</th>
+                                    <th className="text-white">ICD-CM Code</th>
+                                    <th className="text-white">Snomed</th>
+                                    <th className="text-white">Diagnosed Date</th>
+                                    <th className="text-white">Date Changed</th>
+                                    <th className="text-white">Status</th>
+                                    <th className="text-white">Notes</th>
+                                    <th className="text-white">Updates</th>
+                                    <th className="text-white">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <tr>
+                                        <td className="text-center" colSpan={10}>
+                                            <Spinner className="my-5" />
+                                        </td>
+                                    </tr>
+                                ) : problemList?.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={10} className="text-center">
+                                            <h3 className="my-5">No Problems Found!</h3>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    problemList?.map((data, index) => (
+                                        <tr key={data.id || index}>
+                                            <td>{data.problem || 'N/A'}</td>
+                                            <td>{data.icdCode || 'N/A'}</td>
+                                            <td>{data.icdVersion || 'N/A'}</td>
+                                            <td>{data.snomed || 'N/A'}</td>
+                                            <td>{new Date(data.datetimeChanged).toLocaleDateString('en-GB')}</td>
+                                            <td>{data.dateChanged || 'N/A'}</td>
+                                            <td>{data.status || 'N/A'}</td>
+                                            <td>
+                                                <FaEye className="fs-4 ms-2 cursor-pointer text-black" />
+                                            </td>
+                                            <td>{data.updates || 'N/A'}</td>
+                                            <td>
+                                                <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
+                                                &nbsp;
+                                                <FiEdit
+                                                    className="fs-4 cursor-pointer text-black"
+                                                    onClick={() => {
+                                                        handleEditClick(data);
+                                                        const requestData = {
+                                                            id: data?._id,
+                                                        };
+                                                        dispatch(getProblemDetailsAction(requestData));
+                                                    }}
+                                                />
+                                                &nbsp;
+                                             
+                                                  <MdDeleteOutline
+                                                    className="fs-4 cursor-pointer text-black"
+                                                    // onClick={() => {
+                                                    //     handleDelete(data);
+                                                    // }}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </Table>
+                    </Col>
+                </Row>
+            )}
+        </div>
+    );
+};
+
+export default ProblemList;

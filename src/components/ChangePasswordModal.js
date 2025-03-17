@@ -1,34 +1,61 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Row, Col, Form } from 'react-bootstrap';
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { confirmPasswordAction } from '../redux/actions';
-import { encryptMessage } from '../cryptoUtils';
+import { decryptMessage, encryptMessage } from '../cryptoUtils';
 import ToastHandle from '../helpers/ToastMessage';
-import { handleFirstSpace } from '../helpers/noSpace';
 
 const ChangePasswordModal = ({ show, closeModal }) => {
-  const store = useSelector((state) => state);
   const dispatch = useDispatch();
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm();
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    formState: { errors },
+    reset,
+    watch,
+  } = useForm();
+  const [passwordStrength, setPasswordStrength] = useState('');
 
   const newPassword = watch('newPassword');
   const oldPassword = watch('oldPassword');
-
+  const { loading, changeConfirmPasswordSuccess } = useSelector((state) => ({
+    loading: state.Auth.loading,
+    changeConfirmPasswordSuccess: state.Auth.changeConfirmPasswordSuccess,
+  }));
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const changeData = store?.Auth;
+
+  useEffect(() => {
+    if (changeConfirmPasswordSuccess?.data) {
+      try {
+        const decrypted = JSON.parse(decryptMessage(changeConfirmPasswordSuccess.data));
+        if (decrypted?.status === 200) {
+          closeModal();
+          reset();
+        }
+      } catch (error) {
+      }
+    }
+  }, [changeConfirmPasswordSuccess, closeModal, reset]);
 
   const changePasswordSubmit = async (data) => {
     const payload = { oldPassword: data.oldPassword, newPassword: data.newPassword };
     dispatch(confirmPasswordAction({ key: encryptMessage(payload) }));
-    closeModal();
-    reset();
   };
+  const strongRegex = /^[a-zA-Z\d!@#$%^&*]{8,16}$/;
 
+  const checkPasswordStrength = (password) => {
+    if (strongRegex.test(password)) {
+      setPasswordStrength("");
+    } else {
+      setPasswordStrength("Password is too weak. Please use a mix of uppercase, lowercase, numbers, and special characters.");
+    }
+  };
 
   return (
     <Modal centered size="md" show={show} onHide={closeModal}>
@@ -43,17 +70,15 @@ const ChangePasswordModal = ({ show, closeModal }) => {
           </Col>
         </Row>
         <Form onSubmit={handleSubmit(changePasswordSubmit)}>
-          {/* Old Password */}
           <Row>
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-3 w-100 position-relative">
+            {/* Old Password */}
+            <Col md={12}>
+              <Form.Group className="mb-3 position-relative">
                 <Form.Label>Old Password</Form.Label>
                 <Form.Control
                   type={showOldPassword ? 'text' : 'password'}
                   placeholder="Enter old password"
-                  {...register('oldPassword', {
-                    required: 'Old password is required',
-                  })}
+                  {...register('oldPassword', { required: 'Old password is required' })}
                   onCopy={(e) => e.preventDefault()}
                   onCut={(e) => e.preventDefault()}
                   onPaste={(e) => e.preventDefault()}
@@ -70,48 +95,62 @@ const ChangePasswordModal = ({ show, closeModal }) => {
             </Col>
 
             {/* New Password */}
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-3 w-100 position-relative">
+            <Col md={12}>
+              <Form.Group className="mb-3 position-relative">
                 <Form.Label>New Password</Form.Label>
                 <Form.Control
-                  type={showNewPassword ? 'text' : 'password'}
+                  type={showNewPassword ? "text" : "password"}
                   placeholder="Enter new password"
-                  {...register('newPassword', {
-                    required: 'New password is required',
-                    minLength: { value: 8, message: 'Password must be at least 8 characters long' },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                      message: 'Password must include uppercase, lowercase, number, and special character',
+                  {...register("newPassword", {
+                    validate: {
+                      isRequired: (value) =>
+                        value?.trim() !== "" || "Password is too weak. Please use a mix of uppercase, lowercase, numbers, and special characters",
+                      isDifferent: (value) =>
+                        value !== oldPassword ||
+                        "New password cannot be the same as the old password",
+                      isStrongEnough: (value) =>
+                        !value || strongRegex.test(value) ||
+                        "Password must include uppercase, lowercase, number, and special character",
                     },
-
-                    validate: value =>
-                      value !== oldPassword || 'New password cannot be the same as the old password',
                   })}
                   onCopy={(e) => e.preventDefault()}
                   onCut={(e) => e.preventDefault()}
                   onPaste={(e) => e.preventDefault()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    checkPasswordStrength(value); // Check strength on change
+                    trigger("newPassword"); // Revalidate newPassword
+                  }}
                 />
                 <span
                   className="position-absolute"
-                  style={{ top: '35px', right: '10px', cursor: 'pointer' }}
+                  style={{ top: "35px", right: "10px", cursor: "pointer" }}
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
-                {errors.newPassword && <span className="text-danger">{errors.newPassword.message}</span>}
+                {/* Display only one message at a time */}
+                {errors.newPassword && errors.newPassword.type === "isRequired" ? (
+                  <span className="text-danger">{errors.newPassword.message}</span>
+                ) : passwordStrength ? (
+                  <span className="text-warning">{passwordStrength}</span>
+                ) : errors.newPassword ? (
+                  <span className="text-danger">{errors.newPassword.message}</span>
+                ) : null}
               </Form.Group>
             </Col>
 
-            {/* Confirm New Password */}
-            <Col md={12} className="d-flex justify-content-center">
-              <Form.Group className="mb-2 w-100 position-relative">
+
+            {/* Confirm Password */}
+            <Col md={12}>
+              <Form.Group className="mb-2 position-relative">
                 <Form.Label>Confirm New Password</Form.Label>
                 <Form.Control
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
                   {...register('confirmPassword', {
                     required: 'Please confirm your new password',
-                    validate: value => value === newPassword || 'Passwords do not match',
+                    validate: (value) => value === newPassword || 'Passwords do not match',
                   })}
                   onCopy={(e) => e.preventDefault()}
                   onCut={(e) => e.preventDefault()}
@@ -128,9 +167,9 @@ const ChangePasswordModal = ({ show, closeModal }) => {
               </Form.Group>
             </Col>
 
-            <Col sm={12} className="text-center mt-2">
-              <Button className="custom-buttons" type="submit">
-                Change Password
+            <Col sm={12} className="d-flex justify-content-center mt-2">
+              <Button className="custom-buttons" type="submit" disabled={loading}>
+                {loading ? 'Loading...' : 'Change Password'}
               </Button>
             </Col>
           </Row>

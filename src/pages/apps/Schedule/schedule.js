@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import DoctorHoliday from './doctorHoliday';
 import Breaks from './breaks';
 import ScheduleTab from './scheduleTab';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch } from 'react-icons/fi';
 import DatePicker from "react-datepicker";
 import { encryptMessage } from '../../../cryptoUtils';
@@ -25,7 +25,7 @@ const Schedule = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
-
+    const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
         label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
@@ -80,38 +80,41 @@ const Schedule = () => {
             setSelectedDoctor(selectedOption);
         }
     };
+    const handleAddHoliday = () => {
+        navigate("/apps/schedule/addHoliday");
+    }
 
     return (
         <div className="schedule-container">
             <Row className="mt-2">
                 <Col xs={12}>
-                <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                     <Card.Body>
+                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}
                                 <Col sm={4} xs={12} className="mb-3 mb-sm-0">
-                                        <ul className="nav nav-underline font_active_tabs">
-                                            {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
-                                                <li className="nav-item" key={index}>
-                                                    <a
-                                                        className={classNames(
-                                                            'nav-link fw-bold text-black',
-                                                            { active: activeTab === tab }
-                                                        )}
-                                                        href="#"
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setActiveTab(tab);
-                                                        }}
-                                                    >
-                                                        {tab === 'DoctorHolidays' && 'Doctor Holidays'}
-                                                        {/* {tab === 'breaks' && 'Breaks'} */}
-                                                        {tab === 'schedules' && 'Schedules'}
-                                                    </a>
-                                                </li>
-                                            ))}
+                                    <ul className="nav nav-underline font_active_tabs">
+                                        {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
+                                            <li className="nav-item" key={index}>
+                                                <a
+                                                    className={classNames(
+                                                        'nav-link fw-bold text-black',
+                                                        { active: activeTab === tab }
+                                                    )}
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setActiveTab(tab);
+                                                    }}
+                                                >
+                                                    {tab === 'DoctorHolidays' && 'Doctor Holidays'}
+                                                    {/* {tab === 'breaks' && 'Breaks'} */}
+                                                    {tab === 'schedules' && 'Schedules'}
+                                                </a>
+                                            </li>
+                                        ))}
 
-                                        </ul>
+                                    </ul>
                                 </Col>
 
                                 {/* Controls Section */}
@@ -132,14 +135,32 @@ const Schedule = () => {
                                                         options={doctorOptions}
                                                         placeholder="Select Doctor"
                                                         styles={{
-                                                            control: (base) => ({
-                                                                ...base,
-                                                                height: '30px',
+                                                            control: (provided) => ({
+                                                                ...provided,
                                                                 minHeight: '30px',
+                                                                width: '200px',
+                                                                padding: '0px',
+                                                                fontSize: '14px',
+                                                                border: '0px',
+                                                                backgroundColor: '#E8F0FE!important',
+                                                                boxShadow: 'none',
                                                             }),
-                                                            valueContainer: (base) => ({
-                                                                ...base,
-                                                                padding: '0 8px',
+                                                            valueContainer: (provided) => ({
+                                                                ...provided,
+                                                                padding: '0px',
+                                                            }),
+                                                            input: (provided) => ({
+                                                                ...provided,
+                                                                margin: '0px',
+                                                            }),
+                                                            indicatorsContainer: (provided) => ({
+                                                                ...provided,
+                                                                height: '30px',
+                                                            }),
+                                                            placeholder: (provided) => ({
+                                                                ...provided,
+                                                                fontWeight: 600,
+                                                                color: '#0908084f',
                                                             }),
                                                         }}
                                                     />
@@ -152,22 +173,21 @@ const Schedule = () => {
                                                     selectsRange
                                                     isClearable
                                                     placeholderText="Select a date range"
-                                                    className="date-picker-input"
+                                                    className="date-picker-input border-0"
                                                 />
                                                 <Button
-                                                    className="custom-buttons d-none d-md-block py-1"
-                                                    as={Link}
-                                                    to="/apps/schedule/addHoliday"
+                                                    className="custom-buttons d-none d-md-block"
+                                                    onClick={handleAddHoliday}
+
                                                 >
                                                     Add Holiday
                                                 </Button>
                                                 <Button
-                                                className="custom-buttons d-md-none py-1"
-                                                as={Link}
-                                                to="/apps/schedule/addHoliday"
-                                            >
-                                                +
-                                            </Button>
+                                                    className="custom-buttons d-md-none py-1"
+                                                    onClick={handleAddHoliday}
+                                                >
+                                                    +
+                                                </Button>
                                             </div>
                                         )}
                                         {activeTab === 'breaks' && (

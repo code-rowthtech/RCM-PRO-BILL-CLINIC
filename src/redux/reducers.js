@@ -12,12 +12,20 @@ import {
 } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer } from './doctors/reducers';
 import { getAnalyticsReducer } from './dashboard/reducers';
-import { createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer, updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer } from './patients/reducers';
+import {
+    createPatientsReducer, getPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, getResponsiblePartyReducer,
+    updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getInsuranceByIdReducer,
+    getPatientsByAppointmentReducer
+} from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
 import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, deleteScheduleReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer } from './schedule/reducers';
 import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from './settings/rolesetting/reducers';
 import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsReducer, getPractitionerScheduleReducer, getPractitionerSlotsReducer, rescheduleAppointmentReducer } from './appointments/reducers';
+import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
+import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
+import { createProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
+import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer } from './allergyList/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -35,5 +43,14 @@ export default (combineReducers({
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
     createAppointmentReducer, getPractitionerScheduleReducer, getAppointmentsReducer, getAppointmentByIdReducer, createTimingsReducer, getPractitionerTimingsReducer, updateTimingsReducer, getPractitionerSlotsReducer,
-    rescheduleAppointmentReducer, viewPasswordReducer, getCitiesReducer
+    rescheduleAppointmentReducer, viewPasswordReducer, getCitiesReducer, getInsuranceByIdReducer,
+    // vitals
+    createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer, getVitalsByAppointmentIdReducer,
+    getPatientsByAppointmentReducer,
+    // assign task
+    getClinicEmployeesReducer, createTaskReducer,getTaskReducer,updateTaskReducer,getTaskDetailsReducer,
+    // problem list
+    createProblemListReducer,getProblemListReducer,updateProblemListReducer,getALLCodesReducer,getProblemDetailsReducer,getPatientAppointmentReducer,
+    // allergy list
+    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,
 }): any);

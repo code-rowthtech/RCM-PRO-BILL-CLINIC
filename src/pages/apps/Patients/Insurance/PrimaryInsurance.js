@@ -1,17 +1,44 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FiUploadCloud } from 'react-icons/fi';
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInsuranceAction } from '../../../../redux/actions';
+import { createInsuranceAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { useSearchParams } from 'react-router-dom';
 
 const PrimaryInsurance = ({ patientId, activeTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const { handleSubmit, reset, register, errors } = useForm();
+
+    const { handleSubmit, reset, register, setValue } = useForm();
     const [insuredPersonIsPatient, setInsuredPersonIsPatient] = useState(false)
-    const [subscriberIsPatient, setSubscriberIsPatient] = useState(true)
+    const [subscriberIsPatient, setSubscriberIsPatient] = useState(true);
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
+    const primaryInsurance = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === 'Primary Ins')
+    console.log({ primaryInsurance })
+    useEffect(() => {
+        if (id && insuranceByPatient) {
+            setValue('insuredPersonIsPatient', primaryInsurance?.insuredPersonIsPatient);
+            setValue('insuranceCompany', primaryInsurance?.insuranceCompany);
+            setValue('carrierPayerId', primaryInsurance?.carrierPayerId);
+            setValue('alternateEligibilityPayer', primaryInsurance?.alternateEligibilityPayer);
+            setValue('tplCode', primaryInsurance?.tplCode);
+            setValue('insuranceIdNumber', primaryInsurance?.insuranceIdNumber);
+            setValue('insuranceGroupName', primaryInsurance?.insuranceGroupName);
+            setValue('insuranceGroupNumber', primaryInsurance?.insuranceGroupNumber);
+            setValue('insurancePlanName', primaryInsurance?.insurancePlanName);
+            setValue('insurancePlanType', primaryInsurance?.insurancePlanType);
+            setValue('insuranceClaimOfficeNumber', primaryInsurance?.insuranceClaimOfficeNumber);
+            setValue('numberVisitsAllowedPerYear', primaryInsurance?.numberVisitsAllowedPerYear);
+            setValue('cardIssuedDate', primaryInsurance?.cardIssuedDate ? new Date(primaryInsurance?.cardIssuedDate).toISOString().split('T')[0] : '');
+            setValue('insuranceNotes', primaryInsurance?.insuranceNotes);
+            setValue('defaultOnsetDate', primaryInsurance?.hcfaOptions?.defaultOnsetDate ? new Date(primaryInsurance?.hcfaOptions?.defaultOnsetDate).toISOString().split('T')[0] : '');
+            setValue('defaultInitialVisitDate', primaryInsurance?.hcfaOptions?.defaultInitialVisitDate ? new Date(primaryInsurance?.hcfaOptions?.defaultInitialVisitDate).toISOString().split('T')[0] : '');
+        }
+    }, [insuranceByPatient, id])
     const onSubmit = (data) => {
 
         // Helper function to remove empty values
@@ -23,6 +50,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
 
         const payload = {
             ...removeEmptyValues(data),
+            ...(id && primaryInsurance ? { id: primaryInsurance?._id } : {}),
             subscriberIsPatient: subscriberIsPatient,
             insuredPersonIsPatient: insuredPersonIsPatient,
             insuranceType: 'Primary Ins',
@@ -34,8 +62,13 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
             }),
         };
 
-        console.log(payload, 'payyyyyyyyyyyy');
-        dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        if (id && primaryInsurance) {
+            dispatch(updateInsuranceAction({ key: encryptMessage(payload) }))
+        } else if (id && !primaryInsurance) {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        } else {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        }
     };
 
     const tableData = [
@@ -60,21 +93,6 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                             />
                         </Form.Group>
                     </div>
-                    {/* <div className="col-6 mt-1 ">
-                        <Form.Group className='d-flex'>
-                            <Form.Check
-                                type="checkbox"
-                                defaultChecked={subscriberIsPatient}
-                                style={{ cursor: "pointer", color: "#6c757d" }}
-                                {...register('subscriberIsPatient')}
-                                label="Insured person is the same person as the Patient"
-                                onChange={(e) => {
-                                    const isChecked = e.target.checked;
-                                    setSubscriberIsPatient(true);
-                                }}
-                            />
-                        </Form.Group>
-                    </div> */}
                     <div className="col-6 mt-1">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Company</Form.Label>
@@ -174,7 +192,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Insurance Photo Front</Form.Label>
                             <div
-                                className='custom-file-upload justify-content-between cursor-pointer py-0' style={{height:'33px'}}>
+                                className='custom-file-upload justify-content-between cursor-pointer py-0' style={{ height: '33px' }}>
                                 <p className="mb-0">
                                     Upload
                                 </p>
@@ -191,7 +209,7 @@ const PrimaryInsurance = ({ patientId, activeTab }) => {
                     <div className="col-6 mt-1">
                         <div className="mb-1 d-flex flex-column position-relative">
                             <Form.Label className="mb-0">Insurance Photo Back</Form.Label>
-                            <div className='custom-file-upload justify-content-between cursor-pointer py-0' style={{height:'33px'}}>
+                            <div className='custom-file-upload justify-content-between cursor-pointer py-0' style={{ height: '33px' }}>
                                 <p className="mb-0">
                                     Upload
                                 </p>

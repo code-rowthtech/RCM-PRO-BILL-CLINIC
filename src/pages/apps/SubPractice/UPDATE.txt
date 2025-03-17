@@ -1,0 +1,1256 @@
+ <div className='pt-1 pb-2'>
+                <div className="container-fluid mt-2 px-0">
+                    <Card className="px-md-2 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                        <div className="row">
+                            <div className="col-12 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <ul className="nav nav-underline">
+                                        <li className="nav-item">
+                                            <button
+                                                className="text-black nav-link font_active_tabs active"
+                                            >
+                                                Practice Sub Update Information
+                                            </button>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                                <div className='d-flex gap-2  d-none d-md-block'>
+                                    {btnShow && (
+                                        <>
+                                            <Button as={Link} className='cancel-button' to={'/apps/crm/addclinic'}>
+                                                Back
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                            <>
+                                {store?.getClinicsReducer?.loading ?
+                                    <div
+                                        className="d-flex justify-content-center align-items-center"
+                                        style={{ height: '82vh' }}
+                                    >
+                                        <Spinner />
+                                    </div>
+                                    :
+                                    <Form className='mt-1' onSubmit={handleSubmit(submitSubData)} >
+                                        <Row >
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>Practice Name <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        data-has-value={!!watch("clinicname")}
+                                                        {...register('clinicname', { required: 'Practice Name is required' })}
+                                                        value={formData?.clinicname}
+                                                        placeholder="Practice name"
+                                                    />
+                                                    {errors.clinicname && <p className="text-danger">{errors.clinicname.message}</p>}
+
+                                                </Form.Group>
+                                            </Col>
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className="mb-0">
+                                                        Practice type <span className="text-danger">*</span>
+                                                    </Form.Label>
+                                                    <Form.Select
+                                                        {...register('clinicType', { required: 'Practice Type is required' })}
+                                                        defaultValue=""
+                                                        className='form-control'
+                                                        data-has-value={!!watch("clinicType")}
+
+                                                    >
+                                                        <option value="" hidden>Select Clinic type</option>
+                                                        {clinectypes?.map((data) => (
+                                                            <option key={data?._id} value={data?.name}>
+                                                                {data?.name}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                    {errors.clinicType && (
+                                                        <p className="text-danger">{errors.clinicType.message}</p>
+                                                    )}
+                                                </Form.Group>
+                                            </Col>
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1 position-relative">
+                                                    <Form.Label className="mb-0">Email <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="email"
+                                                        data-has-value={!!watch('email')}
+                                                        placeholder="Email"
+                                                        disabled={true}
+                                                        value={formData?.email}
+                                                        {...register('email', {
+                                                            required: 'Email is required',
+                                                            pattern: {
+                                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                                                message: 'Please enter a valid email address'
+                                                            }
+                                                        })}
+                                                    />
+                                                    <span
+                                                        style={{ right: "2%", top: '43%' }}
+                                                        className={`${subClinicsDetailsGet?.userId?.email ? 'text-success position-absolute fs-4' : 'd-none'}`}>
+                                                        <MdVerified />
+                                                    </span>
+                                                    {errors.email && <p className="text-danger">{errors.email.message}</p>}
+
+                                                </Form.Group>
+                                            </Col>
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>Tax ID / EIN<span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        data-has-value={!!watch("taxId")}
+                                                        {...register('taxId', {
+                                                            required: 'Tax ID / EIN is required',
+                                                            pattern: {
+                                                                value: /^\d{2}-\d{7}$/,
+                                                                message: 'Tax ID / EIN must be in the format 12-3456789',
+                                                            },
+                                                        })}
+                                                        maxLength={10} // Includes the hyphen
+                                                        placeholder="Tax ID / EIN"
+                                                    />
+                                                    {errors.taxId && <span className="text-danger">{errors.taxId.message}</span>}
+                                                </Form.Group>
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Form.Group className="mb-1 position-relative" style={{ minHeight: '100px' }}>
+                                                    <Form.Label className="mb-0">Contact Person <span className='text-danger'>*</span></Form.Label>
+                                                    <InputGroup>
+                                                        <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text>
+                                                        <Form.Control
+                                                            type="tel"
+                                                            data-has-value={!!watch("contactPerson")}
+                                                            value={formData?.contactPerson}
+                                                            {...register('contactPerson', {
+                                                                required: 'This field is required',
+                                                                pattern: {
+                                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                                },
+                                                                maxLength: {
+                                                                    value: 13,
+                                                                    message: 'Contact must not exceed 13 digits'
+                                                                },
+                                                                minLength: {
+                                                                    value: 13,
+                                                                    message: 'Contact must not be less than 13 digits'
+                                                                }
+                                                            }
+                                                            )}
+                                                            onChange={(e) => {
+                                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                                const formattedValue = rawValue.replace(
+                                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                                    (match, p1, p2, p3) => {
+                                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                                        if (p2) return `(${p1})${p2}`;
+                                                                        return `(${p1}`;
+                                                                    }
+                                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                                e.target.value = formattedValue; // Update input value
+                                                                clearErrors('phone'); // Clear validation errors
+                                                            }}
+                                                            placeholder="(###)###-####"
+                                                            maxLength={14}
+                                                            onKeyPress={(event) => {
+                                                                // Only allow numeric characters (0-9)
+                                                                if (!/[0-9]/.test(event.key)) {
+                                                                    event.preventDefault();
+                                                                }
+                                                            }}
+                                                        />
+                                                    </InputGroup>
+                                                    {errors.contactPerson && <span className="text-danger">{errors.contactPerson.message}</span>}
+                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)' }}>
+                                                        <img src={us} alt="country code flag" width={20} />
+                                                    </div>
+                                                </Form.Group>
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>NPI Type 2 Number <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        placeholder="NPI Type 2 Number"
+                                                        maxLength={9}
+                                                        data-has-value={!!watch("npiNumber")}
+
+                                                        {...register('npiNumber', {
+                                                            minLength: {
+                                                                value: 9,
+                                                                message: 'NPI must be at least 9 characters long',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: 'NPI cannot exceed 10 characters',
+                                                            },
+                                                            pattern: {
+                                                                value: /^[0-9]+$/,
+                                                                message: 'NPI must contain numbers only',
+                                                            },
+                                                            required: 'NPI Type 2 Number is required'
+                                                        })}
+                                                    />
+
+                                                    {errors.npiNumber && <p className="text-danger">{errors.npiNumber.message}</p>}
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={6} className="mb-1 d-flex flex-column position-relative">
+                                                <Form.Label className='mb-0'>Upload Logo</Form.Label>
+                                                <div
+                                                    onClick={handleLogoClick}
+                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
+                                                        }`}
+                                                    data-has-value={!!logoName}
+                                                >
+                                                    {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
+                                                    {/* {typeof logoName === 'string' && logoName
+                                                        ? logoName.split('/').pop()
+                                                        : 'Upload Logo'} */}
+                                                    {
+                                                        logoUploading
+                                                            ? 'Uploading...'
+                                                            : typeof logoName === 'string' && logoName
+                                                                ? logoName.split('/').pop().slice(0, 30) + "..."
+                                                                : 'Upload Logo'
+                                                    }
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        {/* Eye Icon for Preview */}
+                                                        {logo && (
+                                                            <FiEye
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation(); // Prevent file input trigger
+                                                                    handleShowModal(logo); // Open modal with logo URL
+                                                                }}
+                                                                className="text-dark cursor-pointer"
+                                                                style={{ zIndex: 1 }}
+                                                            />
+                                                        )}
+
+                                                        {/* Download Icon */}
+                                                        <p className="mb-0">
+                                                            <FiDownloadCloud />
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <Form.Control
+                                                    type="file"
+                                                    className="rounded-circle"
+                                                    style={{ display: 'none' }}
+                                                    ref={logoFileInputRef}
+                                                    accept=".png, .jpg, .jpeg, .svg"
+                                                    onChange={handleFileChange}
+                                                />
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>Practice Specialty Description <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        data-has-value={!!watch("practiceSpecialty")}
+                                                        {...register('practiceSpecialty', {
+                                                            required: 'This field is required',
+                                                            validate: (value) =>
+                                                                !value.startsWith(' ') || 'First character cannot be a space',
+                                                        })}
+                                                        placeholder="Practice Specialty Description"
+                                                    />
+                                                    {errors.practiceSpecialty && <span className="text-danger">{errors.practiceSpecialty.message}</span>}
+                                                </Form.Group>
+                                            </Col>
+                                            {taxonomyCodes && taxonomyCodes.map((code, index) => (
+                                                <Col sm={3} key={index}>
+                                                    <Form.Group className="mb-1 position-relative" style={{ minHeight: '80px' }}>
+                                                        <Form.Label className="mb-0">
+                                                            Taxonomy Code(s)
+                                                            {index === taxonomyCodes.length - 1 && (
+                                                                <span
+                                                                    className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                                                    onClick={handleAddTaxonomy}
+                                                                >
+                                                                </span>
+                                                            )}
+                                                            <span className="text-danger">*</span>
+                                                        </Form.Label>
+                                                        <Form.Control
+
+                                                            type="text"
+                                                            data-has-value={!!watch("taxonomyCode")}
+                                                            {...register(`taxonomyCode[${index}]`, {
+                                                                required: 'This field is required',
+                                                            })}
+                                                            placeholder="Taxonomy Code"
+                                                            maxLength={10}
+                                                            onKeyUp={(event) => handleFirstSpace(event, index)}
+                                                            onChange={(e) => {
+                                                                handleTaxonomyChange(index, e.target.value)
+                                                            }}
+                                                        />
+                                                        <span
+                                                            style={{ top: '50%', right: '1%', transform: 'translateY(-50%)', zIndex: '1111', }}
+                                                            onClick={() => handleRemoveTaxonomy(index)} className={`${taxonomyCodes?.length === 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}></span>
+                                                        {errors.taxonomyCode?.[index] && (
+                                                            <span className="text-danger" style={{ top: '100%' }}>{errors.taxonomyCode[index].message}</span>
+                                                        )}
+                                                    </Form.Group>
+                                                </Col>
+                                            ))}
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>CLIA Number </Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        data-has-value= {!!watch('clia')}
+                                                        {...register('clia', {
+                                                            // required: 'CLIA Number is required',
+                                                            minLength: {
+                                                                value: 10,
+                                                                message: 'CLIA Number must be 10 characters long',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: 'CLIA Number must be 10 characters long',
+                                                            },
+                                                            pattern: {
+                                                                value: /^[A-Z0-9]{2}D[0-9]{7}$/, // Ensures the CLIA number matches the specific format
+                                                                message: 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits',
+                                                            },
+                                                        })}
+                                                        placeholder="CLIA Number"
+                                                        maxLength={10}
+                                                    />
+                                                    {errors.clia && <span className="text-danger">{errors.clia.message}</span>}
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-1">
+                                                    <Form.Label className='mb-0'>Medicare Number</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        data-has-value={!!watch('medicare')}
+                                                        {...register('medicare', {
+                                                            // required: 'Medicare Number is required',
+                                                            minLength: {
+                                                                value: 10,
+                                                                message: 'Medicare number must be at least 10 characters long',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: 'Medicare number cannot exceed 10 characters',
+                                                            },
+                                                            pattern: {
+                                                                value: /^[0-9]+$/,
+                                                                message: 'Medicare number must contain numbers only',
+                                                            },
+                                                        })}
+                                                        placeholder="Medicare Number"
+                                                        maxLength={10}
+                                                    />
+                                                    {errors.medicare && <span className="text-danger">{errors.medicare.message}</span>}
+                                                </Form.Group>
+                                            </Col>
+
+                                            <Col sm={3}>
+                                                <Form.Group className="mb-2">
+                                                    <Form.Label className='mb-0'>Medicaid Number </Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                         data-has-value={!!watch('medicaid')}
+                                                        {...register('medicaid', {
+                                                            // required: 'Medicaid Number is required',
+                                                            minLength: {
+                                                                value: 10,
+                                                                message: 'Medicaid number must be at least 10 characters long',
+                                                            },
+                                                            maxLength: {
+                                                                value: 10,
+                                                                message: 'Medicaid number cannot exceed 10 characters',
+                                                            },
+                                                            pattern: {
+                                                                value: /^[0-9]+$/,
+                                                                message: 'Medicaid number must contain numbers only',
+                                                            },
+                                                        })}
+                                                        placeholder="Medicaid Number"
+                                                        maxLength={10}
+                                                    />
+                                                    {errors.medicaid && <span className="text-danger">{errors.medicaid.message}</span>}
+                                                </Form.Group>
+                                            </Col>
+
+                                            <hr className='mb-1' />
+                                            <Col sm={12} className=''>
+                                                <Form.Label>
+                                                    Accreditation Details&nbsp;
+                                                    <span
+                                                        onClick={handleAddAccreditation}
+                                                        className='fs-5 uil-plus-circle fw-bold plusicon cursor-pointer'>
+                                                    </span>
+                                                </Form.Label>
+                                            </Col>
+                                            {accreditationDetails.map((accreditation, index) => (
+                                                <React.Fragment key={index}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
+                                                        <Form.Control
+                                                            type="text"
+                                                            data-has-value={!!accreditation.name}
+                                                            value={accreditation.name}
+                                                            placeholder="Name"
+                                                            onChange={(e) => handleAccreditationInputChange(e, 'name', index)}
+                                                        />
+                                                    </Col>
+
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
+                                                        <Form.Control
+                                                            type="text"
+                                                            value={accreditation.number}
+                                                            data-has-value={!!accreditation.number}
+
+                                                            // {...register('accDocno', {
+                                                            //     pattern: {
+                                                            //         value: /^[0-9]*$/,
+                                                            //         message: 'Document no must be a number'
+                                                            //     },
+                                                            // })}
+                                                            placeholder="Document Number"
+                                                            onChange={(e) => handleAccreditationInputChange(e, 'number', index)}
+                                                            onKeyUp={(event) => handleFirstSpace(event, 0)}
+
+                                                        />
+                                                        {errors.accDocno && <span className="text-danger">{errors.accDocno.message}</span>}
+                                                    </Col>
+                                                    <Col sm={4} className="mb-2 position-relative mb-md-2">
+                                                        <div
+                                                            onClick={() => accreditationFileInputRef.current.click()}
+                                                            className="custom-file-upload justify-content-between cursor-pointer"
+                                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                            data-has-value={!!accreditation.fileName}
+                                                        >
+                                                            {/* {accreditation.loading ? 'Loading...'
+                                                                : accreditation.url
+                                                                    ? accreditation.url.split('/').pop()
+                                                                    : accreditation?.fileName || 'Upload Document'} */}
+                                                            <span style={{ flex: 1 }}>
+                                                                {
+                                                                    newaccreditationLogo
+                                                                        ? 'Uploading...'
+                                                                        : accreditation.url
+                                                                            ? accreditation.fileName.split('/').pop().slice(0, 30) // Truncated file name
+                                                                            : accreditation?.fileName || 'Upload Document'
+                                                                }
+                                                            </span>
+
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                {/* Eye Icon for Preview */}
+                                                                {accreditation.url && (
+                                                                    <FiEye
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation(); // Prevent file input trigger
+                                                                            handleShowModal(accreditation.url); // Open modal with accreditation URL
+                                                                        }}
+                                                                        className="text-dark cursor-pointer"
+                                                                        style={{ zIndex: 1 }}
+                                                                    />
+                                                                )}
+
+                                                                {/* Download Icon */}
+                                                                <p className="mb-0"><FiDownloadCloud /></p>
+                                                            </div>
+                                                        </div>
+
+                                                        <Form.Control
+                                                            type="file"
+                                                            className="rounded-circle"
+                                                            style={{ display: 'none' }}
+                                                            ref={accreditationFileInputRef}
+                                                            onChange={(e) => handleAccreditationChange(e, index)}
+                                                        />
+                                                        <span
+                                                            onClick={() => handleRemoveAccreditation(index)}
+                                                            style={{ right: '-2%', top: '20%' }}
+                                                            className={`${accreditationDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                                        >
+                                                        </span>
+                                                    </Col>
+                                                </React.Fragment>
+                                            ))}
+                                            <hr />
+                                            <Col sm={12} className="position-relative">
+                                                <Form.Label ref={containerRef} className='mb-0'>
+                                                    State of Licensure&nbsp;
+                                                    <span
+                                                        onClick={() => setStatesMenu(!statesMenu)}
+                                                        className={`plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer`}
+                                                    ></span>
+                                                    <div
+                                                        ref={menuRef}
+                                                        className={`scroll-container ${statesMenu ? '' : 'd-none'} bg-white border border-secondary position-absolute ps-1 py-1`}
+                                                        style={{ height: '14rem', width: '12em', zIndex: '111' }}
+                                                    >
+                                                        {statesData?.states?.map((data, index) => (
+                                                            <div className='d-flex align-items-center px-1' key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }} onClick={() => handleCheckboxChange(data?.name)}
+                                                            >
+                                                                {selectedStates.includes(data?.name) ?
+                                                                    <MdOutlineRadioButtonChecked />
+                                                                    :
+                                                                    <MdOutlineRadioButtonUnchecked />
+                                                                }
+                                                                <span className='ps-1'>
+                                                                    {data?.name}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </Form.Label>
+                                            </Col>
+                                            {stateDetails.map((data, index) => (
+                                                <React.Fragment key={index}>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
+                                                        <Form.Control
+                                                        data-has-value= {!!data.name}
+                                                            type="text"
+                                                            value={data.name}
+                                                            readOnly // Display selected state name
+                                                            placeholder="State"
+                                                        />
+                                                    </Col>
+                                                    <Col sm={4} className='mb-md-0 mb-2'>
+                                                        <Form.Control
+                                                            type="text"
+                                                            data-has-value= {!!data.number}
+                                                            value={data.number}
+                                                            placeholder="Document Number"
+                                                            onChange={(e) => handleStateInputChange(e, 'number', index)}
+                                                        />
+                                                    </Col>
+                                                    <Col sm={4} className="mb-2 position-relative">
+                                                        <div
+                                                            onClick={() => document.getElementById(`fileInput-state=${index}`).click()}
+                                                            className={`custom-file-upload justify-content-between cursor-pointer ${data.fileName || stateLogoUpload ? 'form-control' : 'custom-form-fields'}`}
+                                                            style={{ paddingTop: '7px', paddingBottom: '7px' }}
+                                                            data-has-value={!!data.fileName}
+
+                                                        >
+                                                            {/* {data.fileName
+                                                                ? data?.fileName?.length > 30
+                                                                    ? data?.fileName?.slice(0, 25) + '...'
+                                                                    : data?.fileName
+                                                                : 'Upload Document'} */}
+                                                            {
+                                                                stateLogoUpload
+                                                                    ? 'Uploading...'
+                                                                    : (data.fileName
+                                                                        ? (data.fileName.length > 30
+                                                                            ? data.fileName.split('/').pop().slice(0, 25) + '...' // Extract and truncate file name
+                                                                            : data.fileName.split('/').pop()) // Extract full file name
+                                                                        : 'Upload Document')
+                                                            }
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                {data.url && (
+                                                                    <FiEye
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation(); // Prevent file input trigger
+                                                                            handleShowModal(data.url); // Pass the URL to open the modal
+                                                                        }}
+                                                                        className="text-dark cursor-pointer"
+                                                                        style={{ zIndex: 1 }}
+                                                                    />
+                                                                )}
+
+                                                                {/* Download Icon */}
+                                                                <p className="mb-0">
+                                                                    <FiDownloadCloud />
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <Form.Control
+                                                            type="file"
+                                                            id={`fileInput-state=${index}`}
+                                                            style={{ display: 'none' }}
+                                                            onChange={(e) => handleStateChange(e, index)}
+                                                        />
+                                                        <span
+                                                            onClick={() => handleRemoveState(index)}
+                                                            className={`${stateDetails.length <= 1 ? 'd-none' : ''
+                                                                } uil-minus-circle cursor-pointer position-absolute fs-5 fw-bold text-danger`}
+                                                            style={{ right: '-2%', top: '20%' }}
+                                                        ></span>
+                                                    </Col>
+                                                </React.Fragment>
+                                            ))}
+
+
+
+                                            <hr className='mb-1' />
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={12} className='mb-1'>
+                                                        <span className='text-black fw-semibold form-label'>Address Details</span>
+                                                    </Col>
+                                                    <Col sm={6}>
+                                                        <Row className='position-relative'>
+                                                            <Col sm={12}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">
+                                                                        Address <span className='text-danger'>*</span>
+                                                                    </Form.Label>
+                                                                    <div style={{ position: 'relative' }}>
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            data-has-value={!!watch('address')}
+                                                                            defaultValue={subClinicsDetailsGet?.address?.address || ''}
+                                                                            {...register('address', {
+                                                                                required: "Address is required",
+                                                                            })} // Marked as required
+                                                                            onChange={(e) => {
+                                                                                getGeolocation(e);
+                                                                                setFocused(true); // Open dropdown on input
+                                                                            }}
+                                                                            onFocus={() => setFocused(true)} // Open dropdown when the field is focused
+                                                                            onBlur={() => {
+                                                                                setTimeout(() => setFocused(false), 200); // Delay to allow selection before hiding dropdown
+                                                                            }}
+                                                                            placeholder="Search for address"
+                                                                            autoComplete="off"
+                                                                        />
+                                                                        {/* Dropdown suggestions */}
+                                                                        <div
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: '100%',
+                                                                                left: 0,
+                                                                                width: '100%',
+                                                                                maxHeight: '150px',
+                                                                                overflow: 'auto',
+                                                                                zIndex: 111,
+                                                                                backgroundColor: '#fff',
+                                                                                border: '1px solid #ced4da',
+                                                                                borderTop: 'none',
+                                                                            }}
+                                                                            className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                                                        >
+                                                                            {searchedLocations?.map((data, index) => (
+                                                                                <p
+                                                                                    key={index}
+                                                                                    onClick={() => {
+                                                                                        setSelectedLocation(data)
+                                                                                        setFocused(false); // Close dropdown after selection
+                                                                                    }}
+                                                                                    style={{
+                                                                                        margin: 0,
+                                                                                        padding: '8px 12px',
+                                                                                        cursor: 'pointer',
+                                                                                    }}
+                                                                                    className="hover-bg-change text-black"
+                                                                                >
+                                                                                    {data?.formatted}
+                                                                                </p>
+                                                                            ))}
+                                                                            {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                            {errors.address && (
+                                                                                <span className="text-danger">{errors.address.message}</span>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className='mb-0'>
+                                                                        Latitude <span className='text-danger'>*</span>
+                                                                    </Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value={!!latitude}
+                                                                        defaultValue={latitude}
+                                                                        placeholder="Latitude"
+                                                                    />
+                                                                    {errors.latitude && (
+                                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className='mb-0'>Longitude <span className='text-danger'>*</span></Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value={!!longitude}
+                                                                        defaultValue={longitude}
+                                                                        placeholder="Longitude" />
+                                                                    {errors.longitude && (
+                                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                    <Col sm={6}>
+                                                        <Row>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className='mb-0'>
+                                                                        State
+                                                                    </Form.Label>
+                                                                    <Form.Select
+                                                                        className='form-control'
+                                                                        data-has-value= {!!watch('stateName') }
+                                                                        {...register('stateName', {
+                                                                            required: 'State is required',
+                                                                        })} // Marked as required
+                                                                        onChange={(e) => handleStateSelection(e)}
+                                                                    >
+                                                                        <option value={''} hidden>State</option>
+                                                                        {statesData?.states?.map((data) => (
+                                                                            <option
+                                                                                key={data?.id} // Unique key for each option
+                                                                                data-key={JSON.stringify({ id: data?.id, _id: data?._id })} // Store the key as a data attribute
+                                                                                value={data?._id}
+                                                                            >
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                    {errors.stateName && (
+                                                                        <span className="text-danger">{errors.stateName.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className='mb-0'>
+                                                                        City <span className="text-danger">*</span>
+                                                                    </Form.Label>
+                                                                    <Form.Select
+                                                                        className='form-control'
+                                                                        data-has-value= {!!watch("city")}
+                                                                        disabled={store?.getCitiesReducer?.loading}
+                                                                        {...register('city', {
+                                                                            required: 'City is required',
+                                                                        })} // Marked as required
+                                                                        onChange={(e) => handleCitySelection(e)}
+                                                                    >
+                                                                        <option value='' hidden >{store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}</option>
+                                                                        {cities?.map((data) => (
+                                                                            <option data-key={JSON.stringify({ _id: data?._id, latitude: data?.latitude, longitude: data?.longitude })} key={data?._id} value={data?._id}>
+                                                                                {data?.name}
+                                                                            </option>
+                                                                        ))}
+                                                                    </Form.Select>
+                                                                    {errors.city && (
+                                                                        <span className="text-danger">{errors.city.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className='mb-0'>
+                                                                        Street <span className='text-danger'>*</span>
+                                                                    </Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                         data-has-value={!!watch('street')}
+                                                                        {...register('street', {
+                                                                            required: 'Street is required',
+                                                                        })} // Marked as required
+                                                                        onKeyPress={handleFirstSpace}
+                                                                        placeholder="Street" />
+                                                                </Form.Group>
+                                                                {errors.street && <span className="text-danger">{errors.street.message}</span>}
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className='mb-0'>
+                                                                        Zip <span className="text-danger">*</span>
+                                                                    </Form.Label>
+                                                                    <Form.Control
+                                                                        defaultValue={subClinicsDetailsGet?.address?.zip || ''}
+                                                                        type="text"
+                                                                        data-has-value={!!watch('zip')}
+                                                                        {...register('zip', {
+                                                                            required: 'ZIP is required',
+                                                                            minLength: {
+                                                                                value: 5,
+                                                                                message: 'ZIP code must be at least 5 characters long',
+                                                                            },
+                                                                            pattern: {
+                                                                                value: /^[0-9]+$/,
+                                                                                message: 'ZIP code must contain numbers only',
+                                                                            },
+                                                                        })}
+                                                                        onKeyPress={handleFirstSpace}
+                                                                        placeholder="Zip"
+                                                                        maxLength={5}
+                                                                    />
+                                                                    {errors.zip && <span className="text-danger">{errors.zip.message}</span>}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+
+                                            <hr className='mb-1' />
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={12} className="">
+                                                        <span className="text-black fw-semibold form-label">Mailing Address Details </span>
+                                                    </Col>
+
+                                                    {/* Checkbox for using primary address */}
+                                                    <Col sm={12} className="mb-2">
+                                                        <Form.Check
+                                                            type="checkbox"
+                                                            style={{ cursor: "pointer", color: "#6c757d" }}
+                                                            label="Same as Primary Address"
+                                                            // disabled={!getValues('')}
+                                                            checked={usePrimaryAsMailing}
+                                                            onChange={(e) => {
+                                                                const isChecked = e.target.checked;
+                                                                setUsePrimaryAsMailing(isChecked);
+
+                                                                if (isChecked) {
+                                                                    setValue('mailingAddress', getValues('address'));
+                                                                    setLatitude1(latitude);
+                                                                    setLongitude1(longitude);
+                                                                    setValue('mailingZip', getValues('zip'));
+                                                                    setValue('mailingStreet', getValues('street'));
+                                                                }
+                                                                else {
+                                                                    setValue('mailingAddress', '');
+                                                                    setValue('mailingStateName', '');
+                                                                    setLatitude1('');
+                                                                    setLongitude1('');
+                                                                    setValue('mailingCity', '');
+                                                                    setValue('mailingZip', '');
+                                                                    setValue('mailingStreet', '');
+                                                                }
+                                                            }}
+                                                        />
+                                                    </Col>
+
+                                                    <Col sm={6}>
+                                                        <Row className="position-relative">
+                                                            <Col sm={12}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Mailing Address <span className="text-danger">*</span></Form.Label>
+                                                                    <div style={{ position: 'relative' }}>
+                                                                        <Form.Control
+                                                                            type="text"
+                                                                            data-has-value= {!!watch("mailingAddress")}
+                                                                            value={watch('mailingAddress')}
+                                                                            {...register('mailingAddress', {
+                                                                                required: 'Mailing Address is required', // Validation rule: required
+                                                                            })}
+                                                                            onChange={(e) => {
+                                                                                if (!usePrimaryAsMailing) {
+                                                                                    setValue('mailingAddress', e.target.value);
+                                                                                    getGeolocation2(e);
+                                                                                    setFocused2(true);
+                                                                                }
+                                                                            }}
+                                                                            onFocus={() => setFocused2(true)}
+                                                                            onBlur={() => setTimeout(() => setFocused2(false), 200)}
+                                                                            placeholder="Search for mailing address"
+                                                                            autoComplete="off"
+                                                                            disabled={usePrimaryAsMailing}
+                                                                        />
+                                                                        <div
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: '100%',
+                                                                                left: 0,
+                                                                                width: '100%',
+                                                                                maxHeight: '150px',
+                                                                                overflow: 'auto',
+                                                                                zIndex: 111,
+                                                                                backgroundColor: '#fff',
+                                                                                border: '1px solid #ced4da',
+                                                                                borderTop: 'none',
+                                                                            }}
+                                                                            className={`scroll-container hover-bg-change ${searchedLocations2?.length === 0 || !focused2 ? 'd-none' : ''}`}
+                                                                        >
+                                                                            {searchedLocations2?.map((data, index) => (
+                                                                                <p
+                                                                                    key={index}
+                                                                                    onClick={() => {
+                                                                                        setSelectedLocation2(data);
+                                                                                        setValue('mailingAddress', data?.formatted);
+                                                                                        setFocused2(false);
+                                                                                    }}
+                                                                                    style={{
+                                                                                        margin: 0,
+                                                                                        padding: '8px 12px',
+                                                                                        cursor: 'pointer',
+                                                                                    }}
+                                                                                    className="hover-bg-change text-black"
+                                                                                >
+                                                                                    {data?.formatted}
+                                                                                </p>
+                                                                            ))}
+                                                                            {searchedLocations2?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                                                        </div>
+                                                                    </div>
+                                                                    {errors.mailingAddress && (
+                                                                        <span className="text-danger">{errors.mailingAddress.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Latitude  <span className="text-danger">*</span></Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value= {!!latitude}
+                                                                        value={latitude1}
+                                                                        placeholder="Latitude"
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    />
+                                                                    {errors.latitude && (
+                                                                        <span className="text-danger">{errors.latitude.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Longitude  <span className="text-danger">*</span></Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value= {!!latitude}
+                                                                        value={longitude1}
+                                                                        placeholder="Longitude"
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    />
+                                                                    {errors.longitude && (
+                                                                        <span className="text-danger">{errors.longitude.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+
+                                                    <Col sm={6}>
+                                                        <Row>
+                                                            {/* State */}
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">State <span className="text-danger">*</span></Form.Label>
+                                                                    {usePrimaryAsMailing ? (
+                                                                        <Form.Control
+                                                                            readOnly
+                                                                            data-has-value= {!!watch("mailingStateName")}
+                                                                            value={
+                                                                                statesData?.states?.find(
+                                                                                    (data) => data?._id === getValues('stateName')
+                                                                                )?.name || 'N/A'
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <Form.Select
+                                                                            {...register('mailingStateName', {
+                                                                                required: 'State is required',
+                                                                            })}
+                                                                            onChange={(e) => handleStateSelection(e)}
+                                                                            disabled={usePrimaryAsMailing}
+                                                                        >
+                                                                            <option value={''} hidden>State</option>
+                                                                            {statesData?.states?.map((data) => (
+                                                                                <option key={data?.id} value={data?._id}>
+                                                                                    {data?.name}
+                                                                                </option>
+                                                                            ))}
+                                                                        </Form.Select>
+                                                                    )}
+                                                                    {errors.mailingStateName && (
+                                                                        <span className="text-danger">{errors.mailingStateName.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            {/* City */}
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">City  <span className="text-danger">*</span></Form.Label>
+                                                                    {usePrimaryAsMailing ? (
+                                                                        <Form.Control
+                                                                        data-has-value= {!!watch("mailingCity")}
+
+                                                                         readOnly value={cities && cities?.find((data) => data?._id === getValues('city'))?.name} />
+                                                                    ) : (
+                                                                        <Form.Select
+                                                                            disabled={store?.getCitiesReducer?.loading || usePrimaryAsMailing}
+                                                                            {...register('mailingCity', {
+                                                                                required: 'City is required',
+                                                                            })}
+                                                                            onChange={(e) => handleCitySelection(e)}
+                                                                        >
+                                                                            <option value="" hidden>
+                                                                                {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
+                                                                            </option>
+                                                                            {cities2?.map((data) => (
+                                                                                <option key={data?._id} value={data?._id}>
+                                                                                    {data?.name}
+                                                                                </option>
+                                                                            ))}
+                                                                        </Form.Select>
+                                                                    )}
+                                                                    {errors.mailingCity && (
+                                                                        <span className="text-danger">{errors.mailingCity.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            {/* Street */}
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Street  <span className="text-danger">*</span></Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value= {!!watch('mailingStreet')}
+                                                                        {...register('mailingStreet', {
+                                                                            required: 'Street is required',
+                                                                        })}
+                                                                        placeholder="Street"
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    />
+                                                                    {errors.mailingStreet && (
+                                                                        <span className="text-danger">{errors.mailingStreet.message}</span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+
+                                                            {/* ZIP */}
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-2">
+                                                                    <Form.Label className="mb-0">Zip  <span className='text-danger'>*</span> </Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value= {!!watch('mailingZip')}
+
+                                                                        {...register('mailingZip', {
+                                                                            required: !usePrimaryAsMailing && 'ZIP is required',
+                                                                            minLength: { value: 5, message: 'ZIP must be 5 characters long' },
+                                                                            pattern: { value: /^[0-9]+$/, message: 'ZIP must contain numbers only' },
+                                                                        })}
+                                                                        maxLength={5}
+                                                                        placeholder="Zip"
+                                                                        disabled={usePrimaryAsMailing}
+                                                                    />
+                                                                    {errors.mailingZip && <span className="text-danger">{errors.mailingZip.message}</span>}
+                                                                </Form.Group>
+                                                            </Col>
+                                                        </Row>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+
+                                            <hr className='mb-1' />
+                                            <Col sm={12}>
+                                                <Row>
+                                                    <Col sm={12} className="mb-1">
+                                                        <span className="text-black fw-semibold form-label">
+                                                            Primary contact
+                                                            <span
+                                                                onClick={handleAddPOS}
+                                                                className="plusicon ms-1 fs-5 uil-plus-circle fw-bold cursor-pointer">
+                                                            </span>
+                                                        </span>
+                                                    </Col>
+                                                    {posDetails?.map((data, index) => (
+                                                        <React.Fragment key={index}>
+                                                            <Col sm={12} className='form-label mb-0'>
+                                                                {'POS ' + `${index + 1}`}
+                                                                <span
+                                                                    onClick={() => handleRemovePOS(index)}
+                                                                    className={`${posDetails.length <= 1 ? 'd-none' : ''} uil-minus-circle cursor-pointer  fs-5 fw-bold text-danger`}>
+                                                                </span>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Full Name {index === 0 && <span className='text-danger'>*</span>} </Form.Label>
+                                                                    <Form.Control
+                                                                        type="text"
+                                                                        data-has-value={!!data?.name}
+                                                                        {...register(`name.${index}`, {
+                                                                            required: index === 0 && (!posDetails?.[0]?.name || posDetails[0]?.name.trim() === "")
+                                                                                ? "Full Name is required"
+                                                                                : false,
+                                                                        })}
+                                                                        value={data.name}
+                                                                        onChange={(e) => {
+                                                                            clearErrors(`name.${index}`);
+                                                                            handlePOSInputChange(e, 'name', index);
+                                                                            setValue(`name.${index}`, e.target.value);
+                                                                        }}
+                                                                        onKeyPress={(event) => handleFirstSpace(event, 1)}
+                                                                        placeholder="Full Name"
+                                                                    />
+                                                                    {errors?.name?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.name[index]?.message}
+                                                                        </span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Contact Email  {index === 0 && <span className='text-danger'>*</span>}</Form.Label>
+                                                                    <Form.Control
+                                                                        type="email"
+                                                                        data-has-value={!!data?.email}
+
+                                                                        value={data.email}
+                                                                        {...register(`contactemail.${index}`, {
+                                                                            pattern: {
+                                                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
+                                                                                message: 'Please enter a valid email address'
+                                                                            },
+                                                                            required: index === 0 && (!posDetails?.[0]?.email || posDetails[0]?.email.trim() === "") ? 'Contact Email is required' : false,
+                                                                            onChange: (e) => {
+                                                                                clearErrors(`contactemail.${index}`);
+                                                                                handlePOSInputChange(e, 'email', index);
+                                                                            },
+                                                                        })}
+                                                                        placeholder="Contact Email"
+                                                                    />
+                                                                    {errors?.contactemail?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.contactemail[index]?.message}
+                                                                        </span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1">
+                                                                    <Form.Label className="mb-0">Job Title / Role{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
+                                                                    <Form.Control
+                                                                        type='text'
+                                                                        data-has-value= {!!data?.role}
+                                                                        value={data?.role}
+                                                                        {...register(`role.${index}`, {
+                                                                            required: index === 0 && (!posDetails?.[0]?.role || posDetails[0]?.role.trim() === "") ? 'Job Title / Role is required' : false,
+                                                                            onChange: (e) => {
+                                                                                clearErrors(`role.${index}`);
+                                                                                handlePOSInputChange(e, 'role', index);
+                                                                            },
+                                                                        })}
+                                                                        placeholder='Job Title / Role'
+                                                                    />
+                                                                    {errors?.role?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.role[index]?.message}
+                                                                        </span>
+                                                                    )}
+                                                                </Form.Group>
+                                                            </Col>
+                                                            <Col sm={6}>
+                                                                <Form.Group className="mb-1 position-relative" style={{ minHeight: '100px' }}>
+                                                                    <Form.Label className="mb-0">Contact Person{index === 0 && <span className='text-danger'>*</span>}</Form.Label>
+                                                                    <InputGroup>
+                                                                        <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">&nbsp;&nbsp;+1</InputGroup.Text>
+                                                                        <Form.Control
+                                                                            type="tel"
+                                                                            value={data.contact}
+                                                                            data-has-value= {!!data?.contact}
+
+                                                                            {...register(`poccontact.${index}`, {
+                                                                                required: index === 0 && (!posDetails?.[0]?.contact || posDetails[0]?.contact.trim() === "") ? 'Contact is required' : false,
+                                                                                pattern: {
+                                                                                    value: /^(\d{3}-\d{3}-\d{4}|\d{9,10})$/,
+                                                                                    message:
+                                                                                        'Contact must be in the format XXX-XXX-XXXX or contain only 9–10 digits',
+                                                                                },
+                                                                                maxLength: {
+                                                                                    value: 10,
+                                                                                    message: 'Contact must not exceed 10 characters',
+                                                                                },
+                                                                                minLength: {
+                                                                                    value: 10,
+                                                                                    message: 'Contact must not be less than 10 digits',
+                                                                                },
+                                                                                onChange: (e) => {
+                                                                                    const rawValue = e.target.value.replace(/\D/g, '');
+                                                                                    const formattedValue = rawValue.replace(
+                                                                                        /(\d{3})(\d{3})(\d{0,4})/,
+                                                                                        (match, p1, p2, p3) =>
+                                                                                            p3 ? `${p1}-${p2}-${p3}` : `${p1}-${p2}`
+                                                                                    );
+                                                                                    handlePOSInputChange(
+                                                                                        { ...e, target: { ...e.target, value: rawValue } },
+                                                                                        'contact',
+                                                                                        index
+                                                                                    );
+                                                                                    e.target.value = formattedValue;
+                                                                                    clearErrors(`poccontact.${index}`);
+                                                                                },
+                                                                            })}
+                                                                            placeholder="123-456-7890"
+                                                                            maxLength={10}
+                                                                            onKeyPress={(event) => {
+                                                                                if (!/[0-9]/.test(event.key)) {
+                                                                                    event.preventDefault();
+                                                                                }
+                                                                            }}
+                                                                        />
+                                                                    </InputGroup>
+                                                                    {errors?.poccontact?.[index] && (
+                                                                        <span className="text-danger">
+                                                                            {errors.poccontact[index]?.message}
+                                                                        </span>
+                                                                    )}
+                                                                    <div className="position-absolute" style={{ top: '50%', left: '1%', transform: 'translateY(-100%)' }}>
+                                                                        <img src={us} alt="country code flag" width={20} />
+                                                                    </div>
+                                                                </Form.Group>
+
+                                                            </Col>
+                                                        </React.Fragment>
+                                                    ))}
+                                                </Row>
+                                            </Col>
+                                            <Col md={12} className='mt-1 d-flex gap-2 justify-content-end'>
+                                                <Button variant="primary" className='custom-buttons' onClick={() => setShowModal(true)}>
+                                                    Change Password
+                                                </Button>
+
+                                                <Button
+                                                    variant="primary"
+                                                    type="submit"
+                                                    className="custom-buttons"
+                                                    disabled={updateLoading}
+                                                >
+                                                    {updateLoading ? (
+                                                        <Spinner color="white" className="spinner-border-sm" />
+                                                    ) : (
+                                                        idUpdateDataSubClinics ? 'Update' : 'Submit'
+                                                    )}
+                                                </Button>
+
+                                            </Col>
+                                        </Row >
+                                    </Form >
+                                }
+                            </>
+
+                        </div>
+                    </Card>
+
+                </div>
+                {/* <ResetPassword closeModal={closepassModal} show={passShow} /> */}
+                <EmailToDoctorModal show={showModal} formData={formData} setFormData={setFormData} closeModal={closeModal} />
+
+            </div>

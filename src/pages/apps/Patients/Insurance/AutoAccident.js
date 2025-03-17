@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { FiUploadCloud } from 'react-icons/fi';
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInsuranceAction, getCitiesAction, getStatesByCountryAction } from '../../../../redux/actions';
+import { createInsuranceAction, getCitiesAction, getStatesByCountryAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { useSearchParams } from 'react-router-dom';
 
 const AutoAccident = ({ patientId, activeTab }) => {
     const store = useSelector((state) => state);
@@ -13,27 +13,52 @@ const AutoAccident = ({ patientId, activeTab }) => {
         register,
         handleSubmit,
         formState: { errors },
-        reset,
-        watch,
         setValue,
-        getValues,
-        setError,
-        clearErrors
     } = useForm();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     const [insuredPersonIsPatient, setInsuredPersonIsPatient] = useState(false)
     const [hasSimilarCondition, setHasSimilarCondition] = useState(false)
-    const [claimRepresentativeIsInsurer, setClaimRepresentativeIsInsurer] = useState(true)
+    const [claimRepresentativeIsInsurer, setClaimRepresentativeIsInsurer] = useState(false)
     const [permanentDisfigurement, setPermanentDisfigurment] = useState(false)
     const [isPatentStillUnderCare, setIsPatentStillUnderCare] = useState(false)
     const [requiredRehabilitation, setRequiredRehabilitation] = useState(false)
     const [searchedLocations, setSearchedLocations] = useState(null);
     const [citySearch, setCitySearch] = useState(null);
-
     const [focused, setFocused] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
 
-    console.log(cities, 'sele')
+    const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
+    const autoAccident = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === 'Auto Accident')
+    useEffect(() => {
+        if (id && insuranceByPatient) {
+            setValue('insuredPersonIsPatient', autoAccident?.insuredPersonIsPatient);
+            setValue('claimRepresentativeIsInsurer', autoAccident?.claimRepresentativeIsInsurer);
+            setValue('autoAccidentCompany', autoAccident?.autoAccidentCompany);
+            setValue('autoAccidentCaseNumber', autoAccident?.autoAccidentCaseNumber);
+            setValue('autoAccidentPayerId', autoAccident?.autoAccidentPayerId);
+            setValue('autoAccidentPolicyNumber', autoAccident?.autoAccidentPolicyNumber);
+            setValue('autoAccidentPayerState', autoAccident?.autoAccidentPayerState);
+            setValue('autoAccidentPayerLatitude', autoAccident?.autoAccidentPayerLatitude);
+            setValue('autoAccidentPayerLongitude', autoAccident?.autoAccidentPayerLongitude);
+            setValue('autoAccidentNotes', autoAccident?.autoAccidentNotes);
+            setValue('autoAccidentNotes', autoAccident?.autoAccidentNotes);
+            setValue('notDeterminable', autoAccident?.permanentDisfigurement?.notDeterminable === true ? 'Yes' : 'No');
+            setValue('description', autoAccident?.permanentDisfigurement?.description);
+            setValue('from', autoAccident?.permanentDisfigurement?.from ? new Date(autoAccident?.permanentDisfigurement?.from).toISOString().split('T')[0] : '');
+            setValue('to', autoAccident?.permanentDisfigurement?.to ? new Date(autoAccident?.permanentDisfigurement?.to).toISOString().split('T')[0] : '');
+            setValue('returnToWork', autoAccident?.permanentDisfigurement?.returnToWork ? new Date(autoAccident?.permanentDisfigurement?.returnToWork).toISOString().split('T')[0] : "");
+            setValue('requiresRehab', autoAccident?.rehabilitationDetails?.requiresRehab);
+            setValue('recommendation', autoAccident?.rehabilitationDetails?.recommendation);
+            setValue('hasSimilarCondition', autoAccident?.similarConditionDetails?.hasSimilarCondition);
+            setValue('when', autoAccident?.similarConditionDetails?.when ? new Date(autoAccident?.similarConditionDetails?.when).toISOString().split('T')[0] : '');
+            setValue('why', autoAccident?.similarConditionDetails?.why);
+            setValue('isPatientStillUnderCare', autoAccident?.isPatientStillUnderCare);
+            setValue('estimatedDuration', autoAccident?.estimatedDuration);
+            setValue('autoAccidentStateOfOccurrence', autoAccident?.autoAccidentStateOfOccurrence);
+        }
+    }, [insuranceByPatient, id])
     useEffect(() => {
         if (selectedState) {
             dispatch(getCitiesAction({ state_code: selectedState?.id, name: citySearch ? citySearch : '', limit: 25, skip: '' }))
@@ -50,8 +75,6 @@ const AutoAccident = ({ patientId, activeTab }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch])
     const onSubmit = (data) => {
-
-        // Helper function to remove empty values
         const removeEmptyValues = (obj) => {
             return Object.fromEntries(
                 Object.entries(obj).filter(([_, value]) => value !== undefined && value !== null && value !== '')
@@ -60,28 +83,35 @@ const AutoAccident = ({ patientId, activeTab }) => {
 
         const payload = {
             ...removeEmptyValues(data),
+            ...(id && autoAccident ? { id: autoAccident?._id } : {}),
             claimRepresentativeIsInsurer: claimRepresentativeIsInsurer,
             insuredPersonIsPatient: insuredPersonIsPatient,
             insuranceType: 'Auto Accident',
             patientId: patientId,
             similarConditionDetails: removeEmptyValues({
-                hasSimilarCondition: hasSimilarCondition,
+                hasSimilarCondition: data?.hasSimilarCondition,
                 when: data?.when,
                 why: data?.why,
                 // prepopulateLastRelatedVisit: { type: Boolean },
             }),
-            permanentDisfigurment: removeEmptyValues({
-                notDeterminable: data?.notDeterminable,
-                description: data?.description
+            permanentDisfigurement: removeEmptyValues({
+                notDeterminable: permanentDisfigurement,
+                description: data?.description,
+                from: data?.from,
+                to: data?.to,
+                returnToWork: data?.returnToWork,
             }),
             rehabilitationDetails: removeEmptyValues({
-                requiresRehab: requiredRehabilitation,
+                requiresRehab: data?.requiresRehab,
                 recommendation: data?.recommendation
             })
         };
 
-        console.log(payload, 'payyyyyyyyyyyy');
-        dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        if (id && autoAccident) {
+            dispatch(updateInsuranceAction({ key: encryptMessage(payload) }))
+        } else {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        }
     };
 
     const getGeolocation = (e) => {
@@ -316,7 +346,6 @@ const AutoAccident = ({ patientId, activeTab }) => {
                                 <Form.Group className=''>
                                     <Form.Check
                                         type="checkbox"
-                                        defaultChecked={hasSimilarCondition}
                                         style={{ cursor: "pointer", color: "#6c757d" }}
                                         {...register('hasSimilarCondition')}
                                         label="Has patient ever had same or similar condition?"
@@ -408,7 +437,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
                             <div className="col-12 mt-1">
                                 <Form.Group>
                                     <Form.Label className='mb-0'>Patient was disabled (unable to work) from:</Form.Label>
-                                    <Form.Control type='date' readOnly={!permanentDisfigurement} />
+                                    <Form.Control type='date' {...register('from')} readOnly={!permanentDisfigurement} />
                                 </Form.Group>
                             </div>
 
@@ -432,12 +461,12 @@ const AutoAccident = ({ patientId, activeTab }) => {
                             <div className="col-6 mt-1">
                                 <Form.Group>
                                     <Form.Label className='mb-0'>Patient was disabled (unable to work) to:</Form.Label>
-                                    <Form.Control type='date' readOnly={!permanentDisfigurement} />
+                                    <Form.Control type='date' {...register('to')} readOnly={!permanentDisfigurement} />
                                 </Form.Group>
                             </div>
                             <div className="col-6 mt-1"> <Form.Group>
                                 <Form.Label className='mb-0'>If still disabled, patient should be able to return to work on:</Form.Label>
-                                <Form.Control type='date' readOnly={!permanentDisfigurement} />
+                                <Form.Control type='date' {...register('returnToWork')} readOnly={!permanentDisfigurement} />
                             </Form.Group></div>
                         </div>
                     </div>
@@ -447,7 +476,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
                             <Form.Check
                                 type="checkbox"
                                 style={{ cursor: "pointer", color: "#6c757d" }}
-                                {...register('hasSimilarCondition')}
+                                {...register('requiresRehab')}
                                 label="Will the patient require rehabilitation and/or occupational therapy as a result of the injuries sustained in this accident?"
                                 onChange={(e) => {
                                     const isChecked = e.target.checked;

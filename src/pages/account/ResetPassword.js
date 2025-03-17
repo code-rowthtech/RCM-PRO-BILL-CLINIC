@@ -128,7 +128,7 @@ const ResetPassword = (): React$Element<any> => {
                         onPaste={(e) => e.preventDefault()}
                     />
 
-                    <div className="mb-3 mb-0 text-center">
+                    <div className="mb-3 mb-0 d-flex justify-content-center">
                         <Button variant="primary" className='custom-buttons' type="submit" disabled={loading}>
                             {t('Submit')}
                         </Button>

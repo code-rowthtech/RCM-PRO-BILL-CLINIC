@@ -1,7 +1,7 @@
 // @flow
 import React, { useEffect, useState } from 'react';
 import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
 import { FormInput } from '../../../components';
@@ -40,7 +40,6 @@ type OrderListProps = {
 const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     return (
         <Table responsive className="table-centered table-nowrap mb-0  rounded"
@@ -72,7 +71,7 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                             <td className='text-capitalize'>{data?.patient?.firstName}</td>
                             <td className='text-capitalize'>{data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName}</td>
                             <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td>
-                            <td className='text-capitalize'>{data?.purposeOfVisit}</td>
+                            <td className='text-capitalize'>{data?.reason || 'N/A'}</td>
                             <td>{data?.startTime} - {data?.endTime}</td>
                             <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
                             <td><span className={`px-1 text-white ${data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'} rounded-2`}>{data?.status}</span></td>
@@ -151,7 +150,11 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const handleInputChange = (data, type) => {
         setDoctorSearch(data)
     }
-
+    const handleSearchInputChange = (selectedOption, type) => {
+        if (type === 'doctor') {
+            setSelectedDoctor(selectedOption);
+        }
+    };
     const handleChange = (selectedOption, type) => {
         setSelectedDoctor(selectedOption, 'Selected Option');
     };
@@ -188,12 +191,10 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <Col sm={8} className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col
-                                            xs={12} // Full-width on extra-small screens
-                                            sm="auto" // Auto width on small screens and above
-                                            className="d-flex flex-wrap gap-2 align-items-center justify-content-between responnsible-party-select"
-                                            style={{ overflowX: 'auto' }} // Enable horizontal scrolling on smaller screens
+                                            xs={12}
+                                            sm="auto"
+                                            className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select"
                                         >
-                                            {/* Search input shown in both tabs */}
                                             <Select
                                                 className="basic-single"
                                                 classNamePrefix="select"
@@ -210,17 +211,18 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 }}
                                                 name="doctorName"
                                                 options={doctorOptions}
-                                                placeholder="Select Doctor Name"
+                                                placeholder="Select Doctor"
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
-                                                        minHeight: '33px',
-                                                        height: '33px',
+                                                        minHeight: '30px',
+                                                        height: '30px',
+                                                        width: '200px',
                                                         padding: '0px',
                                                         fontSize: '14px',
-                                                        border: '0px',            // Remove border
-                                                        backgroundColor: '#d9ddd6!important',     // Set background to red
-                                                        boxShadow: 'none',           // Remove any shadow effects
+                                                        border: '0px',
+                                                        backgroundColor: '#E8F0FE!important',
+                                                        boxShadow: 'none',
                                                     }),
                                                     valueContainer: (provided) => ({
                                                         ...provided,
@@ -237,10 +239,12 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     placeholder: (provided) => ({
                                                         ...provided,
                                                         fontWeight: 600,
-                                                        color: '#0908084f',  // White text for contrast with red background
+                                                        color: '#0908084f',
                                                     }),
                                                 }}
                                             />
+
+
 
 
 
@@ -281,8 +285,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                             )}
                         </Card.Body>
                     </Card>
-                </Col>
-            </Row>
+                </Col >
+            </Row >
         </>
     );
 };

@@ -9,6 +9,11 @@ export const getPatientsAction = (data): AuthAction => ({
     data
 });
 
+export const getPatientsByAppointmentAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_PATIENTS_BY_APPOINTMENT,
+    data
+});
+
 export const getPatientByIdAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_PATIENTS_BY_ID,
     data
@@ -32,6 +37,10 @@ export const getResponsiblePartyAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_RESPONSIBLE_PARTY,
     data
 });
+export const getResponsiblePartyByIdAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_RESPONSIBLE_PARTY_BY_ID,
+    data
+});
 
 export const updatePatientsAction = (data): AuthAction => ({
     type: PatientsActionTypes.UPDATE_PATIENTS,
@@ -43,11 +52,15 @@ export const createInsuranceAction = (data): AuthAction => ({
     data
 });
 
+export const getInsuranceByPatientAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_INSURANCE_BY_ID,
+    data
+});
+
 export const updateInsuranceAction = (data): AuthAction => ({
     type: PatientsActionTypes.UPDATE_INSURANCE,
     data
 });
-export const stateEmptydAction = (): LayoutAction => ({
-    type: PatientsActionTypes.STATE_EMPTY_INTIAL_STATE,
-
+export const resetUpdateAction = (): LayoutAction => ({
+    type: PatientsActionTypes.RESET_UPDATE_STATUS,
 });

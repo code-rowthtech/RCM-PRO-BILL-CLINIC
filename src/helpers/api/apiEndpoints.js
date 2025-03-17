@@ -1,93 +1,128 @@
-export const addPermissions = '/api/v1/permisssions';
-export const getPermissions = '/api/v1/clinic/getPermissions';
-export const deletePermissions = '/api/v1/permisssions/delete';
-export const updatePermissions = '/api/v1/permisssions';
+const BaseRoute = '/api/v1/clinic';
+export const addPermissions = `${BaseRoute}/permissions`
+export const getPermissions = `${BaseRoute}/getPermissions`;
+export const deletePermissions = `${BaseRoute}/permisssions/delete`;
+export const updatePermissions = `${BaseRoute}/permisssions`;
 export const deleteClinicOnboarding = "";
 export const getClinicsByParentId = '';
 
-// ROLES
-export const createRoles = '/api/v1/clinic/createSubUser';
-export const viewPassword = '/api/v1/clinic/viewPassword';
-export const updateRoles = '/api/v1/clinic/updateSubUser';
-export const getRoles = '/api/v1/clinic/listAllUsers';
-export const getUserId = '/api/v1/clinic/getUserDetails';
-export const deleterRoles = '/api/v1/clinic/removeUser'
+// ROLES 
+export const createRoles = `${BaseRoute}/createSubUser`;
+export const viewPassword =  `${BaseRoute}/viewPassword`;
+export const updateRoles = `${BaseRoute}/updateSubUser`;
+export const getRoles = `${BaseRoute}/listAllUsers`;
+export const getUserId = `${BaseRoute}/getUserDetails`;
+export const deleterRoles =`${BaseRoute}/removeUser`;
 
 // CLINIC
-export const createClinic = '/api/v1/clinic/editClinicDetails';
-export const changeEmail = 'api/v1/clinic/requestOtpForEmailVerification';
+export const createClinic =  `${BaseRoute}/edit-clinic-details`;
+export const changeEmail =  `${BaseRoute}/request-otp-email-verification`;
 // export const updateClinic = '/api/v1/clinic/editClinicDetails';
-export const getClinic = '/api/v1/clinic/getClinicDetails';
-export const getClinicById = '/api/v1/clinic/byId';
-export const getStatedByCountry = '/api/v1/clinic/states/US';
-export const getCityByState = '/api/v1/clinic/cities/';
-export const getClinicType = '/api/v1/clinic/getClinicTypes';
-
-
+export const getClinic = `${BaseRoute}/details`;
+export const getClinicById = `${BaseRoute}/byId`;
+export const getStatedByCountry =  `${BaseRoute}/states/US`;
+export const getCityByState = `${BaseRoute}/cities/`;
+export const getClinicType = `${BaseRoute}/getClinicTypes`;
 
 // SUB CLINIC
-export const createSubClinic = '/api/v1/clinic/createSubClinics'
-export const getSubClinic = '/api/v1/clinic/getSubClinics'
-export const getSubClinicCityByState = '/api/v1/clinic/cities/';
-export const updateSubClinic = '/api/v1/clinic/editClinicDetails';
-export const createUpgrade = '/api/v1/clinic/upgradeSubscription'
-export const getSubClinicType = '/api/v1/clinic/getClinicTypes'
-export const getSubscription = '/api/v1/clinic/getSubscription/history'
+export const createSubClinic =  `${BaseRoute}/createSubClinics`;
+export const getSubClinic = `${BaseRoute}/getSubClinics`;
+export const getSubClinicCityByState =  `${BaseRoute}/cities/`;
+export const updateSubClinic =  `${BaseRoute}/edit-clinic-details`;
+export const createUpgrade = `${BaseRoute}/upgradeSubscription`;
+export const getSubClinicType = `${BaseRoute}/getClinicTypes`;
+export const getSubscription = `${BaseRoute}/getSubscription/history`;
 
 //CONTRACT
-export const createContract = '/api/v1/clinic/getContractDetails';
-export const standardContract = 'api/v1/clinic/getStandardContact';
+export const createContract = `${BaseRoute}/contract-details`;
+export const standardContract = `${BaseRoute}/getStandardContact`;
 
 // SETTING
-export const addMastersData = '/api/v1/clinic/createOrUpdateMasterData';
-export const getMastersData = '/api/v1/clinic/getmasterData';
-export const getDepartmentData = '/api/v1/clinic/getmasterData';
-export const updateMastersData = '/api/v1/clinic/createOrUpdateMasterData';
-
-export const addRoleData = '/api/v1/clinic/roles/create';
-export const getRoleData = '/api/v1/clinic/getAllRoles';
-export const updateRoleData = '/api/v1/clinic/roles/edit';
+export const addMastersData = `${BaseRoute}/createOrUpdateMasterData`;
+export const getMastersData = `${BaseRoute}/getmasterData`;
+export const getDepartmentData = `${BaseRoute}/getmasterData`;
+export const updateMastersData = `${BaseRoute}/createOrUpdateMasterData`;
+export const addRoleData = `${BaseRoute}/roles/create`;
+export const getRoleData = `${BaseRoute}/getAllRoles`;
+export const updateRoleData = `${BaseRoute}/roles/edit`;
 
 // DOCTORS
-export const getDoctor = '/api/v1/doctors/getClinicDoctors';
-export const createDoctor = '/api/v1/clinics/practitioner/add';
-export const getDoctorRoles = '/api/v1/clinic/roles';
-export const createDoctorDetail = '/api/v1/clinics/practitioner/update';
-export const getDoctorDetails = '/api/v1/doctors/getDoctorDetails';
-export const addReferringDoctor = '/api/v1/clinics/add/referringDoc'
+export const getDoctor = `${BaseRoute}/practitioner/list`;
+export const createDoctor = `${BaseRoute}/practitioner/create`;
+export const getDoctorRoles = `${BaseRoute}/roles`;
+export const createDoctorDetail = `${BaseRoute}/practitioner/update`;
+export const getDoctorDetails = `${BaseRoute}/practitioner/details`;
+export const addReferringDoctor = `${BaseRoute}/Patient/referring-doc`;
 
 // PATIENTS
-export const getPatients = '/api/v1/clinics/patient-get';
-export const getPatientById = '/api/v1/clinics/patient-getById';
-export const createPatients = '/api/v1/clinics/patient-onboard';
-export const updatePatients = '/api/v1/clinics/patient-edit';
-export const createResponsibleParty = '/api/v1/clinics/responsible-party-add';
-export const updateResponsibleParty = '/api/v1/clinics/responsible-party-edit';
-export const getResponsibleParty = '/api/v1/clinics/responsible-party-get';
-export const createInsurance = 'api/v1/clinics/createInsurances';
-export const updateInsurance = 'api';
+export const getPatients = `${BaseRoute}/Patients`;
+export const getPatientById = `${BaseRoute}/patient/by/id`;
+export const createPatients = `${BaseRoute}/Patient/add`;
+export const updatePatients = `${BaseRoute}/Patient/update`;
+export const createResponsibleParty = `${BaseRoute}/Patient/responsible-party`;
+export const updateResponsibleParty = `${BaseRoute}/responsible-party-edit`;
+export const getResponsibleParty = `${BaseRoute}/responsible-party-get`;
+export const getResponsiblePartyById = `${BaseRoute}/responsible-party-getByPatientId`;
+export const createInsurance = `${BaseRoute}/createInsurances`;
+export const getInsuranceById = `${BaseRoute}/getInsuranceByPatientId`;
+export const updateInsurance = `${BaseRoute}/updateInsurances`;
 
 // DASHBOARD
 export const getAnalytics = '/api/v1/admin/';
 
 // SUBSCRIPTIONS
-export const getSubscriptions = '/api/v1/clinic/getSubscriptionsList';
-export const getSubSubscriptions = '/api/v1/clinic/getSubscription/history'
-export const addSubscriptionPlan = '/api/v1/clinic/addSubscriptionPlan';
+export const getSubscriptions = `${BaseRoute}/subscriptions-list`;
+export const getSubSubscriptions = `${BaseRoute}/subscription-history`;
+export const addSubscriptionPlan = `${BaseRoute}/add-subscription-plan`;
 
 // SCHEDULE
-export const createSchedule = '/api/v1/clinic/practitioner/holiday/create';
-export const createTimings = '/api/v1/clinic/practitioner/schedule/create';
-export const updateTimings = '/api/v1/clinic/practitioner/schedule/update';
-export const getDoctorsList = 'api/v1/clinic/getDoctorsList';
-export const deleteSchedule = '/api/v1/clinic/practitioner/holiday/delete'
-export const getSchedule = '/api/v1/clinic/practitioner/holidays';
-export const getPractitionerTimings = '/api/v1/clinic/practitioner/schedule';
+export const createSchedule = `${BaseRoute}/practitioner/holiday/create`;
+export const createTimings = `${BaseRoute}/practitioner/schedule/create`;
+export const updateTimings = `${BaseRoute}/practitioner/schedule/update`;
+export const getDoctorsList = `${BaseRoute}/getDoctorsList`;
+export const deleteSchedule = `${BaseRoute}/practitioner/holiday/delete`
+export const getSchedule = `${BaseRoute}/practitioner/holidays`;
+export const getPractitionerTimings = `${BaseRoute}/practitioner/schedule`;
 
 // appointments
-export const createAppointment = '/api/v1/clinic/appointments';
-export const rescheduleAppointment = '/api/v1/clinic/appointment/';
-export const getPractitionerSchedule = '/api/v1/clinic/getPractitionerSchedule';
-export const getAppointments = '/api/v1/clinic/appointment/getAll/';
-export const getAppointmentById = '/api/v1/clinic/appointment/';
-export const getPractitionerSlots = '/api/v1/clinic/practitioner/slots';
+export const createAppointment = `${BaseRoute}/appointments`;
+export const rescheduleAppointment = `${BaseRoute}/appointment/`;
+export const getPractitionerSchedule = `${BaseRoute}/getPractitionerSchedule`;
+export const getAppointments = `${BaseRoute}/appointment/getAll/`;
+export const getAppointmentById = `${BaseRoute}/appointment/`;
+export const getPractitionerSlots = `${BaseRoute}/practitioner/slots`;
+export const getPatientsByAppointment = `${BaseRoute}/getPatientsByAppointments`;
+
+// ASSIGN NOTES
+export const getClinicEmployees = `${BaseRoute}/getClinicEmployees`;
+export const createTask = `${BaseRoute}/createTask`;
+export const getAllTasks = `${BaseRoute}/getAllTasks`;
+export const updateTask = `${BaseRoute}/updateTask`;
+export const getTaskDetails = `${BaseRoute}/getTaskDetails`;
+
+// Problem List
+export const getProblemList = `${BaseRoute}/getPatientProblems`;
+export const createProblemList = `${BaseRoute}/createProblems`;
+export const updateProblemList = `${BaseRoute}/updateProblems`;
+export const deleteProblemList = `${BaseRoute}/deleteProblems`;
+export const allCodes = `${BaseRoute}/codes/search`;
+export const getPatientAppointment = `${BaseRoute}/getPatientAppointments`;
+export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
+
+
+// Allergy List
+// export const getAllergylist = `${BaseRoute}/getAllergiesList`;
+export const createAllergy = `${BaseRoute}/addAllergy`;
+export const updateAllergy = `${BaseRoute}/updateAllergy`;
+// export const deleteProblemList = `${BaseRoute}/deleteAllergy`;
+export const getAllergiesOfAPatient = `${BaseRoute}/getAllergiesOfAPatient`;
+export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
+
+
+// vitals
+export const createVitals = `${BaseRoute}/addVitals`;
+export const getVitals = `${BaseRoute}/getAllVitals`;
+export const getVitalsByPatientId = `${BaseRoute}/vitalsByPatientId`;
+export const getVitalsByAppointmentId = `${BaseRoute}/vitalsByAppointmentId`;
+export const updateVitals = `${BaseRoute}/updateVitals`;
+

@@ -35,18 +35,18 @@ const DoctorHoliday = () => {
   }
   return (
     <div>
-      <Table responsive  className="table-centered table-nowrap mb-0  rounded"
-              style={{ height: scheduleResponse?.length === 0 ? '90vh' : 'auto' }}>
+      <Table responsive className="table-centered table-nowrap mb-0  rounded"
+        style={{ height: scheduleResponse?.length === 0 ? '74vh' : 'auto' }}>
         <thead className="text-white">
           <tr>
-            <th className="text-white "  style={{ fontSize: '13px' }}>Sr.No.</th>
-            <th className="text-white "  style={{ fontSize: '13px' }}>Doctor Name</th>
-            <th className="text-white "  style={{ fontSize: '13px' }}>Reason</th>
-            <th className="text-white "  style={{ fontSize: '13px' }}>Date</th>
-            <th className="text-white "  style={{ fontSize: '13px' }}>Action</th>
+            <th className="text-white " style={{ fontSize: '13px' }}>Sr.No.</th>
+            <th className="text-white " style={{ fontSize: '13px' }}>Doctor Name</th>
+            <th className="text-white " style={{ fontSize: '13px' }}>Reason</th>
+            <th className="text-white " style={{ fontSize: '13px' }}>Date</th>
+            <th className="text-white " style={{ fontSize: '13px' }}>Action</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody >
           {isLoading ? (
             <tr>
               <td colSpan={5} className="text-center " >

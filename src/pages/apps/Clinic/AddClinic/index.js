@@ -47,7 +47,7 @@ const Index = () => {
                 <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
                     <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
-                                <div className="d-flex gap-3">
+                                <div className="d-flex gap-4">
                                     {['clinic', 'billing', 'contract'].map((tab) => (
                                         <span
                                             key={tab}
@@ -55,7 +55,7 @@ const Index = () => {
                                             role="button"
                                             tabIndex="0"
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTab === tab ? 'border-bottom border-2 border-dark text-black fw-bold' : ''
+                                                activeTab === tab ? 'active_tabs_link fw-bold' : ''
                                             }`}>
                                             {tab === 'clinic'
                                                 ? 'Practice Information'

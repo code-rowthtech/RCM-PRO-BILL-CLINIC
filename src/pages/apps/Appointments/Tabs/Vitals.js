@@ -7,7 +7,7 @@ const Vitals = () => {
             <div className='rounded ' style={{ border: '1px solid #ced4da' }}>
                 <div className='px-2 '>
                     {/* first section */}
-                    <Row className=' pb-1' style={{ background: '#313A46', borderTopLeftRadius:'3px', borderTopRightRadius:'3px'}}>
+                    <Row className=' pb-1' style={{ background: '#313A46', borderTopLeftRadius: '3px', borderTopRightRadius: '3px' }}>
 
                         <Col sm={3}>
                             <p className='text-nowrap mt-2 mb-0 fw-bold text-white'>System Vitals</p>
@@ -44,7 +44,7 @@ const Vitals = () => {
                     {/* second section */}
                     <Row className='pt-1' style={{ background: '#E6EBFF', }}>
                         <Col sm={4} style={{ borderRight: '1px solid #ced4da' }}>
-                            <p className='mb-0 mt-1 fw-bold'>Name</p>
+                            <p className='mb-0 mt-1 fw-bold'></p>
                         </Col>
                         <Col sm={4} className='text-center' style={{ borderRight: '1px solid #ced4da' }}>
                             <p className='m-0 fw-bold'>O1/10/2025</p>
@@ -92,9 +92,7 @@ const Vitals = () => {
             <Row>
                 <Col className='d-flex justify-content-end mt-2'>
                     <Button
-                        variant='success'
-                        className='fs-6 d-flex align-items-center justify-content-center'
-                        style={{ height: '30px', padding: '0 15px' }}
+                        className='fs-6 d-flex align-items-center justify-content-center custom-buttons'
                     >
                         Mark as Done
                     </Button>

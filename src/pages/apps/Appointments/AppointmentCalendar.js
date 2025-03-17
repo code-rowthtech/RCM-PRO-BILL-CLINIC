@@ -118,6 +118,7 @@ const AppointmentCalendar = () => {
                     <p className='fw-bold mt-1'>Appointment Calendar</p>
                     <Button
                         onClick={() => navigate("/apps/appointments/list")}
+                        className='cancel-button'
                     >
                         Back
                     </Button>

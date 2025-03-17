@@ -9,4 +9,6 @@ export * from './dashboard/actions';
 export * from './doctors/actions';
 export * from './patients/actions';
 export * from './subscriptions/actions';
-export * from './appointments/action'
+export * from './appointments/action';
+export * from './vitals/actions';
+export * from './assigntasks/action';

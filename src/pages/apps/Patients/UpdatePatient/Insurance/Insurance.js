@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PrimaryInsurance from '../../Insurance/PrimaryInsurance';
 import AutoAccident from '../../Insurance/AutoAccident';
 import WorkersCamp from '../../Insurance/WorkersCamp';
 import SecondaryInsurance from '../../Insurance/SecondaryInsurance';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getInsuranceByPatientAction, resetUpdateAction } from '../../../../../redux/actions';
+import { encryptMessage } from '../../../../../cryptoUtils';
+import Spinner from '../../../../../constants/Spinner';
 
 
 const Insurance = ({ patientId }) => {
     const [activeTab, setActiveTab] = useState("primaryInsurance");
-
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const store = useSelector((state) => state);
+    const updateInsuranceSuccess = store?.updateInsuranceReducer?.data?.status;
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(getInsuranceByPatientAction({ key: encryptMessage({ patientId: id }) }));
+    }, [])
+    useEffect(() => {
+        if (updateInsuranceSuccess === 200) {
+            dispatch(getInsuranceByPatientAction({ key: encryptMessage({ patientId: id }) }));
+            dispatch(resetUpdateAction())
+        }
+    }, [updateInsuranceSuccess])
     const handleTabChange = (tab) => {
         setActiveTab(tab);
     };
@@ -52,17 +70,25 @@ const Insurance = ({ patientId }) => {
                     </ul>
                 </div>
                 <div className="col-12 mt-2">
-                    {activeTab === 'primaryInsurance' ?
-                        <PrimaryInsurance patientId={patientId} />
-                        :
-                        activeTab === 'secondaryInsurance' ?
-                            <SecondaryInsurance patientId={patientId} />
+                    {
+                        store?.getInsuranceByIdReducer?.loading ?
+                            <div className='d-flex justify-content-center'>
+                                <Spinner />
+                            </div>
                             :
-                            activeTab === 'autoAccident' ?
-                                <AutoAccident patientId={patientId} />
-                                : activeTab === 'workersCamp' ?
-                                    <WorkersCamp patientId={patientId} /> : ''
+                            activeTab === 'primaryInsurance' ?
+                                <PrimaryInsurance patientId={patientId} />
+                                :
+                                activeTab === 'secondaryInsurance' ?
+                                    <SecondaryInsurance patientId={patientId} />
+                                    :
+                                    activeTab === 'autoAccident' ?
+                                        <AutoAccident patientId={patientId} />
+                                        : activeTab === 'workersCamp' ?
+                                            <WorkersCamp patientId={patientId} /> : ''
+
                     }
+
 
                 </div>
             </div>

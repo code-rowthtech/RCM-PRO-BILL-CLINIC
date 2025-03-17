@@ -1,17 +1,40 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FiUploadCloud } from 'react-icons/fi';
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInsuranceAction } from '../../../../redux/actions';
+import { createInsuranceAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { useSearchParams } from 'react-router-dom';
 
 const SecondaryInsuance = ({ patientId, activeTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const { handleSubmit, reset, register, errors } = useForm();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const { handleSubmit, reset, register, setValue } = useForm();
     const [insuredPersonIsPatient, setInsuredPersonIsPatient] = useState(false)
     const [subscriberIsPatient, setSubscriberIsPatient] = useState(true)
+    const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
+    const secondaryInsurance = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === 'Secondary Ins')
+    useEffect(() => {
+        if (id && insuranceByPatient) {
+            setValue('subscriberIsPatient', secondaryInsurance?.subscriberIsPatient);
+            setValue('insuredPersonIsPatient', secondaryInsurance?.insuredPersonIsPatient);
+            setValue('insuranceCompany', secondaryInsurance?.insuranceCompany);
+            setValue('carrierPayerId', secondaryInsurance?.carrierPayerId);
+            setValue('insuranceIdNumber', secondaryInsurance?.insuranceIdNumber);
+            setValue('insuranceGroupName', secondaryInsurance?.insuranceGroupName);
+            setValue('insuranceGroupNumber', secondaryInsurance?.insuranceGroupNumber);
+            setValue('insurancePlanName', secondaryInsurance?.insurancePlanName);
+            setValue('insurancePlanType', secondaryInsurance?.insurancePlanType);
+            setValue('insuranceType', secondaryInsurance?.insuranceType);
+            setValue('secondaryInsuranceTypeCode', secondaryInsurance?.secondaryInsuranceTypeCode);
+            setValue('insuranceClaimOfficeNumber', secondaryInsurance?.insuranceClaimOfficeNumber);
+            setValue('insuranceNotes', secondaryInsurance?.insuranceNotes);
+            setValue('cardIssuedDate', secondaryInsurance?.cardIssuedDate ? new Date(secondaryInsurance?.cardIssuedDate).toISOString().split('T')[0] : '');
+        }
+    }, [insuranceByPatient, id])
     const onSubmit = (data) => {
 
         // Helper function to remove empty values
@@ -23,6 +46,7 @@ const SecondaryInsuance = ({ patientId, activeTab }) => {
 
         const payload = {
             ...removeEmptyValues(data),
+            ...(id && secondaryInsurance ? { id: secondaryInsurance?._id } : {}),
             subscriberIsPatient: subscriberIsPatient,
             insuredPersonIsPatient: insuredPersonIsPatient,
             insuranceType: 'Secondary Ins',
@@ -34,8 +58,11 @@ const SecondaryInsuance = ({ patientId, activeTab }) => {
             }),
         };
 
-        console.log(payload, 'payyyyyyyyyyyy');
-        dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        if (id && secondaryInsurance) {
+            dispatch(updateInsuranceAction({ key: encryptMessage(payload) }))
+        } else {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        }
     };
 
     const tableData = [
@@ -67,7 +94,7 @@ const SecondaryInsuance = ({ patientId, activeTab }) => {
                                 defaultChecked={subscriberIsPatient}
                                 style={{ cursor: "pointer", color: "#6c757d" }}
                                 {...register('subscriberIsPatient')}
-                                label="Insured person is the same person as the Patient"
+                                label="Subscriber is the patient"
                                 onChange={(e) => {
                                     const isChecked = e.target.checked;
                                     setSubscriberIsPatient(true);
@@ -209,8 +236,8 @@ const SecondaryInsuance = ({ patientId, activeTab }) => {
                     </div>
                     <div className="col-12">
                         <Form.Group>
-                            <Form.Label className='mb-0'>Primary Issuance Notes</Form.Label>
-                            <Form.Control placeholder='Primary Issuance Notes' {...register('insuranceNotes')} type='text' />
+                            <Form.Label className='mb-0'>Secondary Issuance Notes</Form.Label>
+                            <Form.Control placeholder='Secondary Issuance Notes' {...register('insuranceNotes')} type='text' />
                         </Form.Group>
                     </div>
                 </div>

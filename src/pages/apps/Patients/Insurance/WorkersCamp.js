@@ -1,17 +1,59 @@
-import React, { useState } from 'react'
-import { FiUploadCloud } from 'react-icons/fi';
+import React, { useEffect, useState } from 'react'
 import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { createInsuranceAction } from '../../../../redux/actions';
+import { createInsuranceAction, getCitiesAction, getStatesByCountryAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { useSearchParams } from 'react-router-dom';
 
 const WorkersCamp = ({ patientId, activeTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const { handleSubmit, reset, register, errors } = useForm();
-    const [insuredPersonIsPatient, setInsuredPersonIsPatient] = useState(false)
-    const [subscriberIsPatient, setSubscriberIsPatient] = useState(true)
+    const { handleSubmit, reset, register, errors, setValue } = useForm();
+    const [searchedLocations, setSearchedLocations] = useState(null);
+    const cities = store?.getCitiesReducer?.cities1?.data?.cities;
+    const [selectedState, setSelectedState] = useState(null);
+    const [citySearch, setCitySearch] = useState(null);
+    const [focused, setFocused] = useState(false);
+    const statesData = store?.getStatesReducer?.data?.states;
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const insuranceByPatient = store?.getInsuranceByIdReducer?.data?.insurance;
+
+    const workersComp = insuranceByPatient && insuranceByPatient?.find((data) => data?.insuranceType === `Worker's Comp`)
+    useEffect(() => {
+        if (id && insuranceByPatient) {
+            setValue('carrierPayerId', workersComp?.carrierPayerId)
+            setValue('insuranceCarrierCode', workersComp?.insuranceCarrierCode)
+            setValue('insuranceCaseNumber', workersComp?.insuranceCaseNumber)
+            setValue('insuranceGroupName', workersComp?.insuranceGroupName)
+            setValue('insuranceGroupNumber', workersComp?.insuranceGroupNumber)
+            setValue('insurancePayerCity', workersComp?.insurancePayerCity)
+            setValue('insurancePayerState', workersComp?.insurancePayerState)
+            setValue('insurancePayerZip', workersComp?.insurancePayerZip)
+            setValue('insuranceProvider', workersComp?.insuranceProvider)
+            setValue('insuranceWcbNumber', workersComp?.insuranceWcbNumber)
+            setValue('insurancePayerAddress', workersComp?.insurancePayerAddress)
+            setValue('insuranceWcbRatingCode', workersComp?.insuranceWcbRatingCode)
+            setValue('propertyCasualtyClaimNumber', workersComp?.propertyCasualtyClaimNumber)
+            setValue('stateOfOccurrence', workersComp?.stateOfOccurrence)
+            setValue('workerCampLatitude', workersComp?.workerCampLatitude)
+            setValue('workerCampLongitude', workersComp?.workerCampLongitude)
+            setValue('workerCampTimeZone', workersComp?.workerCampTimeZone)
+            setValue('workersCompNotes', workersComp?.workersCompNotes)
+            setValue('dateOfAccident', workersComp?.dateOfAccident ? new Date(workersComp?.dateOfAccident).toISOString().split('T')[0] : "");
+        }
+    }, [insuranceByPatient, id])
+
+    useEffect(() => {
+        if (selectedState) {
+            dispatch(getCitiesAction({ state_code: selectedState?.id, name: citySearch ? citySearch : '', limit: 25, skip: '' }))
+        }
+    }, [selectedState])
+
+    useEffect(() => {
+        dispatch(getStatesByCountryAction());
+    }, [dispatch])
     const onSubmit = (data) => {
 
         // Helper function to remove empty values
@@ -23,20 +65,45 @@ const WorkersCamp = ({ patientId, activeTab }) => {
 
         const payload = {
             ...removeEmptyValues(data),
-            subscriberIsPatient: subscriberIsPatient,
-            insuredPersonIsPatient: insuredPersonIsPatient,
+            ...(id && workersComp ? { id: workersComp?._id } : {}),
             insuranceType: `Worker's Comp`,
             patientId: patientId,
         };
 
-        console.log(payload, 'payyyyyyyyyyyy');
-        dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        if (id && workersComp) {
+            dispatch(updateInsuranceAction({ key: encryptMessage(payload) }))
+        } else {
+            dispatch(createInsuranceAction({ key: encryptMessage(payload) }));
+        }
     };
 
-    const tableData = [
-        { type: 'Patient', values: Array(6).fill("0.00") },
-        { type: 'Insurance', values: Array(6).fill("0.00") }, // Add more rows as needed
-    ];
+    const getGeolocation = (e) => {
+        const addressToSearch = e.target.value;
+        async function fetchGeocodeData(location) {
+            const apiKey = '2a77840d874f4c35848e37042ce7c8ed'; // Replace with your API key
+            const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(location)}&key=${apiKey}&language=en&pretty=1&countrycode=us`;
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`Error fetching data: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Failed to fetch geocode data:", error);
+                return null;
+            }
+        }
+        fetchGeocodeData(addressToSearch)
+            .then((data) => {
+                if (data) {
+                    setSearchedLocations(data?.results)
+                }
+            });
+    }
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -68,43 +135,110 @@ const WorkersCamp = ({ patientId, activeTab }) => {
                     <div className="col-6">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Payer Address</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='Insurance Payer Address' {...register("insurancePayerAddress")} />
+                            <div style={{ position: 'relative' }}>
+                                <Form.Control
+                                    {...register('insurancePayerAddress')}
+                                    onChange={(e) => {
+                                        getGeolocation(e);
+                                        setFocused(true);
+                                    }}
+                                    onFocus={() => setFocused(true)}
+                                    onBlur={() => {
+                                        setTimeout(() => setFocused(false), 200);
+                                    }}
+                                    placeholder="Search for address"
+                                    autoComplete="off"
+                                />
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: 0,
+                                        width: '100%',
+                                        maxHeight: '150px',
+                                        overflow: 'auto',
+                                        zIndex: 111,
+                                        backgroundColor: '#fff',
+                                        border: '1px solid #ced4da',
+                                        borderTop: 'none',
+                                    }}
+                                    className={`scroll-container hover-bg-change ${searchedLocations?.length === 0 || !focused ? 'd-none' : ''}`}
+                                >
+                                    {searchedLocations?.map((data, index) => (
+                                        <p
+                                            key={index}
+                                            onClick={() => {
+                                                setValue('insurancePayerZip', data?.components?.postcode)
+                                                setValue('workerCampLatitude', data?.bounds?.southwest?.lat);
+                                                setValue('workerCampLongitude', data?.bounds?.southwest?.lng);
+                                                setValue('insurancePayerState', statesData && statesData?.find((state) => state?.state_code === data?.components?.state_code)?.name);
+                                                setCitySearch(data?.components?.county)
+                                                setSelectedState(statesData && statesData?.find((state) => state?.state_code === data?.components?.state_code))
+                                                setValue('insurancePayerAddress', data?.formatted)
+                                                setFocused(false);
+                                                setValue('workerCampTimeZone', data?.annotations?.timezone?.name)
+                                            }}
+                                            style={{
+                                                margin: 0,
+                                                padding: '8px 12px',
+                                                cursor: 'pointer',
+                                            }}
+                                            className="hover-bg-change text-black"
+                                        >
+                                            {data?.formatted}
+                                        </p>
+                                    ))}
+                                    {searchedLocations?.length === 0 && <p className="text-muted px-2 py-1">No results found</p>}
+                                </div>
+                            </div>
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Payer State</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='Insurance Payer Address' {...register("insurancePayerState")} />
+                            <Form.Select {...register('insurancePayerState')}>
+                                <option value="">Select State</option>
+                                {statesData?.map((data, index) => (
+                                    <option value={data?.name} key={data?._id}>{data?.name}</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Payer City</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='Insurance Payer Address' {...register("insurancePayerCity")} />
+                            <Form.Select
+                                {...register("insurancePayerCity")}
+                            >
+                                <option value=''>Select City</option>
+                                {cities?.map((data) => (
+                                    <option value={data?.name}>{data?.name}</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>Longitude</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='Longitude' {...register("longitude")} />
+                            <Form.Control className='mb-1' type='text' placeholder='Longitude' {...register("workerCampLongitude")} />
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>Latitude</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='Latitude' {...register("latitude")} />
+                            <Form.Control className='mb-1' type='text' placeholder='Latitude' {...register("workerCampLatitude")} />
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>ZIP</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='ZIP' {...register("insurancePayerZip")} />
+                            <Form.Control className='mb-1' type='text' maxLength={5} placeholder='ZIP' {...register("insurancePayerZip")} />
                         </Form.Group>
                     </div>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>TimeZone</Form.Label>
-                            <Form.Control className='mb-1' type='text' placeholder='TimeZone' {...register("insurancePayerTimeZone")} />
+                            <Form.Control className='mb-1' type='text' placeholder='TimeZone' {...register("workerCampTimeZone")} />
                         </Form.Group>
                     </div>
                     <div className="col-3">
@@ -140,7 +274,12 @@ const WorkersCamp = ({ patientId, activeTab }) => {
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>State of Occurence</Form.Label>
-                            <Form.Control className='mb-1' placeholder='Insurance Case #' {...register("stateOfOccurrence")} />
+                            <Form.Select {...register('stateOfOccurrence')}>
+                                <option value="">Select State</option>
+                                {statesData?.map((data, index) => (
+                                    <option value={data?.name} key={data?._id}>{data?.name}</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                     </div>
                     <div className="col-3">

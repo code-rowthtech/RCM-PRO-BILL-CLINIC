@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import Spinner from '../../../constants/Spinner'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FormInput } from '../../../components';
 import { FiEdit, FiFileText, FiTrash } from "react-icons/fi";
 import { FiFilter } from "react-icons/fi";
@@ -11,8 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getPatientsAction, updatePatientsAction } from '../../../redux/patients/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Paginations from '../../../helpers/Paginations';
+import { IoSearchSharp } from 'react-icons/io5';
 
 const Patients = () => {
+    const navigate = useNavigate('');
     const [detailsModal, setDetailsModal] = useState(false);
     const [selectedDetails, setSelectedDetails] = useState(null);
     const [status, setStatus] = useState(true);
@@ -35,8 +37,7 @@ const Patients = () => {
             limit: 10,
             search: search,
         }
-        // console.log(data, 'dataaa')
-        dispatch(getPatientsAction({ key: encryptMessage(data) }));
+        dispatch(getPatientsAction(data));
     }, [dispatch, skip, search]);
     const handleShowDetails = () => {
         setSmShow(true);
@@ -71,13 +72,17 @@ const Patients = () => {
         }
     };
 
-    const patientsData = store?.getPatientsReducer?.data?.patients;
+    const patientsData = store?.getPatientsReducer?.data?.data;
+    console.log( store?.getPatientsReducer,'patientsData')
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);
     };
 
-
+    const handleNewPatients = () => {
+        navigate('/apps/patients/new-patient')
+    }
+ 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -89,27 +94,43 @@ const Patients = () => {
                         <Card.Body style={{ height: '88vh' }}>
                             <Row className="mb-2">
                                 <Col sm={6}>
-                                    {/* <Button
-                                        onClick={() => setStatus(true)}
-                                        className={`me-2 ${status === true ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                    >
-                                        Active
-                                    </Button>
-
-                                    <Button
-                                        onClick={() => setStatus(false)}
-                                        className={`me-2 ${status === false ? 'custom-buttons text-white' : 'bg-white border-primary text-dark'}`}
-                                    >
-                                        Inactive
-                                    </Button> */}
                                 </Col>
 
 
                                 <Col sm={6} className='text-end'>
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className='d-flex gap-2'>
-                                            <FormInput type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." style={{ height: '30px' }} />
-                                            <Button as={Link} to='/apps/patients/new-patient' className="custom-buttons py-1" style={{ fontSize: '13px', height: '30px', fontWeight: '400' }}>
+                                            <div
+                                                className="input_search_box"
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    borderRadius: "4px",
+                                                    backgroundColor: "#e8f0fe",
+                                                    padding: "0px 5px",
+                                                }}
+                                            >
+                                                <IoSearchSharp
+                                                    style={{
+                                                        fontSize: "1.2rem",
+                                                        color: "black",
+                                                        marginRight: "10px",
+                                                    }}
+                                                />
+                                                <FormInput
+                                                    type="text"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    className="input_search_box"
+                                                    style={{
+                                                        border: "none",
+                                                        outline: "none",
+                                                        flex: 1,
+                                                        backgroundColor: "#ccc",
+
+                                                    }}
+                                                />
+                                            </div>
+                                            <Button onClick={handleNewPatients} className="custom-buttons py-1" >
                                                 New Patient
                                             </Button>
                                         </Col>
@@ -126,7 +147,7 @@ const Patients = () => {
                                                 <th className='text-white'>Patient Name</th>
                                                 <th className='text-white'>Gender</th>
                                                 <th className='text-white'>Phone</th>
-                                                <th className='text-white'>Insurance Range</th>
+                                                <th className='text-white'>Address</th>
                                                 <th className='text-white'>Last Visit</th>
                                                 <th className='text-white'>Next Visit</th>
                                                 <th className='text-white'>Action</th>
@@ -151,10 +172,10 @@ const Patients = () => {
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
                                                             <td>CH-{data?.chartNumber}</td>
-                                                            <td className='text-capitalize'>{data?.firstName}</td>
-                                                            <td className='text-capitalize'>{data?.sex}</td>
-                                                            <td>{data?.cellPhone}</td>
-                                                            <td>{data?.insuranceRange || 'N/A'}</td>
+                                                            <td className='text-capitalize'>{data?.name?.[0]?.text || 'N/A'}</td>
+                                                            <td className='text-capitalize'>{data?.gender || 'N/A'}</td>
+                                                            <td>{data?.telecom?.[1]?.value || 'N/A'}</td>
+                                                            <td>{data?.address?.[0]?.city || data?.address?.[0]?.state || 'N/A'}</td>
                                                             <td>{data?.lastVisit || 'N/A'}</td>
                                                             <td>{data?.nextVisit || 'N/A'}</td>
                                                             <td>
