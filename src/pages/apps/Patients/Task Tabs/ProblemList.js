@@ -37,7 +37,6 @@ const ProblemList = () => {
     };
     // delete function
     // const handleDelete = (data) =>{
-    //     console.log({data})
     //     dispatch(deleteProblemListAction({id:data?._id} ));
     // }
     return (

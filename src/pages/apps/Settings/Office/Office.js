@@ -20,7 +20,6 @@ import { IoSearchSharp } from 'react-icons/io5';
 
 const Office = () => {
   const store = useSelector((state) => state);
-  console.log(store, 'stoed')
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
@@ -57,10 +56,8 @@ const Office = () => {
     };
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("Updated", payload);
     } else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("create", payload);
 
     }
 
@@ -68,7 +65,6 @@ const Office = () => {
 
   const createResponse = store?.createMastersDataReducer?.data?.status;
   const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-  console.log("tableGetData", tableGetData)
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
     if (createResponse === 200) {

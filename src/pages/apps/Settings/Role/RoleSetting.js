@@ -25,7 +25,6 @@ const RoleSetting = () => {
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
     const rolePagination = store?.getRoleDataReducer?.data;
 
-    console.log({ rolePagination })
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
     const createSuccess = store?.createRoleDataReducer?.data?.status;
     const handleClosemodal = () => {
@@ -75,7 +74,6 @@ const RoleSetting = () => {
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
         dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search, createdById: '', page: skip, status: status }));
 
-        console.log({ status })
 
     }
     const handlePageChange = (pageNumber) => {

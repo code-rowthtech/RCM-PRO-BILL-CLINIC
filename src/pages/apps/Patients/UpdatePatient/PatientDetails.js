@@ -65,13 +65,10 @@ const PatientDetails = ({ patientId }) => {
     const [logo, setLogo] = useState(null);
     const [age, setAge] = useState(null);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    console.log(selectedDoctor,'selll')
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails,'id')
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'name');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
         label: data?.name?.[0]?.text,
@@ -180,7 +177,6 @@ const PatientDetails = ({ patientId }) => {
                 prefix: [data?.title || ''],
             },
         ];
- console.log(data?.previousBirthName,'privous')
         if (data?.previousBirthName) {
          
             payload.name.push({
@@ -229,7 +225,6 @@ const PatientDetails = ({ patientId }) => {
         }
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'Updated patient payload');
     };
 
     const handleInputChange = (data) => {

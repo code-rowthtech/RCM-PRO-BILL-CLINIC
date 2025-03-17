@@ -90,7 +90,6 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     };
     const onSubmit = () => {
         const otpString = otp.join('');
-        console.log({ otpString })
     }
     return (
         <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>

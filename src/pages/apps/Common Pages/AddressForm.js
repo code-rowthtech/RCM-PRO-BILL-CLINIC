@@ -14,9 +14,7 @@ const AddressForm = ({addresses,setAddresses}) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesData');
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log(addresses, 'addressessssssssssssssssss');
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,
@@ -240,7 +238,6 @@ const AddressForm = ({addresses,setAddresses}) => {
                                             };
                                             // Update the specific address entry
                                             const updatedAddresses = [...addresses];
-                                            console.log(updatedAddresses, 'updatedAddresses11');
                                             updatedAddresses[index] = newAddress;
                                             setAddresses(updatedAddresses);
                                             // Clear suggestions and remove focus

@@ -30,7 +30,6 @@ import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
 const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
-    console.log(patientId, 'patientId');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -66,21 +65,18 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesData');
     const updateResponse = store?.updatePatientsReducer?.data?.status;
-    console.log(updateResponse, 'updateResponse');
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const employerState = watch('employerStateName');
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (employerState) {
-            const stateCity = statesData?.states?.find((data) => data?.state_code === employerState)?.id;
-            dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
-        }
-    }, [employerState]);
+    // useEffect(() => {
+    //     if (employerStateName) {
+    //         const stateCity = statesData?.states?.find((data) => data?.state_code === employerStateName)?.id;
+    //         dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
+    //     }
+    // }, [employerStateName]);
     useEffect(() => {
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
@@ -169,7 +165,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
 
             address: demographicAddresses,
         };
-        console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {
@@ -210,7 +205,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             if (data) {
                 setSearchedEmployerLocations(data?.results);
             } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -235,16 +229,13 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     }));
 
     const handleEthnicityChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
     const handleRelationChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
 
     const handleTribalChange = (selectedOption) => {
-        console.log(selectedOption, 'selectedOption');
         setValue('ethnicity', selectedOption ? selectedOption.display : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
@@ -262,7 +253,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -369,7 +359,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 onChange={handleEthnicityChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -417,7 +406,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -541,7 +529,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 onChange={handleRelationChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,

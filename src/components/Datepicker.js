@@ -11,7 +11,6 @@ type DatepickerInputProps = {
 /* Datepicker with Input */
 const DatepickerInput = forwardRef((props: DatepickerInputProps, ref) => {
     const onDateValueChange = () => {
-        console.log('date value changed');
     };
     return (
         <input

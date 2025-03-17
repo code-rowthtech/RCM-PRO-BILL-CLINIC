@@ -81,7 +81,6 @@ const SubUpdateClinic = () => {
     const statesData = store?.getStatesReducer?.data;
     const citiesData = [store?.getSubClinicCityReducer];
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(subClinicsDetailsGet, 'updateDataofsubclinic');
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     useEffect(() => {
@@ -164,7 +163,6 @@ const SubUpdateClinic = () => {
             if (data) {
                 setSearchedLocations2(data?.results);
             } else {
-                console.log('No data returned.');
             }
         });
     };
@@ -346,7 +344,6 @@ const SubUpdateClinic = () => {
     //         }
     //     }
     // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
-    console.log(subClinicsDetailsGet?.name, 'name');
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (subClinicsDetailsGet) {
@@ -618,7 +615,6 @@ const SubUpdateClinic = () => {
             ...(posDetails && { pos: posDetails }),
         };
         dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
-        console.log({ payload });
     };
     useEffect(() => {
         if (updateSuccess === 200) {

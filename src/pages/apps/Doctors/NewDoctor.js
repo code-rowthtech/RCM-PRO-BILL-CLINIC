@@ -31,7 +31,6 @@ const NewDoctor = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     // const daaa=watch('state1')
-    // console.log(,'daa')
     const [activeTab, setActiveTab] = useState("personalDetails");
     const logoFileInputRef = useRef(null);
     const [show, setShow] = useState(false);
@@ -47,15 +46,12 @@ const NewDoctor = () => {
     const [demographicAddresses, setDemographicAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
-    console.log(demographicAddresses, 'demographicAddressesdemographicAddresses')
     const statesData = store?.getStatesReducer?.data;
-    console.log(statesData, 'statesData')
     const dispatch = useDispatch();
     const navigate = useNavigate();
     // If you want to remove any prefix (like "check")
     const updateId = id?.replace(/^check/, '');
 
-    // console.log(updateId, 'cleaned id');
 
     useEffect(() => {
         dispatch(
@@ -72,7 +68,6 @@ const NewDoctor = () => {
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-    console.log(doctorDetails, 'doctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
@@ -126,12 +121,10 @@ const NewDoctor = () => {
             // data?.joiningDate ? new Date(data.joiningDate).toISOString().split('T')[0] : ''
             setValue('dateOfBirth', formattedDateOfBirth);
         }
-        console.log(doctorDetails?.address, 'addresssss')
     }, [doctorDetails, setValue])
     useEffect(() => {
         if (doctorDetails && updateId && statesData) {
             const state = statesData?.states?.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id
-            console.log(state, 'state324234')
             dispatch(getCitiesAction({ state_code: state, name: doctorDetails?.address?.[0]?.city, limit: 10, skip: 1 }))
         }
     }, [statesData, doctorDetails])
@@ -149,7 +142,6 @@ const NewDoctor = () => {
     };
 
     const submitData = (data) => {
-        console.log(data, '8754567890')
         const payload = {
             ...(updateId ? { doctorId: store?.getDoctorDetailsReducer?.data?.result?._id } : {}), // Conditionally add id if updateId exists
             // clinicId: clinicId,
@@ -188,10 +180,8 @@ const NewDoctor = () => {
             address: demographicAddresses,
         };
         if (updateId) {
-            console.log({ payload })
             dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         } else {
-            console.log({ payload })
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
     };

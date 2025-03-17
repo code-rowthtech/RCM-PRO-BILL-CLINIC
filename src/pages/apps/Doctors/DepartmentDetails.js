@@ -24,7 +24,6 @@ const DepartmentDetails = ({ docId }) => {
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-  console.log(doctorDetails, 'doctorDetails')
   const id = doctorDetails?._id
   const {
     register,
@@ -42,7 +41,6 @@ const DepartmentDetails = ({ docId }) => {
 
   const [qualifications, setQualifications] = useState([{ id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
   const degreeFileInputRef = useRef(null);
-  console.log(qualifications, 'qualificationsqualificationsqualifications')
   // Add a new qualification
   const addQualification = () => {
     const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
@@ -59,7 +57,6 @@ const DepartmentDetails = ({ docId }) => {
 
   // Handle changes in qualification fields
   const handleQualificationChange = (index, field, value) => {
-    console.log({ index, field, value }, 'index, field, value')
 
     const updatedQualifications = qualifications.map((qual, i) =>
       i === index ? { ...qual, [field]: field === 'degreeName' ? value?.data : value } : qual
@@ -159,7 +156,6 @@ const DepartmentDetails = ({ docId }) => {
       const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
       setConstantIdentifiers((prevDetails) => {
         const updatedDetails = [...prevDetails];
-        console.log(url, 'constantIdentifierurl');
         updatedDetails[index] = {
           ...updatedDetails[index],
           file: {
@@ -173,7 +169,6 @@ const DepartmentDetails = ({ docId }) => {
       console.error('Error during file upload:', error);
     }
   };
-  console.log(qualificationsData, 'qualificationsData76543567899')
 
   const QualificationOptions = qualificationsData.map((qualification) => ({
     value: qualification.code,
@@ -182,9 +177,7 @@ const DepartmentDetails = ({ docId }) => {
   }));
 
   const [code, setCode] = useState([])
-  console.log(code, '32435')
   // const handleQualificationChange = (selectedOption) => {
-  //   console.log(selectedOption, 'selectedOption');
 
   //   const { definition, ...rest } = selectedOption.value; // Remove `definition`
 
@@ -204,7 +197,6 @@ const DepartmentDetails = ({ docId }) => {
       documents: item?.degreeFile,
       issuer: item?.issuerOrganisation,
     }))
-    console.log(identifiers, 'identifiers123456');
     let finalIdentifiersData = [];
     if(identifiers){
       identifiers.forEach((element)=>{
@@ -256,10 +248,8 @@ const DepartmentDetails = ({ docId }) => {
       specialties: [data?.specialist],
 
     }
-    console.log(payload, 'payload')
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
-console.log(qualifications,'qualifications')
 useEffect(() => {
   if (doctorDetails && updateId) {
     // Set qualifications data
@@ -318,7 +308,6 @@ useEffect(() => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    onChange={(data) => console.log('Updated Identifiers:', data)}
                   />
                   <Row>
                     <h5>
@@ -330,7 +319,6 @@ useEffect(() => {
                     </h5>
                     {qualifications?.map((qualification, index) => (
                       <React.Fragment key={index}>
-                        {console.log({ qualification, index })}
                         <div className="col-md-4 col-12">
                           <Form.Group className="mb-1">
                             <Form.Label className="mb-0">Select Degree Name</Form.Label>
@@ -344,7 +332,6 @@ useEffect(() => {
                               onChange={(selectedOption) =>
                                 handleQualificationChange(index, 'degreeName', selectedOption) // Access the full object from 'data'
                               }
-                              onMenuOpen={() => console.log('Dropdown Opened')}
                               styles={{
                                 control: (provided) => ({
                                   ...provided,

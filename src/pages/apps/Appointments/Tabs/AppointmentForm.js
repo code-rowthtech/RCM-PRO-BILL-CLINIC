@@ -51,7 +51,6 @@ const AppointmentForm = () => {
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
-    console.log(getAppointment, 'getAppointment');
     const doctorDetails = store?.getDoctorsReducer?.data?.response;
     const appointmentDetails = store?.getAppointmentByIdReducer?.data?.data;
     const [focused, setFocused] = useState(false);
@@ -128,7 +127,6 @@ const AppointmentForm = () => {
 
     const consultationRoomData = store?.getMastersDataReducer?.data1?.data?.result;
     const officeData = store?.getMastersDataReducer?.data2?.data?.result;
-    console.log(store?.getMastersDataReducer, 'office');
     useEffect(() => {
         const data = {
             clinicId: clinicId,

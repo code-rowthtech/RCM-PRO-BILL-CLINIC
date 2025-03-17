@@ -56,10 +56,8 @@ const ConsultationRoom = () => {
     };
     if (edit) {
       dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("Updated", payload);
     } else {
       dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-      console.log("create", payload);
 
     }
 
@@ -67,7 +65,6 @@ const ConsultationRoom = () => {
 
   const createResponse = store?.createMastersDataReducer?.data?.status;
   const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-  console.log("tableGetData", tableGetData);
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
     if (createResponse === 200) {

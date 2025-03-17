@@ -18,7 +18,6 @@ const AssignTask = () => {
     const store = useSelector((state) => state);
     const { data, loading } = store?.getTaskReducer || {}; // Extract loading state
     const taskData = data?.tasks || [];
-    console.log(store?.getTaskReducer, 'taskkkkkk');
     const addTaskResponse = store?.createTaskReducer?.data?.status;
     const limit = 10;
     useEffect(() => {
@@ -79,7 +78,6 @@ const AssignTask = () => {
     document.addEventListener('show.bs.offcanvas', (event) => {
         const button = event.relatedTarget; // Button that triggered the offcanvas
         const taskId = button?.getAttribute('data-task-id');
-        console.log('Task ID:', taskId);
         setTaskId(taskId);
     });
     const handlePageChange = (pageNumber) => {

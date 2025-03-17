@@ -73,7 +73,6 @@ const Patients = () => {
     };
 
     const patientsData = store?.getPatientsReducer?.data?.data;
-    console.log( store?.getPatientsReducer,'patientsData')
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);

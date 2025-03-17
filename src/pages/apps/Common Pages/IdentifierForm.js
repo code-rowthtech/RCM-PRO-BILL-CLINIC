@@ -111,7 +111,6 @@ const store=useSelector((state)=>state);
             console.error('Error during file upload:', error);
         }
     };
-    console.log(identifiers,'identifiers924ji')
     useEffect(()=>{
 if(doctorDetails){
     setIdentifiers(doctorDetails?.identifier)

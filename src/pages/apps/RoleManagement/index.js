@@ -31,7 +31,6 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
-    console.log({ roleData });
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     const createSuccess = store?.updateRolesReducer?.data?.status;
@@ -147,7 +146,7 @@ const RoleManagement = () => {
             status: !data?.status,
         };
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
-        console.log({ status })
+        // ({ status })
 
     };
 

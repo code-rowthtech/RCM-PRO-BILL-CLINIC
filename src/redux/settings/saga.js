@@ -73,9 +73,7 @@ function* getMastersData2Function(data) {
             payload: {},
         });
         const response = yield call(getMastersDataApi, data);
-        console.log(response,'responseresponseresponseresponseresponse')
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData,'responseresponseresponseresponseresponse')
 
 
         if (response.status === 200) {

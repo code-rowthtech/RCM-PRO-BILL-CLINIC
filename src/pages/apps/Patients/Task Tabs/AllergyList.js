@@ -20,7 +20,6 @@ const AllergyList = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
-    // console.log(allergyData, 'Allergies of Patient');
 
     useEffect(() => {
         const data = {
@@ -103,7 +102,6 @@ const AllergyList = () => {
                                                                 id: data?._id,
                                                             };
                                                             dispatch(getAllergyDetailsAction(requestData));
-                                                            // console.log(requestData, 'Request Data');
                                                         }}
                                                     />
                                                     &nbsp;

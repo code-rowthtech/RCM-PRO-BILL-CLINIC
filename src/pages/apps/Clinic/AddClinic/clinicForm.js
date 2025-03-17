@@ -50,7 +50,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
-    console.log(clinic_id, 'clinic_id');
     const [usePrimaryAsMailing, setUsePrimaryAsMailing] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [citySearch, setCitySearch] = useState('');
@@ -64,7 +63,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [taxonomyCodes, setTaxonomyCodes] = useState(['']);
     const [medicalLicenses, setMedicalLicenses] = useState(null);
     const [logo, setLogo] = useState(null);
-    console.log(logo, 'logo');
     const [accreditationLogo, setAccreditationLogo] = useState(null);
     const [addType, setAddType] = useState('');
     const [logoName, setLogoName] = useState(null);
@@ -116,7 +114,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-    console.log(cities1, 'cities');
 
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
@@ -154,7 +151,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log({ clinicsDataGet });
 
     const setField = (key, value) => value && setValue(key, value);
     // useEffect(() => {
@@ -448,7 +444,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //       },
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log({ newPayload });
     };
     const logoFileInputRef = useRef(null);
     // const accreditationFileInputRef = useRef(null);
@@ -622,7 +617,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     }, [cities1]);
     const getTableData = store.getSubClinicsReducer?.data?.clinics;
-    console.log(getTableData, 'getTableData');
     // const [selectedStates, setSelectedStates] = useState([]);
     const [statesMenu, setStatesMenu] = useState(false);
     // const handleCheckboxChange = (stateName) => {
@@ -1726,7 +1720,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 // Extract the necessary fields from the API response
                                                                 const formatted = data.formatted || '';
                                                                 const components = data.components || {};
-                                                                console.log(components, 'comp');
                                                                 // Build the new address object with auto-populated fields
                                                                 const newAddress = {
                                                                     use: item.use, // preserve existing use

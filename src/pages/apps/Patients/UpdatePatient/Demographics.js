@@ -226,7 +226,6 @@ const Demographicdetails = ({ patientId }) => {
                 if (data) {
                     setSearchedLocations(data?.results);
                 } else {
-                    console.log("No data returned.");
                 }
             });
     }
@@ -253,7 +252,6 @@ const Demographicdetails = ({ patientId }) => {
                 if (data) {
                     setSearchedMailingLocations(data?.results);
                 } else {
-                    console.log("No data returned.");
                 }
             });
     }
@@ -281,7 +279,6 @@ const Demographicdetails = ({ patientId }) => {
                 if (data) {
                     setSearchedEmployerLocations(data?.results);
                 } else {
-                    console.log("No data returned.");
                 }
             });
     }

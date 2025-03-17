@@ -62,15 +62,12 @@ const NewPatient = () => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createPatientsReducer?.data?.status;
-    console.log(createResponse,'createResponse')
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
-    console.log(createPatientResponse, 'createPatientResponse');
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(store?.getDoctorsReducer,'doctorDetails')
     const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
@@ -143,7 +140,6 @@ const NewPatient = () => {
                 setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
                 dispatch(stateEmptydAction());
-                console.log(patientId,"234567890")
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
@@ -373,7 +369,6 @@ const NewPatient = () => {
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'patient payload');
         if (submissionType === 'saveAndReset') {
             reset(); // Reset before dispatch
         }

@@ -13,7 +13,6 @@ const AddSubscriptions = ({ show, closeModal }) => {
         formState: { errors },
     } = useForm();
     const onSubmit = () => {
-        console.log('submitted')
     }
     return (
         <Modal show={show} size='md' centered onHide={closeModal}>

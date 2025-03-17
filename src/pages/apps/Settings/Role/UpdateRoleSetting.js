@@ -18,7 +18,6 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [selectedPermissions, setSelectedPermissions] = useState([]);
-    console.log({ selectedPermissions })
     const [initialPermissions, setInitialPermissions] = useState(data?.permissions || []);
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
 
@@ -84,7 +83,6 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
             status: true
         };
 
-        console.log(payload, 'editrole');
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
 
         if (updateSuccess === 200) {

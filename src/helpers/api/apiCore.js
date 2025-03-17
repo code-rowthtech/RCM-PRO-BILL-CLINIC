@@ -50,14 +50,12 @@ const AUTH_SESSION_KEY = 'hyper_user';
  * @param {*} token
  */
 const setAuthorization = (token) => {
-    // console.log({ token })
     if (token) axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
     else delete axios.defaults.headers.common['Authorization'];
 };
 
 const getUserFromSession = () => {
     const user = sessionStorage.getItem(AUTH_SESSION_KEY);
-    // console.log(user,'user1')
 
     return user ? (typeof user == 'object' ? user : JSON.parse(user)) : null;
 

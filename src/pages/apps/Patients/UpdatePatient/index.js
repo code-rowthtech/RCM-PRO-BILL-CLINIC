@@ -58,7 +58,6 @@ const UpdatePatientIndex = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'store?.getPatientByIdReducer');
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const updateResponsibleParty = store?.updateResponsiblePartyReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
@@ -207,7 +206,6 @@ const UpdatePatientIndex = () => {
                   }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payloadpayload');
     };
 
     return (
