@@ -75,7 +75,15 @@ const Demographicdetails = ({ patientId }) => {
     ]);
 
     const updateResponse = store?.updatePatientsReducer?.data?.status;
-
+    const formatPhoneNumber = (phone) => {
+        if (!phone) return '';
+        const cleaned = phone.replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+        if (match) {
+            return `(${match[1]})${match[2]}-${match[3]}`;
+        }
+        return phone; // fallback if not 10 digits
+    };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
@@ -110,12 +118,14 @@ const Demographicdetails = ({ patientId }) => {
 
             // ✅ Emergency Contact Fix
             setValue('emergencyContactName', patientDetails?.contact?.[0]?.name?.text || '');
-            // setValue('emergencyContactPhone', patientDetails?.contact?.[0]?.telecom?.[0]?.value?.replace(/\D/g, '') || '');
+            setValue(
+                'emergencyContactPhone',
+                formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value)
+            );
             setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
 
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');
-            // setValue('employerPhone', patientDetails?.employerDetails?.employerPhone?.replace(/\D/g, '') || '');
             setValue('employmentStatus', patientDetails?.employerDetails?.employmentStatus || '');
             setValue('occupation', patientDetails?.employerDetails?.occupation || '');
 
@@ -123,12 +133,14 @@ const Demographicdetails = ({ patientId }) => {
             setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
-            setEmployerLatitude(patientDetails?.employerDetails?.workLocation?.latitude || '');
-            setEmployerLongitude(patientDetails?.employerDetails?.workLocation?.longitude || '');
-
+            setValue(
+                'employerPhone',
+                formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || '')
+            );
          
         }
     }, [patientDetails]);
+ 
 
     const onSubmit = (data) => {
         console.log(data, 'formData');
