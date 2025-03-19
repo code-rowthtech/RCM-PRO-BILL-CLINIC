@@ -24,6 +24,7 @@ const DepartmentDetails = ({ docId }) => {
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+  console.log(doctorDetails,'doctorDetails')
   const id = doctorDetails?._id
   const {
     register,
@@ -248,6 +249,7 @@ const DepartmentDetails = ({ docId }) => {
       specialties: [data?.specialist],
 
     }
+    console.log({payload})
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
 useEffect(() => {
@@ -261,11 +263,12 @@ useEffect(() => {
         definition:item?.code?.display,
         system:item?.code?.system
       },
-      specialist:item?.specialties?.[0] || 'N/A',
+      specialties:item?.specialties?.[0] || 'N/A',
       degreeFile: item?.documents?.[0] || null, // Use the first document if available
-      issuerOrganisation: item?.issuer?.reference || '', // Use the issuer reference if available
+      issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
     }));
     setQualifications(updatedQualifications);
+    setValue('specialist',doctorDetails?.specialties?.[0])
   }
 }, [doctorDetails, setValue, updateId]);
 
@@ -293,7 +296,6 @@ useEffect(() => {
             >
               <Spinner />
             </div>
-
             :
             <>
               <Row>
@@ -305,7 +307,7 @@ useEffect(() => {
                         value: 'http://hl7.org/fhir/sid/us-npi',
                         code: 'NPI',
                       },
-                    ]}
+                    ]}  
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
                   />
