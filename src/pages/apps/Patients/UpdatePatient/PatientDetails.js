@@ -69,6 +69,7 @@ const PatientDetails = ({ patientId }) => {
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    console.log(patientDetails,'patientDetials')
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
         label: data?.name?.[0]?.text,
@@ -142,8 +143,8 @@ const PatientDetails = ({ patientId }) => {
             setValue('followupReason', patientDetails?.followupReason || '');
 
             // Setting profile picture
-            setLogo(patientDetails?.patientChartPhoto?.url || '');
-            setLogoName(patientDetails?.patientChartPhoto?.fileName || '');
+            setLogo(patientDetails.photo[0].url);
+            setLogoName(patientDetails.photo[0].title); // Set file name for display
         }
     }, [patientDetails, doctorDetails]);
 
