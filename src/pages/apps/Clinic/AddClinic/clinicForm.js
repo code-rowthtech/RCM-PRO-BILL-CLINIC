@@ -142,7 +142,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        dispatch(getCitiesAction({ state_code: key?.id, name: '', limit: 25, skip: '' }));
+        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }));
     };
 
     useEffect(() => {
@@ -151,6 +151,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log('clinicsDataGet', clinicsDataGet);
 
     const setField = (key, value) => value && setValue(key, value);
     // useEffect(() => {
@@ -257,10 +258,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     type: data.identifierType || '',
                     number: data?.value || '',
                     // file: data?.file|| '',
-                    file: data?.documents?.[0]
+                    file: data?.documents?.[0]?.fileName
                         ? {
                               url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
+                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
                           }
                         : '',
                     expiry: data?.expirationDate || '',
@@ -1765,10 +1766,19 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Select
                                             {...register(`address[${index}].state`)}
                                             data-has-value={!!getValues(`address[${index}].state`)}
-                                            onChange={handleStateSelection}>
+                                            value={item?.state}
+                                            onChange={(e) => {
+                                                handleStateSelection(e);
+                                                const updatedAddresses = [...addresses];
+                                                updatedAddresses[index] = {
+                                                    ...updatedAddresses[index],
+                                                    state: e.target.value,
+                                                };
+                                                setAddresses(updatedAddresses);
+                                            }}>
                                             <option value="">Select State</option>
                                             {statesData?.states?.map((data) => (
-                                                <option key={data?.name} data-key={data?.id} value={data?.state_code}>
+                                                <option key={data?.name} data-key={data?.id} value={data?.name}>
                                                     {data?.name}
                                                 </option>
                                             ))}
@@ -1779,10 +1789,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Select
                                             data-has-value={!!getValues(`address[${index}].city`)}
                                             {...register(`address[${index}].city`)}
-                                            // disabled={
-                                            //     !selectedState
-                                            // }
-                                        >
+                                            onChange={(e) => {
+                                                const updatedAddresses = [...addresses];
+                                                updatedAddresses[index] = {
+                                                    ...updatedAddresses[index],
+                                                    city: e.target.value,
+                                                };
+                                                setAddresses(updatedAddresses);
+                                            }}>
                                             <option value="">
                                                 {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
                                             </option>
@@ -1798,8 +1812,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label className="mb-1">Postal Code</Form.Label>
                                             <Form.Control
                                                 type="text"
+                                                value={item?.postalCode}
                                                 placeholder="Postal Code"
-                                                {...register(`postalCode`, {
+                                                {...register(`address[${index}].postalCode`, {
                                                     minLength: {
                                                         value: 5,
                                                         message: 'Postal code must be at least 5 characters long',
@@ -1812,8 +1827,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 maxLength={5}
                                                 onKeyPress={handleFirstSpace}
                                             />
-                                            {errors.postalCode && (
-                                                <span className="text-danger">{errors.postalCode.message}</span>
+                                            {errors?.address?.[index]?.postalCode && (
+                                                <span className="text-danger">
+                                                    {errors.address[index].postalCode.message}
+                                                </span>
                                             )}
                                         </Form.Group>
                                     </Col>

@@ -226,6 +226,7 @@ const PatientDetails = ({ patientId }) => {
         }
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload,'main')
     };
 
     const handleInputChange = (data) => {
