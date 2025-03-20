@@ -84,11 +84,14 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     }, [employerCitySearch, cities3]);
 
     const onSubmit = (data) => {
+        const selectedGenderIdentity=genderIdentityOptions.find((option) => option.show === data.genderIdentity)
+        const selectedSexualOrientation=sexParameterOptions.find((option) => option.show === data.genderIdentity)
+        console.log(selectedGenderIdentity, 'genderIdentityOptions');
         let parsedSex = null;
         try {
             parsedSex = data?.sex ? JSON.parse(data.sex) : null;
         } catch (error) {
-            console.error("Error parsing sex:", error);
+            console.error('Error parsing sex:', error);
         }
         console.log(data, 'dattaaa');
         let finalIdentifiers = [];
@@ -106,46 +109,28 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         });
         const payload = {
             id: patientId,
-            // birthSex: {
-            //     system:data?.birthSex?.system,
-            //     code: data?.birthSex?.value,
-            //     display: data?.birthSex?.label,
-            // },
-            // race: [
-            //     {
-            //         system: data?.race?.system,
-            //         code: data?.race?.code,
-            //         display: data?.race?.display,
-            //         text: data?.race?.display,
-            //     }
-            // ],
-            // ethnicity: [{
-            //     system: data?.ethnicity?.system,
-            //     code: data?.ethnicity?.code,
-            //     display: data?.ethnicity?.display,
-
-            // }],
-            // birthSex: {
-            //     system: data?.sex?.system,
-            //     code: data?.sex?.value,
-            //     display: data?.sex?.label,
-            // },
             birthSex: parsedSex
-            ? {
-                  system: parsedSex.system,
-                  code: parsedSex.value,
-                  display: parsedSex.label,
-              }
-            : undefined,
+                ? {
+                      system: parsedSex.system,
+                      code: parsedSex.value,
+                      display: parsedSex.label,
+                  }
+                : undefined,
 
-            ...(data?.genderIdentity && { gender: data.genderIdentity }),
+                genderIdentity: [
+                    {...selectedGenderIdentity, code:selectedGenderIdentity?.value,display:selectedGenderIdentity?.show,text:selectedGenderIdentity?.label}
+                ],
             ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
             // ✅ Fixing Race & Ethnicity Structure
             ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
-            ethnicity: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-Ethnicity', display: eth }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: tri }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: rela }],
-
+            ethnicity: [
+            {...eth,text:eth?.display}
+            ],
+            tribalAffiliation: [
+                {
+                   ...tri, text:tri?.display
+                },
+            ],
             // ✅ Fixing Marital Status Structure
             ...(data?.maritalStatus && {
                 maritalStatus: {
@@ -176,27 +161,41 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     },
                 ],
             }),
-
-            ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
             ...(data?.notes && { notes: data.notes }),
-            ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
-            ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
-
             // ✅ Fixing Emergency Contact Field
-            ...(data?.emergencyContactName && {
+            // ...(data?.emergencyContactName && {
+                // contact: [
+                //     {
+                //         relationship: [{...rela,text:rela.display}],
+                //         name: { text: data?.emergencyContactName },
+                //         telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
+
+                //     },
+                // ],
                 contact: [
                     {
-                        relationship: [{ text: data?.emergencyContactRelation }],
-                        name: { text: data?.emergencyContactName },
-                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
+                        relationship: [{
+                            coding: [
+                                rela
+                            ],
+                            text:  data?.emergencyContactName // Human-readable relationship (e.g., "Father", "Aunt")
+                        }],
                     },
+                    {telecom: [
+                        {
+                            system: '', //enum: ["phone", "email"]
+                            value: data?.emergencyContactPhone?.replace(/\D/g, ''),
+                            use: '' //, enum: ["home", "work", "mobile"]
+                        }
+                    ]}
+    
                 ],
-            }),
-
+            // }),
             ...(data?.employerName && { employerName: data.employerName }),
             ...(data?.employerPhone && {
                 employerPhone: data?.employerPhone ? data.employerPhone?.replace(/\D/g, '') : '', // ✅ Fixed
             }),
+           
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
                 employerName: data?.employerName,
@@ -216,17 +215,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             address: demographicAddresses,
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
     };
     useEffect(() => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {
                 reset();
                 setActiveTab('responsible');
-                dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 setActiveTab('personelDetails');
-
-                dispatch(stateEmptydAction());
             }
         }
     }, [updateResponse, submissionType]);
@@ -280,17 +277,17 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
 
     const [eth, setEth] = useState(null);
     const handleEthnicityChange = (selectedOption) => {
-        setEth('ethnicity', selectedOption ? selectedOption.display : '');
+        setEth(selectedOption ? selectedOption.value : '');
     };
     const [rela, setRela] = useState(null); // Store selected relationship
-
+console.log(rela,'redlas')
     const handleRelationChange = (selectedOption) => {
-        setRela('relation', selectedOption ? selectedOption.display : '');
+        setRela(selectedOption ? selectedOption.value : '');
     };
     const [tri, setTri] = useState(null); // Store selected tribal entity
 
     const handleTribalChange = (selectedOption) => {
-        setTri('tribal', selectedOption ? selectedOption.display : '');
+        setTri(selectedOption ? selectedOption.value : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
 
@@ -315,15 +312,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-    <option value="" hidden>
-        Select Sex
-    </option>
-    {sexAssignedAtBirthOptions.map((option) => (
-        <option key={option.value} value={JSON.stringify(option)}>
-            {option.label}
-        </option>
-    ))}
-</Form.Select>
+                                <option value="" hidden>
+                                    Select Sex
+                                </option>
+                                {sexAssignedAtBirthOptions.map((option) => (
+                                    <option key={option.value} value={JSON.stringify(option)}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                     </Col>
 
@@ -335,7 +332,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select
                                 </option>
                                 {genderIdentityOptions?.map((option) => (
-                                    <option key={option?.value} value={option}>
+                                    <option key={option?.value} value={option?.show}>
                                         {option?.show}
                                     </option>
                                 ))}
@@ -397,7 +394,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 value={
-                                    formattedEthnicityOptions.find((option) => option?.value?.display === eth) || null
+                                    formattedEthnicityOptions.find(
+                                        (option) => option?.value?.display === eth?.display
+                                    ) || null
                                 } // Show selected value
                                 onChange={handleEthnicityChange}
                                 styles={{
@@ -446,7 +445,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                value={
+                                    formattedTribleOptions.find((option) => option?.value?.display === tri?.display) ||
+                                    null
+                                } // Show selected value
                                 onChange={handleTribalChange}
                                 styles={{
                                     control: (provided) => ({
@@ -570,7 +572,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                value={
+                                    relationshipOption.find((option) => option?.value?.display === rela?.display) ||
+                                    null
+                                } // Show selected value
                                 onChange={handleRelationChange}
                                 styles={{
                                     control: (provided) => ({

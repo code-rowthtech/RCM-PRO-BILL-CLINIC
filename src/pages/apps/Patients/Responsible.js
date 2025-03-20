@@ -68,10 +68,8 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
                 setActiveTab('referringDoctor');
-                dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 reset();
-                dispatch(stateEmptydAction());
                 setActiveTab('personalDetails');
             }
         }
