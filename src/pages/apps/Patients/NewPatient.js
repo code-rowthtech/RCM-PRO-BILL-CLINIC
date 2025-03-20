@@ -1,17 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BiEdit } from 'react-icons/bi';
-import ProfileDummy from '../../../assets/images/profileDummy.png';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
-import { FiEdit, FiTrash, FiUploadCloud } from 'react-icons/fi';
+import { Button, Card, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
+import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createPatientsAction,
-    updatePatientsAction,
     getPatientByIdAction,
     getResponsiblePartyAction,
 } from '../../../redux/patients/actions';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
@@ -23,7 +20,6 @@ import {
     stateEmptydAction,
 } from '../../../redux/actions';
 import Responsiblle from './Responsible';
-import { getResponsibleParty } from '../../../helpers/api/apiEndpoints';
 import Select from 'react-select';
 import Insurance from './Insurance/Insurance';
 import Demographicdetails from './Demographic';
@@ -60,36 +56,29 @@ const NewPatient = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
-    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createPatientsReducer?.data?.status;
+    console.log(createResponse, 'createResponse');
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState('');
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
-    const [showTooltip, setShowTooltip] = useState(false);
     const [patientId, setPatientId] = useState(null);
     const [age, setAge] = useState(null);
-    const [formData, setFormData] = useState({
-        role: doctorRoleId,
-    });
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
-    const [partySearch, setPartySearch] = useState('');
     const [selectedParty, setSelectedParty] = useState(null);
     const [doctorSearch, setDoctorSearch] = useState('');
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    const [searchedLocations, setSearchedLocations] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
 
@@ -139,19 +128,19 @@ const NewPatient = () => {
                 reset(); // Reset the form
                 setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
-                dispatch(stateEmptydAction());
+                // dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
                 setLogo(null);
                 setLogoName(null);
                 setPatientId(null);
-                dispatch(stateEmptydAction());
+                // dispatch(stateEmptydAction());
             } else if (submissionType === 'save') {
                 setPatientId(createPatientResponse?._id);
             }
         }
-    }, [createResponse]);
+    }, [createResponse,submissionType]);
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
