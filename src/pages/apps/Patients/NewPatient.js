@@ -122,25 +122,25 @@ const NewPatient = () => {
             setValue('approxAge', age);
         }
     }, [age]);
-    // useEffect(() => {
-    //     if (createResponse === 201) {
-    //         if (submissionType === 'saveAndNext') {
-    //             reset(); // Reset the form
-    //             setActiveTab('demographicDetails');
-    //             setPatientId(createPatientResponse?._id);
-    //             dispatch(stateEmptydAction());
-    //         } else if (submissionType === 'saveAndReset') {
-    //             reset(); // Ensure the form resets
-    //             setSelectedDoctor(null);
-    //             setLogo(null);
-    //             setLogoName(null);
-    //             setPatientId(null);
-    //             dispatch(stateEmptydAction());
-    //         } else if (submissionType === 'save') {
-    //             setPatientId(createPatientResponse?._id);
-    //         }
-    //     }
-    // }, [createResponse]);
+    useEffect(() => {
+        if (createResponse === 201) {
+            if (submissionType === 'saveAndNext') {
+                reset(); // Reset the form
+                setActiveTab('demographicDetails');
+                setPatientId(createPatientResponse?._id);
+                // dispatch(stateEmptydAction());
+            } else if (submissionType === 'saveAndReset') {
+                reset(); // Ensure the form resets
+                setSelectedDoctor(null);
+                setLogo(null);
+                setLogoName(null);
+                setPatientId(null);
+                // dispatch(stateEmptydAction());
+            } else if (submissionType === 'save') {
+                setPatientId(createPatientResponse?._id);
+            }
+        }
+    }, [createResponse,submissionType]);
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
