@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
+import {  Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createInsuranceAction, getCitiesAction, getStatesByCountryAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import { useSearchParams } from 'react-router-dom';
 const WorkersCamp = ({ patientId, activeTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const { handleSubmit, reset, register, errors, setValue } = useForm();
+    const { handleSubmit, register, setValue } = useForm();
     const [searchedLocations, setSearchedLocations] = useState(null);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const [selectedState, setSelectedState] = useState(null);
