@@ -62,6 +62,7 @@ const NewPatient = () => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createPatientsReducer?.data?.status;
+    console.log(createResponse, 'createResponse');
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
@@ -133,25 +134,25 @@ const NewPatient = () => {
             setValue('approxAge', age);
         }
     }, [age]);
-    useEffect(() => {
-        if (createResponse === 201) {
-            if (submissionType === 'saveAndNext') {
-                reset(); // Reset the form
-                setActiveTab('demographicDetails');
-                setPatientId(createPatientResponse?._id);
-                dispatch(stateEmptydAction());
-            } else if (submissionType === 'saveAndReset') {
-                reset(); // Ensure the form resets
-                setSelectedDoctor(null);
-                setLogo(null);
-                setLogoName(null);
-                setPatientId(null);
-                dispatch(stateEmptydAction());
-            } else if (submissionType === 'save') {
-                setPatientId(createPatientResponse?._id);
-            }
-        }
-    }, [createResponse]);
+    // useEffect(() => {
+    //     if (createResponse === 201) {
+    //         if (submissionType === 'saveAndNext') {
+    //             reset(); // Reset the form
+    //             setActiveTab('demographicDetails');
+    //             setPatientId(createPatientResponse?._id);
+    //             dispatch(stateEmptydAction());
+    //         } else if (submissionType === 'saveAndReset') {
+    //             reset(); // Ensure the form resets
+    //             setSelectedDoctor(null);
+    //             setLogo(null);
+    //             setLogoName(null);
+    //             setPatientId(null);
+    //             dispatch(stateEmptydAction());
+    //         } else if (submissionType === 'save') {
+    //             setPatientId(createPatientResponse?._id);
+    //         }
+    //     }
+    // }, [createResponse]);
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
