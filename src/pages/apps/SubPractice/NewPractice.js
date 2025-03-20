@@ -88,6 +88,7 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log('clinicsDataGet', clinicsDataGet);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
@@ -280,10 +281,10 @@ const NewPractice = () => {
                     type: data.identifierType || '',
                     number: data?.value || '',
                     // file: data?.file|| '',
-                    file: data?.documents?.[0]
+                    file: data?.documents?.[0]?.fileName
                         ? {
                               url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
+                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
                           }
                         : '',
                     expiry: data?.expirationDate || '',
@@ -937,7 +938,6 @@ const NewPractice = () => {
                                                             onChange={(e) =>
                                                                 formDataChange('clinicname', e.target.value)
                                                             }
-                                                            value={formData?.clinicname}
                                                             placeholder="Practice name"
                                                         />
                                                         {errors.clinicname && (
@@ -983,7 +983,6 @@ const NewPractice = () => {
                                                             type="email"
                                                             data-has-value={!!watch('email')}
                                                             placeholder="Email"
-                                                            value={formData?.email}
                                                             {...register('email', {
                                                                 required: 'Email is required',
                                                                 pattern: {
@@ -1531,18 +1530,28 @@ const NewPractice = () => {
                                                                     </div>
                                                                 )}
                                                         </Col>
+
                                                         <Col sm={4} className="mb-2">
                                                             <Form.Label className="mb-1">State</Form.Label>
                                                             <Form.Select
                                                                 {...register(`address[${index}].state`)}
                                                                 data-has-value={!!getValues(`address[${index}].state`)}
-                                                                onChange={handleStateSelection}>
+                                                                value={item?.state}
+                                                                onChange={(e) => {
+                                                                    handleStateSelection(e);
+                                                                    const updatedAddresses = [...addresses];
+                                                                    updatedAddresses[index] = {
+                                                                        ...updatedAddresses[index],
+                                                                        state: e.target.value,
+                                                                    };
+                                                                    setAddresses(updatedAddresses);
+                                                                }}>
                                                                 <option value="">Select State</option>
                                                                 {statesData?.states?.map((data) => (
                                                                     <option
                                                                         key={data?.name}
                                                                         data-key={data?.id}
-                                                                        value={data?.state_code}>
+                                                                        value={data?.name}>
                                                                         {data?.name}
                                                                     </option>
                                                                 ))}
@@ -1562,7 +1571,7 @@ const NewPractice = () => {
                                                                         : 'Select City'}
                                                                 </option>
                                                                 {cities?.map((data) => (
-                                                                    <option key={data?.name} value={data?._id}>
+                                                                    <option key={data?.name} value={data?.name}>
                                                                         {data?.name}
                                                                     </option>
                                                                 ))}

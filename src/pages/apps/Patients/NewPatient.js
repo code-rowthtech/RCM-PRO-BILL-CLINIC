@@ -273,7 +273,7 @@ const NewPatient = () => {
             preferredCommunication: data?.preferredCommunication || '',
             // previousBirthName: data?.previousBirthName || '',
             //     profileImage: data?.profileImage || '',
-            //     reminderLanguage: data?.reminderLanguage || '',
+            reminderLanguage: data?.reminderLanguage || '',
             //     selectedDoctor: data?.selectedDoctor || '',
             //     suffix: data?.suffix || '',
             //     title: data?.title || '',
@@ -288,7 +288,7 @@ const NewPatient = () => {
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 use: 'official',
                 suffix: [data?.suffix || ''],
-                prefix: [data?.prefix || ''],
+                prefix: [data?.title || ''],
             },
         ];
         if (data?.previousBirthName) {
@@ -369,6 +369,7 @@ const NewPatient = () => {
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload,'payload');
         if (submissionType === 'saveAndReset') {
             reset(); // Reset before dispatch
         }
