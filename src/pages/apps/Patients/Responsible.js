@@ -22,6 +22,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
+    console.log(createResponse,'createResponse');
 
     const {
         register,
@@ -57,12 +58,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
     };
-    useEffect(() => {
-        if (createResponse === 201) {
-            dispatch(stateEmptydAction());
-            reset();
-        }
-    }, [createResponse]);
+   
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
