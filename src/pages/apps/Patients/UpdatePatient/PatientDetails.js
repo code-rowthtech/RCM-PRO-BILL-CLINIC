@@ -95,7 +95,6 @@ const PatientDetails = ({ patientId }) => {
             setValue('suffix', patientDetails?.name?.[0]?.suffix?.[0] || '');
             setValue('title', patientDetails?.name?.[0]?.suffix?.[0] || '');
             setValue('approxAge', patientDetails?.approxAge || '');
-
             setValue(
                 'dateOfBirth',
                 patientDetails?.birthDate ? new Date(patientDetails.birthDate).toISOString().split('T')[0] : ''
@@ -108,7 +107,6 @@ const PatientDetails = ({ patientId }) => {
             setValue('preferredCommunication',patientDetails?.preferredCommunication || '');
             setValue('reminderLanguage' , patientDetails?.reminderLanguage || '');
             setValue('previousBirthName' , patientDetails?.name[1]?.text || '');
-
             setValue('title', patientDetails?.name[0]?.prefix[0] || '')
             // Extracting telecom details
             const homePhone =
