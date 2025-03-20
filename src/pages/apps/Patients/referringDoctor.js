@@ -31,10 +31,8 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             if (submissionType === 'saveAndNext') {
                 reset();
                 setActiveTab('insurance');
-                dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 setActiveTab('personelDetails');
-                dispatch(stateEmptydAction());
             }
         }
     }, [createResponseReferring, submissionType]);

@@ -155,7 +155,7 @@ const PatientDetails = ({ patientId }) => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
+            medicationHistoryConsent: true,
             patientCopayAmount: data?.patientCopayAmount || '0',
             paymentProfile: data?.paymentProfile || '',
             preferredCommunication: data?.preferredCommunication || '',

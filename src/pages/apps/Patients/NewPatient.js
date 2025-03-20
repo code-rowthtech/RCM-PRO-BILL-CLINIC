@@ -17,7 +17,6 @@ import {
     getDoctorsAction,
     getStatesByCountryAction,
     getSubClinicCitiesAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import Responsiblle from './Responsible';
 import Select from 'react-select';
@@ -128,14 +127,12 @@ const NewPatient = () => {
                 reset(); // Reset the form
                 setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
-                // dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
                 setLogo(null);
                 setLogoName(null);
                 setPatientId(null);
-                // dispatch(stateEmptydAction());
             } else if (submissionType === 'save') {
                 setPatientId(createPatientResponse?._id);
             }
@@ -243,7 +240,7 @@ const NewPatient = () => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
+            medicationHistoryConsent:true,
             patientCopayAmount: data?.patientCopayAmount || '0',
             photo: logo?.url
                 ? [
