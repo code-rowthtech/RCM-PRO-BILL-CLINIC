@@ -21,9 +21,10 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
+    const [responsibleTelecom, setResponsibleTelecom] = useState([
+        { system: '', value: '', use: '' },
+    ]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
-    console.log(createResponse,'createResponse');
-
     const {
         register,
         handleSubmit,
@@ -35,6 +36,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const onSubmit = (data) => {
         const payload = {
             patientId: patientId,
+            clinicId: clinicId,
             name: [
                 {
                     use: 'official', // You can set this dynamically if needed
@@ -46,17 +48,19 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                     preferred: true,
                 },
             ],
-            account: data?.account,
+            relationship: [
+                {
+                    coding: [rela],
+                    text: data?.fullName, // Human-readable relationship (e.g., "Father", "Aunt")
+                },
+            ],
             address: responsibleAddresses,
             gender: data?.gender,
             dateOfBirth: data?.dateOfBirth,
-            ssn: data?.SSN,
-            email: data?.email,
-            contactNumber: data?.contactNumber,
-            clinicId: clinicId,
-            title: data?.title,
+            telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
     };
    
     useEffect(() => {
@@ -74,8 +78,9 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
     }));
+    const [rela, setRela] = useState(null);
     const handleRelationChange = (selectedOption) => {
-        setValue('ethnicity', selectedOption ? selectedOption.display : '');
+        setRela( selectedOption ? selectedOption.value : '');
     };
     return (
         <>
@@ -145,6 +150,11 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                     classNamePrefix="select"
                                     placeholder="&nbsp; Select "
                                     onChange={handleRelationChange}
+                                    value={
+                                        relationshipOption.find(
+                                            (option) => option?.value?.display === rela?.display
+                                        ) || null
+                                    } // Show selected value
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
@@ -166,7 +176,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                     <hr />
                     <AddressForm addresses={responsibleAddresses} setAddresses={setResponsibleAddresses} />
                     <hr />
-                    <TelecomFrom />
+                    <TelecomFrom  constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
                 </div>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
                     <Button className="cancel-button" onClick={() => reset()}>
