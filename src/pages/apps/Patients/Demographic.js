@@ -12,13 +12,13 @@ import {
     updatePatientsAction,
     stateEmptydAction,
 } from '../../../redux/actions';
+import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { CiCircleMinus } from 'react-icons/ci';
 import { raceOptions } from '../../../utils/DataSets/race.data';
 import { ethnicityOptions } from '../../../utils/DataSets/enthnicity.data';
-import Select from 'react-select';
 import { genderIdentityOptions } from '../../../utils/DataSets/genderIdentities';
 import { sexAssignedAtBirthOptions } from '../../../utils/DataSets/sex';
 import { sexParameterOptions } from '../../../utils/DataSets/SexParameterforClinicalUse';
@@ -84,20 +84,18 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     }, [employerCitySearch, cities3]);
 
     const onSubmit = (data) => {
-        const selectedGenderIdentity=genderIdentityOptions.find((option) => option.show === data.genderIdentity)
-        const selectedSexualOrientation=sexParameterOptions.find((option) => option.show === data.genderIdentity)
-        console.log(selectedGenderIdentity, 'genderIdentityOptions');
-        let parsedSex = null;
-        try {
-            parsedSex = data?.sex ? JSON.parse(data.sex) : null;
-        } catch (error) {
-            console.error('Error parsing sex:', error);
-        }
+        const selectedGenderIdentity = genderIdentityOptions.find((option) => option.show === data.genderIdentity);
+        const selectedSexualOrientation = sexParameterOptions.find((option) => option.show === data.sexParameter);
+        const selectedPersonalPronouns = personalPronounsOptions.find(
+            (option) => option.show === data.personalPronouns
+        );
+        const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
+        const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
+        const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
         console.log(data, 'dattaaa');
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-            console.log(element, 'element');
-            data = {
+          const identifierData  = {
                 type: element?.type?.code,
                 system: element?.type?.value,
                 value: element?.number,
@@ -105,45 +103,77 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 file: element?.file,
                 expiry: element?.expiry,
             };
-            finalIdentifiers.push(data);
+            finalIdentifiers.push(identifierData );
         });
         const payload = {
             id: patientId,
-            birthSex: parsedSex
-                ? {
-                      system: parsedSex.system,
-                      code: parsedSex.value,
-                      display: parsedSex.label,
-                  }
-                : undefined,
-
-                genderIdentity: [
-                    {...selectedGenderIdentity, code:selectedGenderIdentity?.value,display:selectedGenderIdentity?.show,text:selectedGenderIdentity?.label}
-                ],
-            ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
-            // ✅ Fixing Race & Ethnicity Structure
-            ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
-            ethnicity: [
-            {...eth,text:eth?.display}
+            birthSex:[
+                {
+                    ...selectedSexOption,
+                    code: selectedSexOption?.value,
+                    display: selectedSexOption?.label,
+                    system: selectedSexOption?.system,
+                }
             ],
+            genderIdentity: [
+                {
+                    ...selectedGenderIdentity,
+                    code: selectedGenderIdentity?.value,
+                    display: selectedGenderIdentity?.show,
+                    text: selectedGenderIdentity?.label,
+                },
+            ],
+            sexParameterForClinicalUse: [
+                {
+                    ...selectedSexualOrientation,
+                    code: selectedSexualOrientation?.value,
+                    display: selectedSexualOrientation?.show,
+                    text: selectedSexualOrientation?.label,
+                    system: selectedSexualOrientation?.system,
+                },
+            ],
+            personalPronouns: [
+                {
+                    ...selectedPersonalPronouns,
+                    code: selectedPersonalPronouns?.value,
+                    display: selectedPersonalPronouns?.show,
+                    text: selectedPersonalPronouns?.label,
+                    system: selectedPersonalPronouns?.system,
+                },
+            ],
+            // ✅ Fixing Race
+            race: [
+                {
+                    ...selectedRaceOption,
+                    code: selectedRaceOption?.code,
+                    display: selectedRaceOption?.display,
+                    text: selectedRaceOption?.display,
+                },
+            ],
+            // ✅ Fixing Ethnicity
+            ethnicity: [
+                {
+                    ...eth,
+                    text: eth?.display,
+                },
+            ],
+            // ✅ Fixing Tribal Entity
             tribalAffiliation: [
                 {
-                   ...tri, text:tri?.display
+                    ...tri,
+                    text: tri?.display,
                 },
             ],
             // ✅ Fixing Marital Status Structure
-            ...(data?.maritalStatus && {
-                maritalStatus: {
-                    coding: [
-                        {
-                            system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
-                            code: data.maritalStatus,
-                            display: data.maritalStatusDisplay || '',
-                        },
-                    ],
+            maritalStatus: [
+                {
+                    ...selectedMaritalStatus,
+                    code: selectedMaritalStatus?.value,
+                    display: selectedMaritalStatus?.show,
+                    text: selectedMaritalStatus?.label,
+                    system: selectedMaritalStatus?.system,
                 },
-            }),
-
+            ],
             // ✅ Fixing Preferred Language Structure
             ...(data?.preferredLanguage && {
                 communication: [
@@ -163,39 +193,25 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             }),
             ...(data?.notes && { notes: data.notes }),
             // ✅ Fixing Emergency Contact Field
-            // ...(data?.emergencyContactName && {
-                // contact: [
-                //     {
-                //         relationship: [{...rela,text:rela.display}],
-                //         name: { text: data?.emergencyContactName },
-                //         telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
-
-                //     },
-                // ],
-                contact: [
-                    {
-                        relationship: [{
-                            coding: [
-                                rela
-                            ],
-                            text:  data?.emergencyContactName // Human-readable relationship (e.g., "Father", "Aunt")
-                        }],
-                    },
-                    {telecom: [
+            contact: [
+                {
+                    relationship: [
+                        {
+                            coding: [rela],
+                            text: data?.emergencyContactName, // Human-readable relationship (e.g., "Father", "Aunt")
+                        },
+                    ],
+                },
+                {
+                    telecom: [
                         {
                             system: '', //enum: ["phone", "email"]
                             value: data?.emergencyContactPhone?.replace(/\D/g, ''),
-                            use: '' //, enum: ["home", "work", "mobile"]
-                        }
-                    ]}
-    
-                ],
-            // }),
-            ...(data?.employerName && { employerName: data.employerName }),
-            ...(data?.employerPhone && {
-                employerPhone: data?.employerPhone ? data.employerPhone?.replace(/\D/g, '') : '', // ✅ Fixed
-            }),
-           
+                            use: '', //, enum: ["home", "work", "mobile"]
+                        },
+                    ],
+                },
+            ],
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
                 employerName: data?.employerName,
@@ -204,6 +220,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
+                        line: data?.employerAddress,
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -213,6 +230,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             },
             identifier: finalIdentifiers,
             address: demographicAddresses,
+            ...(data?.notes && { notes: data.notes })
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         console.log(payload, 'payload');
@@ -280,12 +298,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         setEth(selectedOption ? selectedOption.value : '');
     };
     const [rela, setRela] = useState(null); // Store selected relationship
-console.log(rela,'redlas')
     const handleRelationChange = (selectedOption) => {
         setRela(selectedOption ? selectedOption.value : '');
     };
     const [tri, setTri] = useState(null); // Store selected tribal entity
-
     const handleTribalChange = (selectedOption) => {
         setTri(selectedOption ? selectedOption.value : '');
     };
@@ -316,7 +332,7 @@ console.log(rela,'redlas')
                                     Select Sex
                                 </option>
                                 {sexAssignedAtBirthOptions.map((option) => (
-                                    <option key={option.value} value={JSON.stringify(option)}>
+                                    <option key={option.value} value={option?.value}>
                                         {option.label}
                                     </option>
                                 ))}
@@ -348,7 +364,7 @@ console.log(rela,'redlas')
                                     Select
                                 </option>
                                 {sexParameterOptions.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -363,7 +379,7 @@ console.log(rela,'redlas')
                                     Select Pronouns
                                 </option>
                                 {personalPronounsOptions?.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option?.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -376,7 +392,7 @@ console.log(rela,'redlas')
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race}>
+                                    <option key={race.code} value={race.code}>
                                         {race.display}
                                     </option>
                                 ))}
@@ -475,7 +491,7 @@ console.log(rela,'redlas')
                             <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
                                 {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}

@@ -24,18 +24,17 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
-
-
     useEffect(() => {
-        if (createResponseReferring === 200) {
-            if (submissionType === 'saveAndNext') {
-                reset();
-                setActiveTab('insurance');
-            } else if (submissionType === 'saveAndReset') {
-                setActiveTab('personelDetails');
+            if (createResponseReferring === 201) {
+                if (submissionType === 'saveAndNext') {
+                    reset(); // Reset the form
+                    setActiveTab('insurance');
+                } else if (submissionType === 'saveAndReset') {
+                    reset();
+                    setActiveTab('personalDetails');
+                }
             }
-        }
-    }, [createResponseReferring, submissionType]);
+        }, [createResponseReferring]);
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -96,6 +95,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             ],
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
+        console.log("payload",payload)
     };
 
     return (

@@ -199,9 +199,9 @@ const UpdatePatientIndex = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      patientChartPhoto: {
-                          url: logo?.url?.split('?')[0] || patientDetails?.patientChartPhoto?.url,
-                          fileName: logoName,
+                      photo: {
+                          url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
+                          title: logoName,
                       },
                   }),
         };

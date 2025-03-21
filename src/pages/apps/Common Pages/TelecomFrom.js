@@ -5,10 +5,9 @@ import { CiCircleMinus } from 'react-icons/ci';
 import us from '../../../assets/images/flags/us.jpg';
 
 
-const TelecomFrom = () => {
+const TelecomFrom = ({constantContact,setConstantContact}) => {
     const contactDetails = ['phone', 'email'];
     const contactOptions = ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'];
-    const [constantContact, setConstantContact] = useState([]);
         const {
             control,
             register,

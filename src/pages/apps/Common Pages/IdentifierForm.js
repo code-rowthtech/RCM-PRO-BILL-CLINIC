@@ -19,7 +19,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         clearErrors,
     } = useForm();
 const store=useSelector((state)=>state);   
-console.log(identifiers,'identifiersidentifiers')
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
@@ -129,7 +128,6 @@ if(doctorDetails){
     setValue('specialist',doctorDetails?.specialties?.[0])
   }}
     },[doctorDetails])
-    console.log({identifiers})
     return (
         <>
             <Row>

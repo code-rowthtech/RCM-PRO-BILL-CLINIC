@@ -56,7 +56,6 @@ const NewPatient = () => {
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
     const createResponse = store?.createPatientsReducer?.data?.status;
-    console.log(createResponse, 'createResponse');
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
@@ -349,7 +348,6 @@ const NewPatient = () => {
 
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
-
             if (data?.deceasedDateTime) {
                 payload.deceasedDateTime = new Date(data.deceasedDateTime).toISOString();
             }
@@ -1110,7 +1108,7 @@ const NewPatient = () => {
                         {activeTab === 'responsible' && <Responsiblle patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />}
                         {activeTab === 'insurance' && <Insurance patientId={patientId} />}
                         {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab}/>}
-                        {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
+                        {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />}
                     </div>
                 </Card>
             </div>
