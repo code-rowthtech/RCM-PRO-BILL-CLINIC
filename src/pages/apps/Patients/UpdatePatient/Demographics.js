@@ -67,9 +67,7 @@ const Demographicdetails = ({ patientId }) => {
     const primaryState = watch('primaryStateName');
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
-
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'patientDetails');
 
     const [demographicAddresses, setDemographicAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
@@ -151,11 +149,9 @@ const Demographicdetails = ({ patientId }) => {
         const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
         const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
-        console.log(data, 'formData');
       
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-            console.log(element, 'element');
           const  identifierData = {
                 type: element?.type?.code,
                 system: element?.type?.value,
@@ -357,11 +353,9 @@ const Demographicdetails = ({ patientId }) => {
     }));
 
     const [eth, setEth] = useState(null); // Store selected ethnicity
-    console.log(eth,formattedEthnicityOptions,',formattedEthnicityOptions,formattedEthnicityOptions')
     const handleEthnicityChange = (selectedOption) => {
         setEth(selectedOption?.value?.display); // Store value in state
     };
-    console.log(eth,'asdiewf')
     const [rela, setRela] = useState(null); // Store selected relationship
     const handleRelationChange = (selectedOption) => {
         setRela('relation', selectedOption ? selectedOption.display : '');
@@ -372,7 +366,6 @@ const Demographicdetails = ({ patientId }) => {
     };
     const [identifiers, setIdentifiers] = useState([]);
     const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code===eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display===eth);
-    console.log(rela,'selectedEthnicityOptionselectedEthnicityOption')
     const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||  formattedTribleOptions.find((option) => option?.value?.code == tri) ;
     const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela);
     return (
