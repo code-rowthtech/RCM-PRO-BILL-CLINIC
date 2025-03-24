@@ -61,9 +61,6 @@ const Patients = () => {
             ToastHandle("password incorrect", "danger");
         }
     };
-
-
-
     const toggleVisibility = () => {
         if (isPasswordCorrect) {
             setIsVisible(!isVisible);
@@ -73,7 +70,6 @@ const Patients = () => {
     };
 
     const patientsData = store?.getPatientsReducer?.data?.data;
-    console.log(patientsData, 'patientsData');
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);

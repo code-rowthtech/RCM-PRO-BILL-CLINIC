@@ -102,25 +102,30 @@ const Demographicdetails = ({ patientId }) => {
     }, [employerCitySearch, cities3]);
     useEffect(() => {
         if (patientDetails) {
-            setValue('race', patientDetails?.race?.[0]?.code || '');
+            setValue('race', patientDetails?.race?.[0]?.display || '');
             setValue('raceSubcategories', patientDetails?.raceSubcategories);
-            setValue('sex', patientDetails?.birthSex?.code || '');
-            setValue('genderIdentity', patientDetails?.gender);
+            setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
+            setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
             setValue('sexualOrientation', patientDetails?.sexualOrientation);
+            setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
+            setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
             setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
             setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
-            setValue('trible', patientDetails?.trible?.[0]?.code || '');
-            setValue('ethnicity', patientDetails?.ethnicity?.[0]?.code || '');
+            // setValue('trible', patientDetails?.trible?.[0]?.code || '');
+            // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
+            setEth(patientDetails?.ethnicity)
+            setTri(patientDetails?.tribalAffiliation)
             setValue('notes', patientDetails?.notes);
-            setValue('maritalStatus', patientDetails?.maritalStatus?.coding?.[0]?.code || '');
+            setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
             setValue('epsdtServices', patientDetails?.epsdtServices);
             setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition);
 
             // ✅ Emergency Contact Fix
-            setValue('emergencyContactName', patientDetails?.contact?.[0]?.name?.text || '');
-            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
-            setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[1]?.telecom?.[0]?.value));
+            // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding?.[0]?.display);
 
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');
@@ -132,6 +137,9 @@ const Demographicdetails = ({ patientId }) => {
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');            
+            setIdentifiers(patientDetails?.identifier || []);
+            setDemographicAddresses(patientDetails?.address || []);
         }
     }, [patientDetails]);
 
@@ -350,9 +358,11 @@ const Demographicdetails = ({ patientId }) => {
     }));
 
     const [eth, setEth] = useState(null); // Store selected ethnicity
+    console.log(eth,formattedEthnicityOptions,',formattedEthnicityOptions,formattedEthnicityOptions')
     const handleEthnicityChange = (selectedOption) => {
         setEth(selectedOption?.value?.display); // Store value in state
     };
+    console.log(eth,'asdiewf')
     const [rela, setRela] = useState(null); // Store selected relationship
     const handleRelationChange = (selectedOption) => {
         setRela('relation', selectedOption ? selectedOption.display : '');
@@ -362,7 +372,10 @@ const Demographicdetails = ({ patientId }) => {
         setTri('tribal', selectedOption ? selectedOption.display : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
-
+    const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code===eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display===eth);
+    console.log(rela,'selectedEthnicityOptionselectedEthnicityOption')
+    const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||  formattedTribleOptions.find((option) => option?.value?.code == tri) ;
+    const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela);
     return (
         <div className="scroll-container" style={{ overflow: 'scroll', height: '65vh' }}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
@@ -482,9 +495,12 @@ const Demographicdetails = ({ patientId }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select"
+                                // value={
+                                    // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
+                                // } // Show selected value
                                 value={
-                                    formattedEthnicityOptions.find((option) => option?.value?.display === eth) || null
-                                } // Show selected value
+                                    selectedEthnicityOption
+                                  }
                                 onChange={handleEthnicityChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -532,7 +548,10 @@ const Demographicdetails = ({ patientId }) => {
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
-                                value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                value={
+                                    selectedTribleOption
+                                  }
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
@@ -661,7 +680,10 @@ const Demographicdetails = ({ patientId }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                value={
+                                    selectedRelationOption
+                                }
                                 onChange={handleRelationChange}
                                 onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{

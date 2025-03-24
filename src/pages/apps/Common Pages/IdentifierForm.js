@@ -50,7 +50,7 @@ const store=useSelector((state)=>state);
         'Dun & Bradstreet',
         'Other',
     ];
-
+console.log(identifiers,'identifiersidentifiersidentifiers')
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -165,7 +165,7 @@ if(doctorDetails){
                 <Row key={index} className="mb-2">
                     <Col>
                         <Form.Select
-                            value={item?.type?.value || ''}
+                            value={item?.type?.value || item?.value}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 const selectedSystem = item?.system
@@ -187,7 +187,7 @@ if(doctorDetails){
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            value={item.number}
+                            value={item?.number||item?.value}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
@@ -234,8 +234,13 @@ if(doctorDetails){
                     <Col>
                         <Form.Control
                             type="date"
-                            value={item?.expiry || ''}
-                            onChange={(e) => handleChange(index, 'expiry', e.target.value)}
+                            value={
+                                item?.expiry
+                                  ? new Date(item.expiry).toISOString().split('T')[0]
+                                  : new Date().toISOString().split('T')[0]
+                              }
+                              min={new Date().toISOString().split('T')[0]}                 
+                                         onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
                         {index >= defaultIdentifiers?.length && (
                             <span
