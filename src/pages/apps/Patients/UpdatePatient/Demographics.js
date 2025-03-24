@@ -106,7 +106,6 @@ const Demographicdetails = ({ patientId }) => {
             setValue('raceSubcategories', patientDetails?.raceSubcategories);
             setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
             setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
-            setValue('sexualOrientation', patientDetails?.sexualOrientation);
             setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
             setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
@@ -426,22 +425,6 @@ const Demographicdetails = ({ patientId }) => {
                         </Form.Group>
                     </Col>
 
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
-                            <Form.Select {...register('sexualOrientation')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                <option value="Heterosexual">Heterosexual</option>
-                                <option value="Lesbian or gay">Lesbian or gay</option>
-                                <option value="Bisexual">Bisexual</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
