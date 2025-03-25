@@ -5,7 +5,7 @@ import { createDoctorDetailAction } from "../../../redux/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FiDownloadCloud, FiUploadCloud, FiTrash2 } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
@@ -14,7 +14,8 @@ import IdentifierForm from "../Common Pages/IdentifierForm";
 import Select from 'react-select';
 import { qualificationsData } from "../../../utils/DataSets/qualification.data";
 
-const DepartmentDetails = ({ docId }) => {
+const DepartmentDetails = ({ docId, setActiveTab }) => {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [showCAQHPassword, setShowCAQHPassword] = useState(false);
   const defaultIdentifiers = ['NPI'];
@@ -24,7 +25,14 @@ const DepartmentDetails = ({ docId }) => {
   const store = useSelector((state) => state);
   const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-  console.log(doctorDetails,'doctorDetails')
+  const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
+  useEffect(() => {
+    if (updateResponse === 200) {
+      setActiveTab('personalDetails')
+      navigate('/apps/doctors/list')
+      reset();
+    }
+  }, [updateResponse]);
   const id = doctorDetails?._id
   const {
     register,
@@ -199,8 +207,8 @@ const DepartmentDetails = ({ docId }) => {
       issuer: item?.issuerOrganisation,
     }))
     let finalIdentifiersData = [];
-    if(identifiers){
-      identifiers.forEach((element)=>{
+    if (identifiers) {
+      identifiers.forEach((element) => {
         let data = {
           identifierType: element?.type?.label,
           sliceName: element?.type?.code,
@@ -249,28 +257,27 @@ const DepartmentDetails = ({ docId }) => {
       specialties: [data?.specialist],
 
     }
-    console.log({payload})
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
-useEffect(() => {
-  if (doctorDetails && updateId) {
-    // Set qualifications data
-    const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
-      id: index + 1,
-      degreeName: {
-        code:item?.code?.code,
-        display:item?.code?.display,
-        definition:item?.code?.display,
-        system:item?.code?.system
-      },
-      specialties:item?.specialties?.[0] || 'N/A',
-      degreeFile: item?.documents?.[0] || null, // Use the first document if available
-      issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
-    }));
-    setQualifications(updatedQualifications);
-    setValue('specialist',doctorDetails?.specialties?.[0])
-  }
-}, [doctorDetails, setValue, updateId]);
+  useEffect(() => {
+    if (doctorDetails && updateId) {
+      // Set qualifications data
+      const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
+        id: index + 1,
+        degreeName: {
+          code: item?.code?.code,
+          display: item?.code?.display,
+          definition: item?.code?.display,
+          system: item?.code?.system
+        },
+        specialties: item?.specialties?.[0] || 'N/A',
+        degreeFile: item?.documents?.[0] || null, // Use the first document if available
+        issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
+      }));
+      setQualifications(updatedQualifications);
+      setValue('specialist', doctorDetails?.specialties?.[0])
+    }
+  }, [doctorDetails, setValue, updateId]);
 
   useEffect(() => {
     dispatch(
@@ -307,7 +314,7 @@ useEffect(() => {
                         value: 'http://hl7.org/fhir/sid/us-npi',
                         code: 'NPI',
                       },
-                    ]}  
+                    ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
                   />
@@ -404,9 +411,9 @@ useEffect(() => {
                             >
                               <FiTrash2 /> Remove
                             </Button> */}
-                             <span
+                            <span
                               className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                              style={{ marginTop:'-35px' }}
+                              style={{ marginTop: '-35px' }}
                               onClick={() => removeQualification(qualification.id)}>
                               <CiCircleMinus />
                             </span>
@@ -452,7 +459,7 @@ useEffect(() => {
                   {store?.createtDoctorsDetailReducer?.loading ? (
                     <Spinner color="white" className="spinner-border-sm" />
                   ) : (
-                    updateId ? "Update" : "Save"
+                    'Update'
                   )}
                 </Button>
 
