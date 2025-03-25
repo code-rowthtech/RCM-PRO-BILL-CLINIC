@@ -231,6 +231,7 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    console.log('clinicId', clinicId);
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinicId || '',
