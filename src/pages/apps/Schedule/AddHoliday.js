@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction } from "../../../redux/schedule/action";
 import { encryptMessage } from "../../../cryptoUtils";
-import { getDoctorsAction, stateEmptydAction } from "../../../redux/actions";
+import { getDoctorsAction } from "../../../redux/actions";
 import Spinner from "../../../constants/Spinner";
 import Select from 'react-select';
 
@@ -17,22 +17,21 @@ const AddHoliday = () => {
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const addResponse = store?.createScheduleReducer?.data?.response?.status;
-    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+        label: data?.name[0]?.text + ' ' 
     }));
 
     useEffect(() => {
         if (addResponse === 200) {
             reset();
-            dispatch(stateEmptydAction());
             const payload = {
                 search: doctorSearch,
                 status: status,
             }
             dispatch(
-                getDoctorsAction({ key: encryptMessage(payload) })
+                getDoctorsAction(payload)
             );
         }
     }, [addResponse])
@@ -64,7 +63,7 @@ const AddHoliday = () => {
             status: status,
         }
         dispatch(
-            getDoctorsAction({ key: encryptMessage(payload) })
+            getDoctorsAction(payload)
         );
 
     }, [dispatch, doctorSearch]);

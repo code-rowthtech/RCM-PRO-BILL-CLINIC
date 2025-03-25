@@ -1125,7 +1125,7 @@ const NewPractice = () => {
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
                                                                                 ? 5
-                                                                                : undefined
+                                                                                : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)

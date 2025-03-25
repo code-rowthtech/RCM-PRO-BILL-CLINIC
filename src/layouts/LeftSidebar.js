@@ -82,7 +82,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     }, []);
 
     const createPatientsResponse = store?.createPatientsReducer?.data?.status;
-    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const appointmentDetails = [];
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
@@ -111,7 +111,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
     useEffect(() => {
         const payload = { status: true, search: doctorSearch }
-        dispatch(getDoctorsAction({ key: encryptMessage(payload) }));
+        dispatch(getDoctorsAction(payload));
     }, [dispatch, doctorSearch])
 
     const closeModal = () => {

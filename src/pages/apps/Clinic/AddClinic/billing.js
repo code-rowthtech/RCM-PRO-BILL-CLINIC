@@ -56,9 +56,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
         if (billingAddResponse === 200) {
             reset();
             setActiveTab('contract');
-            ToastHandle(store?.createSubscriptionPlanReducer?.data?.message, 'success');
-            dispatch(stateEmptydAction());
-        }
+            ToastHandle(store?.createSubscriptionPlanReducer?.data?.message, 'success');        }
     }, [billingAddResponse]);
     useEffect(() => {
         if (amount?.months && selectedDate) {
