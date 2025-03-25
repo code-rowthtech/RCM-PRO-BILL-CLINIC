@@ -369,7 +369,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             orgType: data?.clinicType,
             // orgSpecialty: [],
             orgLogo: {
-                url: logo?.url.split('?')[0] || '',
+                url: logo?.url ? logo?.url?.split('?')[0] : '', // Check if url exists first
                 fileName: logoName || '',
             },
             identifier: constantIdentifiers.map((item) => ({
@@ -1173,7 +1173,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             ? 10
                                                             : item.type === 'NAIC'
                                                             ? 5
-                                                            : undefined
+                                                            : 10
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)

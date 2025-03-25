@@ -51,6 +51,7 @@ const ScheduleTab = () => {
   const inputRefs = useRef([]);
   const { control, handleSubmit, setValue, register, reset } = useForm();
   const [doctorSearch, setDoctorSearch] = useState('');
+  const [status, setStatus] = useState(true);
   const [days, setDays] = useState([
     { day: "Monday", slots: [{ startTime: '', endTime: '' }] },
     { day: "Tuesday", slots: [{ startTime: '', endTime: '' }] },
@@ -61,20 +62,20 @@ const ScheduleTab = () => {
     { day: "Sunday", slots: [{ startTime: '', endTime: '' }] },
   ]);
   // const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const doctorDetails = store?.getDoctorsReducer?.data?.response;
+  const doctorDetails = store?.getDoctorsReducer?.data?.result;
   const doctorOptions = doctorDetails?.map((data) => ({
     value: data._id,
-    label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    label: data?.name[0]?.text + ' ',
   }));
   const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;
   useEffect(() => {
     const payload = {
       search: doctorSearch,
-      status: true,
+      status: status,
     }
     dispatch(
-      getDoctorsAction({ key: encryptMessage(payload) })
+      getDoctorsAction(payload)
     );
   }, [dispatch, doctorSearch]);
   useEffect(() => {

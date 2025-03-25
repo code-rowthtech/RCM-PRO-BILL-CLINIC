@@ -21,7 +21,7 @@ export function getPractitionerScheduleApi(params: any): any {
 
 export function getAppointmentsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getAppointments}${data?.clinicId}?doctorId=${data?.doctorId || ''}`);
+    return api.get(`${URL.getAppointments}${data?.clinicId}`);
 }
 
 export function getAppointmentByIdApi(params: any): any {

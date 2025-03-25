@@ -97,7 +97,7 @@ const PatientDetails = ({ patientId }) => {
             setValue('approxAge', patientDetails?.approxAge || '');
             setValue(
                 'dateOfBirth',
-                patientDetails?.birthDate ? new Date(patientDetails.birthDate).toISOString().split('T')[0] : ''
+                patientDetails?.birthDate ? new Date(patientDetails?.birthDate).toISOString().split('T')[0] : ''
             );
             setValue('gender', patientDetails?.gender || '');
             setValue('maritalStatus', patientDetails?.maritalStatus?.coding?.[0]?.code || '');
@@ -136,13 +136,13 @@ const PatientDetails = ({ patientId }) => {
             // Setting follow-up details
             setValue(
                 'followupDate',
-                patientDetails?.followupDate ? new Date(patientDetails.followupDate).toISOString().split('T')[0] : ''
+                patientDetails?.followupDate ? new Date(patientDetails?.followupDate).toISOString().split('T')[0] : ''
             );
             setValue('followupReason', patientDetails?.followupReason || '');
 
             // Setting profile picture
-            setLogo(patientDetails.photo[0].url);
-            setLogoName(patientDetails.photo[0].title); // Set file name for display
+            setLogo(patientDetails?.photo[0]?.url);
+            setLogoName(patientDetails?.photo[0]?.title); // Set file name for display
         }
     }, [patientDetails, doctorDetails]);
 
