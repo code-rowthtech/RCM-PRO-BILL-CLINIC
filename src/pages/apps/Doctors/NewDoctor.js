@@ -159,7 +159,7 @@ const NewDoctor = () => {
             },
             photo: [{
                 contentType: logo?.type || 'image/jpeg',
-                url: logo?.url?.split('?')[0] || logo, 
+                url: logo?.url?.split('?')[0] || logo,
                 data: logo?.data || null, // Assuming `data` contains base64 or buffer
                 hash: logo?.hash || null, // You may need to generate or pass the hash
                 title: logoName || null, // Use `logoName` as the title
@@ -290,7 +290,13 @@ const NewDoctor = () => {
                                                         </OverlayTrigger>
                                                     )}
                                                     <div className='d-none d-md-block me-2'>
-                                                        <Button className='cancel-button' onClick={handleNewDoctor}>
+                                                        <Button className='cancel-button'
+                                                            // onClick={handleNewDoctor}
+                                                            onClick={() => {
+                                                                navigate('/apps/doctors/list')
+                                                                reset();
+                                                            }}
+                                                        >
                                                             Back
                                                         </Button>
                                                     </div>
@@ -611,7 +617,7 @@ const NewDoctor = () => {
 
                                     </Form>
                                 )}
-                                {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} />}
+                                {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} setActiveTab={setActiveTab} />}
                                 {activeTab === "documents" && <Documents />}
                             </div>
                         </Card.Body>
