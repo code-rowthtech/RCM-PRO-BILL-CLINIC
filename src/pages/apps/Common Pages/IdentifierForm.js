@@ -18,7 +18,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setError,
         clearErrors,
     } = useForm();
-const store=useSelector((state)=>state);   
+    const store = useSelector((state) => state);
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
@@ -50,7 +50,6 @@ const store=useSelector((state)=>state);
         'Dun & Bradstreet',
         'Other',
     ];
-console.log(identifiers,'identifiersidentifiersidentifiers')
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -108,26 +107,27 @@ console.log(identifiers,'identifiersidentifiersidentifiers')
             console.error('Error during file upload:', error);
         }
     };
-    useEffect(()=>{
-if(doctorDetails){
- if (doctorDetails) {
-    // Set qualifications data
-    const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
-        expiry:item?.expirationDate?new Date(item?.expirationDate).toISOString().split('T')[0]:'',
-        file:item?.documents?.[0],
-        issuingAuthority:item?.issuingAuthority,
-        number:item?.value,
-        system:'',
-        type:{
-            code:item?.sliceName,
-            label:item?.identifierType,
-            value:item?.system,
+    useEffect(() => {
+        if (doctorDetails) {
+            if (doctorDetails) {
+                // Set qualifications data
+                const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
+                    expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
+                    file: item?.documents?.[0] || null,
+                    issuingAuthority: item?.issuingAuthority || '',
+                    number: item?.value || '',
+                    system: '',
+                    type: {
+                        code: item?.sliceName || '',
+                        label: item?.identifierType || '',
+                        value: item?.system || '',
+                    }
+                }));
+                setIdentifiers(updatedIdentifiers);
+                setValue('specialist', doctorDetails?.specialties?.[0])
+            }
         }
-    }));
-    setIdentifiers(updatedIdentifiers);
-    setValue('specialist',doctorDetails?.specialties?.[0])
-  }}
-    },[doctorDetails])
+    }, [doctorDetails])
     return (
         <>
             <Row>
@@ -165,11 +165,11 @@ if(doctorDetails){
                 <Row key={index} className="mb-2">
                     <Col>
                         <Form.Select
-                            value={item?.type?.value || item?.value}
+                            value={item?.type?.value || item?.value || ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 const selectedSystem = item?.system
-                                handleChange(index, 'type', selectedType,'system',selectedSystem);
+                                handleChange(index, 'type', selectedType, 'system', selectedSystem);
                             }}
                             disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
                             <option value="" disabled>
@@ -187,16 +187,15 @@ if(doctorDetails){
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            value={item?.number||item?.value}
+                            value={item?.number || item?.value || ''}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item?.file?.name ? 'form-control' : 'custom-form-fields'
-                            }`}>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
                             {item?.file?.name
                                 ? item.file.name.length > 30
                                     ? item.file.name.slice(0, 25) + '...'
@@ -218,7 +217,7 @@ if(doctorDetails){
 
                     <Col>
                         <Form.Select
-                            value={item.issuingAuthority}
+                            value={item?.issuingAuthority || ''}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
                             <option value="" disabled>
                                 Select Issuing Authority
@@ -236,11 +235,11 @@ if(doctorDetails){
                             type="date"
                             value={
                                 item?.expiry
-                                  ? new Date(item.expiry).toISOString().split('T')[0]
-                                  : new Date().toISOString().split('T')[0]
-                              }
-                              min={new Date().toISOString().split('T')[0]}                 
-                                         onChange={(e) => handleChange(index, 'expiry', e.target.value)}
+                                    ? new Date(item.expiry).toISOString().split('T')[0]
+                                    : ''
+                            }
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
                         {index >= defaultIdentifiers?.length && (
                             <span

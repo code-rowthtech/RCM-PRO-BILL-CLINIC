@@ -124,7 +124,8 @@ const NewPatient = () => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                setActiveTab('demographicDetails');
+                handleTabChange('demographicDetails')
+                // setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
@@ -231,6 +232,7 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    console.log('clinicId', clinicId);
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinicId || '',

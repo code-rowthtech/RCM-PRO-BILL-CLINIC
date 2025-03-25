@@ -108,12 +108,17 @@ function* createDoctorsDetailFunction(data) {
                 type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR,
                 payload: { ...decryptedData },
             });
         }
+
     } catch (error) {
         ToastHandle(error, 'danger')
         yield put({
