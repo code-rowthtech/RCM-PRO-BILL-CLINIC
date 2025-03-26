@@ -58,6 +58,7 @@ const UpdatePatientIndex = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    console.log('patientDetails', patientDetails);
     const updateSuccess = store?.updatePatientsReducer?.data?.status;
     const updateResponsibleParty = store?.updateResponsiblePartyReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
@@ -156,7 +157,6 @@ const UpdatePatientIndex = () => {
             console.error('Error accessing camera:', error);
         }
     };
-
     const [uploading, setUploading] = useState(false);
     const capturePhoto = async () => {
         const canvas = canvasRef.current;
@@ -197,12 +197,12 @@ const UpdatePatientIndex = () => {
         const payload = {
             id: id,
             ...(logo?.url === null
-                ? {}
+                ? []
                 : {
-                      photo: {
+                      photo:[ {
                           url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
                           title: logoName,
-                      },
+                      }],
                   }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
@@ -253,7 +253,8 @@ const UpdatePatientIndex = () => {
                                                                 src={
                                                                     logo?.url
                                                                         ? logo.url.split('?')[0]
-                                                                        : patientDetails?.photo[0]?.url
+                                                                        : 
+                                                                        patientDetails?.photo[0]?.url
                                                                         ? patientDetails.photo[0]?.url
                                                                         : profilePhoto
                                                                 }
@@ -562,6 +563,8 @@ const UpdatePatientIndex = () => {
                                                         {[
                                                             'Patient Details',
                                                             'Demographics',
+                                                            'Responsible Party',
+                                                            'Reffering Doctor',
                                                             'Insurances',
                                                             'Eligibility',
                                                             'Authorizations',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form } from 'react-bootstrap';
-import { FiDownloadCloud } from 'react-icons/fi';
+import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FiDownloadCloud, FiInfo } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
@@ -15,7 +15,8 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     const store = useSelector((state) => state);
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
-    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    const [constantIdentifiers, setConstantIdentifiers] = useState([]);
+    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
 
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
@@ -112,16 +113,16 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     number: item?.value,
                     system: '',
                     type: {
-                        code: item?.sliceName,
-                        label: item?.identifierType,
-                        value: item?.system,
-                    }
+                        code: item?.sliceName || '',
+                        label: item?.identifierType || '',
+                        value: item?.system || '',
+                    },
                 }));
                 setIdentifiers(updatedIdentifiers);
-                setValue('specialist', doctorDetails?.specialties?.[0])
+                setValue('specialist', doctorDetails?.specialties?.[0]);
             }
         }
-    }, [doctorDetails])
+    }, [doctorDetails]);
     return (
         <>
             <Row>
@@ -143,8 +144,21 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                 <Col>
                     <Form.Label>Identifier Number</Form.Label>
                 </Col>
-                <Col>
+                <Col className="d-flex align-items-center gap-2">
                     <Form.Label>Identifier Document</Form.Label>
+
+                    {/* Tooltip Icon */}
+                    <OverlayTrigger
+                        placement="top"
+                        overlay={
+                            <Tooltip id="tooltip-identifier">
+                                File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
+                            </Tooltip>
+                        }>
+                        <span className="text-secondary cursor-pointer mb-2">
+                            <FiInfo size={15} />
+                        </span>
+                    </OverlayTrigger>
                 </Col>
                 <Col>
                     <Form.Label>Issuing Authority</Form.Label>
@@ -164,7 +178,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             className={defaultIdentifiers ? "bg-danger" : ""}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
-                                const selectedSystem = item?.system
+                                const selectedSystem = item?.system;
                                 handleChange(index, 'type', selectedType, 'system', selectedSystem);
                             }}
                             disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
@@ -190,9 +204,12 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
-                            {item?.file?.name
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
+                            {identifierDocument
+                                ? 'Uploading...'
+                                : item.file?.name
                                 ? item.file.name.length > 30
                                     ? item.file.name.slice(0, 25) + '...'
                                     : item.file.name
@@ -229,11 +246,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Control
                             type="date"
-                            value={
-                                item?.expiry
-                                    ? new Date(item.expiry).toISOString().split('T')[0]
-                                    : new Date().toISOString().split('T')[0]
-                            }
+                            value={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : ''}
                             min={new Date().toISOString().split('T')[0]}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />

@@ -10,7 +10,6 @@ import {
     getCities2Action,
     getCities3Action,
     updatePatientsAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';

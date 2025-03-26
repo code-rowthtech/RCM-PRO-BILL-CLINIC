@@ -10,7 +10,6 @@ import {
   createMastersDataAction,
   getDepartmentDataAction,
   getMastersDataAction,
-  stateEmptydAction,
   updateMastersDataAction
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
@@ -84,7 +83,6 @@ const POV = () => {
     dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', limit: 10, skip, search }));
     if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', search, limit: 10, skip }));
-      dispatch(stateEmptydAction());
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 

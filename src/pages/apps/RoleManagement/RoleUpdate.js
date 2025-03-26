@@ -3,7 +3,7 @@ import { Button, Modal, InputGroup, Form, Row, Col, Spinner } from 'react-bootst
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { getRoleDataAction, getRolesAction, stateEmptydAction, updateRolesAction } from '../../../redux/actions';
+import { getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
@@ -66,7 +66,6 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
 
     useEffect(() => {
         if (createSuccess === 200) {
-            // dispatch(stateEmptydAction());
             // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
             close();
             reset();

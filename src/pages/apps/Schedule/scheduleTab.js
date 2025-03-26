@@ -82,6 +82,15 @@ const ScheduleTab = () => {
   }, [dispatch, doctorSearch]);
   useEffect(() => {
     if (selectedDoctor?.value) {
+      setDays([
+    { day: "Monday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Tuesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Wednesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Thursday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Friday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Saturday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Sunday", slots: [{ startTime: '', endTime: '' }] },
+  ])
       const payload = {
         clinicId: clinicId,
         doctorId: selectedDoctor?.value

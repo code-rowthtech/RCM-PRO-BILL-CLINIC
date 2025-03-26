@@ -4,14 +4,13 @@ import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 // import { getRolesAction, updateRolesAction } from '../../../redux/actions'
-// import { stateEmptydAction } from '../../../redux/roles/actions'
 import Spinner from '../../../../constants/Spinner'
 import Paginations from '../../../../helpers/Paginations'
 import CreateRoleSetting from './CreateRoleSetting'
 import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
-import { getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
+import { getRoleDataAction, updateRoleDataAction } from '../../../../redux/actions'
 import { IoSearchSharp } from 'react-icons/io5'
 
 const RoleSetting = () => {
@@ -45,7 +44,6 @@ const RoleSetting = () => {
 
         // If there's a successful update or create, reset the modal and fetch updated data
         if (updateSuccess === 200 || createSuccess === 200) {
-            dispatch(stateEmptydAction());
             setShowUpdateModal(false);
             setShowModal(false);
             dispatch(getRoleDataAction({

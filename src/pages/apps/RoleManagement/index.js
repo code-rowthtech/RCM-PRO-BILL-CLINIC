@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
+import { deleteRolesAction, getRolesAction, getUserAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
 import { getMastersDataAction } from '../../../redux/settings/action';
@@ -120,7 +120,6 @@ const RoleManagement = () => {
     }
     useEffect(() => {
         if (createSuccess === 200) {
-            dispatch(stateEmptydAction());
             dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
             dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
 
@@ -128,12 +127,12 @@ const RoleManagement = () => {
         }
     }, [createSuccess]);
 
-    useEffect(() => {
-        if (deleteSuccess === 200) {
-            dispatch(stateEmptydAction());
+    // useEffect(() => {
+    //     if (deleteSuccess === 200) {
+    //         dispatch(stateEmptydAction());
 
-        }
-    }, [deleteSuccess])
+    //     }
+    // }, [deleteSuccess])
 
     const handleStatusChange = (isActive) => {
         setStatus(isActive);
