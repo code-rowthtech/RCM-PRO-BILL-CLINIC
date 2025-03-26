@@ -198,18 +198,53 @@ const NewDoctor = () => {
 
     const [formData, setFormData] = useState({
         role: doctorRoleId,
-        firstName: '',
         email: '',
-        lastName: '',
+        name: {
+            use: "official",
+            text: "",
+            family: "",
+            given: "",
+        },
         phone: '',
         password: '',
+        confirmPassword: '',
     });
+
+    // Example of updating the state when data changes
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "firstName" || name === "lastName") {
+            setFormData((prev) => {
+                const firstName = name === "firstName" ? value : prev.name.given;
+                const lastName = name === "lastName" ? value : prev.name.family;
+
+                return {
+                    ...prev,
+                    name: {
+                        use: "official",
+                        text: `${firstName} ${lastName}`.trim(),
+                        family: lastName,
+                        given: firstName,
+                    },
+                };
+            });
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+    };
+
+
     useEffect(() => {
         if (logo) {
             setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
         }
     }, [logo])
     const passwordValue = watch('password', '');
+
     React.useEffect(() => {
         setFormData((prev) => ({ ...prev, password: passwordValue }));
         if (doctorRoleId) {
@@ -221,28 +256,49 @@ const NewDoctor = () => {
         }
     }, [passwordValue, doctorRoleId, id]);
 
-    
-    useEffect(() => {
-        const isFormValid =
-            formData?.firstName?.trim()?.length >= 3 &&
-            /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
-            formData?.lastName?.trim()?.length >= 3 &&
-            /^[a-zA-Z]{3,}$/.test(formData.lastName) &&
-            // formData?.phone?.trim()?.length === 14 &&
-            // /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone) &&
-            formData?.dateOfBirth &&
-            new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18)) &&
-            formData?.email?.trim()?.length > 0 &&
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
-            formData?.gender &&
-            (id || (
-                formData?.password?.trim()?.length >= 8 &&
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
-                formData?.confirmPassword === formData?.password
-            ));
 
+    // useEffect(() => {
+    //     const isFormValid =
+    //         formData?.firstName?.trim()?.length >= 3 &&
+    //         /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
+    //         formData?.lastName?.trim()?.length >= 3 &&
+    //         /^[a-zA-Z]{3,}$/.test(formData.lastName) &&
+    //         formData?.dateOfBirth &&
+    //         new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18)) &&
+    //         formData?.email?.trim()?.length > 0 &&
+    //         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+    //         formData?.gender &&
+    //         (id || (
+    //             formData?.password?.trim()?.length >= 8 &&
+    //             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
+    //             formData?.confirmPassword === formData?.password
+    //         ));
+
+    //     console.log("Form Data:", formData);
+    //     console.log("Is Form Valid:", isFormValid);
+
+    //     setIsButtonDisabled(!isFormValid);
+    // }, [formData, id]);
+
+    useEffect(() => {
+        const isFirstNameValid = formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName);
+        const isLastNameValid = formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName);
+        const isPhoneValid = formData?.phone?.trim()?.length === 14 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
+        const isDOBValid = formData?.dateOfBirth &&
+            new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+        const isEmailValid = formData?.email?.trim()?.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+        const isGenderValid = !!formData?.gender;
+
+        const isPasswordValid = id || (
+            formData?.password?.trim()?.length >= 8 &&
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
+            formData?.confirmPassword === formData?.password
+        );
+
+        const isFormValid = isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid;
         setIsButtonDisabled(!isFormValid);
     }, [formData, id]);
+
 
     const requiredFieldTooltip = (
         <Tooltip id="button-tooltip">
@@ -528,32 +584,34 @@ const NewDoctor = () => {
                                                                 <div className="position-relative">
                                                                     <Form.Control
                                                                         type={showPassword ? "text" : "password"}
-                                                                        // onKeyDown={(event) => handleFirstSpace(event, 0)}
-
                                                                         onKeyDown={(e) => {
                                                                             if (e.key === " ") {
                                                                                 e.preventDefault();
                                                                             }
                                                                         }}
-                                                                        defaultValue={updateId ? '*********' : ''}
+                                                                        value={formData.password}  // Use value instead of defaultValue
                                                                         onCopy={(e) => e.preventDefault()}
                                                                         onCut={(e) => e.preventDefault()}
                                                                         placeholder={"Password"}
                                                                         readOnly={updateId}
                                                                         onChange={(e) => {
                                                                             clearErrors('password');
-                                                                            setFormData({ ...formData, password: e.target.value })
+                                                                            setFormData({ ...formData, password: e.target.value });
                                                                         }}
                                                                         {...register("password", {
                                                                             required: !updateId ? "Password is required" : false,
-                                                                            pattern: {
-                                                                                value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
-                                                                                message:
-                                                                                    "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
-                                                                            },
+                                                                            ...(updateId
+                                                                                ? {} // Don't apply pattern if updating
+                                                                                : {
+                                                                                    pattern: {
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        message: "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
+                                                                                    }
+                                                                                })
 
                                                                         })}
                                                                     />
+
                                                                     <span
                                                                         className="position-absolute end-0 top-0 me-2 cursor-pointer"
                                                                         style={{ marginTop: '3px' }}
@@ -574,21 +632,18 @@ const NewDoctor = () => {
                                                                     <Form.Control
                                                                         type={showConfirmPassword ? "text" : "password"}
                                                                         placeholder="Confirm Password"
-                                                                        readOnly={id}
-                                                                        onCopy={(e) => e.preventDefault()}
-                                                                        onCut={(e) => e.preventDefault()}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('confirmPassword');
-                                                                            setFormData({ ...formData, confirmPassword: e.target.value })
-                                                                        }}
                                                                         {...register('confirmPassword', {
-                                                                            ...(!id ? { required: 'Please confirm your password' } : {}),
-                                                                            pattern: {
-                                                                                value: id ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
-                                                                            },
-                                                                            validate: value =>
-                                                                                value === password || 'Passwords do not match'
+                                                                            required: !id ? 'Please confirm your password' : false,
+                                                                            validate: (value) =>
+                                                                                value === watch("password") || 'Passwords do not match',
+                                                                            onChange: (e) => {
+                                                                                clearErrors('confirmPassword');
+                                                                                console.log(e.target.value, "onChange Triggered"); // Debugging
+                                                                                setFormData((prev) => ({
+                                                                                    ...prev,
+                                                                                    confirmPassword: e.target.value
+                                                                                }));
+                                                                            }
                                                                         })}
                                                                     />
                                                                     <span
