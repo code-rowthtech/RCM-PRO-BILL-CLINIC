@@ -291,7 +291,7 @@ const DepartmentDetails = () => {
                   {store?.createtDoctorsDetailReducer?.loading ? (
                     <Spinner color="white" className="spinner-border-sm" />
                   ) : (
-                    updateId ? "Update" : "Save"
+                    'Update'
                   )}
                 </Button>
 

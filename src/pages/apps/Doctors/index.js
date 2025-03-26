@@ -175,15 +175,15 @@ const Doctors = () => {
                                                                         placement="top"
                                                                         overlay={
                                                                             <Tooltip id={`tooltip-${data?._id}`}>
-                                                                            <ul className="m-0 p-0">
-                                                                                {data?.specialities?.slice(0).map((specialty, index) => (
-                                                                                    <li key={index} style={{ listStyleType: "disc", marginLeft: "10px" }}>
-                                                                                        {specialty}
-                                                                                    </li>
-                                                                                ))}
-                                                                            </ul>
-                                                                        </Tooltip>
-                                                                        
+                                                                                <ul className="m-0 p-0">
+                                                                                    {data?.specialities?.slice(0).map((specialty, index) => (
+                                                                                        <li key={index} style={{ listStyleType: "disc", marginLeft: "10px" }}>
+                                                                                            {specialty}
+                                                                                        </li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </Tooltip>
+
 
                                                                         }
                                                                     >

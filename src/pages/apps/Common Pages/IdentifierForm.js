@@ -213,7 +213,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
 
                     <Col>
                         <Form.Select
-                            value={item.issuingAuthority}
+                            value={item?.issuingAuthority || ''}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
                             <option value="" disabled>
                                 Select Issuing Authority

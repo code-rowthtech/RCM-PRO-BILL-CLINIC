@@ -306,7 +306,13 @@ const NewDoctor = () => {
                                                         </OverlayTrigger>
                                                     )}
                                                     <div className='d-none d-md-block me-2'>
-                                                        <Button className='cancel-button' onClick={handleNewDoctor}>
+                                                        <Button className='cancel-button'
+                                                            // onClick={handleNewDoctor}
+                                                            onClick={() => {
+                                                                navigate('/apps/doctors/list')
+                                                                reset();
+                                                            }}
+                                                        >
                                                             Back
                                                         </Button>
                                                     </div>
@@ -643,7 +649,7 @@ const NewDoctor = () => {
 
                                     </Form>
                                 )}
-                                {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} />}
+                                {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} setActiveTab={setActiveTab} />}
                                 {activeTab === "documents" && <Documents />}
                             </div>
                         </Card.Body>
