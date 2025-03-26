@@ -40,13 +40,13 @@ export const handleUpload = async (file, setLoading) => {
         //         'Content-Type': file.type,
         //     },
         // });
-        // const uploadResponse = await fetch(url?.url, {
-        //     method: 'PUT',
-        //     headers: {
-        //         'Content-Type': file.type,
-        //     },
-        //     body: file,
-        // });
+        const uploadResponse = await fetch(url?.url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': file.type,
+            },
+            body: file,
+        });
         // if (uploadResponse.status === 200) {
         //     return url; // Ensure this line returns the URL correctly
         // } else {

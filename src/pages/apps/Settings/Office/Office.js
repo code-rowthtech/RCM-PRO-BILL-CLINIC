@@ -10,7 +10,6 @@ import {
   createMastersDataAction,
   getDepartmentDataAction,
   getMastersDataAction,
-  stateEmptydAction,
   updateMastersDataAction
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
@@ -83,7 +82,6 @@ const Office = () => {
     dispatch(getMastersDataAction({ status: status, category: 'Office', limit: 10, skip, search: search }));
     if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
-      dispatch(stateEmptydAction());
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 

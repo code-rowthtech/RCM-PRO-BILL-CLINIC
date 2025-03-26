@@ -19,7 +19,6 @@ import {
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdVerified } from 'react-icons/md';
-import { stateEmptydAction } from '../../../redux/clinics/actions';
 import EmailToDoctorModal from './EmailToSubClinicModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
@@ -606,7 +605,6 @@ const SubUpdateClinic = () => {
     useEffect(() => {
         if (updateSuccess === 200) {
             navigate('/apps/crm/addclinic');
-            dispatch(stateEmptydAction());
         }
     }, [updateSuccess]);
     const [selectedLocation, setSelectedLocation] = useState(null);
