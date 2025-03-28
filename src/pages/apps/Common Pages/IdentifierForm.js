@@ -8,15 +8,9 @@ import { useSelector } from 'react-redux';
 
 const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, identifiers }) => {
     const {
-        register,
-        handleSubmit,
         formState: { errors },
-        reset,
-        watch,
         setValue,
-        getValues,
-        setError,
-        clearErrors,
+        watch,
     } = useForm();
     const store = useSelector((state) => state);
 
@@ -50,6 +44,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         'Dun & Bradstreet',
         'Other',
     ];
+    console.log(identifiers, 'identifiersidentifiersidentifiers')
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -113,9 +108,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                 // Set qualifications data
                 const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
                     expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
-                    file: item?.documents?.[0] || null,
-                    issuingAuthority: item?.issuingAuthority || '',
-                    number: item?.value || '',
+                    file: item?.documents?.[0],
+                    issuingAuthority: item?.issuingAuthority,
+                    number: item?.value,
                     system: '',
                     type: {
                         code: item?.sliceName || '',
@@ -178,7 +173,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                 <Row key={index} className="mb-2">
                     <Col>
                         <Form.Select
-                            value={item?.type?.value || item?.value || ''}
+                            value={item?.type?.value || item?.value}
+                            data-has-value={!!watch(defaultIdentifiers[index])}
+                            className={defaultIdentifiers ? "bg-danger" : ""}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 const selectedSystem = item?.system;
@@ -200,7 +197,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            value={item?.number || item?.value || ''}
+                            value={item?.number || item?.value}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
@@ -255,8 +252,8 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         />
                         {index >= defaultIdentifiers?.length && (
                             <span
-                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                style={{ right: '-2%', top: '12%' }}
+                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                                style={{ marginTop: '-29px', right:'9px' }}
                                 onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>

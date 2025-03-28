@@ -2,18 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiEdit, FiTrash } from "react-icons/fi";
+import { FiEdit } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
-import { createDoctorAction, createDoctorDetailAction, getDoctorsAction, stateEmptydAction } from '../../../redux/actions';
+import {  createDoctorDetailAction, getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoSearchSharp } from "react-icons/io5";
 import { Info } from 'lucide-react';
 
 
 const Doctors = () => {
-    const [detailsModal, setDetailsModal] = useState(false);
     const [statusModal, setStatusModal] = useState(false);  // Modal to confirm status change
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [status, setStatus] = useState(true);
@@ -48,7 +47,16 @@ const Doctors = () => {
         closeStatusModal();
     };
 
-
+    useEffect(() => {
+        if (updateStatus === 200) {
+            // dispatch(stateEmptydAction())
+            const payload = { status: status, search: search }
+            dispatch(
+                getDoctorsAction(payload)
+    
+            );
+        }
+    }, [updateStatus]);
     const handleNewDoctor = () => {
         navigate("/apps/doctors/new-doctor")
     }

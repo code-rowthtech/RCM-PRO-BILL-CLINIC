@@ -5,51 +5,33 @@ import { createDoctorDetailAction } from "../../../redux/actions";
 import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FiDownloadCloud, FiUploadCloud, FiTrash2 } from "react-icons/fi";
+import { useSearchParams } from "react-router-dom";
+import { FiUploadCloud } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
 import { handleUpload } from "../../../helpers/HandleUpload";
 import IdentifierForm from "../Common Pages/IdentifierForm";
 import Select from 'react-select';
 import { qualificationsData } from "../../../utils/DataSets/qualification.data";
 
-const DepartmentDetails = ({ docId, setActiveTab }) => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState(false);
-  const [showCAQHPassword, setShowCAQHPassword] = useState(false);
-  const defaultIdentifiers = ['NPI'];
+const DepartmentDetails = () => {
+  // const defaultIdentifiers = ['NPI'];
   const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-  const [identifierDocument, setIdentifierDocumnent] = useState(false);
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
-  const departmentId = store?.getMastersDataReducer?.data?.result;
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-  const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
-  useEffect(() => {
-    if (updateResponse === 200) {
-      setActiveTab('personalDetails')
-      navigate('/apps/doctors/list')
-      reset();
-    }
-  }, [updateResponse]);
+  console.log(doctorDetails, 'doctorDetails')
   const id = doctorDetails?._id
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    reset,
     setValue,
-    watch,
     clearErrors,
   } = useForm();
-
-
   const [searchParams] = useSearchParams();
   const updateId = searchParams.get('id');
-
   const [qualifications, setQualifications] = useState([{ id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
   const degreeFileInputRef = useRef(null);
+
   // Add a new qualification
   const addQualification = () => {
     const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
@@ -77,7 +59,6 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
   const handleFileChangeDegree = async (index, event) => {
     const file = event.target.files[0];
     try {
-
       const url = await handleUpload(file, setDegreeUploading);
       const fileName = file.name
       handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
@@ -97,87 +78,17 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
         use: '',
       }))
     );
-    // setConstantContact(
-    //   contactDetails.map((system) => ({
-    //     system,
-    //     value: '',
-    //     use: '',
-    //   }))
-    // );
   }, []);
-  const [logo, setLogo] = useState(null);
-  const [logoName, setLogoName] = useState('');
-  const [degree, setDegree] = useState(null);
-  const [degreeName, setDegreeName] = useState('');
-  const [logoUploading, setLogoUploading] = useState(false)
   const [identifiers, setIdentifiers] = useState([]);
-
-  const handleFileChange = async (e) => {
-    const selectedFile = e.target.files[0];
-    try {
-      const url = await handleUpload(selectedFile, setLogoUploading);
-      setLogo(url);
-      setLogoName(selectedFile?.name)
-    } catch (error) {
-      // console.error('Error during file upload:', error);
-    }
-  };
   const [degreeUploading, setDegreeUploading] = useState(false);
-  // const handleFileChangeDegree = async (e) => {
-  //   const selectedFile = e.target.files[0];
-  //   try {
-  //     const url = await handleUpload(selectedFile, setDegreeUploading);
-  //     setDegree(url);
-  //     setDegreeName(selectedFile?.name)
-  //   } catch (error) {
-  //     // console.error('Error during file upload:', error);
-  //   }
-  // };
-  const addIdentifier = () => {
-    setConstantIdentifiers([
-      ...constantIdentifiers,
-      { type: '', number: '', file: '', expiry: '', issuingAuthority: '', use: '' },
-    ]);
-  };
-  const removeIdentifier = (index) => {
-    if (index < defaultIdentifiers.length) return;
-    setConstantIdentifiers(constantIdentifiers.filter((_, i) => i !== index));
-  };
-  const handleChange = (index, field, value) => {
-    const updatedIdentifiers = [...constantIdentifiers];
-    updatedIdentifiers[index][field] = value;
-    setConstantIdentifiers(updatedIdentifiers);
-  };
-  const identifierOptions = [
-    { label: "National Provider Identifier (NPI)", value: "http://hl7.org/fhir/sid/us-npi", code: "NPI" },
-    { label: "State Medical License", value: "http://terminology.hl7.org/CodeSystem/v2-0203", code: "MED-LIC" },
-    { label: "DEA Number (Controlled Substances)", value: "http://www.nabp.pharmacy/DEA", code: "DEA" },
-    { label: "Board Certification", value: "http://www.abms.org/certification", code: "BOARD-CERT" },
-    { label: "Tax Identification Number (TIN)", value: "http://hl7.org/fhir/sid/us-tin", code: "TIN" },
-    { label: "Medicare Provider Number", value: "http://hl7.org/fhir/sid/us-medicare", code: "Medicare" },
-    { label: "Medicaid Provider Number", value: "http://hl7.org/fhir/sid/us-medicaid", code: "Medicaid" }
-  ];
 
-  const handleIdentifierFileChange = async (e, index) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-    try {
-      const url = await handleUpload(selectedFile, setIdentifierDocumnent); // Upload file
-      setConstantIdentifiers((prevDetails) => {
-        const updatedDetails = [...prevDetails];
-        updatedDetails[index] = {
-          ...updatedDetails[index],
-          file: {
-            url: url?.url?.split('?')[0],
-            name: selectedFile.name,
-          },
-        };
-        return updatedDetails;
-      });
-    } catch (error) {
-      console.error('Error during file upload:', error);
-    }
-  };
+  const defaultIdentifiers = [
+    {
+      label: 'National Provider Identifier (NPI)',
+      value: 'http://hl7.org/fhir/sid/us-npi',
+      code: 'NPI',
+    },
+  ];
 
   const QualificationOptions = qualificationsData.map((qualification) => ({
     value: qualification.code,
@@ -185,21 +96,6 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
     data: qualification, // Store full object for later use
   }));
 
-  const [code, setCode] = useState([])
-  // const handleQualificationChange = (selectedOption) => {
-
-  //   const { definition, ...rest } = selectedOption.value; // Remove `definition`
-
-  //   setCode(prevState => [
-  //     ...prevState,
-  //     {
-  //       ...rest,
-  //       url: '' // Add or update the `url` property
-  //     }
-  //   ]);
-
-  //   setValue('degreeName', selectedOption ? selectedOption.display : '');
-  // };
   const onsubmit = (data) => {
     const qualificationData = qualifications?.map((item) => ({
       code: item?.degreeName,
@@ -225,38 +121,11 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
       identifier: finalIdentifiersData,
-      // qualification: [{
-      //   // identifier: [{
-      //   //   use: "", // Example: "official", "usual", etc.
-      //   //   system: "", // Example: "https://example.com/degree-system"
-      //   //   value: data?.degreeName, // Degree name
-      //   //   period: {
-      //   //     start: "", 
-      //   //     end: "" 
-      //   //   }
-      //   // }],
-      //   code: {
-      //     system: "http://hl7.org/fhir/ValueSet/degreeLicenseCertificate",
-      //     code: "", // Example: "MD"
-      //     display: "", // Degree display name
-      //     url: "" // Degree document URL
-      //   },
-      //   // period: {
-      //   //   start: "", 
-      //   //   end: "" 
-      //   // },
-      //   issuer: {
-      //     reference: "test" // Example: "Organization/12345" (Reference to issuing organization)
-      //   },
-      //   documents: [{
-      //     url: degree?.url?.split('?')[0] || degree,
-      //     fileName: degreeName,
-      //   }] // Degree file name(s)
-      // }]
       qualification: qualificationData,
       specialties: [data?.specialist],
 
     }
+    console.log({ payload })
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
   useEffect(() => {
@@ -285,13 +154,6 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
     );
   }, [dispatch]);
 
-  useEffect(() => {
-    if (updateId) {
-      setValue('NPIPassword', '********')
-      setValue('CAQHPassword', '********')
-    }
-  }, [updateId]);
-
   return (
     <>
       <div className="container-fluid">
@@ -308,13 +170,7 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
               <Row>
                 <Col sm={12}>
                   <IdentifierForm
-                    defaultIdentifiers={[
-                      {
-                        label: 'National Provider Identifier (NPI)',
-                        value: 'http://hl7.org/fhir/sid/us-npi',
-                        code: 'NPI',
-                      },
-                    ]}
+                    defaultIdentifiers={defaultIdentifiers}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
                   />
@@ -390,27 +246,8 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
                             />
                           </Form.Group>
                         </div>
-                        {/* Delete Button */}
-                        {/* {index > 0 && ( // Only show delete button for added rows
-                        
-                          <div className="d-flex justify-content-end">
-                            <span
-                              className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                              style={{ right: '0.5%', top: '58.5%' }}
-                              onClick={() => removeQualification(qualification.id)}>
-                              <CiCircleMinus />
-                            </span>
-                          </div>
-                        )} */}
                         {index > 0 && ( // Only show delete button for added rows
                           <div className="col-md-12 text-end">
-                            {/* <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => removeQualification(qualification.id)}
-                            >
-                              <FiTrash2 /> Remove
-                            </Button> */}
                             <span
                               className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
                               style={{ marginTop: '-35px' }}
@@ -429,20 +266,15 @@ const DepartmentDetails = ({ docId, setActiveTab }) => {
                         <Form.Label className="mb-0">Specialist </Form.Label>
                         <Form.Control
                           type="text"
-                          {...register('specialist',
-                            // { required: 'Specialist Name is required' }
-                          )}
+                          {...register('specialist')}
                           onChange={(e) => {
                             clearErrors('specialist');
-                            // setFormData({ ...formData, specialties: e.target.value });
                           }}
                           placeholder="Enter Specialist Name"
                         />
                       </Form.Group>
                     </div>
                   </Row>
-
-
                 </Col>
               </Row>
 

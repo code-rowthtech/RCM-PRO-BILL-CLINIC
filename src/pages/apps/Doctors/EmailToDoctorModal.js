@@ -21,7 +21,8 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
 
     }
     const store = useSelector((state) => state);
-    const createResponse = store?.createtDoctorsReducer?.data?.status
+    const createResponse = store?.createDoctorsReducer?.data?.status
+
     useEffect(() => {
         if (createResponse === 200) {
             closeModal();
@@ -29,6 +30,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
             reset();
         }
     }, [createResponse])
+
     return (
         <div>
             <Modal centered show={show} onHide={closeModal}>
@@ -54,7 +56,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                                         {...register('name', { required: 'Name is required' })}
                                         defaultValue={formData?.email}
                                     />
-                                    {errors.name && <span className="text-danger">{errors.name.message}</span>}
+                                    {/* {errors.name && <span className="text-danger">{errors.name.message}</span>} */}
                                 </Form.Group>
 
                                 <div className='text-center'>
