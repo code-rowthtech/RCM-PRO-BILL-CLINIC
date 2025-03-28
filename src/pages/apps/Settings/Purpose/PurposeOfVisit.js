@@ -83,6 +83,8 @@ const POV = () => {
     dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', limit: 10, skip, search }));
     if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'purposeOfVisit', search, limit: 10, skip }));
+      // dispatch(stateEmptydAction());
+      closeAddModal();
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 
@@ -311,7 +313,7 @@ const POV = () => {
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

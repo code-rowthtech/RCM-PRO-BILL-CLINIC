@@ -454,7 +454,7 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display}>
+                                    <option key={race.code} value={race.display} className='text-capitalize'>
                                         {race.display}
                                     </option>
                                 ))}
@@ -947,7 +947,7 @@ const Demographicdetails = ({ patientId }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -959,7 +959,7 @@ const Demographicdetails = ({ patientId }) => {
                                                 <span className="text-danger">{errors.employerTimeZone.message}</span>
                                             )}
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

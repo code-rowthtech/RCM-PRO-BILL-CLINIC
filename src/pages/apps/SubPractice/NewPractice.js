@@ -178,13 +178,12 @@ const NewPractice = () => {
         }
     }, [stateToSelect]);
 
-    const handleStateSelection = (e) => {
-        const stateCode = e.target.value;
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
-    };
+    
+     const handleStateSelection = (e) => {
+            const selectedOption = e.target.selectedOptions[0];
+            const key = JSON.parse(selectedOption.getAttribute('data-key'));
+            dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }));
+        };
 
     const handleCitySelection = (e) => {
         const city = e.target.value;
@@ -1576,16 +1575,14 @@ const NewPractice = () => {
                                                             <Form.Select
                                                                 data-has-value={!!getValues(`address[${index}].city`)}
                                                                 {...register(`address[${index}].city`)}
-                                                                disabled={
-                                                                    !selectedState || store?.getCitiesReducer?.loading
-                                                                }>
+                                                              >
                                                                 <option value="">
                                                                     {store?.getCitiesReducer?.loading
                                                                         ? 'Loading...'
                                                                         : 'Select City'}
                                                                 </option>
                                                                 {cities?.map((data) => (
-                                                                    <option key={data?.name} value={data?.name}>
+                                                                    <option key={data?.name} value={data?._id}>
                                                                         {data?.name}
                                                                     </option>
                                                                 ))}
