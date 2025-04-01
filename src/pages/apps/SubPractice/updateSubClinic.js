@@ -331,6 +331,7 @@ const SubUpdateClinic = () => {
     //     }
     // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
     const setField = (key, value) => value && setValue(key, value);
+    console.log(subClinicsDetailsGet,'subClinicsDetailsGet')
     useEffect(() => {
         if (subClinicsDetailsGet) {
             if (subClinicsDetailsGet?.orgType) {
@@ -351,7 +352,7 @@ const SubUpdateClinic = () => {
                     file: data?.documents?.[0]
                         ? {
                               url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
+                              name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
                           }
                         : '',
                     expiry: data?.expirationDate || '',
