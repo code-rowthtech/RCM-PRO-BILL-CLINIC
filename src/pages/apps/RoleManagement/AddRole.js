@@ -32,9 +32,10 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
 
     const [addDepartmentalModal, setAddDepartmentalModal] = useState(false);
 
-    const tableGetData = store?.getMastersDataReducer?.data?.result;
+    const designationData = store?.getMastersDataReducer?.data1?.data?.result;
+    const designationDataLoading = store?.getMastersDataReducer?.data?.loading;
+    console.log(store?.getMastersDataReducer, "designationData")
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    const tableGetDataLoading = store?.getMastersDataReducer?.data?.loading;
     const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
     const roleData = store?.getRolesDataReducer?.data
     const roleDataLoading = store?.getRolesDataReducer?.loading
@@ -63,10 +64,10 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
 
     useEffect(() => {
         if (show) {
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
-            dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
-            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
-            dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+            // dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
+            // dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+            // dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
+            // dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
         }
     }, [dispatch, show]);
 
@@ -97,34 +98,40 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
         }
     };
 
-    // useEffect(() => {
-    //     if (createSuccess === 200) {
-    //         reset();
-    //         close()
-    //         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-
-    //     }
-    // }, [createSuccess])
+    useEffect(() => {
+        if (createSuccess === 200) {
+            reset();
+            close()
+        }
+    }, [createSuccess])
     const onSubmit = (data) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
         // const formattedLeavingDate = new Date(data.leavingDate).toISOString();
-        const payload = {
-            firstName: data.name,
-            email: data.email,
-            password: data.password,
-            phone: data?.contact,
-            phNumberSecondary: data.phNumberSecondary,
-            clinicId: clinicId,
-            reportingTo: data.reportingTo || clinicId,
-            joiningDate: formattedJoiningDate,
-            designation: data.designation,
-            department: data.department,
-            role: data.role,
+        // const payload = {
+        //     firstName: data.firstName,
+        //     email: data.email,
+        //     password: data.password,
+        //     phone: data?.phone,
+        //     phNumberSecondary: data.phNumberSecondary,
+        //     clinicId: clinicId,
+        //     reportingTo: data.reportingTo || clinicId,
+        //     joiningDate: formattedJoiningDate,
+        //     designation: data.designation,
+        //     department: data.department,
+        //     roleId: data.role,
+        //     name:{
+        //         text:'wuidbuidw'
+        //     }
+        // };
+        data.clinicId = clinicId;
+        data.reportingTo = data.reportingTo || clinicId;
+        data.name = {
+            text: data.firstName,
         };
+        // console.log(data, '2222222222222222222222222')
 
-
-        dispatch(createRolesAction({ key: `${encryptMessage(payload)}` }));
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
+        dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
+        // dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
 
 
 
@@ -159,7 +166,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
     const joiningDate = watch('joiningDate')
     const desigination = watch('designation')
     const department = watch('department')
-    const role = watch('role')
+    const role = watch('roleId')
 
 
     return (
@@ -186,7 +193,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     <Form.Control
                                         type="text"
                                         placeholder=" Name"
-                                        {...register('name', {
+                                        {...register('firstName', {
                                             required: 'Name is required',
                                             pattern: {
                                                 value: /^(?! )[A-Za-z0-9 ]*$/,
@@ -204,7 +211,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             }
                                         }}
                                     />
-                                    {errors.name && <span className="text-danger fs-6">{errors.name.message}</span>}
+                                    {errors.firstName && <span className="text-danger fs-6">{errors.firstName.message}</span>}
                                 </Form.Group>
                             </Col>
                             <Col sm={6}>
@@ -447,7 +454,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         {/* Contact Input */}
                                         <Form.Control
                                             type="tel"
-                                            {...register("contact", !id ? {
+                                            {...register("phone", !id ? {
                                                 required: "Contact number is required",
                                                 pattern: {
                                                     value: /^[0-9]*$/,
@@ -476,8 +483,8 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     </InputGroup>
 
                                     {/* Validation Error Message */}
-                                    {errors.contact && (
-                                        <span className="text-danger fs-6">{errors.contact.message}</span>
+                                    {errors.phone && (
+                                        <span className="text-danger fs-6">{errors.phone.message}</span>
                                     )}
 
                                     {/* Country Code Flag */}
@@ -535,7 +542,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">Designation <span className='text-danger'>*</span></Form.Label>
                                     <div style={{ position: "relative" }}>
-                                        {tableGetData?.length === 0 ? (
+                                        {designationData?.length === 0 ? (
                                             <Dropdown
                                                 show={isDropdownDesignation}
                                                 onToggle={(isDropdownDesignation) => setIsDropdownDesignation(isDropdownDesignation)}
@@ -559,7 +566,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                     }}
                                                     className='border border-secondary'
                                                 >
-                                                    {tableGetDataLoading ? (
+                                                    {designationDataLoading ? (
                                                         <Dropdown.Item disabled>Loading...</Dropdown.Item>
                                                     ) : (
                                                         <div
@@ -592,7 +599,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                 className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
-                                                {tableGetDataLoading ? (
+                                                {designationDataLoading ? (
                                                     <div className="d-flex justify-content-center">
                                                         <div className="spinner-border" role="status">
                                                             <span className="visually-hidden">Loading...</span>
@@ -600,8 +607,8 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                     </div>) : (
                                                     <>
                                                         <option value="" className='select' hidden>Select Designation</option>
-                                                        {tableGetData?.map((data) => (
-                                                            <option key={data?._id} className='text-dark' value={data?.name}>
+                                                        {designationData?.map((data) => (
+                                                            <option key={data?._id} className='text-dark text-capitalize' value={data?.name}>
                                                                 {data?.name}
                                                             </option>
                                                         ))}
@@ -673,7 +680,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             >
                                                 <option value="" hidden>Select Department</option>
                                                 {departmentGetData?.map((data) => (
-                                                    <option key={data?._id} value={data.name}>
+                                                    <option className='text-capitalize' key={data?._id} value={data.name}>
                                                         {data?.name}
                                                     </option>
                                                 ))}
@@ -738,21 +745,21 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             </Dropdown>
                                         ) : (
                                             <Form.Select
-                                                {...register("role", { required: "Role is required" })}
+                                                {...register("roleId", { required: "Role is required" })}
                                                 className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
                                                 <option value="" hidden>Select Role</option>
                                                 {decryptedRolesData?.map((data) => (
-                                                    <option key={data._id} value={data._id}>
+                                                    <option className='text-capitalize' key={data._id} value={data._id}>
                                                         {data.name}
                                                     </option>
                                                 ))}
                                             </Form.Select>
                                         )}
                                     </div>
-                                    {errors.role && (
-                                        <span className="text-danger fs-6">{errors.role.message}</span>
+                                    {errors.roleId && (
+                                        <span className="text-danger fs-6">{errors.roleId.message}</span>
                                     )}
                                 </Form.Group>
                             </Col>

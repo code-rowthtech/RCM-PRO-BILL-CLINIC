@@ -10,10 +10,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
+import { deleteRolesAction, getRoleDataAction, getRolesAction, getUserAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
-import { getMastersDataAction } from '../../../redux/settings/action';
+import { getDepartmentDataAction, getMastersDataAction, getMastersDataAction2 } from '../../../redux/settings/action';
 import { IoSearchSharp } from 'react-icons/io5';
 
 function formatDate(dateString) {
@@ -31,6 +31,7 @@ const RoleManagement = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state)
     const roleData = store?.getRolesDataReducer?.data
+    console.log(roleData, "roleData")
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
     const createSuccess = store?.updateRolesReducer?.data?.status;
@@ -64,6 +65,18 @@ const RoleManagement = () => {
             })
         );
     }, [dispatch, status, searchQuery, skip]);
+    useEffect(() => {
+        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: '', search: '' }));
+        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: '', search: '' }));
+        dispatch(getRoleDataAction({
+            clinicId: clinicId,
+            limit: 10,
+            search: '',
+            createdById: '',
+            page: '',
+            status: true
+        }));
+    }, [dispatch])
     useEffect(() => {
         if (viewPasswordStatus === 200) {
             dispatch(
@@ -118,15 +131,20 @@ const RoleManagement = () => {
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
     }
-    // useEffect(() => {
-    //     if (createSuccess === 200) {
-    //         dispatch(stateEmptydAction());
-    //         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
-    //         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    useEffect(() => {
+        if (createSuccess === 200) {
 
-
-    //     }
-    // }, [createSuccess]);
+            dispatch(
+                getRolesAction({
+                    clinicId: clinicId,
+                    limit: 10,
+                    search: searchQuery,
+                    page: skip,
+                    status: status,
+                })
+            );
+        }
+    }, [createSuccess]);
 
     // useEffect(() => {
     //     if (deleteSuccess === 200) {
@@ -260,7 +278,7 @@ const RoleManagement = () => {
                                                 <tr key={index} className="border-bottom">
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
                                                     <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                        {data?.firstName?.charAt(0).toUpperCase() + data?.firstName?.slice(1)}
+                                                        {data?.name?.text}
                                                     </td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
