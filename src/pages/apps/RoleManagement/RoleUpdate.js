@@ -40,13 +40,13 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
         setUpdateDepartmentModal(false);
     };
 
-    useEffect(() => {
-        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
-    }, [dispatch]);
+    // useEffect(() => {
+    //     dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    // }, [dispatch]);
 
     useEffect(() => {
         if (show && currentUser) {
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
+            // dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
             // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
 
             reset({
@@ -61,7 +61,7 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
                 department: currentUser.department,
             });
         }
-        dispatch(getDepartmentDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
+        // dispatch(getDepartmentDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
     }, [getRolesAction, show, currentUser, reset]);
 
     useEffect(() => {
@@ -359,10 +359,10 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
 
                                     >
                                         {departmentGetDataLoading ? (
-                                           <button class="btn" type="button" disabled>
-                                           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                           Loading...
-                                         </button>
+                                            <button class="btn" type="button" disabled>
+                                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                Loading...
+                                            </button>
                                         ) : departmentGetData && departmentGetData.length > 0 ? (
                                             departmentGetData?.map((data) => (
                                                 <option key={data._id} className={department ? 'text-dark border border-secondary' : 'custom-date-input border border-secondary'}

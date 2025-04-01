@@ -118,22 +118,22 @@ const RoleManagement = () => {
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
     }
-    useEffect(() => {
-        if (createSuccess === 200) {
-            dispatch(stateEmptydAction());
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
-            dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+    // useEffect(() => {
+    //     if (createSuccess === 200) {
+    //         dispatch(stateEmptydAction());
+    //         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
+    //         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
 
 
-        }
-    }, [createSuccess]);
+    //     }
+    // }, [createSuccess]);
 
-    useEffect(() => {
-        if (deleteSuccess === 200) {
-            dispatch(stateEmptydAction());
+    // useEffect(() => {
+    //     if (deleteSuccess === 200) {
+    //         dispatch(stateEmptydAction());
 
-        }
-    }, [deleteSuccess])
+    //     }
+    // }, [deleteSuccess])
 
     const handleStatusChange = (isActive) => {
         setStatus(isActive);

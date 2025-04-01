@@ -94,6 +94,7 @@ const NewPractice = () => {
     const statecode = statesData?.states?.state_code;
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
+    // console.log(store?.createSubClinicsReducer, 'createSubresponse')
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null);
@@ -255,7 +256,7 @@ const NewPractice = () => {
                 };
                 return updatedDetails;
             });
-        } catch (error) {}
+        } catch (error) { }
     };
     const [formData, setFormData] = useState({
         clinicname: '',
@@ -283,9 +284,9 @@ const NewPractice = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -503,13 +504,10 @@ const NewPractice = () => {
     };
 
     useEffect(() => {
-        if (createResponseOfSubClinics === 200) {
-            if (!isModalRequest) {
-                navigate('/apps/crm/addclinic');
-                dispatch(stateEmptydAction());
-            }
+        if (createResponseOfSubClinics === 200 && !isModalRequest) {
+            navigate('/apps/crm/addclinic');
         } else if (createResponseOfSubClinics === 400) {
-            console.error('Error creating/updating the sub-clinic');
+            console.error('Error creating / updating the sub-clinic');
         }
     }, [createResponseOfSubClinics]);
 
@@ -659,7 +657,7 @@ const NewPractice = () => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = [ 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const addressUses = ['work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -888,9 +886,8 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${
-                                                    activeTab === 'personalDetails' ? 'active' : ''
-                                                }`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
+                                                    }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
                                                 Practice Sub Information
                                             </button>
@@ -1002,15 +999,14 @@ const NewPractice = () => {
                                                     <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                            logoName ? '' : 'custom-form-fields'
-                                                        }`}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
+                                                            }`}
                                                         data-has-value={!!logoName}>
                                                         {logoUploading
                                                             ? 'Uploading...'
                                                             : typeof logoName === 'string' && logoName
-                                                            ? logoName.split('/').pop().slice(0, 30) + '...'
-                                                            : 'Upload Logo'}
+                                                                ? logoName.split('/').pop().slice(0, 30) + '...'
+                                                                : 'Upload Logo'}
 
                                                         <div className="d-flex align-items-center gap-2">
                                                             {/* Eye Icon for Preview */}
@@ -1124,8 +1120,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                ? 5
-                                                                                : 10
+                                                                                    ? 5
+                                                                                    : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -1190,11 +1186,10 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                            item.file
-                                                                                ? 'form-control'
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                            ? 'form-control'
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         {item.file?.name
                                                                             ? item.file.name.length > 30
                                                                                 ? item.file.name.slice(0, 25) + '...'
@@ -1484,7 +1479,7 @@ const NewPractice = () => {
                                                                                             use: item.use, // preserve existing use
                                                                                             line: [
                                                                                                 components.road ||
-                                                                                                    formatted,
+                                                                                                formatted,
                                                                                             ],
                                                                                             city:
                                                                                                 components.city ||
@@ -1597,14 +1592,14 @@ const NewPractice = () => {
                                                                     maxLength={5}
                                                                     onKeyPress={handleFirstSpace}
                                                                 />
-                                                                 {addresses.length > 1 && index !== 0 && (
-                                                                <span
-                                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                    style={{ right: '-2%', top: '50%' }}
-                                                                    onClick={() => removeAddress(index)}>
-                                                                    <CiCircleMinus />
-                                                                </span>
-                                                            )}
+                                                                {addresses.length > 1 && index !== 0 && (
+                                                                    <span
+                                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                                                        style={{ right: '-2%', top: '50%' }}
+                                                                        onClick={() => removeAddress(index)}>
+                                                                        <CiCircleMinus />
+                                                                    </span>
+                                                                )}
                                                                 {errors.postalCode && (
                                                                     <span className="text-danger">
                                                                         {errors.postalCode.message}

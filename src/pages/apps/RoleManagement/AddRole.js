@@ -44,7 +44,6 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
     const closeAddModal = () => {
         setAddDepartmentalModal(false);
         setAddDesiginationModal(false);
-
         reset();
     };
     const close = () => {
@@ -55,22 +54,38 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
         setValue('')
 
     };
+    // useEffect(() => {
+    //     if (createSuccess === 200) {
+    //         dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
+
+    //     }
+    // }, [createSuccess])
+
     useEffect(() => {
-        if (createSuccess === 200) {
+        if (show) {
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
             dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
-
+            dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
+            dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
         }
-    }, [createSuccess])
+    }, [dispatch, show]);
 
-    useEffect(() => {
-        dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
-    }, [dispatch]);
-
-    const [showPassword, setShowPassword] = useState(false);
+    // const [showPassword, setShowPassword] = useState(false);
 
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
+    // const togglePasswordVisibility = () => {
+    //     setShowPassword(!showPassword);
+    // };
+    const [passwordVisibility, setPasswordVisibility] = useState({
+        password: false,
+        confirmPassword: false
+    });
+
+    const togglePasswordVisibility = (field) => {
+        setPasswordVisibility(prev => ({
+            ...prev,
+            [field]: !prev[field]
+        }));
     };
     const strongRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,16}$/;
 
@@ -81,23 +96,15 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
             setPasswordStrength("Password is too weak. Please use a mix of uppercase, lowercase, numbers, and special characters.");
         }
     };
-    useEffect(() => {
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
-        dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
-        dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
 
+    // useEffect(() => {
+    //     if (createSuccess === 200) {
+    //         reset();
+    //         close()
+    //         dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
 
-
-
-    }, [getRoleDataAction])
-    useEffect(() => {
-        if (createSuccess === 200) {
-            reset();
-            close()
-            dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-
-        }
-    }, [createSuccess])
+    //     }
+    // }, [createSuccess])
     const onSubmit = (data) => {
         const formattedJoiningDate = new Date(data.joiningDate).toISOString();
         // const formattedLeavingDate = new Date(data.leavingDate).toISOString();
@@ -150,10 +157,10 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
         }
     };
     const joiningDate = watch('joiningDate')
-    const desigination = watch('designation') 
+    const desigination = watch('designation')
     const department = watch('department')
     const role = watch('role')
-   
+
 
     return (
         <>
@@ -229,7 +236,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                 </Form.Group>
                             </Col>
 
-                            <Col sm={6}>
+                            {/* <Col sm={6}>
                                 <Form.Group className="mb-2 position-relative">
                                     <Form.Label className="mb-0">
                                         Password <span className="text-danger">*</span>
@@ -315,9 +322,84 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         </span>
                                     )}
                                 </Form.Group>
+                            </Col> */}
+
+                            <Col sm={6}>
+                                <Form.Group className="mb-2 position-relative">
+                                    <Form.Label className="mb-0">
+                                        Password <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                        type={passwordVisibility.password ? "text" : "password"}
+                                        placeholder="Password"
+                                        autoComplete="off"
+                                        {...register("password", {
+                                            required: "Password is required",
+                                            minLength: {
+                                                value: 8,
+                                                message: "Password must be at least 8 characters",
+                                            },
+                                            maxLength: {
+                                                value: 16,
+                                                message: "Password must not exceed 16 characters",
+                                            },
+                                            validate: {
+                                                noEmpty: (value) => value.trim() !== "" || "Password cannot be empty or only spaces",
+                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                                isStrong: (value) => strongRegex.test(value) || "Password must be strong (8-16 characters, at least one uppercase, one number, one special character)",
+                                            },
+                                        })}
+                                        onChange={(e) => {
+                                            handlePasswordChange(e);
+                                            checkPasswordStrength(e.target.value); // Check strength on change
+                                            trigger("confirmPassword"); // Revalidate confirmPassword
+                                        }}
+                                        maxLength={16}
+                                    />
+                                    <span
+                                        className="position-absolute fs-4"
+                                        style={{ top: "26px", right: "10px", cursor: "pointer" }}
+                                        onClick={() => togglePasswordVisibility("password")}
+                                    >
+                                        {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
+                                    {errors.password && (
+                                        <span className="text-danger fs-6">{errors.password.message}</span>
+                                    )}                                </Form.Group>
                             </Col>
 
-
+                            <Col sm={6}>
+                                <Form.Group className="mb-2 position-relative">
+                                    <Form.Label className="mb-0">
+                                        Confirm Password <span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Form.Control
+                                        type={passwordVisibility.confirmPassword ? "text" : "password"}
+                                        placeholder="Confirm password"
+                                        {...register("confirmPassword", {
+                                            required: "Confirm password is required",
+                                            validate: {
+                                                matchPassword: (value) =>
+                                                    value === watch("password") || "Passwords do not match",
+                                            },
+                                        })}
+                                        onInput={() => trigger("confirmPassword")}
+                                        maxLength={16} />
+                                    <span
+                                        className="position-absolute d-flex align-items-center fs-4 justify-content-center"
+                                        style={{ top: "32px", right: "10px", cursor: "pointer" }}
+                                        onClick={() => togglePasswordVisibility("confirmPassword")}
+                                        onMouseEnter={(e) => (e.target.style.color = "#000")}
+                                        onMouseLeave={(e) => (e.target.style.color = "#666")}
+                                    >
+                                        {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                    </span>
+                                    {errors.confirmPassword?.type === "matchPassword" && (
+                                        <span className="text-danger fs-6">
+                                            {errors.confirmPassword.message}
+                                        </span>
+                                    )}                                </Form.Group>
+                            </Col>
 
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
@@ -357,7 +439,8 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     <Form.Label className="mb-0">Contact No. <span className='text-danger'>*</span></Form.Label>
                                     <InputGroup>
                                         {/* Country Code Prefix */}
-                                        <InputGroup.Text className="ps-4   pe-1 fw-bold text-black">
+                                        <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                            <img src={us} alt="country code flag" width={16} />
                                             +1
                                         </InputGroup.Text>
 
@@ -398,7 +481,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     )}
 
                                     {/* Country Code Flag */}
-                                    <div
+                                    {/* <div
                                         className="position-absolute "
                                         style={{
                                             top: "50%",
@@ -406,7 +489,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         }}
                                     >
                                         <img src={us} alt="country code flag" width={20} />
-                                    </div>
+                                    </div> */}
                                 </Form.Group>
                             </Col>
 
@@ -416,8 +499,9 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     <Form.Label className="mb-0">Contact Number Secondary</Form.Label>
                                     <Form.Group>
                                         <InputGroup>
-                                            <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
-                                                &nbsp;&nbsp;+1
+                                            <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                                <img src={us} alt="country code flag" width={16} />
+                                                +1
                                             </InputGroup.Text>
                                             <Form.Control
                                                 type="tel"
@@ -437,9 +521,9 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             />
                                         </InputGroup>
                                     </Form.Group>
-                                    <div className="position-absolute" style={{ top: '36%', left: '1%' }}>
+                                    {/* <div className="position-absolute" style={{ top: '36%', left: '1%' }}>
                                         <img src={us} alt="country code flag" width={20} />
-                                    </div>
+                                    </div> */}
                                     {errors.phNumberSecondary && (
                                         <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>
                                     )}

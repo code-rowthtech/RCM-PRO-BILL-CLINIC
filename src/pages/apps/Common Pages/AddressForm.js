@@ -6,7 +6,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import { getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 
-const AddressForm = ({addresses,setAddresses}) => {
+const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
@@ -39,7 +39,7 @@ const AddressForm = ({addresses,setAddresses}) => {
     };
 
     const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['postal', 'physical', 'both'];
+    const addressTypes = ['Primary', 'Mailing', 'Both']; // Physical Postal
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -93,7 +93,7 @@ const AddressForm = ({addresses,setAddresses}) => {
             return updated;
         });
     };
-    
+
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted);
@@ -222,7 +222,7 @@ const AddressForm = ({addresses,setAddresses}) => {
                                             // const components = data.components || {};
                                             // Build the new address object with auto-populated fields
                                             const newAddress = {
-                                                type:item?.type,
+                                                type: item?.type,
                                                 use: item?.use, // preserve existing use
                                                 line: [data?.formatted ? data?.formatted : ''],
                                                 city:
@@ -274,7 +274,7 @@ const AddressForm = ({addresses,setAddresses}) => {
                     <Col sm={3} className="mb-2">
                         <Form.Label className="mb-1">City</Form.Label>
                         <Form.Select
-                        value={item?.city}
+                            value={item?.city}
                             data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
@@ -284,7 +284,7 @@ const AddressForm = ({addresses,setAddresses}) => {
                         >
                             <option value="">{store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}</option>
                             {cities1?.map((data) => (
-                                <option  key={data?.name} value={data?.name}>
+                                <option key={data?.name} value={data?.name}>
                                     {data?.name}
                                 </option>
                             ))}
@@ -313,14 +313,14 @@ const AddressForm = ({addresses,setAddresses}) => {
                                     handleAddressChange(index, 'postalCode', e.target.value);
                                 }}
                             />
-                               {addresses.length > 1 && index !== 0 && (
-                            <span
-                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                style={{ right: '-2%', top: '50%' }}
-                                onClick={() => removeAddress(index)}>
-                                <CiCircleMinus />
-                            </span>
-                        )}
+                            {addresses.length > 1 && index !== 0 && (
+                                <span
+                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                    style={{ right: '-2%', top: '50%' }}
+                                    onClick={() => removeAddress(index)}>
+                                    <CiCircleMinus />
+                                </span>
+                            )}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>

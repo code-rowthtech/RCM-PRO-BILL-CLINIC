@@ -32,6 +32,18 @@ const GET_CITIES_INITIAL_STATE = {
     cities3: {
         data: [],
         loading: false,
+    },
+    cities4: {
+        data: [],
+        loading: false,
+    },
+    cities5: {
+        data: [],
+        loading: false,
+    },
+    cities6: {
+        data: [],
+        loading: false,
     }
 };
 
@@ -297,6 +309,78 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
             return {
                 ...state,
                 cities3: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_LOADING:
+            return {
+                ...state,
+                cities4: {
+                    ...state.cities4,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_SUCCESS:
+            return {
+                ...state,
+                cities4: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES4_ERROR:
+            return {
+                ...state,
+                cities4: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_LOADING:
+            return {
+                ...state,
+                cities5: {
+                    ...state.cities5,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_SUCCESS:
+            return {
+                ...state,
+                cities5: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES5_ERROR:
+            return {
+                ...state,
+                cities5: {
+                    data: [],
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_LOADING:
+            return {
+                ...state,
+                cities6: {
+                    ...state.cities6,
+                    loading: true
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_SUCCESS:
+            return {
+                ...state,
+                cities6: {
+                    data: action.payload,
+                    loading: false
+                }
+            };
+        case ClinicsActionTypes.GET_CITIES6_ERROR:
+            return {
+                ...state,
+                cities6: {
                     data: [],
                     loading: false
                 }

@@ -41,6 +41,18 @@ export const getCities3Action = (data) => ({
     type: ClinicsActionTypes.GET_CITIES3,
     data
 });
+export const getCities4Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES4,
+    data
+});
+export const getCities5Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES5,
+    data
+});
+export const getCities6Action = (data) => ({
+    type: ClinicsActionTypes.GET_CITIES6,
+    data
+});
 
 export const updateClinicAction = (data): AuthAction => ({
     type: ClinicsActionTypes.UPDATE_CLINIC,

@@ -48,11 +48,25 @@ const AUTH_SESSION_KEY = 'hyper_user';
 /**
  * Sets the default authorization
  * @param {*} token
- */
+//  */
+// const setAuthorization = (token) => {
+//     if (token) axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
+//     else delete axios.defaults.headers.common['Authorization'];
+// };
+
 const setAuthorization = (token) => {
-    if (token) axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
-    else delete axios.defaults.headers.common['Authorization'];
+    const userData = JSON.parse(sessionStorage.getItem(AUTH_SESSION_KEY));
+
+    if (userData?._id) {
+        axios.defaults.headers.common['x-user-id'] = `${encryptMessage(userData._id)}`; // Set new value for 'XUIXX'
+    }
+    if (token) {
+        axios.defaults.headers.common['Authorization'] = `${encryptMessage(token)}`;
+    } else {
+        delete axios.defaults.headers.common['Authorization']; // Remove the header if token is null/undefined
+    }
 };
+
 
 const getUserFromSession = () => {
     const user = sessionStorage.getItem(AUTH_SESSION_KEY);
