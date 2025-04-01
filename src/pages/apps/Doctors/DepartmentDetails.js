@@ -127,6 +127,7 @@ const DepartmentDetails = () => {
     }
     console.log({ payload })
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
+    console.log(payload,'payload')
   }
   useEffect(() => {
     if (doctorDetails && updateId) {

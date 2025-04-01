@@ -15,6 +15,7 @@ import { Info } from 'lucide-react';
 const Doctors = () => {
     const [statusModal, setStatusModal] = useState(false);  // Modal to confirm status change
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    console.log(selectedDoctor,'selectedDoctor')
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
     const navigate = useNavigate('');
@@ -30,18 +31,20 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result) || [];
+    console.log(doctorDetails, 'doctorDetails');
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
-    const filteredDoctors = doctorDetails.filter((doctor) =>
-        doctor.userDetails?.status === status &&
-        (doctor.userDetails?.firstName?.toLowerCase() || "").includes(search?.toLowerCase() || "")
-    );
+    const filteredDoctors = doctorDetails;
+    // .filter((doctor) =>
+    //     doctor.userDetails?.status === status &&
+    //     (doctor.userDetails?.firstName?.toLowerCase() || "").includes(search?.toLowerCase() || "")
+    // );
 
 
     const handleStatusChange = () => {
         const payload = {
             doctorId: selectedDoctor?._id,
-            status: !selectedDoctor?.userDetails?.status,
+            status: !selectedDoctor?.status,
         }
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         closeStatusModal();
@@ -168,7 +171,7 @@ const Doctors = () => {
                                                                 {(data?.name?.[0]?.given || []).join(" ")} {data?.name?.[0]?.family || ""}
                                                             </td>
                                                             <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {data?.specialities?.[0] || 'N/A'}
+                                                                {data?.specialties?.[0] || 'N/A'}
 
                                                                 {data?.specialities?.length > 1 && (
                                                                     <OverlayTrigger
@@ -176,11 +179,12 @@ const Doctors = () => {
                                                                         overlay={
                                                                             <Tooltip id={`tooltip-${data?._id}`}>
                                                                                 <ul className="m-0 p-0">
-                                                                                    {data?.specialities?.slice(0).map((specialty, index) => (
+                                                                                    {/* {data?.specialities?.slice(0).map((specialty, index) => (
                                                                                         <li key={index} style={{ listStyleType: "disc", marginLeft: "10px" }}>
                                                                                             {specialty}
                                                                                         </li>
-                                                                                    ))}
+                                                                                    ))} */}
+                                                                                    <li>{data?.specialties[0]}</li>
                                                                                 </ul>
                                                                             </Tooltip>
 
@@ -194,15 +198,15 @@ const Doctors = () => {
                                                                 )}
                                                             </td>
                                                             <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                {data?.userDetails?.email || 'N/A'}
+                                                                {data?.userId?.email || 'N/A'}
                                                             </td>
                                                             <td className='py-1' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {data?.telecom?.[0]?.value || 'N/A'}
                                                             </td>
                                                             <td className='py-1 ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
-                                                                    className={data?.userDetails?.status ? "custom-active" : ""}
-                                                                    checked={data?.userDetails?.status}
+                                                                    className={data?.userId?.status ? "custom-active" : ""}
+                                                                    checked={data?.userId?.status}
                                                                     onChange={() => {
                                                                         setSelectedDoctor(data);
                                                                         setStatusModal(true);
@@ -237,7 +241,7 @@ const Doctors = () => {
                             <Col sm={1}></Col>
                             <Col sm={10}>
                                 <h4 className="mb-0  d-flex align-items-center justify-content-center">
-                                    <span className={`${selectedDoctor?.userDetails?.status ? 'text-danger' : 'text-success'}`}>{selectedDoctor?.userDetails?.status ? 'Deactivate' : 'Activate'} Doctor</span>
+                                    <span className={`${selectedDoctor?.status ? 'text-danger' : 'text-success'}`}>{selectedDoctor?.status ? 'Deactivate' : 'Activate'} Doctor</span>
                                 </h4>
                             </Col>
                             <Col sm={1}>

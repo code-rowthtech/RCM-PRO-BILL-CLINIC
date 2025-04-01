@@ -68,6 +68,7 @@ const NewDoctor = () => {
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    console.log(doctorDetails, 'doctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;

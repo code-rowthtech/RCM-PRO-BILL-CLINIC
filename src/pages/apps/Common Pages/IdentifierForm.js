@@ -197,6 +197,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
+                            maxLength={10} 
                             value={item?.number || item?.value}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
