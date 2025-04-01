@@ -84,7 +84,7 @@ const Department = () => {
     dispatch(getMastersDataAction({ status: status, category: 'Department', limit: 10, skip, search: search }));
     if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
-      dispatch(stateEmptydAction());
+      closeAddModal();
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 
@@ -318,7 +318,7 @@ const Department = () => {
               </Col>
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

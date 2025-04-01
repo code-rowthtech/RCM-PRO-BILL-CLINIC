@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSubscriptionsAction } from '../../../../redux/subscriptions/actions'
 import { encryptMessage } from '../../../../cryptoUtils';
-import { addSubscriptionPlanAction, stateEmptydAction } from '../../../../redux/actions';
+import { addSubscriptionPlanAction } from '../../../../redux/actions';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import Spinner from '../../../../constants/Spinner';
 import us from '../../../../assets/images/flags/us.jpg'
@@ -25,7 +25,6 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
     const subscriptionsData = store?.getSubscriptionReducer?.data?.result;
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
     const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscriptionId
-    console.log(billingData, 'billingDatabillingData')
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Store the selected date
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);

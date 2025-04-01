@@ -5,7 +5,7 @@ import { FormInput } from '../../../components';
 import { Link } from 'react-router-dom';
 import AddPermissions from './Modal/addPermissions';
 import { useDispatch, useSelector } from 'react-redux';
-import { deletePermissionAction, getPermissionAction, stateEmptydAction, updatePermissionAction } from '../../../redux/actions';
+import { deletePermissionAction, getPermissionAction, updatePermissionAction } from '../../../redux/actions';
 import { decryptMessage, encryptMessage } from '../../../cryptoUtils';
 import Loader from '../../../components/Loader';
 import Spinner from '../../../constants/Spinner';
@@ -29,16 +29,13 @@ const Permissions = () => {
         dispatch(getPermissionAction({ search: search, limit: 10, skip: skip }));
         if (store?.createPermissionsDataReducer?.data?.success === true) {
             dispatch(getPermissionAction({ search: search, limit: 10, skip: skip }));
-            dispatch(stateEmptydAction())
         }
         if (deleteSuccess === true) {
             dispatch(getPermissionAction({ search: search, limit: 10, skip: skip }));
             closeDeleteModal();
-            dispatch(stateEmptydAction())
         }
         if (updateSuccess === true) {
             dispatch(getPermissionAction({ search: search, limit: 10, skip: skip }));
-            dispatch(stateEmptydAction())
         }
     }, [dispatch, store?.createPermissionsDataReducer?.data?.success, deleteSuccess, updateSuccess, search, skip])
 

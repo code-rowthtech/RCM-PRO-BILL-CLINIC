@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { createScheduleAction, getDoctorsListAction } from "../../../redux/schedule/action";
 import { encryptMessage } from "../../../cryptoUtils";
-import { stateEmptydAction } from "../../../redux/actions";
 import Spinner from "../../../constants/Spinner";
 
 const AddBreak = () => {
@@ -35,7 +34,6 @@ const AddBreak = () => {
     useEffect(() => {
         if (addResponse === 200) {
             reset();
-            dispatch(stateEmptydAction());
             dispatch(getDoctorsListAction());
         }
     }, [addResponse])

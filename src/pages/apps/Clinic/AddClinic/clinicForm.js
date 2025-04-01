@@ -14,7 +14,7 @@ import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
-import { FiDownloadCloud, FiEdit, FiEye, FiMinus, FiTrash } from 'react-icons/fi';
+import { FiDownloadCloud, FiEdit, FiEye, FiInfo, FiMinus, FiTrash } from 'react-icons/fi';
 import UploadToS3 from '../../../../helpers/uploads3';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -260,9 +260,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     // }, [dispatch, clinicsDataGet, statesData, setValue]);
     useEffect(() => {
         if (clinicsDataGet) {
-            if (clinicsDataGet?.orgType) {
-                setValue('clinicType', clinicsDataGet?.orgType);
-            }
+            setValue('clinicType', clinicsDataGet?.orgType);
             setField('clinicname', clinicsDataGet?.name);
             setField('email', clinicsDataGet?.userId?.email);
             if (clinicsDataGet?.orgLogo) {
@@ -1188,8 +1186,22 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Col>
                                             <Form.Label>Identifier Number</Form.Label>
                                         </Col>
-                                        <Col>
+                                        <Col className="d-flex align-items-center gap-2">
                                             <Form.Label>Identifier Document</Form.Label>
+
+                                            {/* Tooltip Icon */}
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip-identifier">
+                                                        File size should be less than 2MB. Supported formats: JPG, PNG,
+                                                        JPEG, PDF.
+                                                    </Tooltip>
+                                                }>
+                                                <span className="text-secondary cursor-pointer mb-2">
+                                                    <FiInfo size={15} />
+                                                </span>
+                                            </OverlayTrigger>
                                         </Col>
                                         <Col>
                                             <Form.Label>Issuing Authority</Form.Label>
@@ -1295,6 +1307,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             ? item.file.name.slice(0, 25) + '...'
                                                             : item.file.name
                                                         : 'Upload Document'}
+
                                                     <p className="mb-0">
                                                         <FiDownloadCloud />
                                                     </p>
@@ -1338,6 +1351,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Control
                                                     type="date"
                                                     value={item?.expiry ? formatDateForInput(item.expiry) : ''}
+                                                    min={new Date().toISOString().split("T")[0]} // Sets min date to today
                                                     onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                                                 />
                                                 {index >= defaultIdentifiers?.length && (
@@ -1958,7 +1972,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             })()}
                                         </Form.Select>
                                     </Col>
-                                    <Col sm={4} className='position-relative'>
+                                    <Col sm={4} className="position-relative">
                                         <Form.Group className="mb-2">
                                             <Form.Label className="mb-1">Postal Code</Form.Label>
                                             <Form.Control

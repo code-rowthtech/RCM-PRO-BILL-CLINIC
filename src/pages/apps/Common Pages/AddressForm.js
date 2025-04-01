@@ -135,9 +135,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                 </Col>
             </Row>
             {addresses?.map((item, index) => (
-                <Row key={index} className="mb-2">
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">Type</Form.Label>
+                <Row key={index} className="mb-0">
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
                             value={item.type}
                             className="text-capitalize"
@@ -154,8 +154,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">Use</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Use</Form.Label>
                         <Form.Select
                             value={item.use}
                             className="text-capitalize"
@@ -172,8 +172,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2 position-relative">
-                        <Form.Label className="mb-1">Address</Form.Label>
+                    <Col sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Address</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Street Address"
@@ -257,8 +257,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         )}
                     </Col>
 
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">State</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">State</Form.Label>
                         <Form.Select
                             value={item.state || ''}
                             {...register(`address[${index}].state`)}
@@ -271,8 +271,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">City</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">City</Form.Label>
                         <Form.Select
                             value={item?.city}
                             data-has-value={!!getValues(`address[${index}].city`)}
@@ -291,9 +291,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         </Form.Select>
                     </Col>
 
-                    <Col sm={3}>
-                        <Form.Group className="mb-2">
-                            <Form.Label className="mb-1">Postal Code</Form.Label>
+                    <Col sm={3} style={{ height: 'fit-content' }}>
+                        <Form.Group className="mb-0">
+                            <Form.Label className="mb-0">Postal Code</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={item.postalCode || ''} // Ensure empty string if undefined

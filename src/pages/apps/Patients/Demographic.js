@@ -10,7 +10,6 @@ import {
     getCities2Action,
     getCities3Action,
     updatePatientsAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
@@ -29,7 +28,7 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibleTab , setShowResponsibleTab   }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -239,12 +238,16 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {
                 reset();
-                setActiveTab('responsible');
+                if (showResponsibleTab) {
+                    setActiveTab('responsible'); // Go to Responsible tab if allowed
+                } else {
+                    setActiveTab('insurance'); // Otherwise, go to Insurance tab
+                }
             } else if (submissionType === 'saveAndReset') {
-                setActiveTab('personelDetails');
+                setActiveTab('personalDetails');
             }
         }
-    }, [updateResponse, submissionType]);
+    }, [updateResponse, submissionType, showResponsibleTab]); // Dependency added
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -392,7 +395,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.code}>
+                                    <option key={race.code} value={race.code} className='text-capitalize'>
                                         {race.display}
                                     </option>
                                 ))}
@@ -870,7 +873,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -882,7 +885,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                                 <span className="text-danger">{errors.employerTimeZone.message}</span>
                                             )}
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

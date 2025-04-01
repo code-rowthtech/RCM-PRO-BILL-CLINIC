@@ -19,7 +19,6 @@ import {
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdVerified } from 'react-icons/md';
-import { stateEmptydAction } from '../../../redux/clinics/actions';
 import EmailToDoctorModal from './EmailToSubClinicModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
@@ -333,6 +332,7 @@ const SubUpdateClinic = () => {
     //     }
     // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
     const setField = (key, value) => value && setValue(key, value);
+    console.log(subClinicsDetailsGet, 'subClinicsDetailsGet')
     useEffect(() => {
         if (subClinicsDetailsGet) {
             if (subClinicsDetailsGet?.orgType) {

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddRole from './AddRole';
-import { deleteRolesAction, getRolesAction, getUserAction, stateEmptydAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
+import { deleteRolesAction, getRolesAction, getUserAction, updateRolesAction, viewPasswordAction } from '../../../redux/actions';
 import RoleUpdate from './RoleUpdate';
 import Paginations from '../../../helpers/Paginations';
 import { getMastersDataAction } from '../../../redux/settings/action';

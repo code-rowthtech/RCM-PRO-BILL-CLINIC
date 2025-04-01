@@ -108,7 +108,7 @@ const Schedule = () => {
                                                         setActiveTab(tab);
                                                     }}
                                                 >
-                                                    {tab === 'DoctorHolidays' && 'Doctor Holidays'}
+                                                    {tab === 'DoctorHolidays' && 'Doctor Time Off'}
                                                     {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>
