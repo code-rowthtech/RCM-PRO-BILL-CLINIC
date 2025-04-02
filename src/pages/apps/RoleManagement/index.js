@@ -34,10 +34,10 @@ const RoleManagement = () => {
     console.log(roleData, "roleData")
     const roleDataLoading = store?.getRolesDataReducer?.loading
     const deleteSuccess = store?.deleteRolesDataReducer?.data?.status
-    const createSuccess = store?.updateRolesReducer?.data?.status;
+    const createSuccess = store?.createRolesReducer?.data?.status;
+    const updateSuccess = store?.updateRolesReducer?.data?.status;
     const [smShow, setSmShow] = useState(false);
     const [detailModal, setDetailModal] = useState(false);
-
     const [password, setPassword] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
     const [timeoutId, setTimeoutId] = useState(null);
@@ -46,13 +46,12 @@ const RoleManagement = () => {
     const [updateDepartmentModal, setUpdateDepartmentModal] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [status, setStatus] = useState(true)
-
     const [skip, setSkip] = useState(1)
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const [searchQuery, setSearchQuery] = useState('');
     const [userDetails, setUserDetails] = useState([]);
+    const [dataToEdit, setDataToEdit] = useState(null);
     const viewPasswordStatus = store?.viewPasswordReducer?.data?.status;
-
 
     useEffect(() => {
         dispatch(
@@ -131,9 +130,9 @@ const RoleManagement = () => {
     const deleteHandle = (id) => {
         dispatch(deleteRolesAction(id))
     }
-    useEffect(() => {
-        if (createSuccess === 200) {
 
+    useEffect(() => {
+        if (createSuccess === 200 || updateSuccess === 200) {
             dispatch(
                 getRolesAction({
                     clinicId: clinicId,
@@ -144,14 +143,7 @@ const RoleManagement = () => {
                 })
             );
         }
-    }, [createSuccess]);
-
-    // useEffect(() => {
-    //     if (deleteSuccess === 200) {
-    //         dispatch(stateEmptydAction());
-
-    //     }
-    // }, [deleteSuccess])
+    }, [createSuccess, updateSuccess]);
 
     const handleStatusChange = (isActive) => {
         setStatus(isActive);
@@ -164,8 +156,6 @@ const RoleManagement = () => {
             status: !data?.status,
         };
         dispatch(updateRolesAction({ key: encryptMessage(payload) }));
-        // ({ status })
-
     };
 
     const handlePageChange = (pageNumber) => {
@@ -236,7 +226,6 @@ const RoleManagement = () => {
                                                     outline: "none",
                                                     flex: 1,
                                                     backgroundColor: "#ccc",
-
                                                 }}
                                             />
                                         </div>
@@ -278,9 +267,14 @@ const RoleManagement = () => {
                                                 <tr key={index} className="border-bottom">
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
                                                     <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                        {data?.name?.text}
+                                                        {data?.name?.text || 'N/A'}
                                                     </td>
-                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>+1 {data?.phone}</td>
+                                                    <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        {(() => {
+                                                            const workPhone = data?.telecom?.find((item) => item?.system === 'phone' && item?.use === 'work')?.value;
+                                                            return workPhone ? `+1${workPhone}` : 'N/A';
+                                                        })()}
+                                                    </td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
                                                     <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
@@ -294,7 +288,11 @@ const RoleManagement = () => {
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"
-                                                                onClick={() => openEditModal(data)}
+                                                                // onClick={() => openEditModal(data)}
+                                                                onClick={() => {
+                                                                    setDataToEdit(data)
+                                                                    setAddDepartmentModal(true)
+                                                                }}
                                                             />
                                                             {/* Additional actions */}
                                                         </div>
@@ -310,24 +308,16 @@ const RoleManagement = () => {
                                             </tr>
                                         )}
                                     </tbody>
-
                                 </Table>
-
-
-
-
-
                             </Col>
                         </Row>
                         <Row>
-
                             <Col className='mt-2 d-flex justify-content-end'>
                                 <Paginations
                                     currentPage={skip}
                                     totalPages={roleData?.pagination?.totalPages || 1}
                                     onPageChange={handlePageChange}
                                 />
-
                             </Col>
                         </Row>
                     </Card.Body>
@@ -371,7 +361,6 @@ const RoleManagement = () => {
                             {/* Add more fields as needed */}
                         </tbody>
                     </Table>
-
                 </Modal.Body>
                 <Modal.Footer>
                     <Button
@@ -383,10 +372,9 @@ const RoleManagement = () => {
                     >
                         Close
                     </Button>
-
                 </Modal.Footer>
             </Modal>
-            <AddRole show={addDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} setCurrentUser={setCurrentUser} setUpdateDepartmentModal={setUpdateDepartmentModal} />
+            <AddRole dataToEdit={dataToEdit} setDataToEdit={setDataToEdit} show={addDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} setCurrentUser={setCurrentUser} setUpdateDepartmentModal={setUpdateDepartmentModal} />
             <RoleUpdate show={updateDepartmentModal} currentUser={currentUser} setUpdateDepartmentModal={setUpdateDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} setCurrentUser={setCurrentUser} />
         </Row>
     );

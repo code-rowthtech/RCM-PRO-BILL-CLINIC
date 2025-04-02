@@ -64,16 +64,16 @@ const RoleUpdate = ({ show, currentUser, setCurrentUser, setAddDepartmentModal, 
         // dispatch(getDepartmentDataAction({ status: true, category: 'Department', search: '', skip: '', limit: '' }));
     }, [getRolesAction, show, currentUser, reset]);
 
-    useEffect(() => {
-        if (createSuccess === 200) {
-            // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
-            close();
-            reset();
-            getValues('');
-            setLeavingDate('')
-            setCurrentUser('');
-        }
-    }, [createSuccess]);
+    // useEffect(() => {
+    //     if (createSuccess === 200) {
+    //         // dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: 1, status: true }));
+    //         close();
+    //         reset();
+    //         getValues('');
+    //         setLeavingDate('')
+    //         setCurrentUser('');
+    //     }
+    // }, [createSuccess]);
     const [leavingDate, setLeavingDate] = useState("");
     const [leavingSelectedDate, setLeavingSelectedDate] = useState("");
 
