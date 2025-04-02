@@ -123,7 +123,6 @@ const RoleManagement = () => {
             dispatch(getRolesAction({ clinicId: clinicId, limit: 10, search: '', page: skip, status: status }));
             dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
 
-
         }
     }, [createSuccess]);
 
