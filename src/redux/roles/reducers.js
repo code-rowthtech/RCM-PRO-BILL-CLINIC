@@ -42,14 +42,20 @@ export const createRolesReducer = (state = CREATE_ROLES_INITIAL_STATE, action) =
                 data: action.payload,
                 loading: false
             }
+        case RolesActionTypes.CREATE_ROLES_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case RolesActionTypes.CREATE_ROLES_ERROR:
             return {
-                data: action.payload,
-                loading: false
-            }
-        default: return state
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
     }
-}
+};
 
 export const viewPasswordReducer = (state = VIEW_PASSWORD_INITIAL_STATE, action) => {
     switch (action.type) {
@@ -84,19 +90,20 @@ export const updateRolesReducer = (state = UPDATE_ROLES_INITIAL_STATE, action) =
                 data: action.payload,
                 loading: false
             }
+        case RolesActionTypes.UPDATE_ROLES_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case RolesActionTypes.UPDATE_ROLES_ERROR:
             return {
-                data: action.payload,
-                loading: false
-            }
-        case RolesActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: UPDATE_ROLES_INITIAL_STATE,
-                loading: false
-            }
-        default: return state
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
     }
-}
+};
 
 export const getRolesDataReducer = (state = GET_ROLES_INITIAL_STATE, action) => {
     switch (action.type) {

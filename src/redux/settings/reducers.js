@@ -36,18 +36,18 @@ export const createMastersDataReducer = (state = CREATE_MASTERS_DATA_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
-        case SettingsActionTypes.CREATE_MASTERS_DATA_ERROR:
-            return {
-                data: action.payload,
-                loading: false,
-            };
-        case SettingsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case SettingsActionTypes.CREATE_MASTERS_DATA_RESET:
             return {
                 data: [],
                 loading: false,
             };
+        case SettingsActionTypes.CREATE_MASTERS_DATA_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
         default:
-            return state;
+            return { ...state };
     }
 };
 
@@ -101,7 +101,7 @@ export const getMastersDataReducer = (state = GET_MASTERS_DATA_INITIAL_STATE, ac
                     loading: false,
                 },
             };
-            
+
         default:
             return state;
     }
@@ -145,17 +145,17 @@ export const updateMastersDataReducer = (state = UPDATE_MASTERS_DATA_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
-        case SettingsActionTypes.UPDATE_MASTERS_DATA_ERROR:
-            return {
-                data: action.payload,
-                loading: false,
-            };
-        case SettingsActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case SettingsActionTypes.UPDATE_MASTERS_DATA_RESET:
             return {
                 data: [],
                 loading: false,
             };
+        case SettingsActionTypes.UPDATE_MASTERS_DATA_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
         default:
-            return state;
+            return { ...state };
     }
 };

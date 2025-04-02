@@ -57,6 +57,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
     const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
+    console.log({ logo })
     const handleOtpGeneration = () => {
         dispatch(changeEmailAction())
     }
@@ -92,7 +93,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
                 onClick={toggleDropdown}
                 className="nav-link  border-0 dropdown-toggle nav-user arrow-none me-0">
                 <span className="account-user-avatar">
-                    {changedLogo ?
+                    {changedLogo !== undefined || changedLogo !== 'undefined' ?
                         <img src={changedLogo} className="rounded-circle" alt="user" />
                         :
                         logo ?

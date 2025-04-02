@@ -39,7 +39,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
     };
 
     const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['postal', 'physical', 'both'];
+    const addressTypes = ['Primary', 'Mailing', 'Both']; // Physical Postal
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;

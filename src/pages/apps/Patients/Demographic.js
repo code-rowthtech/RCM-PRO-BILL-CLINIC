@@ -28,7 +28,7 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibleTab , setShowResponsibleTab   }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -91,10 +91,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibl
         const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
         const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
-        console.log(data, 'dattaaa');
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-          const identifierData  = {
+            const identifierData = {
                 type: element?.type?.code,
                 system: element?.type?.value,
                 value: element?.number,
@@ -102,11 +101,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibl
                 file: element?.file,
                 expiry: element?.expiry,
             };
-            finalIdentifiers.push(identifierData );
+            finalIdentifiers.push(identifierData);
         });
         const payload = {
             id: patientId,
-            birthSex:[
+            birthSex: [
                 {
                     ...selectedSexOption,
                     code: selectedSexOption?.value,
@@ -232,7 +231,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibl
             ...(data?.notes && { notes: data.notes })
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     useEffect(() => {
         if (updateResponse === 200) {
@@ -761,11 +759,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab ,showResponsibl
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
