@@ -4,7 +4,6 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 import { encryptMessage } from '../../../cryptoUtils';
-import { stateEmptydAction } from '../../../redux/actions';
 
 const DoctorHoliday = () => {
   const dispatch = useDispatch();

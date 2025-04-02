@@ -6,7 +6,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import { getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 
-const AddressForm = ({addresses,setAddresses}) => {
+const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
@@ -39,7 +39,7 @@ const AddressForm = ({addresses,setAddresses}) => {
     };
 
     const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['postal', 'physical', 'both'];
+    const addressTypes = ['Primary', 'Mailing', 'Both']; // Physical Postal
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -93,7 +93,7 @@ const AddressForm = ({addresses,setAddresses}) => {
             return updated;
         });
     };
-    
+
     useEffect(() => {
         if (selectedLocation) {
             setValue('address', selectedLocation?.formatted);
@@ -135,9 +135,9 @@ const AddressForm = ({addresses,setAddresses}) => {
                 </Col>
             </Row>
             {addresses?.map((item, index) => (
-                <Row key={index} className="mb-2">
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">Type</Form.Label>
+                <Row key={index} className="mb-0">
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
                             value={item.type}
                             className="text-capitalize"
@@ -154,8 +154,8 @@ const AddressForm = ({addresses,setAddresses}) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">Use</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Use</Form.Label>
                         <Form.Select
                             value={item.use}
                             className="text-capitalize"
@@ -172,8 +172,8 @@ const AddressForm = ({addresses,setAddresses}) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2 position-relative">
-                        <Form.Label className="mb-1">Address</Form.Label>
+                    <Col sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Address</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Street Address"
@@ -222,7 +222,7 @@ const AddressForm = ({addresses,setAddresses}) => {
                                             // const components = data.components || {};
                                             // Build the new address object with auto-populated fields
                                             const newAddress = {
-                                                type:item?.type,
+                                                type: item?.type,
                                                 use: item?.use, // preserve existing use
                                                 line: [data?.formatted ? data?.formatted : ''],
                                                 city:
@@ -257,8 +257,8 @@ const AddressForm = ({addresses,setAddresses}) => {
                         )}
                     </Col>
 
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">State</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">State</Form.Label>
                         <Form.Select
                             value={item.state || ''}
                             {...register(`address[${index}].state`)}
@@ -271,10 +271,10 @@ const AddressForm = ({addresses,setAddresses}) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={3} className="mb-2">
-                        <Form.Label className="mb-1">City</Form.Label>
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">City</Form.Label>
                         <Form.Select
-                        value={item?.city}
+                            value={item?.city}
                             data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
@@ -284,16 +284,16 @@ const AddressForm = ({addresses,setAddresses}) => {
                         >
                             <option value="">{store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}</option>
                             {cities1?.map((data) => (
-                                <option  key={data?.name} value={data?.name}>
+                                <option key={data?.name} value={data?.name}>
                                     {data?.name}
                                 </option>
                             ))}
                         </Form.Select>
                     </Col>
 
-                    <Col sm={3}>
-                        <Form.Group className="mb-2">
-                            <Form.Label className="mb-1">Postal Code</Form.Label>
+                    <Col sm={3} style={{ height: 'fit-content' }}>
+                        <Form.Group className="mb-0">
+                            <Form.Label className="mb-0">Postal Code</Form.Label>
                             <Form.Control
                                 type="text"
                                 value={item.postalCode || ''} // Ensure empty string if undefined
@@ -313,14 +313,14 @@ const AddressForm = ({addresses,setAddresses}) => {
                                     handleAddressChange(index, 'postalCode', e.target.value);
                                 }}
                             />
-                               {addresses.length > 1 && index !== 0 && (
-                            <span
-                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                style={{ right: '-2%', top: '50%' }}
-                                onClick={() => removeAddress(index)}>
-                                <CiCircleMinus />
-                            </span>
-                        )}
+                            {addresses.length > 1 && index !== 0 && (
+                                <span
+                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                    style={{ right: '-2%', top: '50%' }}
+                                    onClick={() => removeAddress(index)}>
+                                    <CiCircleMinus />
+                                </span>
+                            )}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>

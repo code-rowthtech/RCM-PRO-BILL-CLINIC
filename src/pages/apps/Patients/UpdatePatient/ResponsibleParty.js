@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import us from '../../../../assets/images/flags/us.jpg';
 import { encryptMessage } from "../../../../cryptoUtils";
 import { handleUpload } from '../../../../helpers/HandleUpload';
-import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction, stateEmptydAction, updateResponsiblePartyAction } from "../../../../redux/actions";
+import { createResponsiblePartyAction, getCitiesAction, getClinicById, getStatesByCountryAction, getSubClinicCitiesAction, updateResponsiblePartyAction } from "../../../../redux/actions";
 import Spinner from "../../../../constants/Spinner";
 
 

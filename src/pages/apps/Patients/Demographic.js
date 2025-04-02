@@ -10,7 +10,6 @@ import {
     getCities2Action,
     getCities3Action,
     updatePatientsAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
@@ -29,7 +28,7 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -92,10 +91,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
         const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
         const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
-        console.log(data, 'dattaaa');
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-          const identifierData  = {
+            const identifierData = {
                 type: element?.type?.code,
                 system: element?.type?.value,
                 value: element?.number,
@@ -103,11 +101,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 file: element?.file,
                 expiry: element?.expiry,
             };
-            finalIdentifiers.push(identifierData );
+            finalIdentifiers.push(identifierData);
         });
         const payload = {
             id: patientId,
-            birthSex:[
+            birthSex: [
                 {
                     ...selectedSexOption,
                     code: selectedSexOption?.value,
@@ -233,18 +231,21 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
             ...(data?.notes && { notes: data.notes })
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     useEffect(() => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {
                 reset();
-                setActiveTab('responsible');
+                if (showResponsibleTab) {
+                    setActiveTab('responsible'); // Go to Responsible tab if allowed
+                } else {
+                    setActiveTab('insurance'); // Otherwise, go to Insurance tab
+                }
             } else if (submissionType === 'saveAndReset') {
-                setActiveTab('personelDetails');
+                setActiveTab('personalDetails');
             }
         }
-    }, [updateResponse, submissionType]);
+    }, [updateResponse, submissionType, showResponsibleTab]); // Dependency added
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -392,7 +393,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.code}>
+                                    <option key={race.code} value={race.code} className='text-capitalize'>
                                         {race.display}
                                     </option>
                                 ))}
@@ -758,11 +759,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -870,7 +870,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -882,7 +882,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                                 <span className="text-danger">{errors.employerTimeZone.message}</span>
                                             )}
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

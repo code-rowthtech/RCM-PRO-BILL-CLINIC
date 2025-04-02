@@ -11,7 +11,9 @@ import CreateRoleSetting from './CreateRoleSetting'
 import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
-import { getRoleDataAction, stateEmptydAction, updateRoleDataAction } from '../../../../redux/actions'
+import { getRoleDataAction,
+    //  stateEmptydAction, 
+    updateRoleDataAction } from '../../../../redux/actions'
 import { IoSearchSharp } from 'react-icons/io5'
 
 const RoleSetting = () => {
@@ -45,7 +47,9 @@ const RoleSetting = () => {
 
         // If there's a successful update or create, reset the modal and fetch updated data
         if (updateSuccess === 200 || createSuccess === 200) {
-            dispatch(stateEmptydAction());
+            // dispatch(stateEmptydAction());
+            handleClosemodal();
+            closeUpdateModal();
             setShowUpdateModal(false);
             setShowModal(false);
             dispatch(getRoleDataAction({

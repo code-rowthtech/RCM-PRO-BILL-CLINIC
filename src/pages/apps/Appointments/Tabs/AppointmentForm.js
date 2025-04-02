@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Toast, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { getPatientsAction } from '../../../../redux/patients/actions';
 import { createAppointmentAction, getDoctorsAction, rescheduleAppointmentAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
@@ -21,14 +21,13 @@ import Select from 'react-select';
 const AppointmentForm = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log('doctorDetails', store?.getDoctorsReducer);
     const appointmentDetails = store?.getAppointmentByIdReducer?.data;
-    console.log('appointmentDetails', store?.getAppointmentByIdReducer);
     const [age, setAge] = useState(null);
     const [status, setStatus] = useState(true);
     const [patientId, setPatientId] = useState(null);
@@ -84,7 +83,7 @@ const AppointmentForm = () => {
     const renderTooltip = (props) => {
         return !watch('doctorName') ? <Tooltip {...props}>Please select a doctor first</Tooltip> : <></>;
     };
-        useEffect(() => {
+    useEffect(() => {
         // Set default values when the component loads
         setValue('scheduled', getTodayDate());
         setValue('startTime', getDefaultTime());
@@ -101,7 +100,7 @@ const AppointmentForm = () => {
     }, [dispatch, search, skip]);
 
     const consultationRoomData = store?.getMastersDataReducer?.data1?.data?.result;
-    const officeData = store?.getMastersDataReducer?.data2?.data?.result;
+    // const officeData = store?.getMastersDataReducer?.data2?.data?.result;
     useEffect(() => {
         const data = {
             clinicId: clinicId,
@@ -113,7 +112,6 @@ const AppointmentForm = () => {
     }, [dispatch, skip, search]);
 
     const patientsData = store?.getPatientsReducer?.data?.data;
-    console.log('patientsData', patientsData);
     const formatTime = (isoDateString) => {
         if (!isoDateString) return '';
         const date = new Date(isoDateString);
@@ -146,7 +144,7 @@ const AppointmentForm = () => {
             setValue('duration', appointmentDetails?.minutesDuration);
             setValue('startTime', formatTime(appointmentDetails?.start));
             setValue('status', appointmentDetails?.status);
-            setValue('office', appointmentDetails?.office);
+            // setValue('office', appointmentDetails?.office);
             setValue(
                 'scheduled',
                 appointmentDetails?.date ? new Date(appointmentDetails?.date).toISOString().split('T')[0] : ''
@@ -178,7 +176,7 @@ const AppointmentForm = () => {
             end: endDateTime.toISOString(), // ✅ ISO format
             created: new Date().toISOString(), // ✅ Now in ISO
             minutesDuration: data.duration, // ✅ Number
-            office: data?.office,
+            // office: data?.office,
             date: data?.scheduled,
             duration: data?.duration,
             examRoom: data?.consultationRoom,
@@ -196,12 +194,12 @@ const AppointmentForm = () => {
         } else {
             dispatch(createAppointmentAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
         if (getAppointment === 201) {
             reset();
+            navigate('/apps/appointments/list');
         }
     }, [getAppointment]);
 
@@ -294,7 +292,7 @@ const AppointmentForm = () => {
                                 </option>
                                 {appointmentTypeOptions.map((option) => (
                                     <option key={option.value} value={option.show}>
-                                        {option.show} ( {option.label})
+                                        {option.show}
                                     </option>
                                 ))}
                             </Form.Select>
@@ -333,6 +331,7 @@ const AppointmentForm = () => {
                                         {...register('scheduled', { required: 'Scheduled date is required' })}
                                         value={watch('scheduled')}
                                         disabled={!watch('doctorName')}
+                                        min={new Date().toISOString().split('T')[0]} // Prevents past dates
                                         onClick={handleDisabledClick} // Show popup if clicked
                                         style={{ pointerEvents: watch('doctorName') ? 'auto' : 'none' }} // Ensure tooltip works on disabled fields
                                     />
@@ -386,7 +385,7 @@ const AppointmentForm = () => {
                         </div>
                     </Col>
 
-                    <Col sm={6}>
+                    {/* <Col sm={6}>
                         <Form.Group className="mb-1" controlId="office">
                             <Form.Label className="mb-0">Office</Form.Label>
                             <Form.Control
@@ -409,7 +408,7 @@ const AppointmentForm = () => {
                             </Form.Control>
                             {errors.office && <p className="text-danger">{errors.office.message}</p>}
                         </Form.Group>
-                    </Col>
+                    </Col> */}
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Reason</Form.Label>
@@ -469,29 +468,35 @@ const AppointmentForm = () => {
                     </Col>
                     <Col sm={6}>
                         <Form.Group className="mb-3">
-                            <Form.Label className="mb-1 ">Status</Form.Label>
+                            <Form.Label className="mb-1">Status</Form.Label>
                             <Form.Control
                                 as="select"
                                 data-has-value={!!watch('status')}
                                 className="form-select"
                                 {...register('status', {
                                     required: 'Status is required',
-                                })}>
-                                <option value="" hidden>
-                                    Select Status
-                                </option>
+                                })}
+                                defaultValue="Scheduled" // Default value set to "Scheduled"
+                            >
+                                {/* Always available options */}
                                 <option value="Scheduled">Scheduled</option>
-                                <option value="Completed">Completed</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Rescheduled">Rescheduled</option>
-                                <option value="Noshow">No-Show</option>
-                                <option value="Arrived">Arrived</option>
-                                <option value="Checkedin">Checked In</option>
-                                <option value="Checkedinonline">Checked In Online</option>
-                                <option value="Inroom">In Room</option>
-                                <option value="Insession">In Session</option>
                                 <option value="Confirmed">Confirmed</option>
                                 <option value="Notconfirmed">Not Confirmed</option>
+
+                                {/* Show all options only if "id" exists */}
+                                {id && (
+                                    <>
+                                        <option value="Completed">Completed</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Rescheduled">Rescheduled</option>
+                                        <option value="Noshow">No-Show</option>
+                                        <option value="Arrived">Arrived</option>
+                                        <option value="Checkedin">Checked In</option>
+                                        <option value="Checkedinonline">Checked In Online</option>
+                                        <option value="Inroom">In Room</option>
+                                        <option value="Insession">In Session</option>
+                                    </>
+                                )}
                             </Form.Control>
                             {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
                         </Form.Group>

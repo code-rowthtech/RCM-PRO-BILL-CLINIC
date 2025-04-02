@@ -68,6 +68,7 @@ const NewDoctor = () => {
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    console.log(doctorDetails, 'doctorDetails')
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
@@ -184,6 +185,8 @@ const NewDoctor = () => {
         } else {
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
+        console.log(payload, 'payload')
+
     };
 
     const handleTabChange = (tab) => {
@@ -196,18 +199,53 @@ const NewDoctor = () => {
 
     const [formData, setFormData] = useState({
         role: doctorRoleId,
-        firstName: '',
         email: '',
-        lastName: '',
+        name: {
+            use: "official",
+            text: "",
+            family: "",
+            given: "",
+        },
         phone: '',
         password: '',
+        confirmPassword: '',
     });
+
+    // Example of updating the state when data changes
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === "firstName" || name === "lastName") {
+            setFormData((prev) => {
+                const firstName = name === "firstName" ? value : prev.name.given;
+                const lastName = name === "lastName" ? value : prev.name.family;
+
+                return {
+                    ...prev,
+                    name: {
+                        use: "official",
+                        text: `${firstName} ${lastName}`.trim(),
+                        family: lastName,
+                        given: firstName,
+                    },
+                };
+            });
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
+    };
+
+
     useEffect(() => {
         if (logo) {
             setFormData({ ...formData, profileImage: logo?.url?.split('?')[0] })
         }
     }, [logo])
     const passwordValue = watch('password', '');
+
     React.useEffect(() => {
         setFormData((prev) => ({ ...prev, password: passwordValue }));
         if (doctorRoleId) {
@@ -219,18 +257,49 @@ const NewDoctor = () => {
         }
     }, [passwordValue, doctorRoleId, id]);
 
+
+    // useEffect(() => {
+    //     const isFormValid =
+    //         formData?.firstName?.trim()?.length >= 3 &&
+    //         /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
+    //         formData?.lastName?.trim()?.length >= 3 &&
+    //         /^[a-zA-Z]{3,}$/.test(formData.lastName) &&
+    //         formData?.dateOfBirth &&
+    //         new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18)) &&
+    //         formData?.email?.trim()?.length > 0 &&
+    //         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+    //         formData?.gender &&
+    //         (id || (
+    //             formData?.password?.trim()?.length >= 8 &&
+    //             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
+    //             formData?.confirmPassword === formData?.password
+    //         ));
+
+    //     console.log("Form Data:", formData);
+    //     console.log("Is Form Valid:", isFormValid);
+
+    //     setIsButtonDisabled(!isFormValid);
+    // }, [formData, id]);
+
     useEffect(() => {
-        const isFormValid =
-            formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
-            formData?.email?.trim()?.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
-            formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName) &&
-            formData?.phone?.trim()?.length === 10 && /^[0-9]+$/.test(formData.phone) &&
-            (id || (
-                formData?.password?.trim()?.length >= 8 &&
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password)
-            ));
+        const isFirstNameValid = formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName);
+        const isLastNameValid = formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName);
+        const isPhoneValid = formData?.phone?.trim()?.length === 14 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
+        const isDOBValid = formData?.dateOfBirth &&
+            new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+        const isEmailValid = formData?.email?.trim()?.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+        const isGenderValid = !!formData?.gender;
+
+        const isPasswordValid = id || (
+            formData?.password?.trim()?.length >= 8 &&
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
+            formData?.confirmPassword === formData?.password
+        );
+
+        const isFormValid = isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid;
         setIsButtonDisabled(!isFormValid);
-    }, [formData]);
+    }, [formData, id]);
+
 
     const requiredFieldTooltip = (
         <Tooltip id="button-tooltip">
@@ -281,7 +350,11 @@ const NewDoctor = () => {
                                                                 <Button
                                                                     onClick={() => setShow(true)}
                                                                     disabled={isButtonDisabled}
-                                                                    style={isButtonDisabled ? { pointerEvents: "none" } : {}}
+                                                                    style={isButtonDisabled ? {
+                                                                        pointerEvents: "none",
+                                                                        opacity: 0.6,  // Visual indication that the button is disabled
+                                                                        cursor: "not-allowed"  // Shows the "not allowed" cursor
+                                                                    } : {}}
                                                                     className='custom-buttons text-nowrap'
                                                                 >
                                                                     Email to Doctor
@@ -328,7 +401,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
                                                                     {...register('firstName', {
                                                                         required: 'First name is required',
                                                                         pattern: {
@@ -342,7 +415,7 @@ const NewDoctor = () => {
                                                                     }}
                                                                     placeholder="Enter first name"
                                                                 />
-                                                                {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
+                                                                {errors.firstName && <span className="text-danger err_font">{errors.firstName.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
@@ -352,7 +425,7 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
-                                                                    onKeyDown={(event) => handleFirstSpace(event, 5)}
+                                                                    onKeyDown={(event) => handleFirstSpace(event, 0)}
                                                                     {...register('lastName', {
                                                                         required: 'Last name is required',
                                                                         pattern: {
@@ -366,7 +439,7 @@ const NewDoctor = () => {
                                                                     }}
                                                                     placeholder="Enter last name"
                                                                 />
-                                                                {errors.lastName && <span className="text-danger">{errors.lastName.message}</span>}
+                                                                {errors.lastName && <span className="text-danger err_font">{errors.lastName.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
@@ -385,28 +458,41 @@ const NewDoctor = () => {
                                                                                 {...register('phone', !id ? {
                                                                                     required: 'This field is required',
                                                                                     pattern: {
-                                                                                        value: /^[0-9]*$/,
-                                                                                        message: 'Contact must be a number',
+                                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                                        message:
+                                                                                            'Contact must be in the format (XXX)XXX-XXXX',
                                                                                     },
                                                                                     maxLength: {
-                                                                                        value: 10,
-                                                                                        message: 'Contact must not exceed 10 digits',
+                                                                                        value: 13,
+                                                                                        message: 'Contact must not exceed 13 digits',
                                                                                     },
                                                                                     minLength: {
-                                                                                        value: 10,
-                                                                                        message: 'Contact must not be less than 10 digits',
+                                                                                        value: 13,
+                                                                                        message:
+                                                                                            'Contact must not be less than 13 digits',
                                                                                     },
                                                                                 } : {}
                                                                                 )}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('phone');
+                                                                                    let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                                                    if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                                                    const formattedValue = rawValue.replace(
+                                                                                        /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                                                        (match, p1, p2, p3) => {
+                                                                                            if (p3) return `(${p1})${p2}-${p3}`;
+                                                                                            if (p2) return `(${p1})${p2}`;
+                                                                                            return `(${p1}`;
+                                                                                        }
+                                                                                    ); // Format dynamically as (XXX)XXX-XXXX
+                                                                                    e.target.value = formattedValue;
                                                                                     setFormData({ ...formData, phone: e.target.value });
                                                                                 }}
-                                                                                placeholder="1234-234-234"
-                                                                                maxLength={10}
+                                                                                placeholder="(XXX)XXX-XXXX"
+                                                                                maxLength={14}
                                                                             />
                                                                         </InputGroup>
-                                                                        {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
+                                                                        {errors.phone && <span className="text-danger err_font">{errors.phone.message}</span>}
                                                                     </Form.Group>
                                                                     <div
                                                                         className="position-absolute"
@@ -424,24 +510,25 @@ const NewDoctor = () => {
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
-                                                                    className='form-control'
-                                                                    max={new Date().toISOString().split('T')[0]}
+                                                                    className="form-control"
+                                                                    max={new Date(new Date().setFullYear(new Date().getFullYear() - 18)).toISOString().split('T')[0]} // Set max date to 18 years ago
                                                                     {...register('dateOfBirth', {
                                                                         required: 'Date of birth is required',
                                                                         validate: (value) => {
                                                                             const selectedDate = new Date(value);
-                                                                            const today = new Date();
-                                                                            today.setHours(0, 0, 0, 0);
-                                                                            return selectedDate <= today || 'Date of birth cannot be in the future';
+                                                                            const minAllowedDate = new Date();
+                                                                            minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 18);
+                                                                            return selectedDate <= minAllowedDate || 'You must be at least 18 years old';
                                                                         },
                                                                     })}
                                                                     onChange={(e) => {
                                                                         clearErrors('dateOfBirth');
-                                                                        setFormData({ ...formData, dateOfBirth: e.target.value })
+                                                                        setFormData({ ...formData, dateOfBirth: e.target.value });
                                                                     }}
                                                                 />
 
-                                                                {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
+
+                                                                {errors.dateOfBirth && <span className="text-danger err_font">{errors.dateOfBirth.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12 ">
@@ -464,7 +551,7 @@ const NewDoctor = () => {
                                                                     }}
                                                                     placeholder="Enter email"
                                                                 />
-                                                                {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                                {errors.email && <span className="text-danger err_font">{errors.email.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
@@ -487,7 +574,7 @@ const NewDoctor = () => {
                                                                     <option value="Female">Female</option>
                                                                     <option value="Other">Other</option>
                                                                 </Form.Select>
-                                                                {errors.gender && <span className="text-danger">{errors.gender.message}</span>}
+                                                                {errors.gender && <span className="text-danger err_font">{errors.gender.message}</span>}
                                                             </Form.Group>
                                                         </div>
                                                         <div className='col-md-6 col-lg-3 col-sm-6 col-12'>
@@ -498,40 +585,43 @@ const NewDoctor = () => {
                                                                 <div className="position-relative">
                                                                     <Form.Control
                                                                         type={showPassword ? "text" : "password"}
-                                                                        // onKeyDown={(event) => handleFirstSpace(event, 0)}
-
                                                                         onKeyDown={(e) => {
                                                                             if (e.key === " ") {
                                                                                 e.preventDefault();
                                                                             }
                                                                         }}
-                                                                        defaultValue={updateId ? '*********' : ''}
+                                                                        value={formData.password}  // Use value instead of defaultValue
                                                                         onCopy={(e) => e.preventDefault()}
                                                                         onCut={(e) => e.preventDefault()}
                                                                         placeholder={"Password"}
                                                                         readOnly={updateId}
                                                                         onChange={(e) => {
                                                                             clearErrors('password');
-                                                                            setFormData({ ...formData, password: e.target.value })
+                                                                            setFormData({ ...formData, password: e.target.value });
                                                                         }}
                                                                         {...register("password", {
                                                                             required: !updateId ? "Password is required" : false,
-                                                                            pattern: {
-                                                                                value: !updateId ? /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/ : '',
-                                                                                message:
-                                                                                    "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
-                                                                            },
+                                                                            ...(updateId
+                                                                                ? {} // Don't apply pattern if updating
+                                                                                : {
+                                                                                    pattern: {
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        message: "At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.",
+                                                                                    }
+                                                                                })
 
                                                                         })}
                                                                     />
+
                                                                     <span
-                                                                        className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                                                                        className="position-absolute end-0 top-0 me-2 cursor-pointer"
+                                                                        style={{ marginTop: '3px' }}
                                                                         onClick={() => setShowPassword(!showPassword)}
                                                                     >
                                                                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                                                                     </span>
                                                                     {errors.password && (
-                                                                        <span className="text-danger">{errors.password.message}</span>
+                                                                        <span className="text-danger err_font">{errors.password.message}</span>
                                                                     )}
                                                                 </div>
                                                             </Form.Group>
@@ -543,30 +633,28 @@ const NewDoctor = () => {
                                                                     <Form.Control
                                                                         type={showConfirmPassword ? "text" : "password"}
                                                                         placeholder="Confirm Password"
-                                                                        readOnly={id}
-                                                                        onCopy={(e) => e.preventDefault()}
-                                                                        onCut={(e) => e.preventDefault()}
-                                                                        onChange={(e) => {
-                                                                            clearErrors('confirmPassword');
-                                                                            setFormData({ ...formData, confirmPassword: e.target.value })
-                                                                        }}
                                                                         {...register('confirmPassword', {
-                                                                            ...(!id ? { required: 'Please confirm your password' } : {}),
-                                                                            pattern: {
-                                                                                value: id ? '' : /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                message: 'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character',
-                                                                            },
-                                                                            validate: value =>
-                                                                                value === password || 'Passwords do not match'
+                                                                            required: !id ? 'Please confirm your password' : false,
+                                                                            validate: (value) =>
+                                                                                value === watch("password") || 'Passwords do not match',
+                                                                            onChange: (e) => {
+                                                                                clearErrors('confirmPassword');
+                                                                                console.log(e.target.value, "onChange Triggered"); // Debugging
+                                                                                setFormData((prev) => ({
+                                                                                    ...prev,
+                                                                                    confirmPassword: e.target.value
+                                                                                }));
+                                                                            }
                                                                         })}
                                                                     />
                                                                     <span
-                                                                        className="position-absolute end-0 top-0 mt-1 me-2 cursor-pointer"
+                                                                        className="position-absolute end-0 top-0 me-2 cursor-pointer"
+                                                                        style={{ marginTop: '3px' }}
                                                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                                                     >
                                                                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                                                                     </span>
-                                                                    {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
+                                                                    {errors.confirmPassword && <span className="text-danger err_font">{errors.confirmPassword.message}</span>}
                                                                 </div>
                                                             </Form.Group>
                                                         </div>
@@ -603,7 +691,7 @@ const NewDoctor = () => {
 
                                                 </div>
                                                 <div className="col-12 d-flex justify-content-end gap-2 mt-1">
-                                                    <Button className='cancel-button'>Cancel</Button>
+                                                    <Button className="cancel-button" onClick={() => reset()}>Cancel</Button>
                                                     <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading} >
                                                         {store?.createtDoctorsReducer?.loading ?
                                                             <Spinner color='white' className='spinner-border-sm' />

@@ -1,26 +1,20 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Col, Form, Row, Button, Table, Modal, InputGroup, Card } from 'react-bootstrap';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { Col, Form, Row, Button, Table, Modal, InputGroup, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Spinner from '../../../../constants/Spinner';
 import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png';
 import us from '../../../../assets/images/flags/us.jpg';
 import {
-    createClinicAction,
-    getCities2Action,
-    getCitiesAction,
-    getClinicAction,
-    getClinicById,
-    getClinicByParentAction,
-    getClinicTypeAction,
-    getStatesByCountryAction,
-    updateClinicAction,
+    createClinicAction, getCities2Action, getCities3Action, getCities4Action, getCities5Action,
+    getCities6Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction,
+    getStatesByCountryAction, updateClinicAction,
 } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaDownload, FaPlus } from 'react-icons/fa';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
-import { FiDownloadCloud, FiEdit, FiEye, FiMinus, FiTrash } from 'react-icons/fi';
+import { FiDownloadCloud, FiEdit, FiEye, FiInfo, FiMinus, FiTrash } from 'react-icons/fi';
 import UploadToS3 from '../../../../helpers/uploads3';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../../cryptoUtils';
@@ -114,8 +108,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const clinicsList = store?.getClinicsByParentReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
-
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
+    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
 
     const handleAddTaxonomy = () => {
@@ -139,19 +133,35 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     //         return updatedCodes.length > 0 ? updatedCodes : [''];
     //     });
     // };
-    const handleStateSelection = (e) => {
+    const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
-        const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }));
-    };
+        const stateId = selectedOption.getAttribute('data-key');
 
+        // Update the addresses state first
+        const updatedAddresses = [...addresses];
+        updatedAddresses[index] = {
+            ...updatedAddresses[index],
+            state: e.target.value,
+        };
+        setAddresses(updatedAddresses);
+
+        // Then fetch cities based on address type
+        if (addressType === 'physical') {
+            dispatch(getCitiesAction({ state_code: stateId, name: '', limit: 25, skip: '' }));
+        } else if (addressType === 'postal') {
+            dispatch(getCities2Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
+        } else {
+            dispatch(getCities3Action({ state_code: stateId, name: '', limit: 25, skip: '' }));
+        }
+    };
+    const [citiesByType, setCitiesByType] = useState({});
+    const cachedCities = citiesByType
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log('clinicsDataGet', clinicsDataGet);
 
     const setField = (key, value) => value && setValue(key, value);
     // useEffect(() => {
@@ -243,9 +253,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     // }, [dispatch, clinicsDataGet, statesData, setValue]);
     useEffect(() => {
         if (clinicsDataGet) {
-            if (clinicsDataGet?.orgType) {
-                setValue('clinicType', clinicsDataGet?.orgType);
-            }
+            setValue('clinicType', clinicsDataGet?.orgType);
             setField('clinicname', clinicsDataGet?.name);
             setField('email', clinicsDataGet?.userId?.email);
             if (clinicsDataGet?.orgLogo) {
@@ -260,9 +268,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -301,17 +309,52 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setConstantContact(contacts);
 
             // ✅ Set Addresses
-            setAddresses(
-                clinicsDataGet?.address?.map((addr) => ({
-                    use: addr.use || '',
-                    line: addr.line && Array.isArray(addr.line) ? addr.line : [''], // Ensure array
-                    city: addr.city || '',
-                    state: addr.state || '',
-                    postalCode: addr.postalCode || '',
-                    country: addr.country || '',
-                })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]
-            );
+            const newAddresses = clinicsDataGet?.address?.map((addr) => ({
+                type: addr.type || '',  // Make sure type is included
+                use: addr.use || '',
+                line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
+                city: addr.city || '',
+                state: addr.state || '',
+                postalCode: addr.postalCode || '',
+                country: addr.country || 'US',
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
+            setAddresses(newAddresses);
+            if (statesData?.states) {
+                newAddresses.forEach((address) => {
+                    const state = statesData.states.find(s => s.name === address.state);
+                    if (!state) return;
 
+                    if (address.type === 'physical') {
+                        dispatch(getCitiesAction({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    } else if (address.type === 'postal') {
+                        dispatch(getCities2Action({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    } else {
+                        dispatch(getCities3Action({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    }
+                });
+            }
+            // addresses?.map((data) => (
+            //     data?.use === 'primary' ?
+            //         dispatch(getCitiesAction({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' })) :
+            //         data?.use === 'postal' ?
+            //             dispatch(getCities2Action({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' })) :
+            //             dispatch(getCities3Action({ state_code: statesData?.states?.find((item) => item?.name === data?.state)?.id, name: data?.city, limit: 25, skip: '' }))
+            // ))
             // ✅ Set POCs (Point of Contacts)
             setPocs(
                 clinicsDataGet?.poc?.map((pocs) => ({
@@ -444,6 +487,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //           ...(longitude1 ? { longitude: longitude1 } : ''),
             //       },
         };
+        // console.log(newPayload, 'oopayload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
     const logoFileInputRef = useRef(null);
@@ -704,7 +748,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = [ 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const addressUses = ['work', 'temp', 'old', 'billing'];
+    const addressTypes = ['physical', 'postal', 'both'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -732,8 +777,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         period: { start: new Date().toISOString() },
     });
     const [addresses, setAddresses] = useState([
-        { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
+        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
+
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     // Load Default Identifiers & Contacts
@@ -768,6 +814,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         setConstantContact([...constantContact, { system: '', value: '', use: '' }]);
     };
     const addAddress = () => {
+        if (addresses?.length === 3) {
+            ToastHandle('Maximun 3 addresses are allowed.', 'danger');
+            return;
+        }
         setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
     };
 
@@ -825,6 +875,12 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     };
 
     const handleAddressChange = (index, field, value) => {
+        if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
+            ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
+            return; // Prevent selection
+        }
+
+        // if(addresses?.some((address) => address?.use === field)) {}
         const updatedAddresses = [...addresses];
         if (field === 'line') {
             updatedAddresses[index].line[0] = value; // update street address
@@ -1043,11 +1099,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     <span
                                         style={{ right: '2%', top: '43%' }}
-                                        className={`${
-                                            clinicsDataGet?.userId?.verified_email
-                                                ? 'text-success position-absolute fs-4'
-                                                : 'd-none'
-                                        }`}>
+                                        className={`${clinicsDataGet?.userId?.verified_email
+                                            ? 'text-success position-absolute fs-4'
+                                            : 'd-none'
+                                            }`}>
                                         <MdVerified />
                                     </span>
 
@@ -1058,9 +1113,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                        logoName ? '' : 'custom-form-fields'
-                                    }`}
+                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
+                                        }`}
                                     data-has-value={!!logoName}>
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
                                     {/* {typeof logoName === 'string' && logoName
@@ -1069,8 +1123,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {logoUploading
                                         ? 'Uploading...'
                                         : typeof logoName === 'string' && logoName
-                                        ? logoName.split('/').pop().slice(0, 30) + '...'
-                                        : 'Upload Logo'}
+                                            ? logoName.split('/').pop().slice(0, 30) + '...'
+                                            : 'Upload Logo'}
                                     {/* {logoName} */}
 
                                     <div className="d-flex align-items-center gap-2">
@@ -1123,8 +1177,22 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Col>
                                             <Form.Label>Identifier Number</Form.Label>
                                         </Col>
-                                        <Col>
+                                        <Col className="d-flex align-items-center gap-2">
                                             <Form.Label>Identifier Document</Form.Label>
+
+                                            {/* Tooltip Icon */}
+                                            <OverlayTrigger
+                                                placement="top"
+                                                overlay={
+                                                    <Tooltip id="tooltip-identifier">
+                                                        File size should be less than 2MB. Supported formats: JPG, PNG,
+                                                        JPEG, PDF.
+                                                    </Tooltip>
+                                                }>
+                                                <span className="text-secondary cursor-pointer mb-2">
+                                                    <FiInfo size={15} />
+                                                </span>
+                                            </OverlayTrigger>
                                         </Col>
                                         <Col>
                                             <Form.Label>Issuing Authority</Form.Label>
@@ -1172,8 +1240,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                             ? 10
                                                             : item.type === 'NAIC'
-                                                            ? 5
-                                                            : 10
+                                                                ? 5
+                                                                : 10
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)
@@ -1223,14 +1291,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onClick={() =>
                                                         document.getElementById(`fileInput-identifier-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                        item.file ? 'form-control' : 'custom-form-fields'
-                                                    }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file ? 'form-control' : 'custom-form-fields'
+                                                        }`}>
                                                     {item.file?.name
                                                         ? item.file.name.length > 30
                                                             ? item.file.name.slice(0, 25) + '...'
                                                             : item.file.name
                                                         : 'Upload Document'}
+
                                                     <p className="mb-0">
                                                         <FiDownloadCloud />
                                                     </p>
@@ -1274,6 +1342,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Control
                                                     type="date"
                                                     value={item?.expiry ? formatDateForInput(item.expiry) : ''}
+                                                    min={new Date().toISOString().split("T")[0]} // Sets min date to today
                                                     onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                                                 />
                                                 {index >= defaultIdentifiers?.length && (
@@ -1655,6 +1724,22 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2">
                                         <Form.Label className="mb-1">Use</Form.Label>
                                         <Form.Select
+                                            value={item?.type}
+                                            className="text-capitalize"
+                                            data-has-value={!!watch(`address[${index}].type`)}
+                                            {...register(`address[${index}].type`)}
+                                            onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
+                                            <option value="">Select</option>
+                                            {addressTypes.map((data) => (
+                                                <option key={data} className="text-capitalize" value={data}>
+                                                    {data}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Col>
+                                    <Col sm={4} className="mb-2">
+                                        <Form.Label className="mb-1">Use</Form.Label>
+                                        <Form.Select
                                             value={item.use}
                                             className="text-capitalize"
                                             data-has-value={!!watch(`address[${index}].use`)}
@@ -1711,40 +1796,81 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}>
-                                                    {searchedLocations.map((data, suggestionIndex) => (
+                                                    {searchedLocations?.map((data, suggestionIndex) => (
                                                         <p
                                                             key={suggestionIndex}
+                                                            // onClick={() => {
+                                                            //     if (item?.type === 'physical') {
+                                                            //         dispatch(getCitiesAction({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
+                                                            //     } else if (item?.type === 'postal') {
+                                                            //         dispatch(getCities2Action({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
+                                                            //     } else if (item?.type === 'both') {
+                                                            //         dispatch(getCities3Action({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
+                                                            //     }
+                                                            //     // Extract the necessary fields from the API response
+                                                            //     const formatted = data.formatted || '';
+                                                            //     const components = data.components || {};
+                                                            //     // Build the new address object with auto-populated fields
+                                                            //     console.log({ components })
+                                                            //     const newAddress = {
+                                                            //         use: item.use, // preserve existing use
+                                                            //         line: [data?.formatted ? data?.formatted : ''],
+                                                            //         // city:
+                                                            //         //     components.city ||
+                                                            //         //     components.town ||
+                                                            //         //     components.village ||
+                                                            //         //     '',
+                                                            //         state:
+                                                            //             components.state || components.state_code || '',
+                                                            //         postalCode: components.postcode || '',
+                                                            //         country: components.country || '',
+                                                            //     };
+                                                            //     // Update the specific address entry
+                                                            //     const updatedAddresses = [...addresses];
+                                                            //     updatedAddresses[index] = newAddress;
+                                                            //     setAddresses(updatedAddresses);
+                                                            //     // Clear suggestions and remove focus
+                                                            //     setSearchedLocations([]);
+                                                            //     setAddressFocused(false);
+                                                            //     setValue(
+                                                            //         `address[${index}].state`,
+                                                            //         components?.state_code
+                                                            //     );
+                                                            //     setValue(`postalCode`, components?.postcode);
+                                                            //     setSelectedState(components?.state_code);
+                                                            // }}
+
                                                             onClick={() => {
-                                                                // Extract the necessary fields from the API response
-                                                                const formatted = data.formatted || '';
-                                                                const components = data.components || {};
-                                                                // Build the new address object with auto-populated fields
+                                                                const state = statesData?.states?.find(s => s.name === data.components?.state);
+                                                                const stateCode = state?.id;
+                                                                const cityName = data.components?.city || data.components?.town || data.components?.village || '';
+
+                                                                // Dispatch city load based on address type
+                                                                if (item?.type === 'physical') {
+                                                                    dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                } else if (item?.type === 'postal') {
+                                                                    dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                } else {
+                                                                    dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                }
+
+                                                                // Update address
                                                                 const newAddress = {
-                                                                    use: item.use, // preserve existing use
-                                                                    line: [data?.formatted ? data?.formatted : ''],
-                                                                    city:
-                                                                        components.city ||
-                                                                        components.town ||
-                                                                        components.village ||
-                                                                        '',
-                                                                    state:
-                                                                        components.state || components.state_code || '',
-                                                                    postalCode: components.postcode || '',
-                                                                    country: components.country || '',
+                                                                    ...item,
+                                                                    line: [data.formatted || ''],
+                                                                    state: data.components?.state || '',
+                                                                    city: cityName,  // Set the city name
+                                                                    postalCode: data.components?.postcode || '',
+                                                                    country: data.components?.country || '',
                                                                 };
-                                                                // Update the specific address entry
+
                                                                 const updatedAddresses = [...addresses];
                                                                 updatedAddresses[index] = newAddress;
                                                                 setAddresses(updatedAddresses);
-                                                                // Clear suggestions and remove focus
+
+                                                                // Clear suggestions
                                                                 setSearchedLocations([]);
                                                                 setAddressFocused(false);
-                                                                setValue(
-                                                                    `address[${index}].state`,
-                                                                    components?.state_code
-                                                                );
-                                                                setValue(`postalCode`, components?.postcode);
-                                                                setSelectedState(components?.state_code);
                                                             }}
                                                             style={{
                                                                 margin: 0,
@@ -1765,7 +1891,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             data-has-value={!!getValues(`address[${index}].state`)}
                                             value={item?.state}
                                             onChange={(e) => {
-                                                handleStateSelection(e);
+                                                handleStateSelection(e, item?.type, index);
                                                 const updatedAddresses = [...addresses];
                                                 updatedAddresses[index] = {
                                                     ...updatedAddresses[index],
@@ -1781,7 +1907,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             ))}
                                         </Form.Select>
                                     </Col>
-                                    <Col sm={4} className="mb-2">
+                                    {/* <Col sm={4} className="mb-2">
                                         <Form.Label className="mb-1">City</Form.Label>
                                         <Form.Select
                                             data-has-value={!!getValues(`address[${index}].city`)}
@@ -1797,14 +1923,47 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <option value="">
                                                 {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
                                             </option>
-                                            {cities1?.map((data) => (
-                                                <option key={data?.name} value={data?._id}>
-                                                    {data?.name}
-                                                </option>
-                                            ))}
+                                            {(item?.use === 'physical' ? cities1 :
+                                                item?.use === 'postal' ? cities2 :
+                                                    cities3)?.map((data) => (
+                                                        <option key={data?.name} value={data?._id}>
+                                                            {data?.name}
+                                                        </option>
+                                                    ))}
+                                        </Form.Select>
+                                    </Col> */}
+                                    <Col sm={4} className="mb-2">
+                                        <Form.Label className="mb-1">City</Form.Label>
+                                        <Form.Select
+                                            data-has-value={!!getValues(`address[${index}].city`)}
+                                            {...register(`address[${index}].city`)}
+                                            value={item?.city}
+                                            onChange={(e) => {
+                                                const updatedAddresses = [...addresses];
+                                                updatedAddresses[index] = {
+                                                    ...updatedAddresses[index],
+                                                    city: e.target.value,
+                                                };
+                                                setAddresses(updatedAddresses);
+                                            }}>
+                                            <option value="">
+                                                {store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}
+                                            </option>
+                                            {(() => {
+                                                const cities =
+                                                    item?.type === 'physical' ? cities1 :
+                                                        item?.type === 'postal' ? cities2 :
+                                                            cities3;
+
+                                                return cities?.map((data) => (
+                                                    <option key={data?._id} value={data?.name}>
+                                                        {data?.name}
+                                                    </option>
+                                                ));
+                                            })()}
                                         </Form.Select>
                                     </Col>
-                                    <Col sm={4} className='position-relative'>
+                                    <Col sm={4} className="position-relative">
                                         <Form.Group className="mb-2">
                                             <Form.Label className="mb-1">Postal Code</Form.Label>
                                             <Form.Control
@@ -1821,17 +1980,18 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         message: 'Postal code must contain numbers only',
                                                     },
                                                 })}
+                                                onChange={(e) => handleAddressChange(index, 'postalCode', e.target.value)}
                                                 maxLength={5}
                                                 onKeyPress={handleFirstSpace}
                                             />
-                                             {addresses.length > 1 && index !== 0 && (
-                                            <span
-                                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                style={{ right: '-2%', top: '50%' }}
-                                                onClick={() => removeAddress(index)}>
-                                                <CiCircleMinus />
-                                            </span>
-                                        )}
+                                            {addresses.length > 1 && index !== 0 && (
+                                                <span
+                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                                    style={{ right: '-2%', top: '50%' }}
+                                                    onClick={() => removeAddress(index)}>
+                                                    <CiCircleMinus />
+                                                </span>
+                                            )}
                                             {errors?.address?.[index]?.postalCode && (
                                                 <span className="text-danger">
                                                     {errors.address[index].postalCode.message}
@@ -2003,7 +2163,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <tr key={patient?.id || `patient-${index}`}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient?.name}</td>
-                                                        <td>{patient?.address?.[0]?.line?.[0] || 'N/A'}</td>
+                                                        <td className='cursor-pointer' data-toggle="tooltip" data-placement="top" title={patient?.address?.[0]?.line?.[0]}>
+                                                            {patient?.address?.[0]?.line?.[0]?.length > 27 ? patient?.address?.[0]?.line?.[0]?.slice(0, 26) + '...' : patient?.address?.[0]?.line?.[0] || 'N/A'}
+                                                        </td>
                                                         <td>{patient.orgType}</td>
                                                         {/* <td>{patient.practiceSpecialty || 'N/A'}</td> */}
                                                         <td>

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form,  Modal, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { FiDownloadCloud,  FiEye } from 'react-icons/fi';
+import { FiDownloadCloud, FiEye } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -19,7 +19,6 @@ import {
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdVerified } from 'react-icons/md';
-import { stateEmptydAction } from '../../../redux/clinics/actions';
 import EmailToDoctorModal from './EmailToSubClinicModal';
 const SubUpdateClinic = () => {
     const [searchParams] = useSearchParams();
@@ -71,6 +70,7 @@ const SubUpdateClinic = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(subClinicsDetailsGet, 'subClinicsDetailsGetsubClinicsDetailsGet')
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     useEffect(() => {
@@ -332,6 +332,7 @@ const SubUpdateClinic = () => {
     //     }
     // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
     const setField = (key, value) => value && setValue(key, value);
+    console.log(subClinicsDetailsGet, 'subClinicsDetailsGet')
     useEffect(() => {
         if (subClinicsDetailsGet) {
             if (subClinicsDetailsGet?.orgType) {
@@ -351,9 +352,9 @@ const SubUpdateClinic = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.url?.split('/').pop(), // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -606,7 +607,6 @@ const SubUpdateClinic = () => {
     useEffect(() => {
         if (updateSuccess === 200) {
             navigate('/apps/crm/addclinic');
-            dispatch(stateEmptydAction());
         }
     }, [updateSuccess]);
     const [selectedLocation, setSelectedLocation] = useState(null);
@@ -1019,7 +1019,7 @@ const SubUpdateClinic = () => {
                                                         {...register('clinicname', {
                                                             required: 'Practice Name is required',
                                                         })}
-                                                      
+
                                                         placeholder="Practice name"
                                                     />
                                                     {errors.clinicname && (
@@ -1073,11 +1073,10 @@ const SubUpdateClinic = () => {
                                                     />
                                                     <span
                                                         style={{ right: '2%', top: '43%' }}
-                                                        className={`${
-                                                            subClinicsDetailsGet?.userId?.email
-                                                                ? 'text-success position-absolute fs-4'
-                                                                : 'd-none'
-                                                        }`}>
+                                                        className={`${subClinicsDetailsGet?.userId?.email
+                                                            ? 'text-success position-absolute fs-4'
+                                                            : 'd-none'
+                                                            }`}>
                                                         <MdVerified />
                                                     </span>
                                                     {errors.email && (
@@ -1089,9 +1088,8 @@ const SubUpdateClinic = () => {
                                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                 <div
                                                     onClick={handleLogoClick}
-                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                        logoName ? '' : 'custom-form-fields'
-                                                    }`}
+                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
+                                                        }`}
                                                     data-has-value={!!logoName}>
                                                     {/* {/ Ensure logoName is a string or fallback to 'Upload Logo' /} */}
                                                     {/* {typeof logoName === 'string' && logoName
@@ -1100,8 +1098,8 @@ const SubUpdateClinic = () => {
                                                     {logoUploading
                                                         ? 'Uploading...'
                                                         : typeof logoName === 'string' && logoName
-                                                        ? logoName.split('/').pop().slice(0, 30) + '...'
-                                                        : 'Upload Logo'}
+                                                            ? logoName.split('/').pop().slice(0, 30) + '...'
+                                                            : 'Upload Logo'}
                                                     <div className="d-flex align-items-center gap-2">
                                                         {/* Eye Icon for Preview */}
                                                         {logo && (
@@ -1210,8 +1208,8 @@ const SubUpdateClinic = () => {
                                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                                             ? 10
                                                                             : item.type === 'NAIC'
-                                                                            ? 5
-                                                                            : undefined
+                                                                                ? 5
+                                                                                : undefined
                                                                     }
                                                                     {...register(`identifiers[${index}].number`, {
                                                                         // required: defaultIdentifiers.includes(item.type)
@@ -1274,11 +1272,10 @@ const SubUpdateClinic = () => {
                                                                             )
                                                                             .click()
                                                                     }
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                        item.file
-                                                                            ? 'form-control'
-                                                                            : 'custom-form-fields'
-                                                                    }`}>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                        ? 'form-control'
+                                                                        : 'custom-form-fields'
+                                                                        }`}>
                                                                     {item.file?.name
                                                                         ? item.file.name.length > 30
                                                                             ? item.file.name.slice(0, 25) + '...'
