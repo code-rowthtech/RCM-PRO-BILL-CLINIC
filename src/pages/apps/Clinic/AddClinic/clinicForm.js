@@ -487,7 +487,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //           ...(longitude1 ? { longitude: longitude1 } : ''),
             //       },
         };
-        // console.log(newPayload, 'oopayload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
     const logoFileInputRef = useRef(null);

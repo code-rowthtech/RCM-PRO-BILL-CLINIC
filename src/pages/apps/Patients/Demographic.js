@@ -48,7 +48,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
     const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
@@ -94,12 +94,20 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
             const identifierData = {
-                type: element?.type?.code,
-                system: element?.type?.value,
-                value: element?.number,
-                issuingAuthority: element?.issuingAuthority,
-                file: element?.file,
                 expiry: element?.expiry,
+                file: element?.file,
+                value: element?.number,
+                use: 'official',
+                system: element?.type?.value,
+                type: {
+                    coding: [{
+                        system: element?.type?.value,
+                        code: element?.type?.code,
+                        display: element?.type?.label,
+                    }],
+                    text: element?.type?.label,
+                },
+                issuingAuthority: element?.issuingAuthority,
             };
             finalIdentifiers.push(identifierData);
         });
@@ -197,18 +205,18 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                         {
                             coding: [rela],
                             text: data?.emergencyContactName, // Human-readable relationship (e.g., "Father", "Aunt")
-                        },
-                    ],
-                },
-                {
+                        }],
                     telecom: [
                         {
-                            system: '', //enum: ["phone", "email"]
+                            system: 'phone', //enum: ["phone", "email"]
                             value: data?.emergencyContactPhone?.replace(/\D/g, ''),
-                            use: '', //, enum: ["home", "work", "mobile"]
+                            use: 'home', //, enum: ["home", "work", "mobile"]
                         },
                     ],
                 },
+                // {
+
+                // },
             ],
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
@@ -218,11 +226,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: data?.employerAddress,
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
-                        country: 'US',
+                        country: 'United States',
                     },
                 },
             },
@@ -230,6 +238,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes })
         };
+        // console.log(payload, 'payload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         console.log(payload)
     };

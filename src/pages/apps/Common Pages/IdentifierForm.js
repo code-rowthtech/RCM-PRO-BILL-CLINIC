@@ -44,7 +44,6 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         'Dun & Bradstreet',
         'Other',
     ];
-    console.log(identifiers, 'identifiersidentifiersidentifiers')
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -60,9 +59,9 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         }
     }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
 
-    useEffect(() => {
-        onChange?.(identifiers);
-    }, [identifiers, onChange]);
+    // useEffect(() => {
+    //     onChange?.(identifiers);
+    // }, [identifiers, onChange]);
 
     const addIdentifier = () => {
         setIdentifiers([
@@ -81,6 +80,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         updatedIdentifiers[index][field] = value;
         setIdentifiers(updatedIdentifiers);
     };
+
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
@@ -173,31 +173,28 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                 <Row key={index} className="mb-2">
                     <Col>
                         <Form.Select
-                            value={item?.type?.value || item?.value}
-                            data-has-value={!!watch(defaultIdentifiers[index])}
-                            className={defaultIdentifiers ? "bg-danger" : ""}
+                            value={item?.system || item?.type?.value || ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
-                                const selectedSystem = item?.system;
-                                handleChange(index, 'type', selectedType, 'system', selectedSystem);
+                                handleChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>
-                                Select Identifier Type
-                            </option>
+                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
+                        >
+                            <option value="" disabled>Select Identifier Type</option>
                             {identifierOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
                         </Form.Select>
+
                     </Col>
 
                     <Col>
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            maxLength={10} 
+                            maxLength={10}
                             value={item?.number || item?.value}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
@@ -205,16 +202,15 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item?.file?.name ? 'form-control' : 'custom-form-fields'
-                            }`}>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
                             {identifierDocument
                                 ? 'Uploading...'
                                 : item.file?.name
-                                ? item.file.name.length > 30
-                                    ? item.file.name.slice(0, 25) + '...'
-                                    : item.file.name
-                                : 'Upload Document'}
+                                    ? item.file.name.length > 30
+                                        ? item.file.name.slice(0, 25) + '...'
+                                        : item.file.name
+                                    : 'Upload Document'}
                             <p className="mb-0">
                                 <FiDownloadCloud />
                             </p>
@@ -254,7 +250,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         {index >= defaultIdentifiers?.length && (
                             <span
                                 className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right:'9px' }}
+                                style={{ marginTop: '-29px', right: '9px' }}
                                 onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>

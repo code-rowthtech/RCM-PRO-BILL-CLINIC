@@ -19,7 +19,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
-    const decryptedRolesDataLoading = store?.getRoleDataReducer?.loading;
     const [isDropdownClicked, setIsDropdownClicked] = useState(false);
     const [isDropdownDesignation, setIsDropdownDesignation] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -35,13 +34,9 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
         { system: 'email', value: '', use: 'work' },
     ]);
     const [addDepartmentalModal, setAddDepartmentalModal] = useState(false);
-
     const designationData = store?.getMastersDataReducer?.data1?.data?.result;
     const designationDataLoading = store?.getMastersDataReducer?.data?.loading;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
-    const roleData = store?.getRolesDataReducer?.data
-    const roleDataLoading = store?.getRolesDataReducer?.loading
     const { register, reset, trigger, handleSubmit, watch, setValue, formState: { errors }, getValues } = useForm();
 
     const closeAddModal = () => {
@@ -151,7 +146,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     }
 
     const [passwordStrength, setPasswordStrength] = useState('');
-    const passwordValue = watch('password', '');
 
     const handlePasswordChange = (e) => {
         const value = e.target.value;
@@ -184,7 +178,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
             )
         );
     };
-
 
     return (
         <>
