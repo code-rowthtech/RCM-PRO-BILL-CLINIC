@@ -19,7 +19,6 @@ const DepartmentDetails = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
-  console.log(doctorDetails, 'doctorDetails')
   const id = doctorDetails?._id
   const {
     register,
@@ -125,9 +124,7 @@ const DepartmentDetails = () => {
       specialties: [data?.specialist],
 
     }
-    console.log({ payload })
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
-    console.log(payload,'payload')
   }
   useEffect(() => {
     if (doctorDetails && updateId) {
