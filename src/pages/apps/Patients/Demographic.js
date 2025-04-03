@@ -231,6 +231,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
             ...(data?.notes && { notes: data.notes })
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload)
     };
     useEffect(() => {
         if (updateResponse === 200) {
