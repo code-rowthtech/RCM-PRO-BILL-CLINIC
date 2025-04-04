@@ -221,7 +221,7 @@ const NewPatient = () => {
             setLogo(url);
             setLogoName(selectedFile?.name);
             clearErrors('profileImage');
-        } catch (error) {}
+        } catch (error) { }
     };
     useEffect(() => {
         dispatch(getStatesByCountryAction());
@@ -253,15 +253,15 @@ const NewPatient = () => {
 
             photo: logo?.url
                 ? [
-                      {
-                          contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
-                          url: logo?.url?.split('?')[0], // Remove query params from URL
-                          data: logo?.base64 || undefined, // If base64 data is available
-                          hash: logo?.hash || '', // If you have a hash for verification
-                          title: logoName || '', // Use provided file name as title
-                          creation: new Date().toISOString(), // Current timestamp
-                      },
-                  ]
+                    {
+                        contentType: logo?.fileType || 'image/jpeg', // Assuming fileType exists, default to 'image/jpeg'
+                        url: logo?.url?.split('?')[0], // Remove query params from URL
+                        data: logo?.base64 || undefined, // If base64 data is available
+                        hash: logo?.hash || '', // If you have a hash for verification
+                        title: logoName || '', // Use provided file name as title
+                        creation: new Date().toISOString(), // Current timestamp
+                    },
+                ]
                 : [],
             patientStatus: data?.patientStatus || '',
             paymentProfile: data?.paymentProfile || '',
@@ -390,18 +390,16 @@ const NewPatient = () => {
                             <ul className="nav nav-underline">
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'personalDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'personalDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('personalDetails')}>
                                         Personal Details
                                     </button>
                                 </li>
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'demographicDetails' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'demographicDetails' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('demographicDetails')}>
                                         Demographic
                                     </button>
@@ -409,9 +407,8 @@ const NewPatient = () => {
                                 {showResponsibleTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'responsible' ? 'active fw-bold' : ''
-                                            }`}
+                                            className={`text-black nav-link fw-medium ${activeTab === 'responsible' ? 'active fw-bold' : ''
+                                                }`}
                                             onClick={() => handleTabChange('responsible')}>
                                             Responsible Party
                                         </button>
@@ -420,9 +417,8 @@ const NewPatient = () => {
                                 {showReferringTab && (
                                     <li className="nav-item">
                                         <button
-                                            className={`text-black nav-link fw-medium ${
-                                                activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                            }`}
+                                            className={`text-black nav-link fw-medium ${activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                                }`}
                                             onClick={() => handleTabChange('referringDoctor')}>
                                             Referring Doctor
                                         </button>
@@ -431,9 +427,8 @@ const NewPatient = () => {
 
                                 <li className="nav-item">
                                     <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'insurance' ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`text-black nav-link fw-medium ${activeTab === 'insurance' ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabChange('insurance')}>
                                         Insurance
                                     </button>
@@ -532,21 +527,21 @@ const NewPatient = () => {
                                                             'cellPhone',
                                                             !id
                                                                 ? {
-                                                                      pattern: {
-                                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                          message:
-                                                                              'Contact must be in the format (XXX)XXX-XXXX',
-                                                                      },
-                                                                      maxLength: {
-                                                                          value: 13,
-                                                                          message: 'Contact must not exceed 13 digits',
-                                                                      },
-                                                                      minLength: {
-                                                                          value: 13,
-                                                                          message:
-                                                                              'Contact must not be less than 13 digits',
-                                                                      },
-                                                                  }
+                                                                    pattern: {
+                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                        message:
+                                                                            'Contact must be in the format (XXX)XXX-XXXX',
+                                                                    },
+                                                                    maxLength: {
+                                                                        value: 13,
+                                                                        message: 'Contact must not exceed 13 digits',
+                                                                    },
+                                                                    minLength: {
+                                                                        value: 13,
+                                                                        message:
+                                                                            'Contact must not be less than 13 digits',
+                                                                    },
+                                                                }
                                                                 : {}
                                                         )}
                                                         onChange={(e) => {
@@ -690,14 +685,13 @@ const NewPatient = () => {
                                             <div
                                                 onClick={() => logoFileInputRef.current.click()}
                                                 style={{ height: '30px' }}
-                                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                                }`}>
+                                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                                    }`}>
                                                 {logoName
                                                     ? logoName.split('/').pop().slice(0, 30) + '...'
                                                     : profileUploading
-                                                    ? 'Uploading...'
-                                                    : 'Upload Photo'}
+                                                        ? 'Uploading...'
+                                                        : 'Upload Photo'}
                                                 <p className="mb-0">
                                                     <FiUploadCloud />
                                                 </p>
@@ -776,21 +770,21 @@ const NewPatient = () => {
                                                             'homePhone',
                                                             !id
                                                                 ? {
-                                                                      pattern: {
-                                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                          message:
-                                                                              'Contact must be in the format (XXX)XXX-XXXX',
-                                                                      },
-                                                                      maxLength: {
-                                                                          value: 13,
-                                                                          message: 'Contact must not exceed 13 digits',
-                                                                      },
-                                                                      minLength: {
-                                                                          value: 13,
-                                                                          message:
-                                                                              'Contact must not be less than 13 digits',
-                                                                      },
-                                                                  }
+                                                                    pattern: {
+                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                        message:
+                                                                            'Contact must be in the format (XXX)XXX-XXXX',
+                                                                    },
+                                                                    maxLength: {
+                                                                        value: 13,
+                                                                        message: 'Contact must not exceed 13 digits',
+                                                                    },
+                                                                    minLength: {
+                                                                        value: 13,
+                                                                        message:
+                                                                            'Contact must not be less than 13 digits',
+                                                                    },
+                                                                }
                                                                 : {}
                                                         )}
                                                         onChange={(e) => {
@@ -855,21 +849,21 @@ const NewPatient = () => {
                                                             'officePhone',
                                                             !id
                                                                 ? {
-                                                                      pattern: {
-                                                                          value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                          message:
-                                                                              'Contact must be in the format (XXX)XXX-XXXX',
-                                                                      },
-                                                                      maxLength: {
-                                                                          value: 13,
-                                                                          message: 'Contact must not exceed 13 digits',
-                                                                      },
-                                                                      minLength: {
-                                                                          value: 13,
-                                                                          message:
-                                                                              'Contact must not be less than 13 digits',
-                                                                      },
-                                                                  }
+                                                                    pattern: {
+                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                        message:
+                                                                            'Contact must be in the format (XXX)XXX-XXXX',
+                                                                    },
+                                                                    maxLength: {
+                                                                        value: 13,
+                                                                        message: 'Contact must not exceed 13 digits',
+                                                                    },
+                                                                    minLength: {
+                                                                        value: 13,
+                                                                        message:
+                                                                            'Contact must not be less than 13 digits',
+                                                                    },
+                                                                }
                                                                 : {}
                                                         )}
                                                         onChange={(e) => {

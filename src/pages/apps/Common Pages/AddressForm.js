@@ -16,9 +16,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
-    const location = useLocation();
-    const isDoctor = location?.pathname === '/apps/doctors/new-doctor' ? true : false;
-    console.log(isDoctor, 'isDoctorisDoctor')
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
@@ -66,7 +63,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
     };
 
     const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = isDoctor ? ['primary', 'mailing', 'secondary'] : ['physical', 'postal', 'both'];
+    const addressTypes = ['physical', 'postal', 'both'];
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -187,27 +184,24 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             ))}
                         </Form.Select>
                     </Col>
-                    {!isDoctor &&
-                        <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
-                            <Form.Label className="mb-0">Use</Form.Label>
-                            <Form.Select
-                                value={item.use}
-                                className="text-capitalize"
-                                data-has-value={!!watch(`address[${index}].use`)}
-                                {...register(`address[${index}].use`)}
-                                onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
-                                <option value="" hidden>
-                                    Select
+                    <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
+                        <Form.Label className="mb-0">Use</Form.Label>
+                        <Form.Select
+                            value={item.use}
+                            className="text-capitalize"
+                            data-has-value={!!watch(`address[${index}].use`)}
+                            {...register(`address[${index}].use`)}
+                            onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
+                            <option value="" hidden>
+                                Select
+                            </option>
+                            {addressUses?.map((use) => (
+                                <option key={use} className="text-capitalize" value={use}>
+                                    {use}
                                 </option>
-                                {addressUses?.map((use) => (
-                                    <option key={use} className="text-capitalize" value={use}>
-                                        {use}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                    }
-
+                            ))}
+                        </Form.Select>
+                    </Col>
                     <Col sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
                         <Form.Label className="mb-0">Address</Form.Label>
                         <Form.Control

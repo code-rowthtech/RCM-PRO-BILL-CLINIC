@@ -341,7 +341,7 @@ const Demographicdetails = ({ patientId }) => {
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };
-        // console.log('Payload:', payload);
+        console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
