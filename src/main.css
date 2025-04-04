@@ -339,6 +339,7 @@ table {
     padding: 6px 8px;
     width: 100%;
     background-color: #e8f0fe !important;
+    font-weight: 600 !important;
 }
 
 .file-upload-label {
@@ -651,7 +652,19 @@ table {
 .css-1k8uk7m-control {
     font-size: 12px !important;
 }
+
 .css-15plnj5-control {
     font-size: 12px !important;
+}
+.css-19bb58m {
+padding-top: 2px!important;
+padding-bottom: 8px!important;
+}
 
+.css-1wy0on6 {
+    height: 30px;
+}
+
+.err_font {
+    font-size: 10px;
 }

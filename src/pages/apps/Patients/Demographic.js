@@ -10,15 +10,14 @@ import {
     getCities2Action,
     getCities3Action,
     updatePatientsAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
+import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { CiCircleMinus } from 'react-icons/ci';
 import { raceOptions } from '../../../utils/DataSets/race.data';
 import { ethnicityOptions } from '../../../utils/DataSets/enthnicity.data';
-import Select from 'react-select';
 import { genderIdentityOptions } from '../../../utils/DataSets/genderIdentities';
 import { sexAssignedAtBirthOptions } from '../../../utils/DataSets/sex';
 import { sexParameterOptions } from '../../../utils/DataSets/SexParameterforClinicalUse';
@@ -29,7 +28,7 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -49,7 +48,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     const [mailingLatitude, setMailingLatitude] = useState(null);
     const [employerLongitude, setEmployerLongitude] = useState(null);
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
     const [employerLatitude, setEmployerLatitude] = useState(null);
     const [focused, setFocused] = useState(false);
@@ -84,81 +83,103 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
     }, [employerCitySearch, cities3]);
 
     const onSubmit = (data) => {
-        let parsedSex = null;
-        try {
-            parsedSex = data?.sex ? JSON.parse(data.sex) : null;
-        } catch (error) {
-            console.error("Error parsing sex:", error);
-        }
-        console.log(data, 'dattaaa');
+        const selectedGenderIdentity = genderIdentityOptions.find((option) => option.show === data.genderIdentity);
+        const selectedSexualOrientation = sexParameterOptions.find((option) => option.show === data.sexParameter);
+        const selectedPersonalPronouns = personalPronounsOptions.find(
+            (option) => option.show === data.personalPronouns
+        );
+        const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
+        const selectedRaceOption = raceOptions.find((option) => option.code === data.race);
+        const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-            console.log(element, 'element');
-            data = {
-                type: element?.type?.code,
-                system: element?.type?.value,
-                value: element?.number,
-                issuingAuthority: element?.issuingAuthority,
-                file: element?.file,
+            const identifierData = {
                 expiry: element?.expiry,
+                file: element?.file,
+                value: element?.number,
+                use: 'official',
+                system: element?.type?.value,
+                type: {
+                    coding: [{
+                        system: element?.type?.value,
+                        code: element?.type?.code,
+                        display: element?.type?.label,
+                    }],
+                    text: element?.type?.label,
+                },
+                issuingAuthority: element?.issuingAuthority,
             };
-            finalIdentifiers.push(data);
+            finalIdentifiers.push(identifierData);
         });
         const payload = {
             id: patientId,
-            // birthSex: {
-            //     system:data?.birthSex?.system,
-            //     code: data?.birthSex?.value,
-            //     display: data?.birthSex?.label,
-            // },
-            // race: [
-            //     {
-            //         system: data?.race?.system,
-            //         code: data?.race?.code,
-            //         display: data?.race?.display,
-            //         text: data?.race?.display,
-            //     }
-            // ],
-            // ethnicity: [{
-            //     system: data?.ethnicity?.system,
-            //     code: data?.ethnicity?.code,
-            //     display: data?.ethnicity?.display,
-
-            // }],
-            // birthSex: {
-            //     system: data?.sex?.system,
-            //     code: data?.sex?.value,
-            //     display: data?.sex?.label,
-            // },
-            birthSex: parsedSex
-            ? {
-                  system: parsedSex.system,
-                  code: parsedSex.value,
-                  display: parsedSex.label,
-              }
-            : undefined,
-
-            ...(data?.genderIdentity && { gender: data.genderIdentity }),
-            ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
-            // ✅ Fixing Race & Ethnicity Structure
-            ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
-            ethnicity: [{ system: 'http://terminology.hl7.org/CodeSystem/v3-Ethnicity', display: eth }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: tri }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: rela }],
-
-            // ✅ Fixing Marital Status Structure
-            ...(data?.maritalStatus && {
-                maritalStatus: {
-                    coding: [
-                        {
-                            system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
-                            code: data.maritalStatus,
-                            display: data.maritalStatusDisplay || '',
-                        },
-                    ],
+            birthSex: [
+                {
+                    ...selectedSexOption,
+                    code: selectedSexOption?.value,
+                    display: selectedSexOption?.label,
+                    system: selectedSexOption?.system,
+                }
+            ],
+            genderIdentity: [
+                {
+                    ...selectedGenderIdentity,
+                    code: selectedGenderIdentity?.value,
+                    display: selectedGenderIdentity?.show,
+                    text: selectedGenderIdentity?.label,
                 },
-            }),
-
+            ],
+            sexParameterForClinicalUse: [
+                {
+                    ...selectedSexualOrientation,
+                    code: selectedSexualOrientation?.value,
+                    display: selectedSexualOrientation?.show,
+                    text: selectedSexualOrientation?.label,
+                    system: selectedSexualOrientation?.system,
+                },
+            ],
+            personalPronouns: [
+                {
+                    ...selectedPersonalPronouns,
+                    code: selectedPersonalPronouns?.value,
+                    display: selectedPersonalPronouns?.show,
+                    text: selectedPersonalPronouns?.label,
+                    system: selectedPersonalPronouns?.system,
+                },
+            ],
+            // ✅ Fixing Race
+            race: [
+                {
+                    ...selectedRaceOption,
+                    code: selectedRaceOption?.code,
+                    display: selectedRaceOption?.display,
+                    text: selectedRaceOption?.display,
+                },
+            ],
+            // ✅ Fixing Ethnicity
+            ethnicity: [
+                {
+                    ...eth,
+                    text: eth?.display,
+                },
+            ],
+            // ✅ Fixing Tribal Entity
+            tribalAffiliation: [
+                {
+                    ...tri,
+                    text: tri?.display,
+                },
+            ],
+            // ✅ Fixing Marital Status Structure
+            maritalStatus: [
+                {
+                    ...selectedMaritalStatus,
+                    code: selectedMaritalStatus?.value,
+                    display: selectedMaritalStatus?.show,
+                    text: selectedMaritalStatus?.label,
+                    system: selectedMaritalStatus?.system,
+                },
+            ],
             // ✅ Fixing Preferred Language Structure
             ...(data?.preferredLanguage && {
                 communication: [
@@ -176,27 +197,27 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                     },
                 ],
             }),
-
-            ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
             ...(data?.notes && { notes: data.notes }),
-            ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
-            ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
-
             // ✅ Fixing Emergency Contact Field
-            ...(data?.emergencyContactName && {
-                contact: [
-                    {
-                        relationship: [{ text: data?.emergencyContactRelation }],
-                        name: { text: data?.emergencyContactName },
-                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
-                    },
-                ],
-            }),
+            contact: [
+                {
+                    relationship: [
+                        {
+                            coding: [rela],
+                            text: data?.emergencyContactName, // Human-readable relationship (e.g., "Father", "Aunt")
+                        }],
+                    telecom: [
+                        {
+                            system: 'phone', //enum: ["phone", "email"]
+                            value: data?.emergencyContactPhone?.replace(/\D/g, ''),
+                            use: 'home', //, enum: ["home", "work", "mobile"]
+                        },
+                    ],
+                },
+                // {
 
-            ...(data?.employerName && { employerName: data.employerName }),
-            ...(data?.employerPhone && {
-                employerPhone: data?.employerPhone ? data.employerPhone?.replace(/\D/g, '') : '', // ✅ Fixed
-            }),
+                // },
+            ],
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
                 employerName: data?.employerName,
@@ -205,31 +226,35 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
-                        country: 'US',
+                        country: 'United States',
                     },
                 },
             },
             identifier: finalIdentifiers,
             address: demographicAddresses,
+            ...(data?.notes && { notes: data.notes })
         };
+        // console.log(payload, 'payload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
     useEffect(() => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {
                 reset();
-                setActiveTab('responsible');
-                dispatch(stateEmptydAction());
+                if (showResponsibleTab) {
+                    setActiveTab('responsible'); // Go to Responsible tab if allowed
+                } else {
+                    setActiveTab('insurance'); // Otherwise, go to Insurance tab
+                }
             } else if (submissionType === 'saveAndReset') {
-                setActiveTab('personelDetails');
-
-                dispatch(stateEmptydAction());
+                setActiveTab('personalDetails');
             }
         }
-    }, [updateResponse, submissionType]);
+    }, [updateResponse, submissionType, showResponsibleTab]); // Dependency added
 
     const getEmployerGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -280,17 +305,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
 
     const [eth, setEth] = useState(null);
     const handleEthnicityChange = (selectedOption) => {
-        setEth('ethnicity', selectedOption ? selectedOption.display : '');
+        setEth(selectedOption ? selectedOption.value : '');
     };
     const [rela, setRela] = useState(null); // Store selected relationship
-
     const handleRelationChange = (selectedOption) => {
-        setRela('relation', selectedOption ? selectedOption.display : '');
+        setRela(selectedOption ? selectedOption.value : '');
     };
     const [tri, setTri] = useState(null); // Store selected tribal entity
-
     const handleTribalChange = (selectedOption) => {
-        setTri('tribal', selectedOption ? selectedOption.display : '');
+        setTri(selectedOption ? selectedOption.value : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
 
@@ -315,15 +338,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                         <Form.Group>
                             <Form.Label className="mb-0">Sex</Form.Label>
                             <Form.Select {...register('sex')}>
-    <option value="" hidden>
-        Select Sex
-    </option>
-    {sexAssignedAtBirthOptions.map((option) => (
-        <option key={option.value} value={JSON.stringify(option)}>
-            {option.label}
-        </option>
-    ))}
-</Form.Select>
+                                <option value="" hidden>
+                                    Select Sex
+                                </option>
+                                {sexAssignedAtBirthOptions.map((option) => (
+                                    <option key={option.value} value={option?.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                     </Col>
 
@@ -335,7 +358,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select
                                 </option>
                                 {genderIdentityOptions?.map((option) => (
-                                    <option key={option?.value} value={option}>
+                                    <option key={option?.value} value={option?.show}>
                                         {option?.show}
                                     </option>
                                 ))}
@@ -351,7 +374,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select
                                 </option>
                                 {sexParameterOptions.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -366,7 +389,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                     Select Pronouns
                                 </option>
                                 {personalPronounsOptions?.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option?.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -379,7 +402,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race}>
+                                    <option key={race.code} value={race.code} className='text-capitalize'>
                                         {race.display}
                                     </option>
                                 ))}
@@ -397,7 +420,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 value={
-                                    formattedEthnicityOptions.find((option) => option?.value?.display === eth) || null
+                                    formattedEthnicityOptions.find(
+                                        (option) => option?.value?.display === eth?.display
+                                    ) || null
                                 } // Show selected value
                                 onChange={handleEthnicityChange}
                                 styles={{
@@ -446,7 +471,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                value={
+                                    formattedTribleOptions.find((option) => option?.value?.display === tri?.display) ||
+                                    null
+                                } // Show selected value
                                 onChange={handleTribalChange}
                                 styles={{
                                     control: (provided) => ({
@@ -473,7 +501,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                             <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
                                 {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option}>
+                                    <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -570,7 +598,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
-                                value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                value={
+                                    relationshipOption.find((option) => option?.value?.display === rela?.display) ||
+                                    null
+                                } // Show selected value
                                 onChange={handleRelationChange}
                                 styles={{
                                     control: (provided) => ({
@@ -737,11 +768,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -849,7 +879,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -861,7 +891,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab }) => {
                                                 <span className="text-danger">{errors.employerTimeZone.message}</span>
                                             )}
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

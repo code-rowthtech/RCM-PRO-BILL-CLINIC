@@ -61,9 +61,6 @@ const Patients = () => {
             ToastHandle("password incorrect", "danger");
         }
     };
-
-
-
     const toggleVisibility = () => {
         if (isPasswordCorrect) {
             setIsVisible(!isVisible);
@@ -81,7 +78,7 @@ const Patients = () => {
     const handleNewPatients = () => {
         navigate('/apps/patients/new-patient')
     }
- 
+
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };

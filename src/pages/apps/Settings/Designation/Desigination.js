@@ -9,7 +9,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import {
   createMastersDataAction,
   getMastersDataAction,
-  stateEmptydAction,
+  // stateEmptydAction,
   updateMastersDataAction
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
@@ -87,7 +87,8 @@ const Designation = () => {
     dispatch(getMastersDataAction({ status, category: 'Desigination', limit: 10, skip, search }));
     if (createResponse === 200 || updateResponse === 200) {
       dispatch(getMastersDataAction({ status, category: 'Desigination', search, limit: 10, skip }));
-      dispatch(stateEmptydAction());
+      // dispatch(stateEmptydAction());
+      closeAddModal();
     }
   }, [dispatch, createResponse, updateResponse, status, search, skip]);
 
@@ -294,7 +295,7 @@ const Designation = () => {
                 </Col> */}
             </Row>
             <Modal.Footer>
-              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
+              {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

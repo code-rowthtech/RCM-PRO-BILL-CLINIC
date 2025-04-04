@@ -21,22 +21,23 @@ const Schedule = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
+    const [status, setStatus] = useState(true);
     const dispatch = useDispatch();
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+        label: data?.name[0]?.text + ' ' ,
     }));
 
     useEffect(() => {
         const payload = {
             search: doctorSearch,
-            status: true,
+            status: status,
         };
-        dispatch(getDoctorsAction({ key: encryptMessage(payload) }));
+        dispatch(getDoctorsAction(payload));
     }, [dispatch, doctorSearch]);
 
     const renderTabContent = () => {
@@ -107,7 +108,7 @@ const Schedule = () => {
                                                         setActiveTab(tab);
                                                     }}
                                                 >
-                                                    {tab === 'DoctorHolidays' && 'Doctor Holidays'}
+                                                    {tab === 'DoctorHolidays' && 'Doctor Time Off'}
                                                     {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>

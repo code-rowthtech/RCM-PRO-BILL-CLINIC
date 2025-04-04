@@ -85,10 +85,10 @@ export const getSchedule = `${BaseRoute}/practitioner/holidays`;
 export const getPractitionerTimings = `${BaseRoute}/practitioner/schedule`;
 
 // appointments
-export const createAppointment = `${BaseRoute}/appointments`;
-export const rescheduleAppointment = `${BaseRoute}/appointment/`;
+export const createAppointment = `${BaseRoute}/appointment/create`;
+export const rescheduleAppointment = `${BaseRoute}/appointment/update/`;
 export const getPractitionerSchedule = `${BaseRoute}/getPractitionerSchedule`;
-export const getAppointments = `${BaseRoute}/appointment/getAll/`;
+export const getAppointments = `${BaseRoute}/appointments/`;
 export const getAppointmentById = `${BaseRoute}/appointment/`;
 export const getPractitionerSlots = `${BaseRoute}/practitioner/slots`;
 export const getPatientsByAppointment = `${BaseRoute}/getPatientsByAppointments`;

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { getSubscriptionsAction } from '../../../../redux/subscriptions/actions'
 import { encryptMessage } from '../../../../cryptoUtils';
-import { addSubscriptionPlanAction, stateEmptydAction } from '../../../../redux/actions';
+import { addSubscriptionPlanAction } from '../../../../redux/actions';
 import ToastHandle from '../../../../helpers/ToastMessage';
 import Spinner from '../../../../constants/Spinner';
 import us from '../../../../assets/images/flags/us.jpg'
@@ -15,8 +15,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
         handleSubmit,
         formState: { errors },
         reset, getValues,
-        watch,
-        setError,
+        setValue,
         clearErrors
     } = useForm();
     const [paymentType, setPaymentType] = useState('');
@@ -25,19 +24,27 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
     const [amount, setAmount] = useState((null));
     const subscriptionsData = store?.getSubscriptionReducer?.data?.result;
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
-    const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscription
+    const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscriptionId
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscription?.isActive;
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Store the selected date
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
 
-
+    useEffect(() => {
+        if (billingData?.subscriptionId) {
+            setValue('subscription', billingData?.subscriptionId);
+            setSelectedDate(billingData?.implimentFrom ? new Date(billingData?.implimentFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0])
+            const selectedSubscription = subscriptionsData?.find(data => data?._id === billingData?.subscriptionId);
+            console.log(selectedSubscription, 'selectedSubscription')
+            setAmount(selectedSubscription || 0);
+        }
+    }, [billingData, subscriptionsData])
     useEffect(() => {
         if (activeTab === 'billing') {
             dispatch(getSubscriptionsAction());
         }
-        if (createResponse === 200) {
-            setActiveTab('contract');
-        }
+        // if (createResponse === 200) {
+        //     setActiveTab('contract');
+        // }
     }, [dispatch, activeTab]);
     const onSubmit = (data) => {
         const payload = {
@@ -57,7 +64,6 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
             reset();
             setActiveTab('contract');
             ToastHandle(store?.createSubscriptionPlanReducer?.data?.message, 'success');
-            dispatch(stateEmptydAction());
         }
     }, [billingAddResponse]);
     useEffect(() => {
@@ -140,7 +146,7 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
                                     // className={`${!!getValues('subscription') ? 'emptyField' : 'selectedField'}`}
                                     onChange={(e) => {
                                         const selectedId = e.target.value;
-                                        const selectedSubscription = subscriptionsData?.find(data => data._id === selectedId);
+                                        const selectedSubscription = subscriptionsData?.find(data => data?._id === selectedId);
                                         setAmount(selectedSubscription || 0);
                                         clearErrors('subscription')
                                     }}
@@ -228,175 +234,177 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
                             </Form.Group>
                         </Col>
                     </Row>
-                    <hr />
-                    <Row className='mt-2'>
-                        <Col sm={12}>
-                            <Row>
-                                <Col sm={6} className=''>
-                                    <Row className='mt-1'>
-                                        <Col sm={12}>
-                                            <span className='text-black fw-semibold'>Payment Information</span>
-                                        </Col>
-                                        <Col sm={12}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Payment Method <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Select
-                                                    {...register('method', {
-                                                        required: 'This field is required'
-                                                    })}
-                                                    className={`${!!getValues('method') ? 'emptyField' : 'selectedField'}`}
-                                                    onChange={(e) => {
-                                                        setPaymentType(e.target.value)
-                                                        clearErrors('method')
-                                                    }}>
-                                                    <option value=''>Select payment method</option>
-                                                    <option value='card'>Card</option>
-                                                    <option value='online'>Online banking</option>
-                                                    <option value='cheque'>Cheque</option>
-                                                </Form.Select>
-                                                {errors?.method && <span className='text-danger'>{errors?.method?.message}</span>}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={12}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Billing Address <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    {...register('billingaddress', { required: 'This field is required' })}
-                                                    placeholder="Billing Address" />
-                                                {errors.billingaddress && <span className="text-danger">{errors.billingaddress.message}</span>}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Cardholder Name <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    // {...register('cardholder', { required: 'This field is required' })}
-                                                    placeholder="Name on card" />
-                                                {/* {errors.cardholder && <span className="text-danger">{errors.cardholder.message}</span>} */}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Credit / Debit Card Number</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="xxxx-xxxx-xxxx"
-                                                    // {...register('cardnumber', {
-                                                    //     // required: 'This field is required',
-                                                    //     minLength: {
-                                                    //         value: 12,
-                                                    //         message: 'Card number must be at least 12 characters',
-                                                    //     },
-                                                    // })}
-                                                    maxLength={12}
-                                                />
-                                                {/* {errors.cardnumber && <span className='text-danger'>{errors.cardnumber.message}</span>} */}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>CVV (Security Code)</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    // {...register('cvv', {
-                                                    //     // required: 'This field is required',
-                                                    //     minLength: {
-                                                    //         value: 3,
-                                                    //         message: 'CVV must be at least 3 characters',
-                                                    //     },
-                                                    // })}
-                                                    maxLength={3}
-                                                    placeholder="---" />
-                                                {/* {errors.cvv && <span className="text-danger">{errors.cvv.message}</span>} */}
-                                            </Form.Group>
-                                        </Col>
-                                        <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
-                                            <Form.Group className="mb-2">
-                                                <Form.Label className='mb-1'>Expiration Date (Security Code)</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    // {...register('expiration', { required: 'This field is required' })}
-                                                    placeholder="---" />
-                                                {/* {errors.expiration && <span className="text-danger">{errors.expiration.message}</span>} */}
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-
-                                </Col>
-                                <Col sm={6}>
-                                    <Row className='mt-1'>
-                                        <Col sm={12}>
-                                            <span className='text-black fw-semibold'>Billing Contact Information</span>
-                                        </Col>
-                                        <Col sm={12} className='mb-2'>
-                                            <Form.Group className="">
-                                                <Form.Label className='mb-1'>Billing Contact Name <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Control
-                                                    type='text'
-                                                    {...register('name', {
-                                                        required: 'This field is required.'
-                                                    })}
-                                                    placeholder='Billing Contact Name' />
-                                            </Form.Group>
-                                            {errors.name && <span className="text-danger">{errors.name.message}</span>}
-                                        </Col>
-                                        <Col sm={12} className='mb-2'>
-                                            <Form.Group className="">
-                                                <Form.Label className='mb-1'>Billing Contact Email <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Control
-                                                    type='email'
-                                                    {...register('email', {
-                                                        required: 'This field is required',
-                                                        pattern: {
-                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
-                                                            message: 'Please enter a valid email address'
-                                                        }
-                                                    })}
-                                                    placeholder='Billing Contact Email' />
-                                            </Form.Group>
-                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                        </Col>
-                                        <Col sm={12} className='mb-2'>
-                                            <Form.Group className="mb-0 position-relative">
-                                                <Form.Label className='mb-1'>Billing Contact Phone Number <span className='text-danger'>*</span></Form.Label>
-                                                <Form.Group>
-                                                    <InputGroup>
-                                                        <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                    {!billingData &&
+                        <>
+                            <hr />
+                            <Row className='mt-2'>
+                                <Col sm={12}>
+                                    <Row>
+                                        <Col sm={6} className=''>
+                                            <Row className='mt-1'>
+                                                <Col sm={12}>
+                                                    <span className='text-black fw-semibold'>Payment Information</span>
+                                                </Col>
+                                                <Col sm={12}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>Payment Method <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Select
+                                                            {...register('method', {
+                                                                required: 'This field is required'
+                                                            })}
+                                                            className={`${!!getValues('method') ? 'emptyField' : 'selectedField'}`}
+                                                            onChange={(e) => {
+                                                                setPaymentType(e.target.value)
+                                                                clearErrors('method')
+                                                            }}>
+                                                            <option value=''>Select payment method</option>
+                                                            <option value='card'>Card</option>
+                                                            <option value='online'>Online banking</option>
+                                                            <option value='cheque'>Cheque</option>
+                                                        </Form.Select>
+                                                        {errors?.method && <span className='text-danger'>{errors?.method?.message}</span>}
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={12}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>Billing Address <span className='text-danger'>*</span></Form.Label>
                                                         <Form.Control
-                                                            type="tel"
-                                                            {...register('contact', {
+                                                            type="text"
+                                                            {...register('billingaddress', { required: 'This field is required' })}
+                                                            placeholder="Billing Address" />
+                                                        {errors.billingaddress && <span className="text-danger">{errors.billingaddress.message}</span>}
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>Cardholder Name <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            // {...register('cardholder', { required: 'This field is required' })}
+                                                            placeholder="Name on card" />
+                                                        {/* {errors.cardholder && <span className="text-danger">{errors.cardholder.message}</span>} */}
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>Credit / Debit Card Number</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            placeholder="xxxx-xxxx-xxxx"
+                                                            // {...register('cardnumber', {
+                                                            //     // required: 'This field is required',
+                                                            //     minLength: {
+                                                            //         value: 12,
+                                                            //         message: 'Card number must be at least 12 characters',
+                                                            //     },
+                                                            // })}
+                                                            maxLength={12}
+                                                        />
+                                                        {/* {errors.cardnumber && <span className='text-danger'>{errors.cardnumber.message}</span>} */}
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>CVV (Security Code)</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            // {...register('cvv', {
+                                                            //     // required: 'This field is required',
+                                                            //     minLength: {
+                                                            //         value: 3,
+                                                            //         message: 'CVV must be at least 3 characters',
+                                                            //     },
+                                                            // })}
+                                                            maxLength={3}
+                                                            placeholder="---" />
+                                                        {/* {errors.cvv && <span className="text-danger">{errors.cvv.message}</span>} */}
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col sm={12} className={`${paymentType === 'card' ? '' : 'd-none'}`}>
+                                                    <Form.Group className="mb-2">
+                                                        <Form.Label className='mb-1'>Expiration Date (Security Code)</Form.Label>
+                                                        <Form.Control
+                                                            type="date"
+                                                            // {...register('expiration', { required: 'This field is required' })}
+                                                            placeholder="---" />
+                                                        {/* {errors.expiration && <span className="text-danger">{errors.expiration.message}</span>} */}
+                                                    </Form.Group>
+                                                </Col>
+                                            </Row>
+
+                                        </Col>
+                                        <Col sm={6}>
+                                            <Row className='mt-1'>
+                                                <Col sm={12}>
+                                                    <span className='text-black fw-semibold'>Billing Contact Information</span>
+                                                </Col>
+                                                <Col sm={12} className='mb-2'>
+                                                    <Form.Group className="">
+                                                        <Form.Label className='mb-1'>Billing Contact Name <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Control
+                                                            type='text'
+                                                            {...register('name', {
+                                                                required: 'This field is required.'
+                                                            })}
+                                                            placeholder='Billing Contact Name' />
+                                                    </Form.Group>
+                                                    {errors.name && <span className="text-danger">{errors.name.message}</span>}
+                                                </Col>
+                                                <Col sm={12} className='mb-2'>
+                                                    <Form.Group className="">
+                                                        <Form.Label className='mb-1'>Billing Contact Email <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Control
+                                                            type='email'
+                                                            {...register('email', {
                                                                 required: 'This field is required',
                                                                 pattern: {
-                                                                    value: /^[0-9]*$/,
-                                                                    message: 'Contact must be a number'
-                                                                },
-                                                                maxLength: {
-                                                                    value: 10,
-                                                                    message: 'Contact must not exceed 10 digits'
-                                                                },
-                                                                minLength: {
-                                                                    value: 9,
-                                                                    message: 'Contact must not be less than 9 digits'
+                                                                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // Regex for email validation
+                                                                    message: 'Please enter a valid email address'
                                                                 }
                                                             })}
+                                                            placeholder='Billing Contact Email' />
+                                                    </Form.Group>
+                                                    {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                </Col>
+                                                <Col sm={12} className='mb-2'>
+                                                    <Form.Group className="mb-0 position-relative">
+                                                        <Form.Label className='mb-1'>Billing Contact Phone Number <span className='text-danger'>*</span></Form.Label>
+                                                        <Form.Group>
+                                                            <InputGroup>
+                                                                <InputGroup.Text className='ps-3 pe-1 fw-bold text-black'>&nbsp;&nbsp;+1</InputGroup.Text> {/* This is the prefix */}
+                                                                <Form.Control
+                                                                    type="tel"
+                                                                    {...register('contact', {
+                                                                        required: 'This field is required',
+                                                                        pattern: {
+                                                                            value: /^[0-9]*$/,
+                                                                            message: 'Contact must be a number'
+                                                                        },
+                                                                        maxLength: {
+                                                                            value: 10,
+                                                                            message: 'Contact must not exceed 10 digits'
+                                                                        },
+                                                                        minLength: {
+                                                                            value: 9,
+                                                                            message: 'Contact must not be less than 9 digits'
+                                                                        }
+                                                                    })}
 
-                                                            placeholder="1234-234-234"
-                                                            maxLength={10}
-                                                        />
-                                                    </InputGroup>
-                                                </Form.Group>
-                                                <div
-                                                    className='position-absolute ' style={{ top: '52%', left: '1%' }}
-                                                >
-                                                    <img
-                                                        src={us}
-                                                        alt="country code flag"
-                                                        width={20} />
-                                                </div>
-                                            </Form.Group>
-                                            {/* <Form.Group className="">
+                                                                    placeholder="1234-234-234"
+                                                                    maxLength={10}
+                                                                />
+                                                            </InputGroup>
+                                                        </Form.Group>
+                                                        <div
+                                                            className='position-absolute ' style={{ top: '52%', left: '1%' }}
+                                                        >
+                                                            <img
+                                                                src={us}
+                                                                alt="country code flag"
+                                                                width={20} />
+                                                        </div>
+                                                    </Form.Group>
+                                                    {/* <Form.Group className="">
                                             <Form.Control
                                                 type='text'
                                                 {...register('contact', {
@@ -418,24 +426,33 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
     
                                                 placeholder='Billing Contact Phone Number' />
                                         </Form.Group> */}
-                                            {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                    {errors.contact && <span className="text-danger">{errors.contact.message}</span>}
+                                                </Col>
+                                            </Row>
                                         </Col>
+
+
                                     </Row>
                                 </Col>
-
-
                             </Row>
-                        </Col>
-                    </Row>
+                        </>
+                    }
+
                     <Row className='mt-2'>
                         <Col sm={12} className='text-end'>
-                            <Button type='submit' className='custom-button' disabled={store?.createSubscriptionPlanReducer?.loading}>
-                                {store?.createSubscriptionPlanReducer?.loading ?
-                                    <Spinner className='spinner-border-sm' color='white' />
-                                    :
-                                    'Next'
-                                }
-                            </Button>
+                            {billingData ?
+                                <Button onClick={() => setActiveTab('contract')} className='custom-button'>
+                                    Next
+                                </Button>
+                                :
+                                <Button type='submit' className='custom-button' disabled={store?.createSubscriptionPlanReducer?.loading}>
+                                    {store?.createSubscriptionPlanReducer?.loading ?
+                                        <Spinner className='spinner-border-sm' color='white' />
+                                        :
+                                        'Next'
+                                    }
+                                </Button>
+                            }
                         </Col>
                     </Row>
 

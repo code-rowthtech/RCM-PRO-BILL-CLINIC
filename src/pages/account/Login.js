@@ -136,7 +136,7 @@ const Login = (): React$Element<any> => {
                     </FormInput>
 
                     <div className="mb-3 mb-0 d-flex justify-content-center">
-                        <Button className='custom-buttons ' type="submit" disabled={loading}>
+                        <Button className='custom-buttons w-25' type="submit" disabled={loading}>
                             {loading ?
                                 <Spinner color='white' className="spinner-border-sm " />
                                 :

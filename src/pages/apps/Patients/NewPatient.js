@@ -1,17 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BiEdit } from 'react-icons/bi';
-import ProfileDummy from '../../../assets/images/profileDummy.png';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
-import { FiEdit, FiTrash, FiUploadCloud } from 'react-icons/fi';
+import { Button, Card, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
+import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    createPatientsAction,
-    updatePatientsAction,
-    getPatientByIdAction,
-    getResponsiblePartyAction,
-} from '../../../redux/patients/actions';
-import { useForm, Controller } from 'react-hook-form';
+import { createPatientsAction, getPatientByIdAction, getResponsiblePartyAction } from '../../../redux/patients/actions';
+import { useForm } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
@@ -20,10 +13,8 @@ import {
     getDoctorsAction,
     getStatesByCountryAction,
     getSubClinicCitiesAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import Responsiblle from './Responsible';
-import { getResponsibleParty } from '../../../helpers/api/apiEndpoints';
 import Select from 'react-select';
 import Insurance from './Insurance/Insurance';
 import Demographicdetails from './Demographic';
@@ -60,7 +51,6 @@ const NewPatient = () => {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('updateid');
     const store = useSelector((state) => state);
-    const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const createResponse = store?.createPatientsReducer?.data?.status;
     const createPatientResponse = store?.createPatientsReducer?.data?.data;
     const statesData = store?.getStatesReducer?.data;
@@ -68,31 +58,25 @@ const NewPatient = () => {
     const patientDetails = store?.getPatientByIdReducer?.data?.patient;
     const responsibleParties = store?.getResponsiblePartyReducer?.data?.responsibleParties;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    const [focused, setFocused] = useState(false);
     const [submissionType, setSubmissionType] = useState(null);
     const [smShow, setSmShow] = useState(false);
     const [password, setPassword] = useState('');
     const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
-    const [showTooltip, setShowTooltip] = useState(false);
     const [patientId, setPatientId] = useState(null);
     const [age, setAge] = useState(null);
-    const [formData, setFormData] = useState({
-        role: doctorRoleId,
-    });
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
-    const [partySearch, setPartySearch] = useState('');
     const [selectedParty, setSelectedParty] = useState(null);
     const [doctorSearch, setDoctorSearch] = useState('');
     const logoFileInputRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    const [searchedLocations, setSearchedLocations] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [deceasedDateTime, setDeceasedDateTime] = useState('');
-
+    const [showResponsibleTab, setShowResponsibleTab] = useState(true);
+    const [showReferringTab, setShowReferringTab] = useState(true);
     const [activeTab, setActiveTab] = useState('personalDetails');
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
@@ -105,7 +89,7 @@ const NewPatient = () => {
 
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name?.[0]?.text ,
+        label: data?.name?.[0]?.text,
     }));
     const handleTabChange = (tab) => {
         setActiveTab(tab);
@@ -114,6 +98,13 @@ const NewPatient = () => {
         } else {
             setBtnShow(false);
         }
+    };
+    const handleResponsibleChange = (e) => {
+        setShowResponsibleTab(e.target.value === 'true');
+    };
+
+    const handleReferringChange = (e) => {
+        setShowReferringTab(e.target.value === 'true');
     };
 
     const navigate = useNavigate();
@@ -137,21 +128,20 @@ const NewPatient = () => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                setActiveTab('demographicDetails');
+                handleTabChange('demographicDetails');
+                // setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
-                dispatch(stateEmptydAction());
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
                 setLogo(null);
                 setLogoName(null);
                 setPatientId(null);
-                dispatch(stateEmptydAction());
             } else if (submissionType === 'save') {
                 setPatientId(createPatientResponse?._id);
             }
         }
-    }, [createResponse]);
+    }, [createResponse, submissionType]);
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
@@ -174,7 +164,7 @@ const NewPatient = () => {
             const payload = {
                 id: id,
             };
-            dispatch(getPatientByIdAction(payload ));
+            dispatch(getPatientByIdAction(payload));
         }
     }, [id]);
     useEffect(() => {
@@ -246,6 +236,7 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    console.log('clinicId', clinicId);
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinicId || '',
@@ -254,8 +245,12 @@ const NewPatient = () => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
+            medicationHistoryConsent: true,
             patientCopayAmount: data?.patientCopayAmount || '0',
+            // Responsible Party & Referring Doctor
+            responsibleParty: showResponsibleTab, // Convert string to boolean
+            refferingDoctor: showReferringTab, // Convert string to boolean
+
             photo: logo?.url
                 ? [
                       {
@@ -273,7 +268,8 @@ const NewPatient = () => {
             preferredCommunication: data?.preferredCommunication || '',
             // previousBirthName: data?.previousBirthName || '',
             //     profileImage: data?.profileImage || '',
-            //     reminderLanguage: data?.reminderLanguage || '',
+            reminderLanguage: data?.reminderLanguage || '',
+
             //     selectedDoctor: data?.selectedDoctor || '',
             //     suffix: data?.suffix || '',
             //     title: data?.title || '',
@@ -288,7 +284,7 @@ const NewPatient = () => {
                 text: `${data?.firstName || ''} ${data?.lastName || ''}`.trim(),
                 use: 'official',
                 suffix: [data?.suffix || ''],
-                prefix: [data?.prefix || ''],
+                prefix: [data?.title || ''],
             },
         ];
         if (data?.previousBirthName) {
@@ -363,12 +359,12 @@ const NewPatient = () => {
 
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
-
             if (data?.deceasedDateTime) {
                 payload.deceasedDateTime = new Date(data.deceasedDateTime).toISOString();
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
         if (submissionType === 'saveAndReset') {
             reset(); // Reset before dispatch
         }
@@ -410,24 +406,28 @@ const NewPatient = () => {
                                         Demographic
                                     </button>
                                 </li>
-                                <li className="nav-item">
-                                    <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'responsible' ? 'active fw-bold' : ''
-                                        }`}
-                                        onClick={() => handleTabChange('responsible')}>
-                                        Responsible party
-                                    </button>
-                                </li>
-                                <li className="nav-item">
-                                    <button
-                                        className={`text-black nav-link fw-medium ${
-                                            activeTab === 'referringDoctor' ? 'active fw-bold' : ''
-                                        }`}
-                                        onClick={() => handleTabChange('referringDoctor')}>
-                                        Referring Doctor
-                                    </button>
-                                </li>
+                                {showResponsibleTab && (
+                                    <li className="nav-item">
+                                        <button
+                                            className={`text-black nav-link fw-medium ${
+                                                activeTab === 'responsible' ? 'active fw-bold' : ''
+                                            }`}
+                                            onClick={() => handleTabChange('responsible')}>
+                                            Responsible Party
+                                        </button>
+                                    </li>
+                                )}
+                                {showReferringTab && (
+                                    <li className="nav-item">
+                                        <button
+                                            className={`text-black nav-link fw-medium ${
+                                                activeTab === 'referringDoctor' ? 'active fw-bold' : ''
+                                            }`}
+                                            onClick={() => handleTabChange('referringDoctor')}>
+                                            Referring Doctor
+                                        </button>
+                                    </li>
+                                )}
 
                                 <li className="nav-item">
                                     <button
@@ -477,6 +477,22 @@ const NewPatient = () => {
                                             />
                                             {errors.firstName && (
                                                 <span className="text-danger">{errors.firstName.message}</span>
+                                            )}
+                                        </Form.Group>
+                                    </div>
+                                    <div className="col-md-3 col-12 mb-2">
+                                        <Form.Group>
+                                            <Form.Label htmlFor="middleName" className="mb-0">
+                                                Middle Name
+                                            </Form.Label>
+                                            <Form.Control
+                                                id="middleName"
+                                                type="text"
+                                                placeholder="Middle Name"
+                                                {...register('middleName')}
+                                            />
+                                            {errors.middleName && (
+                                                <span className="text-danger">{errors.middleName.message}</span>
                                             )}
                                         </Form.Group>
                                     </div>
@@ -645,10 +661,6 @@ const NewPatient = () => {
                                                 id="patientstatus"
                                                 {...register('patientStatus')}
                                                 data-has-value={!!watch('patientStatus')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>{' '}
-                                                {/* Default option */}
                                                 <option value="Active">Active</option>
                                                 <option value="Inactive">Inactive</option>
                                                 <option value="Inactive-Deceased">Inactive-Deceased</option>
@@ -682,7 +694,7 @@ const NewPatient = () => {
                                                     logoName || profileUploading ? '' : 'custom-form-fields'
                                                 }`}>
                                                 {logoName
-                                                    ? logoName
+                                                    ? logoName.split('/').pop().slice(0, 30) + '...'
                                                     : profileUploading
                                                     ? 'Uploading...'
                                                     : 'Upload Photo'}
@@ -724,22 +736,7 @@ const NewPatient = () => {
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
-                                    <div className="col-md-3 col-12 mb-2">
-                                        <Form.Group>
-                                            <Form.Label htmlFor="middleName" className="mb-0">
-                                                Middle Name
-                                            </Form.Label>
-                                            <Form.Control
-                                                id="middleName"
-                                                type="text"
-                                                placeholder="Middle Name"
-                                                {...register('middleName')}
-                                            />
-                                            {errors.middleName && (
-                                                <span className="text-danger">{errors.middleName.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </div>
+
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Suffix </Form.Label>
@@ -948,6 +945,25 @@ const NewPatient = () => {
                                             </Form.Select>
                                         </Form.Group>
                                     </div>
+                                    <div className="col-md-3 col-12">
+                                        <Form.Group>
+                                            <Form.Label className="mb-0">Responsible Party</Form.Label>
+                                            <Form.Select onChange={handleResponsibleChange} defaultValue="true">
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </div>
+
+                                    <div className="col-md-3 col-12">
+                                        <Form.Group>
+                                            <Form.Label className="mb-0">Referring Doctor</Form.Label>
+                                            <Form.Select onChange={handleReferringChange} defaultValue="true">
+                                                <option value="true">Yes</option>
+                                                <option value="false">No</option>
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </div>
                                 </div>
                                 <hr className="mt-2" />
 
@@ -993,7 +1009,7 @@ const NewPatient = () => {
 
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
-                                            <Form.Label className="mb-0">Medication History Concent</Form.Label>
+                                            <Form.Label className="mb-0">Medical History Concent</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
                                                 data-has-value={!!watch('medicationHistoryConsent')}>
@@ -1120,10 +1136,24 @@ const NewPatient = () => {
                                 </div>
                             </Form>
                         )}
-                        {activeTab === 'responsible' && <Responsiblle patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />}
+                        {activeTab === 'responsible' && (
+                            <Responsiblle patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />
+                        )}
                         {activeTab === 'insurance' && <Insurance patientId={patientId} />}
-                        {activeTab === 'demographicDetails' && <Demographicdetails patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab}/>}
-                        {activeTab === 'referringDoctor' && <ReferringDoctor patientId={patientId} />}
+                        {activeTab === 'demographicDetails' && (
+                            <Demographicdetails
+                                patientId={patientId}
+                                activeTab={activeTab}
+                                setActiveTab={setActiveTab}
+                                showResponsibleTab={showResponsibleTab}
+                                setShowResponsibleTab={setShowResponsibleTab}
+                                showReferringTab={showReferringTab}
+                                setShowReferringTab={setShowReferringTab}
+                            />
+                        )}
+                        {activeTab === 'referringDoctor' && (
+                            <ReferringDoctor patientId={patientId} activeTab={activeTab} setActiveTab={setActiveTab} />
+                        )}
                     </div>
                 </Card>
             </div>

@@ -45,12 +45,14 @@ const formatTo24Hour = (time) => {
 };
 const ScheduleTab = () => {
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  console.log(selectedDoctor, 'selectedDoctor')
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const [time, setTime] = useState("");
   const inputRefs = useRef([]);
   const { control, handleSubmit, setValue, register, reset } = useForm();
   const [doctorSearch, setDoctorSearch] = useState('');
+  const [status, setStatus] = useState(true);
   const [days, setDays] = useState([
     { day: "Monday", slots: [{ startTime: '', endTime: '' }] },
     { day: "Tuesday", slots: [{ startTime: '', endTime: '' }] },
@@ -61,29 +63,41 @@ const ScheduleTab = () => {
     { day: "Sunday", slots: [{ startTime: '', endTime: '' }] },
   ]);
   // const [selectedDoctor, setSelectedDoctor] = useState(null);
-  const doctorDetails = store?.getDoctorsReducer?.data?.response;
+  const doctorDetails = store?.getDoctorsReducer?.data?.result;
   const doctorOptions = doctorDetails?.map((data) => ({
     value: data._id,
-    label: data?.userDetails?.firstName + ' ' + data?.userDetails?.lastName,
+    label: data?.name[0]?.text + ' ',
   }));
   const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const practitionerTimings = store?.getPractitionerTimingsReducer?.data?.schedule;
+  console.log(practitionerTimings, 'practitionerTimings')
   useEffect(() => {
     const payload = {
       search: doctorSearch,
-      status: true,
+      status: status,
     }
     dispatch(
-      getDoctorsAction({ key: encryptMessage(payload) })
+      getDoctorsAction(payload)
     );
   }, [dispatch, doctorSearch]);
   useEffect(() => {
     if (selectedDoctor?.value) {
+      setDays([
+    { day: "Monday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Tuesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Wednesday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Thursday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Friday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Saturday", slots: [{ startTime: '', endTime: '' }] },
+    { day: "Sunday", slots: [{ startTime: '', endTime: '' }] },
+  ])
       const payload = {
         clinicId: clinicId,
         doctorId: selectedDoctor?.value
       }
+      console.log({payload})
       dispatch(getPractitionerTimingsAction({ key: encryptMessage(payload) }))
+      console.log(payload, 'payload')
     }
   }, [selectedDoctor])
 
@@ -144,9 +158,11 @@ const ScheduleTab = () => {
 
     if (selectedDoctor && practitionerTimings?.availability) {
       dispatch(updateTimingsAction({ key: encryptMessage(payload) }));
+      
     } else {
       dispatch(createTimingsAction({ key: encryptMessage(payload) }));
     }
+    console.log(payload,'payload')
   };
 
 
@@ -350,7 +366,6 @@ const ScheduleTab = () => {
                                 className="uil-minus-circle minusicon fw-bold cursor-pointer ms-2"
                                 onClick={() => handleRemoveSlot(dayIndex, slotIndex)}
                               >
-
                               </span>
                             )}
                           </td>

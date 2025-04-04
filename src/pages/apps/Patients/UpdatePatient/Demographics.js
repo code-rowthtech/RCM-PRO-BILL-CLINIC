@@ -26,6 +26,7 @@ import { maritalStatusOptions } from '../../../../utils/DataSets/maritalStatus';
 import AddressForm from '../../Common Pages/AddressForm';
 import Select from 'react-select';
 import { error } from 'jquery';
+import { use } from 'react';
 
 const Demographicdetails = ({ patientId }) => {
     const store = useSelector((state) => state);
@@ -66,12 +67,9 @@ const Demographicdetails = ({ patientId }) => {
     const primaryState = watch('primaryStateName');
     const mailingState = watch('mailingStateName');
     const employerState = watch('employerStateName');
-
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails,'patientDetails')
-
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
 
     const updateResponse = store?.updatePatientsReducer?.data?.status;
@@ -101,28 +99,29 @@ const Demographicdetails = ({ patientId }) => {
     }, [employerCitySearch, cities3]);
     useEffect(() => {
         if (patientDetails) {
-            setValue('race', patientDetails?.race?.[0]?.code || '');
+            setValue('race', patientDetails?.race?.[0]?.display || '');
             setValue('raceSubcategories', patientDetails?.raceSubcategories);
-            setValue('sex', patientDetails?.birthSex?.code || '');
-            setValue('genderIdentity', patientDetails?.gender);
-            setValue('sexualOrientation', patientDetails?.sexualOrientation);
+            setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
+            setValue('genderIdentity', patientDetails?.genderIdentity?.[0]?.code || '');
+            setValue('sexParameter', patientDetails?.sexParameterForClinicalUse?.[0]?.code || '');
+            setValue('personalPronouns', patientDetails?.personalPronouns?.[0]?.code || '');
             setValue('patientStudentStatus', patientDetails?.patientStudentStatus);
             setValue('nationalIdNumber', patientDetails?.nationalIdNumber);
             setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
-            setValue('trible', patientDetails?.trible?.[0]?.code || '');
-            setValue('ethnicity', patientDetails?.ethnicity?.[0]?.code || '');
+            // setValue('trible', patientDetails?.trible?.[0]?.code || '');
+            // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
+            setEth(patientDetails?.ethnicity)
+            setTri(patientDetails?.tribalAffiliation)
             setValue('notes', patientDetails?.notes);
-            setValue('maritalStatus', patientDetails?.maritalStatus?.coding?.[0]?.code || '');
+            setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
             setValue('epsdtServices', patientDetails?.epsdtServices);
             setValue('epsdtReferralCondition', patientDetails?.epsdtReferralCondition);
 
             // ✅ Emergency Contact Fix
-            setValue('emergencyContactName', patientDetails?.contact?.[0]?.name?.text || '');
-            setValue(
-                'emergencyContactPhone',
-                formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value)
-            );
-            setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactName', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setValue('emergencyContactPhone', formatPhoneNumber(patientDetails?.contact?.[0]?.telecom?.[0]?.value));
+            // setValue('emergencyContactRelation', patientDetails?.contact?.[0]?.relationship?.[0]?.text || '');
+            setRela(patientDetails?.contact?.[0]?.relationship?.[0]?.coding);
 
             // ✅ Employer Details Fix
             setValue('employerName', patientDetails?.employerDetails?.employerName || '');
@@ -133,60 +132,151 @@ const Demographicdetails = ({ patientId }) => {
             setValue('employerCity', patientDetails?.employerDetails?.workLocation?.address?.city || '');
             setValue('employerStateName', patientDetails?.employerDetails?.workLocation?.address?.state || '');
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
-            setValue(
-                'employerPhone',
-                formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || '')
-            );
-         
+            setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
+            setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');
+            setIdentifiers(patientDetails?.identifier || []);
+            // setDemographicAddresses(patientDetails?.address || []);
+            const newAddresses = patientDetails?.address?.map((addr) => ({
+                type: addr.type || '',  // Make sure type is included
+                use: addr.use || '',
+                line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
+                city: addr.city || '',
+                state: addr.state || '',
+                postalCode: addr.postalCode || '',
+                country: addr.country || 'US',
+            })) || [{ type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }];
+            setDemographicAddresses(newAddresses);
+            if (statesData?.states) {
+                newAddresses.forEach((address) => {
+                    const state = statesData.states.find(s => s.name === address.state);
+                    if (!state) return;
+                    if (address.type === 'physical') {
+                        dispatch(getCitiesAction({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    } else if (address.type === 'postal') {
+                        dispatch(getCities2Action({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    } else {
+                        dispatch(getCities3Action({
+                            state_code: state.id,
+                            name: address.city,
+                            limit: 25,
+                            skip: ''
+                        }));
+                    }
+                });
+            }
         }
-    }, [patientDetails]);
- 
+    }, [patientDetails, statesData]);
 
     const onSubmit = (data) => {
-        console.log(data, 'formData');
+        const selectedGenderIdentity = genderIdentityOptions.find((option) => option.value === data.genderIdentity);
+        const selectedSexualOrientation = sexParameterOptions.find((option) => option.value === data.sexParameter);
+        const selectedPersonalPronouns = personalPronounsOptions.find(
+            (option) => option.value === data.personalPronouns
+        );
+        const selectedMaritalStatus = maritalStatusOptions.find((option) => option.show === data.maritalStatus);
+        const selectedRaceOption = raceOptions.find((option) => option.display === data.race);
+        const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
+
         let finalIdentifiers = [];
         identifiers.forEach((element) => {
-            console.log(element, 'element');
-            data = {
-                type: element?.type?.code,
-                system: element?.type?.value,
-                value: element?.number,
-                issuingAuthority: element?.issuingAuthority,
-                file: element?.file,
+            const identifierData = {
                 expiry: element?.expiry,
+                file: element?.file,
+                value: element?.number || element?.value,
+                use: 'official',
+                system: element?.type?.value || element?.system,
+                type: {
+                    coding: [{
+                        system: element?.type?.value || element?.system,
+                        code: element?.type?.code || element?.type?.coding?.[0]?.code,
+                        display: element?.type?.label || element?.type?.coding?.[0]?.display,
+                    }],
+                    text: element?.type?.label || element?.type?.coding?.[0]?.display,
+                },
+                issuingAuthority: element?.issuingAuthority,
             };
-            finalIdentifiers.push(data);
+            finalIdentifiers.push(identifierData);
         });
-        console.log(finalIdentifiers, 'finalIdentifiers');
         const payload = {
             id: id,
-            ...(data?.nationalIdNumber && { nationalIdNumber: data.nationalIdNumber }),
-            ...(data?.sex && { birthSex: { code: data.sex } }),
-            ...(data?.genderIdentity && { gender: data.genderIdentity }),
-            ...(data?.sexualOrientation && { sexualOrientation: data.sexualOrientation }),
-            // ✅ Fixing Race & Ethnicity Structure
-            ...(data?.race && { race: [{ system: 'http://hl7.org/fhir/v3/Race', code: data.race }] }),
-            // ...(data?.ethnicity && {
-            // }),
-            ethnicity: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: eth }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: tri }],
-            trible: [{ system: 'http://hl7.org/fhir/v3/Ethnicity', display: rela }],
+            birthSex: [
+                {
+                    ...selectedSexOption,
+                    code: selectedSexOption?.value,
+                    display: selectedSexOption?.label,
+                    system: selectedSexOption?.system,
+                }
+            ],
 
-
-
-            // ✅ Fixing Marital Status Structure
-            ...(data?.maritalStatus && {
-                maritalStatus: {
-                    coding: [
-                        {
-                            system: 'http://terminology.hl7.org/CodeSystem/v3-MaritalStatus',
-                            code: data.maritalStatus,
-                            display: data.maritalStatusDisplay || '',
-                        },
-                    ],
+            genderIdentity: [
+                {
+                    ...selectedGenderIdentity,
+                    code: selectedGenderIdentity?.value,
+                    display: selectedGenderIdentity?.show,
+                    text: selectedGenderIdentity?.label,
                 },
-            }),
-
+            ],
+            sexParameterForClinicalUse: [
+                {
+                    ...selectedSexualOrientation,
+                    code: selectedSexualOrientation?.value,
+                    display: selectedSexualOrientation?.show,
+                    text: selectedSexualOrientation?.label,
+                    system: selectedSexualOrientation?.system,
+                },
+            ],
+            personalPronouns: [
+                {
+                    ...selectedPersonalPronouns,
+                    code: selectedPersonalPronouns?.value,
+                    display: selectedPersonalPronouns?.show,
+                    text: selectedPersonalPronouns?.label,
+                    system: selectedPersonalPronouns?.system,
+                },
+            ],
+            // ✅ Fixing Race
+            race: [
+                {
+                    ...selectedRaceOption,
+                    code: selectedRaceOption?.code,
+                    display: selectedRaceOption?.display,
+                    text: selectedRaceOption?.display,
+                },
+            ],
+            // ✅ Fixing Ethnicity
+            ethnicity: [
+                {
+                    ...eth,
+                    text: eth?.display,
+                },
+            ],
+            // ✅ Fixing Tribal Entity
+            tribalAffiliation: [
+                {
+                    ...tri,
+                    text: tri?.display,
+                },
+            ],
+            // ✅ Fixing Marital Status Structure
+            maritalStatus: [
+                {
+                    ...selectedMaritalStatus,
+                    code: selectedMaritalStatus?.value,
+                    display: selectedMaritalStatus?.show,
+                    text: selectedMaritalStatus?.label,
+                    system: selectedMaritalStatus?.system,
+                },
+            ],
             // ✅ Fixing Preferred Language Structure
             ...(data?.preferredLanguage && {
                 communication: [
@@ -204,35 +294,42 @@ const Demographicdetails = ({ patientId }) => {
                     },
                 ],
             }),
-
-            ...(data?.patientStudentStatus && { patientStudentStatus: data.patientStudentStatus }),
             ...(data?.notes && { notes: data.notes }),
-            ...(data?.epsdtServices && { epsdtServices: data.epsdtServices }),
-            ...(data?.epsdtReferralCondition && { epsdtReferralCondition: data.epsdtReferralCondition }),
-
             // ✅ Fixing Emergency Contact Field
-            ...(data?.emergencyContactName && {
-                contact: [
-                    {
-                        relationship: [{ text: data?.emergencyContactRelation }],
-                        name: { text: data?.emergencyContactName },
-                        telecom: [{ system: 'phone', value: data?.emergencyContactPhone.replace(/\D/g, '') }],
-                    },
-                ],
-            }),
+            // ...(data?.emergencyContactName && {
+            // contact: [
+            //     {
+            //         relationship: [{...rela,text:rela.display}],
+            //         name: { text: data?.emergencyContactName },
+            //         telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
 
-            ...(data?.employerName && { employerName: data.employerName }),
-            ...(data?.employerPhone && {
-                employerPhone: data.employerPhone ? data.employerPhone.replace(/\D/g, '') : '',
-            }),
+            //     },
+            // ],
+            contact: [
+                {
+                    relationship: [
+                        {
+                            coding: [rela], //code:'I" , system:url, display:'Ins Company
+                            text: data?.emergencyContactName,
+                        }],
+                    telecom: [
+                        {
+                            system: 'phone',
+                            value: data?.emergencyContactPhone?.replace(/\D/g, ''),
+                            use: 'home',
+                        },
+                    ],
+                },
+            ],
             // ✅ Fixing Employer Address (No latitude/longitude/timeZone)
             employerDetails: {
                 employerName: data?.employerName,
-                employerPhone: data?.employerPhone ? data.employerPhone.replace(/\D/g, '') : '', // ✅ Fixed
+                employerPhone: data?.employerPhone?.replace(/\D/g, ''),
                 employmentStatus: data?.employmentStatus,
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -240,11 +337,11 @@ const Demographicdetails = ({ patientId }) => {
                     },
                 },
             },
-
             identifier: finalIdentifiers,
             address: demographicAddresses,
+            ...(data?.notes && { notes: data.notes }),
         };
-        console.log('Payload:', payload);
+        // console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
@@ -272,7 +369,7 @@ const Demographicdetails = ({ patientId }) => {
             if (data) {
                 setSearchedEmployerLocations(data?.results);
             } else {
-                console.log('No data returned.');
+                // console.log('No data returned.');
             }
         });
     };
@@ -292,18 +389,20 @@ const Demographicdetails = ({ patientId }) => {
 
     const [eth, setEth] = useState(null); // Store selected ethnicity
     const handleEthnicityChange = (selectedOption) => {
-        setEth(selectedOption?.value?.display); // Store value in state
+        setEth(selectedOption?.value); // Store value in state
     };
     const [rela, setRela] = useState(null); // Store selected relationship
     const handleRelationChange = (selectedOption) => {
-        setRela('relation', selectedOption ? selectedOption.display : '');
+        setRela(selectedOption ? selectedOption.value : '');
     };
-const [tri, setTri] = useState(null); // Store selected tribal entity
+    const [tri, setTri] = useState(null); // Store selected tribal entity
     const handleTribalChange = (selectedOption) => {
-        setTri('tribal', selectedOption ? selectedOption.display : '');
+        setTri(selectedOption ? selectedOption.value : '');
     };
     const [identifiers, setIdentifiers] = useState([]);
-
+    const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display === eth);
+    const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) || formattedTribleOptions.find((option) => option?.value?.code == tri);
+    const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     return (
         <div className="scroll-container" style={{ overflow: 'scroll', height: '65vh' }}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
@@ -317,7 +416,7 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    onChange={(data) => console.log('Updated Identifiers:', data)}
+                // onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -356,22 +455,6 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
 
                     <Col sm={3}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Sexual Orientation</Form.Label>
-                            <Form.Select {...register('sexualOrientation')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                <option value="Heterosexual">Heterosexual</option>
-                                <option value="Lesbian or gay">Lesbian or gay</option>
-                                <option value="Bisexual">Bisexual</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Choose not to disclose">Choose not to disclose</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
                             <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
                             <Form.Select {...register('sexParameter')}>
                                 <option value="" hidden>
@@ -406,7 +489,7 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display}>
+                                    <option key={race.code} value={race.display} className='text-capitalize'>
                                         {race.display}
                                     </option>
                                 ))}
@@ -423,12 +506,14 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select"
+                                // value={
+                                // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
+                                // } // Show selected value
                                 value={
-                                    formattedEthnicityOptions.find((option) => option?.value?.display === eth) ||
-                                    null
-                                } // Show selected value
+                                    selectedEthnicityOption
+                                }
                                 onChange={handleEthnicityChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -474,13 +559,13 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
+                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
                                 value={
-                                    formattedTribleOptions.find((option) => option?.value?.display === tri) ||
-                                    null
-                                } // Show selected value
+                                    selectedTribleOption
+                                }
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -506,7 +591,7 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                             <Form.Select id="marital" {...register('maritalStatus')}>
                                 <option value="">Select marital status</option>
                                 {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                    <option key={option.value} value={option?.show}>
                                         {option.show}
                                     </option>
                                 ))}
@@ -606,12 +691,12 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                 className="basic-single"
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
+                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 value={
-                                    relationshipOption.find((option) => option?.value?.display === rela) ||
-                                    null
-                                } // Show selected value
+                                    selectedRelationOption
+                                }
                                 onChange={handleRelationChange}
-                                onMenuOpen={() => console.log('Dropdown Opened')}
+                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -785,11 +870,10 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -897,7 +981,7 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col sm={6}>
+                                    {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -909,7 +993,7 @@ const [tri, setTri] = useState(null); // Store selected tribal entity
                                                 <span className="text-danger">{errors.employerTimeZone.message}</span>
                                             )}
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                 </Row>
                             </Col>
                         </Row>

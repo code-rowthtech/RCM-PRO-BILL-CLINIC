@@ -95,10 +95,9 @@ const PatientDetails = ({ patientId }) => {
             setValue('suffix', patientDetails?.name?.[0]?.suffix?.[0] || '');
             setValue('title', patientDetails?.name?.[0]?.suffix?.[0] || '');
             setValue('approxAge', patientDetails?.approxAge || '');
-
             setValue(
                 'dateOfBirth',
-                patientDetails?.birthDate ? new Date(patientDetails.birthDate).toISOString().split('T')[0] : ''
+                patientDetails?.birthDate ? new Date(patientDetails?.birthDate).toISOString().split('T')[0] : ''
             );
             setValue('gender', patientDetails?.gender || '');
             setValue('maritalStatus', patientDetails?.maritalStatus?.coding?.[0]?.code || '');
@@ -108,7 +107,6 @@ const PatientDetails = ({ patientId }) => {
             setValue('preferredCommunication',patientDetails?.preferredCommunication || '');
             setValue('reminderLanguage' , patientDetails?.reminderLanguage || '');
             setValue('previousBirthName' , patientDetails?.name[1]?.text || '');
-
             setValue('title', patientDetails?.name[0]?.prefix[0] || '')
             // Extracting telecom details
             const homePhone =
@@ -138,13 +136,13 @@ const PatientDetails = ({ patientId }) => {
             // Setting follow-up details
             setValue(
                 'followupDate',
-                patientDetails?.followupDate ? new Date(patientDetails.followupDate).toISOString().split('T')[0] : ''
+                patientDetails?.followupDate ? new Date(patientDetails?.followupDate).toISOString().split('T')[0] : ''
             );
             setValue('followupReason', patientDetails?.followupReason || '');
 
             // Setting profile picture
-            setLogo(patientDetails.photo[0].url);
-            setLogoName(patientDetails.photo[0].title); // Set file name for display
+            setLogo(patientDetails?.photo[0]?.url);
+            setLogoName(patientDetails?.photo[0]?.title); // Set file name for display
         }
     }, [patientDetails, doctorDetails]);
 
@@ -157,7 +155,7 @@ const PatientDetails = ({ patientId }) => {
             followupDate: data?.followupDate || '',
             gender: data?.gender || '',
             followupReason: data?.followupReason || '',
-            medicationHistoryConsent: data?.medicationHistoryConsent ?? false,
+            medicationHistoryConsent: true,
             patientCopayAmount: data?.patientCopayAmount || '0',
             paymentProfile: data?.paymentProfile || '',
             preferredCommunication: data?.preferredCommunication || '',
@@ -226,6 +224,7 @@ const PatientDetails = ({ patientId }) => {
         }
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload,'main')
     };
 
     const handleInputChange = (data) => {
@@ -262,6 +261,20 @@ const PatientDetails = ({ patientId }) => {
                                 {...register('firstName', { required: 'First name is required' })}
                             />
                             {errors.firstName && <span className="text-danger">{errors.firstName.message}</span>}
+                        </Form.Group>
+                    </div>
+                    <div className="col-md-3 col-12">
+                        <Form.Group>
+                            <Form.Label htmlFor="middleName" className="mb-0">
+                                Middle Name
+                            </Form.Label>
+                            <Form.Control
+                                id="middleName"
+                                type="text"
+                                placeholder="Middle Name"
+                                {...register('middleName')}
+                            />
+                            {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
                         </Form.Group>
                     </div>
                     <div className="col-md-3 col-12">
@@ -418,7 +431,7 @@ const PatientDetails = ({ patientId }) => {
                                 {logoName
                                     ? logoName.length > 25
                                         ? `${logoName.substring(0, 22)}...`
-                                        : logoName
+                                        : logoName.split('/').pop().slice(0, 30) + '...'
                                     : profileUploading
                                     ? 'Uploading...'
                                     : 'Upload Patient Chart Photo'}
@@ -474,20 +487,7 @@ const PatientDetails = ({ patientId }) => {
                             </Form.Select>
                         </Form.Group>
                     </div>
-                    <div className="col-md-3 col-12">
-                        <Form.Group>
-                            <Form.Label htmlFor="middleName" className="mb-0">
-                                Middle Name
-                            </Form.Label>
-                            <Form.Control
-                                id="middleName"
-                                type="text"
-                                placeholder="Middle Name"
-                                {...register('middleName')}
-                            />
-                            {errors.middleName && <span className="text-danger">{errors.middleName.message}</span>}
-                        </Form.Group>
-                    </div>
+              
                     <div className="col-md-3 col-12">
                         <Form.Group className="mb-1 position-relative">
                             <Form.Label className="mb-0">Home Phone</Form.Label>
@@ -673,7 +673,7 @@ const PatientDetails = ({ patientId }) => {
                 <Row>
                     <div className="col-md-3 col-12">
                         <Form.Group controlId="doctorName">
-                            <Form.Label className="mb-0">Select Doctor Name</Form.Label>
+                            <Form.Label className="mb-0">Primary Provider( Doctor Name)</Form.Label>
                             <Form.Control
                                 as="select"
                                 className="border-0"
@@ -701,7 +701,7 @@ const PatientDetails = ({ patientId }) => {
                     </div>
                     <div className="col-md-3 col-12">
                         <Form.Group>
-                            <Form.Label className="mb-0">Medication History Concent</Form.Label>
+                            <Form.Label className="mb-0">Medical History Concent</Form.Label>
                             <Form.Select {...register('medicationHistoryConsent')}>
                                 <option value="">Select Medication History Concent</option>
                                 <option value={'true'}>Yes</option>

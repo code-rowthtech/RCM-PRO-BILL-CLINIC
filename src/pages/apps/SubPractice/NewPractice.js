@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, InputGroup, Modal, Row, Spinner, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FiDownloadCloud, FiEdit, FiEye, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
+import { FiInfo } from 'react-icons/fi';
+
 // import EmailToSubClinicModal from './EmailToSubClinicModal';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -28,7 +30,6 @@ import {
 import ToastHandle from '../../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../../helpers/noSpace';
 import { MdOutlineRadioButtonChecked, MdOutlineRadioButtonUnchecked } from 'react-icons/md';
-import { stateEmptydAction } from '../../../redux/clinics/actions';
 const NewPractice = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
@@ -88,11 +89,13 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log('clinicsDataGet', clinicsDataGet);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
+    // console.log(store?.createSubClinicsReducer, 'createSubresponse')
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null);
@@ -176,12 +179,11 @@ const NewPractice = () => {
         }
     }, [stateToSelect]);
 
+
     const handleStateSelection = (e) => {
-        const stateCode = e.target.value;
-        if (stateCode) {
-            setStateToSelect(stateCode);
-            dispatch(getCitiesAction({ state_code: stateCode, name: '', limit: 25, skip: '' }));
-        }
+        const selectedOption = e.target.selectedOptions[0];
+        const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25, skip: '' }));
     };
 
     const handleCitySelection = (e) => {
@@ -254,7 +256,7 @@ const NewPractice = () => {
                 };
                 return updatedDetails;
             });
-        } catch (error) {}
+        } catch (error) { }
     };
     const [formData, setFormData] = useState({
         clinicname: '',
@@ -265,9 +267,7 @@ const NewPractice = () => {
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
-            if (clinicsDataGet?.orgType) {
-                setValue('clinicType', clinicsDataGet?.orgType);
-            }
+            setValue('clinicType', clinicsDataGet?.orgType);
             setValue('clinicname', clinicsDataGet?.name);
             setValue('email', clinicsDataGet?.userId?.email);
             if (clinicsDataGet?.orgLogo) {
@@ -280,11 +280,11 @@ const NewPractice = () => {
                     type: data.identifierType || '',
                     number: data?.value || '',
                     // file: data?.file|| '',
-                    file: data?.documents?.[0]
+                    file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0].split('/').pop(), // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -331,7 +331,7 @@ const NewPractice = () => {
                     state: addr.state || '',
                     postalCode: addr.postalCode || '',
                     country: addr.country || '',
-                })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]
+                })) || [{ use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]
             );
 
             // ✅ Set POCs (Point of Contacts)
@@ -502,13 +502,10 @@ const NewPractice = () => {
     };
 
     useEffect(() => {
-        if (createResponseOfSubClinics === 200) {
-            if (!isModalRequest) {
-                navigate('/apps/crm/addclinic');
-                dispatch(stateEmptydAction());
-            }
+        if (createResponseOfSubClinics === 200 && !isModalRequest) {
+            navigate('/apps/crm/addclinic');
         } else if (createResponseOfSubClinics === 400) {
-            console.error('Error creating/updating the sub-clinic');
+            console.error('Error creating / updating the sub-clinic');
         }
     }, [createResponseOfSubClinics]);
 
@@ -658,7 +655,7 @@ const NewPractice = () => {
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
-    const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
+    const addressUses = ['work', 'temp', 'old', 'billing', 'mailing', 'primary'];
     const uses = ['usual', 'old', 'temp', 'secondary', 'official'];
     const identifierOptions = [
         'NPI',
@@ -686,7 +683,7 @@ const NewPractice = () => {
         period: { start: new Date().toISOString() },
     });
     const [addresses, setAddresses] = useState([
-        { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }, // Default address
+        { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
@@ -722,7 +719,7 @@ const NewPractice = () => {
         setConstantContact([...constantContact, { system: '', value: '', use: '' }]);
     };
     const addAddress = () => {
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: '' }]);
+        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
     };
 
     // Function to Remove Fields
@@ -887,9 +884,8 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${
-                                                    activeTab === 'personalDetails' ? 'active' : ''
-                                                }`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
+                                                    }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
                                                 Practice Sub Information
                                             </button>
@@ -937,7 +933,6 @@ const NewPractice = () => {
                                                             onChange={(e) =>
                                                                 formDataChange('clinicname', e.target.value)
                                                             }
-                                                            value={formData?.clinicname}
                                                             placeholder="Practice name"
                                                         />
                                                         {errors.clinicname && (
@@ -983,7 +978,6 @@ const NewPractice = () => {
                                                             type="email"
                                                             data-has-value={!!watch('email')}
                                                             placeholder="Email"
-                                                            value={formData?.email}
                                                             {...register('email', {
                                                                 required: 'Email is required',
                                                                 pattern: {
@@ -1003,15 +997,14 @@ const NewPractice = () => {
                                                     <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                            logoName ? '' : 'custom-form-fields'
-                                                        }`}
+                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
+                                                            }`}
                                                         data-has-value={!!logoName}>
                                                         {logoUploading
                                                             ? 'Uploading...'
                                                             : typeof logoName === 'string' && logoName
-                                                            ? logoName.split('/').pop().slice(0, 30) + '...'
-                                                            : 'Upload Logo'}
+                                                                ? logoName.split('/').pop().slice(0, 30) + '...'
+                                                                : 'Upload Logo'}
 
                                                         <div className="d-flex align-items-center gap-2">
                                                             {/* Eye Icon for Preview */}
@@ -1063,9 +1056,24 @@ const NewPractice = () => {
                                                             <Col>
                                                                 <Form.Label>Identifier Number</Form.Label>
                                                             </Col>
-                                                            <Col>
+                                                            <Col className="d-flex align-items-center gap-2">
                                                                 <Form.Label>Identifier Document</Form.Label>
+
+                                                                {/* Tooltip Icon */}
+                                                                <OverlayTrigger
+                                                                    placement="top"
+                                                                    overlay={
+                                                                        <Tooltip id="tooltip-identifier">
+                                                                            File size should be less than 2MB. Supported
+                                                                            formats: JPG, PNG, JPEG, PDF.
+                                                                        </Tooltip>
+                                                                    }>
+                                                                    <span className="text-secondary cursor-pointer mb-2">
+                                                                        <FiInfo size={15} />
+                                                                    </span>
+                                                                </OverlayTrigger>
                                                             </Col>
+
                                                             <Col>
                                                                 <Form.Label>Issuing Authority</Form.Label>
                                                             </Col>
@@ -1125,8 +1133,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                ? 5
-                                                                                : undefined
+                                                                                    ? 5
+                                                                                    : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -1191,11 +1199,10 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                            item.file
-                                                                                ? 'form-control'
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
+                                                                            ? 'form-control'
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         {item.file?.name
                                                                             ? item.file.name.length > 30
                                                                                 ? item.file.name.slice(0, 25) + '...'
@@ -1264,6 +1271,7 @@ const NewPractice = () => {
                                                                                 ? formatDateForInput(item.expiry)
                                                                                 : ''
                                                                         }
+                                                                        min={new Date().toISOString().split("T")[0]} // Sets min date to today
                                                                         onChange={(e) =>
                                                                             handleChange(
                                                                                 index,
@@ -1376,10 +1384,8 @@ const NewPractice = () => {
                                                                         <option value="">Select Option</option>{' '}
                                                                         {/* Placeholder option */}
                                                                         <option value="temp">Temp</option>
-                                                                        <option value="home">Home</option>
                                                                         <option value="work">Work</option>
                                                                         <option value="old">Old</option>
-                                                                        <option value="mobile">Mobile</option>
                                                                         {/* Add more options as needed */}
                                                                     </Form.Select>
                                                                     {index >= contactDetails.length && (
@@ -1487,7 +1493,7 @@ const NewPractice = () => {
                                                                                             use: item.use, // preserve existing use
                                                                                             line: [
                                                                                                 components.road ||
-                                                                                                    formatted,
+                                                                                                formatted,
                                                                                             ],
                                                                                             city:
                                                                                                 components.city ||
@@ -1531,18 +1537,28 @@ const NewPractice = () => {
                                                                     </div>
                                                                 )}
                                                         </Col>
+
                                                         <Col sm={4} className="mb-2">
                                                             <Form.Label className="mb-1">State</Form.Label>
                                                             <Form.Select
                                                                 {...register(`address[${index}].state`)}
                                                                 data-has-value={!!getValues(`address[${index}].state`)}
-                                                                onChange={handleStateSelection}>
+                                                                value={item?.state}
+                                                                onChange={(e) => {
+                                                                    handleStateSelection(e);
+                                                                    const updatedAddresses = [...addresses];
+                                                                    updatedAddresses[index] = {
+                                                                        ...updatedAddresses[index],
+                                                                        state: e.target.value,
+                                                                    };
+                                                                    setAddresses(updatedAddresses);
+                                                                }}>
                                                                 <option value="">Select State</option>
                                                                 {statesData?.states?.map((data) => (
                                                                     <option
                                                                         key={data?.name}
                                                                         data-key={data?.id}
-                                                                        value={data?.state_code}>
+                                                                        value={data?.name}>
                                                                         {data?.name}
                                                                     </option>
                                                                 ))}
@@ -1553,9 +1569,7 @@ const NewPractice = () => {
                                                             <Form.Select
                                                                 data-has-value={!!getValues(`address[${index}].city`)}
                                                                 {...register(`address[${index}].city`)}
-                                                                disabled={
-                                                                    !selectedState || store?.getCitiesReducer?.loading
-                                                                }>
+                                                            >
                                                                 <option value="">
                                                                     {store?.getCitiesReducer?.loading
                                                                         ? 'Loading...'
@@ -1568,7 +1582,7 @@ const NewPractice = () => {
                                                                 ))}
                                                             </Form.Select>
                                                         </Col>
-                                                        <Col sm={4}>
+                                                        <Col sm={4} className="position-relative">
                                                             <Form.Group className="mb-2">
                                                                 <Form.Label className="mb-1">Postal Code</Form.Label>
                                                                 <Form.Control
@@ -1590,6 +1604,14 @@ const NewPractice = () => {
                                                                     maxLength={5}
                                                                     onKeyPress={handleFirstSpace}
                                                                 />
+                                                                {addresses.length > 1 && index !== 0 && (
+                                                                    <span
+                                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                                                                        style={{ right: '-2%', top: '50%' }}
+                                                                        onClick={() => removeAddress(index)}>
+                                                                        <CiCircleMinus />
+                                                                    </span>
+                                                                )}
                                                                 {errors.postalCode && (
                                                                     <span className="text-danger">
                                                                         {errors.postalCode.message}
@@ -1598,7 +1620,7 @@ const NewPractice = () => {
                                                             </Form.Group>
                                                         </Col>
 
-                                                        <Col sm={4} className="position-relative">
+                                                        {/* <Col sm={4} className="position-relative">
                                                             <Form.Label className="mb-1">Country</Form.Label>
                                                             <Form.Control
                                                                 type="text"
@@ -1612,15 +1634,8 @@ const NewPractice = () => {
                                                                     )
                                                                 }
                                                             />
-                                                            {addresses.length > 1 && index !== 0 && (
-                                                                <span
-                                                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                    style={{ right: '-2%', top: '50%' }}
-                                                                    onClick={() => removeAddress(index)}>
-                                                                    <CiCircleMinus />
-                                                                </span>
-                                                            )}
-                                                        </Col>
+                                                           
+                                                        </Col> */}
                                                     </Row>
                                                 ))}
                                                 <hr className="mb-1" />

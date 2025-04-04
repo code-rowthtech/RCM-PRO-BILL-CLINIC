@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getPatientsByAppointmentAction } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import Spinner from '../constants/Spinner';
-import { Button, Col,  Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
 
 type SideBarContentProps = {
@@ -82,7 +82,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     }, []);
 
     const createPatientsResponse = store?.createPatientsReducer?.data?.status;
-    const doctorDetails = store?.getDoctorsReducer?.data?.response;
+    const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const appointmentDetails = [];
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
@@ -109,14 +109,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
-    useEffect(() => {
-        const payload = { status: true, search: doctorSearch }
-        dispatch(getDoctorsAction({ key: encryptMessage(payload) }));
-    }, [dispatch, doctorSearch])
-
-    const closeModal = () => {
-        // setFilter(false);
-    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -200,7 +192,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     };
 
     const getAppointments = () => {
-        closeModal();
         if (selectedDoctor) {
             const payload = {
                 doctorId: selectedDoctor,
@@ -216,7 +207,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '60px' }} ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
                     <>
-                        {!isCondensed ? 
+                        {!isCondensed ?
                             <ul style={{ listStyle: 'none' }} className='px-0'>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
                                     <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
@@ -311,12 +302,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                             </li>
                                         ))
                                 }
-                                
+
                                 {showFilterDropDown && (
                                     <div
                                         ref={filterDropdownRef}
                                         className="position-absolute bg-white border p-1 rounded shadow-sm"
-                                        style={{ top: "15vh", left: "15vw", zIndex: 1002 , width: '500px' }}
+                                        style={{ top: "15vh", left: "15vw", zIndex: 1002, width: '500px' }}
                                     >
                                         <Row className=" pb-2 ">
                                             <Col sm={12} className="text-end">
@@ -400,22 +391,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                                     />
                                                     <div>
                                                         <p className="mb-0 mt-1 text-capitalize" style={{ fontSize: '12px' }}>
-                                                            {data?.patient?.firstName} 
+                                                            {data?.patient?.firstName}
 
                                                         </p>
                                                         <p className="mb-0 " style={{ fontSize: '10px' }}>Dr.{data?.doctor?.userId?.firstName} </p>
                                                     </div>
                                                 </div>
-                                              
+
                                             </li>
                                         ))
                                 }
-                                
+
                                 {showFilterDropDown && (
                                     <div
                                         ref={filterDropdownRef}
                                         className="position-absolute bg-white border p-1 rounded shadow-sm"
-                                        style={{ top: "15vh", left: "15vw", zIndex: 1002 , width: '500px' }}
+                                        style={{ top: "15vh", left: "15vw", zIndex: 1002, width: '500px' }}
                                     >
                                         <Row className=" pb-2 ">
                                             <Col sm={12} className="text-end">
@@ -464,7 +455,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     </div>
                                 )}
                             </ul>
-}
+                        }
                     </>
                     :
                     <>

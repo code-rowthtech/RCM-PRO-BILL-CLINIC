@@ -4,13 +4,13 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 import { encryptMessage } from '../../../cryptoUtils';
-import { stateEmptydAction } from '../../../redux/actions';
 
 const DoctorHoliday = () => {
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const scheduleResponse = store?.getScheduleReducer?.data?.holidays || [];
+  console.log('scheduleResponse', scheduleResponse)
   const isLoading = store?.getScheduleReducer?.loading;
   const deleteResponse = store?.deleteScheduleReducer?.data?.response?.status;
   useEffect(() => {
@@ -21,7 +21,6 @@ const DoctorHoliday = () => {
   }, [dispatch]);
   useEffect(() => {
     if (deleteResponse === 200) {
-      dispatch(stateEmptydAction())
       const payload = {
         clinicId: clinicId,
       };
@@ -63,7 +62,7 @@ const DoctorHoliday = () => {
             scheduleResponse.map((holiday, index) => (
               <tr key={holiday?.id || index}>
                 <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                <td className='text-capitalize ' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.doctorId?.userId?.firstName + ' ' + holiday?.doctorId?.userId?.lastName}</td>
+                <td className='text-capitalize ' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.doctorId?.name[0]?.text + ' ' }</td>
                 <td className='text-capitalize ' style={{ fontSize: '13px', fontWeight: '400' }}>{holiday?.reason ? holiday?.reason : 'N/A'}</td>
                 <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
                   <div className="  text-white text-center bg-secondary rounded-2" style={{ width: '100px' }}>

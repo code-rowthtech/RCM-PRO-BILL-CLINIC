@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form } from 'react-bootstrap';
-import { FiDownloadCloud } from 'react-icons/fi';
+import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { FiDownloadCloud, FiInfo } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
@@ -8,21 +8,15 @@ import { useSelector } from 'react-redux';
 
 const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, identifiers }) => {
     const {
-        register,
-        handleSubmit,
         formState: { errors },
-        reset,
-        watch,
         setValue,
-        getValues,
-        setError,
-        clearErrors,
+        watch,
     } = useForm();
-const store=useSelector((state)=>state);   
+    const store = useSelector((state) => state);
 
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
-    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
 
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
@@ -50,7 +44,6 @@ const store=useSelector((state)=>state);
         'Dun & Bradstreet',
         'Other',
     ];
-
     useEffect(() => {
         if (identifiers.length === 0) {
             setIdentifiers(
@@ -66,9 +59,9 @@ const store=useSelector((state)=>state);
         }
     }, [defaultIdentifiers, setIdentifiers, identifiers.length]);
 
-    useEffect(() => {
-        onChange?.(identifiers);
-    }, [identifiers, onChange]);
+    // useEffect(() => {
+    //     onChange?.(identifiers);
+    // }, [identifiers, onChange]);
 
     const addIdentifier = () => {
         setIdentifiers([
@@ -87,6 +80,7 @@ const store=useSelector((state)=>state);
         updatedIdentifiers[index][field] = value;
         setIdentifiers(updatedIdentifiers);
     };
+
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
@@ -108,11 +102,27 @@ const store=useSelector((state)=>state);
             console.error('Error during file upload:', error);
         }
     };
-    useEffect(()=>{
-if(doctorDetails){
-    setIdentifiers(doctorDetails?.identifier)
-}
-    },[doctorDetails])
+    useEffect(() => {
+        if (doctorDetails) {
+            if (doctorDetails) {
+                // Set qualifications data
+                const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
+                    expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
+                    file: item?.documents?.[0],
+                    issuingAuthority: item?.issuingAuthority,
+                    number: item?.value,
+                    system: '',
+                    type: {
+                        code: item?.sliceName || '',
+                        label: item?.identifierType || '',
+                        value: item?.system || '',
+                    },
+                }));
+                setIdentifiers(updatedIdentifiers);
+                setValue('specialist', doctorDetails?.specialties?.[0]);
+            }
+        }
+    }, [doctorDetails]);
     return (
         <>
             <Row>
@@ -134,8 +144,21 @@ if(doctorDetails){
                 <Col>
                     <Form.Label>Identifier Number</Form.Label>
                 </Col>
-                <Col>
+                <Col className="d-flex align-items-center gap-2">
                     <Form.Label>Identifier Document</Form.Label>
+
+                    {/* Tooltip Icon */}
+                    <OverlayTrigger
+                        placement="top"
+                        overlay={
+                            <Tooltip id="tooltip-identifier">
+                                File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
+                            </Tooltip>
+                        }>
+                        <span className="text-secondary cursor-pointer mb-2">
+                            <FiInfo size={15} />
+                        </span>
+                    </OverlayTrigger>
                 </Col>
                 <Col>
                     <Form.Label>Issuing Authority</Form.Label>
@@ -150,43 +173,44 @@ if(doctorDetails){
                 <Row key={index} className="mb-2">
                     <Col>
                         <Form.Select
-                            value={item?.type?.value || ''}
+                            value={item?.system || item?.type?.value || ''}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
-                                const selectedSystem = item?.system
-                                handleChange(index, 'type', selectedType,'system',selectedSystem);
+                                handleChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
-                            <option value="" disabled>
-                                Select Identifier Type
-                            </option>
+                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
+                        >
+                            <option value="" disabled>Select Identifier Type</option>
                             {identifierOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
                         </Form.Select>
+
                     </Col>
 
                     <Col>
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            value={item.number}
+                            maxLength={10}
+                            value={item?.number || item?.value}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col className="mb-2 position-relative">
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${
-                                item?.file?.name ? 'form-control' : 'custom-form-fields'
-                            }`}>
-                            {item?.file?.name
-                                ? item.file.name.length > 30
-                                    ? item.file.name.slice(0, 25) + '...'
-                                    : item.file.name
-                                : 'Upload Document'}
+                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
+                                }`}>
+                            {identifierDocument
+                                ? 'Uploading...'
+                                : item.file?.name
+                                    ? item.file.name.length > 30
+                                        ? item.file.name.slice(0, 25) + '...'
+                                        : item.file.name
+                                    : 'Upload Document'}
                             <p className="mb-0">
                                 <FiDownloadCloud />
                             </p>
@@ -203,7 +227,7 @@ if(doctorDetails){
 
                     <Col>
                         <Form.Select
-                            value={item.issuingAuthority}
+                            value={item?.issuingAuthority || ''}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
                             <option value="" disabled>
                                 Select Issuing Authority
@@ -219,13 +243,14 @@ if(doctorDetails){
                     <Col>
                         <Form.Control
                             type="date"
-                            value={item?.expiry || ''}
+                            value={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : ''}
+                            min={new Date().toISOString().split('T')[0]}
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
                         {index >= defaultIdentifiers?.length && (
                             <span
-                                className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                style={{ right: '-2%', top: '12%' }}
+                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                                style={{ marginTop: '-29px', right: '9px' }}
                                 onClick={() => removeIdentifier(index)}>
                                 <CiCircleMinus />
                             </span>

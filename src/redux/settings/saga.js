@@ -24,6 +24,10 @@ function* createMastersDataFunction(data) {
                 type: SettingsActionTypes.CREATE_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: SettingsActionTypes.CREATE_MASTERS_DATA_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: SettingsActionTypes.CREATE_MASTERS_DATA_ERROR,
@@ -137,6 +141,10 @@ function* updateMastersDataFunction(data) {
                 type: SettingsActionTypes.UPDATE_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: SettingsActionTypes.UPDATE_MASTERS_DATA_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: SettingsActionTypes.UPDATE_MASTERS_DATA_ERROR,
@@ -152,7 +160,7 @@ function* updateMastersDataFunction(data) {
 }
 
 export function* callStateEmpty() {
-   yield put({
+    yield put({
         type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });
@@ -190,7 +198,7 @@ function* settingsSaga() {
         fork(watchGetDepartmentData),
         fork(watchUpdateMastersData),
         fork(watchresetState),
-        fork(watchGetMasters2Data) 
+        fork(watchGetMasters2Data)
     ]);
 }
 export default settingsSaga;
