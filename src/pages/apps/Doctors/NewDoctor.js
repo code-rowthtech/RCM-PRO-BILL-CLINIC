@@ -15,6 +15,8 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons for eye visi
 import { getDepartmentDataAction } from '../../../redux/settings/action';
 import AddressForm from '../Common Pages/AddressForm';
 import { FiUploadCloud } from 'react-icons/fi';
+import DoctorAddress from './DoctorAddressForm';
+import DoctorQualifications from './Qualifications';
 
 
 const NewDoctor = () => {
@@ -44,7 +46,7 @@ const NewDoctor = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const password = watch('password');
     const [demographicAddresses, setDemographicAddresses] = useState([
-        { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+        { type: 'primary', line: [''], city: '', state: '', postalCode: '', country: '', telecom: [{ system: 'phone', value: '', use: 'work' }, { system: 'fax', value: '', use: 'work' }] },
     ]);
     const statesData = store?.getStatesReducer?.data;
     const dispatch = useDispatch();
@@ -178,6 +180,7 @@ const NewDoctor = () => {
                 }
             ],
             address: demographicAddresses,
+            specialties: [data?.specialist],
         };
         if (updateId) {
             dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
@@ -256,30 +259,6 @@ const NewDoctor = () => {
         }
     }, [passwordValue, doctorRoleId, id]);
 
-
-    // useEffect(() => {
-    //     const isFormValid =
-    //         formData?.firstName?.trim()?.length >= 3 &&
-    //         /^[a-zA-Z]{3,}$/.test(formData.firstName) &&
-    //         formData?.lastName?.trim()?.length >= 3 &&
-    //         /^[a-zA-Z]{3,}$/.test(formData.lastName) &&
-    //         formData?.dateOfBirth &&
-    //         new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18)) &&
-    //         formData?.email?.trim()?.length > 0 &&
-    //         /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
-    //         formData?.gender &&
-    //         (id || (
-    //             formData?.password?.trim()?.length >= 8 &&
-    //             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(formData.password) &&
-    //             formData?.confirmPassword === formData?.password
-    //         ));
-
-    //     console.log("Form Data:", formData);
-    //     console.log("Is Form Valid:", isFormValid);
-
-    //     setIsButtonDisabled(!isFormValid);
-    // }, [formData, id]);
-
     useEffect(() => {
         const isFirstNameValid = formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName);
         const isLastNameValid = formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName);
@@ -332,6 +311,14 @@ const NewDoctor = () => {
                                                         onClick={() => handleTabChange("departmentDetails")}
                                                     >
                                                         Professional Information
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item">
+                                                    <button
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === "qualifications" ? "active" : ""}`}
+                                                        onClick={() => handleTabChange("qualifications")}
+                                                    >
+                                                        Qualifications
                                                     </button>
                                                 </li>
                                             </ul>
@@ -638,7 +625,6 @@ const NewDoctor = () => {
                                                                                 value === watch("password") || 'Passwords do not match',
                                                                             onChange: (e) => {
                                                                                 clearErrors('confirmPassword');
-                                                                                console.log(e.target.value, "onChange Triggered"); // Debugging
                                                                                 setFormData((prev) => ({
                                                                                     ...prev,
                                                                                     confirmPassword: e.target.value
@@ -684,9 +670,22 @@ const NewDoctor = () => {
                                                                 }
                                                             </div>
                                                         </div>
+                                                        <div className="col-md-3 col-12">
+                                                            <Form.Group className="mb-1">
+                                                                <Form.Label className="mb-0">Specialist </Form.Label>
+                                                                <Form.Control
+                                                                    type="text"
+                                                                    {...register('specialist')}
+                                                                    onChange={(e) => {
+                                                                        clearErrors('specialist');
+                                                                    }}
+                                                                    placeholder="Enter Specialist Name"
+                                                                />
+                                                            </Form.Group>
+                                                        </div>
                                                         <hr className='my-1' />
                                                     </div>
-                                                    <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
+                                                    <DoctorAddress addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
 
                                                 </div>
                                                 <div className="col-12 d-flex justify-content-end gap-2 mt-1">
@@ -705,6 +704,7 @@ const NewDoctor = () => {
                                     </Form>
                                 )}
                                 {activeTab === "departmentDetails" && <DepartmentDetails docId={docId} setActiveTab={setActiveTab} />}
+                                {activeTab === "qualifications" && <DoctorQualifications docId={docId} setActiveTab={setActiveTab} />}
                                 {activeTab === "documents" && <Documents />}
                             </div>
                         </Card.Body>

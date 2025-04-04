@@ -62,7 +62,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
         console.log(payload, 'payload');
     };
-   
+
     useEffect(() => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
@@ -80,7 +80,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     }));
     const [rela, setRela] = useState(null);
     const handleRelationChange = (selectedOption) => {
-        setRela( selectedOption ? selectedOption.value : '');
+        setRela(selectedOption ? selectedOption.value : '');
     };
     return (
         <>
@@ -176,7 +176,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                     <hr />
                     <AddressForm addresses={responsibleAddresses} setAddresses={setResponsibleAddresses} />
                     <hr />
-                    <TelecomFrom  constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
+                    <TelecomFrom constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
                 </div>
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
                     <Button className="cancel-button" onClick={() => reset()}>
