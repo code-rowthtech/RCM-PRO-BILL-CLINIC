@@ -3,7 +3,7 @@ import { Button, Modal, Form, Row, Col, Spinner, Dropdown, InputGroup } from 're
 import { IoMdClose } from 'react-icons/io';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { createRolesAction, getRoleDataAction, getRolesAction } from '../../../redux/actions';
+import { createRolesAction, getRoleDataAction, getRolesAction, updateRolesAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
@@ -11,72 +11,77 @@ import CreateRoleSetting from '../Settings/Role/CreateRoleSetting';
 import Adddepartment from './Adddepartment';
 import us from '../../../assets/images/flags/us.jpg'
 import { useSearchParams } from 'react-router-dom';
+import { updateRolesReducer } from '../../../redux/roles/reducers';
 
 
-const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCurrentUser }) => {
+const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
-    const decryptedRolesDataLoading = store?.getRoleDataReducer?.loading;
     const [isDropdownClicked, setIsDropdownClicked] = useState(false);
     const [isDropdownDesignation, setIsDropdownDesignation] = useState(false);
-
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const createLoading = store?.createRolesReducer?.loading
-    const createStatus = store?.createRolesReducer?.data
-    const createSuccess = store?.createRolesReducer?.data?.status
+    const createLoading = store?.createRolesReducer?.loading;
+    const createSuccess = store?.createRolesReducer?.data?.status;
+    const updateSuccess = store?.updateRolesReducer?.data?.status;
     const [addDesiginationModal, setAddDesiginationModal] = useState(false);
-
+    const [telecom, setTelecom] = useState([
+        { system: 'phone', value: '', use: 'work' },
+        { system: 'phone', value: '', use: 'home' },
+        { system: 'email', value: '', use: 'work' },
+    ]);
     const [addDepartmentalModal, setAddDepartmentalModal] = useState(false);
-
     const designationData = store?.getMastersDataReducer?.data1?.data?.result;
     const designationDataLoading = store?.getMastersDataReducer?.data?.loading;
-    console.log(store?.getMastersDataReducer, "designationData")
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-    const departmentGetDataLoading = store?.getDepartmentDataReducer?.data?.loading;
-    const roleData = store?.getRolesDataReducer?.data
-    const roleDataLoading = store?.getRolesDataReducer?.loading
     const { register, reset, trigger, handleSubmit, watch, setValue, formState: { errors }, getValues } = useForm();
-
 
     const closeAddModal = () => {
         setAddDepartmentalModal(false);
         setAddDesiginationModal(false);
         reset();
     };
-    const close = () => {
-        setAddDepartmentModal(false);
-        setCurrentUser(null);
-        setUpdateDepartmentModal(false);
-        reset()
-        setValue('')
-
-    };
-    // useEffect(() => {
-    //     if (createSuccess === 200) {
-    //         dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
-
-    //     }
-    // }, [createSuccess])
 
     useEffect(() => {
-        if (show) {
-            // dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
-            // dispatch(getRolesAction({ clinicId: clinicId, limit: '', search: '', page: '', status: true }));
-            // dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
-            // dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: 1, search: '' }));
+        if (dataToEdit) {
+            setValue('firstName', dataToEdit?.name?.text);
+            setValue('email', dataToEdit?.email);
+            setValue('roleId', dataToEdit?.roleId);
+            setValue('joiningDate', dataToEdit?.joiningDate ? new Date(dataToEdit?.joiningDate).toISOString().split("T")[0] : '');
+            setValue('designation', dataToEdit?.designation);
+            setValue('department', dataToEdit?.department);
+            setValue('phone', dataToEdit?.telecom?.find((data) => data?.system === 'phone' && data?.use === 'work')?.value || '');
+            setValue('phNumberSecondary', dataToEdit?.telecom?.find((data) => data?.system === 'phone' && data?.use === 'home')?.value || '');
+            if (dataToEdit?.telecom) {
+                setTelecom(dataToEdit.telecom);
+            }
         }
-    }, [dispatch, show]);
+    }, [dataToEdit, setValue])
 
-    // const [showPassword, setShowPassword] = useState(false);
+    const close = () => {
+        setAddDepartmentModal(false);
+        setDataToEdit(null);
+        reset({
+            firstName: '',
+            email: '',
+            roleId: '',
+            joiningDate: '',
+            designation: '',
+            department: '',
+            phone: '',
+            phNumberSecondary: '',
+            ...(!dataToEdit && { password: '', confirmPassword: '' })
+        });
+        setTelecom([
+            { system: 'phone', value: '', use: 'work' },
+            { system: 'phone', value: '', use: 'home' },
+            { system: 'email', value: '', use: 'work' },
+        ]);
+    };
 
-
-    // const togglePasswordVisibility = () => {
-    //     setShowPassword(!showPassword);
-    // };
     const [passwordVisibility, setPasswordVisibility] = useState({
         password: false,
         confirmPassword: false
@@ -104,38 +109,36 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
             close()
         }
     }, [createSuccess])
+    useEffect(() => {
+        if (updateSuccess === 200) {
+            reset();
+            close()
+        }
+    }, [updateSuccess])
+
     const onSubmit = (data) => {
-        const formattedJoiningDate = new Date(data.joiningDate).toISOString();
-        // const formattedLeavingDate = new Date(data.leavingDate).toISOString();
-        // const payload = {
-        //     firstName: data.firstName,
-        //     email: data.email,
-        //     password: data.password,
-        //     phone: data?.phone,
-        //     phNumberSecondary: data.phNumberSecondary,
-        //     clinicId: clinicId,
-        //     reportingTo: data.reportingTo || clinicId,
-        //     joiningDate: formattedJoiningDate,
-        //     designation: data.designation,
-        //     department: data.department,
-        //     roleId: data.role,
-        //     name:{
-        //         text:'wuidbuidw'
-        //     }
-        // };
         data.clinicId = clinicId;
         data.reportingTo = data.reportingTo || clinicId;
         data.name = {
             text: data.firstName,
         };
-        // console.log(data, '2222222222222222222222222')
-
-        dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
-        // dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, createdById: '', search: '', page: 1, status: true }));
-
-
-
+        data.telecom = telecom;
+        delete data.phone;
+        delete data.phNumberSecondary;
+        delete data.firstName;
+        if (dataToEdit) {
+            data.id = dataToEdit?._id;
+            delete data.email;
+            delete data.password;
+            delete data.confirmPassword;
+        }
+        if (dataToEdit?._id) {
+            dispatch(updateRolesAction({ key: `${encryptMessage(data)}` }));
+        } else {
+            dispatch(createRolesAction({ key: `${encryptMessage(data)}` }));
+        }
     };
+
     const [showModal, setShowModal] = useState(false)
 
     const handleClosemodal = () => {
@@ -143,7 +146,6 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
     }
 
     const [passwordStrength, setPasswordStrength] = useState('');
-    const passwordValue = watch('password', '');
 
     const handlePasswordChange = (e) => {
         const value = e.target.value;
@@ -169,6 +171,14 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
     const role = watch('roleId')
 
 
+    const handleContactChange = (value, field) => {
+        setTelecom(prevTelecom =>
+            prevTelecom.map((contact, index) =>
+                index === field ? { ...contact, value } : contact
+            )
+        );
+    };
+
     return (
         <>
             <Modal centered show={show} size="lg" onHide={close}>
@@ -177,7 +187,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                         <Col sm={1}></Col>
                         <Col sm={10}>
                             <h4 className="mb-0 text-center">
-                                Add New User
+                                {dataToEdit ? "Update User" : "Add New User"}
                             </h4>
                         </Col>
                         <Col sm={1}>
@@ -194,7 +204,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         type="text"
                                         placeholder=" Name"
                                         {...register('firstName', {
-                                            required: 'Name is required',
+                                            required: dataToEdit ? false : 'Name is required',
                                             pattern: {
                                                 value: /^(?! )[A-Za-z0-9 ]*$/,
                                                 message: 'Special characters and leading spaces are not allowed',
@@ -222,7 +232,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         placeholder="Email"
                                         autoComplete="off" // Disable autofill for email
                                         {...register('email', {
-                                            required: 'Email is required',
+                                            required: dataToEdit ? false : 'Email is required',
                                             pattern: {
                                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                                 message: 'Invalid email format',
@@ -232,6 +242,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                 noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
                                             },
                                         })}
+                                        onChange={(e) => { handleContactChange(e.target.value, 2) }}
                                         onInput={(e) => {
                                             const value = e.target.value;
                                             if (value.trim() === "") {
@@ -243,204 +254,100 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                 </Form.Group>
                             </Col>
 
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label className="mb-0">
-                                        Password <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Password"
-                                        autoComplete="off"
-                                        {...register("password", {
-                                            required: "Password is required",
-                                            minLength: {
-                                                value: 8,
-                                                message: "Password must be at least 8 characters",
-                                            },
-                                            maxLength: {
-                                                value: 16,
-                                                message: "Password must not exceed 16 characters",
-                                            },
-                                            validate: {
-                                                noEmpty: (value) => value.trim() !== "" || "Password cannot be empty or only spaces",
-                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
-                                                isStrong: (value) => strongRegex.test(value) || "Password must be strong (8-16 characters, at least one uppercase, one number, one special character)",
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            handlePasswordChange(e);
-                                            checkPasswordStrength(e.target.value); // Check strength on change
-                                            trigger("confirmPassword"); // Revalidate confirmPassword
-                                        }}
-                                    />
-                                    <span
-                                        className="position-absolute fs-4"
-                                        style={{ top: "26px", right: "10px", cursor: "pointer" }}
-                                        onClick={togglePasswordVisibility}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.password && (
-                                        <span className="text-danger fs-6">{errors.password.message}</span>
-                                    )}
-                                    {passwordStrength && (
+                            <Row className={`${dataToEdit ? 'd-none' : ''}`}>
+                                <Col sm={6}>
+                                    <Form.Group className="mb-2 position-relative">
+                                        <Form.Label className="mb-0">
+                                            Password <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            type={passwordVisibility.password ? "text" : "password"}
+                                            placeholder="Password"
+                                            autoComplete="off"
+                                            {...register("password", {
+                                                required: dataToEdit ? false : "Password is required",
+                                                minLength: dataToEdit ? false : {
+                                                    value: 8,
+                                                    message: "Password must be at least 8 characters",
+                                                },
+                                                maxLength: dataToEdit ? false : {
+                                                    value: 16,
+                                                    message: "Password must not exceed 16 characters",
+                                                },
+                                                validate: dataToEdit ? false : {
+                                                    noEmpty: (value) => value.trim() !== "" || "Password cannot be empty or only spaces",
+                                                    noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
+                                                    isStrong: (value) => strongRegex.test(value) || "Password must be strong (8-16 characters, at least one uppercase, one number, one special character)",
+                                                },
+                                            })}
+                                            onChange={(e) => {
+                                                handlePasswordChange(e);
+                                                checkPasswordStrength(e.target.value); // Check strength on change
+                                                trigger("confirmPassword"); // Revalidate confirmPassword
+                                            }}
+                                            maxLength={16}
+                                        />
                                         <span
-                                            className={`fs-6 ${passwordStrength === "Strong password"
-                                                ? "text-success"
-                                                : "text-danger"
-                                                }`}
+                                            className="position-absolute fs-4"
+                                            style={{ top: "26px", right: "10px", cursor: "pointer" }}
+                                            onClick={() => togglePasswordVisibility("password")}
                                         >
-                                            {passwordStrength}
+                                            {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
                                         </span>
-                                    )}
-                                </Form.Group>
-                            </Col>
+                                        {errors.password && (
+                                            <span className="text-danger fs-6">{errors.password.message}</span>
+                                        )}                                </Form.Group>
+                                </Col>
 
-                            <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label className="mb-0">
-                                        Confirm Password <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Confirm password"
-                                        {...register("confirmPassword", {
-                                            required: "Confirm password is required",
-                                            validate: {
-                                                matchPassword: (value) =>
-                                                    value === watch("password") || "Passwords do not match",
-                                            },
-                                        })}
-                                        onInput={() => trigger("confirmPassword")} // Trigger revalidation on every input change
-                                    />
-                                    <span
-                                        className="position-absolute d-flex align-items-center fs-4 justify-content-center"
-                                        style={{ top: "32px", right: "10px", cursor: "pointer" }}
-                                        onClick={togglePasswordVisibility}
-                                        onMouseEnter={(e) => (e.target.style.color = "#000")}
-                                        onMouseLeave={(e) => (e.target.style.color = "#666")}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.confirmPassword?.type === "matchPassword" && (
-                                        <span className="text-danger fs-6">
-                                            {errors.confirmPassword.message}
+                                <Col sm={6}>
+                                    <Form.Group className="mb-2 position-relative">
+                                        <Form.Label className="mb-0">
+                                            Confirm Password <span className="text-danger">*</span>
+                                        </Form.Label>
+                                        <Form.Control
+                                            type={passwordVisibility.confirmPassword ? "text" : "password"}
+                                            placeholder="Confirm password"
+                                            {...register("confirmPassword", {
+                                                required: dataToEdit ? false : "Confirm password is required",
+                                                validate: dataToEdit ? false : {
+                                                    matchPassword: (value) =>
+                                                        value === watch("password") || "Passwords do not match",
+                                                },
+                                            })}
+                                            onInput={() => trigger("confirmPassword")}
+                                            maxLength={16} />
+                                        <span
+                                            className="position-absolute d-flex align-items-center fs-4 justify-content-center"
+                                            style={{ top: "32px", right: "10px", cursor: "pointer" }}
+                                            onClick={() => togglePasswordVisibility("confirmPassword")}
+                                            onMouseEnter={(e) => (e.target.style.color = "#000")}
+                                            onMouseLeave={(e) => (e.target.style.color = "#666")}
+                                        >
+                                            {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
                                         </span>
-                                    )}
-                                </Form.Group>
-                            </Col> */}
+                                        {errors.confirmPassword?.type === "matchPassword" && (
+                                            <span className="text-danger fs-6">
+                                                {errors.confirmPassword.message}
+                                            </span>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                            <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label className="mb-0">
-                                        Password <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type={passwordVisibility.password ? "text" : "password"}
-                                        placeholder="Password"
-                                        autoComplete="off"
-                                        {...register("password", {
-                                            required: "Password is required",
-                                            minLength: {
-                                                value: 8,
-                                                message: "Password must be at least 8 characters",
-                                            },
-                                            maxLength: {
-                                                value: 16,
-                                                message: "Password must not exceed 16 characters",
-                                            },
-                                            validate: {
-                                                noEmpty: (value) => value.trim() !== "" || "Password cannot be empty or only spaces",
-                                                noSpacesBeforeText: (value) => !/^\s/.test(value) || "First character cannot be a space",
-                                                isStrong: (value) => strongRegex.test(value) || "Password must be strong (8-16 characters, at least one uppercase, one number, one special character)",
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            handlePasswordChange(e);
-                                            checkPasswordStrength(e.target.value); // Check strength on change
-                                            trigger("confirmPassword"); // Revalidate confirmPassword
-                                        }}
-                                        maxLength={16}
-                                    />
-                                    <span
-                                        className="position-absolute fs-4"
-                                        style={{ top: "26px", right: "10px", cursor: "pointer" }}
-                                        onClick={() => togglePasswordVisibility("password")}
-                                    >
-                                        {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.password && (
-                                        <span className="text-danger fs-6">{errors.password.message}</span>
-                                    )}                                </Form.Group>
-                            </Col>
-
-                            <Col sm={6}>
-                                <Form.Group className="mb-2 position-relative">
-                                    <Form.Label className="mb-0">
-                                        Confirm Password <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Control
-                                        type={passwordVisibility.confirmPassword ? "text" : "password"}
-                                        placeholder="Confirm password"
-                                        {...register("confirmPassword", {
-                                            required: "Confirm password is required",
-                                            validate: {
-                                                matchPassword: (value) =>
-                                                    value === watch("password") || "Passwords do not match",
-                                            },
-                                        })}
-                                        onInput={() => trigger("confirmPassword")}
-                                        maxLength={16} />
-                                    <span
-                                        className="position-absolute d-flex align-items-center fs-4 justify-content-center"
-                                        style={{ top: "32px", right: "10px", cursor: "pointer" }}
-                                        onClick={() => togglePasswordVisibility("confirmPassword")}
-                                        onMouseEnter={(e) => (e.target.style.color = "#000")}
-                                        onMouseLeave={(e) => (e.target.style.color = "#666")}
-                                    >
-                                        {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </span>
-                                    {errors.confirmPassword?.type === "matchPassword" && (
-                                        <span className="text-danger fs-6">
-                                            {errors.confirmPassword.message}
-                                        </span>
-                                    )}                                </Form.Group>
-                            </Col>
 
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">Date of Joining <span className='text-danger'>*</span></Form.Label>
                                     <Form.Control
                                         type="date"
-                                        {...register('joiningDate', { required: 'Joining date is required' })}
+                                        {...register('joiningDate', { required: dataToEdit ? false : 'Joining date is required' })}
                                         className={joiningDate ? 'text-dark border border-secondary' : 'custom-date-input border border-secondary'}
 
                                     />
                                     {errors.joiningDate && <span className="text-danger fs-6">{errors.joiningDate.message}</span>}
                                 </Form.Group>
                             </Col>
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-0">Reporting</Form.Label>
-                                    <Form.Select
-                                        {...register('reportingTo')} // No required validation
-                                    >
-                                        <option value="">Select Reporting</option>
-                                        {roleDataLoading ? (
-                                            <option disabled>Loading...</option> // Display "Loading..." as an option
-                                        ) : Array.isArray(roleData?.users) && roleData?.users.length > 0 ? (
-                                            roleData?.users.map((data) => (
-                                                <option key={data._id} value={data._id}>
-                                                    {data.firstName || "Unnamed User"} {data.lastName || ""}
-                                                </option>
-                                            ))
-                                        ) : (
-                                            <option disabled>No RoleManagement</option> // Display "No Data Found" as an option
-                                        )}
-                                    </Form.Select>
-                                </Form.Group>
-                            </Col> */}
+
                             <Col sm={6}>
                                 <Form.Group className="mb-0 position-relative">
                                     <Form.Label className="mb-0">Contact No. <span className='text-danger'>*</span></Form.Label>
@@ -455,7 +362,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                         <Form.Control
                                             type="tel"
                                             {...register("phone", !id ? {
-                                                required: "Contact number is required",
+                                                required: dataToEdit ? false : "Contact number is required",
                                                 pattern: {
                                                     value: /^[0-9]*$/,
                                                     message: "Contact must be numeric only",
@@ -475,28 +382,16 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             } : {})}
                                             placeholder="1234567890"
                                             maxLength={10}
+                                            onChange={(e) => { handleContactChange(e.target.value, 0) }}
                                             onInput={(e) => {
                                                 const value = e.target.value;
                                                 e.target.value = value.replace(/\s/g, ""); // Remove spaces
                                             }}
                                         />
                                     </InputGroup>
-
-                                    {/* Validation Error Message */}
                                     {errors.phone && (
                                         <span className="text-danger fs-6">{errors.phone.message}</span>
                                     )}
-
-                                    {/* Country Code Flag */}
-                                    {/* <div
-                                        className="position-absolute "
-                                        style={{
-                                            top: "50%",
-                                            left: "2%",
-                                        }}
-                                    >
-                                        <img src={us} alt="country code flag" width={20} />
-                                    </div> */}
                                 </Form.Group>
                             </Col>
 
@@ -521,6 +416,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                                 })}
                                                 placeholder="1234-234-234"
                                                 maxLength={10}
+                                                onChange={(e) => { handleContactChange(e.target.value, 1) }}
                                                 onInput={(e) => {
                                                     const value = e.target.value;
                                                     e.target.value = value.replace(/\s/g, ''); // Remove all spaces
@@ -528,9 +424,6 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             />
                                         </InputGroup>
                                     </Form.Group>
-                                    {/* <div className="position-absolute" style={{ top: '36%', left: '1%' }}>
-                                        <img src={us} alt="country code flag" width={20} />
-                                    </div> */}
                                     {errors.phNumberSecondary && (
                                         <span className="text-danger fs-6">{errors.phNumberSecondary.message}</span>
                                     )}
@@ -595,7 +488,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
 
                                         ) : (
                                             <Form.Select
-                                                {...register('designation', { required: 'Designation is required' })}
+                                                {...register('designation', { required: dataToEdit ? false : 'Designation is required' })}
                                                 className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
@@ -674,7 +567,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             </Dropdown>
                                         ) : (
                                             <Form.Select
-                                                {...register("department", { required: "Department is required" })}
+                                                {...register("department", { required: dataToEdit ? false : "Department is required" })}
                                                 className={`text-dark border border-secondary ${department ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
@@ -745,7 +638,7 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                             </Dropdown>
                                         ) : (
                                             <Form.Select
-                                                {...register("roleId", { required: "Role is required" })}
+                                                {...register("roleId", { required: dataToEdit ? false : "Role is required" })}
                                                 className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}
 
                                             >
@@ -763,34 +656,50 @@ const AddRole = ({ show, setUpdateDepartmentModal, setAddDepartmentModal, setCur
                                     )}
                                 </Form.Group>
                             </Col>
-
-
-
-
                         </Row>
                         <Modal.Footer className="border-0 py-0">
                             <Button type="button" className="cancel-button" onClick={close}>
                                 Cancel
                             </Button>
 
+                            {dataToEdit ?
+                                <Button type="submit" variant="primary" className="ms-2 custom-buttons btn-height" disabled={store?.updateRolesReducer?.loading}>
+                                    {store?.updateRolesReducer?.loading ? (
+                                        <>
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                                className="me-2"
+                                            />
 
-                            <Button type="submit" variant="primary" className="ms-2 custom-buttons btn-height" disabled={createLoading}>
-                                {createLoading ? (
-                                    <>
-                                        <Spinner
-                                            as="span"
-                                            animation="border"
-                                            size="sm"
-                                            role="status"
-                                            aria-hidden="true"
-                                            className="me-2"
-                                        />
+                                        </>
+                                    ) : (
+                                        'Update'
+                                    )}
+                                </Button>
+                                :
+                                <Button type="submit" variant="primary" className="ms-2 custom-buttons btn-height" disabled={createLoading}>
+                                    {createLoading ? (
+                                        <>
+                                            <Spinner
+                                                as="span"
+                                                animation="border"
+                                                size="sm"
+                                                role="status"
+                                                aria-hidden="true"
+                                                className="me-2"
+                                            />
 
-                                    </>
-                                ) : (
-                                    'Submit'
-                                )}
-                            </Button>
+                                        </>
+                                    ) : (
+                                        'Submit'
+                                    )}
+                                </Button>
+                            }
+
 
                         </Modal.Footer>
                     </Form>

@@ -3,8 +3,10 @@ import { Row, Col, Form } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
-import { getCitiesAction } from '../../../redux/actions';
+import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
+import ToastHandle from '../../../helpers/ToastMessage';
+import { useLocation } from 'react-router-dom';
 
 const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
@@ -15,6 +17,8 @@ const AddressForm = ({ addresses, setAddresses }) => {
     const store = useSelector((state) => state);
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
+    const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
+    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,
@@ -25,12 +29,32 @@ const AddressForm = ({ addresses, setAddresses }) => {
         formState: { errors },
         watch,
     } = useForm();
+    // const addAddress = () => {
+    //     if (addresses?.length === 3) {
+    //         ToastHandle('Maximun 3 addresses are allowed.', 'danger');
+    //         return;
+    //     }
+    //     setAddresses([
+    //         ...addresses,
+    //         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+    //     ]);
+    // };
     const addAddress = () => {
+        if (addresses?.length === 3) {
+            ToastHandle('Maximum 3 addresses are allowed.', 'danger');
+            return;
+        }
+
+        // Find the first available address type
+        const usedTypes = addresses.map((address) => address.type);
+        const availableType = addressTypes.find((type) => !usedTypes.includes(type)) || addressTypes[0];
+
         setAddresses([
             ...addresses,
-            { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
+            { type: availableType, use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
         ]);
     };
+
 
     const removeAddress = (index) => {
         if (addresses.length > 1) {
@@ -39,7 +63,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
     };
 
     const addressUses = ['home', 'work', 'temp', 'old', 'billing', 'mailing', 'primary'];
-    const addressTypes = ['Primary', 'Mailing', 'Both']; // Physical Postal
+    const addressTypes = ['physical', 'postal', 'both'];
 
     const getGeolocation = (e) => {
         const addressToSearch = e.target.value;
@@ -81,17 +105,19 @@ const AddressForm = ({ addresses, setAddresses }) => {
     // };
 
     const handleAddressChange = (index, field, value) => {
-        setAddresses((prev) => {
-            const updated = [...prev];
-            if (field === 'line') {
-                updated[index].line[0] = value;
-            } else {
-                updated[index][field] = value;
-            }
-            // Sync with react-hook-form's setValue
-            setValue(`address[${index}].${field}`, value);
-            return updated;
-        });
+        if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
+            ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
+            return; // Prevent selection
+        }
+
+        // if(addresses?.some((address) => address?.use === field)) {}
+        const updatedAddresses = [...addresses];
+        if (field === 'line') {
+            updatedAddresses[index].line[0] = value; // update street address
+        } else {
+            updatedAddresses[index][field] = value;
+        }
+        setAddresses(updatedAddresses);
     };
 
     useEffect(() => {
@@ -108,18 +134,22 @@ const AddressForm = ({ addresses, setAddresses }) => {
             dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
         }
     }, [selectedLocation, setValue, statesData, dispatch]);
-    const handleStateSelection = (e, index) => {
+    const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
         const stateData = JSON.parse(selectedOption.getAttribute('data-key'));
-
         if (stateData) {
             // Update the address with selected state
             const updatedAddresses = [...addresses];
             updatedAddresses[index].state = stateData.name;
             setAddresses(updatedAddresses);
-
             // Fetch cities for selected state
-            dispatch(getCitiesAction({ state_code: stateData.id, name: '', limit: 25, skip: '' }));
+            if (addressType === 'physical') {
+                dispatch(getCitiesAction({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
+            } else if (addressType === 'postal') {
+                dispatch(getCities2Action({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
+            } else {
+                dispatch(getCities3Action({ state_code: stateData?.id, name: '', limit: 25, skip: '' }));
+            }
         }
     };
     return (
@@ -217,30 +247,34 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                     <p
                                         key={suggestionIndex}
                                         onClick={() => {
-                                            // Extract the necessary fields from the API response
-                                            // const formatted = data.formatted || '';
-                                            // const components = data.components || {};
-                                            // Build the new address object with auto-populated fields
+                                            const state = statesData?.states?.find(s => s.name === data.components?.state);
+                                            const stateCode = state?.id;
+                                            const cityName = data.components?.city || data.components?.town || data.components?.village || '';
+
+                                            // Dispatch city load based on address type
+                                            if (item?.type === 'physical') {
+                                                dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                            } else if (item?.type === 'postal') {
+                                                dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                            } else {
+                                                dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                            }
+
+                                            // Update address
                                             const newAddress = {
-                                                type: item?.type,
-                                                use: item?.use, // preserve existing use
-                                                line: [data?.formatted ? data?.formatted : ''],
-                                                city:
-                                                    data?.components.city ||
-                                                    data?.components.town ||
-                                                    data?.components.village ||
-                                                    '',
-                                                state: data?.components.state
-                                                    ? data?.components.state
-                                                    : data?.components.state_code,
-                                                postalCode: data?.components.postcode || item.postalCode || '', // Auto-fill or keep user input
-                                                country: data?.components?.country || '',
+                                                ...item,
+                                                line: [data.formatted || ''],
+                                                state: data.components?.state || '',
+                                                city: cityName,  // Set the city name
+                                                postalCode: data.components?.postcode || '',
+                                                country: data.components?.country || '',
                                             };
-                                            // Update the specific address entry
+
                                             const updatedAddresses = [...addresses];
                                             updatedAddresses[index] = newAddress;
                                             setAddresses(updatedAddresses);
-                                            // Clear suggestions and remove focus
+
+                                            // Clear suggestions
                                             setSearchedLocations([]);
                                             setAddressFocused(false);
                                         }}
@@ -262,7 +296,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         <Form.Select
                             value={item.state || ''}
                             {...register(`address[${index}].state`)}
-                            onChange={(e) => handleStateSelection(e, index)}>
+                            onChange={(e) => handleStateSelection(e, item?.type, index)}>
                             <option value="">Select State</option>
                             {statesData?.states?.map((data) => (
                                 <option key={data.id} data-key={JSON.stringify(data)} value={data.name}>
@@ -283,11 +317,18 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             }}
                         >
                             <option value="">{store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}</option>
-                            {cities1?.map((data) => (
-                                <option key={data?.name} value={data?.name}>
-                                    {data?.name}
-                                </option>
-                            ))}
+                            {(() => {
+                                const cities =
+                                    item?.type === 'physical' ? cities1 :
+                                        item?.type === 'postal' ? cities2 :
+                                            cities3;
+
+                                return cities?.map((data) => (
+                                    <option key={data?._id} value={data?.name}>
+                                        {data?.name}
+                                    </option>
+                                ));
+                            })()}
                         </Form.Select>
                     </Col>
 

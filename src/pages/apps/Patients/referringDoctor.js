@@ -10,6 +10,7 @@ import AddressForm from '../Common Pages/AddressForm';
 const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
+    const clinicId = JSON.parse(localStorage.getItem('hyper_user'))?.data?._id
     const {
         register,
         handleSubmit,
@@ -25,16 +26,16 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const [submissionType, setSubmissionType] = useState(null);
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
     useEffect(() => {
-            if (createResponseReferring === 201) {
-                if (submissionType === 'saveAndNext') {
-                    reset(); // Reset the form
-                    setActiveTab('insurance');
-                } else if (submissionType === 'saveAndReset') {
-                    reset();
-                    setActiveTab('personalDetails');
-                }
+        if (createResponseReferring === 201) {
+            if (submissionType === 'saveAndNext') {
+                reset(); // Reset the form
+                setActiveTab('insurance');
+            } else if (submissionType === 'saveAndReset') {
+                reset();
+                setActiveTab('personalDetails');
             }
-        }, [createResponseReferring]);
+        }
+    }, [createResponseReferring]);
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
 
@@ -54,14 +55,23 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const onSubmit = (data) => {
         const payload = {
             patientId: patientId,
-            type: 'Referring',
+            clinicId,
             identifier: [
                 {
+                    use: 'official',
                     system: 'http://hl7.org/fhir/sid/us-npi',
-                    value: data.npiNumber,
-                    type: 'NPI',
+                    value: data?.npiNumber,
+                    type: {
+                        coding: [{
+                            system: 'http://hl7.org/fhir/sid/us-npi',
+                            code: 'NPI',
+                            display: 'National Provider Identifier (NPI)',
+                        }],
+                        text: 'National Provider Identifier (NPI)',
+                    },
                 },
             ],
+
             name: {
                 prefix: data.prefix ? [data.prefix] : [],
                 given: [data.firstName, data.middleName].filter(Boolean), // Removing empty values
@@ -87,15 +97,15 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                     },
                     organization: data.source
                         ? {
-                              reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
-                              display: data.source,
-                          }
+                            reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
+                            display: data.source,
+                        }
                         : undefined,
                 },
             ],
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log("payload",payload)
+        console.log("payload", payload)
     };
 
     return (
@@ -205,10 +215,10 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                         Clear
                     </Button>
                     <Button className="custom-buttons" type="submit"
-                     onClick={() => {
-                        setSubmissionType('saveAndReset');
-                    }}>
-                        
+                        onClick={() => {
+                            setSubmissionType('saveAndReset');
+                        }}>
+
                         Save & Add Another
                     </Button>
                     <Button

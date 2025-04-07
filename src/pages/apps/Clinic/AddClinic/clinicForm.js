@@ -110,12 +110,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
-    const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
-    const cities5 = store?.getCitiesReducer?.cities5?.data?.cities;
-    const cities6 = store?.getCitiesReducer?.cities6?.data?.cities;
-    console.log(cities1, 'cities 1')
-    console.log(cities2, 'cities 2')
-    console.log(cities3, 'cities 3')
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
 
     const handleAddTaxonomy = () => {
@@ -168,7 +162,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log('clinicsDataGet', clinicsDataGet);
 
     const setField = (key, value) => value && setValue(key, value);
     // useEffect(() => {
@@ -494,7 +487,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //           ...(longitude1 ? { longitude: longitude1 } : ''),
             //       },
         };
-        // console.log(newPayload, 'oopayload')
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
     };
     const logoFileInputRef = useRef(null);
@@ -787,7 +779,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
 
-    console.log(addresses, 'addresssssssss')
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     // Load Default Identifiers & Contacts
@@ -888,7 +879,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             return; // Prevent selection
         }
 
-        console.log(field, 'field')
         // if(addresses?.some((address) => address?.use === field)) {}
         const updatedAddresses = [...addresses];
         if (field === 'line') {

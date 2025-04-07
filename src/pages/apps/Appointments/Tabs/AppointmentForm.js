@@ -413,7 +413,7 @@ const AppointmentForm = () => {
                         <Form.Group>
                             <Form.Label className="mb-0">Reason</Form.Label>
                             <Select
-                                options={formattedReasonOptions} // Use the formatted array
+                                options={formattedReasonOptions?.slice(0, 9)} // Use the formatted array
                                 isSearchable
                                 className="basic-single"
                                 classNamePrefix="select"
