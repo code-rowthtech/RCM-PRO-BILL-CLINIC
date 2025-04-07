@@ -69,7 +69,7 @@ const NewDoctor = () => {
         dispatch(getStatesByCountryAction())
     }, [dispatch]);
 
-    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result
+    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
@@ -111,6 +111,7 @@ const NewDoctor = () => {
             setValue('phone', doctorDetails?.telecom?.[0]?.value)
             setValue('gender', doctorDetails?.userId?.gender)
             setValue('department', doctorDetails?.departmentId?._id)
+            setValue('specialist', doctorDetails?.specialties?.[0])
             if (doctorDetails?.address) {
                 setDemographicAddresses(doctorDetails.address);
             }
@@ -130,13 +131,6 @@ const NewDoctor = () => {
             dispatch(getCitiesAction({ state_code: state, name: doctorDetails?.address?.[0]?.city, limit: 10, skip: 1 }))
         }
     }, [statesData, doctorDetails])
-
-    // useEffect(() => {
-    //     if (doctorDetails && updateId && cities1) {
-    //         setValue('city1', cities1?.find((data) => data?.name === doctorDetails?.address?.[0]?.city))
-    //     }
-    // }, [statesData, doctorDetails])
-
 
     const handleNewDoctor = () => {
         navigate('/apps/doctors/list');
@@ -187,8 +181,6 @@ const NewDoctor = () => {
         } else {
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'payload')
-
     };
 
     const handleTabChange = (tab) => {
