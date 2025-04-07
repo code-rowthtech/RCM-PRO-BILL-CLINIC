@@ -6,7 +6,7 @@ import { CiCircleMinus } from 'react-icons/ci';
 import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import us from '../../../assets/images/flags/us.jpg';
 
 const formatDisplayValue = (value) => {
@@ -19,13 +19,16 @@ const formatDisplayValue = (value) => {
     });
 };
 const DoctorAddress = ({ addresses, setAddresses }) => {
-    console.log('addresses', addresses);
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [selectedState, setSelectedState] = useState(null);
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
+    const updateId = id?.replace(/^check/, '');
     const store = useSelector((state) => state);
+    const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
@@ -53,6 +56,36 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
             { type: availableType, use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
         ]);
     };
+
+    useEffect(() => {
+        if (doctorDetails && updateId && statesData?.states) {
+            doctorDetails?.address?.forEach((address) => {
+                const stateObj = statesData?.states?.find((data) => data?.name === address?.state);
+                const stateCode = stateObj?.id;
+
+                if (!stateCode) return;
+
+                const cityPayload = {
+                    state_code: stateCode,
+                    name: address?.city || '',
+                    limit: 25,
+                    skip: ''
+                };
+
+                switch (address?.type) {
+                    case 'primary':
+                        dispatch(getCitiesAction(cityPayload));
+                        break;
+                    case 'mailing':
+                        dispatch(getCities2Action(cityPayload));
+                        break;
+                    default:
+                        dispatch(getCities3Action(cityPayload));
+                        break;
+                }
+            });
+        }
+    }, [doctorDetails, updateId, statesData]);
 
 
     const removeAddress = (index) => {
@@ -93,16 +126,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
         });
     };
 
-    // const handleAddressChange = (index, field, value) => {
-    //     const updatedAddresses = [...addresses];
-    //     if (field === 'line') {
-    //         updatedAddresses[index].line[0] = value; // update street address
-    //     } else {
-    //         updatedAddresses[index][field] = value;
-    //     }
-    //     setAddresses(updatedAddresses);
-    // };
-
     const handleAddressChange = (index, field, value, lineIndex = 0) => {
         if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
             ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
@@ -129,58 +152,25 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
 
         setAddresses(updatedAddresses);
     };
-    // const handleAddressChange = (index, field, value, lineIndex = 0) => {
-    //     if (!addresses || !addresses[index]) {
-    //         console.error("Invalid address index:", index);
-    //         return;
+
+    // useEffect(() => {
+    //     if (selectedLocation) {
+    //         setValue('address', selectedLocation?.formatted);
+    //         const stateId =
+    //             statesData?.states &&
+    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
+    //         const selectedState =
+    //             statesData?.states &&
+    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
+    //         setValue('stateName', selectedState);
+    //         const countyName = selectedLocation?.components?.county;
+    //         dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
     //     }
-
-    //     if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
-    //         ToastHandle('This address type is already selected. Please choose a different type.', 'danger');
-    //         return;
-    //     }
-
-    //     const updatedAddresses = [...addresses];
-
-    //     if (field === 'line') {
-    //         updatedAddresses[index].line = [...(updatedAddresses[index].line || [])]; // Ensure `line` exists
-    //         updatedAddresses[index].line[lineIndex] = value;
-    //     } else if (field === 'phone' || field === 'fax') {
-    //         updatedAddresses[index].telecom = updatedAddresses[index].telecom || []; // Ensure telecom exists
-    //         const telecomIndex = updatedAddresses[index].telecom.findIndex(t => t.system === field);
-    //         if (telecomIndex !== -1) {
-    //             updatedAddresses[index].telecom[telecomIndex].value = value;
-    //         } else {
-    //             updatedAddresses[index].telecom.push({ system: field, value });
-    //         }
-    //     } else {
-    //         updatedAddresses[index][field] = value;
-    //     }
-
-    //     setAddresses(updatedAddresses);
-    // };
-
-
-
-    useEffect(() => {
-        if (selectedLocation) {
-            setValue('address', selectedLocation?.formatted);
-            const stateId =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-            const selectedState =
-                statesData?.states &&
-                statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-            setValue('stateName', selectedState);
-            const countyName = selectedLocation?.components?.county;
-            dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-        }
-    }, [selectedLocation, setValue, statesData, dispatch]);
+    // }, [selectedLocation, setValue, statesData, dispatch]);
     const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
         const stateData = JSON.parse(selectedOption.getAttribute('data-key'));
         if (stateData) {
-            // Update the address with selected state
             const updatedAddresses = [...addresses];
             updatedAddresses[index].state = stateData.name;
             setAddresses(updatedAddresses);
@@ -199,19 +189,15 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
             ToastHandle('Maximum 3 address lines are allowed.', 'danger');
             return;
         }
-        console.log(index, 'index');
         setAddresses(prev => {
             const updated = [...prev];
             const currentAddress = { ...updated[index] };
-
-            // Copy the line array and add a new empty line
             currentAddress.line = [...(currentAddress.line || []), ''];
 
             updated[index] = currentAddress;
             return updated;
         });
     };
-
 
     const removeAddressLine = (addressIndex, lineIndex) => {
         if (addresses[addressIndex].line.length > 1) {
@@ -234,9 +220,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                 </Col>
             </Row>
             {addresses?.map((item, index) => (
-                <Row key={index} className="mb-0"
-                // style={{ borderBottom: index === 0 && addresses?.length > 1 || index === 1 && addresses?.length > 1 ? '1px solid gray' : 'none' }}
-                >
+                <Row key={index} className="mb-0">
                     <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
                         <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
@@ -266,12 +250,9 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             value={item.line[0]}
                             onChange={(e) => {
                                 handleAddressChange(index, 'line', e.target.value);
-                                // Set active index so suggestions appear for this address
                                 setActiveAddressIndex(index);
                                 setAddressFocused(true);
-                                // Call your geolocation API with the current input value
                                 getGeolocation(e)?.then((data) => {
-                                    // Expecting your getGeolocation to return an object with results
                                     if (data && data.results) {
                                         setSearchedLocations(data.results);
                                     }
