@@ -242,8 +242,8 @@ const DepartmentDetails = () => {
         status: ''
       }
     ]);
-    const [taxonmy, setTaxonomy] = useState(null);
   };
+  const [taxonmy, setTaxonomy] = useState(null);
   const handleTaxonomyChange = (selectedOption, index) => {
     const updatedList = [...taxonomyCodesList];
     updatedList[index] = {
