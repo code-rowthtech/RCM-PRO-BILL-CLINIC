@@ -152,6 +152,34 @@ const AddressForm = ({ addresses, setAddresses }) => {
             }
         }
     };
+
+    const addAddressLine = (index) => {
+        if (addresses[index]?.line?.length === 3) {
+            ToastHandle('Maximum 3 address lines are allowed.', 'danger');
+            return;
+        }
+        console.log(index, 'index');
+        setAddresses(prev => {
+            const updated = [...prev];
+            const currentAddress = { ...updated[index] };
+
+            // Copy the line array and add a new empty line
+            currentAddress.line = [...(currentAddress.line || []), ''];
+
+            updated[index] = currentAddress;
+            return updated;
+        });
+    };
+
+
+    const removeAddressLine = (addressIndex, lineIndex) => {
+        if (addresses[addressIndex].line.length > 1) {
+            const updatedAddresses = [...addresses];
+            updatedAddresses[addressIndex].line.splice(lineIndex, 1);
+            setAddresses(updatedAddresses);
+        }
+    };
+
     return (
         <Form>
             <Row>
@@ -203,7 +231,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         </Form.Select>
                     </Col>
                     <Col sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
-                        <Form.Label className="mb-0">Address</Form.Label>
+                        <Form.Label className="mb-0">Line 1   <span
+                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                            onClick={() => addAddressLine(index)}></span></Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Street Address"
@@ -252,9 +282,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                             const cityName = data.components?.city || data.components?.town || data.components?.village || '';
 
                                             // Dispatch city load based on address type
-                                            if (item?.type === 'physical') {
+                                            if (item?.type === 'primary') {
                                                 dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
-                                            } else if (item?.type === 'postal') {
+                                            } else if (item?.type === 'mailing') {
                                                 dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
                                             } else {
                                                 dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
@@ -263,12 +293,13 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                             // Update address
                                             const newAddress = {
                                                 ...item,
-                                                line: [data.formatted || ''],
+                                                line: [data.formatted || '', ...(item.line?.slice(1) || [])],  // keep existing lines after the first
                                                 state: data.components?.state || '',
-                                                city: cityName,  // Set the city name
+                                                city: cityName,
                                                 postalCode: data.components?.postcode || '',
                                                 country: data.components?.country || '',
                                             };
+
 
                                             const updatedAddresses = [...addresses];
                                             updatedAddresses[index] = newAddress;
@@ -290,6 +321,22 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             </div>
                         )}
                     </Col>
+                    {item.line.slice(1).map((line, lineIndex) => (
+                        <Col key={lineIndex} sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
+                            <Form.Label className="mb-0">
+                                Line {lineIndex + 2}
+                                <span
+                                    className="fs-5 uil-minus-circle minusicon ms-1 fw-bold cursor-pointer text-danger"
+                                    onClick={() => removeAddressLine(index, lineIndex + 1)}></span>
+                            </Form.Label>
+                            <Form.Control
+                                type="text"
+                                placeholder="Additional Address"
+                                value={line || ''}
+                                onChange={(e) => handleAddressChange(index, 'line', e.target.value, lineIndex + 1)}
+                            />
+                        </Col>
+                    ))}
 
                     <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
                         <Form.Label className="mb-0">State</Form.Label>
