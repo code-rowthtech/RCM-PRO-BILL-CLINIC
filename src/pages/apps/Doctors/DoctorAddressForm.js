@@ -3,7 +3,7 @@ import { Row, Col, Form, InputGroup } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
-import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
+import { getCities2Action, getCities3Action, getCitiesAction  } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { useLocation, useSearchParams } from 'react-router-dom';

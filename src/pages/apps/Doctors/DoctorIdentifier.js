@@ -6,7 +6,6 @@ import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { identifierOptions, licensureOptions } from '../../../utils/DataSets/commonData'
-import { useSearchParams } from 'react-router-dom';
 
 const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], onChange, setIdentifiers, identifiers, licensure, setLicensure }) => {
     const {
@@ -15,12 +14,10 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         watch,
     } = useForm();
     const store = useSelector((state) => state);
-    const [searchParams] = useSearchParams();
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data?.states;
-    const id = searchParams.get('id');
-    const updateId = id?.replace(/^check/, '');
+
     const defaultIssuingAuthority = [
         'NPPES',
         'CLIA',
@@ -34,7 +31,12 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (identifiers.length === 0) {
             setIdentifiers(
                 defaultIdentifiers.map((type) => ({
-                    type, number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
+                    type,
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                    system: '',
                 }))
             );
         }
@@ -43,7 +45,13 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (licensure.length === 0) {
             setLicensure(
                 defaultLicensure.map((type) => ({
-                    type: '', state: '', number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
+                    type: '',
+                    state: '',
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                    system: '',
                 }))
             );
         }
@@ -137,45 +145,26 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         }
     };
     useEffect(() => {
-        if (doctorDetails && updateId) {
-            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.licenseState) || [];
-            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.licenseState) || [];
-            // Set qualifications data
-            const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
-                expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
-                file: item?.documents?.[0],
-                issuingAuthority: item?.issuingAuthority,
-                number: item?.value,
-                system: '',
-                type: {
-                    code: item?.sliceName || '',
-                    label: item?.identifierType || '',
-                    value: item?.system || '',
-                },
-                file: item?.file?.[0],
-                status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate ? new Date(item?.ennumerationDate).toISOString().split('T')[0] : '',
-            }));
-            const updatedLicensure = identifiersWithState?.map((item, index) => ({
-                expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
-                file: item?.documents?.[0],
-                issuingAuthority: item?.issuingAuthority,
-                number: item?.value,
-                system: '',
-                type: {
-                    code: item?.sliceName || '',
-                    label: item?.identifierType || '',
-                    value: item?.system || '',
-                },
-                file: item?.file?.[0],
-                licenseState: item?.licenseState || '',
-                status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate ? new Date(item?.ennumerationDate).toISOString().split('T')[0] : '',
-            }));
-            setIdentifiers(updatedIdentifiers);
-            setLicensure(updatedLicensure);
+        if (doctorDetails) {
+            if (doctorDetails) {
+                // Set qualifications data
+                const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
+                    expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
+                    file: item?.documents?.[0],
+                    issuingAuthority: item?.issuingAuthority,
+                    number: item?.value,
+                    system: '',
+                    type: {
+                        code: item?.sliceName || '',
+                        label: item?.identifierType || '',
+                        value: item?.system || '',
+                    },
+                }));
+                setIdentifiers(updatedIdentifiers);
+                setValue('specialist', doctorDetails?.specialties?.[0]);
+            }
         }
-    }, [doctorDetails, statesData]);
+    }, [doctorDetails]);
     return (
         <>
             <Row>
@@ -239,7 +228,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         <Form.Label className='mb-0 mt-2'>Start Date (Ennumeration Date)</Form.Label>
                         <Form.Control
                             type="date"
-                            value={item?.ennumerationDate || ''}
+                            maxLength={10}
                             onChange={(e) => handleChange(index, 'ennumerationDate', e.target.value)}
                         />
                     </Col>
@@ -413,9 +402,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                     </Col>
                     <Col sm={3}>
                         <Form.Label className='mb-0 mt-2'>Status</Form.Label>
-                        <Form.Select
-                            value={item?.status || ''}
-                            onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
+                        <Form.Select onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
                             <option value="">Select</option>
                             <option value="active">Active</option>
                             <option value="hold">Hold</option>

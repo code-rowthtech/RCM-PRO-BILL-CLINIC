@@ -185,6 +185,7 @@ const DepartmentDetails = () => {
       identifier: [...finalIdentifiersData, ...finalLicensureData],
       taxonomy: taxonomyCodes,
     }
+    console.log(payload, 'payload')
     dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
   }
   useEffect(() => {
@@ -199,19 +200,11 @@ const DepartmentDetails = () => {
           system: item?.code?.system
         },
         specialties: item?.specialties?.[0] || 'N/A',
-        degreeFile: item?.documents?.[0] || null,
-        issuerOrganisation: item?.issuer || '',
+        degreeFile: item?.documents?.[0] || null, // Use the first document if available
+        issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
       }));
       setQualifications(updatedQualifications);
       setValue('specialist', doctorDetails?.specialties?.[0])
-      const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
-        type: item?.type || '',
-        code: item?.code || '',
-        state: item?.state || '',
-        licenseNumber: item?.licenseNumber || '',
-        status: item?.status === true ? 'active' : 'inactive' || ''
-      }))
-      setTaxonomyCodesList(updatedTaxonomyCodes)
     }
   }, [doctorDetails, setValue, updateId]);
 
@@ -293,6 +286,90 @@ const DepartmentDetails = () => {
                     licensure={licensure}
                     setLicensure={setLicensure}
                   />
+                  {/* <Row>
+                    <h5>
+                      Qualifications
+                      <span
+                        className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                        onClick={addQualification}
+                      ></span>
+                    </h5>
+                    {qualifications?.map((qualification, index) => (
+                      <React.Fragment key={index}>
+                        <div className="col-md-4 col-12">
+                          <Form.Group className="mb-1">
+                            <Form.Label className="mb-0">Select Degree Name</Form.Label>
+                            <Select
+                              options={QualificationOptions}
+                              isSearchable
+                              className="basic-single"
+                              classNamePrefix="select"
+                              placeholder="&nbsp; Select "
+                              value={QualificationOptions.find(option => option.value === qualification?.degreeName?.code)}
+                              onChange={(selectedOption) =>
+                                handleQualificationChange(index, 'degreeName', selectedOption) 
+                              }
+                              styles={{
+                                control: (provided) => ({
+                                  ...provided,
+                                  height: '30px',
+                                  minHeight: '30px',
+                                  border: '0px',
+                                }),
+                                placeholder: (provided) => ({
+                                  ...provided,
+                                  fontWeight: 'bold',
+                                  fontSize: '12px',
+                                  paddingBottom: '5px',
+                                }),
+                              }}
+                            />
+                          </Form.Group>
+                        </div>
+                        <div className="col-md-4 col-12">
+                          <div className="mb-1 d-flex flex-column position-relative">
+                            <Form.Label className="mb-0">Degree</Form.Label>
+                            <div
+                              onClick={() => degreeFileInputRef.current.click()}
+                              className={`custom-file-upload justify-content-between cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile ? '' : 'custom-form-fields'}`}
+                            >
+                              {degreeUploading ? 'Uploading...' : qualification.degreeFile?.fileName ? qualification.degreeFile.fileName : 'Upload Degree'}
+                              <p className="mb-0">
+                                <FiUploadCloud />
+                              </p>
+                            </div>
+                            <Form.Control
+                              type="file"
+                              className="d-none"
+                              ref={degreeFileInputRef}
+                              onChange={(event) => handleFileChangeDegree(index, event)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-4 col-12">
+                          <Form.Group className="mb-1">
+                            <Form.Label className="mb-0">Issuer Organisation</Form.Label>
+                            <Form.Control
+                              type="text"
+                              value={qualification.issuerOrganisation}
+                              onChange={(e) => handleQualificationChange(index, 'issuerOrganisation', e.target.value)}
+                              placeholder="Enter Issuer Organisation"
+                            />
+                          </Form.Group>
+                        </div>
+                        {index > 0 && (
+                          <div className="col-md-12 text-end">
+                            <span
+                              className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                              style={{ marginTop: '-35px' }}
+                              onClick={() => removeQualification(qualification.id)}>
+                              <CiCircleMinus />
+                            </span>
+                          </div>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </Row> */}
                   <hr />
                   <Row>
                     <Col sm={12} >
