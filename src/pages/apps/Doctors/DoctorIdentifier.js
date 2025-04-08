@@ -21,6 +21,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     const statesData = store?.getStatesReducer?.data?.states;
     const id = searchParams.get('id');
     const updateId = id?.replace(/^check/, '');
+
     const defaultIssuingAuthority = [
         'NPPES',
         'CLIA',
@@ -138,8 +139,8 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     };
     useEffect(() => {
         if (doctorDetails && updateId) {
-            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.licenseState) || [];
-            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.licenseState) || [];
+            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.hasOwnProperty('licenseState')) || [];
+            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.hasOwnProperty('licenseState')) || [];
             // Set qualifications data
             const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
                 expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',

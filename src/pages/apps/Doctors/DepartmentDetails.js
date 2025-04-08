@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { createDoctorDetailAction } from "../../../redux/actions";
@@ -6,91 +6,32 @@ import { encryptMessage } from "../../../cryptoUtils";
 import { useForm } from "react-hook-form";
 import { getMastersDataAction } from "../../../redux/settings/action";
 import { useSearchParams } from "react-router-dom";
-import { FiUploadCloud } from "react-icons/fi";
 import { CiCircleMinus } from "react-icons/ci";
-import { handleUpload } from "../../../helpers/HandleUpload";
-import IdentifierForm from "../Common Pages/IdentifierForm";
-import Select from 'react-select';
-import { qualificationsData } from "../../../utils/DataSets/qualification.data";
 import DoctorIdentifierForm from "./DoctorIdentifier";
-import { getFilteredTaxonomies } from "../../../utils/DataSets/commonData";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
 const DepartmentDetails = () => {
   // const defaultIdentifiers = ['NPI'];
-  const [constantIdentifiers, setConstantIdentifiers] = useState([]);
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
   const statesData = store?.getStatesReducer?.data?.states;
   const id = doctorDetails?._id;
-
   const {
-    register,
     handleSubmit,
     setValue,
-    clearErrors,
   } = useForm();
   const [searchParams] = useSearchParams();
 
   const updateId = searchParams.get('id');
-  const [qualifications, setQualifications] = useState([{ id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
-  const degreeFileInputRef = useRef(null);
-  const [inputValue, setInputValue] = useState('');
   const formattedTaxonomyOptions = taxonomy.map((option) => ({
     value: option,
     label: option.code + ' - ' + option.displayName,
   }))
 
-  const addQualification = () => {
-    const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
-    setQualifications([...qualifications, newQualification]);
-  };
 
-  // Remove a qualification by its ID, but ensure the first row is not deleted
-  const removeQualification = (id) => {
-    if (qualifications.length > 1) { // Ensure at least one row remains
-      const updatedQualifications = qualifications.filter((qual) => qual.id !== id);
-      setQualifications(updatedQualifications);
-    }
-  };
-
-  // Handle changes in qualification fields
-  const handleQualificationChange = (index, field, value) => {
-
-    const updatedQualifications = qualifications.map((qual, i) =>
-      i === index ? { ...qual, [field]: field === 'degreeName' ? value?.data : value } : qual
-    );
-    setQualifications(updatedQualifications);
-  };
-
-  // Handle file upload for degree
-  const handleFileChangeDegree = async (index, event) => {
-    const file = event.target.files[0];
-    try {
-      const url = await handleUpload(file, setDegreeUploading);
-      const fileName = file.name
-      handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
-    } catch (error) {
-
-    }
-  };
-
-  useEffect(() => {
-    setConstantIdentifiers(
-      defaultIdentifiers.map((type) => ({
-        type,
-        number: '',
-        file: '',
-        expiry: '',
-        issuingAuthority: '',
-        use: '',
-      }))
-    );
-  }, []);
   const [identifiers, setIdentifiers] = useState([]);
   const [licensure, setLicensure] = useState([])
-  const [degreeUploading, setDegreeUploading] = useState(false);
 
   const defaultIdentifiers = [
     {
@@ -104,19 +45,7 @@ const DepartmentDetails = () => {
     label: '', value: '', code: ''
   }];
 
-
-  const QualificationOptions = qualificationsData.map((qualification) => ({
-    value: qualification.code,
-    label: qualification.display,
-    data: qualification, // Store full object for later use
-  }));
-
   const onsubmit = (data) => {
-    const qualificationData = qualifications?.map((item) => ({
-      code: item?.degreeName,
-      documents: item?.degreeFile,
-      issuer: item?.issuerOrganisation,
-    }))
     let finalIdentifiersData = [];
     if (identifiers) {
       identifiers.forEach((element) => {
@@ -168,17 +97,17 @@ const DepartmentDetails = () => {
     }
     const taxonomyCodes = taxonomyCodesList?.map((item) => ({
       type: item?.type,
-      code: item?.code?.code, // Taxonomy code
-      Grouping: item?.code?.grouping, // Taxonomy grouping
-      Classification: item?.code?.classification, // Taxonomy classification
-      Specialization: item?.code?.specialization, // Taxonomy specialization
-      Definition: item?.code?.definition, // Taxonomy definition
-      Notes: item?.code?.notes, // Taxonomy notes
-      displayName: item?.code?.displayName, // Taxonomy display name
-      section: item?.code?.section, // Taxonomy section
-      state: item?.state, // Taxonomy state
-      licenseNumber: item?.licenseNumber, // Taxonomy license number
-      status: item?.status === 'active' ? true : false, // Taxonomy sta
+      code: item?.code?.code,
+      Grouping: item?.code?.grouping,
+      Classification: item?.code?.classification,
+      Specialization: item?.code?.specialization,
+      Definition: item?.code?.definition,
+      Notes: item?.code?.notes,
+      displayName: item?.code?.displayName,
+      section: item?.code?.section,
+      state: item?.state,
+      licenseNumber: item?.licenseNumber,
+      status: item?.status === 'active' ? true : false,
     }))
     const payload = {
       ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
@@ -189,24 +118,10 @@ const DepartmentDetails = () => {
   }
   useEffect(() => {
     if (doctorDetails && updateId) {
-      // Set qualifications data
-      const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
-        id: index + 1,
-        degreeName: {
-          code: item?.code?.code,
-          display: item?.code?.display,
-          definition: item?.code?.display,
-          system: item?.code?.system
-        },
-        specialties: item?.specialties?.[0] || 'N/A',
-        degreeFile: item?.documents?.[0] || null,
-        issuerOrganisation: item?.issuer || '',
-      }));
-      setQualifications(updatedQualifications);
-      setValue('specialist', doctorDetails?.specialties?.[0])
       const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
         type: item?.type || '',
-        code: item?.code || '',
+        displayName: item?.displayName || '',
+        code: { code: item?.code, grouping: item?.Grouping, classification: item?.Classification } || {},
         state: item?.state || '',
         licenseNumber: item?.licenseNumber || '',
         status: item?.status === true ? 'active' : 'inactive' || ''
@@ -243,7 +158,6 @@ const DepartmentDetails = () => {
       }
     ]);
   };
-  const [taxonmy, setTaxonomy] = useState(null);
   const handleTaxonomyChange = (selectedOption, index) => {
     const updatedList = [...taxonomyCodesList];
     updatedList[index] = {
@@ -255,9 +169,6 @@ const DepartmentDetails = () => {
   };
 
 
-  const selectedTaxonomyOption =
-    formattedTaxonomyOptions.find((option) => option?.value?.displayName === taxonomy?.text) ||
-    formattedTaxonomyOptions.find((option) => option?.displayName === taxonomy);
   const loadTaxonomyOptions = (inputValue, callback) => {
     if (!inputValue) {
       callback(formattedTaxonomyOptions.slice(0, 10));
@@ -268,7 +179,6 @@ const DepartmentDetails = () => {
     );
     callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
   };
-
 
   return (
     <>
@@ -315,7 +225,7 @@ const DepartmentDetails = () => {
                             className="basic-single"
                             classNamePrefix="select"
                             placeholder="&nbsp; Select"
-                            value={formattedTaxonomyOptions.find(opt => opt.value === data.code)}
+                            value={formattedTaxonomyOptions.find(opt => opt.value === data.code) || formattedTaxonomyOptions.find(opt => opt.value.code === data.code.code)}
                             onChange={(selected) => handleTaxonomyChange(selected, index)}
                             styles={{
                               control: (provided) => ({

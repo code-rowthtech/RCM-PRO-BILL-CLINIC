@@ -241,6 +241,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
         // console.log(payload, 'payload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
+
     useEffect(() => {
         if (updateResponse === 200) {
             if (submissionType === 'saveAndNext') {

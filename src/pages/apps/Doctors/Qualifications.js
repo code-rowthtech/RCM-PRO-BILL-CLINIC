@@ -22,7 +22,6 @@ const DoctorQualifications = () => {
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const id = doctorDetails?._id;
-
     const {
         register,
         handleSubmit,
@@ -55,6 +54,15 @@ const DoctorQualifications = () => {
 
     // Handle changes in qualification fields
     const handleQualificationChange = (index, field, value) => {
+        if (field === 'degreeName') {
+            const selectedQualification = qualificationsData.find((qualification) => qualification.code === value?.data?.code);
+            if (selectedQualification) {
+                const updatedQualifications = qualifications.map((qual, i) =>
+                    i === index ? { ...qual, [field]: selectedQualification, degreeFile: null } : qual
+                );
+                setQualifications(updatedQualifications);
+            }
+        }
         const updatedQualifications = qualifications.map((qual, i) =>
             i === index ? { ...qual, [field]: field === 'degreeFile' ? value : value } : qual
         );
@@ -79,9 +87,10 @@ const DoctorQualifications = () => {
         data: qualification, // Store full object for later use
     }));
 
+
     const onsubmit = (data) => {
         const qualificationData = qualifications?.map((item) => ({
-            code: item?.degreeName,
+            code: item?.degreeName?.data || item?.degreeName,
             documents: item?.degreeFile,
             issuer: item?.issuerOrganisation,
         }))
@@ -145,7 +154,6 @@ const DoctorQualifications = () => {
 
         }
     };
-
 
     return (
         <>
