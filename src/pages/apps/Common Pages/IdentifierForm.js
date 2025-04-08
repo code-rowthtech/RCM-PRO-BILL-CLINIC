@@ -174,11 +174,11 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Select
                             value={item?.system || item?.type?.value || ''}
+                            data-has-value={!!(item?.system || item?.type?.value)}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 handleChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
                         >
                             <option value="" disabled>Select Identifier Type</option>
                             {identifierOptions.map((option) => (
@@ -196,8 +196,10 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             placeholder="Document Number"
                             maxLength={10}
                             value={item?.number || item?.value}
+                            data-has-value={!!(item?.number || item?.value)}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
+
                     </Col>
                     <Col className="mb-2 position-relative">
                         <div
@@ -228,6 +230,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Select
                             value={item?.issuingAuthority || ''}
+                            data-has-value={!!(item?.issuingAuthority )}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
                             <option value="" disabled>
                                 Select Issuing Authority

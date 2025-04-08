@@ -112,7 +112,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
             <Row className="pb-2">
                 <Col sm={12}>
-                    <span className="text-black fw-semibold form-label">Personal Details</span>
+                    <h5 className="text-black">Personal Details</h5>
                 </Col>
                 <Col sm={3}>
                     <Form.Group>
