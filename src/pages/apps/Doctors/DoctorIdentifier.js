@@ -6,7 +6,7 @@ import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 import { identifierOptions, licensureOptions } from '../../../utils/DataSets/commonData'
-import { useParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], onChange, setIdentifiers, identifiers, licensure, setLicensure }) => {
     const {
@@ -15,10 +15,10 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         watch,
     } = useForm();
     const store = useSelector((state) => state);
+    const [searchParams] = useSearchParams();
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data?.states;
-    const [searchParams] = useParams();
     const id = searchParams.get('id');
     const updateId = id?.replace(/^check/, '');
 
@@ -35,12 +35,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (identifiers.length === 0) {
             setIdentifiers(
                 defaultIdentifiers.map((type) => ({
-                    type,
-                    number: '',
-                    file: null,
-                    expiry: '',
-                    issuingAuthority: '',
-                    system: '',
+                    type, number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
                 }))
             );
         }
@@ -49,13 +44,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (licensure.length === 0) {
             setLicensure(
                 defaultLicensure.map((type) => ({
-                    type: '',
-                    state: '',
-                    number: '',
-                    file: null,
-                    expiry: '',
-                    issuingAuthority: '',
-                    system: '',
+                    type: '', state: '', number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
                 }))
             );
         }
@@ -187,7 +176,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             setIdentifiers(updatedIdentifiers);
             setLicensure(updatedLicensure);
         }
-    }, [doctorDetails]);
+    }, [doctorDetails, statesData]);
     return (
         <>
             <Row>
@@ -251,7 +240,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         <Form.Label className='mb-0 mt-2'>Start Date (Ennumeration Date)</Form.Label>
                         <Form.Control
                             type="date"
-                            maxLength={10}
+                            value={item?.ennumerationDate || ''}
                             onChange={(e) => handleChange(index, 'ennumerationDate', e.target.value)}
                         />
                     </Col>
@@ -425,7 +414,9 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                     </Col>
                     <Col sm={3}>
                         <Form.Label className='mb-0 mt-2'>Status</Form.Label>
-                        <Form.Select onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
+                        <Form.Select
+                            value={item?.status || ''}
+                            onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
                             <option value="">Select</option>
                             <option value="active">Active</option>
                             <option value="hold">Hold</option>
