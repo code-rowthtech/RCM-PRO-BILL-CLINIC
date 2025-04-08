@@ -71,6 +71,7 @@ const NewDoctor = () => {
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const createResponse = store?.createtDoctorsReducer?.data?.status
+    const updateResponse = store?.createtDoctorsDetailReducer?.data?.status
     const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
 
@@ -84,6 +85,17 @@ const NewDoctor = () => {
             setActiveTab('departmentDetails')
         }
     }, [createResponse])
+
+    useEffect(() => {
+        if (updateResponse === 200 && activeTab === 'personalDetails') {
+            setActiveTab('departmentDetails')
+        } else if (updateResponse === 200 && activeTab === 'departmentDetails') {
+            setActiveTab('qualifications')
+        } else if (updateResponse === 200 && activeTab === 'qualifications') {
+            // setActiveTab('personalDetails')
+            navigate('/apps/doctors/list')
+        }
+    }, [updateResponse, activeTab])
 
     const closeModal = () => {
         setShow(false);
@@ -340,19 +352,20 @@ const NewDoctor = () => {
                                                             </span>
                                                         </OverlayTrigger>
                                                     )}
-                                                    <div className='d-none d-md-block me-2'>
-                                                        <Button className='cancel-button'
-                                                            // onClick={handleNewDoctor}
-                                                            onClick={() => {
-                                                                navigate('/apps/doctors/list')
-                                                                reset();
-                                                            }}
-                                                        >
-                                                            Back
-                                                        </Button>
-                                                    </div>
+
                                                 </>
                                             )}
+                                            <div className='d-none d-md-block me-2'>
+                                                <Button className='cancel-button'
+                                                    // onClick={handleNewDoctor}
+                                                    onClick={() => {
+                                                        navigate('/apps/doctors/list')
+                                                        reset();
+                                                    }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -681,12 +694,12 @@ const NewDoctor = () => {
 
                                                 </div>
                                                 <div className="col-12 d-flex justify-content-end gap-2 mt-1">
-                                                    <Button className="cancel-button" onClick={() => reset()}>Cancel</Button>
+                                                    {/* <Button className="cancel-button" onClick={() => reset()}>Cancel</Button> */}
                                                     <Button variant="primary" type='submit' className='custom-buttons' disabled={store?.createtDoctorsReducer?.loading} >
                                                         {store?.createtDoctorsReducer?.loading ?
                                                             <Spinner color='white' className='spinner-border-sm' />
                                                             :
-                                                            id ? "Update" : "Next"
+                                                            id ? "Update & Next" : "Save & Next"
                                                         }
                                                     </Button>
                                                 </div>

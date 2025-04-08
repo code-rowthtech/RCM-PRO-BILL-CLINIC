@@ -66,7 +66,7 @@ const NewPatient = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
     const [patientId, setPatientId] = useState(null);
-    const [genderIdentity, setGenderIdentity] =useState(null);
+    const [genderIdentity, setGenderIdentity] = useState(null);
     const [age, setAge] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
@@ -331,8 +331,8 @@ const NewPatient = () => {
 
     const maxInputsReached = showCellPhone && showOfficePhone;
 
-
     const onSubmit = (data) => {
+
         const payload = {
             clinicId: clinicId || '',
             birthDate: data?.dateOfBirth || '',
@@ -433,24 +433,7 @@ const NewPatient = () => {
             value: data?.alternateEmail || '',
         });
 
-        // if (data?.preferredCommunication) {
-        //     switch (data.preferredCommunication) {
-        //         case 'Home Phone':
-        //             payload.telecom.find(t => t.use === 'home')?.rank = 1;
-        //             break;
-        //         case 'Work Phone':
-        //             payload.telecom.find(t => t.use === 'work')?.rank = 1;
-        //             break;
-        //         case 'Cell Phone':
-        //             payload.telecom.find(t => t.use === 'mobile')?.rank = 1;
-        //             break;
-        //         case 'Email':
-        //             payload.telecom.find(t => t.system === 'email')?.rank = 1;
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // }
+
 
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
@@ -675,13 +658,10 @@ const NewPatient = () => {
                                         'Home Phone',
                                         'homePhone',
                                         !maxInputsReached && (
-                                            <FaPlusCircle
-                                                className="text-primary cursor-pointer"
-                                                onClick={() => {
-                                                    if (!showCellPhone) setShowCellPhone(true);
-                                                    else if (!showOfficePhone) setShowOfficePhone(true);
-                                                }}
-                                            />
+                                            <span className=' uil-plus-circle plusicon cursor-pointer' onClick={() => {
+                                                if (!showCellPhone) setShowCellPhone(true);
+                                                else if (!showOfficePhone) setShowOfficePhone(true);
+                                            }} />
                                         )
                                     )}
 
@@ -689,8 +669,7 @@ const NewPatient = () => {
                                         renderPhoneField(
                                             'Cell Phone',
                                             'cellPhone',
-                                            <FaMinusCircle
-                                                className="text-danger cursor-pointer"
+                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
                                                 onClick={() => setShowCellPhone(false)}
                                             />
                                         )}
@@ -699,10 +678,8 @@ const NewPatient = () => {
                                         renderPhoneField(
                                             'Office Phone',
                                             'officePhone',
-                                            <FaMinusCircle
-                                                className="text-danger cursor-pointer"
-                                                onClick={() => setShowOfficePhone(false)}
-                                            />
+                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
+                                                onClick={() => setShowOfficePhone(false)} />
                                         )}
 
                                     <div className="col-md-3 col-12 mb-2">
@@ -710,10 +687,8 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
                                                 Email ID
                                                 {!showAltEmail && (
-                                                    <FaPlusCircle
-                                                        className="text-primary cursor-pointer"
-                                                        onClick={() => setShowAltEmail(true)}
-                                                    />
+                                                    <span className=' uil-plus-circle plusicon cursor-pointer'
+                                                        onClick={() => setShowAltEmail(true)} />
                                                 )}
                                             </Form.Label>
                                             <Form.Control
@@ -732,12 +707,11 @@ const NewPatient = () => {
                                     {showAltEmail && (
                                         <div className="col-md-3 col-12 mb-2">
                                             <Form.Group>
-                                                <Form.Label className="mb-0 d-flex justify-content-between align-items-center">
+                                                <Form.Label className="mb-0 d-flex gap-1  align-items-center">
                                                     Alternate Email
-                                                    <FaMinusCircle
-                                                        className="text-danger cursor-pointer"
+                                                    <span
                                                         onClick={() => setShowAltEmail(false)}
-                                                    />
+                                                        className=' uil-minus-circle minusicon text-danger cursor-pointer'></span>
                                                 </Form.Label>
                                                 <Form.Control
                                                     type="email"
@@ -1298,7 +1272,7 @@ const NewPatient = () => {
                             <Demographicdetails
                                 patientId={patientId}
                                 activeTab={activeTab}
-                                gender={genderIdentity} 
+                                gender={genderIdentity}
                                 setActiveTab={setActiveTab}
                                 showResponsibleTab={showResponsibleTab}
                                 setShowResponsibleTab={setShowResponsibleTab}

@@ -16,7 +16,7 @@ import DoctorIdentifierForm from "./DoctorIdentifier";
 import { getFilteredTaxonomies } from "../../../utils/DataSets/commonData";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
-const DoctorQualifications = () => {
+const DoctorQualifications = ({ setActiveTab }) => {
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -358,8 +358,8 @@ const DoctorQualifications = () => {
                             </Row>
 
                             <div className="d-flex justify-content-end gap-2 mt-1">
-                                <Button className="cancel-button">
-                                    Cancel
+                                <Button className="cancel-button" onClick={() => setActiveTab('departmentDetails')}>
+                                    Previous
                                 </Button>
                                 <Button
                                     variant="primary"
@@ -370,7 +370,7 @@ const DoctorQualifications = () => {
                                     {store?.createtDoctorsDetailReducer?.loading ? (
                                         <Spinner color="white" className="spinner-border-sm" />
                                     ) : (
-                                        'Update'
+                                        'Update & Exit'
                                     )}
                                 </Button>
 

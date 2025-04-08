@@ -9,7 +9,7 @@ import { TbCapture, TbHeartRateMonitor } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import PatientDetails from './PatientDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPatientByIdAction, resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
+import { getPatientByIdAction, getStatesByCountryAction, resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
@@ -40,6 +40,7 @@ import AllergyList from '../Task Tabs/AllergyList';
 import AddAssignTask from '../Task Tabs/AddAssignTask';
 import FilterModal from './FilterModal';
 import FilterDropdown from './FilterModal';
+import Responsiblle from '../Responsible';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -94,7 +95,9 @@ const UpdatePatientIndex = () => {
             setProfilePhoto(null);
         }
     }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
-
+    useEffect(() => {
+        dispatch(getStatesByCountryAction())
+    }, [dispatch])
     const handleTabClick = (tab) => {
         setSelectedSubTab(tab);
     };
@@ -199,11 +202,11 @@ const UpdatePatientIndex = () => {
             ...(logo?.url === null
                 ? []
                 : {
-                      photo:[ {
-                          url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
-                          title: logoName,
-                      }],
-                  }),
+                    photo: [{
+                        url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
+                        title: logoName,
+                    }],
+                }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
@@ -253,10 +256,10 @@ const UpdatePatientIndex = () => {
                                                                 src={
                                                                     logo?.url
                                                                         ? logo.url.split('?')[0]
-                                                                        : 
+                                                                        :
                                                                         patientDetails?.photo[0]?.url
-                                                                        ? patientDetails.photo[0]?.url
-                                                                        : profilePhoto
+                                                                            ? patientDetails.photo[0]?.url
+                                                                            : profilePhoto
                                                                 }
                                                                 alt="Patient Profile"
                                                                 className="img-fluid rounded"
@@ -270,9 +273,8 @@ const UpdatePatientIndex = () => {
 
                                                         {!isCameraOpen && (
                                                             <BiEdit
-                                                                className={`position-absolute fs-4 text-black ${
-                                                                    uploading ? 'd-none' : ''
-                                                                }`}
+                                                                className={`position-absolute fs-4 text-black ${uploading ? 'd-none' : ''
+                                                                    }`}
                                                                 style={{
                                                                     bottom: '-5px',
                                                                     right: '-9px',
@@ -341,8 +343,8 @@ const UpdatePatientIndex = () => {
                                                             <span>
                                                                 {patientDetails?.birthDate
                                                                     ? new Date(
-                                                                          patientDetails?.birthDate
-                                                                      )?.toLocaleDateString('en-GB')
+                                                                        patientDetails?.birthDate
+                                                                    )?.toLocaleDateString('en-GB')
                                                                     : 'N/A'}
                                                             </span>
                                                         </p>
@@ -416,15 +418,7 @@ const UpdatePatientIndex = () => {
                                                                         <span
                                                                             className="ps-2 fs-6"
                                                                             style={{ fontWeight: 600 }}>
-                                                                            {patientDetails?.address?.address
-                                                                                ? patientDetails?.address?.address
-                                                                                      ?.length > 30
-                                                                                    ? patientDetails?.address?.address?.slice(
-                                                                                          0,
-                                                                                          29
-                                                                                      ) + '...'
-                                                                                    : patientDetails?.address?.address
-                                                                                : 'N/A'}
+                                                                            {patientDetails?.address?.[0]?.city || ''}{patientDetails?.address?.[0]?.city && ','} {patientDetails?.address?.[0]?.state || ''}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -491,7 +485,8 @@ const UpdatePatientIndex = () => {
                                                                         <span
                                                                             className="ps-2 fs-6"
                                                                             style={{ fontWeight: 600 }}>
-                                                                            01/01/2025
+                                                                            {/* 01/01/2025 */}
+                                                                            -
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -574,11 +569,10 @@ const UpdatePatientIndex = () => {
                                                         ].map((tab) => (
                                                             <li className="nav-item" key={tab}>
                                                                 <a
-                                                                    className={`nav-link me-3 pb-0 tab-font-family ${
-                                                                        selectedMainTab === tab
-                                                                            ? 'active text-primary'
-                                                                            : 'text-black'
-                                                                    }`}
+                                                                    className={`nav-link me-3 pb-0 tab-font-family ${selectedMainTab === tab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                        }`}
                                                                     onClick={() => handleMainTabChange(tab)}
                                                                     style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                     {tab}
@@ -610,6 +604,7 @@ const UpdatePatientIndex = () => {
                                                 style={{ height: '65vh', overflow: 'auto' }}>
                                                 {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                                 {selectedMainTab === 'Demographics' && <Demographics />}
+                                                {selectedMainTab === 'Responsible Party' && <Responsiblle />}
                                                 {selectedMainTab === 'Insurances' && <Insurances />}
                                                 {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
@@ -657,11 +652,10 @@ const UpdatePatientIndex = () => {
                                                         ].map((subTab) => (
                                                             <li className="nav-item" key={subTab}>
                                                                 <a
-                                                                    className={`nav-link me-2 pb-0 tab-font-family ${
-                                                                        selectedSubTab === subTab
-                                                                            ? 'active text-primary'
-                                                                            : 'text-black'
-                                                                    }`}
+                                                                    className={`nav-link me-2 pb-0 tab-font-family ${selectedSubTab === subTab
+                                                                        ? 'active text-primary'
+                                                                        : 'text-black'
+                                                                        }`}
                                                                     onClick={() => handleSubTabChange(subTab)}
                                                                     style={{ cursor: 'pointer', fontWeight: 600 }}>
                                                                     {subTab}
@@ -746,29 +740,26 @@ const UpdatePatientIndex = () => {
                                                 aria-controls="patientChartData"
                                                 onClick={handleToggle}>
                                                 <i
-                                                    className={`bi ${
-                                                        isClinicalReviewExpandedData
-                                                            ? 'bi-chevron-up'
-                                                            : 'bi-chevron-down'
-                                                    }`}
+                                                    className={`bi ${isClinicalReviewExpandedData
+                                                        ? 'bi-chevron-up'
+                                                        : 'bi-chevron-down'
+                                                        }`}
                                                     style={{ fontSize: '14px', color: 'white' }}></i>
                                             </button>
                                         </div>
                                         <div id="patientChartData" className="collapse">
                                             <div
-                                                className={`card-body p-0 scroll-container ${
-                                                    isSidebarCollapsed ? 'collapsed-sidebar' : ''
-                                                }`}
+                                                className={`card-body p-0 scroll-container ${isSidebarCollapsed ? 'collapsed-sidebar' : ''
+                                                    }`}
                                                 style={{ height: '76.8vh', overflow: 'auto' }}>
                                                 {patientMenuItems.map((item, index) =>
                                                     item.subItems ? (
                                                         <div key={index} className="ms-0 w-100">
                                                             <p
-                                                                className={`patient-menu-item text-black mb-0 ps-2 pe-2  border-bottom py-1 ${
-                                                                    isSidebarCollapsed
-                                                                        ? 'text-center fw-bold'
-                                                                        : 'd-flex justify-content-between align-items-center'
-                                                                }`}
+                                                                className={`patient-menu-item text-black mb-0 ps-2 pe-2  border-bottom py-1 ${isSidebarCollapsed
+                                                                    ? 'text-center fw-bold'
+                                                                    : 'd-flex justify-content-between align-items-center'
+                                                                    }`}
                                                                 onClick={handleClinicalReviewToggle}
                                                                 style={{
                                                                     cursor: 'pointer',
@@ -785,11 +776,10 @@ const UpdatePatientIndex = () => {
                                                                 </span>
                                                                 {!isSidebarCollapsed && (
                                                                     <i
-                                                                        className={`bi ${
-                                                                            isClinicalReviewExpanded
-                                                                                ? 'bi-chevron-up'
-                                                                                : 'bi-chevron-down'
-                                                                        }`}></i>
+                                                                        className={`bi ${isClinicalReviewExpanded
+                                                                            ? 'bi-chevron-up'
+                                                                            : 'bi-chevron-down'
+                                                                            }`}></i>
                                                                 )}
                                                             </p>
                                                             {isClinicalReviewExpanded && (
@@ -797,11 +787,10 @@ const UpdatePatientIndex = () => {
                                                                     {item.subItems.map((subItem, subIndex) => (
                                                                         <div
                                                                             key={subIndex}
-                                                                            className={`d-flex  align-items-center ${
-                                                                                isSidebarCollapsed
-                                                                                    ? 'text-center justify-content-center'
-                                                                                    : 'ps-4 justify-content-between pe-2'
-                                                                            } border-bottom py-1 `}
+                                                                            className={`d-flex  align-items-center ${isSidebarCollapsed
+                                                                                ? 'text-center justify-content-center'
+                                                                                : 'ps-4 justify-content-between pe-2'
+                                                                                } border-bottom py-1 `}
                                                                             title={
                                                                                 isSidebarCollapsed ? subItem.label : ''
                                                                             } // Show tooltip in collapsed mode
@@ -834,7 +823,7 @@ const UpdatePatientIndex = () => {
                                                                                             //     selectedSubTab === subItem.label ? '#e9ecef' : 'transparent',
                                                                                             fontWeight:
                                                                                                 selectedSubTab ===
-                                                                                                subItem.label
+                                                                                                    subItem.label
                                                                                                     ? 'bold'
                                                                                                     : 'normal',
                                                                                         }}>
@@ -870,11 +859,10 @@ const UpdatePatientIndex = () => {
                                                     ) : (
                                                         <p
                                                             key={index}
-                                                            className={`patient-menu-item text-black mb-0 d-flex align-items-center w-100  ${
-                                                                isSidebarCollapsed
-                                                                    ? 'fw-bold text-center justify-content-center'
-                                                                    : ' '
-                                                            }`}
+                                                            className={`patient-menu-item text-black mb-0 d-flex align-items-center w-100  ${isSidebarCollapsed
+                                                                ? 'fw-bold text-center justify-content-center'
+                                                                : ' '
+                                                                }`}
                                                             onClick={() => handleTabClick(item.label)}
                                                             style={{
                                                                 cursor: 'pointer',
