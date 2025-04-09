@@ -153,20 +153,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
         setAddresses(updatedAddresses);
     };
 
-    // useEffect(() => {
-    //     if (selectedLocation) {
-    //         setValue('address', selectedLocation?.formatted);
-    //         const stateId =
-    //             statesData?.states &&
-    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?.id;
-    //         const selectedState =
-    //             statesData?.states &&
-    //             statesData?.states.find((data) => data?.state_code === selectedLocation?.components?.state_code)?._id;
-    //         setValue('stateName', selectedState);
-    //         const countyName = selectedLocation?.components?.county;
-    //         dispatch(getCitiesAction({ state_code: stateId, name: countyName, limit: '', skip: '' }));
-    //     }
-    // }, [selectedLocation, setValue, statesData, dispatch]);
     const handleStateSelection = (e, addressType, index) => {
         const selectedOption = e.target.selectedOptions[0];
         const stateData = JSON.parse(selectedOption.getAttribute('data-key'));
@@ -458,17 +444,26 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                     handleAddressChange(index, 'fax', e.target.value);
                                 }}
                             />
-                            {addresses.length > 1 && index !== 0 && (
+                            {/* {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                                     style={{ right: '-2%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>
-                            )}
+                            )} */}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>
+                    {addresses.length > 1 && (
+                        <span
+                            className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                            // style={{ right: '-2%', top: '50%', zIndex: 111 }}
+                            onClick={() => removeAddress(index)}>
+                            <CiCircleMinus />
+                        </span>
+                    )}
+
                     {addresses?.length > 1 && index < addresses.length - 1 && <hr className="mt-2" />}
 
                 </Row >

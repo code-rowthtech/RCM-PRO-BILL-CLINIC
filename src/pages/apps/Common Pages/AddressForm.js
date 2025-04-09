@@ -7,6 +7,7 @@ import { getCities2Action, getCities3Action, getCitiesAction } from '../../../re
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { useLocation } from 'react-router-dom';
+import PatientDetails from '../Patients/UpdatePatient/PatientDetails';
 
 const AddressForm = ({ addresses, setAddresses }) => {
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
@@ -152,13 +153,42 @@ const AddressForm = ({ addresses, setAddresses }) => {
             }
         }
     };
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
+    useEffect(() => {
+        if (patientDetails && statesData?.states) {
+            patientDetails?.address?.forEach((address) => {
+                const stateObj = statesData?.states?.find((data) => data?.name === address?.state);
+                const stateCode = stateObj?.id;
+
+                if (!stateCode) return;
+
+                const cityPayload = {
+                    state_code: stateCode,
+                    name: address?.city || '',
+                    limit: 25,
+                    skip: ''
+                };
+
+                switch (address?.type) {
+                    case 'physical':
+                        dispatch(getCitiesAction(cityPayload));
+                        break;
+                    case 'postal':
+                        dispatch(getCities2Action(cityPayload));
+                        break;
+                    default:
+                        dispatch(getCities3Action(cityPayload));
+                        break;
+                }
+            });
+        }
+    }, [patientDetails, statesData]);
     const addAddressLine = (index) => {
         if (addresses[index]?.line?.length === 3) {
             ToastHandle('Maximum 3 address lines are allowed.', 'danger');
             return;
         }
-        console.log(index, 'index');
         setAddresses(prev => {
             const updated = [...prev];
             const currentAddress = { ...updated[index] };
@@ -282,9 +312,9 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                             const cityName = data.components?.city || data.components?.town || data.components?.village || '';
 
                                             // Dispatch city load based on address type
-                                            if (item?.type === 'primary') {
+                                            if (item?.type === 'physical') {
                                                 dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
-                                            } else if (item?.type === 'mailing') {
+                                            } else if (item?.type === 'postal') {
                                                 dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
                                             } else {
                                                 dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));

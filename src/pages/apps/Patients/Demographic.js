@@ -70,19 +70,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
-    // useEffect(() => {
-    //     if (employerStateName) {
-    //         const stateCity = statesData?.states?.find((data) => data?.state_code === employerStateName)?.id;
-    //         dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
-    //     }
-    // }, [employerStateName]);
     useEffect(() => {
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
         }
     }, [employerCitySearch, cities3]);
-
-    console.log(gender,'gender')
 
     const onSubmit = (data) => {
         const selectedGenderIdentity = genderIdentityOptions.find((option) => option.show === data.genderIdentity);
@@ -240,7 +232,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes })
         };
-        // console.log(payload, 'payload')
+        console.log(payload, 'payload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
         console.log(payload)
     };

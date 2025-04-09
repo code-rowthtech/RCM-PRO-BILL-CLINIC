@@ -264,7 +264,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                     <Col sm={3}>
                         <Form.Label className='mb-0 mt-2'>Status</Form.Label>
                         <Form.Select
-                            value={item?.status || ''}
+                            value={item?.status || 'active'}
                             onChange={(e) => handleChange(index, 'status', e.target.value)}>
                             <option value="">Select</option>
                             <option value="active">Active</option>
@@ -415,7 +415,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                     <Col sm={3}>
                         <Form.Label className='mb-0 mt-2'>Status</Form.Label>
                         <Form.Select
-                            value={item?.status || ''}
+                            value={item?.status || 'active'}
                             onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
                             <option value="">Select</option>
                             <option value="active">Active</option>

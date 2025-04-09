@@ -162,7 +162,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-
     const setField = (key, value) => value && setValue(key, value);
     // useEffect(() => {
     //     setField('clinicType', clinicsDataGet?.orgType);
@@ -268,7 +267,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                            url: data?.documents?.[0], // Store URL
+                            url: data?.documents?.[0]?.url, // Store URL
                             name: data?.documents?.[0]?.fileName, // Extract filename from URL
                         }
                         : '',
@@ -419,8 +418,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 identifierType: item.type,
                 use: item.use,
                 value: item.number,
-                // documents: item.file ? {  url: item.file.url,fileName: item.file.name || '' } : null,
-                documents: [item?.file?.url],
+                documents: item.file ? { url: item.file.url, fileName: item.file.name || '' } : null,
+                // documents: [item?.file?.url],
                 expirationDate: item.expiry,
                 status: 'active',
                 system: 'urn:oid:2.16.840.1.113883.4.7',
@@ -488,6 +487,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //       },
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
+        // console.log(newPayload, '934873890')
     };
     const logoFileInputRef = useRef(null);
     // const accreditationFileInputRef = useRef(null);

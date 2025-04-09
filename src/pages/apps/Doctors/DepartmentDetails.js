@@ -10,7 +10,7 @@ import { CiCircleMinus } from "react-icons/ci";
 import DoctorIdentifierForm from "./DoctorIdentifier";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
-const DepartmentDetails = () => {
+const DepartmentDetails = ({ setActiveTab }) => {
   // const defaultIdentifiers = ['NPI'];
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
@@ -261,7 +261,7 @@ const DepartmentDetails = () => {
                         <Col sm={3}>
                           <Form.Label className='mb-0'>Type</Form.Label>
                           <Form.Select
-                            value={data.type}
+                            value={data.type || 'primary'}
                             onChange={(e) => {
                               const updatedList = [...taxonomyCodesList];
                               updatedList[index].type = e.target.value;
@@ -324,8 +324,8 @@ const DepartmentDetails = () => {
               </Row>
 
               <div className="d-flex justify-content-end gap-2 mt-1">
-                <Button className="cancel-button">
-                  Cancel
+                <Button className="cancel-button" onClick={() => setActiveTab('personalDetails')}>
+                  Previous
                 </Button>
                 <Button
                   variant="primary"
@@ -336,7 +336,7 @@ const DepartmentDetails = () => {
                   {store?.createtDoctorsDetailReducer?.loading ? (
                     <Spinner color="white" className="spinner-border-sm" />
                   ) : (
-                    'Update'
+                    'Update & Next'
                   )}
                 </Button>
 

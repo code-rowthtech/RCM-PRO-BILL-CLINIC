@@ -60,6 +60,8 @@ const Demographicdetails = ({ patientId }) => {
     const [searchedMailingLocations, setSearchedMailingLocations] = useState(null);
     const [searchedEmployerLocations, setSearchedEmployerLocations] = useState(null);
     const [sameAsPrimary, setSameAsPrimary] = useState(false);
+    const [identifiers, setIdentifiers] = useState([]);
+
     const statesData = store?.getStatesReducer?.data;
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
@@ -134,7 +136,15 @@ const Demographicdetails = ({ patientId }) => {
             setValue('employerZip', patientDetails?.employerDetails?.workLocation?.address?.postalCode || '');
             setValue('employerPhone', formatPhoneNumber(patientDetails?.employerDetails?.employerPhone || ''));
             setValue('employerAddress', patientDetails?.employerDetails?.workLocation?.address?.line || '');
-            setIdentifiers(patientDetails?.identifier || []);
+            const defaultIdentifiers = patientDetails?.identifier?.map((data, index) => ({
+                expiry: data?.expiry,
+                file: data?.file?.[0],
+                issuingAuthority: data?.issuingAuthority,
+                number: data?.value,
+                system: '',
+                type: { label: data?.type?.coding?.[0]?.display, value: data?.type?.coding?.[0]?.system, code: data?.type?.coding?.[0]?.code }
+            }))
+            setIdentifiers(defaultIdentifiers || []);
             // setDemographicAddresses(patientDetails?.address || []);
             const newAddresses = patientDetails?.address?.map((addr) => ({
                 type: addr.type || '',  // Make sure type is included
@@ -329,7 +339,7 @@ const Demographicdetails = ({ patientId }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: [data?.employerAddress],
+                        line: data?.employerAddress,
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -399,7 +409,6 @@ const Demographicdetails = ({ patientId }) => {
     const handleTribalChange = (selectedOption) => {
         setTri(selectedOption ? selectedOption.value : '');
     };
-    const [identifiers, setIdentifiers] = useState([]);
     const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display === eth);
     const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) || formattedTribleOptions.find((option) => option?.value?.code == tri);
     const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
