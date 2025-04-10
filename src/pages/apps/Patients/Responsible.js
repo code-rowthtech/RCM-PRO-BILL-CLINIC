@@ -50,6 +50,14 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                 city: data?.city, country: data?.country, line: data?.line, postalCode: data?.postalCode, state: data?.state, type: data?.type, use: data?.use
             }))
             setResponsibleAddresses(updateAddress)
+            const updateTelecom = patientDetails?.telecom?.map((data, index) => (
+                {
+                    system: data?.system, value: data?.value, use: data?.use
+                    }
+                    )
+            )
+            setResponsibleTelecom(updateTelecom)
+          
         }
     }, [patientDetails, id])
     const onSubmit = (data) => {

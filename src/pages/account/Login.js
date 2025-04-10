@@ -38,7 +38,7 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/crm/addclinic';
+    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/';
 
     useEffect(() => {
         dispatch(resetAuth());
@@ -136,7 +136,7 @@ const Login = (): React$Element<any> => {
                     </FormInput>
 
                     <div className="mb-3 mb-0 d-flex justify-content-center">
-                        <Button className='custom-buttons w-25' type="submit" disabled={loading}>
+                        <Button className='custom-buttons w-100 d-flex algin-items-center justify-content-center' type="submit" disabled={loading}>
                             {loading ?
                                 <Spinner color='white' className="spinner-border-sm " />
                                 :

@@ -434,7 +434,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                    style={{ right: '-2%', top: '50%' }}
+                                    style={{ right: '-10%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>
