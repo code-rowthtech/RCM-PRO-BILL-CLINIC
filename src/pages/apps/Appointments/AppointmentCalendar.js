@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
@@ -9,11 +9,12 @@ import { getAppointmentsAction } from '../../../redux/appointments/action';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from 'react-icons/io';
 import Spinner from '../../../constants/Spinner';
+import AppointmentForm from './Tabs/AppointmentForm';
 
 const localizer = momentLocalizer(moment);
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
-const AppointmentCalendar = () => {
+const AppointmentCalendar = ({ selectedDoctor }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [events, setEvents] = useState([]);
@@ -21,31 +22,42 @@ const AppointmentCalendar = () => {
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [show, setShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null)
+    const [selectedSlot, setSelectedSlot] = useState(null);
+
+    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
+    const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     useEffect(() => {
-        dispatch(getAppointmentsAction({ clinicId: clinicId }));
-    }, [dispatch, clinicId]);
+        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+    }, [dispatch, selectedDoctor])
+    useEffect(() => {
+        if (createAppointmentResponse === 201) {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+            setAppModal(false)
+        }
+    }, [createAppointmentResponse]);
+    useEffect(() => {
+        if (updateSuccess === 200) {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+            setShow(false)
+        }
+    }, [updateSuccess]);
+
+    const CustomEvent = ({ event }) => {
+        return (
+            <div>
+                <p className="text-capitalize mb-0">{event.patientName} {`(${event?.status})`}</p>
+                <p className="mb-0">{event.title}</p>
+            </div>
+        );
+    };
+
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList.map((data) => {
                 try {
-                    // Parse the date string into a base Date object
-                    const baseDate = new Date(data.date);
-                    if (isNaN(baseDate)) {
-                        console.error(`Invalid date format: ${data.date}`);
-                        return null;
-                    }
+                    const start = new Date(data.start);
+                    const end = new Date(data.end);
 
-                    // Parse startTime and endTime strings
-                    const startTimeParts = parseTimeString(data.startTime);
-                    const endTimeParts = parseTimeString(data.endTime);
-                    // Create the start and end Date objects
-                    const start = new Date(baseDate);
-                    start.setHours(startTimeParts.hours, startTimeParts.minutes);
-
-                    const end = new Date(baseDate);
-                    end.setHours(endTimeParts.hours, endTimeParts.minutes);
-
-                    // Check for valid start and end dates
                     if (isNaN(start) || isNaN(end)) {
                         console.error("Invalid start or end date", start, end);
                         return null;
@@ -53,54 +65,31 @@ const AppointmentCalendar = () => {
 
                     return {
                         event_id: data?._id,
-                        title: data?.purposeOfVisit,
+                        title: data?.reason?.[0]?.coding?.[0]?.display,
+                        status: data?.status,
                         appointmentDate: new Date(data?.date).toLocaleDateString('en-GB'),
                         start: start,
                         end: end,
-                        slotStart: data?.startTime,
-                        slotEnd: data?.endTime,
-                        doctorName: data?.doctor?.userId?.firstName + ' ' + data?.doctor?.userId?.lastName,
-                        patientName: data?.patient?.title + ' ' + data?.patient?.firstName,
-                        patientContact: data?.patient?.cellPhone,
-                        appointmentDescription: data?.reason,
-                        patientAddress: data?.patient?.address?.street,
-                        clinicLogo: data?.clinic?.logo?.url,
-                        patientGender: data?.patient?.sex,
-                        patientEmail: data?.patient?.email,
-                        doctorDepartment: data?.doctor?.departmentId?.name,
-                        doctorContact: data?.doctor?.userId?.phone,
-                        doctorEmail: data?.doctor?.userId?.email,
-                        patientId: data?.patient?._id,
+                        slotStart: data?.start,
+                        slotEnd: data?.end,
+                        doctorName: data?.doctorId?.name?.[0]?.text,
+                        patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
+                        patientContact: data?.subject?.telecom?.[0]?.value,
+                        appointmentDescription: data?.appointmentType?.text,
+                        patientEmail: data?.subject?.telecom?.find((data) => data?.system === 'email' && data?.value)?.value,
+                        patientId: data?.subject?._id,
                     };
                 } catch (error) {
                     console.error("Error processing appointment:", data, error);
                     return null;
                 }
-            }).filter(Boolean); // Remove null values caused by invalid data
-            setEvents(transformedEvents); // Update the events state
+            }).filter(Boolean);
+
+            setEvents(transformedEvents);
         }
     }, [appointmentsList]);
 
-    // Helper function to parse "9:30 AM" into hours and minutes
-    const parseTimeString = (timeString) => {
-        if (!timeString) {
-            throw new Error(`Invalid time string: ${timeString}`);
-        }
-        const [time, modifier] = timeString.split(" ");
-        let [hours, minutes] = time.split(":").map(Number);
-
-        if (modifier === "PM" && hours !== 12) {
-            hours += 12;
-        } else if (modifier === "AM" && hours === 12) {
-            hours = 0;
-        }
-
-        return { hours, minutes };
-    };
-
-
     const handleEventClick = (event) => {
-        // alert(`Event clicked: ${event.title}`);
         setShow(true);
         setSelectedEvent(event);
     };
@@ -108,18 +97,14 @@ const AppointmentCalendar = () => {
         setShow(false);
         setSelectedEvent(null);
     }
+    const [appModal, setAppModal] = useState(false)
+    const closeAppModal = () => {
+        setAppModal(false);
+        setSelectedEvent(null);
+    }
     return (
         <div className='background_Color pt-1 pb-2'>
             <div className='container-fluid px-4'>
-                <div className='d-flex justify-content-between mt-3'>
-                    <p className='fw-bold mt-1'>Appointment Calendar</p>
-                    <Button
-                        onClick={() => navigate("/apps/appointments/list")}
-                        className='cancel-button'
-                    >
-                        Back
-                    </Button>
-                </div>
                 <div className='row'>
                     {store?.getAppointmentsReducer?.loading ?
                         <div className="row h-100">
@@ -135,36 +120,65 @@ const AppointmentCalendar = () => {
                                     events={events}
                                     startAccessor="start"
                                     endAccessor="end"
-                                    style={{ height: 500 }}
+                                    style={{ height: '68vh' }}
+                                    selectable
                                     onSelectEvent={handleEventClick}
+                                    onSelectSlot={(slotInfo) => {
+                                        setSelectedSlot(slotInfo);
+                                        setAppModal(true);
+                                    }}
+                                    components={{
+                                        event: CustomEvent,
+                                    }}
                                 />
+
                             </div>
                         </div>
                     }
 
                 </div>
             </div>
+            <Modal centered show={appModal} size='lg' onHide={closeAppModal}>
+                <Modal.Body>
+                    <Row className="border-bottom mb-1 pb-2">
+                        <Col sm={11} className='text-center'>
+                            <h4>{selectedEvent ? "Appointment Details" : "Create New Appointment"}</h4>
+                        </Col>
+                        <Col sm={1}>
+                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />
+                        </Col>
+                    </Row>
+
+                    {selectedEvent ? (
+                        <Row>
+                        </Row>
+                    ) : selectedSlot ? (
+                        <AppointmentForm selectedSlot={selectedSlot} />
+                    ) : null}
+                </Modal.Body>
+            </Modal>
             <Modal centered show={show} size='lg' onHide={closeModal}>
+                <Modal.Body>
+                    <Row className="border-bottom mb-1 pb-2">
+                        <Col sm={11} className='text-center'>
+                            <h4>{selectedEvent ? "Appointment Details" : "Create New Appointment"}</h4>
+                        </Col>
+                        <Col sm={1}>
+                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />
+                        </Col>
+                    </Row>
+
+                    <AppointmentForm appointmentId={selectedEvent?.event_id} />
+                </Modal.Body>
+            </Modal>
+
+            {/* <Modal centered show={show} size='lg' onHide={closeModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'><h4>Appointment Details</h4></Col>
                         <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} /></Col>
                     </Row>
                     <Row>
-                        {/* <Col sm={12} className="d-flex justify-content-start my-1">
-                            <img
-                                src={selectedEvent?.clinicLogo}
-                                alt="clinic logo"
-                                className="rounded-circle border border-muted" // Ensures the image is circular
-                                style={{
-                                    width: "3rem", // Set width and height explicitly for a perfect circle
-                                    height: "3rem",
-                                    objectFit: "cover", // Ensures the image fills the circle without distorting
-                                }}
-                            />
-                        </Col> */}
-                        {/* <hr className='my-1 text-black' /> */}
-                        {/* <Col sm={12} className='my-1'> */}
                         <Row className='text-black my-2'>
                             <Col sm={12}>
                                 <h4 className='my-0 mb-1 fw-bold'>Patient Details</h4>
@@ -313,7 +327,7 @@ const AppointmentCalendar = () => {
                         </Row>
                     </Row>
                 </Modal.Body>
-            </Modal >
+            </Modal > */}
         </div >
     );
 };

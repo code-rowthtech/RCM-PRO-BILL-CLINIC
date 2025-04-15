@@ -16,7 +16,7 @@ import DoctorIdentifierForm from "./DoctorIdentifier";
 import { getFilteredTaxonomies } from "../../../utils/DataSets/commonData";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
-const DoctorQualifications = () => {
+const DoctorQualifications = ({ setActiveTab }) => {
     // const defaultIdentifiers = ['NPI'];
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -31,18 +31,14 @@ const DoctorQualifications = () => {
     const [searchParams] = useSearchParams();
 
     const updateId = searchParams.get('id');
-    const [qualifications, setQualifications] = useState([{ degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
+    const [qualifications, setQualifications] = useState([{ id: 1, degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
+    const degreeFileInputRef = useRef(null);
+    const documentsFileInputRef = useRef(null);
     const [documents, setDocuments] = useState([{ name: '', number: '', issuingAuthority: '', document: null, note: '' }]);
     const [documentUploading, setDocumentUploading] = useState(false);
     const addQualification = () => {
-        setQualifications((prev) => [
-            ...prev,
-            {
-                degreeName: '', degreeFile: null, issuerOrganisation: '',
-            },
-        ]);
-        // const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
-        // setQualifications([...qualifications, newQualification]);
+        const newQualification = { id: qualifications.length + 1, degreeName: '', degreeFile: null, issuerOrganisation: '' };
+        setQualifications([...qualifications, newQualification]);
     };
 
     const removeQualification = (id) => {
@@ -64,7 +60,7 @@ const DoctorQualifications = () => {
             }
         }
         const updatedQualifications = qualifications.map((qual, i) =>
-            i === index ? { ...qual, [field]: field === 'degreeFile' ? value : value } : qual
+            i === index ? { ...qual, [field]: field === 'degreeName' ? value?.data : value } : qual
         );
         setQualifications(updatedQualifications);
     };
@@ -99,12 +95,14 @@ const DoctorQualifications = () => {
             qualification: qualificationData,
             otherDocuments: documents
         }
+        console.log(payload, 'payload')
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     }
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
             const updatedQualifications = doctorDetails?.qualification?.map((item, index) => ({
+                id: index + 1,
                 degreeName: {
                     code: item?.code?.code,
                     display: item?.code?.display,
@@ -115,10 +113,6 @@ const DoctorQualifications = () => {
                 degreeFile: item?.documents?.[0] || null, // Use the first document if available
                 issuerOrganisation: item?.issuer || '', // Use the issuer reference if available
             }));
-            const updatedDocuments = doctorDetails?.otherDocuments?.map((item, index) => ({
-                name: item?.name || '', number: item?.number || '', issuingAuthority: item?.issuingAuthority || '', document: item?.document || null, note: item?.note || ''
-            }));
-            setDocuments(updatedDocuments)
             setQualifications(updatedQualifications);
         }
     }, [doctorDetails, setValue, updateId]);
@@ -139,10 +133,19 @@ const DoctorQualifications = () => {
     };
     const handleDocumentsChange = (index, field, value) => {
         const updatedDocuments = documents.map((docs, i) =>
-            i === index ? { ...docs, [field]: field === 'document' ? value : value } : docs
+            i === index ? { ...docs, [field]: field === 'degreeName' ? value?.data : value } : docs
         );
         setDocuments(updatedDocuments);
     };
+
+    // const handleFileChangeDocuments = (index, event) => {
+    //     const file = event.target.files[0];
+    //     if (file) {
+    //         const updatedDocs = [...documents];
+    //         updatedDocs[index].document = file;
+    //         setDocuments(updatedDocs);
+    //     }
+    // };
 
     const handleFileChangeDocuments = async (index, event) => {
         const file = event.target.files[0];
@@ -214,7 +217,7 @@ const DoctorQualifications = () => {
                                                     <div className="mb-1 d-flex flex-column position-relative">
                                                         <Form.Label className="mb-0">Degree</Form.Label>
                                                         <div
-                                                            onClick={() => document.getElementById(`fileInput-degree-${index}`).click()}
+                                                            onClick={() => degreeFileInputRef.current.click()}
                                                             className={`custom-file-upload justify-content-between cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile ? '' : 'custom-form-fields'}`}
                                                         >
                                                             {degreeUploading ? 'Uploading...' : qualification.degreeFile?.fileName ? qualification.degreeFile.fileName : 'Upload Degree'}
@@ -224,10 +227,8 @@ const DoctorQualifications = () => {
                                                         </div>
                                                         <Form.Control
                                                             type="file"
-                                                            id={`fileInput-degree-${index}`}
-                                                            // {...register(`degree[${index}]`)}
                                                             className="d-none"
-                                                            // ref={degreeFileInputRef}
+                                                            ref={degreeFileInputRef}
                                                             onChange={(event) => handleFileChangeDegree(index, event)}
                                                         />
                                                     </div>
@@ -279,7 +280,6 @@ const DoctorQualifications = () => {
                                                             <Form.Label className="mb-0">Document Name</Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                value={data?.name || ''}
                                                                 {...register(`documentName[${index}]`)}
                                                                 onChange={(e) => handleDocumentsChange(index, 'name', e.target.value)}
                                                                 placeholder="Enter Document Name"
@@ -291,7 +291,6 @@ const DoctorQualifications = () => {
                                                             <Form.Label className="mb-0">Document Number</Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                value={data?.number}
                                                                 {...register(`documentNumber[${index}]`)}
                                                                 onChange={(e) => handleDocumentsChange(index, 'number', e.target.value)}
                                                                 placeholder="Enter Document Number"
@@ -303,7 +302,6 @@ const DoctorQualifications = () => {
                                                             <Form.Label className="mb-0">Issuing Authority</Form.Label>
                                                             <Form.Control
                                                                 type="text"
-                                                                value={data.issuingAuthority}
                                                                 {...register(`issuingAuthority[${index}]`)}
                                                                 onChange={(e) => handleDocumentsChange(index, 'issuingAuthority', e.target.value)}
                                                                 // value={data.issuerOrganisation}
@@ -312,25 +310,35 @@ const DoctorQualifications = () => {
                                                             />
                                                         </Form.Group>
                                                     </div>
+                                                    {/* <div className="col-md-3 col-12">
+                                                    <Form.Group className="mb-1">
+                                                        <Form.Label className="mb-0">Status</Form.Label>
+                                                        <Form.Select
+                                                            {...register(`status[${index}]`)}
+                                                            onChange={(e) => handleDocumentsChange(index, 'status', e.target.value === 'active' ? true : false)}>
+                                                            <option value="" hidden>Select Status</option>
+                                                            <option value="active">Active</option>
+                                                            <option value="inactive">Inactive</option>
+                                                        </Form.Select>
+                                                    </Form.Group>
+                                                </div> */}
                                                     <div className="col-md-3 col-12">
                                                         <div className="mb-1 d-flex flex-column position-relative">
                                                             <Form.Label className="mb-0">Document</Form.Label>
                                                             <div
-                                                                onClick={() => document.getElementById(`fileInput-documents-${index}`).click()}
-                                                                // onClick={() => documentsFileInputRef.current.click()}
+                                                                onClick={() => documentsFileInputRef.current.click()}
                                                                 className={`custom-file-upload justify-content-between cursor-pointer form-control ${data.degreeName || data.degreeFile ? '' : 'custom-form-fields'}`}
                                                             >
-                                                                {documentUploading ? 'Uploading...' : data?.document?.fileName ? data.document.fileName : 'Upload Degree'}
+                                                                {documentUploading ? 'Uploading...' : data.degreeFile?.fileName ? data.degreeFile.fileName : 'Upload Degree'}
                                                                 <p className="mb-0">
                                                                     <FiUploadCloud />
                                                                 </p>
                                                             </div>
                                                             <Form.Control
                                                                 type="file"
-                                                                id={`fileInput-documents-${index}`}
-                                                                // {...register(`document[${index}]`)}
+                                                                {...register(`document[${index}]`)}
                                                                 className="d-none"
-                                                                // ref={documentsFileInputRef}
+                                                                ref={documentsFileInputRef}
                                                                 onChange={(event) => handleFileChangeDocuments(index, event)}
                                                             />
                                                         </div>
@@ -340,7 +348,6 @@ const DoctorQualifications = () => {
                                                             <Form.Label className="mb-0">Note</Form.Label>
                                                             <Form.Control
                                                                 as='textarea'
-                                                                value={data?.note}
                                                                 {...register(`note[${index}]`)}
                                                                 onChange={(e) => handleDocumentsChange(index, 'note', e.target.value)}
                                                                 // value={qualification.issuerOrganisation}
@@ -358,8 +365,8 @@ const DoctorQualifications = () => {
                             </Row>
 
                             <div className="d-flex justify-content-end gap-2 mt-1">
-                                <Button className="cancel-button">
-                                    Cancel
+                                <Button className="cancel-button" onClick={() => setActiveTab('departmentDetails')}>
+                                    Previous
                                 </Button>
                                 <Button
                                     variant="primary"
@@ -370,7 +377,7 @@ const DoctorQualifications = () => {
                                     {store?.createtDoctorsDetailReducer?.loading ? (
                                         <Spinner color="white" className="spinner-border-sm" />
                                     ) : (
-                                        'Update'
+                                        'Update & Exit'
                                     )}
                                 </Button>
 

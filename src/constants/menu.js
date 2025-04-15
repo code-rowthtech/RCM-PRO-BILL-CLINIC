@@ -10,7 +10,7 @@ const MENU_ITEMS = [
 
     {
         key: 'appointments',
-        label: 'Appointments',
+        label: 'Calendar',
         icon: 'uil-schedule',
         url: '/apps/appointments/list',
     },

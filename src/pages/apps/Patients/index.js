@@ -12,6 +12,7 @@ import { getPatientsAction, updatePatientsAction } from '../../../redux/patients
 import { encryptMessage } from '../../../cryptoUtils';
 import Paginations from '../../../helpers/Paginations';
 import { IoSearchSharp } from 'react-icons/io5';
+import { getStatesByCountryAction } from '../../../redux/actions';
 
 const Patients = () => {
     const navigate = useNavigate('');
@@ -70,6 +71,7 @@ const Patients = () => {
     };
 
     const patientsData = store?.getPatientsReducer?.data?.data;
+    console.log('patientsData', store?.getPatientsReducer);
     const closeDetailsModal = () => {
         setDetailsModal(false);
         setSelectedDetails(null);

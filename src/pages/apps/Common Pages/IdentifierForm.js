@@ -17,6 +17,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
     const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
     const [constantIdentifiers, setConstantIdentifiers] = useState([]);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     const identifierOptions = [
         { label: 'National Provider Identifier (NPI)', value: 'http://hl7.org/fhir/sid/us-npi', code: 'NPI' },
@@ -75,6 +76,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setIdentifiers(identifiers.filter((_, i) => i !== index));
     };
 
+
     const handleChange = (index, field, value) => {
         const updatedIdentifiers = [...identifiers];
         updatedIdentifiers[index][field] = value;
@@ -103,32 +105,18 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         }
     };
     useEffect(() => {
-        if (doctorDetails) {
-            if (doctorDetails) {
-                // Set qualifications data
-                const updatedIdentifiers = doctorDetails?.identifier?.map((item, index) => ({
-                    expiry: item?.expirationDate ? new Date(item?.expirationDate).toISOString().split('T')[0] : '',
-                    file: item?.documents?.[0],
-                    issuingAuthority: item?.issuingAuthority,
-                    number: item?.value,
-                    system: '',
-                    type: {
-                        code: item?.sliceName || '',
-                        label: item?.identifierType || '',
-                        value: item?.system || '',
-                    },
-                }));
-                setIdentifiers(updatedIdentifiers);
-                setValue('specialist', doctorDetails?.specialties?.[0]);
-            }
+        if (patientDetails) {
+            // Set qualifications data
+
+            setValue('specialist', patientDetails?.specialties?.[0]);
         }
-    }, [doctorDetails]);
+    }, [patientDetails]);
     return (
         <>
             <Row>
                 <Col sm={12}>
                     <h5>
-                        Identifiers
+                        Identifier
                         <span
                             className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
                             onClick={addIdentifier}></span>
@@ -174,11 +162,11 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Select
                             value={item?.system || item?.type?.value || ''}
+                            data-has-value={!!(item?.system || item?.type?.value)}
                             onChange={(e) => {
                                 const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
                                 handleChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
                         >
                             <option value="" disabled>Select Identifier Type</option>
                             {identifierOptions.map((option) => (
@@ -196,8 +184,10 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             placeholder="Document Number"
                             maxLength={10}
                             value={item?.number || item?.value}
+                            data-has-value={!!(item?.number || item?.value)}
                             onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
+
                     </Col>
                     <Col className="mb-2 position-relative">
                         <div
@@ -228,6 +218,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                     <Col>
                         <Form.Select
                             value={item?.issuingAuthority || ''}
+                            data-has-value={!!(item?.issuingAuthority)}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
                             <option value="" disabled>
                                 Select Issuing Authority

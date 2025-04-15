@@ -18,13 +18,18 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const [submissionType, setSubmissionType] = useState(null);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
+
     const [responsibleTelecom, setResponsibleTelecom] = useState([
         { system: '', value: '', use: '' },
     ]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
     const {
         register,
         handleSubmit,
@@ -33,9 +38,32 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         reset,
         clearErrors,
     } = useForm();
+
+    useEffect(() => {
+        if (patientDetails && id) {
+            setValue('title', patientDetails?.name?.[0]?.prefix);
+            setValue('fullName', patientDetails?.name?.[0]?.text);
+            setValue('gender', patientDetails?.gender);
+            setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0])
+            setValue('dateOfBirth', patientDetails?.relatedPerson?.dateOfBirth ? new Date(patientDetails?.relatedPerson?.dateOfBirth).toISOString().split('T')[0] : '');
+            const updateAddress = patientDetails?.address?.map((data, index) => ({
+                city: data?.city, country: data?.country, line: data?.line, postalCode: data?.postalCode, state: data?.state, type: data?.type, use: data?.use
+            }))
+            setResponsibleAddresses(updateAddress)
+            const updateTelecom = patientDetails?.telecom?.map((data, index) => (
+                {
+                    system: data?.system, value: data?.value, use: data?.use
+                    }
+                    )
+            )
+            setResponsibleTelecom(updateTelecom)
+          
+        }
+    }, [patientDetails, id])
     const onSubmit = (data) => {
         const payload = {
-            patientId: patientId,
+            ...(id && { id: patientDetails?.relatedPerson?._id }),
+            patientId: id ? id : patientId,
             clinicId: clinicId,
             name: [
                 {
@@ -43,7 +71,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                     text: data?.fullName,
                     family: data?.lastName || '', // Assuming you have a last name field
                     given: [data?.firstName || '', data?.middleName || ''], // Assuming first & middle name exist
-                    prefix: [data?.title || ''], // Using title as prefix
+                    prefix: data?.title || '', // Using title as prefix
                     suffix: [], // Add suffix if available
                     preferred: true,
                 },
@@ -67,10 +95,10 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                setActiveTab('referringDoctor');
+                // setActiveTab('referringDoctor');
             } else if (submissionType === 'saveAndReset') {
                 reset();
-                setActiveTab('personalDetails');
+                // setActiveTab('personalDetails');
             }
         }
     }, [createResponse]);
@@ -79,6 +107,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         label: relation.display, // Display text as the label
     }));
     const [rela, setRela] = useState(null);
+    console.log(rela, 'relarelarelarela')
     const handleRelationChange = (selectedOption) => {
         setRela(selectedOption ? selectedOption.value : '');
     };
@@ -122,9 +151,9 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                     {...register('gender', { required: 'Gender is required' })}
                                     aria-label="Select Gender">
                                     <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
                                 </Form.Select>
                             </div>
                             {errors.gender && <span className="text-danger">{errors.gender.message}</span>}

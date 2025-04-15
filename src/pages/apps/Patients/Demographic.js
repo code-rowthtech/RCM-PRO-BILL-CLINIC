@@ -28,7 +28,7 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab }) => {
+const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab, gender }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -70,12 +70,6 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
 
-    // useEffect(() => {
-    //     if (employerStateName) {
-    //         const stateCity = statesData?.states?.find((data) => data?.state_code === employerStateName)?.id;
-    //         dispatch(getCities3Action({ state_code: stateCity, name: employerCitySearch, limit: 25, skip: '' }));
-    //     }
-    // }, [employerStateName]);
     useEffect(() => {
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
@@ -238,8 +232,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes })
         };
-        // console.log(payload, 'payload')
+        console.log(payload, 'payload')
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
+        console.log(payload)
     };
 
     useEffect(() => {
@@ -324,9 +319,9 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
-                            label: 'National Provider Identifier (NPI)',
-                            value: 'http://hl7.org/fhir/sid/us-npi',
-                            code: 'NPI',
+                            label: 'Social Security Number (SSN)',
+                            value: 'http://hl7.org/fhir/sid/us-ssn',
+                            code: 'SSN',
                         },
                     ]}
                     identifiers={identifiers}
@@ -446,8 +441,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select {...register('preferredLanguage')}>
-                                <option value="">Select Preferred Language</option>
+                            <Form.Select {...register('preferredLanguage')}
+                                data-has-value={!!watch('preferredLanguage')}
+                                defaultValue={"English"}
+                            >
                                 <option value="English">English</option>
                                 <option value="Chinese">Chinese</option>
                                 <option value="French">French</option>
@@ -903,7 +900,12 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                placeholder="Enter Notes"
+                                {...register('notes')}
+                            />
                         </Form.Group>
                     </Col>
                 </Row>

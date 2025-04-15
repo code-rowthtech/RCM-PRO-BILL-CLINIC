@@ -42,19 +42,21 @@ export const createAppointmentReducer = (state = CREATE_APPOINTMENTS_INITIAL_STA
                 data: action.payload,
                 loading: false
             }
-        case AppointmentActionTypes.CREATE_APPOINTMENT_ERROR:
-            return {
-                data: action.payload,
-                loading: false
-            }
-        case AppointmentActionTypes.STATE_EMPTY_INTIAL_STATE:
+        case AppointmentActionTypes.CREATE_APPOINTMENT_RESET:
             return {
                 data: [],
-                loading: false
-            }
-        default: return state
+                loading: false,
+            };
+        case AppointmentActionTypes.CREATE_APPOINTMENT_ERROR:
+            return {
+                data: action?.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
     }
-}
+};
+
 export const rescheduleAppointmentReducer = (state = RESCHEDULE_APPOINTMENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case AppointmentActionTypes.RESCHEDULE_APPOINTMENT_LOADING:
@@ -67,22 +69,20 @@ export const rescheduleAppointmentReducer = (state = RESCHEDULE_APPOINTMENTS_INI
                 data: action.payload,
                 loading: false
             }
+        case AppointmentActionTypes.RESCHEDULE_APPOINTMENT_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case AppointmentActionTypes.RESCHEDULE_APPOINTMENT_ERROR:
             return {
-                data: action.payload,
-                loading: false
-            }
-        case AppointmentActionTypes.RESET_UPDATE_STATUS:
-            return {
-                ...state,
-                data: {
-                    ...state.data,
-                    status: null, // or whatever the initial state should be
-                },
+                data: action?.payload,
+                loading: false,
             };
-        default: return state
+        default:
+            return { ...state };
     }
-}
+};
 
 export const getPractitionerScheduleReducer = (state = PRACTITIONER_SCHEDULE_INITIAL_STATE, action) => {
     switch (action.type) {

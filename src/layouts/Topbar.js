@@ -51,7 +51,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
         '/dashboard/project': 'Dashboard',
-        '/apps/appointments/list': 'Appointments',
+        '/apps/appointments/list': 'Schedule',
         '/apps/appointments/newAppointment': 'New Appointments',
         '/apps/doctors/list': 'Doctors',
         '/apps/Practice/list': 'Sub Practice',
@@ -72,7 +72,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
-        '/apps/patients/update-patient': 'Update Patient'
+        '/apps/patients/update-patient': 'Update Patient',
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {
@@ -145,8 +145,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     )}
 
                     <ul className="list-unstyled topbar-menu float-end mb-0">
-                        <li className="dropdown notification-list">
-                        </li>
+                        <li className="dropdown notification-list"></li>
                         <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}
@@ -158,12 +157,12 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     </ul>
 
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
-                        <div className='d-flex align-items-center'>
+                        <div className="d-flex align-items-center">
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
                                 <i className="mdi mdi-menu" />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h4 className=''>{pageTitle}</h4>
+                            <h4 className="">{pageTitle}</h4>
                         </div>
                     )}
 

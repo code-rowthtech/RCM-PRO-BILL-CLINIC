@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Card, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
 import { FiUploadCloud } from 'react-icons/fi';
+import { FaPlusCircle, FaMinusCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPatientsAction, getPatientByIdAction, getResponsiblePartyAction } from '../../../redux/patients/actions';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import { handleUpload } from '../../../helpers/HandleUpload';
@@ -65,6 +66,7 @@ const NewPatient = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [timeoutId, setTimeoutId] = useState(null);
     const [patientId, setPatientId] = useState(null);
+    const [genderIdentity, setGenderIdentity] = useState(null);
     const [age, setAge] = useState(null);
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
@@ -81,6 +83,9 @@ const NewPatient = () => {
     const [btnShow, setBtnShow] = useState(true);
     const [stateToSelect, setStateToSelect] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [responsibleParty, setResponsibleParty] = useState('true');
+    const [referringPhysician, setReferringPhysician] = useState('true');
+
 
     const options = responsibleParties?.map((party) => ({
         value: party._id,
@@ -100,16 +105,22 @@ const NewPatient = () => {
         }
     };
     const handleResponsibleChange = (e) => {
-        setShowResponsibleTab(e.target.value === 'true');
+        const value = e.target.value;
+        setResponsibleParty(value);
+        setShowResponsibleTab(value === 'true');
     };
 
     const handleReferringChange = (e) => {
-        setShowReferringTab(e.target.value === 'true');
+        const value = e.target.value;
+        setReferringPhysician(value);
+        setShowReferringTab(value === 'true');
     };
 
     const navigate = useNavigate();
     const {
         register,
+        control,
+        getValues,
         handleSubmit,
         formState: { errors },
         setValue,
@@ -118,6 +129,9 @@ const NewPatient = () => {
         watch,
     } = useForm();
     const patientStatus = watch('patientStatus'); // Watch selected option
+
+    const gender = watch('gender');
+    const title = watch('title');
 
     useEffect(() => {
         if (age) {
@@ -131,12 +145,15 @@ const NewPatient = () => {
                 handleTabChange('demographicDetails');
                 // setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
+                setGenderIdentity(createPatientResponse?.gender);
+                // console.log(createPatientResponse?.gender, 'createPatientResponse')
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
                 setLogo(null);
                 setLogoName(null);
                 setPatientId(null);
+                setGenderIdentity(null);
             } else if (submissionType === 'save') {
                 setPatientId(createPatientResponse?._id);
             }
@@ -199,6 +216,18 @@ const NewPatient = () => {
             setValue('city', selectedCounty);
         }
     }, [cities]);
+
+    useEffect(() => {
+        const currentTitle = getValues('title');
+
+        if (!currentTitle || ['Mr.', 'Mrs.', 'Miss'].includes(currentTitle)) {
+            if (gender === 'male') setValue('title', 'Mr.');
+            else if (gender === 'female') setValue('title', 'Miss');
+            else if (gender === 'other') setValue('title', 'Other');
+            else if (gender === 'unknown') setValue('title', '');
+        }
+    }, [gender, title, setValue, getValues]);
+
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         if (password === '1234') {
@@ -236,8 +265,74 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    console.log('clinicId', clinicId);
+    // console.log('clinicId', clinicId);
+    const [showCellPhone, setShowCellPhone] = useState(false);
+    const [showOfficePhone, setShowOfficePhone] = useState(false);
+    const [showAltEmail, setShowAltEmail] = useState(false);
+
+    const formatPhone = (value) => {
+        let rawValue = value.replace(/\D/g, '');
+        if (rawValue.length > 10) rawValue = rawValue.slice(0, 10);
+        return rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+            if (p3) return `(${p1})${p2}-${p3}`;
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+    };
+
+    const renderPhoneField = (label, name, iconToggle) => (
+        <div className="col-md-3 col-12 mb-2 ">
+            <Form.Group className="mb-1 position-relative p">
+                <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
+                    {label}
+                    {iconToggle}
+                </Form.Label>
+                <InputGroup>
+                    <InputGroup.Text className="ps-3 pe-1 fw-bold text-black" style={{ height: '30px' }}>
+                        &nbsp;&nbsp;+1
+                    </InputGroup.Text>
+                    <Controller
+                        name={name}
+                        control={control}
+                        rules={!id ? {
+                            pattern: {
+                                value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                message: 'Format must be (XXX)XXX-XXXX',
+                            },
+                            maxLength: { value: 13, message: 'Max 13 characters' },
+                            minLength: { value: 13, message: 'Min 13 characters' },
+                        } : {}}
+                        render={({ field: { onChange, value, ref } }) => (
+                            <Form.Control
+                                type="tel"
+                                style={{ height: '30px' }}
+                                placeholder="(XXX)XXX-XXXX"
+                                maxLength={14}
+                                value={value || ''}
+                                onChange={(e) => {
+                                    const formatted = formatPhone(e.target.value);
+                                    onChange(formatted);
+                                    clearErrors(name);
+                                }}
+                                onKeyPress={(e) => {
+                                    if (!/[0-9]/.test(e.key)) e.preventDefault();
+                                }}
+                                ref={ref}
+                            />
+                        )}
+                    />
+                </InputGroup>
+                <div className="position-absolute" style={{ top: '48%', left: '1%' }}>
+                    <img src={us} alt="country code flag" width={20} />
+                </div>
+            </Form.Group>
+        </div>
+    );
+
+    const maxInputsReached = showCellPhone && showOfficePhone;
+
     const onSubmit = (data) => {
+
         const payload = {
             clinicId: clinicId || '',
             birthDate: data?.dateOfBirth || '',
@@ -338,24 +433,7 @@ const NewPatient = () => {
             value: data?.alternateEmail || '',
         });
 
-        // if (data?.preferredCommunication) {
-        //     switch (data.preferredCommunication) {
-        //         case 'Home Phone':
-        //             payload.telecom.find(t => t.use === 'home')?.rank = 1;
-        //             break;
-        //         case 'Work Phone':
-        //             payload.telecom.find(t => t.use === 'work')?.rank = 1;
-        //             break;
-        //         case 'Cell Phone':
-        //             payload.telecom.find(t => t.use === 'mobile')?.rank = 1;
-        //             break;
-        //         case 'Email':
-        //             payload.telecom.find(t => t.system === 'email')?.rank = 1;
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // }
+
 
         if (data?.patientStatus === 'Inactive-Deceased') {
             payload.deceasedBoolean = true;
@@ -508,7 +586,7 @@ const NewPatient = () => {
                                         </Form.Group>
                                     </div>
 
-                                    <div className="col-md-3 col-12">
+                                    {/* <div className="col-md-3 col-12">
                                         <Form.Group className="mb-1 position-relative">
                                             <Form.Label className="mb-0">
                                                 Cell Phone <span className="text-danger">*</span>
@@ -574,12 +652,44 @@ const NewPatient = () => {
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div>
                                         </Form.Group>
-                                    </div>
+                                       
+                                    </div> */}
+                                    {renderPhoneField(
+                                        'Home Phone',
+                                        'homePhone',
+                                        !maxInputsReached && (
+                                            <span className=' uil-plus-circle plusicon cursor-pointer' onClick={() => {
+                                                if (!showCellPhone) setShowCellPhone(true);
+                                                else if (!showOfficePhone) setShowOfficePhone(true);
+                                            }} />
+                                        )
+                                    )}
+
+                                    {showCellPhone &&
+                                        renderPhoneField(
+                                            'Cell Phone',
+                                            'cellPhone',
+                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
+                                                onClick={() => setShowCellPhone(false)}
+                                            />
+                                        )}
+
+                                    {showOfficePhone &&
+                                        renderPhoneField(
+                                            'Office Phone',
+                                            'officePhone',
+                                            <span className=' uil-minus-circle minusicon text-danger cursor-pointer'
+                                                onClick={() => setShowOfficePhone(false)} />
+                                        )}
 
                                     <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
-                                            <Form.Label htmlFor="email" className="mb-0">
+                                            <Form.Label className="mb-0 d-flex justify-content-start gap-1 align-items-center">
                                                 Email ID
+                                                {!showAltEmail && (
+                                                    <span className=' uil-plus-circle plusicon cursor-pointer'
+                                                        onClick={() => setShowAltEmail(true)} />
+                                                )}
                                             </Form.Label>
                                             <Form.Control
                                                 type="email"
@@ -593,6 +703,30 @@ const NewPatient = () => {
                                             />
                                         </Form.Group>
                                     </div>
+
+                                    {showAltEmail && (
+                                        <div className="col-md-3 col-12 mb-2">
+                                            <Form.Group>
+                                                <Form.Label className="mb-0 d-flex gap-1  align-items-center">
+                                                    Alternate Email
+                                                    <span
+                                                        onClick={() => setShowAltEmail(false)}
+                                                        className=' uil-minus-circle minusicon text-danger cursor-pointer'></span>
+                                                </Form.Label>
+                                                <Form.Control
+                                                    type="email"
+                                                    placeholder="Alternate Email ID"
+                                                    {...register('alternateEmail', {
+                                                        pattern: {
+                                                            value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                                                            message: 'Invalid email address',
+                                                        },
+                                                    })}
+                                                />
+                                            </Form.Group>
+                                        </div>
+                                    )}
+
                                     <Col md={3} className="mb-2">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Date of Birth</Form.Label>
@@ -617,7 +751,7 @@ const NewPatient = () => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <div className="col-md-3 col-12">
+                                    <div className="col-md-3 col-12 mb-2">
                                         <Form.Group>
                                             <Form.Label htmlFor="gender" className="mb-0">
                                                 Gender
@@ -753,7 +887,7 @@ const NewPatient = () => {
                                             )}
                                         </Form.Group>
                                     </div>
-                                    <div className="col-md-3 col-12 mb-2">
+                                    {/* <div className="col-md-3 col-12 mb-2">
                                         <Form.Group className="mb-1 position-relative">
                                             <Form.Label className="mb-0">Home Phone</Form.Label>
                                             <Form.Group>
@@ -816,8 +950,8 @@ const NewPatient = () => {
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div>
                                         </Form.Group>
-                                    </div>
-                                    <div className="col-md-3 col-12">
+                                    </div> */}
+                                    {/* <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Alternate Email</Form.Label>
                                             <Form.Control
@@ -831,8 +965,8 @@ const NewPatient = () => {
                                                 })}
                                             />
                                         </Form.Group>
-                                    </div>
-                                    <div className="col-md-3 col-12">
+                                    </div> */}
+                                    {/* <div className="col-md-3 col-12">
                                         <Form.Group className="mb-1 position-relative">
                                             <Form.Label className="mb-0">Office Phone</Form.Label>
                                             <Form.Group>
@@ -896,7 +1030,7 @@ const NewPatient = () => {
                                                 <img src={us} alt="country code flag" width={20} />
                                             </div>
                                         </Form.Group>
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Preferred Communication</Form.Label>
@@ -929,10 +1063,7 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Reminder Language</Form.Label>
                                             <Form.Select
                                                 {...register('reminderLanguage')}
-                                                data-has-value={!!watch('reminderLanguage')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>
+                                                data-has-value={!!watch('reminderLanguage')} defaultValue="English">
                                                 <option value="English">English</option>
                                                 <option value="Spanish">Spanish</option>
                                                 <option value="French">French</option>
@@ -942,7 +1073,11 @@ const NewPatient = () => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Responsible Party</Form.Label>
-                                            <Form.Select onChange={handleResponsibleChange} defaultValue="true">
+                                            <Form.Select
+                                                onChange={handleResponsibleChange}
+                                                data-has-value={!!responsibleParty}
+                                                value={responsibleParty}
+                                            >
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -952,7 +1087,11 @@ const NewPatient = () => {
                                     <div className="col-md-3 col-12">
                                         <Form.Group>
                                             <Form.Label className="mb-0">Referring Doctor</Form.Label>
-                                            <Form.Select onChange={handleReferringChange} defaultValue="true">
+                                            <Form.Select
+                                                onChange={handleReferringChange}
+                                                data-has-value={!!referringPhysician}
+                                                value={referringPhysician}
+                                            >
                                                 <option value="true">Yes</option>
                                                 <option value="false">No</option>
                                             </Form.Select>
@@ -1006,10 +1145,7 @@ const NewPatient = () => {
                                             <Form.Label className="mb-0">Medical History Concent</Form.Label>
                                             <Form.Select
                                                 {...register('medicationHistoryConsent')}
-                                                data-has-value={!!watch('medicationHistoryConsent')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>
+                                                data-has-value={!!watch('medicationHistoryConsent')} defaultValue={'true'}>
                                                 <option value={'true'}>Yes</option>
                                                 <option value={'false'}>No</option>
                                             </Form.Select>
@@ -1022,10 +1158,7 @@ const NewPatient = () => {
                                             <Form.Select
                                                 {...register('paymentProfile')}
                                                 aria-label="Payment Profile"
-                                                data-has-value={!!watch('paymentProfile')}>
-                                                <option value="" hidden>
-                                                    Select
-                                                </option>
+                                                data-has-value={!!watch('paymentProfile')} defaultValue={'Cash'}>
                                                 <option value="Cash">Cash</option>
                                                 <option value="Insurance">Insurance</option>
                                                 <option value="Insurance Out of Network">
@@ -1052,6 +1185,7 @@ const NewPatient = () => {
                                                         message: 'Only numbers or decimals are allowed',
                                                     },
                                                 })}
+                                                defaultValue={'25'}
                                             />
                                         </Form.Group>
                                     </div>
@@ -1138,6 +1272,7 @@ const NewPatient = () => {
                             <Demographicdetails
                                 patientId={patientId}
                                 activeTab={activeTab}
+                                gender={genderIdentity}
                                 setActiveTab={setActiveTab}
                                 showResponsibleTab={showResponsibleTab}
                                 setShowResponsibleTab={setShowResponsibleTab}
