@@ -21,7 +21,7 @@ import AsyncSelect from 'react-select/async';
 import { appointmentStatus } from '../../../../utils/DataSets/commonData';
 
 
-const AppointmentForm = ({ selectedSlot, appointmentId }) => {
+const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -39,6 +39,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
     const [activeTab, setActiveTab] = useState('personalDetails');
     const [showModal, setShowModal] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [repeat, setRepeat] = useState(false);
+    const [repeatType, setRepeatType] = useState('')
 
     useEffect(() => {
         if (appointmentId) {
@@ -91,21 +93,23 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
     const renderTooltip = (props) => {
         return !watch('doctorName') ? <Tooltip {...props}>Please select a doctor first</Tooltip> : <></>;
     };
-    // useEffect(() => {
-    //     // Set default values when the component loads
 
-    // }, [setValue]);
     useEffect(() => {
-        if (selectedSlot) {
+        if (selectedSlot && calendarView === 'month') {
             const date = new Date(selectedSlot?.slots);
             const localDateString = date.toLocaleDateString('en-CA'); // returns YYYY-MM-DD in local time
             setValue('scheduled', localDateString);
+        } else if (calendarView !== 'month' && selectedSlot) {
+            const date = new Date(selectedSlot?.start);
+            const localDateString = date.toLocaleDateString('en-CA'); // returns YYYY-MM-DD in local time
+            setValue('scheduled', localDateString);
+            setValue('startTime', formatTime(selectedSlot?.start));
         } else {
             setValue('scheduled', getTodayDate());
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }
-    }, [selectedSlot, setValue])
+    }, [selectedSlot, setValue, calendarView])
     useEffect(() => {
         dispatch(
             getMastersDataAction({ status: true, category: 'Consultation Room', limit: 10, skip, search: search })
@@ -136,19 +140,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
         return `${hours}:${minutes}`;
     };
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    function addDurationToTime(time, duration) {
-        let [hours, minutes] = time?.split(':').map(Number);
-        minutes += duration;
-        if (minutes >= 60) {
-            hours += Math.floor(minutes / 60); // Add the extra hours
-            minutes = minutes % 60; // Keep only the remainder of minutes
-        }
-        if (hours >= 24) {
-            hours = hours % 24;
-        }
-
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    }
 
     useEffect(() => {
         if (appointmentDetails && id) {
@@ -252,16 +243,34 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
 
         callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
     };
-    // const appointmentStatus = [
-    //     { label: "Arrived", value: "arrived" },
-    //     { label: "Booked", value: "booked" },
-    //     { label: "Cancelled", value: "cancelled" },
-    //     { label: "Fulfilled", value: "fulfilled" },
-    //     { label: "Noshow", value: "noshow" },
-    //     { label: "Pending", value: "pending" },
-    //     { label: "Proposed", value: "proposed" },
-    //     { label: "Waitlist", value: "waitlist" },
-    // ]
+
+    // const Daily = () => {
+    //     return (
+    //         <Row>
+    //             <Col sm={6}>
+    //                 <Form.Group className="mb-1" controlId="appointmentType">
+    //                     <Form.Label className="mb-0">Every</Form.Label>
+    //                     <Form.Control placeholder='Enter number of days' type='number' min={1} />
+    //                 </Form.Group>
+    //             </Col>
+    //             <Col sm={4}>
+    //                 <Form.Group className="mb-1" controlId="appointmentType">
+    //                     <Form.Label className="mb-0">Ends On</Form.Label>
+    //                     <span className='d-flex'> <Form.Control type='date' />
+    //                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text></span>
+    //                 </Form.Group>
+    //             </Col>
+    //             <Col sm={2}>
+    //                 <Form.Group className="mb-1" controlId="appointmentType">
+    //                     <Form.Label className="mb-0">Every</Form.Label>
+    //                     <span className='d-flex'> <Form.Control placeholder='Enter number of days' type='number' min={1} />
+    //                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;days</Form.Text></span>
+
+    //                 </Form.Group>
+    //             </Col>
+    //         </Row>
+    //     )
+    // }
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -502,15 +511,57 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
                     </Col>
                 </Row>
                 <Row>
+                    {/* <Col sm={12}>
+                        <Form.Group className="mb-1" controlId="doctorName">
+                            <Form.Check // prettier-ignore
+                                type={'checkbox'}
+                                label={`Repeat`}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setRepeat(true)
+                                    } else {
+                                        setRepeat(false)
+                                    }
+                                }}
+                            />
+                        </Form.Group>
+                    </Col> */}
+                    {/* {repeat &&
+                        <Col sm={12} className='mt-2'>
+                            <div className="time-period-tabs">
+                                <ul className="nav nav-pills">
+                                    <li className="nav-item">
+                                        <span
+                                            className={`cursor-pointer border border-muted nav-link py-1  ${repeatType === 'daily' ? 'active' : 'text-black'}`}
+                                            onClick={() => setRepeatType('daily')}
+                                        >
+                                            Daily
+                                        </span>
+                                    </li>
+                                    <li className="nav-item ms-2">
+                                        <span
+                                            className={`cursor-pointer border border-muted nav-link py-1  ${repeatType === 'weekly' ? 'active' : 'text-black'}`}
+                                            onClick={() => setRepeatType('weekly')}
+                                        >
+                                            Weekly
+                                        </span>
+                                    </li>
+                                    <li className="nav-item ms-2">
+                                        <span
+                                            className={`cursor-pointer border border-muted nav-link py-1  ${repeatType === 'monthly' ? 'active' : 'text-black'}`}
+                                            onClick={() => setRepeatType('monthly')}
+                                        >
+                                            Monthly
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </Col>
+                    } */}
+                </Row>
+                {repeatType === 'daily' && <Daily />}
+                <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                        {/* <Button
-                            className="custom-buttons"
-                            onClick={handleDeleteAll}
-                            disabled={
-                                store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
-                            }>
-                            Delete
-                        </Button> */}
                         <Button
                             className="cancel-button"
                             disabled={
@@ -536,6 +587,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId }) => {
                         </Button>
                     </Col>
                 </Row>
+
             </Form>
 
             <Modal show={showModal} onHide={handleCloseModal} size="xl" centered>

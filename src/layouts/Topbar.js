@@ -51,7 +51,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
         '/dashboard/project': 'Dashboard',
-        '/apps/appointments/list': 'Schedule',
+        '/apps/appointments/list': 'Appointments',
         '/apps/appointments/newAppointment': 'New Appointments',
         '/apps/doctors/list': 'Doctors',
         '/apps/Practice/list': 'Sub Practice',

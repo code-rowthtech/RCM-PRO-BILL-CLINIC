@@ -713,3 +713,7 @@ table {
     border-color: #0d6efd !important;
     box-shadow: 0 0 0 1px #0d6efd !important;
 }
+
+.cancellation-popup {
+    z-index: 1111 !important;
+}

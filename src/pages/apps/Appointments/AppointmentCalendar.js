@@ -18,11 +18,13 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [events, setEvents] = useState([]);
+    console.log(events, 'eventsevents')
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [show, setShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null)
     const [selectedSlot, setSelectedSlot] = useState(null);
+    const [calendarView, setCalendarView] = useState('month'); // default to 'month' or your desired initial view
 
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
@@ -130,6 +132,8 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                                     components={{
                                         event: CustomEvent,
                                     }}
+                                    onView={(view) => setCalendarView(view)} // <-- track view change
+                                    view={calendarView} // optional if you want to programmatically set view
                                 />
 
                             </div>
@@ -168,166 +172,9 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                         </Col>
                     </Row>
 
-                    <AppointmentForm appointmentId={selectedEvent?.event_id} />
+                    <AppointmentForm appointmentId={selectedEvent?.event_id} calendarView={calendarView} />
                 </Modal.Body>
             </Modal>
-
-            {/* <Modal centered show={show} size='lg' onHide={closeModal}>
-                <Modal.Body>
-                    <Row className="border-bottom mb-1 pb-2">
-                        <Col sm={11} className='text-center'><h4>Appointment Details</h4></Col>
-                        <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} /></Col>
-                    </Row>
-                    <Row>
-                        <Row className='text-black my-2'>
-                            <Col sm={12}>
-                                <h4 className='my-0 mb-1 fw-bold'>Patient Details</h4>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Patient name:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.patientName}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Gender:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.patientGender}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Contact no:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.patientContact}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Email:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.patientEmail}
-                                    </Col>
-                                </Row>
-                            </Col>
-
-                        </Row>
-                        <hr className='my-1 text-black' />
-                        <Row className='text-black my-2'>
-                            <Col sm={12}>
-                                <h4 className='my-0 mb-1 fw-bold'>Doctor Details</h4>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Doctor name:
-                                    </Col>
-                                    <Col sm={6}>
-                                        Dr. {selectedEvent?.doctorName}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Department:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.doctorDepartment}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Contact no:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.doctorContact}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Email:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.doctorEmail}
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <hr className='my-1 text-black' />
-                        <Row className='text-black my-2'>
-                            <Col sm={12}>
-                                <h4 className='my-0 mb-1 fw-bold'>Appointment Details</h4>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Appointment Date:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.appointmentDate}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Purpose Of Visit:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.title}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        Start Time:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.slotStart}
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6} className='fw-bold'>
-                                        End Time:
-                                    </Col>
-                                    <Col sm={6}>
-                                        {selectedEvent?.slotEnd}
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                        <hr className='my-1 text-black' />
-                        <Row className='my-2'>
-                            <Col sm={12} className='text-center'>
-                                <Button className='custom-buttons' onClick={() => navigate(`/apps/patients/new-patient?updateid=${selectedEvent?.patientId}`)}>
-                                    View Patient Profile
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Row>
-                </Modal.Body>
-            </Modal > */}
         </div >
     );
 };
