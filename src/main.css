@@ -31,7 +31,6 @@ body {
 
 hr {
     color: #726e6e8a !important;
-
 }
 
 .headers {
@@ -254,7 +253,7 @@ form textarea::placeholder {
     /* Ensure full visibility of placeholder */
 }
 
-.table> :not(caption)>*>* {
+.table > :not(caption) > * > * {
     padding: 0.35rem 0.55rem !important;
     font-size: 14px !important;
 }
@@ -402,7 +401,6 @@ table {
     border-top: 1px solid #ddd;
 }
 
-
 .date-carousel .day {
     width: 40px;
     height: 60px;
@@ -462,7 +460,6 @@ table {
 
 .patient-menu-item:hover {
     background-color: #e9ecef;
-
 }
 
 /* media query */
@@ -657,8 +654,8 @@ table {
     font-size: 12px !important;
 }
 .css-19bb58m {
-padding-top: 2px!important;
-padding-bottom: 8px!important;
+    padding-top: 2px !important;
+    padding-bottom: 8px !important;
 }
 
 .css-1wy0on6 {
@@ -667,4 +664,52 @@ padding-bottom: 8px!important;
 
 .err_font {
     font-size: 10px;
+}
+
+.schedule-status-select {
+    border: 1px solid rgba(0, 0, 0, 0.335) !important;
+    padding: 1px 5px !important;
+    color: black !important;
+    background-color: white !important;
+    width: 8vw !important;
+}
+.rbc-event {
+    margin: 10px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23) !important;
+    width: 100% !important;
+}
+
+.nav-tab-container .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.nav-tab-container .nav-link.active {
+    background-color: #0d6efd;
+    color: white;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+}
+
+.time-period-tabs .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.time-period-tabs .nav-link.active {
+    background-color: #b9bcbe44;
+    color: #727cf5;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.doctor-select .select__control--is-focused {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 1px #0d6efd !important;
 }

@@ -23,6 +23,10 @@ function* createAppointmentFunction(data) {
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: AppointmentActionTypes.CREATE_APPOINTMENT_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: AppointmentActionTypes.CREATE_APPOINTMENT_ERROR,
@@ -50,6 +54,10 @@ function* rescheduleAppointmentFunction(data) {
             yield put({
                 type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: AppointmentActionTypes.RESCHEDULE_APPOINTMENT_RESET,
+                payload: {},
             });
         } else {
             yield put({

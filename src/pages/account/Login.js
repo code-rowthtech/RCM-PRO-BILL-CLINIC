@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect } from 'react';
-import { Button, Alert, Row, Col } from 'react-bootstrap';
+import { Button, Alert, Row, Col, Form } from 'react-bootstrap';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -18,21 +18,13 @@ import ToastHandle from '../../helpers/ToastMessage';
 import { handleFirstSpace } from '../../helpers/noSpace';
 
 /* bottom link of account pages */
-const BottomLink = () => {
-    const { t } = useTranslation();
-    return (
-        <Row className="mt-3">
-            {/* <Col className="text-center">
-                    <p className="text-muted">
-                        {t("Don't have an account?")}{' '}
-                        <Link to={'/account/sign-Up'} className="text-muted ms-1">
-                            <b>{t('Sign Up')}</b>
-                        </Link>
-                    </p>
-                </Col> */}
-        </Row>
-    );
-};
+// const BottomLink = () => {
+//     const { t } = useTranslation();
+//     return (
+//         <Row className="mt-3">
+//         </Row>
+//     );
+// };
 
 const Login = (): React$Element<any> => {
     const { t } = useTranslation();
@@ -85,7 +77,7 @@ const Login = (): React$Element<any> => {
     return (
         <>
             {(userLoggedIn || user) && <Navigate to={redirectUrl} replace />}
-            <AccountLayout bottomLinks={<BottomLink />}>
+            <AccountLayout >
                 <div className="text-center w-75 m-auto">
                     <h4 className="text-dark-50 text-center mt-0 fw-bold">{t('Sign In')}</h4>
                     <p className="text-muted mb-4">
@@ -110,14 +102,14 @@ const Login = (): React$Element<any> => {
                         name="username"
                         placeholder={t('Enter your Email')}
                         containerClass={'mb-3'}
-                        onChange={(e) => {
-                            e.target.value = e.target.value.replace(/\s+/g, ''); // Remove spaces
-                        }}
-                        onKeyPress={(e) => {
-                            if (e.key === ' ') {
-                                e.preventDefault(); // Prevent space keypress
-                            }
-                        }}
+                    // onChange={(e) => {
+                    //     e.target.value = e.target.value.replace(/\s+/g, ''); // Remove spaces
+                    // }}
+                    // onKeyPress={(e) => {
+                    //     if (e.key === ' ') {
+                    //         e.preventDefault(); // Prevent space keypress
+                    //     }
+                    // }}
                     />
 
                     <FormInput
@@ -129,7 +121,7 @@ const Login = (): React$Element<any> => {
                         onPaste={(e) => e.preventDefault()}
                         placeholder={t('Enter your password')}
                         containerClass={'mb-3'}
-                        >
+                    >
                         <Link to="/account/forget-password" className="text-muted float-end">
                             <small>{t('Forgot your password?')}</small>
                         </Link>
