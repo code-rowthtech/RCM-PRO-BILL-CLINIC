@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Modal, Row, Toast, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { getPatientsAction } from '../../../../redux/patients/actions';
-import { createAppointmentAction, getDoctorsAction, rescheduleAppointmentAction } from '../../../../redux/actions';
+import { createAppointmentAction, getAppointmentByIdAction, getDoctorsAction, rescheduleAppointmentAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,13 +18,14 @@ import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmentt
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
+import { appointmentStatus } from '../../../../utils/DataSets/commonData';
 
 
-const AppointmentForm = () => {
+const AppointmentForm = ({ selectedSlot, appointmentId }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const id = searchParams.get('updateid');
+    const id = appointmentId ? appointmentId : searchParams.get('updateid');
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
@@ -39,6 +40,11 @@ const AppointmentForm = () => {
     const [showModal, setShowModal] = useState(false);
     const [showToast, setShowToast] = useState(false);
 
+    useEffect(() => {
+        if (appointmentId) {
+            dispatch(getAppointmentByIdAction({ id: appointmentId }))
+        }
+    }, [appointmentId])
     const handlePlusIconClick = () => {
         setShowModal(true);
     };
@@ -85,13 +91,21 @@ const AppointmentForm = () => {
     const renderTooltip = (props) => {
         return !watch('doctorName') ? <Tooltip {...props}>Please select a doctor first</Tooltip> : <></>;
     };
-    useEffect(() => {
-        // Set default values when the component loads
-        setValue('scheduled', getTodayDate());
-        setValue('startTime', getDefaultTime());
-        setValue('duration', '30');
-    }, [setValue]);
+    // useEffect(() => {
+    //     // Set default values when the component loads
 
+    // }, [setValue]);
+    useEffect(() => {
+        if (selectedSlot) {
+            const date = new Date(selectedSlot?.slots);
+            const localDateString = date.toLocaleDateString('en-CA'); // returns YYYY-MM-DD in local time
+            setValue('scheduled', localDateString);
+        } else {
+            setValue('scheduled', getTodayDate());
+            setValue('startTime', getDefaultTime());
+            setValue('duration', '30');
+        }
+    }, [selectedSlot, setValue])
     useEffect(() => {
         dispatch(
             getMastersDataAction({ status: true, category: 'Consultation Room', limit: 10, skip, search: search })
@@ -152,7 +166,7 @@ const AppointmentForm = () => {
                 appointmentDetails?.date ? new Date(appointmentDetails?.date).toISOString().split('T')[0] : ''
             );
         }
-    }, [appointmentDetails, id]);
+    }, [appointmentDetails, id, doctorDetails, patientsData]);
     const onSubmit = (data) => {
         const selectedAppointmentType = appointmentTypeOptions.find((option) => option.show === data.appointmentType);
         const appointmentTypePayload = {
@@ -182,12 +196,16 @@ const AppointmentForm = () => {
             date: data?.scheduled,
             duration: data?.duration,
             examRoom: data?.consultationRoom,
-            reason: [
+            ...(appointmentReason?.text || appointmentReason?.display === appointmentDetails?.reason?.[0]?.coding?.[0]?.display ? {} :
                 {
-                    coding: appointmentReason,
-                    text: appointmentReason?.display, // use display text
-                },
-            ],
+                    reason: [
+                        {
+                            coding: appointmentReason,
+                            text: appointmentReason?.display, // use display text
+                        },
+                    ]
+                }
+            ),
             status: data?.status,
             slot: data?.startTime,
         };
@@ -220,20 +238,30 @@ const AppointmentForm = () => {
     const selectedReasonOption =
         formattedReasonOptions.find((option) => option?.value?.display === appointmentReason?.text) ||
         formattedReasonOptions.find((option) => option?.display === appointmentReason);
-        const loadReasonOptions = (inputValue, callback) => {
-            // If there's no search input, show only the first 10 options
-            if (!inputValue) {
-                callback(formattedReasonOptions.slice(0, 10));
-                return;
-            }
-        
-            // Filter options based on search input
-            const filteredOptions = formattedReasonOptions.filter((option) =>
-                option.label.toLowerCase().includes(inputValue.toLowerCase())
-            );
-        
-            callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
-        };
+    const loadReasonOptions = (inputValue, callback) => {
+        // If there's no search input, show only the first 10 options
+        if (!inputValue) {
+            callback(formattedReasonOptions.slice(0, 10));
+            return;
+        }
+
+        // Filter options based on search input
+        const filteredOptions = formattedReasonOptions.filter((option) =>
+            option.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
+
+        callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
+    };
+    // const appointmentStatus = [
+    //     { label: "Arrived", value: "arrived" },
+    //     { label: "Booked", value: "booked" },
+    //     { label: "Cancelled", value: "cancelled" },
+    //     { label: "Fulfilled", value: "fulfilled" },
+    //     { label: "Noshow", value: "noshow" },
+    //     { label: "Pending", value: "pending" },
+    //     { label: "Proposed", value: "proposed" },
+    //     { label: "Waitlist", value: "waitlist" },
+    // ]
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -400,31 +428,6 @@ const AppointmentForm = () => {
                             <span className="text-secondary fs-6 fw-bold mt-3 pt-1 ps-2">minutes</span>
                         </div>
                     </Col>
-
-                    {/* <Col sm={6}>
-                        <Form.Group className="mb-1" controlId="office">
-                            <Form.Label className="mb-0">Office</Form.Label>
-                            <Form.Control
-                                as="select"
-                                data-has-value={!!watch('office')}
-                                className="form-select"
-                                {...register(
-                                    'office'
-                                    // { required: "Office is required" }
-                                )}>
-                                <option value="" hidden>
-                                    Select Office
-                                </option>
-                                {officeData &&
-                                    officeData.map((office) => (
-                                        <option key={office?._id} value={office?.name}>
-                                            {office?.name}
-                                        </option>
-                                    ))}
-                            </Form.Control>
-                            {errors.office && <p className="text-danger">{errors.office.message}</p>}
-                        </Form.Group>
-                    </Col> */}
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Reason</Form.Label>
@@ -454,7 +457,6 @@ const AppointmentForm = () => {
                             />
                         </Form.Group>
                     </Col>
-
                     <Col sm={6}>
                         <Form.Group className="mb-1" controlId="consultationRoom">
                             <Form.Label className="mb-0">Consultation Room</Form.Label>
@@ -490,25 +492,10 @@ const AppointmentForm = () => {
                                 })}
                                 defaultValue="Scheduled" // Default value set to "Scheduled"
                             >
-                                {/* Always available options */}
-                                <option value="Scheduled">Scheduled</option>
-                                <option value="Confirmed">Confirmed</option>
-                                <option value="Notconfirmed">Not Confirmed</option>
-
-                                {/* Show all options only if "id" exists */}
-                                {id && (
-                                    <>
-                                        <option value="Completed">Completed</option>
-                                        <option value="Cancelled">Cancelled</option>
-                                        <option value="Rescheduled">Rescheduled</option>
-                                        <option value="Noshow">No-Show</option>
-                                        <option value="Arrived">Arrived</option>
-                                        <option value="Checkedin">Checked In</option>
-                                        <option value="Checkedinonline">Checked In Online</option>
-                                        <option value="Inroom">In Room</option>
-                                        <option value="Insession">In Session</option>
-                                    </>
-                                )}
+                                <option value='' key={''} hidden>Select Status</option>
+                                {appointmentStatus?.map((data, index) => (
+                                    <option value={data?.code} key={index}>{data?.display}</option>
+                                ))}
                             </Form.Control>
                             {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
                         </Form.Group>
@@ -516,26 +503,25 @@ const AppointmentForm = () => {
                 </Row>
                 <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
-                        <Button
+                        {/* <Button
                             className="custom-buttons"
                             onClick={handleDeleteAll}
                             disabled={
                                 store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
                             }>
                             Delete
-                        </Button>
-                        {/* <Button
-                            type="submit"
-                            className="custom-buttons"
+                        </Button> */}
+                        <Button
+                            className="cancel-button"
                             disabled={
                                 store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
-                            }>
-                                 {store?.createAppointmentReducer?.loading ? (
-                                <Spinner color="white" className="spinner-border-sm" />
-                            ) : (
-                                'Save and close'
-                            )}
-                        </Button> */}
+                            }
+                            onClick={() => {
+                                reset();
+                                navigate(-1)
+                            }}>
+                            Cancel
+                        </Button>
                         <Button
                             className="custom-buttons"
                             type="submit"
@@ -547,17 +533,6 @@ const AppointmentForm = () => {
                             ) : (
                                 'Save'
                             )}
-                        </Button>
-
-                        <Button
-                            className="cancel-button"
-                            disabled={
-                                store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading
-                            }
-                            onClick={() => {
-                                reset();
-                            }}>
-                            Cancel
                         </Button>
                     </Col>
                 </Row>

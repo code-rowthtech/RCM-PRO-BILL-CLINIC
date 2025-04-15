@@ -8,16 +8,17 @@ import { FormInput } from '../../../components';
 import { patientsData } from './data';
 import { GrDocumentText } from 'react-icons/gr';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { FiFilter } from 'react-icons/fi';
-import { IoCalendarOutline } from 'react-icons/io5';
+import { FiArchive, FiClock, FiFilter, FiSun } from 'react-icons/fi';
+import { IoCalendarOutline, IoCloseCircleOutline } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAppointmentsAction } from '../../../redux/appointments/action';
+import { getAppointmentsAction, rescheduleAppointmentAction } from '../../../redux/appointments/action';
 import Spinner from '../../../constants/Spinner';
 import { getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
-
+import { appointmentStatus } from '../../../utils/DataSets/commonData';
+import AppointmentCalendar from './AppointmentCalendar'
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
@@ -37,17 +38,75 @@ type OrderListProps = {
 };
 
 // Component for Appointments List Table
-const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(appointmentsList, 'appointmentsList');
-    console.log(store?.getAppointmentsReducer, 'appointmentsList');
+    const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
+    const [cancelationReason, setCancelationReason] = useState('');
+    const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+        setValue,
+        reset,
+    } = useForm();
+    useEffect(() => {
+        if (updateSuccess === 200) {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod }));
+            setCancelationPopupRow(null);
+            setCancelationReason('')
+        }
+    }, [updateSuccess]);
     const formatTimeWithAmPm = (isoString) => {
         if (!isoString) return '';
         const date = new Date(isoString);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     };
+    const statusColors = {
+        proposed: 'bg-gray-400',
+        pending: 'bg-yellow-400',
+        booked: 'bg-green-500',
+        arrived: 'bg-blue-400',
+        fulfilled: 'bg-purple-500',
+        cancelled: 'bg-red-500',
+        noshow: 'bg-orange-500',
+        'entered-in-error': 'bg-pink-500',
+        'checked-in': 'bg-cyan-500',
+        waitlist: 'bg-teal-500',
+    }
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            // Check if the click target is NOT inside the popup
+            if (!e.target.closest('.cancellation-popup') && cancelationPopupRow !== null) {
+                setCancelationPopupRow(null); // Close popup
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [cancelationPopupRow]);
+
+    const submitWithReason = (data) => {
+        const payload = {
+            cancellationReason: [{
+                coding: [{
+                    system: "", code: "", display: cancelationReason
+                }],
+                text: cancelationReason, // use display text
+            }],
+            status: 'cancelled'
+        }
+        dispatch(rescheduleAppointmentAction({
+            id: cancelationPopupRow,
+            key: encryptMessage(payload)
+        }));
+    }
     return (
         <Table
             responsive
@@ -56,13 +115,14 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
             <thead className="text-white">
                 <tr>
                     <th className="text-white">Sr.No.</th>
-                    <th className="text-white">Patients Name</th>
-                    <th className="text-white">Doctor</th>
-                    {/* <th className='text-white'>Doctor Department</th> */}
-                    <th className="text-white">Purpose of Visit</th>
+                    <th className="text-white">Status</th>
+                    <th className="text-white">Patient</th>
                     <th className="text-white">Booked Slot</th>
                     <th className="text-white">Date</th>
-                    <th className="text-white">Status</th>
+                    <th className="text-white">Provider</th>
+                    {/* <th className='text-white'>Doctor Department</th> */}
+                    <th className="text-white">Type</th>
+                    <th className="text-white">Reason</th>
                     <th className="text-white">Action</th>
                 </tr>
             </thead>
@@ -78,21 +138,84 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
                     appointmentsList?.map((data, index) => (
                         <tr key={index}>
                             <td>{index + 1}</td>
-                            <td className="text-capitalize">{data?.subject?.name?.[0]?.text}</td>
-                            <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
-                            {/* <td className='text-capitalize'>{data?.doctor?.departmentId?.name}</td> */}
-                            <td className="text-capitalize">{data?.reason?.[0]?.text || 'N/A'}</td>
+                            <td className="text-capitalize position-relative">
+                                <Form.Select
+                                    defaultValue={data?.status}
+                                    onChange={(e) => {
+                                        if (e.target.value === 'cancelled') {
+                                            setCancelationPopupRow(data?._id); // or use data?._id if preferred
+                                        } else {
+                                            dispatch(rescheduleAppointmentAction({
+                                                id: data?._id,
+                                                key: encryptMessage({ status: e.target.value })
+                                            }));
+                                            setCancelationPopupRow(null); // close popup if status changes again
+                                        }
+                                    }}
+
+                                    className='schedule-status-select'>
+                                    {appointmentStatus?.map((data, index) => (
+                                        <option value={data?.code} key={index}>{data?.display}</option>
+                                    ))}
+                                </Form.Select>
+                                {cancelationPopupRow === data?._id && (
+                                    <div
+                                        className='position-absolute cancellation-popup border   bg-white'
+                                        style={{ left: '90%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
+
+                                    >
+                                        <p className="fs-4 px-2 mb-0 text-end ">
+                                            <IoCloseCircleOutline onClick={() => {
+                                                setCancelationPopupRow(null);
+                                            }} />
+                                        </p>
+                                        <div
+                                            className=' p-2 pt-0'
+                                        >
+                                            <Form onSubmit={handleSubmit(submitWithReason)}>
+                                                <Form.Group>
+                                                    <Form.Label>Cancelation Reason</Form.Label>
+                                                    <Form.Control className='mb-2' onChange={(e) => setCancelationReason(e.target.value)} type='text' placeholder='Enter the cancellation reason' />
+                                                </Form.Group>
+                                                <div className='text-end'>
+                                                    <Button disabled={!cancelationReason} className='custom-buttons' type='submit'>Submit</Button>
+                                                </div>
+                                            </Form>
+                                        </div>
+                                    </div>
+
+                                )}
+
+                            </td>
+                            <td className="text-capitalize">
+                                {data?.subject?.name?.[0]?.text}
+                                <div className="d-flex gap-2">
+                                    <span>
+                                        {data?.subject?.birthDate
+                                            ? new Date(data.subject.birthDate).toISOString().split('T')[0]
+                                            : 'N/A'}
+                                    </span>
+                                    <span>
+                                        {
+                                            data?.subject?.telecom?.find(
+                                                (item) => item.system === 'phone' && item.value
+                                            )?.value || 'No phone number'
+                                        }
+                                    </span>
+                                </div>
+                            </td>
                             <td>
                                 {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
                             </td>
                             <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                            <td>
-                                <span
-                                    className={`px-1 text-white ${
-                                        data?.status === 'Scheduled' ? 'bg-success' : 'bg-secondary'
-                                    } rounded-2`}>
-                                    {data?.status}
-                                </span>
+                            <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
+                            <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.appointmentType?.coding?.[0]?.display}>
+                                {data?.appointmentType?.coding?.[0]?.display?.length > 20
+                                    ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                    : data?.appointmentType?.coding?.[0]?.display}
+                            </td>
+                            <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.reason?.[0]?.coding?.[0]?.display}>
+                                {data?.reason?.[0]?.coding?.[0]?.display?.length > 20 ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...' : data?.reason?.[0]?.coding?.[0]?.display}
                             </td>
                             <td>
                                 <Link
@@ -110,115 +233,112 @@ const AppointmentsList = ({ patientsData }: OrderListProps): React$Element<React
 };
 
 // Component for Appointments Transaction Table
-const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
-    return (
-        <Table responsive className="table-centered table-nowrap mb-0">
-            <thead className="text-white">
-                <tr>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Sr.No.
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Patient Name
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Doctor
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Doctor Department
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Appointment Date
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Payment Status
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Payment Mode
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Amount
-                    </th>
-                    <th className="text-white" style={{ fontSize: '13px' }}>
-                        Status
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {[0, 1, 2, 3].map((index) => (
-                    <tr key={index}>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            {index + 1}
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            John Doe
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            Doctor Demo
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            Nephrologists
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            26th sep, 2024
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            <span className="px-1 text-white bg-success rounded-2">Confirm</span>
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            Paystack
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            AR$1,000,00
-                        </td>
-                        <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-                            <span className="px-1 text-white bg-success rounded-2">30th apr,2024</span>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </Table>
-    );
-};
+// const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
+//     return (
+//         <Table responsive className="table-centered table-nowrap mb-0">
+//             <thead className="text-white">
+//                 <tr>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Sr.No.
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Patient Name
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Doctor
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Doctor Department
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Appointment Date
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Payment Status
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Payment Mode
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Amount
+//                     </th>
+//                     <th className="text-white" style={{ fontSize: '13px' }}>
+//                         Status
+//                     </th>
+//                 </tr>
+//             </thead>
+//             <tbody>
+//                 {[0, 1, 2, 3].map((index) => (
+//                     <tr key={index}>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             {index + 1}
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             John Doe
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             Doctor Demo
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             Nephrologists
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             26th sep, 2024
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             <span className="px-1 text-white bg-success rounded-2">Confirm</span>
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             Paystack
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             AR$1,000,00
+//                         </td>
+//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+//                             <span className="px-1 text-white bg-success rounded-2">30th apr,2024</span>
+//                         </td>
+//                     </tr>
+//                 ))}
+//             </tbody>
+//         </Table>
+//     );
+// };
 
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
     const {
         register,
-        handleSubmit,
         formState: { errors },
         setValue,
-        reset,
         clearErrors,
-        getValues,
     } = useForm();
 
     const [activeTab, setActiveTab] = useState('appointments');
+    const [appointmentPeriod, setAppointmentPeriod] = useState('today');
     const navigate = useNavigate();
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    console.log({ selectedDoctor })
     const [doctorSearch, setDoctorSearch] = useState('');
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
-        label: data?.name[0]?.text + ' ' ,
+        label: data?.name[0]?.text + ' ',
     }));
     useEffect(() => {
         const doctorPayload = { status: true, search: doctorSearch };
         dispatch(getDoctorsAction(doctorPayload));
     }, [dispatch, doctorSearch]);
     useEffect(() => {
-        dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value }));
-    }, [dispatch, selectedDoctor]);
+        if (activeTab === 'appointments') {
+            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod }));
+        }
+    }, [dispatch, selectedDoctor, appointmentPeriod, activeTab]);
     const handleInputChange = (data, type) => {
         setDoctorSearch(data);
     };
-    const handleSearchInputChange = (selectedOption, type) => {
-        if (type === 'doctor') {
-            setSelectedDoctor(selectedOption);
-        }
-    };
+
     const handleChange = (selectedOption, type) => {
         setSelectedDoctor(selectedOption, 'Selected Option');
     };
@@ -232,30 +352,27 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                 <Col sm={4}>
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
-                                            <a
-                                                className={classNames('nav-link fw-bold text-black', {
+                                            <span
+                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
                                                     active: activeTab === 'appointments',
                                                     'fw-bold': activeTab === 'appointments',
                                                 })}
-                                                href="#"
                                                 onClick={() => setActiveTab('appointments')}>
                                                 Appointments
-                                            </a>
+                                            </span>
                                         </li>
                                         <li className="nav-item ms-md-2">
-                                            <a
-                                                className={classNames('nav-link fw-bold text-black', {
-                                                    active: activeTab === 'transactions',
-                                                    'fw-bold': activeTab === 'transactions',
+                                            <span
+                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
+                                                    active: activeTab === 'appointmentCalendar',
+                                                    'fw-bold': activeTab === 'appointmentCalendar',
                                                 })}
-                                                href="#"
-                                                onClick={() => setActiveTab('transactions')}>
-                                                Appointments transaction
-                                            </a>
+                                                onClick={() => setActiveTab('appointmentCalendar')}>
+                                                Appointment Calendar
+                                            </span>
                                         </li>
                                     </ul>
                                 </Col>
-
                                 <Col sm={8} className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col
@@ -317,20 +434,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     <Button className="custom-buttons">
                                                         <FiFilter className="fs-5" />
                                                     </Button>
-                                                    <FormInput
-                                                        type="date"
-                                                        placeholder="Search..."
-                                                        className="input_search_box"
-                                                        style={{ minWidth: '150px' }} // Add a minimum width for better alignment
-                                                    />
-                                                    <Button
-                                                        className="custom-buttons py-0 "
-                                                        style={{ height: '30px' }}
-                                                        onClick={() =>
-                                                            navigate('/apps/appointments/appointmentCalendar')
-                                                        }>
-                                                        <IoCalendarOutline className="fs-5 " />
-                                                    </Button>
                                                     <Button
                                                         as={Link}
                                                         to="/apps/appointments/newAppointment"
@@ -342,13 +445,48 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                         </Col>
                                     </Row>
                                 </Col>
+                                {activeTab === 'appointments' &&
+                                    <Col md={12} className='mt-2'>
+                                        <div className="time-period-tabs">
+                                            <ul className="nav nav-pills">
+                                                <li className="nav-item">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('today')}
+                                                    >
+                                                        <FiSun className="me-1" />
+                                                        Today
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item ms-2">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('upcoming')}
+                                                    >
+                                                        <FiClock className="me-1" />
+                                                        Upcoming
+                                                    </button>
+                                                </li>
+                                                <li className="nav-item ms-2">
+                                                    <button
+                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'}`}
+                                                        onClick={() => setAppointmentPeriod('history')}
+                                                    >
+                                                        <FiArchive className="me-1" />
+                                                        History
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </Col>
+                                }
                             </Row>
 
                             {/* Render table based on active tab */}
                             {activeTab === 'appointments' ? (
-                                <AppointmentsList patientsData={patientsData} />
+                                <AppointmentsList patientsData={patientsData} appointmentPeriod={appointmentPeriod} />
                             ) : (
-                                <AppointmentsTransactionList patientsData={patientsData} />
+                                <AppointmentCalendar appointmentPeriod={appointmentPeriod} selectedDoctor={selectedDoctor?.value} />
                             )}
                         </Card.Body>
                     </Card>

@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';

@@ -8,13 +8,13 @@ import { getAppointmentByIdAction, resetUpdateAction } from '../../../redux/acti
 import Spinner from '../../../constants/Spinner';
 
 
-const NewAppointment = () => {
+const NewAppointment = ({ appointmentId }) => {
 
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Appointments');
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
-    const id = searchParams.get('updateid');
+    const id = appointmentId ? appointmentId : searchParams.get('updateid');
     const store = useSelector((state) => state);
     const rescheduleResponse = store?.rescheduleAppointmentReducer?.data?.status;
     useEffect(() => {
