@@ -55,6 +55,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log("patientsData", patientsData)
     const [search, setSearch] = useState('');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
@@ -86,6 +87,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const appointmentDetails = [];
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
+    console.log("selectedDoctor", selectedDoctor)
     const [selectedAppointment, setSelectedAppointment] = useState(null); // Store selected appointment ID
     const filterDropdownRef = useRef(null);
     // Handle selection (only one at a time)
@@ -275,7 +277,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                                     <img
                                                         height='40'
                                                         width='40'
-                                                        src={data?.patient?.patientChartPhoto?.url ? data?.patient?.patientChartPhoto?.url : profileImg}
+                                                        src={data?.photo?.[0]?.url ? data?.photo?.[0]?.url : profileImg}
                                                         // style={{ height: '5vh' }}
                                                         className="rounded-circle border border-black"
                                                         alt="profile image"

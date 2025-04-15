@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table ,Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -100,7 +100,7 @@ const Demographicdetails = ({ patientId }) => {
         }
     }, [employerCitySearch, cities3]);
     useEffect(() => {
-        if (patientDetails) {
+        if (patientDetails && id) {
             setValue('race', patientDetails?.race?.[0]?.display || '');
             setValue('raceSubcategories', patientDetails?.raceSubcategories);
             setValue('sex', patientDetails?.birthSex?.[0]?.value || '');
@@ -112,8 +112,8 @@ const Demographicdetails = ({ patientId }) => {
             setValue('preferredLanguage', patientDetails?.communication?.[0]?.language?.coding?.[0]?.code || '');
             // setValue('trible', patientDetails?.trible?.[0]?.code || '');
             // setValue('ethnicity', patientDetails?.ethnicity?.[0]?.value || '');
-            setEth(patientDetails?.ethnicity)
-            setTri(patientDetails?.tribalAffiliation)
+            setEth(patientDetails?.ethnicity);
+            setTri(patientDetails?.tribalAffiliation);
             setValue('notes', patientDetails?.notes);
             setValue('maritalStatus', patientDetails?.maritalStatus?.[0]?.display || '');
             setValue('epsdtServices', patientDetails?.epsdtServices);
@@ -142,12 +142,16 @@ const Demographicdetails = ({ patientId }) => {
                 issuingAuthority: data?.issuingAuthority,
                 number: data?.value,
                 system: '',
-                type: { label: data?.type?.coding?.[0]?.display, value: data?.type?.coding?.[0]?.system, code: data?.type?.coding?.[0]?.code }
-            }))
+                type: {
+                    label: data?.type?.coding?.[0]?.display,
+                    value: data?.type?.coding?.[0]?.system,
+                    code: data?.type?.coding?.[0]?.code,
+                },
+            }));
             setIdentifiers(defaultIdentifiers || []);
             // setDemographicAddresses(patientDetails?.address || []);
             const newAddresses = patientDetails?.address?.map((addr) => ({
-                type: addr.type || '',  // Make sure type is included
+                type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
                 city: addr.city || '',
@@ -158,29 +162,35 @@ const Demographicdetails = ({ patientId }) => {
             setDemographicAddresses(newAddresses);
             if (statesData?.states) {
                 newAddresses.forEach((address) => {
-                    const state = statesData.states.find(s => s.name === address.state);
+                    const state = statesData.states.find((s) => s.name === address.state);
                     if (!state) return;
                     if (address.type === 'physical') {
-                        dispatch(getCitiesAction({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCitiesAction({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     } else if (address.type === 'postal') {
-                        dispatch(getCities2Action({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCities2Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     } else {
-                        dispatch(getCities3Action({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCities3Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     }
                 });
             }
@@ -206,11 +216,13 @@ const Demographicdetails = ({ patientId }) => {
                 use: 'official',
                 system: element?.type?.value || element?.system,
                 type: {
-                    coding: [{
-                        system: element?.type?.value || element?.system,
-                        code: element?.type?.code || element?.type?.coding?.[0]?.code,
-                        display: element?.type?.label || element?.type?.coding?.[0]?.display,
-                    }],
+                    coding: [
+                        {
+                            system: element?.type?.value || element?.system,
+                            code: element?.type?.code || element?.type?.coding?.[0]?.code,
+                            display: element?.type?.label || element?.type?.coding?.[0]?.display,
+                        },
+                    ],
                     text: element?.type?.label || element?.type?.coding?.[0]?.display,
                 },
                 issuingAuthority: element?.issuingAuthority,
@@ -225,7 +237,7 @@ const Demographicdetails = ({ patientId }) => {
                     code: selectedSexOption?.value,
                     display: selectedSexOption?.label,
                     system: selectedSexOption?.system,
-                }
+                },
             ],
 
             genderIdentity: [
@@ -321,7 +333,8 @@ const Demographicdetails = ({ patientId }) => {
                         {
                             coding: [rela], //code:'I" , system:url, display:'Ins Company
                             text: data?.emergencyContactName,
-                        }],
+                        },
+                    ],
                     telecom: [
                         {
                             system: 'phone',
@@ -409,9 +422,15 @@ const Demographicdetails = ({ patientId }) => {
     const handleTribalChange = (selectedOption) => {
         setTri(selectedOption ? selectedOption.value : '');
     };
-    const selectedEthnicityOption = formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) || formattedEthnicityOptions.find((option) => option?.value?.display === eth);
-    const selectedTribleOption = formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) || formattedTribleOptions.find((option) => option?.value?.code == tri);
-    const selectedRelationOption = relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) || relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+    const selectedEthnicityOption =
+        formattedEthnicityOptions.find((option) => option?.value?.code === eth?.[0]?.code) ||
+        formattedEthnicityOptions.find((option) => option?.value?.display === eth);
+    const selectedTribleOption =
+        formattedTribleOptions.find((option) => option?.value?.code == tri?.[0]?.code) ||
+        formattedTribleOptions.find((option) => option?.value?.code == tri);
+    const selectedRelationOption =
+        relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
+        relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     return (
         <div className="scroll-container" style={{ overflow: 'scroll', height: '65vh' }}>
             <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
@@ -425,7 +444,7 @@ const Demographicdetails = ({ patientId }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                // onChange={(data) => console.log('Updated Identifiers:', data)}
+                    // onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -498,7 +517,7 @@ const Demographicdetails = ({ patientId }) => {
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display} className='text-capitalize'>
+                                    <option key={race.code} value={race.display} className="text-capitalize">
                                         {race.display}
                                     </option>
                                 ))}
@@ -518,9 +537,7 @@ const Demographicdetails = ({ patientId }) => {
                                 // value={
                                 // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
                                 // } // Show selected value
-                                value={
-                                    selectedEthnicityOption
-                                }
+                                value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -569,9 +586,7 @@ const Demographicdetails = ({ patientId }) => {
                                 className="basic-single"
                                 classNamePrefix="select"
                                 // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
-                                value={
-                                    selectedTribleOption
-                                }
+                                value={selectedTribleOption}
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
@@ -701,9 +716,7 @@ const Demographicdetails = ({ patientId }) => {
                                 classNamePrefix="select"
                                 placeholder="&nbsp; Select "
                                 // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
-                                value={
-                                    selectedRelationOption
-                                }
+                                value={selectedRelationOption}
                                 onChange={handleRelationChange}
                                 // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
@@ -879,10 +892,11 @@ const Demographicdetails = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -1023,8 +1037,13 @@ const Demographicdetails = ({ patientId }) => {
                         <Button
                             className="custom-buttons btn-height"
                             disabled={store?.updatePatientsReducer?.loading}
+                            style={{width:'70px'}}
                             type="submit">
-                            Save
+                            {store?.updatePatientsReducer?.loading ? (
+                                <Spinner animation="border" variant="primary" size="sm" />
+                            ) : (
+                                'Update'
+                            )}
                         </Button>
                     </Col>
                 </Row>

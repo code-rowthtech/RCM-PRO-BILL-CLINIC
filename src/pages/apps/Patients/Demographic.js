@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table,Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,7 +28,14 @@ import AddressForm from '../Common Pages/AddressForm';
 import IdentifierForm from '../Common Pages/IdentifierForm';
 import { dataList } from '../../../utils/DataSets/relations.data';
 
-const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibleTab, setShowResponsibleTab, gender }) => {
+const Demographicdetails = ({
+    patientId,
+    activeTab,
+    setActiveTab,
+    showResponsibleTab,
+    setShowResponsibleTab,
+    gender,
+}) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -94,11 +101,13 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                 use: 'official',
                 system: element?.type?.value,
                 type: {
-                    coding: [{
-                        system: element?.type?.value,
-                        code: element?.type?.code,
-                        display: element?.type?.label,
-                    }],
+                    coding: [
+                        {
+                            system: element?.type?.value,
+                            code: element?.type?.code,
+                            display: element?.type?.label,
+                        },
+                    ],
                     text: element?.type?.label,
                 },
                 issuingAuthority: element?.issuingAuthority,
@@ -113,7 +122,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                     code: selectedSexOption?.value,
                     display: selectedSexOption?.label,
                     system: selectedSexOption?.system,
-                }
+                },
             ],
             genderIdentity: [
                 {
@@ -199,7 +208,8 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                         {
                             coding: [rela],
                             text: data?.emergencyContactName, // Human-readable relationship (e.g., "Father", "Aunt")
-                        }],
+                        },
+                    ],
                     telecom: [
                         {
                             system: 'phone', //enum: ["phone", "email"]
@@ -230,11 +240,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
             },
             identifier: finalIdentifiers,
             address: demographicAddresses,
-            ...(data?.notes && { notes: data.notes })
+            ...(data?.notes && { notes: data.notes }),
         };
-        console.log(payload, 'payload')
+        console.log(payload, 'payload');
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload)
+        console.log(payload);
     };
 
     useEffect(() => {
@@ -398,7 +408,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                             <Form.Select {...register('race')}>
                                 <option value="">Select Race</option>
                                 {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.code} className='text-capitalize'>
+                                    <option key={race.code} value={race.code} className="text-capitalize">
                                         {race.display}
                                     </option>
                                 ))}
@@ -441,10 +451,10 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                     <Col sm={3}>
                         <Form.Group>
                             <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select {...register('preferredLanguage')}
+                            <Form.Select
+                                {...register('preferredLanguage')}
                                 data-has-value={!!watch('preferredLanguage')}
-                                defaultValue={"English"}
-                            >
+                                defaultValue={'English'}>
                                 <option value="English">English</option>
                                 <option value="Chinese">Chinese</option>
                                 <option value="French">French</option>
@@ -766,10 +776,11 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
+                                                    className={`scroll-container hover-bg-change ${
+                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                    }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -900,12 +911,7 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
-                                placeholder="Enter Notes"
-                                {...register('notes')}
-                            />
+                            <Form.Control as="textarea" rows={3} placeholder="Enter Notes" {...register('notes')} />
                         </Form.Group>
                     </Col>
                 </Row>
@@ -925,10 +931,15 @@ const Demographicdetails = ({ patientId, activeTab, setActiveTab, showResponsibl
                         onClick={() => {
                             setSubmissionType('saveAndNext');
                         }}
+                        style={{ width: '200px' }}
                         disabled={store?.updatePatientsReducer?.loading}
                         className="custom-buttons"
                         type="submit">
-                        Save & Continue Editing
+                        {store?.updatePatientsReducer?.loading ? (
+                            <Spinner animation="border" variant="primary" size="sm" />
+                        ) : (
+                            ' Save & Continue Editing'
+                        )}
                     </Button>
                 </div>
             </Form>

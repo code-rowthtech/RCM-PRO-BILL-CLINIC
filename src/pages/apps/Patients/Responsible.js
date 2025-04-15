@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form } from 'react-bootstrap';
+import { Button, Col, Form,Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { BiEdit } from 'react-icons/bi';
 import { FiUploadCloud } from 'react-icons/fi';
@@ -12,21 +12,18 @@ import { createResponsiblePartyAction, stateEmptydAction } from '../../../redux/
 import { dataList } from '../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 
-
 const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
     const [submissionType, setSubmissionType] = useState(null);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const dispatch = useDispatch();
-    const [searchParams] = useSearchParams();
-    const id = searchParams.get('id');
+    // const [searchParams] = useSearchParams();
+    // const id = searchParams.get('id');
     const [responsibleAddresses, setResponsibleAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
 
-    const [responsibleTelecom, setResponsibleTelecom] = useState([
-        { system: '', value: '', use: '' },
-    ]);
+    const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
@@ -40,30 +37,38 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     } = useForm();
 
     useEffect(() => {
-        if (patientDetails && id) {
+        if (patientDetails) {
             setValue('title', patientDetails?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.name?.[0]?.text);
             setValue('gender', patientDetails?.gender);
-            setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0])
-            setValue('dateOfBirth', patientDetails?.relatedPerson?.dateOfBirth ? new Date(patientDetails?.relatedPerson?.dateOfBirth).toISOString().split('T')[0] : '');
+            setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
+            setValue(
+                'dateOfBirth',
+                patientDetails?.relatedPerson?.dateOfBirth
+                    ? new Date(patientDetails?.relatedPerson?.dateOfBirth).toISOString().split('T')[0]
+                    : ''
+            );
             const updateAddress = patientDetails?.address?.map((data, index) => ({
-                city: data?.city, country: data?.country, line: data?.line, postalCode: data?.postalCode, state: data?.state, type: data?.type, use: data?.use
-            }))
-            setResponsibleAddresses(updateAddress)
-            const updateTelecom = patientDetails?.telecom?.map((data, index) => (
-                {
-                    system: data?.system, value: data?.value, use: data?.use
-                    }
-                    )
-            )
-            setResponsibleTelecom(updateTelecom)
-          
+                city: data?.city,
+                country: data?.country,
+                line: data?.line,
+                postalCode: data?.postalCode,
+                state: data?.state,
+                type: data?.type,
+                use: data?.use,
+            }));
+            setResponsibleAddresses(updateAddress);
+            const updateTelecom = patientDetails?.telecom?.map((data, index) => ({
+                system: data?.system,
+                value: data?.value,
+                use: data?.use,
+            }));
+            setResponsibleTelecom(updateTelecom);
         }
-    }, [patientDetails, id])
+    }, [patientDetails]);
     const onSubmit = (data) => {
         const payload = {
-            ...(id && { id: patientDetails?.relatedPerson?._id }),
-            patientId: id ? id : patientId,
+            patientId: patientId,
             clinicId: clinicId,
             name: [
                 {
@@ -95,10 +100,10 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         if (createResponse === 201) {
             if (submissionType === 'saveAndNext') {
                 reset(); // Reset the form
-                // setActiveTab('referringDoctor');
+                setActiveTab('referringDoctor');
             } else if (submissionType === 'saveAndReset') {
                 reset();
-                // setActiveTab('personalDetails');
+                setActiveTab('personalDetails');
             }
         }
     }, [createResponse]);
@@ -107,7 +112,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         label: relation.display, // Display text as the label
     }));
     const [rela, setRela] = useState(null);
-    console.log(rela, 'relarelarelarela')
     const handleRelationChange = (selectedOption) => {
         setRela(selectedOption ? selectedOption.value : '');
     };
@@ -169,7 +173,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
-                        <Col sm={3} className='mb-2'>
+                        <Col sm={3} className="mb-2">
                             <Form.Group>
                                 <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
                                 <Select
@@ -180,9 +184,8 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                                     placeholder="&nbsp; Select "
                                     onChange={handleRelationChange}
                                     value={
-                                        relationshipOption.find(
-                                            (option) => option?.value?.display === rela?.display
-                                        ) || null
+                                        relationshipOption.find((option) => option?.value?.display === rela?.display) ||
+                                        null
                                     } // Show selected value
                                     styles={{
                                         control: (provided) => ({
@@ -223,10 +226,15 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                         onClick={() => {
                             setSubmissionType('saveAndNext');
                         }}
-                        disabled={store?.updatePatientsReducer?.loading}
+                        disabled={store?.createResponsiblePartyReducer?.loading}
                         className="custom-buttons"
+                        style= {{width :'200px'}}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.createResponsiblePartyReducer?.loading ? (
+                            <Spinner animation="border" role="status" />
+                        ) : (
+                            ' Save & Continue Editing'
+                        )}
                     </Button>
                 </div>
             </Form>

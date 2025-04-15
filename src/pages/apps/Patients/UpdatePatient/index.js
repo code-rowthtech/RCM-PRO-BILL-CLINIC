@@ -40,7 +40,8 @@ import AllergyList from '../Task Tabs/AllergyList';
 import AddAssignTask from '../Task Tabs/AddAssignTask';
 import FilterModal from './FilterModal';
 import FilterDropdown from './FilterModal';
-import Responsiblle from '../Responsible';
+import Responsiblle from './ResponsibleParty';
+import ReferringDoctor from './ReferringDoctor';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -604,7 +605,8 @@ const UpdatePatientIndex = () => {
                                                 style={{ height: '65vh', overflow: 'auto' }}>
                                                 {selectedMainTab === 'Patient Details' && <PatientDetails />}
                                                 {selectedMainTab === 'Demographics' && <Demographics />}
-                                                {selectedMainTab === 'Responsible Party' && <Responsiblle />}
+                                                {selectedMainTab === 'Responsible Party' && <ResponsibleParty />}
+                                                {selectedMainTab === 'Reffering Doctor' && <ReferringDoctor />}
                                                 {selectedMainTab === 'Insurances' && <Insurances />}
                                                 {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
