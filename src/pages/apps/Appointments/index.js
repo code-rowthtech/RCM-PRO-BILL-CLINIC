@@ -19,6 +19,9 @@ import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import { appointmentStatus } from '../../../utils/DataSets/commonData';
 import AppointmentCalendar from './AppointmentCalendar'
+import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
+import { LucideCalendarDays } from 'lucide-react';
+import { CiCalendar } from 'react-icons/ci';
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 // Define the types for each order item
@@ -110,8 +113,8 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
     return (
         <Table
             responsive
-            className="table-centered table-nowrap mb-0  rounded"
-            style={{ height: appointmentsList?.length === 0 ? '75vh' : 'auto' }}>
+            className="table-centered mb-0  rounded"
+            style={{ height: appointmentsList?.length === 0 ? '75vh' : '' }}>
             <thead className="text-white">
                 <tr>
                     <th className="text-white">Sr.No.</th>
@@ -126,7 +129,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
                     <th className="text-white">Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody className=''>
                 {store?.getAppointmentsReducer?.loading ? (
                     <tr>
                         <td colSpan={9} className="text-center">
@@ -161,7 +164,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
                                 {cancelationPopupRow === data?._id && (
                                     <div
                                         className='position-absolute cancellation-popup border   bg-white'
-                                        style={{ left: '90%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
+                                        style={{ left: '84%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
 
                                     >
                                         <p className="fs-4 px-2 mb-0 text-end ">
@@ -358,7 +361,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     'fw-bold': activeTab === 'appointments',
                                                 })}
                                                 onClick={() => setActiveTab('appointments')}>
-                                                Appointments
+                                                <FaRegListAlt /> Appointment List
                                             </span>
                                         </li>
                                         <li className="nav-item ms-md-2">
@@ -368,7 +371,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                     'fw-bold': activeTab === 'appointmentCalendar',
                                                 })}
                                                 onClick={() => setActiveTab('appointmentCalendar')}>
-                                                Appointment Calendar
+                                                <CiCalendar /> Appointment Calendar
                                             </span>
                                         </li>
                                     </ul>
