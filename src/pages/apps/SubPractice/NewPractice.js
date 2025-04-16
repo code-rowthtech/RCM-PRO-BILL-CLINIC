@@ -67,7 +67,8 @@ const NewPractice = () => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url?.url?.split('?')[0]);
+            // setLogo(url?.url?.split('?')[0]);
+            setLogo({url:url?.url?.split('?')[0]});
             setLogoName(selectedFile?.name);
         } catch (error) {
             console.error('Error during file upload:', error);
