@@ -559,7 +559,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                         </Col>
                     } */}
                 </Row>
-                {/* {repeatType === 'daily' && <Daily />} */}
                 <Row>
                     <Col sm={12} className="d-flex justify-content-end my-2 gap-2">
                         <Button
