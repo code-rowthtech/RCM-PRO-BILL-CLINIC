@@ -347,7 +347,7 @@ const NewDoctor = () => {
                                                                     } : {}}
                                                                     className='custom-buttons text-nowrap'
                                                                 >
-                                                                    Email to Doctor
+                                                                    Email to Provider
                                                                 </Button>
                                                             </span>
                                                         </OverlayTrigger>

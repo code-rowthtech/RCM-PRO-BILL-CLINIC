@@ -97,12 +97,12 @@ const AddBreak = () => {
                                         <div className="col-6">
                                             <Form.Group className="mb-1">
                                                 <Form.Label className="mb-0">
-                                                    Doctor Name<span className="text-danger">*</span>
+                                                    Provider Name<span className="text-danger">*</span>
                                                 </Form.Label>
                                                 <Form.Select
                                                     {...register("doctorInfo", { required: "Doctor selection is required" })}
                                                 >
-                                                    <option value="">Select doctor</option>
+                                                    <option value="">Select Provider</option>
                                                     {doctorLists?.map((doctor, index) => (
                                                         <option
                                                             key={index}

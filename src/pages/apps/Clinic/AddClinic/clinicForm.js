@@ -487,7 +487,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //       },
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        // console.log(newPayload, '934873890')
+        console.log(newPayload, '934873890')
     };
     const logoFileInputRef = useRef(null);
     // const accreditationFileInputRef = useRef(null);
@@ -502,7 +502,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo(url?.url?.split('?')[0]);
+            setLogo({url:url?.url?.split('?')[0]});
             setLogoName(selectedFile?.name);
         } catch (error) {
             console.error('Error during file upload:', error);
