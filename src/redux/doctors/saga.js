@@ -79,6 +79,10 @@ function* createDoctorsFunction(data) {
                 type: DoctorsActionTypes.CREATE_DOCTORS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: DoctorsActionTypes.CREATE_DOCTORS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: DoctorsActionTypes.CREATE_DOCTORS_ERROR,

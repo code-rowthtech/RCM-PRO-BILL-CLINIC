@@ -3,7 +3,7 @@ import { Row, Col, Form, InputGroup } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
-import { getCities2Action, getCities3Action, getCitiesAction  } from '../../../redux/actions';
+import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { useLocation, useSearchParams } from 'react-router-dom';
@@ -456,12 +456,13 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         </Form.Group>
                     </Col>
                     {addresses.length > 1 && (
-                        <span
-                            className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                            // style={{ right: '-2%', top: '50%', zIndex: 111 }}
-                            onClick={() => removeAddress(index)}>
-                            <CiCircleMinus />
-                        </span>
+                        <Col sm={3} className='d-flex justify-content-start align-items-center'>
+                            <span
+                                className="text-danger cursor-pointer fs-5 fw-bold"
+                                onClick={() => removeAddress(index)}>
+                                <CiCircleMinus />
+                            </span>
+                        </Col>
                     )}
 
                     {addresses?.length > 1 && index < addresses.length - 1 && <hr className="mt-2" />}

@@ -32,7 +32,6 @@ const NewDoctor = () => {
     } = useForm();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    // const daaa=watch('state1')
     const [activeTab, setActiveTab] = useState("personalDetails");
     const logoFileInputRef = useRef(null);
     const [show, setShow] = useState(false);
