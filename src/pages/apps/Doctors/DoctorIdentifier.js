@@ -50,10 +50,6 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         }
     }, [defaultLicensure, setLicensure, licensure.length]);
 
-    // useEffect(() => {
-    //     onChange?.(identifiers);
-    // }, [identifiers, onChange]);
-
     const addIdentifier = () => {
         setIdentifiers([
             ...identifiers,

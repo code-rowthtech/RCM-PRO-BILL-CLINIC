@@ -10,7 +10,7 @@ import { CiCircleMinus } from "react-icons/ci";
 import DoctorIdentifierForm from "./DoctorIdentifier";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
-const DepartmentDetails = ({ setActiveTab }) => {
+const DepartmentDetails = ({ setActiveTab, docId }) => {
   // const defaultIdentifiers = ['NPI'];
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
@@ -110,7 +110,7 @@ const DepartmentDetails = ({ setActiveTab }) => {
       status: item?.status === 'active' ? true : false,
     }))
     const payload = {
-      ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
+      ...(updateId ? { doctorId: id } : { doctorId: docId }),
       identifier: [...finalIdentifiersData, ...finalLicensureData],
       taxonomy: taxonomyCodes,
     }

@@ -437,6 +437,20 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                             </Form.Group>
                             <span className="text-secondary fs-6 fw-bold mt-3 pt-1 ps-2">minutes</span>
                         </div>
+                        <Form.Group className="mb-0 ms-2" >
+                            <Form.Label className="mb-0"></Form.Label>
+                            <Form.Check // prettier-ignore
+                                type={'checkbox'}
+                                label={`Repeat`}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        setRepeat(true)
+                                    } else {
+                                        setRepeat(false)
+                                    }
+                                }}
+                            />
+                        </Form.Group>
                     </Col>
                     <Col sm={6}>
                         <Form.Group>
@@ -512,21 +526,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     </Col>
                 </Row>
                 <Row>
-                    {/* <Col sm={12}>
-                        <Form.Group className="mb-1" controlId="doctorName">
-                            <Form.Check // prettier-ignore
-                                type={'checkbox'}
-                                label={`Repeat`}
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        setRepeat(true)
-                                    } else {
-                                        setRepeat(false)
-                                    }
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */}
+
                     {/* {repeat &&
                         <Col sm={12} className='mt-2'>
                             <div className="time-period-tabs">

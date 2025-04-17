@@ -137,175 +137,111 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
                         </td>
                     </tr>
                 ) : (
-                    appointmentsList &&
-                    appointmentsList?.map((data, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td className="text-capitalize position-relative">
-                                <Form.Select
-                                    defaultValue={data?.status}
-                                    onChange={(e) => {
-                                        if (e.target.value === 'cancelled') {
-                                            setCancelationPopupRow(data?._id); // or use data?._id if preferred
-                                        } else {
-                                            dispatch(rescheduleAppointmentAction({
-                                                id: data?._id,
-                                                key: encryptMessage({ status: e.target.value })
-                                            }));
-                                            setCancelationPopupRow(null); // close popup if status changes again
-                                        }
-                                    }}
+                    appointmentsList?.length === 0 ?
+                        <tr>
+                            <td colSpan={9} className="text-center">
+                                <h5>No Appointments Found</h5>
+                            </td>
+                        </tr> :
+                        appointmentsList &&
+                        appointmentsList?.map((data, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td className="text-capitalize position-relative">
+                                    <Form.Select
+                                        defaultValue={data?.status}
+                                        onChange={(e) => {
+                                            if (e.target.value === 'cancelled') {
+                                                setCancelationPopupRow(data?._id); // or use data?._id if preferred
+                                            } else {
+                                                dispatch(rescheduleAppointmentAction({
+                                                    id: data?._id,
+                                                    key: encryptMessage({ status: e.target.value })
+                                                }));
+                                                setCancelationPopupRow(null); // close popup if status changes again
+                                            }
+                                        }}
 
-                                    className='schedule-status-select'>
-                                    {appointmentStatus?.map((data, index) => (
-                                        <option value={data?.code} key={index}>{data?.display}</option>
-                                    ))}
-                                </Form.Select>
-                                {cancelationPopupRow === data?._id && (
-                                    <div
-                                        className='position-absolute cancellation-popup border   bg-white'
-                                        style={{ left: '84%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
-
-                                    >
-                                        <p className="fs-4 px-2 mb-0 text-end ">
-                                            <IoCloseCircleOutline onClick={() => {
-                                                setCancelationPopupRow(null);
-                                            }} />
-                                        </p>
+                                        className='schedule-status-select'>
+                                        {appointmentStatus?.map((data, index) => (
+                                            <option value={data?.code} key={index}>{data?.display}</option>
+                                        ))}
+                                    </Form.Select>
+                                    {cancelationPopupRow === data?._id && (
                                         <div
-                                            className=' p-2 pt-0'
+                                            className='position-absolute cancellation-popup border   bg-white'
+                                            style={{ left: '84%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
+
                                         >
-                                            <Form onSubmit={handleSubmit(submitWithReason)}>
-                                                <Form.Group>
-                                                    <Form.Label>Cancelation Reason</Form.Label>
-                                                    <Form.Control className='mb-2' onChange={(e) => setCancelationReason(e.target.value)} type='text' placeholder='Enter the cancellation reason' />
-                                                </Form.Group>
-                                                <div className='text-end'>
-                                                    <Button disabled={!cancelationReason} className='custom-buttons' type='submit'>Submit</Button>
-                                                </div>
-                                            </Form>
+                                            <p className="fs-4 px-2 mb-0 text-end ">
+                                                <IoCloseCircleOutline onClick={() => {
+                                                    setCancelationPopupRow(null);
+                                                }} />
+                                            </p>
+                                            <div
+                                                className=' p-2 pt-0'
+                                            >
+                                                <Form onSubmit={handleSubmit(submitWithReason)}>
+                                                    <Form.Group>
+                                                        <Form.Label>Cancelation Reason</Form.Label>
+                                                        <Form.Control className='mb-2' onChange={(e) => setCancelationReason(e.target.value)} type='text' placeholder='Enter the cancellation reason' />
+                                                    </Form.Group>
+                                                    <div className='text-end'>
+                                                        <Button disabled={!cancelationReason} className='custom-buttons' type='submit'>Submit</Button>
+                                                    </div>
+                                                </Form>
+                                            </div>
                                         </div>
+
+                                    )}
+
+                                </td>
+                                <td className="text-capitalize">
+                                    {data?.subject?.name?.[0]?.text}
+                                    <div className="d-flex gap-2">
+                                        <span>
+                                            {data?.subject?.birthDate
+                                                ? new Date(data.subject.birthDate).toISOString().split('T')[0]
+                                                : 'N/A'}
+                                        </span>
+                                        <span>
+                                            {
+                                                data?.subject?.telecom?.find(
+                                                    (item) => item.system === 'phone' && item.value
+                                                )?.value || 'No phone number'
+                                            }
+                                        </span>
                                     </div>
-
-                                )}
-
-                            </td>
-                            <td className="text-capitalize">
-                                {data?.subject?.name?.[0]?.text}
-                                <div className="d-flex gap-2">
-                                    <span>
-                                        {data?.subject?.birthDate
-                                            ? new Date(data.subject.birthDate).toISOString().split('T')[0]
-                                            : 'N/A'}
-                                    </span>
-                                    <span>
-                                        {
-                                            data?.subject?.telecom?.find(
-                                                (item) => item.system === 'phone' && item.value
-                                            )?.value || 'No phone number'
-                                        }
-                                    </span>
-                                </div>
-                            </td>
-                            <td>
-                                {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
-                            </td>
-                            <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                            <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
-                            <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.appointmentType?.coding?.[0]?.display}>
-                                {data?.appointmentType?.coding?.[0]?.display?.length > 20
-                                    ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                    : data?.appointmentType?.coding?.[0]?.display}
-                            </td>
-                            <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.reason?.[0]?.coding?.[0]?.display}>
-                                {data?.reason?.[0]?.coding?.[0]?.display?.length > 20 ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...' : data?.reason?.[0]?.coding?.[0]?.display}
-                            </td>
-                            <td>
-                                <Link
-                                    to={`/apps/appointments/newAppointment?updateid=${data?._id}`}
-                                    className="action-icon">
-                                    <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
-                                </Link>
-                            </td>
-                        </tr>
-                    ))
+                                </td>
+                                <td>
+                                    {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
+                                </td>
+                                <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                                <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
+                                <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.appointmentType?.coding?.[0]?.display}>
+                                    {data?.appointmentType?.coding?.[0]?.display?.length > 20
+                                        ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                        : data?.appointmentType?.coding?.[0]?.display}
+                                </td>
+                                <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.reason?.[0]?.coding?.[0]?.display}>
+                                    {data?.reason?.[0]?.coding?.[0]?.display?.length > 20 ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...' : data?.reason?.[0]?.coding?.[0]?.display}
+                                </td>
+                                <td>
+                                    <Link
+                                        to={`/apps/appointments/newAppointment?updateid=${data?._id}`}
+                                        className="action-icon">
+                                        <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))
                 )}
             </tbody>
         </Table>
     );
 };
 
-// Component for Appointments Transaction Table
-// const AppointmentsTransactionList = ({ patientsData }: OrderListProps): React$Element<React$FragmentType> => {
-//     return (
-//         <Table responsive className="table-centered table-nowrap mb-0">
-//             <thead className="text-white">
-//                 <tr>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Sr.No.
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Patient Name
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Doctor
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Doctor Department
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Appointment Date
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Payment Status
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Payment Mode
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Amount
-//                     </th>
-//                     <th className="text-white" style={{ fontSize: '13px' }}>
-//                         Status
-//                     </th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//                 {[0, 1, 2, 3].map((index) => (
-//                     <tr key={index}>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             {index + 1}
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             John Doe
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             Doctor Demo
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             Nephrologists
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             26th sep, 2024
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             <span className="px-1 text-white bg-success rounded-2">Confirm</span>
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             Paystack
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             AR$1,000,00
-//                         </td>
-//                         <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
-//                             <span className="px-1 text-white bg-success rounded-2">30th apr,2024</span>
-//                         </td>
-//                     </tr>
-//                 ))}
-//             </tbody>
-//         </Table>
-//     );
-// };
+
 
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
