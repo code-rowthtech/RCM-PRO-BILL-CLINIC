@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, momentLocalizer, Views, Toolbar } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { EVENTS } from './event'
@@ -15,10 +15,8 @@ const localizer = momentLocalizer(moment);
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 const AppointmentCalendar = ({ selectedDoctor }) => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [events, setEvents] = useState([]);
-    console.log(events, 'eventsevents')
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [show, setShow] = useState(false);
@@ -104,6 +102,59 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         setAppModal(false);
         setSelectedEvent(null);
     }
+    const CustomToolbar = (toolbar) => {
+        const goToBack = () => {
+            toolbar.onNavigate('PREV');
+        };
+
+        const goToNext = () => {
+            toolbar.onNavigate('NEXT');
+        };
+
+        const goToToday = () => {
+            toolbar.onNavigate('TODAY');
+        };
+
+        const changeView = (view) => {
+            toolbar.onView(view);
+        };
+
+        return (
+            <div className="rbc-toolbar">
+                <span className="rbc-btn-group">
+                    <button type="button" onClick={goToBack}>Back</button>
+                    <button type="button" onClick={goToToday}>Today</button>
+                    <button type="button" onClick={goToNext}>Next</button>
+                </span>
+
+                <span className="rbc-toolbar-label">{toolbar.label}</span>
+
+                <span className="rbc-btn-group">
+                    <button
+                        type="button"
+                        className={toolbar.view === Views.MONTH ? 'rbc-active' : ''}
+                        onClick={() => changeView(Views.MONTH)}
+                    >
+                        Month
+                    </button>
+                    <button
+                        type="button"
+                        className={toolbar.view === Views.WEEK ? 'rbc-active' : ''}
+                        onClick={() => changeView(Views.WEEK)}
+                    >
+                        Week
+                    </button>
+                    <button
+                        type="button"
+                        className={toolbar.view === Views.DAY ? 'rbc-active' : ''}
+                        onClick={() => changeView(Views.DAY)}
+                    >
+                        Day
+                    </button>
+                </span>
+            </div>
+        );
+    };
     return (
         <div className='background_Color pt-1 pb-2'>
             <div className='container-fluid px-4'>
@@ -131,6 +182,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                                     }}
                                     components={{
                                         event: CustomEvent,
+                                        toolbar: CustomToolbar, // Use the custom toolbar
                                     }}
                                     onView={(view) => setCalendarView(view)} // <-- track view change
                                     view={calendarView} // optional if you want to programmatically set view
