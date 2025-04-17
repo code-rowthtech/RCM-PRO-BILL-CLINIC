@@ -100,7 +100,7 @@ const AddHoliday = () => {
                                     <div className="col-md-6 col-sm-6 col-12">
                                         <Form.Group className="mb-1 responnsible-party-select">
                                             <Form.Label className="mb-0">
-                                                Doctor Name<span className="text-danger">*</span>
+                                                Provider Name<span className="text-danger">*</span>
                                             </Form.Label>
                                             <Select
                                                 className="basic-single"

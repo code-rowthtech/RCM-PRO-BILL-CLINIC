@@ -29,7 +29,7 @@ const MENU_ITEMS = [
     // },
     {
         key: 'doctors',
-        label: 'Doctor',
+        label: 'Provider',
         icon: 'dripicons-medical',
         url: '/apps/doctors/list',
     },
@@ -53,14 +53,14 @@ const MENU_ITEMS = [
     // },
     {
         key: 'roleManagement',
-        label: 'Role Management',
+        label: 'User Management',
         url: '/apps/role-management/list',
         icon: 'uil uil-users-alt',
     },
 
     {
         key: 'apps-crm',
-        label: 'Profile',
+        label: 'Practice',
         url: '/apps/crm/addclinic',
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },

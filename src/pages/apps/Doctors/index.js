@@ -122,7 +122,7 @@ const Doctors = () => {
                                                 />
                                             </div>
                                             <Button onClick={handleNewDoctor} className="custom-buttons py- d-none d-md-block" >
-                                                New Doctor
+                                                New Provider
                                             </Button>
                                             <Button onClick={handleNewDoctor} className="custom-buttons py d-block d-md-none">
                                                 +

@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row, InputGroup } from 'react-bootstrap';
+import { Button, Col, Form, Row, InputGroup,Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { getStatesByCountryAction, getCitiesAction, addReferringDoctorAction, stateEmptydAction } from '../../../redux/actions';
+import {
+    getStatesByCountryAction,
+    getCitiesAction,
+    addReferringDoctorAction,
+    stateEmptydAction,
+} from '../../../redux/actions';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
@@ -10,7 +15,7 @@ import AddressForm from '../Common Pages/AddressForm';
 const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const clinicId = JSON.parse(localStorage.getItem('hyper_user'))?.data?._id
+    const clinicId = JSON.parse(localStorage.getItem('hyper_user'))?.data?._id;
     const {
         register,
         handleSubmit,
@@ -55,18 +60,20 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
     const onSubmit = (data) => {
         const payload = {
             patientId: patientId,
-            clinicId,
+            clinicId: clinicId,
             identifier: [
                 {
                     use: 'official',
                     system: 'http://hl7.org/fhir/sid/us-npi',
                     value: data?.npiNumber,
                     type: {
-                        coding: [{
-                            system: 'http://hl7.org/fhir/sid/us-npi',
-                            code: 'NPI',
-                            display: 'National Provider Identifier (NPI)',
-                        }],
+                        coding: [
+                            {
+                                system: 'http://hl7.org/fhir/sid/us-npi',
+                                code: 'NPI',
+                                display: 'National Provider Identifier (NPI)',
+                            },
+                        ],
                         text: 'National Provider Identifier (NPI)',
                     },
                 },
@@ -84,28 +91,9 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                 ...(data.fax ? [{ system: 'fax', value: data.fax }] : []),
             ],
             address: referringDoctorAddress,
-            practitionerRole: [
-                {
-                    role: {
-                        coding: [
-                            {
-                                system: 'http://terminology.hl7.org/CodeSystem/practitioner-role',
-                                code: data.speciality,
-                                display: data.speciality,
-                            },
-                        ],
-                    },
-                    organization: data.source
-                        ? {
-                            reference: `Organization/${data.source.replace(/\s/g, '-').toLowerCase()}`,
-                            display: data.source,
-                        }
-                        : undefined,
-                },
-            ],
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log("payload", payload)
+        console.log('payload', payload);
     };
 
     return (
@@ -208,17 +196,15 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             <Row className="mt-2">
                 <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                    <Button
-                        className="cancel-button"
-                        onClick={() => reset()}
-                    >
+                    <Button className="cancel-button" onClick={() => reset()}>
                         Clear
                     </Button>
-                    <Button className="custom-buttons" type="submit"
+                    <Button
+                        className="custom-buttons"
+                        type="submit"
                         onClick={() => {
                             setSubmissionType('saveAndReset');
                         }}>
-
                         Save & Add Another
                     </Button>
                     <Button
@@ -227,8 +213,14 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                         }}
                         // disabled={store?.updatePatientsReducer?.loading
                         className="custom-buttons"
+                        disabled={store?.addReferringDoctorReducer?.loading}
+                        style= {{width :'200px'}}
                         type="submit">
-                        Save & Continue Editing
+                        {store?.addReferringDoctorReducer?.loading ? (
+                            <Spinner animation="border" variant="light" size="sm" className="me-1" />
+                        ) : (
+                            'Save & Continue'
+                        )}
                     </Button>
                 </div>
             </Row>
