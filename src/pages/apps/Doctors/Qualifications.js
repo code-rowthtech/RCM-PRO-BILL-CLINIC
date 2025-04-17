@@ -11,7 +11,7 @@ import { handleUpload } from "../../../helpers/HandleUpload";
 import Select from 'react-select';
 import { qualificationsData } from "../../../utils/DataSets/qualification.data";
 
-const DoctorQualifications = ({ setActiveTab }) => {
+const DoctorQualifications = ({ setActiveTab, docId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
@@ -83,7 +83,7 @@ const DoctorQualifications = ({ setActiveTab }) => {
             issuer: item?.issuerOrganisation,
         }))
         const payload = {
-            ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
+            ...(updateId ? { doctorId: id } : { doctorId: docId }),
             qualification: qualificationData,
             otherDocuments: documents
         }

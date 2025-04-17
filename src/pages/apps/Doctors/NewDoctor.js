@@ -71,9 +71,8 @@ const NewDoctor = () => {
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const createResponse = store?.createtDoctorsReducer?.data?.status
     const updateResponse = store?.createtDoctorsDetailReducer?.data?.status
-    const newDoctorId = store?.createtDoctorsReducer?.data?.response?._id;
+    const newDoctorId = store?.createtDoctorsReducer?.data?.doctor?._id;
     const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
-
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: 1, search: '' }));
