@@ -47,6 +47,8 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('')
+    console.log(selectedStatus, 'selectedStatusselectedStatus')
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     const {
         register,
@@ -68,18 +70,6 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
         const date = new Date(isoString);
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     };
-    const statusColors = {
-        proposed: 'bg-gray-400',
-        pending: 'bg-yellow-400',
-        booked: 'bg-green-500',
-        arrived: 'bg-blue-400',
-        fulfilled: 'bg-purple-500',
-        cancelled: 'bg-red-500',
-        noshow: 'bg-orange-500',
-        'entered-in-error': 'bg-pink-500',
-        'checked-in': 'bg-cyan-500',
-        waitlist: 'bg-teal-500',
-    }
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -151,6 +141,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
                                     <Form.Select
                                         defaultValue={data?.status}
                                         onChange={(e) => {
+                                            setSelectedStatus(e.target.value)
                                             if (e.target.value === 'cancelled') {
                                                 setCancelationPopupRow(data?._id); // or use data?._id if preferred
                                             } else {
@@ -162,9 +153,20 @@ const AppointmentsList = ({ patientsData, appointmentPeriod }: OrderListProps): 
                                             }
                                         }}
 
-                                        className='schedule-status-select'>
+                                        className={`schedule-status-select
+                                         ${data?.status === 'pending' && 'pendingColor'}
+                                         ${data?.status === 'proposed' && 'proposedColor'}
+                                         ${data?.status === 'booked' && 'bookedColor'}
+                                         ${data?.status === 'arrived' && 'arrivedColor'}
+                                         ${data?.status === 'fulfilled' && 'fulfilledColor'}
+                                         ${data?.status === 'cancelled' && 'cancelledColor'}
+                                         ${data?.status === 'noshow' && 'noshowColor'}
+                                         ${data?.status === 'entered-in-error' && 'enteredinerrorColor'}
+                                         ${data?.status === 'checked-in' && 'checkedinColor'}
+                                         ${data?.status === 'waitlist' && 'waitlistColor'}
+                                         `}>
                                         {appointmentStatus?.map((data, index) => (
-                                            <option value={data?.code} key={index}>{data?.display}</option>
+                                            <option value={data?.code} key={index}> {data?.display}</option>
                                         ))}
                                     </Form.Select>
                                     {cancelationPopupRow === data?._id && (

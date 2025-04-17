@@ -180,6 +180,10 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
   };
 
+  const removeTaxonomyItem = (index) => {
+    setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+  }
+
   return (
     <>
       <div className="container-fluid">
@@ -315,6 +319,15 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                             </span>
                           )}
                         </Col>
+                        {index > 0 && (
+                          <div className="col-3 d-flex align-items-center">
+                            <span
+                              className="text-danger cursor-pointer fs-5 fw-bold"
+                              onClick={() => removeTaxonomyItem(index)}>
+                              <CiCircleMinus />
+                            </span>
+                          </div>
+                        )}
                         {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && <hr className="mt-2" />}
                       </Row>
                     ))}
