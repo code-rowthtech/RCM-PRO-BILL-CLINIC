@@ -387,7 +387,7 @@ const UpdatePatientIndex = () => {
                                                                         <span
                                                                             className="ps-2 fs-6"
                                                                             style={{ fontWeight: 600 }}>
-                                                                            +1-{patientDetails?.telecom[1]?.value}
+                                                                            +1-{patientDetails?.telecom[0]?.value}
                                                                         </span>
                                                                     </div>
                                                                 </div>
