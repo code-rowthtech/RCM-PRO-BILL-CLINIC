@@ -10,7 +10,7 @@ import { CiCircleMinus } from "react-icons/ci";
 import DoctorIdentifierForm from "./DoctorIdentifier";
 import { taxonomyOptions as taxonomy } from "../../../utils/DataSets/commonData";
 import AsyncSelect from 'react-select/async';
-const DepartmentDetails = ({ setActiveTab }) => {
+const DepartmentDetails = ({ setActiveTab, docId }) => {
   // const defaultIdentifiers = ['NPI'];
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
@@ -110,7 +110,7 @@ const DepartmentDetails = ({ setActiveTab }) => {
       status: item?.status === 'active' ? true : false,
     }))
     const payload = {
-      ...(updateId ? { doctorId: id } : { doctorId: store?.createtDoctorsReducer?.data?.doctor?._id }),
+      ...(updateId ? { doctorId: id } : { doctorId: docId }),
       identifier: [...finalIdentifiersData, ...finalLicensureData],
       taxonomy: taxonomyCodes,
     }
@@ -179,6 +179,10 @@ const DepartmentDetails = ({ setActiveTab }) => {
     );
     callback(filteredOptions.slice(0, 20)); // Return up to 20 results on search
   };
+
+  const removeTaxonomyItem = (index) => {
+    setTaxonomyCodesList((prev) => prev.filter((_, i) => i !== index));
+  }
 
   return (
     <>
@@ -315,6 +319,15 @@ const DepartmentDetails = ({ setActiveTab }) => {
                             </span>
                           )}
                         </Col>
+                        {index > 0 && (
+                          <div className="col-3 d-flex align-items-center">
+                            <span
+                              className="text-danger cursor-pointer fs-5 fw-bold"
+                              onClick={() => removeTaxonomyItem(index)}>
+                              <CiCircleMinus />
+                            </span>
+                          </div>
+                        )}
                         {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && <hr className="mt-2" />}
                       </Row>
                     ))}
