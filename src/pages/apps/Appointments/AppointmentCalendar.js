@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Col, Modal, Row } from 'react-bootstrap';
+import { Col, Modal, Row } from 'react-bootstrap';
 import { Calendar, momentLocalizer, Views, Toolbar } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { EVENTS } from './event'
 import { getAppointmentsAction } from '../../../redux/appointments/action';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from 'react-icons/io';
@@ -194,7 +192,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
 
                 </div>
             </div>
-            <Modal centered show={appModal} size='lg' onHide={closeAppModal}>
+            <Modal centered show={appModal} size='xl' onHide={closeAppModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>
@@ -213,7 +211,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                     ) : null}
                 </Modal.Body>
             </Modal>
-            <Modal centered show={show} size='lg' onHide={closeModal}>
+            <Modal centered show={show} size='xl' onHide={closeModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>

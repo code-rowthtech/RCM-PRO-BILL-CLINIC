@@ -12633,3 +12633,26 @@ export const appointmentStatus = [
         definition: "The appointment has been placed on a waitlist, to be scheduled/confirmed in the future when a slot/service is available. A specific time might or might not be pre-allocated."
     }
 ]
+
+export const appointmentRecurrence = [
+    {
+        "code": "d",
+        "system": "http://unitsofmeasure.org",
+        "display": "day",
+    },
+    {
+        "code": "wk",
+        "system": "http://unitsofmeasure.org",
+        "display": "week",
+    },
+    // {
+    //     "code": "mo",
+    //     "system": "http://unitsofmeasure.org",
+    //     "display": "month",
+    // },
+    // {
+    //     "code": "a",
+    //     "system": "http://unitsofmeasure.org",
+    //     "display": "year",
+    // }
+]
