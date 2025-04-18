@@ -29,7 +29,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const store = useSelector((state) => state);
     const doctorRoleId = store?.getDoctorsRolesReducer?.data?.result?.[0]?._id;
     const getAppointment = store?.createAppointmentReducer?.data?.appointment;
-    console.log(getAppointment,'getapp')
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const appointmentDetails = store?.getAppointmentByIdReducer?.data;
     const [age, setAge] = useState(null);
