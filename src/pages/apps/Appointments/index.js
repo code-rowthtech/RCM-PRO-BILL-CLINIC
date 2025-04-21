@@ -46,7 +46,6 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(store?.getAppointmentsReducer, 'store?.getAppointmentsReducer?.data')
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('')
@@ -54,14 +53,11 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
-        setValue,
-        reset,
     } = useForm();
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, skip: skip }));
             setCancelationPopupRow(null);
             setCancelationReason('')
         }
@@ -101,6 +97,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
             key: encryptMessage(payload)
         }));
     }
+
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
@@ -248,7 +245,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
             <div className='mt-2 d-flex justify-content-end'>
                 <Paginations
                     currentPage={skip}
-                    totalPages={store?.getAppointmentsReducer?.data?.appointments?.length}
+                    totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
                     onPageChange={handlePageChange}
                 />
             </div>
@@ -285,7 +282,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     }, [dispatch, doctorSearch]);
     useEffect(() => {
         if (activeTab === 'appointments') {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod, skip: skip }));
         }
     }, [dispatch, selectedDoctor, appointmentPeriod, activeTab, skip]);
     const handleInputChange = (data, type) => {

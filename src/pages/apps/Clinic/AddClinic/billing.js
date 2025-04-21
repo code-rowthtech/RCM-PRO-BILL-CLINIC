@@ -34,7 +34,6 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
             setValue('subscription', billingData?.subscriptionId);
             setSelectedDate(billingData?.implimentFrom ? new Date(billingData?.implimentFrom).toISOString().split('T')[0] : new Date().toISOString().split('T')[0])
             const selectedSubscription = subscriptionsData?.find(data => data?._id === billingData?.subscriptionId);
-            console.log(selectedSubscription, 'selectedSubscription')
             setAmount(selectedSubscription || 0);
         }
     }, [billingData, subscriptionsData])

@@ -57,7 +57,6 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
     const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
-    console.log({ logo })
     const handleOtpGeneration = () => {
         dispatch(changeEmailAction())
     }

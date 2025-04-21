@@ -18,14 +18,17 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                 {Array.from({ length: totalPages }, (_, index) => (
                     <li
                         key={index + 1}
-                        className={`page-item ${currentPage === index + 1 ? 'active px-1 ' : ''}`}
+                        style={{ margin: '0 2px' }}
+                        className={`page-item ${currentPage === index + 1 ? 'active px-1' : ''}`}
                     >
                         <button
-                            className="page-link rounded-circle" disabled
+                            className="page-link rounded-circle"
                             onClick={() => onPageChange(index + 1)}
+                            disabled={currentPage === index + 1}
                         >
                             {index + 1}
                         </button>
+
                     </li>
                 ))}
                 {/* Next Button */}
@@ -35,7 +38,7 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                         onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                     >
-                      <i className="bi bi-chevron-right"></i>
+                        <i className="bi bi-chevron-right"></i>
                     </button>
                 </li>
             </ul>

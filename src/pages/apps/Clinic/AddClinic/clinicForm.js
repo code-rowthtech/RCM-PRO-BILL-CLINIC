@@ -487,7 +487,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             //       },
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload, '934873890')
     };
     const logoFileInputRef = useRef(null);
     // const accreditationFileInputRef = useRef(null);
@@ -502,7 +501,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const selectedFile = e.target.files[0];
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
-            setLogo({url:url?.url?.split('?')[0]});
+            setLogo({ url: url?.url?.split('?')[0] });
             setLogoName(selectedFile?.name);
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -1798,47 +1797,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     {searchedLocations?.map((data, suggestionIndex) => (
                                                         <p
                                                             key={suggestionIndex}
-                                                            // onClick={() => {
-                                                            //     if (item?.type === 'physical') {
-                                                            //         dispatch(getCitiesAction({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
-                                                            //     } else if (item?.type === 'postal') {
-                                                            //         dispatch(getCities2Action({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
-                                                            //     } else if (item?.type === 'both') {
-                                                            //         dispatch(getCities3Action({ state_code: statesData?.states?.find((state) => state?.name === data.components?.state)?.id, name: data?.components?.city || '', limit: 25, skip: '' }));
-                                                            //     }
-                                                            //     // Extract the necessary fields from the API response
-                                                            //     const formatted = data.formatted || '';
-                                                            //     const components = data.components || {};
-                                                            //     // Build the new address object with auto-populated fields
-                                                            //     console.log({ components })
-                                                            //     const newAddress = {
-                                                            //         use: item.use, // preserve existing use
-                                                            //         line: [data?.formatted ? data?.formatted : ''],
-                                                            //         // city:
-                                                            //         //     components.city ||
-                                                            //         //     components.town ||
-                                                            //         //     components.village ||
-                                                            //         //     '',
-                                                            //         state:
-                                                            //             components.state || components.state_code || '',
-                                                            //         postalCode: components.postcode || '',
-                                                            //         country: components.country || '',
-                                                            //     };
-                                                            //     // Update the specific address entry
-                                                            //     const updatedAddresses = [...addresses];
-                                                            //     updatedAddresses[index] = newAddress;
-                                                            //     setAddresses(updatedAddresses);
-                                                            //     // Clear suggestions and remove focus
-                                                            //     setSearchedLocations([]);
-                                                            //     setAddressFocused(false);
-                                                            //     setValue(
-                                                            //         `address[${index}].state`,
-                                                            //         components?.state_code
-                                                            //     );
-                                                            //     setValue(`postalCode`, components?.postcode);
-                                                            //     setSelectedState(components?.state_code);
-                                                            // }}
-
                                                             onClick={() => {
                                                                 const state = statesData?.states?.find(s => s.name === data.components?.state);
                                                                 const stateCode = state?.id;

@@ -69,7 +69,6 @@ const PatientDetails = ({ patientId }) => {
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'patientDetials')
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
         label: data?.name?.[0]?.text,
@@ -224,7 +223,6 @@ const PatientDetails = ({ patientId }) => {
         }
 
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'main')
     };
 
     const handleInputChange = (data) => {
