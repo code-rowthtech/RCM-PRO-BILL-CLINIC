@@ -763,3 +763,15 @@ table {
     background-color: rgb(26, 192, 189) !important;
     border: none !important;
 }
+
+
+.react-select__control {
+    border-color: #ced4da  !important;
+    min-height: 38px !important;
+  }
+  
+  .react-select__control--is-focused {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25)!important;
+    border-color: #80bdff !important;
+  }
+  

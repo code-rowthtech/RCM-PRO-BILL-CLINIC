@@ -70,7 +70,7 @@ const UpdatePatientIndex = () => {
     const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-    const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(false);
+    const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(true);
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const videoRef = useRef(null);
@@ -717,7 +717,7 @@ const UpdatePatientIndex = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className={isSidebarCollapsed ? 'col-1 ' : 'col-2'}>
+                            <div className='col-2'>
                                 <div
                                     className="patient-menu-container bg-white mt-0"
                                     style={{
@@ -728,31 +728,11 @@ const UpdatePatientIndex = () => {
                                         <div
                                             className="card-header d-flex justify-content-between align-items-center text-white px-2 py-1"
                                             style={{ backgroundColor: '#313A46' }}>
-                                            <button
-                                                className="btn p-0 shadow-none outline-none"
-                                                onClick={handleSidebarToggle}>
-                                                <i className="bi bi-list text-white" style={{ fontSize: '18px' }}></i>
-                                            </button>
-                                            {!isSidebarCollapsed && <h5 className="m-0">Patient Chart</h5>}
-                                            <button
-                                                className="btn p-0 shadow-none outline-none"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#patientChartData"
-                                                aria-expanded={isClinicalReviewExpandedData}
-                                                aria-controls="patientChartData"
-                                                onClick={handleToggle}>
-                                                <i
-                                                    className={`bi ${isClinicalReviewExpandedData
-                                                        ? 'bi-chevron-up'
-                                                        : 'bi-chevron-down'
-                                                        }`}
-                                                    style={{ fontSize: '14px', color: 'white' }}></i>
-                                            </button>
+                                            <h5 className="m-0">Patient Chart</h5>
                                         </div>
-                                        <div id="patientChartData" className="collapse">
+                                        <div>
                                             <div
-                                                className={`card-body p-0 scroll-container ${isSidebarCollapsed ? 'collapsed-sidebar' : ''
-                                                    }`}
+                                                className={`card-body p-0 scroll-container`}
                                                 style={{ height: '76.8vh', overflow: 'auto' }}>
                                                 {patientMenuItems.map((item, index) =>
                                                     item.subItems ? (
@@ -784,20 +764,63 @@ const UpdatePatientIndex = () => {
                                                                             }`}></i>
                                                                 )}
                                                             </p>
-                                                            {isClinicalReviewExpanded && (
-                                                                <div className="ms-0">
-                                                                    {item.subItems.map((subItem, subIndex) => (
-                                                                        <div
-                                                                            key={subIndex}
-                                                                            className={`d-flex  align-items-center ${isSidebarCollapsed
-                                                                                ? 'text-center justify-content-center'
-                                                                                : 'ps-4 justify-content-between pe-2'
-                                                                                } border-bottom py-1 `}
-                                                                            title={
-                                                                                isSidebarCollapsed ? subItem.label : ''
-                                                                            } // Show tooltip in collapsed mode
-                                                                        >
-                                                                            {isSidebarCollapsed ? (
+                                                            {/* {isClinicalReviewExpanded && ( */}
+                                                            <div className="ms-0">
+                                                                {item.subItems.map((subItem, subIndex) => (
+                                                                    <div
+                                                                        key={subIndex}
+                                                                        className={`d-flex  align-items-center ${isSidebarCollapsed
+                                                                            ? 'text-center justify-content-center'
+                                                                            : 'ps-4 justify-content-between pe-2'
+                                                                            } border-bottom py-1 `}
+                                                                        title={
+                                                                            isSidebarCollapsed ? subItem.label : ''
+                                                                        } // Show tooltip in collapsed mode
+                                                                    >
+                                                                        {isSidebarCollapsed ? (
+                                                                            <p
+                                                                                className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                                style={{
+                                                                                    width: '20px',
+                                                                                    height: '20px',
+                                                                                    fontSize: '10px',
+                                                                                    lineHeight: '20px',
+                                                                                }}>
+                                                                                {subIndex + 1}{' '}
+                                                                                {/* Display subitem number */}
+                                                                            </p>
+                                                                        ) : (
+                                                                            <>
+                                                                                <p
+                                                                                    key={subIndex}
+                                                                                    className="text-black mb-0 d-flex"
+                                                                                    onClick={() =>
+                                                                                        handleTabClick(
+                                                                                            subItem.label
+                                                                                        )
+                                                                                    }
+                                                                                    style={{
+                                                                                        cursor: 'pointer',
+                                                                                        // backgroundColor:
+                                                                                        //     selectedSubTab === subItem.label ? '#e9ecef' : 'transparent',
+                                                                                        fontWeight:
+                                                                                            selectedSubTab ===
+                                                                                                subItem.label
+                                                                                                ? 'bold'
+                                                                                                : 'normal',
+                                                                                    }}>
+                                                                                    <span
+                                                                                        className="mb-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                                                                        style={{
+                                                                                            width: '20px',
+                                                                                            height: '20px',
+                                                                                            fontSize: '10px',
+                                                                                            lineHeight: '20px',
+                                                                                        }}>
+                                                                                        0
+                                                                                    </span>
+                                                                                    {subItem.label}
+                                                                                </p>
                                                                                 <p
                                                                                     className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
                                                                                     style={{
@@ -806,57 +829,14 @@ const UpdatePatientIndex = () => {
                                                                                         fontSize: '10px',
                                                                                         lineHeight: '20px',
                                                                                     }}>
-                                                                                    {subIndex + 1}{' '}
-                                                                                    {/* Display subitem number */}
+                                                                                    {subItem.icon}
                                                                                 </p>
-                                                                            ) : (
-                                                                                <>
-                                                                                    <p
-                                                                                        key={subIndex}
-                                                                                        className="text-black mb-0 d-flex"
-                                                                                        onClick={() =>
-                                                                                            handleTabClick(
-                                                                                                subItem.label
-                                                                                            )
-                                                                                        }
-                                                                                        style={{
-                                                                                            cursor: 'pointer',
-                                                                                            // backgroundColor:
-                                                                                            //     selectedSubTab === subItem.label ? '#e9ecef' : 'transparent',
-                                                                                            fontWeight:
-                                                                                                selectedSubTab ===
-                                                                                                    subItem.label
-                                                                                                    ? 'bold'
-                                                                                                    : 'normal',
-                                                                                        }}>
-                                                                                        <span
-                                                                                            className="mb-0 bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                                                                                            style={{
-                                                                                                width: '20px',
-                                                                                                height: '20px',
-                                                                                                fontSize: '10px',
-                                                                                                lineHeight: '20px',
-                                                                                            }}>
-                                                                                            0
-                                                                                        </span>
-                                                                                        {subItem.label}
-                                                                                    </p>
-                                                                                    <p
-                                                                                        className="mb-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                                                                                        style={{
-                                                                                            width: '20px',
-                                                                                            height: '20px',
-                                                                                            fontSize: '10px',
-                                                                                            lineHeight: '20px',
-                                                                                        }}>
-                                                                                        {subItem.icon}
-                                                                                    </p>
-                                                                                </>
-                                                                            )}
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            )}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                            {/* // )} */}
                                                         </div>
                                                     ) : (
                                                         <p

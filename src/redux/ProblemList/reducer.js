@@ -142,6 +142,7 @@ export const getALLCodesReducer = (state = GET_ALL_CODES_INITIAL_STATE, action) 
 }
 
 export const getPatientAppointmentReducer = (state = GET_PATIENT_APPOINTMENT_INITIAL_STATE, action) => {
+    console.log(action,'patient appointment reducer')
     switch (action.type) {
         case ProblemListActionTypes.GET_PATIENTS_APPOINTMENT_LOADING:
             return {

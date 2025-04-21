@@ -27,7 +27,7 @@ export function getAllCodeApi(params: any): any {
 }
 export function getPatientAppointmentsApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getPatientAppointment, data);
+    return api.get(`${URL.getPatientAppointment}?patientId=${data?.patientId}`,);
 }
 export function getProblemDetailsApi(params: any): any {
     const { data } = params;

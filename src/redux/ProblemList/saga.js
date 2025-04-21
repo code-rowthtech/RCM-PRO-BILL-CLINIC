@@ -159,16 +159,15 @@ function* getPatientAppointmentFunction(data) {
         });
         const response = yield call(getPatientAppointmentsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
         if (response.status === 200) {
             yield put({
                 type: ProblemListActionTypes.GET_PATIENTS_APPOINTMENT_SUCCESS,
-                payload: { ...decryptedData },
+                payload: decryptedData, // ✅ FIXED
             });
         } else {
             yield put({
                 type: ProblemListActionTypes.GET_PATIENTS_APPOINTMENT_ERROR,
-                payload: { ...decryptedData },
+                payload: decryptedData,
             });
         }
     } catch (error) {
@@ -178,6 +177,7 @@ function* getPatientAppointmentFunction(data) {
         });
     }
 }
+
 
 function* getProblemDetailsFunction(data) {
     try {
