@@ -16,7 +16,7 @@ const AddProblem = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const store = useSelector((state) => state);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    const appointments =store?.getPatientAppointmentReducer?.data || [];
+    const appointments = store?.getPatientAppointmentReducer?.data || [];
     const {
         register,
         handleSubmit,
@@ -54,7 +54,6 @@ const AddProblem = () => {
     }));
 
     const onSubmit = (data) => {
-        console.log('Form Submitted:', data);
     };
 
     return (
@@ -138,7 +137,7 @@ const AddProblem = () => {
                             <option value="">Select Appointment</option>
                             {appointments?.map((item) => (
                                 <option key={item._id} value={item._id}>
-                                    {item?.date?new Date(item?.date).toISOString().split('T')[0]:'N/A'} 
+                                    {item?.date ? new Date(item?.date).toISOString().split('T')[0] : 'N/A'}
                                 </option>
                             ))}
                         </Form.Select>

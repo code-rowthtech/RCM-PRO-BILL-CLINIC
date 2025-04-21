@@ -25,17 +25,17 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     useEffect(() => {
-        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
     }, [dispatch, selectedDoctor])
     useEffect(() => {
         if (createAppointmentResponse === 201) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
             setAppModal(false)
         }
     }, [createAppointmentResponse]);
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '' }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
             setShow(false)
         }
     }, [updateSuccess]);
