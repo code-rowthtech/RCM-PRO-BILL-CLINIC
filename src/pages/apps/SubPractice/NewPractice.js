@@ -68,7 +68,7 @@ const NewPractice = () => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             // setLogo(url?.url?.split('?')[0]);
-            setLogo({url:url?.url?.split('?')[0]});
+            setLogo({ url: url?.url?.split('?')[0] });
             setLogoName(selectedFile?.name);
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -90,13 +90,11 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log('clinicsDataGet', clinicsDataGet);
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
     const createLoading = store?.createSubClinicsReducer?.loading;
     const createResponseOfSubClinics = store?.createSubClinicsReducer?.data?.status;
-    // console.log(store?.createSubClinicsReducer, 'createSubresponse')
     const updateLoading = store?.updateSubClinicReducer?.loading;
     const [searchedLocations, setSearchedLocations] = useState([]);
     const [searchedLocations2, setSearchedLocations2] = useState(null);

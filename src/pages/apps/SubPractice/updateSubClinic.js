@@ -53,7 +53,7 @@ const SubUpdateClinic = () => {
         try {
             const url = await handleUpload(selectedFile, setLogoUploading);
             // setLogo(url?.url?.split('?')[0]);
-            setLogo({url:url?.url?.split('?')[0]});
+            setLogo({ url: url?.url?.split('?')[0] });
             setLogoName(selectedFile?.name);
         } catch (error) {
             console.error('Error during file upload:', error);
@@ -71,7 +71,6 @@ const SubUpdateClinic = () => {
     const clinectypes = store?.getClinicTypeReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data;
     const subClinicsDetailsGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(subClinicsDetailsGet, 'subClinicsDetailsGetsubClinicsDetailsGet')
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
     useEffect(() => {
@@ -333,7 +332,6 @@ const SubUpdateClinic = () => {
     //     }
     // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
     const setField = (key, value) => value && setValue(key, value);
-    console.log(subClinicsDetailsGet, 'subClinicsDetailsGet')
     useEffect(() => {
         if (subClinicsDetailsGet) {
             if (subClinicsDetailsGet?.orgType) {

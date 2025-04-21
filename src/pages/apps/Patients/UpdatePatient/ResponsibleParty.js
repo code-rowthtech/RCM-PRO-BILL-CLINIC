@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form,Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { BiEdit } from 'react-icons/bi';
 import { FiUploadCloud } from 'react-icons/fi';
@@ -26,8 +26,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab }) => {
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'patientDetails');
-
     const {
         register,
         handleSubmit,
@@ -62,10 +60,10 @@ const ResponsiblleParty = ({ activeTab, setActiveTab }) => {
             const rawTelecom = patientDetails?.relatedPerson?.telecom;
             const updateTelecom = Array.isArray(rawTelecom)
                 ? rawTelecom.map((data) => ({
-                      system: data?.system || '',
-                      value: data?.value || '',
-                      use: data?.use || '',
-                  }))
+                    system: data?.system || '',
+                    value: data?.value || '',
+                    use: data?.use || '',
+                }))
                 : [];
 
             setResponsibleTelecom(updateTelecom);
@@ -99,7 +97,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab }) => {
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
@@ -234,7 +231,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab }) => {
                         }}
                         disabled={store?.createResponsiblePartyReducer?.loading}
                         className="custom-buttons"
-                        style= {{width :'200px'}}
+                        style={{ width: '200px' }}
                         type="submit">
                         {store?.createResponsiblePartyReducer?.loading ? (
                             <Spinner animation="border" role="status" />
