@@ -106,7 +106,7 @@ export const createProblemList = `${BaseRoute}/createProblems`;
 export const updateProblemList = `${BaseRoute}/updateProblems`;
 export const deleteProblemList = `${BaseRoute}/deleteProblems`;
 export const allCodes = `${BaseRoute}/codes/search`;
-export const getPatientAppointment = `${BaseRoute}/getPatientAppointments`;
+export const getPatientAppointment = `${BaseRoute}/app/get-by-patientId`;
 export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
 
 

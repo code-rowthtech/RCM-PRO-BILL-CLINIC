@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row, InputGroup,Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Row, InputGroup, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -93,7 +93,6 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
             address: referringDoctorAddress,
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log('payload', payload);
     };
 
     return (
@@ -214,7 +213,7 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
                         // disabled={store?.updatePatientsReducer?.loading
                         className="custom-buttons"
                         disabled={store?.addReferringDoctorReducer?.loading}
-                        style= {{width :'200px'}}
+                        style={{ width: '200px' }}
                         type="submit">
                         {store?.addReferringDoctorReducer?.loading ? (
                             <Spinner animation="border" variant="light" size="sm" className="me-1" />

@@ -146,7 +146,6 @@ const NewPatient = () => {
                 // setActiveTab('demographicDetails');
                 setPatientId(createPatientResponse?._id);
                 setGenderIdentity(createPatientResponse?.gender);
-                // console.log(createPatientResponse?.gender, 'createPatientResponse')
             } else if (submissionType === 'saveAndReset') {
                 reset(); // Ensure the form resets
                 setSelectedDoctor(null);
@@ -265,7 +264,6 @@ const NewPatient = () => {
     }, [stateToSelect]);
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    // console.log('clinicId', clinicId);
     const [showCellPhone, setShowCellPhone] = useState(false);
     const [showOfficePhone, setShowOfficePhone] = useState(false);
     const [showAltEmail, setShowAltEmail] = useState(false);
@@ -442,7 +440,6 @@ const NewPatient = () => {
             }
         }
         dispatch(createPatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
         if (submissionType === 'saveAndReset') {
             reset(); // Reset before dispatch
         }

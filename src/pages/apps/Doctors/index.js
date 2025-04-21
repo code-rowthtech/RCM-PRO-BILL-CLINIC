@@ -4,7 +4,7 @@ import { FormInput } from '../../../components';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiEdit } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
-import {  createDoctorDetailAction, getDoctorsAction } from '../../../redux/actions';
+import { createDoctorDetailAction, getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Spinner from '../../../constants/Spinner';
 import { Link, useNavigate } from 'react-router-dom';
@@ -15,7 +15,6 @@ import { Info } from 'lucide-react';
 const Doctors = () => {
     const [statusModal, setStatusModal] = useState(false);  // Modal to confirm status change
     const [selectedDoctor, setSelectedDoctor] = useState(null);
-    console.log(selectedDoctor,'selectedDoctor')
     const [status, setStatus] = useState(true);
     const [search, setSearch] = useState('');
     const navigate = useNavigate('');
@@ -31,7 +30,6 @@ const Doctors = () => {
     }, [dispatch, status, search]);
     const store = useSelector((state) => state);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result) || [];
-    console.log(doctorDetails, 'doctorDetails');
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false);  // Close status change modal
     const filteredDoctors = doctorDetails;
@@ -56,7 +54,7 @@ const Doctors = () => {
             const payload = { status: status, search: search }
             dispatch(
                 getDoctorsAction(payload)
-    
+
             );
         }
     }, [updateStatus]);

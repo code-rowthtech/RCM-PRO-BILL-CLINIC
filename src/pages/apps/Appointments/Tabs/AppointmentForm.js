@@ -27,7 +27,7 @@ import { appointmentReasonOptions } from '../../../../utils/DataSets/appointment
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
 
 // Memoized components
-const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails }) => {
+const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id }) => {
     const daysNumberDaily = watch('daysNumberDaily');
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
     const dailyOccurenceCount = watch('dailyOccurenceCount');
@@ -44,14 +44,14 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             for (let i = 0; i < dailyOccurenceCount; i++) {
                 const nextDate = new Date(startDate);
                 nextDate.setDate(startDate.getDate() + i * daysNumberDaily);
-                dates.push(nextDate.toISOString().split('T')[0]);
+                dates.push(nextDate.toISOString());
             }
         } else if (dailyOccurrenceDate) {
             const endDate = new Date(dailyOccurrenceDate);
             let currentDate = new Date(startDate);
 
             while (currentDate <= endDate) {
-                dates.push(currentDate.toISOString().split('T')[0]);
+                dates.push(currentDate.toISOString());
                 currentDate.setDate(currentDate.getDate() + daysNumberDaily);
             }
         }
@@ -72,8 +72,8 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         placeholder='Enter number of days'
                         type='number'
                         min={1}
-                        readOnly={appointmentDetails?.repeat}
-                        style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                        readOnly={appointmentDetails?.repeat && id}
+                        style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                     />
                 </Form.Group>
             </Col>
@@ -84,8 +84,8 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         <Form.Control
                             {...register('dailyOccurrenceDate')}
                             type='date'
-                            readOnly={appointmentDetails?.repeat}
-                            style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                            readOnly={appointmentDetails?.repeat && id}
+                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
                     </span>
@@ -98,8 +98,8 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                         <Form.Control
                             {...register('dailyOccurenceCount', { valueAsNumber: true })}
                             placeholder='Enter number of days' type='number' min={1}
-                            readOnly={appointmentDetails?.repeat}
-                            style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }} />
+                            readOnly={appointmentDetails?.repeat && id}
+                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }} />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;days</Form.Text>
                     </span>
                 </Form.Group>
@@ -109,13 +109,10 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
 });
 
 
-
-const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails }) => {
-
-    const [endDate, setEndDate] = useState(null);
+const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id }) => {
     const appointmentDays = watch('appointmentDay');
-    const weeklyOccurrenceDate = endDate;
-    const [weekInterval, setWeekInterval] = useState(null)
+    const weekInterval = watch('weekInterval');
+    const weeklyOccurrenceDate = watch('weeklyOccurrenceDate');
 
     const calculateAppointments = useCallback(
         debounce(() => {
@@ -124,6 +121,7 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                 onDatesCalculated([]);
                 return;
             }
+
             const selectedDays = Object.entries(appointmentDays)
                 .filter(([_, selected]) => selected)
                 .map(([day]) => ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day));
@@ -160,16 +158,14 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
             setValue('weeklyOccurenceCount', appointments.length);
             onDatesCalculated(appointments);
         }, 300),
-        [endDate, weekInterval]
+        [appointmentDays, weekInterval, weeklyOccurrenceDate, setValue, onDatesCalculated]
     );
 
     useEffect(() => {
-        if (!appointmentDetails) {
-            calculateAppointments();
-            return () => {
-                calculateAppointments.cancel();
-            };
-        }
+        calculateAppointments();
+        return () => {
+            calculateAppointments.cancel();
+        };
     }, [calculateAppointments]);
 
     const todayString = new Date().toISOString().split('T')[0];
@@ -188,11 +184,10 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                                 label={day.charAt(0).toUpperCase() + day.slice(1)}
                                 id={`day-${day}`}
                                 {...register(`appointmentDay.${day}`)}
-                                readOnly={appointmentDetails?.repeat}
-                                style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                                disabled={appointmentDetails?.repeat && id}
+                                style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                             />
                         ))}
-
                     </div>
                 </Form.Group>
             </Col>
@@ -205,10 +200,9 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                             placeholder="Enter number of weeks"
                             {...register('weekInterval', { valueAsNumber: true })}
                             type="number"
-                            onChange={(e) => setWeekInterval(e.target.value)}
                             min={1}
-                            readOnly={appointmentDetails?.repeat}
-                            style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                            readOnly={appointmentDetails?.repeat && id}
+                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;week(s)</Form.Text>
                     </span>
@@ -222,11 +216,10 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                         <Form.Control
                             {...register('weeklyOccurrenceDate')}
                             type="date"
-                            onChange={(e) => setEndDate(e.target.value)}
                             min={todayString}
                             max={oneYearLaterString}
-                            readOnly={appointmentDetails?.repeat}
-                            style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                            readOnly={appointmentDetails?.repeat && id}
+                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
                     </span>
@@ -242,8 +235,8 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
                             placeholder="Calculated"
                             type="text"
                             min={1}
-                            readOnly={appointmentDetails?.repeat}
-                            style={{ cursor: appointmentDetails?.repeat ? 'not-allowed' : '' }}
+                            readOnly
+                            style={{ cursor: 'not-allowed' }}
                         />
                         <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;appointments</Form.Text>
                     </span>
@@ -510,6 +503,42 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
         const startDateTime = new Date(`${data.scheduled}T${data.startTime}:00`);
         const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
+        let recurrenceTemplate = {};
+
+        if (!(appointmentDetails && id) && repeat && repeatType !== '') {
+            recurrenceTemplate = {
+                recurrenceTemplate: {
+                    recurrenceType: {
+                        coding: [selectedAppointmentRecurrence],
+                        text: selectedAppointmentRecurrence.display,
+                    },
+                    ...(repeatType === 'day' && {
+                        occurrenceCount: appointmentDates?.length,
+                        occurrenceDate: appointmentDates,
+                        lastOccurrenceDate: data?.dailyOccurrenceDate,
+                        every: data?.daysNumberDaily,
+                    }),
+                    ...(repeatType === 'week' && {
+                        occurrenceCount: appointmentDates?.length,
+                        occurrenceDate: appointmentDates,
+                        lastOccurrenceDate: data?.weeklyOccurrenceDate,
+                        every: data?.weekInterval,
+                        weeklyTemplate: {
+                            ...(data?.appointmentDay || {}),
+                            weekInterval: data?.weekInterval,
+                        },
+                    }),
+                    ...(repeatType === 'month' && {
+                        monthlyTemplate: {
+                            dayOfMonth: data?.dayOfMonth,
+                            nthWeekOfMonth: { system: "", code: "", display: data?.nthWeekOfMonth },
+                            dayOfWeek: { system: "", code: "", display: data?.dayOfWeek },
+                            monthInterval: data?.monthInterval,
+                        },
+                    }),
+                }
+            };
+        }
 
         const payload = {
             ...(id && appointmentDetails ? { id } : {}),
@@ -530,41 +559,43 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             }),
             status: data?.status,
             slot: data?.startTime,
-            ...(repeat && repeatType !== '' && {
-                recurrenceTemplate: {
-                    ...(repeat && {
-                        recurrenceType: {
-                            coding: [selectedAppointmentRecurrence],
-                            text: selectedAppointmentRecurrence.display,
-                        }
-                    }),
-                    ...(repeatType === 'day' && {
-                        occurrenceCount: appointmentDates?.length,
-                        occurrenceDate: appointmentDates,
-                        lastOccurrenceDate: data?.dailyOccurrenceDate,
-                        every: data?.daysNumberDaily
-                    }),
-                    ...(repeatType === 'week' && {
-                        occurrenceCount: appointmentDates?.length,
-                        occurrenceDate: appointmentDates,
-                        lastOccurrenceDate: data?.weeklyOccurrenceDate,
-                        every: data?.weekInterval,
-                        weeklyTemplate: {
-                            ...(data?.appointmentDay || {}),
-                            weekInterval: data?.weekInterval,
-                        }
-                    }),
-                    ...(repeatType === 'month' && {
-                        monthlyTemplate: {
-                            dayOfMonth: data?.dayOfMonth,
-                            nthWeekOfMonth: { system: "", code: "", display: data?.nthWeekOfMonth },
-                            dayOfWeek: { system: "", code: "", display: data?.dayOfWeek },
-                            monthInterval: data?.monthInterval,
-                        }
-                    }),
-                }
-            })
+            ...recurrenceTemplate
+            // ...(repeat && repeatType !== '' && {
+            //     recurrenceTemplate: {
+            //         ...(repeat && {
+            //             recurrenceType: {
+            //                 coding: [selectedAppointmentRecurrence],
+            //                 text: selectedAppointmentRecurrence.display,
+            //             }
+            //         }),
+            //         ...(repeatType === 'day' && {
+            //             occurrenceCount: appointmentDates?.length,
+            //             occurrenceDate: appointmentDates,
+            //             lastOccurrenceDate: data?.dailyOccurrenceDate,
+            //             every: data?.daysNumberDaily
+            //         }),
+            //         ...(repeatType === 'week' && {
+            //             occurrenceCount: appointmentDates?.length,
+            //             occurrenceDate: appointmentDates,
+            //             lastOccurrenceDate: data?.weeklyOccurrenceDate,
+            //             every: data?.weekInterval,
+            //             weeklyTemplate: {
+            //                 ...(data?.appointmentDay || {}),
+            //                 weekInterval: data?.weekInterval,
+            //             }
+            //         }),
+            //         ...(repeatType === 'month' && {
+            //             monthlyTemplate: {
+            //                 dayOfMonth: data?.dayOfMonth,
+            //                 nthWeekOfMonth: { system: "", code: "", display: data?.nthWeekOfMonth },
+            //                 dayOfWeek: { system: "", code: "", display: data?.dayOfWeek },
+            //                 monthInterval: data?.monthInterval,
+            //             }
+            //         }),
+            //     }
+            // })
         };
+
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
@@ -773,6 +804,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 type="checkbox"
                                 label="Repeat"
                                 checked={repeat}
+                                disabled={appointmentDetails?.repeat && id}
+                                style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
                                 onChange={(e) => setRepeat(e.target.checked)}
                             />
                         </Form.Group>
@@ -848,13 +881,24 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                     {repeat && (
                         <Col sm={12} className='mt-2'>
                             <div className="time-period-tabs">
-                                <ul className="nav nav-pills">
+                                <ul
+                                    style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
+                                    className="nav nav-pills">
                                     {appointmentRecurrence?.map((data, index) => (
-                                        <li key={index} className="nav-item">
+                                        <li
+                                            key={index}
+                                            style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
+                                            className="nav-item">
                                             <span
                                                 className={`cursor-pointer text-capitalize mx-1 border border-muted nav-link py-1  
-                          ${repeatType === data.display ? 'active' : 'text-black'}`}
-                                                onClick={() => setRepeatType(data?.display)}
+                                                ${repeatType === data.display ? 'active' : 'text-black'}`}
+                                                onClick={() => {
+                                                    if (appointmentDetails?.repeat && id) {
+                                                        return;
+                                                    } else {
+                                                        setRepeatType(data?.display)
+                                                    }
+                                                }}
                                             >
                                                 {data?.display === 'day' && 'Daily'}
                                                 {data?.display === 'week' && 'Weekly'}
@@ -874,6 +918,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 register={register}
                                 watch={watch}
                                 setValue={setValue}
+                                id={id}
                                 appointmentDetails={appointmentDetails}
                                 onDatesCalculated={(dates) => setAppointmentDates(dates)}
                             />}
@@ -882,6 +927,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 errors={errors}
                                 register={register}
                                 watch={watch}
+                                id={id}
                                 setValue={setValue}
                                 appointmentDetails={appointmentDetails}
                                 onDatesCalculated={(dates) => setAppointmentDates(dates)}

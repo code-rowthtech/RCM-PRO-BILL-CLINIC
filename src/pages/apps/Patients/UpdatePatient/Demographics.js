@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table ,Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -364,7 +364,6 @@ const Demographicdetails = ({ patientId }) => {
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };
-        console.log('Payload:', payload);
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
@@ -392,7 +391,6 @@ const Demographicdetails = ({ patientId }) => {
             if (data) {
                 setSearchedEmployerLocations(data?.results);
             } else {
-                // console.log('No data returned.');
             }
         });
     };
@@ -444,7 +442,6 @@ const Demographicdetails = ({ patientId }) => {
                     ]}
                     identifiers={identifiers}
                     setIdentifiers={setIdentifiers}
-                    // onChange={(data) => console.log('Updated Identifiers:', data)}
                 />
 
                 <hr className="mt-0" />
@@ -539,7 +536,6 @@ const Demographicdetails = ({ patientId }) => {
                                 // } // Show selected value
                                 value={selectedEthnicityOption}
                                 onChange={handleEthnicityChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -589,7 +585,6 @@ const Demographicdetails = ({ patientId }) => {
                                 value={selectedTribleOption}
                                 placeholder="&nbsp; Select "
                                 onChange={handleTribalChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -718,7 +713,6 @@ const Demographicdetails = ({ patientId }) => {
                                 // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
                                 value={selectedRelationOption}
                                 onChange={handleRelationChange}
-                                // onMenuOpen={() => console.log('Dropdown Opened')}
                                 styles={{
                                     control: (provided) => ({
                                         ...provided,
@@ -892,11 +886,10 @@ const Demographicdetails = ({ patientId }) => {
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
-                                                    }`}>
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                        ? 'd-none'
+                                                        : ''
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}
@@ -1037,7 +1030,7 @@ const Demographicdetails = ({ patientId }) => {
                         <Button
                             className="custom-buttons btn-height"
                             disabled={store?.updatePatientsReducer?.loading}
-                            style={{width:'70px'}}
+                            style={{ width: '70px' }}
                             type="submit">
                             {store?.updatePatientsReducer?.loading ? (
                                 <Spinner animation="border" variant="primary" size="sm" />

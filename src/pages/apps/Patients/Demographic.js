@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, InputGroup, Table,Spinner } from 'react-bootstrap';
+import { Button, Card, Col, Form, Modal, Row, InputGroup, Table, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FiDownloadCloud, FiUploadCloud } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -242,9 +242,7 @@ const Demographicdetails = ({
             address: demographicAddresses,
             ...(data?.notes && { notes: data.notes }),
         };
-        console.log(payload, 'payload');
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
-        console.log(payload);
     };
 
     useEffect(() => {
@@ -776,11 +774,10 @@ const Demographicdetails = ({
                                                         border: '1px solid #ced4da',
                                                         borderTop: 'none',
                                                     }}
-                                                    className={`scroll-container hover-bg-change ${
-                                                        searchedEmployerLocations?.length === 0 || !employerFocused
+                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
                                                             ? 'd-none'
                                                             : ''
-                                                    }`}>
+                                                        }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p
                                                             key={index}

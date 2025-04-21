@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form,Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { BiEdit } from 'react-icons/bi';
 import { FiUploadCloud } from 'react-icons/fi';
@@ -93,7 +93,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
             telecom: responsibleTelecom,
         };
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
@@ -228,7 +227,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                         }}
                         disabled={store?.createResponsiblePartyReducer?.loading}
                         className="custom-buttons"
-                        style= {{width :'200px'}}
+                        style={{ width: '200px' }}
                         type="submit">
                         {store?.createResponsiblePartyReducer?.loading ? (
                             <Spinner animation="border" role="status" />

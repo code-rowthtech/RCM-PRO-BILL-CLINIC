@@ -32,7 +32,6 @@ const ReferringDoctor = ({ setActiveTab, activeTab }) => {
     ]);
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log('patientDetails', store?.getPatientByIdReducer);
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
     // useEffect(() => {
     //     if (createResponseReferring === 201) {
@@ -71,10 +70,10 @@ const ReferringDoctor = ({ setActiveTab, activeTab }) => {
                 'phone',
                 patientDetails?.referringDocId?.telecom?.[0]?.value
                     ? patientDetails?.referringDocId?.telecom?.[0]?.value
-                          .replace(/\D/g, '')
-                          .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
-                              p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
-                          )
+                        .replace(/\D/g, '')
+                        .replace(/(\d{3})(\d{3})(\d{0,4})/, (match, p1, p2, p3) =>
+                            p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`
+                        )
                     : ''
             );
             // setValue('phone', patientDetails?.referringDocId?.telecom?.[0]?.value);
@@ -129,7 +128,6 @@ const ReferringDoctor = ({ setActiveTab, activeTab }) => {
             address: referringDoctorAddress,
         };
         dispatch(addReferringDoctorAction({ key: encryptMessage(payload) }));
-        console.log('payload', payload);
     };
 
     return (
