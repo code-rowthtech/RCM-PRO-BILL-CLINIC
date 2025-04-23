@@ -6,8 +6,9 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { getAppointmentsAction } from '../../../redux/appointments/action';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from 'react-icons/io';
-import Spinner from '../../../constants/Spinner';
+import Spinner from '../../../constants/Spinner'; // Assuming Spinner is a loading component
 import AppointmentForm from './Tabs/AppointmentForm';
+import ToastHandle from '../../../helpers/ToastMessage';
 
 const localizer = momentLocalizer(moment);
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -17,99 +18,101 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const [events, setEvents] = useState([]);
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    const [show, setShow] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null)
+    const [monthYearFilter, setMonthYearFilter] = useState(() => {
+        const today = new Date();
+        return today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    });
+    const [show, setShow] = useState(false); // This will manage modal visibility
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [selectedSlot, setSelectedSlot] = useState(null);
-    const [calendarView, setCalendarView] = useState('month'); // default to 'month' or your desired initial view
-
+    const [calendarView, setCalendarView] = useState('month');
+    const [loading, setLoading] = useState(true); // loading state to track calendar data fetching
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
+    const [appModal, setAppModal] = useState(false)
+    const closeAppModal = () => {
+        setShow(false);
+        setSelectedEvent(null);
+    }
     useEffect(() => {
-        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
-    }, [dispatch, selectedDoctor])
+        setLoading(true); // Set loading to true when data fetching begins
+        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+    }, [dispatch, selectedDoctor, monthYearFilter]);
+
     useEffect(() => {
         if (createAppointmentResponse === 201) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
-            setAppModal(false)
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+            setShow(false); // Closing the modal after creating appointment
         }
     }, [createAppointmentResponse]);
+
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: 500 }));
-            setShow(false)
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+            setShow(false); // Closing the modal after updating the appointment
         }
     }, [updateSuccess]);
-
-    const CustomEvent = ({ event }) => {
-        return (
-            <div>
-                <p className="text-capitalize mb-0">{event.patientName} {`(${event?.status})`}</p>
-                <p className="mb-0">{event.title}</p>
-            </div>
-        );
-    };
 
     useEffect(() => {
         if (appointmentsList?.length > 0) {
             const transformedEvents = appointmentsList.map((data) => {
-                try {
-                    const start = new Date(data.start);
-                    const end = new Date(data.end);
+                const start = new Date(data.start);
+                const end = new Date(data.end);
 
-                    if (isNaN(start) || isNaN(end)) {
-                        console.error("Invalid start or end date", start, end);
-                        return null;
-                    }
+                if (isNaN(start) || isNaN(end)) return null;
 
-                    return {
-                        event_id: data?._id,
-                        title: data?.reason?.[0]?.coding?.[0]?.display,
-                        status: data?.status,
-                        appointmentDate: new Date(data?.date).toLocaleDateString('en-GB'),
-                        start: start,
-                        end: end,
-                        slotStart: data?.start,
-                        slotEnd: data?.end,
-                        doctorName: data?.doctorId?.name?.[0]?.text,
-                        patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
-                        patientContact: data?.subject?.telecom?.[0]?.value,
-                        appointmentDescription: data?.appointmentType?.text,
-                        patientEmail: data?.subject?.telecom?.find((data) => data?.system === 'email' && data?.value)?.value,
-                        patientId: data?.subject?._id,
-                    };
-                } catch (error) {
-                    console.error("Error processing appointment:", data, error);
-                    return null;
-                }
+                return {
+                    event_id: data?._id,
+                    title: data?.reason?.[0]?.coding?.[0]?.display,
+                    status: data?.status,
+                    start: start,
+                    end: end,
+                    slotStart: data?.start,
+                    slotEnd: data?.end,
+                    patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
+                };
             }).filter(Boolean);
 
             setEvents(transformedEvents);
+            setLoading(false); // Set loading to false once the data has been processed
         }
     }, [appointmentsList]);
 
+    const CustomEvent = ({ event }) => (
+        <div>
+            <p className="text-capitalize mb-0">{event.patientName} {`(${event?.status})`}</p>
+            <p className="mb-0">{event.title}</p>
+        </div>
+    );
+
     const handleEventClick = (event) => {
-        setShow(true);
+        setShow(true); // Open modal for event details
         setSelectedEvent(event);
     };
+
     const closeModal = () => {
         setShow(false);
         setSelectedEvent(null);
-    }
-    const [appModal, setAppModal] = useState(false)
-    const closeAppModal = () => {
-        setAppModal(false);
-        setSelectedEvent(null);
-    }
+    };
+
     const CustomToolbar = (toolbar) => {
         const goToBack = () => {
+            const prevMonth = new Date(toolbar?.date);
+            prevMonth.setMonth(prevMonth.getMonth() - 1);
+            formatMonthYear(prevMonth);
             toolbar.onNavigate('PREV');
         };
 
         const goToNext = () => {
+            const nextMonth = new Date(toolbar?.date);
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            formatMonthYear(nextMonth);
             toolbar.onNavigate('NEXT');
         };
 
         const goToToday = () => {
+            const today = new Date();
+            formatMonthYear(today);
             toolbar.onNavigate('TODAY');
         };
 
@@ -153,46 +156,59 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             </div>
         );
     };
+
+    const formatMonthYear = (dateString) => {
+        const date = new Date(dateString);
+        const options = { month: 'long', year: 'numeric' };
+        setMonthYearFilter(date.toLocaleDateString('en-US', options));
+    };
+
     return (
         <div className='background_Color pt-1 pb-2'>
             <div className='container-fluid px-4'>
                 <div className='row'>
-                    {store?.getAppointmentsReducer?.loading ?
-                        <div className="row h-100">
-                            <div className="col-12 d-flex align-items-center justify-content-center">
-                                <Spinner />
-                            </div>
-                        </div>
-                        :
-                        <div className='col'>
-                            <div className='mt-3'>
-                                <Calendar
-                                    localizer={localizer}
-                                    events={events}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    style={{ height: '68vh' }}
-                                    selectable
-                                    onSelectEvent={handleEventClick}
-                                    onSelectSlot={(slotInfo) => {
+                    <div className='col'>
+                        <div className='mt-3'>
+                            <Calendar
+                                localizer={localizer}
+                                events={events}
+                                startAccessor="start"
+                                endAccessor="end"
+                                style={{ height: '68vh' }}
+                                selectable
+                                onSelectEvent={handleEventClick}
+                                onSelectSlot={(slotInfo) => {
+                                    const today = new Date();
+                                    today.setHours(0, 0, 0, 0); // set today's time to 00:00:00
+
+                                    const slotDate = new Date(slotInfo.start);
+                                    slotDate.setHours(0, 0, 0, 0); // set slot time to 00:00:00
+
+                                    if (slotDate < today) {
+                                        ToastHandle('Appointments cannot be created for past dates', 'danger');
+                                    } else {
                                         setSelectedSlot(slotInfo);
-                                        setAppModal(true);
-                                    }}
-                                    components={{
-                                        event: CustomEvent,
-                                        toolbar: CustomToolbar, // Use the custom toolbar
-                                    }}
-                                    onView={(view) => setCalendarView(view)} // <-- track view change
-                                    view={calendarView} // optional if you want to programmatically set view
-                                />
-
-                            </div>
+                                        setShow(true);
+                                    }
+                                }}
+                                components={{
+                                    event: CustomEvent,
+                                    toolbar: CustomToolbar,
+                                }}
+                                onView={(view) => setCalendarView(view)}
+                                view={calendarView}
+                            />
+                            {/* Add the loader inside the calendar when loading */}
+                            {store?.getAppointmentsReducer?.loading && (
+                                <div className="loading-overlay">
+                                    <Spinner />
+                                </div>
+                            )}
                         </div>
-                    }
-
+                    </div>
                 </div>
             </div>
-            <Modal centered show={appModal} size='xl' onHide={closeAppModal}>
+            {/* <Modal centered show={appModal} size='xl' onHide={closeAppModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>
@@ -210,8 +226,8 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                         <AppointmentForm selectedSlot={selectedSlot} />
                     ) : null}
                 </Modal.Body>
-            </Modal>
-            <Modal centered show={show} size='xl' onHide={closeModal}>
+            </Modal> */}
+            <Modal centered show={show} size='xl' onHide={closeAppModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className='text-center'>
@@ -222,10 +238,10 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                         </Col>
                     </Row>
 
-                    <AppointmentForm appointmentId={selectedEvent?.event_id} calendarView={calendarView} />
+                    <AppointmentForm selectedSlot={selectedSlot} appointmentId={selectedEvent?.event_id} calendarView={calendarView} />
                 </Modal.Body>
             </Modal>
-        </div >
+        </div>
     );
 };
 

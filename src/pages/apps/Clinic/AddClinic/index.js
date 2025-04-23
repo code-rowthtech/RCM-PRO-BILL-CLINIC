@@ -17,7 +17,7 @@ const Index = () => {
     const [activeTab, setActiveTab] = useState('clinic');
     const [clinicId, setClinicId] = useState(null);
     const [billingId, setBillingId] = useState(null);
-    
+
     // const [showModal, setShowModal] = useState(false); // Modal visibility state
     // const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
     const store = useSelector((state) => state);
@@ -44,8 +44,8 @@ const Index = () => {
         <>
             <Row className="mt-2">
                 <Col xs={12} className=''>
-                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
-                    <Row className="mb-0">
+                    <Card className="px-md-3 py-md-2 scroll-container page-height">
+                        <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
                                 <div className="d-flex gap-4">
                                     {['clinic', 'billing', 'contract'].map((tab) => (
@@ -54,14 +54,13 @@ const Index = () => {
                                             onClick={() => handleActiveTab(tab)}
                                             role="button"
                                             tabIndex="0"
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTab === tab ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTab === tab ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
                                             {tab === 'clinic'
                                                 ? 'Practice Information'
                                                 : tab === 'billing'
-                                                ? 'Billing and Subscription Information'
-                                                : 'Contract'}
+                                                    ? 'Billing and Subscription Information'
+                                                    : 'Contract'}
                                         </span>
                                     ))}
                                 </div>

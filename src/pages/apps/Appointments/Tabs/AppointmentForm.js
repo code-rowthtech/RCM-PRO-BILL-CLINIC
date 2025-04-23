@@ -27,7 +27,7 @@ import { appointmentReasonOptions } from '../../../../utils/DataSets/appointment
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
 
 // Memoized components
-const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, id }) => {
+const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id }) => {
     const daysNumberDaily = watch('daysNumberDaily') || 1;
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
 
@@ -39,7 +39,9 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             return;
         }
 
-        const startDate = new Date();
+        if (!scheduledDate) return; // ⛔️ if no scheduledDate, don't proceed
+
+        const startDate = new Date(scheduledDate);
         const dates = [];
 
         if (dailyOccurrenceDate) {
@@ -59,9 +61,17 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
             }
         }
 
+        // // Only update if necessary
+        // setValue(prev => {
+        //     if (prev.dailyOccurenceCount !== dates.length) {
+        //         return { ...prev, dailyOccurenceCount: dates.length };
+        //     }
+        //     return prev;
+        // });
+        setValue("dailyOccurrenceCount", dates.length);
+
         onDatesCalculated?.(dates);
-        setValue('dailyOccurenceCount', dates.length);
-    }, [daysNumberDaily, dailyOccurrenceDate, setValue, onDatesCalculated]);
+    }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate]);
 
     const todayString = new Date().toISOString().split('T')[0];
     const oneYearLaterString = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
@@ -357,6 +367,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [repeatType, setRepeatType] = useState('day');
     const [appointmentDates, setAppointmentDates] = useState();
     const [appointmentReason, setAppointmentReason] = useState(null);
+    const [scheduledDate, setScheduledDate] = useState()
 
     const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm({
         defaultValues: {
@@ -385,9 +396,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     }, []);
 
     // Get today's date helper
-    const getTodayDate = useCallback(() => {
-        return new Date().toISOString().split('T')[0];
-    }, []);
+    // const getTodayDate = useCallback(() => {
+    //     return ;
+    // }, []);
 
     // Get default time helper
     const getDefaultTime = useCallback(() => '10:00', []);
@@ -414,21 +425,23 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     // Set form values when selectedSlot changes
     useEffect(() => {
         if (selectedSlot) {
-            const date = new Date(calendarView === 'month' ? selectedSlot?.slots : selectedSlot?.start);
+            const date = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
             const localDateString = date.toLocaleDateString('en-CA');
 
-            setValue('scheduled', localDateString);
+
+            setScheduledDate(localDateString);
 
             if (calendarView !== 'month') {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            setValue('scheduled', getTodayDate());
+            setScheduledDate(new Date().toISOString().split('T')[0]);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }
-    }, [selectedSlot, calendarView, setValue, formatTime, getTodayDate, getDefaultTime]);
+    }, [selectedSlot, calendarView, scheduledDate]);
 
+    console.log('selectedSlot:', selectedSlot)
     // Fetch doctors when search or status changes
     useEffect(() => {
         const doctorPayload = { status, search };
@@ -480,7 +493,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 setValue('weekInterval', appointmentDetails?.recurrenceTemplate?.every)
             }
             if (details?.date) {
-                setValue('scheduled', new Date(details?.date).toISOString().split('T')[0]);
+                setScheduledDate(new Date(details?.date).toISOString().split('T')[0]);
             }
         }
     }, [appointmentDetails, id, patientsData, doctorDetails, setValue, formatTime]);
@@ -561,40 +574,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             status: data?.status,
             slot: data?.startTime,
             ...recurrenceTemplate
-            // ...(repeat && repeatType !== '' && {
-            //     recurrenceTemplate: {
-            //         ...(repeat && {
-            //             recurrenceType: {
-            //                 coding: [selectedAppointmentRecurrence],
-            //                 text: selectedAppointmentRecurrence.display,
-            //             }
-            //         }),
-            //         ...(repeatType === 'day' && {
-            //             occurrenceCount: appointmentDates?.length,
-            //             occurrenceDate: appointmentDates,
-            //             lastOccurrenceDate: data?.dailyOccurrenceDate,
-            //             every: data?.daysNumberDaily
-            //         }),
-            //         ...(repeatType === 'week' && {
-            //             occurrenceCount: appointmentDates?.length,
-            //             occurrenceDate: appointmentDates,
-            //             lastOccurrenceDate: data?.weeklyOccurrenceDate,
-            //             every: data?.weekInterval,
-            //             weeklyTemplate: {
-            //                 ...(data?.appointmentDay || {}),
-            //                 weekInterval: data?.weekInterval,
-            //             }
-            //         }),
-            //         ...(repeatType === 'month' && {
-            //             monthlyTemplate: {
-            //                 dayOfMonth: data?.dayOfMonth,
-            //                 nthWeekOfMonth: { system: "", code: "", display: data?.nthWeekOfMonth },
-            //                 dayOfWeek: { system: "", code: "", display: data?.dayOfWeek },
-            //                 monthInterval: data?.monthInterval,
-            //             }
-            //         }),
-            //     }
-            // })
         };
 
         if (id && appointmentDetails) {
@@ -649,7 +628,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
         callback(filteredOptions.slice(0, 20));
     }, [formattedReasonOptions]);
-
     return (
         <div>
             {isLoading ?
@@ -762,9 +740,10 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             type="date"
                                             className=""
                                             {...register('scheduled', { required: 'Scheduled date is required' })}
-                                            value={watchedScheduled}
+                                            value={scheduledDate}
                                             disabled={!watchedDoctorName}
-                                            min={getTodayDate()}
+                                            min={new Date().toISOString().split('T')[0]}
+                                            onChange={(e) => setScheduledDate(e.target.value)}
                                             onClick={handleDisabledClick}
                                             style={{ pointerEvents: watchedDoctorName ? 'auto' : 'none' }}
                                         />
@@ -811,10 +790,10 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 <Form.Check
                                     type="checkbox"
                                     label="Repeat"
-                                    checked={repeat}
+                                    value={repeat}
                                     disabled={appointmentDetails?.repeat && id}
                                     style={{ cursor: appointmentDetails?.repeat && id ? 'not-allowed' : '' }}
-                                    onChange={(e) => setRepeat(e.target.checked)}
+                                    onChange={(e) => { setRepeat(e.target.checked) }}
                                 />
                             </Form.Group>
                         </Col>
@@ -928,6 +907,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     setValue={setValue}
                                     id={id}
                                     appointmentDetails={appointmentDetails}
+                                    scheduledDate={scheduledDate}
                                     onDatesCalculated={(dates) => setAppointmentDates(dates)}
                                 />}
                             {repeatType === 'week' &&
@@ -938,6 +918,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     id={id}
                                     setValue={setValue}
                                     appointmentDetails={appointmentDetails}
+                                    scheduledDate={scheduledDate}
                                     onDatesCalculated={(dates) => setAppointmentDates(dates)}
                                 />}
                             {repeatType === 'month' && <Monthly register={register} />}

@@ -16,13 +16,15 @@ import { encryptMessage } from '../cryptoUtils';
 import Spinner from '../constants/Spinner';
 import { Button, Col, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
+import logo from '../assets/images/logo.png';
+import logo_sm from '../assets/images/logo_sm.png';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
 };
 
 /* sidebar content */
-const SideBarContent = ({ hideUserProfile }: SideBarContentProps) => {
+const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) => {
     return (
         <>
             {!hideUserProfile && (
@@ -33,7 +35,7 @@ const SideBarContent = ({ hideUserProfile }: SideBarContentProps) => {
                     </Link>
                 </div>
             )}
-            <AppMenu menuItems={getMenuItems()} />
+            <AppMenu menuItems={getMenuItems()} isCondensed={isCondensed} />
 
 
             <div className="clearfix" />
@@ -128,6 +130,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             return (
                 <>
                     <div className="position-relative mb-2">
+
                         {/* <BiSearch className="position-absolute top-50 start-0 translate-middle-y ms-2 text-secondary" /> */}
                         <input
                             type="text"
@@ -204,11 +207,14 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     }
     return (
         <>
-            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} style={{ paddingTop: '60px' }} ref={menuNodeRef}>
+            <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ?
                     <>
                         {!isCondensed ?
                             <ul style={{ listStyle: 'none' }} className='px-0'>
+                                <li className='text-center py-3' >
+                                    <img src={logo} alt="" height="25" />
+                                </li>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
                                     <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
                                     <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i className="bi bi-filter"></i></Button>
@@ -358,7 +364,10 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                             </ul>
                             :
                             // small side bar
-                            <ul style={{ listStyle: 'none' }} className='px-0 mt-5'>
+                            <ul style={{ listStyle: 'none' }} className='px-0 '>
+                                <li className='text-center py-3' >
+                                    <img src={logo_sm} alt="" height="30" />
+                                </li>
                                 <div className={`text-end text-white me-1 ${selectedDoctor ? '' : 'd-none'}`}>
                                     <u className='cursor-pointer' onClick={() => setSelectedDoctor(null)}>Clear filters</u>
                                 </div>
@@ -465,6 +474,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     menuClickHandler={() => { }}
                                     isLight={isLight}
                                     hideUserProfile={hideUserProfile}
+                                    isCondensed={isCondensed}
                                 />
                             </SimpleBar>
                         )}

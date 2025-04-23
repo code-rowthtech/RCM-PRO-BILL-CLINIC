@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import { findAllParent, findMenuItem } from '../helpers/menu';
 import { logoutUser } from '../redux/actions';
 import { useDispatch } from 'react-redux';
+import logo from '../assets/images/logo.png';
 
 const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMenuItems, toggleMenu }) => {
     const [open, setOpen] = useState(activeMenuItems.includes(item.key));
@@ -108,7 +109,7 @@ const MenuItemLink = ({ item, className }) => {
         // setAuthorization(null);
     }
     const closeModal = () => {
-       window.location.reload();
+        window.location.reload();
     }
     return (
         <Link
@@ -157,7 +158,7 @@ type AppMenuProps = {
     menuItems: Array<any>,
 };
 
-const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType> => {
+const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$FragmentType> => {
     let location = useLocation();
     const menuRef = useRef(null);
 
@@ -205,6 +206,13 @@ const AppMenu = ({ menuItems }: AppMenuProps): React$Element<React$FragmentType>
     return (
         <>
             <ul className="side-nav" ref={menuRef} id="main-side-menu">
+                <li className='text-center py-3' >
+                    {isCondensed ?
+                        <></>
+                        :
+                        <img src={logo} alt="" height="25" />
+                    }
+                </li>
                 {(menuItems || []).map((item, idx) => {
                     return (
                         <React.Fragment key={idx}>

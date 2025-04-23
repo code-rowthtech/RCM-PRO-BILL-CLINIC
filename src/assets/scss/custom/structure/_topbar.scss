@@ -240,17 +240,17 @@
 }
 
 .nav-user {
-    padding: calc(#{$topbar-height - 39px} * 0.5) 20px calc(#{$topbar-height - 39px} * 0.5) 57px !important;
+    // padding: calc(#{$topbar-height - 43px} * 0.5) 20px calc(#{$topbar-height - 39px} * 0.5) 57px !important;
     text-align: left !important;
     position: relative;
     background-color: #{lighten(map-get($grays, "100"), 2.5%)};
     border: #{($border-width) solid map-get($grays, "100")};
     border-width: 0 1px;
-    min-height: $topbar-height;
+    // min-height: $topbar-height;
 
     .account-user-avatar {
         position: absolute;
-        top: calc(#{$topbar-height - 32px} * 0.5);
+        top: calc(#{$topbar-height - 50px} * 0.3);
         left: 15px;
 
         img {

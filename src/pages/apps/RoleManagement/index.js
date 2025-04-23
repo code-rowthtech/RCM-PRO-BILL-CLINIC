@@ -90,7 +90,7 @@ const RoleManagement = () => {
     return (
         <Row className='mt-2'>
             <Col xs={12} className='px-0'>
-                <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Card className="scroll-container page-height">
                     <Card.Body className='' >
                         <Row className="mb-2">
                             <Col md={6} sm={6} xs={6}>
