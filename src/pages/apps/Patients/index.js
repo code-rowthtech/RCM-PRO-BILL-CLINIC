@@ -88,7 +88,7 @@ const Patients = () => {
             <Row className='mt-2'>
                 <Col xs={12}>
                     <Card>
-                        <Card.Body style={{ height: '88vh' }}>
+                        <Card.Body className='page-height scroll-container'>
                             <Row className="mb-2">
                                 <Col sm={6}>
                                 </Col>

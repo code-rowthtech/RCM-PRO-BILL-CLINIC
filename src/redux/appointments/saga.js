@@ -153,7 +153,6 @@ function* getAppointmentsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger')
         yield put({
             type: AppointmentActionTypes.GET_APPOINTMENT_ERROR,
             payload: error,

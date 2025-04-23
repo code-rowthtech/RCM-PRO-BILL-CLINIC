@@ -9,7 +9,7 @@ import Statistics from './Statistics';
 import Tasks from './Tasks';
 // import TasksChart from './TasksChart';
 import Activity from './Activity';
-import {  useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
@@ -18,7 +18,7 @@ const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     // }, [dispatch])
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
-        <div className='scroll-container' style={{height: '82vh', overflow: 'scroll' }}>
+        <div className='scroll-container page-height' >
             {/* <PageTitle
                 breadCrumbItems={[
                     { label: 'Dashboard', path: '/', active: true },

@@ -211,6 +211,7 @@ const UpdatePatientIndex = () => {
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
+    const [isOpen, setIsOpen] = useState(false)
     return (
         <>
             <div className="">
@@ -220,212 +221,225 @@ const UpdatePatientIndex = () => {
                     ) : (
                         <div className="row">
                             <div className={`${isSidebarCollapsed ? 'col-11' : 'col-10'} pe-0`}>
-                                <div
-                                    className="mb-1"
-                                    style={{
-                                        background: 'transparent',
-                                        width: 'auto',
-                                        border: '0px!important',
-                                        boxShadow: 0,
-                                    }}>
-                                    <Card.Body className="p-1">
-                                        <Row>
-                                            <Col sm={2} className="ps-2 pt-1">
-                                                <Form
-                                                    onSubmit={handleSubmit(onSubmit)}
-                                                    className="d-flex flex-column align-items-center">
-                                                    <div
-                                                        className="position-relative d-flex align-items-center flex-column justify-content-center"
-                                                        style={{ display: 'inline-block' }}>
-                                                        {isCameraOpen ? (
-                                                            <video
-                                                                ref={videoRef}
-                                                                autoPlay
-                                                                playsInline
-                                                                className="rounded"
-                                                                style={{
-                                                                    width: '126px',
-                                                                    height: '129px',
-                                                                    objectFit: 'cover',
-                                                                }}
-                                                            />
-                                                        ) : uploading ? (
-                                                            <Spinner />
-                                                        ) : (
-                                                            <img
-                                                                src={
-                                                                    logo?.url
-                                                                        ? logo.url.split('?')[0]
-                                                                        :
-                                                                        patientDetails?.photo[0]?.url
-                                                                            ? patientDetails.photo[0]?.url
-                                                                            : profilePhoto
-                                                                }
-                                                                alt="Patient Profile"
-                                                                className="img-fluid rounded"
-                                                                style={{
-                                                                    width: '126px',
-                                                                    height: '129px',
-                                                                    objectFit: 'cover',
-                                                                }}
-                                                            />
-                                                        )}
+                                <div class="accordion-item collapsed border-0">
+                                    <h2 class="accordion-header customAccordion mt-0">
+                                        <button
+                                            className="accordion-button collapsed py-1 bg-white"
+                                            style={{ border: '#000', height: '43px' }}
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#collapseOne"
+                                            aria-expanded={isOpen}
+                                            aria-controls="collapseOne"
+                                            onClick={() => setIsOpen(!isOpen)} // Toggle state on click
+                                        >
+                                            <div className="d-flex gap-2 ps-1 pt-2">
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fs-6">
+                                                    <span
+                                                        className="fw-bold text-capitalize"
+                                                        style={{ color: 'rgb(249, 139, 55)' }}>
+                                                        {patientDetails?.name?.[0]?.text || 'N/A'}
+                                                    </span>{' '}
+                                                    <span className="fs-6 fw-bold">
+                                                        {patientDetails?.gender || ' '}
+                                                    </span>
+                                                </p>
+                                                <p
+                                                    style={{ borderRight: '1px solid black' }}
+                                                    className="pe-2 text-nowrap fw-bold fs-6">
+                                                    <span>
+                                                        {patientDetails?.birthDate
+                                                            ? new Date(patientDetails.birthDate).toLocaleDateString(
+                                                                'en-GB'
+                                                            )
+                                                            : 'N/A'}
+                                                    </span>
+                                                </p>
+                                                <p
+                                                    className="text-nowrap fs-6 fw-bold pe-2"
+                                                    style={{ borderRight: '1px solid black' }}>
+                                                    <span>
+                                                        {patientDetails?.approxAge != null
+                                                            ? patientDetails.approxAge + ' years old'
+                                                            : '-'}
+                                                    </span>
+                                                </p>
+                                                <p className="text-nowrap fs-6 fw-bold">
+                                                    <span>{patientDetails?.telecom?.[3]?.value || 'N/A'}</span>
+                                                </p>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div
+                                        id="collapseOne"
+                                        class="accordion-collapse customAccordion collapse "
+                                        data-bs-parent="#accordionExample">
+                                        <div
+                                            class="accordion-body  p-0 bg-white pb-1"
+                                            style={{ borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px' }}>
+                                            <div
+                                                className="mb-1 p-1"
+                                                style={{
+                                                    background: 'transparent',
+                                                    width: 'auto',
+                                                    border: '0px!important',
+                                                    boxShadow: 0,
+                                                }}>
+                                                <Card.Body className="p-1">
+                                                    <Row>
+                                                        <Col sm={2} className="ps-2 pt-1">
+                                                            <Form
+                                                                onSubmit={handleSubmit(onSubmit)}
+                                                                className="d-flex flex-column align-items-center">
+                                                                <div
+                                                                    className="position-relative d-flex align-items-center flex-column justify-content-center"
+                                                                    style={{ display: 'inline-block' }}>
+                                                                    {isCameraOpen ? (
+                                                                        <video
+                                                                            ref={videoRef}
+                                                                            autoPlay
+                                                                            playsInline
+                                                                            className="rounded"
+                                                                            style={{
+                                                                                width: '126px',
+                                                                                height: '129px',
+                                                                                objectFit: 'cover',
+                                                                            }}
+                                                                        />
+                                                                    ) : uploading ? (
+                                                                        <Spinner />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={
+                                                                                logo?.url
+                                                                                    ? logo.url.split('?')[0]
+                                                                                    :
+                                                                                    patientDetails?.photo[0]?.url
+                                                                                        ? patientDetails.photo[0]?.url
+                                                                                        : profilePhoto
+                                                                            }
+                                                                            alt="Patient Profile"
+                                                                            className="img-fluid rounded"
+                                                                            style={{
+                                                                                width: '126px',
+                                                                                height: '129px',
+                                                                                objectFit: 'cover',
+                                                                            }}
+                                                                        />
+                                                                    )}
 
-                                                        {!isCameraOpen && (
-                                                            <BiEdit
-                                                                className={`position-absolute fs-4 text-black ${uploading ? 'd-none' : ''
-                                                                    }`}
-                                                                style={{
-                                                                    bottom: '-5px',
-                                                                    right: '-9px',
-                                                                    cursor: 'pointer',
-                                                                }}
-                                                                onClick={openCamera}
-                                                            />
-                                                        )}
+                                                                    {!isCameraOpen && (
+                                                                        <BiEdit
+                                                                            className={`position-absolute fs-4 text-black ${uploading ? 'd-none' : ''
+                                                                                }`}
+                                                                            style={{
+                                                                                bottom: '-5px',
+                                                                                right: '-9px',
+                                                                                cursor: 'pointer',
+                                                                            }}
+                                                                            onClick={openCamera}
+                                                                        />
+                                                                    )}
 
-                                                        {isCameraOpen && (
-                                                            <div className="camera-controls d-flex justify-content-center gap-1">
+                                                                    {isCameraOpen && (
+                                                                        <div className="camera-controls d-flex justify-content-center gap-1">
+                                                                            <Button
+                                                                                onClick={capturePhoto}
+                                                                                type="button"
+                                                                                className="custom-buttons">
+                                                                                <TbCapture className="text-white fs-5" />{' '}
+                                                                            </Button>
+                                                                            <Button onClick={stopCamera} className="custom-buttons">
+                                                                                <IoClose className="text-white fs-5" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+                                                                </div>
+
+                                                                {/* Submit button that sends the form after upload */}
                                                                 <Button
-                                                                    onClick={capturePhoto}
-                                                                    type="button"
-                                                                    className="custom-buttons">
-                                                                    <TbCapture className="text-white fs-5" />{' '}
+                                                                    type="submit"
+                                                                    className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
+                                                                    disabled={!logo}>
+                                                                    Submit
                                                                 </Button>
-                                                                <Button onClick={stopCamera} className="custom-buttons">
-                                                                    <IoClose className="text-white fs-5" />
-                                                                </Button>
-                                                            </div>
-                                                        )}
-
-                                                        <canvas ref={canvasRef} style={{ display: 'none' }} />
-                                                    </div>
-
-                                                    {/* Submit button that sends the form after upload */}
-                                                    <Button
-                                                        type="submit"
-                                                        className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
-                                                        disabled={!logo}>
-                                                        Submit
-                                                    </Button>
-                                                </Form>
-                                            </Col>
-                                            <Col sm={8}>
-                                                <Row className="pt-1">
-                                                    <div className="d-flex gap-2 ps-1 lh-sm">
-                                                        <p
-                                                            style={{ borderRight: '1px solid black' }}
-                                                            className="pe-2 text-nowrap  fs-6">
-                                                            <span
-                                                                className="fw-bold text-capitalize"
-                                                                style={{ color: '#f9a004' }}>
-                                                                {patientDetails?.name[0]?.given[0]
-                                                                    ? patientDetails?.name[0]?.given[0]
-                                                                    : ''}
-                                                                {patientDetails?.name[0]?.given[1]
-                                                                    ? ' ' + patientDetails.name[0]?.given[1]
-                                                                    : ''}
-                                                                {patientDetails?.lastName
-                                                                    ? ' ' + patientDetails.lastName
-                                                                    : ''}
-                                                            </span>
-                                                        </p>
-                                                        <p
-                                                            style={{ borderRight: '1px solid black' }}
-                                                            className="text-nowrap  fs-6 pe-2 fw-bold">
-                                                            <span className="fs-6 text-capitalize">
-                                                                {patientDetails?.gender || 'N/A'}
-                                                            </span>
-                                                        </p>
-                                                        <p
-                                                            style={{ borderRight: '1px solid black' }}
-                                                            className="text-nowrap fs-6 pe-2 fw-bold">
-                                                            <span>
-                                                                {patientDetails?.birthDate
-                                                                    ? new Date(
-                                                                        patientDetails?.birthDate
-                                                                    )?.toLocaleDateString('en-GB')
-                                                                    : 'N/A'}
-                                                            </span>
-                                                        </p>
-                                                        <p className="text-nowrap mb-0 fs-6 fw-bold">
-                                                            <span>
-                                                                {patientDetails?.approxAge
-                                                                    ? patientDetails?.approxAge + ' ' + 'years old'
-                                                                    : 'N/A'}
-                                                            </span>
-                                                        </p>
-                                                    </div>
-
-                                                    <Col sm={6} className="p-0">
-                                                        <div className="row">
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-3 pe-0">
-                                                                        <span className="fw-bold fs-6">
-                                                                            Patients Chart ID:
-                                                                        </span>
+                                                            </Form>
+                                                        </Col>
+                                                        <Col sm={8}>
+                                                            <Row className="pt-1">
+                                                                <Col sm={6} className="p-0">
+                                                                    <div className="row">
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-3 pe-0">
+                                                                                    <span className="fw-bold fs-6">
+                                                                                        Patients Chart ID:
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-9">
+                                                                                    <span
+                                                                                        className="ps-2 text-primary fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        CH-{patientDetails?.chartNumber}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-3">
+                                                                                    <span>
+                                                                                        <MdPhone className="fs-5 text-primary" />
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-9">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        +1-{patientDetails?.telecom[1]?.value}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-3">
+                                                                                    <span>
+                                                                                        <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-9">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        {patientDetails?.telecom[3]?.value}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-3">
+                                                                                    <span>
+                                                                                        <BiSolidLocationPlus className="fs-5 text-primary" />
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-9">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        {patientDetails?.address?.[0]?.city || ''}{patientDetails?.address?.[0]?.city && ','} {patientDetails?.address?.[0]?.state || ''}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="col-9">
-                                                                        <span
-                                                                            className="ps-2 text-primary fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            CH-{patientDetails?.chartNumber}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-3">
-                                                                        <span>
-                                                                            <MdPhone className="fs-5 text-primary" />
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-9">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            +1-{patientDetails?.telecom[0]?.value}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-3">
-                                                                        <span>
-                                                                            <MdOutlineMarkEmailUnread className="fs-5 text-primary" />
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-9">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            {patientDetails?.telecom[3]?.value}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-3">
-                                                                        <span>
-                                                                            <BiSolidLocationPlus className="fs-5 text-primary" />
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-9">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            {patientDetails?.address?.[0]?.city || ''}{patientDetails?.address?.[0]?.city && ','} {patientDetails?.address?.[0]?.state || ''}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </Col>
-                                                    {/* <Col sm={6}>
+                                                                </Col>
+                                                                {/* <Col sm={6}>
                                                     <div>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Primary Provider:</span><span className='ps-2'>{patientDetails?.primaryProvider?.userId?.firstName} {patientDetails?.primaryProvider?.userId?.lastName || ''}</span></p>
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Date Added:</span><span className='ps-2'>{new Date(patientDetails?.createdAt)?.toLocaleDateString('en-GB')}</span></p>
@@ -433,121 +447,125 @@ const UpdatePatientIndex = () => {
                                                         <p className='fs-6 m-1'><span className='fw-bold'>Next Scheduled appt:</span><span className='ps-2'>None</span></p>
                                                     </div>
                                                 </Col> */}
-                                                    <Col sm={6}>
-                                                        <div className="row">
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-5">
-                                                                        <span className="fw-bold fs-6">
-                                                                            Primary Provider:
-                                                                        </span>
+                                                                <Col sm={6}>
+                                                                    <div className="row">
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-5">
+                                                                                    <span className="fw-bold fs-6">
+                                                                                        Primary Provider:
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-7">
+                                                                                    <span
+                                                                                        className="ps-2 text-primary fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        {
+                                                                                            patientDetails?.primaryProvider?.userId
+                                                                                                ?.firstName
+                                                                                        }{' '}
+                                                                                        {patientDetails?.primaryProvider?.userId
+                                                                                            ?.lastName || ''}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-5">
+                                                                                    <span className="fw-bold fs-6">
+                                                                                        Date Added:
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-7">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        {new Date(
+                                                                                            patientDetails?.createdAt
+                                                                                        )?.toLocaleDateString('en-GB')}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-5">
+                                                                                    <span className="fw-bold fs-6">
+                                                                                        Last Appointment Date:
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-7">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        {/* 01/01/2025 */}
+                                                                                        -
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="col-12 mx-1 ">
+                                                                            <div className="row">
+                                                                                <div className="col-5">
+                                                                                    <span className="fw-bold fs-6">
+                                                                                        Next Appointment Date:
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="col-7">
+                                                                                    <span
+                                                                                        className="ps-2 fs-6"
+                                                                                        style={{ fontWeight: 600 }}>
+                                                                                        None
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="col-7">
-                                                                        <span
-                                                                            className="ps-2 text-primary fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            {
-                                                                                patientDetails?.primaryProvider?.userId
-                                                                                    ?.firstName
-                                                                            }{' '}
-                                                                            {patientDetails?.primaryProvider?.userId
-                                                                                ?.lastName || ''}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-5">
-                                                                        <span className="fw-bold fs-6">
-                                                                            Date Added:
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-7">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            {new Date(
-                                                                                patientDetails?.createdAt
-                                                                            )?.toLocaleDateString('en-GB')}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-5">
-                                                                        <span className="fw-bold fs-6">
-                                                                            Last Appointment Date:
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-7">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            {/* 01/01/2025 */}
-                                                                            -
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="col-12 mx-1 ">
-                                                                <div className="row">
-                                                                    <div className="col-5">
-                                                                        <span className="fw-bold fs-6">
-                                                                            Next Appointment Date:
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="col-7">
-                                                                        <span
-                                                                            className="ps-2 fs-6"
-                                                                            style={{ fontWeight: 600 }}>
-                                                                            None
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </Col>
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
 
-                                            <Col sm={2} className="d-flex justify-content-end pe-3">
-                                                <div className="text-center">
-                                                    <Button
-                                                        className=" text-nowrap text-black d-flex justify-content-center align-items-center"
-                                                        onClick={() => navigate('/apps/appointments/newAppointment')}
-                                                        style={{
-                                                            width: '100%',
-                                                            fontSize: '12px',
-                                                            height: '30px',
-                                                            backgroundColor: '#ffffff',
-                                                            borderRadius: '10px',
-                                                        }}>
-                                                        New Appointment
-                                                    </Button>
-                                                    <Button
-                                                        className=" text-nowrap mt-2 text-black d-flex justify-content-center align-items-center"
-                                                        style={{
-                                                            width: '100%',
-                                                            fontSize: '12px',
-                                                            height: '30px',
-                                                            backgroundColor: '#ffffff',
-                                                            borderRadius: '10px',
-                                                        }}>
-                                                        New Referral
-                                                    </Button>
+                                                        <Col sm={2} className="d-flex justify-content-end pe-3">
+                                                            <div className="text-center">
+                                                                <Button
+                                                                    className=" text-nowrap text-black d-flex justify-content-center align-items-center"
+                                                                    onClick={() => navigate('/apps/appointments/newAppointment')}
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        fontSize: '12px',
+                                                                        height: '30px',
+                                                                        backgroundColor: '#ffffff',
+                                                                        borderRadius: '10px',
+                                                                    }}>
+                                                                    New Appointment
+                                                                </Button>
+                                                                <Button
+                                                                    className=" text-nowrap mt-2 text-black d-flex justify-content-center align-items-center"
+                                                                    style={{
+                                                                        width: '100%',
+                                                                        fontSize: '12px',
+                                                                        height: '30px',
+                                                                        backgroundColor: '#ffffff',
+                                                                        borderRadius: '10px',
+                                                                    }}>
+                                                                    New Referral
+                                                                </Button>
 
-                                                    <div className="mt-2 d-flex justify-content-end gap-2 ps-2 ">
-                                                        <IoPrintSharp className="fs-3 text-black" />
-                                                        <LiaReceiptSolid className="fs-3 text-black" />
-                                                        {/* <TbHeartRateMonitor className='fs-4' /> */}
-                                                    </div>
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </Card.Body>
+                                                                <div className="mt-2 d-flex justify-content-end gap-2 ps-2 ">
+                                                                    <IoPrintSharp className="fs-3 text-black" />
+                                                                    <LiaReceiptSolid className="fs-3 text-black" />
+                                                                    {/* <TbHeartRateMonitor className='fs-4' /> */}
+                                                                </div>
+                                                            </div>
+                                                        </Col>
+                                                    </Row>
+                                                </Card.Body>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
                                 {/* Patient Details Section */}
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">

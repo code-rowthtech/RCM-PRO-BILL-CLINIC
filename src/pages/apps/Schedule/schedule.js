@@ -29,7 +29,7 @@ const Schedule = () => {
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
-        label: data?.name[0]?.text + ' ' ,
+        label: data?.name[0]?.text + ' ',
     }));
 
     useEffect(() => {
@@ -89,7 +89,7 @@ const Schedule = () => {
         <div className="schedule-container">
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className=" scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2">
                                 {/* Navigation Tabs */}

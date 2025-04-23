@@ -68,13 +68,13 @@ const Office = () => {
   const updateResponse = store?.updateMastersDataReducer?.data?.status;
   useEffect(() => {
     if (createResponse === 200) {
-        setOffice(false);
+      setOffice(false);
       reset();
     }
   }, [createResponse]);
   useEffect(() => {
     if (updateResponse === 200) {
-        setOffice(false);
+      setOffice(false);
       reset();
       setEdit(null);
     }
@@ -99,7 +99,7 @@ const Office = () => {
   };
 
   const handleUpdate = (data) => {
-    const payload = { id: data?._id, isActive: !data?.isActive , category:'Office'};
+    const payload = { id: data?._id, isActive: !data?.isActive, category: 'Office' };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
@@ -107,7 +107,7 @@ const Office = () => {
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>
-        <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+        <Card className="scroll-container page-height">
           <Card.Body >
             <Row className="mb-2 ">
               <Col sm={6}>

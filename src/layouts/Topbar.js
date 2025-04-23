@@ -73,6 +73,8 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
         '/apps/patients/update-patient': 'Update Patient',
+        '/apps/settings/templates': 'Templates',
+        '/apps/settings/notesType': 'Notes Type',
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {
@@ -145,7 +147,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     )}
 
                     <ul className="list-unstyled topbar-menu float-end mb-0">
-                        <li className="dropdown notification-list"></li>
                         <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}
@@ -159,10 +160,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <div className="d-flex align-items-center">
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
-                                <i className="mdi mdi-menu" />
+                                <i className="mdi mdi-menu fs-3 " />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h4 className="">{pageTitle}</h4>
+                            <h5 className="">{pageTitle}</h5>
                         </div>
                     )}
 

@@ -98,7 +98,7 @@ const POV = () => {
   };
 
   const handleUpdate = (data) => {
-    const payload = { id: data?._id, isActive: !data?.isActive,category:'purposeOfVisit' };
+    const payload = { id: data?._id, isActive: !data?.isActive, category: 'purposeOfVisit' };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
 
@@ -106,7 +106,7 @@ const POV = () => {
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>
-        <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+        <Card className="scroll-container page-height">
           <Card.Body >
             <Row className="mb-2">
               <Col sm={6}>

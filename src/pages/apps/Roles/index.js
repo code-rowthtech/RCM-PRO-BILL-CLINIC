@@ -58,7 +58,7 @@ const Roles = () => {
             /> */}
             <Row className='mt-2'>
                 <Col xs={12}>
-                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col xs="auto">

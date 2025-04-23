@@ -109,9 +109,8 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
         <>
             <div className="wrapper">
                 {/* Fixed Navbar */}
-                <nav className="navbar navbar-expand-lg navbar-custom-top fixed-top d-none d-md-block py-1">
+                {/* <nav className="navbar navbar-expand-lg navbar-custom-top fixed-top d-none d-md-block py-1">
                     <div className="container-fluid d-flex justify-content-between align-items-center">
-                        {/* Logo with margin/padding adjustment */}
                         <div className="d-flex align-items-center ms-5 ps-1">
                             <span className="logo-lg">
                                 <Link to='/'>
@@ -119,8 +118,6 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                                 </Link>
                             </span>
                         </div>
-
-                        {/* Centered Navigation Menu */}
                         <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
                             <ul className="navbar-nav text-center fw-bold">
                                 <li className="nav-item"><Link className="nav-link text-white" to="#">File</Link></li>
@@ -135,7 +132,7 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                             </ul>
                         </div>
                     </div>
-                </nav>
+                </nav> */}
                 <Suspense fallback={loading()}>
                     <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
                 </Suspense>

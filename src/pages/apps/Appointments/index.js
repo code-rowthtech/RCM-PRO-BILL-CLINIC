@@ -57,7 +57,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
     } = useForm();
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, skip: skip }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, skip: skip, limit: 15 }));
             setCancelationPopupRow(null);
             setCancelationReason('')
         }
@@ -264,7 +264,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         clearErrors,
     } = useForm();
 
-    const [activeTab, setActiveTab] = useState('appointments');
+    const [activeTab, setActiveTab] = useState('appointmentCalendar');
     const [appointmentPeriod, setAppointmentPeriod] = useState('today');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
@@ -282,7 +282,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     }, [dispatch, doctorSearch]);
     useEffect(() => {
         if (activeTab === 'appointments') {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod, skip: skip }));
+            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod, skip: skip, limit: 15 }));
         }
     }, [dispatch, selectedDoctor, appointmentPeriod, activeTab, skip]);
     const handleInputChange = (data, type) => {
@@ -296,21 +296,11 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
         <>
             <Row className="mt-2">
                 <Col xs={12}>
-                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2">
                                 <Col sm={4}>
                                     <ul className="nav nav-underline">
-                                        <li className="nav-item">
-                                            <span
-                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
-                                                    active: activeTab === 'appointments',
-                                                    'fw-bold': activeTab === 'appointments',
-                                                })}
-                                                onClick={() => setActiveTab('appointments')}>
-                                                <FaRegListAlt /> Appointment List
-                                            </span>
-                                        </li>
                                         <li className="nav-item ms-md-2">
                                             <span
                                                 className={classNames('nav-link fw-bold text-black cursor-pointer', {
@@ -319,6 +309,16 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 })}
                                                 onClick={() => setActiveTab('appointmentCalendar')}>
                                                 <CiCalendar /> Appointment Calendar
+                                            </span>
+                                        </li>
+                                        <li className="nav-item">
+                                            <span
+                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
+                                                    active: activeTab === 'appointments',
+                                                    'fw-bold': activeTab === 'appointments',
+                                                })}
+                                                onClick={() => setActiveTab('appointments')}>
+                                                <FaRegListAlt /> Appointment List
                                             </span>
                                         </li>
                                     </ul>

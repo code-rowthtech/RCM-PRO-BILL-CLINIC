@@ -11,9 +11,11 @@ import CreateRoleSetting from './CreateRoleSetting'
 import UpdateRoleSetting from './UpdateRoleSetting'
 import { encryptMessage } from '../../../../cryptoUtils'
 import { FormInput } from '../../../../components'
-import { getRoleDataAction,
+import {
+    getRoleDataAction,
     //  stateEmptydAction, 
-    updateRoleDataAction } from '../../../../redux/actions'
+    updateRoleDataAction
+} from '../../../../redux/actions'
 import { IoSearchSharp } from 'react-icons/io5'
 
 const RoleSetting = () => {
@@ -99,7 +101,7 @@ const RoleSetting = () => {
         <div>
             <Row className='mt-2'>
                 <Col xs={12} className='px-0'>
-                    <Card className="scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
                                 <Col xs={6}>

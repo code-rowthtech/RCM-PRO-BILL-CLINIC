@@ -57,6 +57,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
     const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
+    console.log(logo, 'logologologologo')
     const handleOtpGeneration = () => {
         dispatch(changeEmailAction())
     }
@@ -83,37 +84,24 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const onSubmit = () => {
     }
     return (
-        <Dropdown show={dropdownOpen} onToggle={toggleDropdown}>
+        <Dropdown show={dropdownOpen} onToggle={toggleDropdown} drop="down" align="end">
             <Dropdown.Toggle
                 variant="link"
                 id="dropdown-profile"
                 as={Link}
                 to="#"
                 onClick={toggleDropdown}
-                className="nav-link  border-0 dropdown-toggle nav-user arrow-none me-0">
-                <span className="account-user-avatar">
-                    {changedLogo !== undefined || changedLogo !== 'undefined' ?
-                        <img src={changedLogo} className="rounded-circle" alt="user" />
-                        :
+                className="nav-link  border-0 dropdown-toggle  nav-user arrow-none me-0">
+                <span className="account-user-avatar pb-2">
+                    {
                         logo ?
-                            <img src={logo} className="rounded-circle" alt="user" />
+                            <img src={logo} className="rounded-circle object-fit-cover" alt="user" />
                             :
                             <FaUserCircle className="rounded-circle fs-1  text-dark" />
                     }
                 </span>
-                <span className='text-capitalize'>
-                    <OverlayTrigger
-                        placement="bottom"
-                        overlay={<Tooltip>{userName}</Tooltip>}
-                    >
-                        <span className="account-user-name">
-                            {userName.substring(0, 8)}{userName.length > 8 ? '...' : ''}
-                        </span>
-                    </OverlayTrigger>
-                    <span className="account-position ">{JSON.parse(sessionStorage.getItem('hyper_user'))?.role}</span>
-                </span>
             </Dropdown.Toggle>
-            <Dropdown.Menu align={'end'} className="dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
+            <Dropdown.Menu className="dropdown-menu-animated topbar-dropdown-menu profile-dropdown">
                 <div onClick={toggleDropdown}>
                     <p className='mb-0 ps-3 text-start fw-bold'>Practice</p>
                     <hr className='my-0' />
