@@ -459,7 +459,7 @@ const NewPatient = () => {
     return (
         <div className="background_Color ">
             <div className="container-fluid mt-2 px-0">
-                <Card className="px-md-3 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                <Card className="px-md-3 py-md-2 scroll-container page-height">
                     <div className="d-flex justify-content-between">
                         <div>
                             <ul className="nav nav-underline">

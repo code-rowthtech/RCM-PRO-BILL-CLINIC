@@ -64,9 +64,9 @@ const Doctors = () => {
 
     return (
         <>
-            <Row className=''>
+            <Row className='mt-2'>
                 <Col xs={12} className='px-0'>
-                    <Card className=" scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container" style={{ height: '90vh', overflow: 'scroll' }}>
                         <Card.Body >
                             <Row className="mb-2">
                                 <Col sm={6} xs={6}>
