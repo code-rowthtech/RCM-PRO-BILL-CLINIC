@@ -21,3 +21,9 @@ export function updateAllergyApi(params: any): any {
     const { data } = params;
     return api.create(URL.updateAllergy, data);
 }
+
+export function deleteAllergyApi(params: any): any {
+    const { data } = params;
+    // return api.delete(URL.deleteAllergyList, data);
+    return api.delete(`${URL.deleteAllergyList}?id=${data?.id}`);
+}

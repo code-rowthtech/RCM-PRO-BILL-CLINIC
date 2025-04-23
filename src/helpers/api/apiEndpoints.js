@@ -114,7 +114,7 @@ export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
 // export const getAllergylist = `${BaseRoute}/getAllergiesList`;
 export const createAllergy = `${BaseRoute}/addAllergy`;
 export const updateAllergy = `${BaseRoute}/updateAllergy`;
-// export const deleteProblemList = `${BaseRoute}/deleteAllergy`;
+export const deleteAllergyList = `${BaseRoute}/deleteAllergy`;
 export const getAllergiesOfAPatient = `${BaseRoute}/getAllergiesOfAPatient`;
 export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
 

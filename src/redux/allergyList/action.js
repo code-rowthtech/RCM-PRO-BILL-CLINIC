@@ -19,3 +19,8 @@ export const updateAllergyAction = (data): AuthAction => ({
     type: AllergyListActionTypes.UPDATE_ALLERGY,
     data
 });
+
+export const deleteAllergyAction = (data): AuthAction => ({
+    type: AllergyListActionTypes.DELETE_ALLERGY,
+    data
+});

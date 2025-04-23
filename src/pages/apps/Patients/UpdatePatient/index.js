@@ -680,11 +680,13 @@ const UpdatePatientIndex = () => {
                                                 <div className="ms-2" style={{ borderBottom: '2px solid grey' }}>
                                                     <ul className="nav nav-underline">
                                                         {[
-                                                            'Assign Task',
-                                                            'Problem List',
+                                                            // 'Assign Task',
                                                             'Allergy List',
-                                                            'Drug Medication',
+                                                            'Problem List',
+
+                                                            // 'Drug Medication',
                                                             'Medication List',
+                                                            'Vitals List'
                                                         ].map((subTab) => (
                                                             <li className="nav-item" key={subTab}>
                                                                 <a
@@ -701,7 +703,7 @@ const UpdatePatientIndex = () => {
                                                     </ul>
                                                 </div>
 
-                                                <div>
+                                                {/* <div>
                                                     <div
                                                         className="offcanvas offcanvas-end"
                                                         style={{ width: '500px!important' }}
@@ -723,27 +725,31 @@ const UpdatePatientIndex = () => {
                                                             <AddAssignTask />
                                                         </div>
                                                     </div>
-                                                </div>
-                                                {selectedSubTab === 'Assign Task' && (
+                                                </div> */}
+                                                {/* {selectedSubTab === 'Assign Task' && (
                                                     <FilterDropdown
                                                         showFilterDropdown={showFilterDropdown}
                                                         setShowFilterDropdown={setShowFilterDropdown}
                                                     />
-                                                )}
+                                                )} */}
                                             </div>
 
                                             <div
                                                 className="mt-2 px-2 scroll-container"
                                                 style={{ height: '65vh', overflow: 'auto' }}>
-                                                {selectedSubTab === 'Assign Task' && <AssignTask />}
+                                                {/* {selectedSubTab === 'Assign Task' && <AssignTask />} */}
+                                               
+                                                {selectedSubTab === 'Allergy List' && <AllergyList />}
                                                 {selectedSubTab === 'Problem List' && (
                                                     <ProblemList patientId={patientDetails?._id} />
                                                 )}
-                                                {selectedSubTab === 'Allergy List' && <AllergyList />}
                                                 {selectedSubTab === 'Drug Medication' && (
                                                     <p>Drug Medication In Progress...</p>
                                                 )}
                                                 {selectedSubTab === 'Medication List' && (
+                                                    <p>Medication List In Progress...</p>
+                                                )}
+                                                 {selectedSubTab === 'Vitals List' && (
                                                     <p>Medication List In Progress...</p>
                                                 )}
                                             </div>
@@ -767,7 +773,7 @@ const UpdatePatientIndex = () => {
                                         <div>
                                             <div
                                                 className={`card-body p-0 scroll-container`}
-                                                style={{ height: '84.8vh', overflow: 'auto' }}>
+                                                style={{ height: '81.8vh', overflow: 'auto' }}>
                                                 {patientMenuItems.map((item, index) =>
                                                     item.subItems ? (
                                                         <div key={index} className="ms-0 w-100">

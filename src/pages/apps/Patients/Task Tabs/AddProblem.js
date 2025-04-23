@@ -4,10 +4,7 @@ import { Button, Col, Form, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-    getAllCodeAction,
-    getPatientAppointmentAction,
-} from '../../../../redux/ProblemList/action';
+import { createProblemListAction, getAllCodeAction, getPatientAppointmentAction } from '../../../../redux/ProblemList/action';
 
 const AddProblem = () => {
     const dispatch = useDispatch();
@@ -54,6 +51,19 @@ const AddProblem = () => {
     }));
 
     const onSubmit = (data) => {
+        const payload = {
+            patientId: patientId,
+            problem: data.problem,
+            icdVersion: data.icdVersion,
+            icdCode: data.icdCode,
+            status: data.status,
+            appointment: data.appointment,
+            diagnosisDate: data.diagnosisDate,
+            onsetDate: data.onsetDate,
+            note: data.note,
+        }
+        console.log('Form Data:', payload);
+        dispatch(createProblemListAction(payload)); // Uncomment to dispatch the action
     };
 
     return (
@@ -68,7 +78,7 @@ const AddProblem = () => {
 
                 {/* Problem selection with dynamic ICD lookup */}
                 <Col sm={6}>
-                    <Form.Group className="mb-3">
+                    <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Problem</Form.Label>
                         <Controller
                             name="problem"
@@ -77,20 +87,34 @@ const AddProblem = () => {
                             render={({ field }) => (
                                 <Select
                                     {...field}
-                                    classNamePrefix="react-select"
+                                    classNamePrefix="select"
                                     options={formattedOptions}
                                     onInputChange={(value) => setSearchQuery(value)}
                                     placeholder="Search Problem"
                                     isClearable
                                     isSearchable
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                        valueContainer: (provided) => ({
+                                            ...provided,
+                                            padding: '0px 6px',
+                                        }),
+                                    }}
                                 />
                             )}
                         />
-                        {errors.problem && (
-                            <Form.Text className="text-danger">
-                                {errors.problem.message}
-                            </Form.Text>
-                        )}
+                        {errors.problem && <Form.Text className="text-danger">{errors.problem.message}</Form.Text>}
                     </Form.Group>
                 </Col>
 
@@ -108,12 +132,7 @@ const AddProblem = () => {
                 <Col sm={6}>
                     <Form.Group>
                         <Form.Label className="mb-0">ICD 10 Code</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Enter ICD 10 Code"
-                            {...register('icdCode')}
-                            readOnly
-                        />
+                        <Form.Control type="text" placeholder="Enter ICD 10 Code" {...register('icdCode')} readOnly />
                     </Form.Group>
                 </Col>
 
@@ -164,12 +183,7 @@ const AddProblem = () => {
                 <Col sm={12}>
                     <Form.Group>
                         <Form.Label className="mb-0">Note</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            placeholder="Note"
-                            rows={4}
-                            {...register('note')}
-                        />
+                        <Form.Control as="textarea" placeholder="Note" rows={4} {...register('note')} />
                     </Form.Group>
                 </Col>
 

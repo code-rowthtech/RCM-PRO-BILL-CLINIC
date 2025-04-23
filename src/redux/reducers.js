@@ -25,7 +25,7 @@ import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsRed
 import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
 import { createProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
-import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer } from './allergyList/reducer';
+import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer,deleteAllergyReducer } from './allergyList/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -52,5 +52,5 @@ export default (combineReducers({
     // problem list
     createProblemListReducer,getProblemListReducer,updateProblemListReducer,getALLCodesReducer,getProblemDetailsReducer,getPatientAppointmentReducer,
     // allergy list
-    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,
+    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,deleteAllergyReducer
 }): any);
