@@ -23,7 +23,7 @@ import { handleUpload } from '../../../../helpers/HandleUpload';
 import { MdMedicalInformation } from 'react-icons/md';
 import { MdOutlinePreview } from 'react-icons/md';
 import { AiOutlineInteraction } from 'react-icons/ai';
-import { FaUserDoctor } from 'react-icons/fa6';
+import { FaPersonBooth, FaPersonHarassing, FaUserDoctor } from 'react-icons/fa6';
 import { TbReportSearch } from 'react-icons/tb';
 import { TbVaccine } from 'react-icons/tb';
 import { SiPrivateinternetaccess } from 'react-icons/si';
@@ -66,7 +66,7 @@ const UpdatePatientIndex = () => {
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('Patient Details');
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
-    const [selectedSubTab, setSelectedSubTab] = useState('Assign Task');
+    const [selectedSubTab, setSelectedSubTab] = useState('Allergy List');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
     const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(true);
@@ -120,21 +120,38 @@ const UpdatePatientIndex = () => {
     };
     const patientMenuItems = [
         { label: 'Patient Info', icon: <MdMedicalInformation /> },
+        { label: 'Demographics', icon: <TbHeartRateMonitor /> },
+        { label: 'Appointments', icon: <FaPersonBooth /> },
+        { label: 'Encounter', icon: <FaPersonHarassing /> },
         {
             label: 'Clinical Review',
             icon: <MdOutlinePreview />,
             subItems: [
-                { label: 'Assign Task', icon: <FiPlus /> },
-                { label: 'Problem List', icon: <FiPlus /> },
                 { label: 'Allergy List', icon: <FiPlus /> },
-                { label: 'Drug Medication', icon: <FiPlus /> },
+                { label: 'Problem List', icon: <FiPlus /> },
                 { label: 'Medication List', icon: <FiPlus /> },
+                { label: 'Vitals List', icon: <FiPlus /> },
+                // { label: 'Assign Task', icon: <FiPlus /> },
+                // { label: 'Problem List', icon: <FiPlus /> },
+                // { label: 'Drug Medication', icon: <FiPlus /> },
+            ],
+        },
+        {
+            label: 'Related Information',
+            icon: <MdOutlinePreview />,
+            subItems: [
+                { label: 'Tabacco', icon: <FiPlus /> },
+                { label: 'Medical', icon: <FiPlus /> },
+                { label: 'Surgical', icon: <FiPlus /> },
+                { label: 'Family / Genetic', icon: <FiPlus /> },
+                { label: 'Alcohol', icon: <FiPlus /> },
+                { label: 'Vaccination', icon: <FiPlus /> },
             ],
         },
         { label: 'Drug Interactions', icon: <AiOutlineInteraction /> },
         { label: 'CQIs', icon: <FaUserDoctor /> },
         { label: 'Lab Request', icon: <TbReportSearch /> },
-        { label: 'Vaccinations', icon: <TbVaccine /> },
+        // { label: 'Vaccinations', icon: <TbVaccine /> },
         { label: 'Patient Access', icon: <SiPrivateinternetaccess /> },
         { label: 'Patient Communication', icon: <GrContact /> },
         { label: 'Genetic History', icon: <TbHistory /> },
@@ -750,7 +767,7 @@ const UpdatePatientIndex = () => {
                                         <div>
                                             <div
                                                 className={`card-body p-0 scroll-container`}
-                                                style={{ height: '76.8vh', overflow: 'auto' }}>
+                                                style={{ height: '84.8vh', overflow: 'auto' }}>
                                                 {patientMenuItems.map((item, index) =>
                                                     item.subItems ? (
                                                         <div key={index} className="ms-0 w-100">
@@ -781,7 +798,6 @@ const UpdatePatientIndex = () => {
                                                                             }`}></i>
                                                                 )}
                                                             </p>
-                                                            {/* {isClinicalReviewExpanded && ( */}
                                                             <div className="ms-0">
                                                                 {item.subItems.map((subItem, subIndex) => (
                                                                     <div
@@ -792,7 +808,7 @@ const UpdatePatientIndex = () => {
                                                                             } border-bottom py-1 `}
                                                                         title={
                                                                             isSidebarCollapsed ? subItem.label : ''
-                                                                        } // Show tooltip in collapsed mode
+                                                                        } 
                                                                     >
                                                                         {isSidebarCollapsed ? (
                                                                             <p
@@ -804,7 +820,6 @@ const UpdatePatientIndex = () => {
                                                                                     lineHeight: '20px',
                                                                                 }}>
                                                                                 {subIndex + 1}{' '}
-                                                                                {/* Display subitem number */}
                                                                             </p>
                                                                         ) : (
                                                                             <>
@@ -853,7 +868,6 @@ const UpdatePatientIndex = () => {
                                                                     </div>
                                                                 ))}
                                                             </div>
-                                                            {/* // )} */}
                                                         </div>
                                                     ) : (
                                                         <p
