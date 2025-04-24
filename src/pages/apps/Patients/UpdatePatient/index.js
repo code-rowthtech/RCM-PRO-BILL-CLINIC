@@ -401,7 +401,7 @@ const UpdatePatientIndex = () => {
                                                                                     <span
                                                                                         className="ps-2 text-primary fs-6"
                                                                                         style={{ fontWeight: 600 }}>
-                                                                                        CH-{patientDetails?.chartNumber}
+                                                                                        {patientDetails?.chartNumber}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
