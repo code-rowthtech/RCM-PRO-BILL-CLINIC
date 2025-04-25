@@ -79,31 +79,35 @@ const Office = () => {
       setEdit(null);
     }
   }, [updateResponse]);
+
   useEffect(() => {
     dispatch(getMastersDataAction({ status: status, category: 'Office', limit: 10, skip, search: search }));
-    if (createResponse === 200 || updateResponse === 200) {
-      dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
-      // dispatch(stateEmptydAction())
-      closeAddModal();
-    }
-  }, [dispatch, createResponse, updateResponse, status, search, skip]);
+  }, [dispatch, status, search, skip]);
 
+  useEffect(() => {
+    if(createResponse === 200){
+      dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
+    }
+    closeAddModal();
+  }, [createResponse]);
+  useEffect(() => {
+    if(updateResponse === 200){
+      dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
+    }
+    closeAddModal();
+  }, [updateResponse]);
   const handleStatusChange = (data) => {
     setStatus(data);
     setSearch('');
 
   };
-
   const handlePageChange = (pageNumber) => {
     setSkip(pageNumber);
   };
-
   const handleUpdate = (data) => {
     const payload = { id: data?._id, isActive: !data?.isActive, category: 'Office' };
     dispatch(updateMastersDataAction({ key: encryptMessage(payload) }));
   };
-
-
   return (
     <Row className='mt-2'>
       <Col xs={12} className='px-0'>

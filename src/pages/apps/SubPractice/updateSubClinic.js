@@ -248,89 +248,6 @@ const SubUpdateClinic = () => {
         email: '',
         contactPerson: '',
     });
-
-    // useEffect(() => {
-    //     if (subClinicsDetailsGet && idUpdateDataSubClinics) {
-    //         setFormData(subClinicsDetailsGet);
-    //         setValue('clinicname', subClinicsDetailsGet?.name);
-    //         setValue('clinicType', subClinicsDetailsGet?.clinicType);
-    //         setValue('email', subClinicsDetailsGet?.userId?.email);
-    //         setValue('taxId', subClinicsDetailsGet?.taxIdOrEIN);
-    //         setValue('practiceSpecialty', subClinicsDetailsGet?.practiceSpecialty);
-    //         setValue(
-    //             'contactPerson',
-    //             subClinicsDetailsGet?.userId?.phone
-    //                 ? subClinicsDetailsGet?.userId?.phone
-    //                       .replace(/\+1/, '') // Remove all non-numeric characters
-    //                       .replace(
-    //                           /(\d{3})(\d{3})(\d{0,4})/,
-    //                           (match, p1, p2, p3) => (p3 ? `(${p1})${p2}-${p3}` : `(${p1})${p2}`) // Format dynamically as (XXX)XXX-XXXX
-    //                       )
-    //                 : ''
-    //         );
-    //         setValue('npiNumber', subClinicsDetailsGet?.npiNumber);
-    //         setValue('logo', subClinicsDetailsGet?.logo?.url);
-    //         setValue('medicare', subClinicsDetailsGet?.medicareNumber);
-    //         setValue('medicaid', subClinicsDetailsGet?.medicaidNumber);
-    //         setValue('clia', subClinicsDetailsGet?.CLIA_Number);
-    //         setValue('address', subClinicsDetailsGet?.userId?.primaryAddress?.address);
-    //         setValue('street', subClinicsDetailsGet?.userId?.primaryAddress?.street);
-    //         setValue('zip', subClinicsDetailsGet?.userId?.primaryAddress?.zip);
-    //         setLatitude(subClinicsDetailsGet?.userId?.primaryAddress?.latitude);
-    //         setLongitude(subClinicsDetailsGet?.userId?.primaryAddress?.longitude);
-    //         setUsePrimaryAsMailing(subClinicsDetailsGet?.userId?.isPrimaryAndMailingAddressSame);
-    //         setValue('stateName', subClinicsDetailsGet?.userId?.primaryAddress?.state?._id);
-    //         if (subClinicsDetailsGet?.userId?.primaryAddress?.city) {
-    //             dispatch(
-    //                 getCitiesAction({
-    //                     state_code: subClinicsDetailsGet?.userId?.primaryAddress?.state?.id,
-    //                     name: subClinicsDetailsGet?.userId?.primaryAddress?.city?.name,
-    //                     limit: '',
-    //                     skip: '',
-    //                 })
-    //             );
-    //         }
-    //         if (subClinicsDetailsGet?.userId?.mailingAddress?.address) {
-    //             setValue('mailingAddress', subClinicsDetailsGet?.userId?.mailingAddress?.address);
-    //         }
-    //         setValue('mailingAddress', subClinicsDetailsGet?.userId?.mailingAddress?.address);
-    //         setValue('mailingStreet', subClinicsDetailsGet?.userId?.mailingAddress?.street);
-    //         setValue('mailingZip', subClinicsDetailsGet?.userId?.mailingAddress?.zip);
-    //         setLatitude1(subClinicsDetailsGet?.userId?.mailingAddress?.latitude);
-    //         setLongitude1(subClinicsDetailsGet?.userId?.mailingAddress?.longitude);
-    //         setValue('mailingStateName', subClinicsDetailsGet?.userId?.mailingAddress?.state?._id);
-    //         if (subClinicsDetailsGet?.userId?.mailingAddress?.city) {
-    //             dispatch(
-    //                 getCities2Action({
-    //                     state_code: subClinicsDetailsGet?.userId?.mailingAddress?.state?.id,
-    //                     name: subClinicsDetailsGet?.userId?.mailingAddress?.city?.name,
-    //                     limit: '',
-    //                     skip: '',
-    //                 })
-    //             );
-    //         }
-    //         if (subClinicsDetailsGet?.accreditationDetails) {
-    //             setAccreditationDetails(subClinicsDetailsGet?.accreditationDetails);
-    //         }
-    //         if (subClinicsDetailsGet?.taxonomyCodes?.length === 0) {
-    //             setTaxonomyCodes(['']);
-    //         } else {
-    //             setTaxonomyCodes(subClinicsDetailsGet?.taxonomyCodes);
-    //             subClinicsDetailsGet?.taxonomyCodes?.forEach((code, index) => {
-    //                 setValue(`taxonomyCode[${index}]`, code);
-    //             });
-    //         }
-    //         if (subClinicsDetailsGet?.pos) {
-    //             setPosDetails(subClinicsDetailsGet?.pos);
-    //         }
-    //         if (subClinicsDetailsGet?.logo) {
-    //             setLogoName(subClinicsDetailsGet?.logo?.fileName);
-    //         }
-    //         if (subClinicsDetailsGet?.stateOfLicensing) {
-    //             setStateDetails(subClinicsDetailsGet?.stateOfLicensing);
-    //         }
-    //     }
-    // }, [subClinicsDetailsGet, idUpdateDataSubClinics, statesData, setValue]);
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (subClinicsDetailsGet) {
@@ -510,69 +427,6 @@ const SubUpdateClinic = () => {
             return updatedDetails;
         });
     };
-
-
-    // const submitSubData = (data) => {
-    //     const payload = {
-    //         userId: idUpdateDataSubClinics,
-    //         clinicId: cliniId,
-    //         name: data?.clinicname,
-    //         email: data?.email,
-    //         role: getRoleId,
-    //         phone: data?.contactPerson,
-    //         practiceSpecialty: data?.practiceSpecialty,
-    //         clinicType: data?.clinicType,
-    //         taxIdOrEIN: data?.taxId,
-    //         npiNumber: data?.npiNumber,
-    //         CLIA_Number: data?.clia,
-    //         medicareNumber: data?.medicare,
-    //         medicaidNumber: data?.medicaid,
-    //         taxonomyCodes: taxonomyCodes.filter((code) => code),
-    //         isPrimaryAndMailingAddressSame: usePrimaryAsMailing,
-    //         flag: 'subClinic',
-    //         ...(stateDetails && { stateOfLicensing: stateDetails }),
-    //         ...(accreditationDetails && { accreditationDetails: accreditationDetails }),
-    //         ...(logo
-    //             ? {
-    //                   logo: {
-    //                       url: logo?.url?.split('?')[0],
-    //                       fileName: logoName,
-    //                   },
-    //               }
-    //             : ''),
-    //         primaryAddress: {
-    //             ...(data?.address ? { address: data?.address } : ''),
-    //             ...(data?.city ? { city: data?.city } : ''),
-    //             ...(data?.stateName ? { state: data?.stateName } : ''),
-    //             street: data?.street,
-    //             zip: data?.zip,
-    //             ...(latitude ? { latitude: latitude } : ''),
-    //             ...(longitude ? { longitude: longitude } : ''),
-    //         },
-    //         mailingAddress: usePrimaryAsMailing
-    //             ? {
-    //                   ...(data?.address ? { address: data?.address } : ''),
-    //                   ...(data?.city ? { city: data?.city } : ''),
-    //                   ...(data?.stateName ? { state: data?.stateName } : ''),
-    //                   // state: stateToSelect?._id,
-    //                   street: data?.street,
-    //                   zip: data?.zip,
-    //                   ...(latitude ? { latitude: latitude } : ''),
-    //                   ...(longitude ? { longitude: longitude } : ''),
-    //               }
-    //             : {
-    //                   ...(data?.mailingAddress ? { address: data?.mailingAddress } : ''),
-    //                   ...(data?.mailingCity ? { city: data?.mailingCity } : ''),
-    //                   ...(data?.mailingStateName ? { state: data?.mailingStateName } : ''),
-    //                   street: data?.mailingStreet,
-    //                   zip: data?.mailingZip,
-    //                   ...(latitude1 ? { latitude: latitude1 } : ''),
-    //                   ...(longitude1 ? { longitude: longitude1 } : ''),
-    //               },
-    //         ...(posDetails && { pos: posDetails }),
-    //     };
-    //     dispatch(updateSubClinicAction({ key: encryptMessage(payload) }));
-    // };
     const submitSubData = (data) => {
         const payload = {
             clinicId: clinicId,
@@ -975,7 +829,7 @@ const SubUpdateClinic = () => {
         <>
             <div className="pt-1 pb-2">
                 <div className="container-fluid mt-2 px-0">
-                    <Card className="px-md-2 py-md-2 scroll-container" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="px-md-2 py-md-2 scroll-container" style={{ height: '90vh', overflow: 'scroll' }}>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
@@ -1778,6 +1632,7 @@ const SubUpdateClinic = () => {
                                                     variant="primary"
                                                     type="submit"
                                                     className="custom-buttons"
+                                                    style={{width:'65px'}}
                                                     disabled={updateLoading}>
                                                     {updateLoading ? (
                                                         <Spinner color="white" className="spinner-border-sm" />

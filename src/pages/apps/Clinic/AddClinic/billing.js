@@ -440,11 +440,11 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
                     <Row className='mt-2'>
                         <Col sm={12} className='text-end d-flex justify-content-end'>
                             {billingData ?
-                                <Button onClick={() => setActiveTab('contract')} className='custom-buttons' >
+                                <Button onClick={() => setActiveTab('contract')} className='custom-buttons' style={{width:'55px'}} >
                                     Next
                                 </Button>
                                 :
-                                <Button type='submit' className='custom-buttons' disabled={store?.createSubscriptionPlanReducer?.loading}>
+                                <Button type='submit' className='custom-buttons' style={{width:'55px'}} disabled={store?.createSubscriptionPlanReducer?.loading}>
                                     {store?.createSubscriptionPlanReducer?.loading ?
                                         <Spinner className='spinner-border-sm' color='white' />
                                         :

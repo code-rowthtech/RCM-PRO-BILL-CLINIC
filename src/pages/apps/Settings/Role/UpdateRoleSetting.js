@@ -151,9 +151,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                         </Col>
                     </Row>
                     <Modal.Footer>
-                        <Button type="button" className="custom-buttons" onClick={closeModal}>
+                        {/* <Button type="button" className="custom-buttons" onClick={closeModal}>
                             Cancel
-                        </Button>
+                        </Button> */}
                         <Button type="submit" className="custom-buttons" disabled={store?.updateRoleDataReducer?.loading}>
                             {store?.updateRoleDataReducer?.loading ?
                                 <Spinner className="spinner-border-sm" color="white" /> :

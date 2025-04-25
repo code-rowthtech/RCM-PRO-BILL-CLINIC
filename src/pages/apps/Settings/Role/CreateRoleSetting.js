@@ -44,7 +44,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
     }, [show])
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-
     const onSubmit = (data) => {
         if (selectedPermissionIds?.length === 0) {
             setPermissionError(true);
@@ -53,7 +52,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
-               
                 // clinicId: clinicId,
                 // createdById: idFromStorage?._id,
                 // showto: 'clinic'
@@ -64,8 +62,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
             }
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '',createdById:'', page: 1, status: true }));
-        
-
         }
     };
 

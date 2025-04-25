@@ -8,7 +8,6 @@ import ToastHandle from '../../helpers/ToastMessage';
  * @param {*} payload - username and password
  */
 
-
 function* createMastersDataFunction(data) {
     try {
         yield put({
@@ -19,7 +18,7 @@ function* createMastersDataFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success')
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: SettingsActionTypes.CREATE_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },
@@ -56,6 +55,10 @@ function* getMastersDataFunction(data) {
                 type: SettingsActionTypes.GET_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: SettingsActionTypes.GET_MASTERS_DATA_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: SettingsActionTypes.GET_MASTERS_DATA_ERROR,
@@ -79,11 +82,14 @@ function* getMastersData2Function(data) {
         const response = yield call(getMastersDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
-
         if (response.status === 200) {
             yield put({
                 type: SettingsActionTypes.GET_MASTERS2_DATA_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: SettingsActionTypes.GET_MASTERS2_DATA_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -113,6 +119,10 @@ function* getDepartmentDataFunction(data) {
                 type: SettingsActionTypes.GET_DEPARTMENT_DATA_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: SettingsActionTypes.GET_DEPARTMENT_DATA_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: SettingsActionTypes.GET_DEPARTMENT_DATA_ERROR,
@@ -136,7 +146,7 @@ function* updateMastersDataFunction(data) {
         const response = yield call(updateMastersDataApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success')
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: SettingsActionTypes.UPDATE_MASTERS_DATA_SUCCESS,
                 payload: { ...decryptedData },
@@ -164,9 +174,7 @@ export function* callStateEmpty() {
         type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });
-
 }
-
 
 export function* watchCreateMastersData() {
     yield takeEvery(SettingsActionTypes.CREATE_MASTERS_DATA, createMastersDataFunction);
@@ -185,8 +193,6 @@ export function* watchUpdateMastersData() {
     yield takeEvery(SettingsActionTypes.UPDATE_MASTERS_DATA, updateMastersDataFunction);
 }
 
-
-
 export function* watchresetState() {
     yield takeEvery(SettingsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
 }
@@ -198,7 +204,7 @@ function* settingsSaga() {
         fork(watchGetDepartmentData),
         fork(watchUpdateMastersData),
         fork(watchresetState),
-        fork(watchGetMasters2Data)
+        fork(watchGetMasters2Data),
     ]);
 }
 export default settingsSaga;
