@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 
-const AutoAccident = ({ patientId, activeTab }) => {
+const AutoAccident = ({ patientId, activeTab, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const {
@@ -144,7 +144,7 @@ const AutoAccident = ({ patientId, activeTab }) => {
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
-                <div className="row">
+                <div className="row scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '42.5vh' : '65vh' }}>
                     <div className="col-6 mt-1 ">
                         <Form.Group className='d-flex'>
                             <Form.Check

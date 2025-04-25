@@ -46,7 +46,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
 
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
-
     // Define a mapping of paths to titles
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
@@ -156,7 +155,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             />
                         </li>
                     </ul>
-
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
                         <div className="d-flex align-items-center">
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>

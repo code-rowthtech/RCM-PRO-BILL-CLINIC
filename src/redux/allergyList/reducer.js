@@ -1,4 +1,4 @@
-import { AllergyListActionTypes } from "./constants";
+import { AllergyListActionTypes } from './constants';
 
 const CREATE_ALLERGY_INITIAL_STATE = {
     data: [],
@@ -20,6 +20,11 @@ export const UPDATE_ALLERGY_INITIAL_STATE = {
     loading: false,
 };
 
+export const DELETE_ALLERGY_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
 export const createAllergyReducer = (state = CREATE_ALLERGY_INITIAL_STATE, action) => {
     switch (action.type) {
         case AllergyListActionTypes.CREATE_ALLERGY_LOADING:
@@ -32,14 +37,14 @@ export const createAllergyReducer = (state = CREATE_ALLERGY_INITIAL_STATE, actio
                 data: action.payload,
                 loading: false,
             };
+        case AllergyListActionTypes.CREATE_ALLERGY_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case AllergyListActionTypes.CREATE_ALLERGY_ERROR:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case AllergyListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false,
             };
         default:
@@ -59,14 +64,15 @@ export const getAllergyDetailsReducer = (state = GET_ALLERGY_DETAILS_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
+        case AllergyListActionTypes.GET_ALLERGY_DETAILS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+
         case AllergyListActionTypes.GET_ALLERGY_DETAILS_ERROR:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case AllergyListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false,
             };
         default:
@@ -86,14 +92,14 @@ export const getAllergiesOfAPatientReducer = (state = GET_ALLERGIES_OF_A_PATIENT
                 data: action.payload,
                 loading: false,
             };
+        case AllergyListActionTypes.GET_ALLERGIES_OF_A_PATIENT_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case AllergyListActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case AllergyListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false,
             };
         default:
@@ -113,14 +119,41 @@ export const updateAllergyReducer = (state = UPDATE_ALLERGY_INITIAL_STATE, actio
                 data: action.payload,
                 loading: false,
             };
+        case AllergyListActionTypes.GET_ALLERGIES_OF_A_PATIENT_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case AllergyListActionTypes.UPDATE_ALLERGY_ERROR:
             return {
                 data: action.payload,
                 loading: false,
             };
-        case AllergyListActionTypes.STATE_EMPTY_INTIAL_STATE:
+        default:
+            return state;
+    }
+};
+
+export const deleteAllergyReducer = (state = DELETE_ALLERGY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case AllergyListActionTypes.DELETE_ALLERGY_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case AllergyListActionTypes.DELETE_ALLERGY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case AllergyListActionTypes.DELETE_ALLERGY_RESET:
             return {
                 data: [],
+                loading: false,
+            };
+        case AllergyListActionTypes.DELETE_ALLERGY_ERROR:
+            return {
+                data: action.payload,
                 loading: false,
             };
         default:

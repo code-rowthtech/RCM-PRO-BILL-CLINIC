@@ -8,27 +8,27 @@ export const getClinicsByParentId = '';
 
 // ROLES 
 export const createRoles = `${BaseRoute}/createSubUser`;
-export const viewPassword =  `${BaseRoute}/viewPassword`;
+export const viewPassword = `${BaseRoute}/viewPassword`;
 export const updateRoles = `${BaseRoute}/updateSubUser`;
 export const getRoles = `${BaseRoute}/listAllUsers`;
 export const getUserId = `${BaseRoute}/getUserDetails`;
-export const deleterRoles =`${BaseRoute}/removeUser`;
+export const deleterRoles = `${BaseRoute}/removeUser`;
 
 // CLINIC
-export const createClinic =  `${BaseRoute}/edit-clinic-details`;
-export const changeEmail =  `${BaseRoute}/request-otp-email-verification`;
+export const createClinic = `${BaseRoute}/edit-clinic-details`;
+export const changeEmail = `${BaseRoute}/request-otp-email-verification`;
 // export const updateClinic = '/api/v1/clinic/editClinicDetails';
 export const getClinic = `${BaseRoute}/details`;
 export const getClinicById = `${BaseRoute}/byId`;
-export const getStatedByCountry =  `${BaseRoute}/states/US`;
+export const getStatedByCountry = `${BaseRoute}/states/US`;
 export const getCityByState = `${BaseRoute}/cities/`;
 export const getClinicType = `${BaseRoute}/getClinicTypes`;
 
 // SUB CLINIC
-export const createSubClinic =  `${BaseRoute}/createSubClinics`;
+export const createSubClinic = `${BaseRoute}/createSubClinics`;
 export const getSubClinic = `${BaseRoute}/getSubClinics`;
-export const getSubClinicCityByState =  `${BaseRoute}/cities/`;
-export const updateSubClinic =  `${BaseRoute}/edit-clinic-details`;
+export const getSubClinicCityByState = `${BaseRoute}/cities/`;
+export const updateSubClinic = `${BaseRoute}/edit-clinic-details`;
 export const createUpgrade = `${BaseRoute}/upgradeSubscription`;
 export const getSubClinicType = `${BaseRoute}/getClinicTypes`;
 export const getSubscription = `${BaseRoute}/getSubscription/history`;
@@ -91,7 +91,7 @@ export const getPractitionerSchedule = `${BaseRoute}/getPractitionerSchedule`;
 export const getAppointments = `${BaseRoute}/appointments/`;
 export const getAppointmentById = `${BaseRoute}/appointment/`;
 export const getPractitionerSlots = `${BaseRoute}/practitioner/slots`;
-export const getPatientsByAppointment = `${BaseRoute}/getPatientsByAppointments`;
+export const getPatientsByAppointment = `${BaseRoute}/appiontments/today-upcoming-history`;
 
 // ASSIGN NOTES
 export const getClinicEmployees = `${BaseRoute}/getClinicEmployees`;
@@ -114,7 +114,7 @@ export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
 // export const getAllergylist = `${BaseRoute}/getAllergiesList`;
 export const createAllergy = `${BaseRoute}/addAllergy`;
 export const updateAllergy = `${BaseRoute}/updateAllergy`;
-// export const deleteProblemList = `${BaseRoute}/deleteAllergy`;
+export const deleteAllergyList = `${BaseRoute}/deleteAllergy`;
 export const getAllergiesOfAPatient = `${BaseRoute}/getAllergiesOfAPatient`;
 export const getAllergyDetails = `${BaseRoute}/getAllergyDetails`;
 

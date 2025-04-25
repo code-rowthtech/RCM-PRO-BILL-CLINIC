@@ -143,7 +143,7 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                         <Suspense fallback={loading()}>
                             <Topbar openLeftMenuCallBack={openMenu} hideLogo={true} />
                         </Suspense>
-                        <Container fluid>
+                        <Container fluid className='px-0 '>
                             <Outlet />
                         </Container>
                     </div>

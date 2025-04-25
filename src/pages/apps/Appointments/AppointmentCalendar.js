@@ -29,49 +29,78 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     const [loading, setLoading] = useState(true); // loading state to track calendar data fetching
     const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
-    const [appModal, setAppModal] = useState(false)
+    const [appModal, setAppModal] = useState(false);
     const closeAppModal = () => {
         setShow(false);
         setSelectedEvent(null);
-    }
+    };
     useEffect(() => {
         setLoading(true); // Set loading to true when data fetching begins
-        dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+        dispatch(
+            getAppointmentsAction({
+                clinicId: clinicId,
+                status: '',
+                doctorId: selectedDoctor || '',
+                limit: '',
+                skip: '',
+                monthYear: monthYearFilter,
+            })
+        );
     }, [dispatch, selectedDoctor, monthYearFilter]);
 
     useEffect(() => {
         if (createAppointmentResponse === 201) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+            dispatch(
+                getAppointmentsAction({
+                    clinicId: clinicId,
+                    status: '',
+                    doctorId: selectedDoctor || '',
+                    limit: '',
+                    skip: '',
+                    monthYear: monthYearFilter,
+                })
+            );
             setShow(false); // Closing the modal after creating appointment
         }
     }, [createAppointmentResponse]);
 
     useEffect(() => {
         if (updateSuccess === 200) {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, status: '', doctorId: selectedDoctor || '', limit: '', skip: '', monthYear: monthYearFilter }));
+            dispatch(
+                getAppointmentsAction({
+                    clinicId: clinicId,
+                    status: '',
+                    doctorId: selectedDoctor || '',
+                    limit: '',
+                    skip: '',
+                    monthYear: monthYearFilter,
+                })
+            );
             setShow(false); // Closing the modal after updating the appointment
         }
     }, [updateSuccess]);
 
     useEffect(() => {
         if (appointmentsList?.length > 0) {
-            const transformedEvents = appointmentsList.map((data) => {
-                const start = new Date(data.start);
-                const end = new Date(data.end);
+            const transformedEvents = appointmentsList
+                .map((data) => {
+                    const start = new Date(data.start);
+                    const end = new Date(data.end);
 
-                if (isNaN(start) || isNaN(end)) return null;
+                    if (isNaN(start) || isNaN(end)) return null;
 
-                return {
-                    event_id: data?._id,
-                    title: data?.reason?.[0]?.coding?.[0]?.display,
-                    status: data?.status,
-                    start: start,
-                    end: end,
-                    slotStart: data?.start,
-                    slotEnd: data?.end,
-                    patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
-                };
-            }).filter(Boolean);
+                    return {
+                        event_id: data?._id,
+                        title: data?.reason?.[0]?.coding?.[0]?.display,
+                        status: data?.status,
+                        start: start,
+                        end: end,
+                        slotStart: data?.start,
+                        slotEnd: data?.end,
+                        patientName: data?.subject?.name?.find((data) => data?.use === 'official')?.text,
+                    };
+                })
+                .filter(Boolean);
 
             setEvents(transformedEvents);
             setLoading(false); // Set loading to false once the data has been processed
@@ -79,10 +108,15 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     }, [appointmentsList]);
 
     const CustomEvent = ({ event }) => (
-        <div>
-            <p className="text-capitalize mb-0">{event.patientName} {`(${event?.status})`}</p>
-            <p className="mb-0">{event.title}</p>
-        </div>
+        <>
+            <p className="text-capitalize mb-0 ps-1" style={{ fontSize: '10px' }}>
+                {new Date(event?.slotStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} |{' '}
+                {event?.patientName}
+            </p>
+            {/* <p className="text-capitalize mb-0 ps-1" style={{ fontSize: '10px' }}>
+                {event?.title}
+            </p> */}
+        </>
     );
 
     const handleEventClick = (event) => {
@@ -123,9 +157,15 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         return (
             <div className="rbc-toolbar">
                 <span className="rbc-btn-group">
-                    <button type="button" onClick={goToBack}>Back</button>
-                    <button type="button" onClick={goToToday}>Today</button>
-                    <button type="button" onClick={goToNext}>Next</button>
+                    <button type="button" className="fs-6" onClick={goToBack}>
+                        Back
+                    </button>
+                    <button type="button" className="fs-6" onClick={goToToday}>
+                        Today
+                    </button>
+                    <button type="button" className="fs-6" onClick={goToNext}>
+                        Next
+                    </button>
                 </span>
 
                 <span className="rbc-toolbar-label">{toolbar.label}</span>
@@ -133,23 +173,20 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                 <span className="rbc-btn-group">
                     <button
                         type="button"
-                        className={toolbar.view === Views.MONTH ? 'rbc-active' : ''}
-                        onClick={() => changeView(Views.MONTH)}
-                    >
+                        className={toolbar.view === Views.MONTH ? 'rbc-active fs-6' : 'fs-6'}
+                        onClick={() => changeView(Views.MONTH)}>
                         Month
                     </button>
                     <button
                         type="button"
-                        className={toolbar.view === Views.WEEK ? 'rbc-active' : ''}
-                        onClick={() => changeView(Views.WEEK)}
-                    >
+                        className={toolbar.view === Views.WEEK ? 'rbc-active fs-6' : 'fs-6'}
+                        onClick={() => changeView(Views.WEEK)}>
                         Week
                     </button>
                     <button
                         type="button"
-                        className={toolbar.view === Views.DAY ? 'rbc-active' : ''}
-                        onClick={() => changeView(Views.DAY)}
-                    >
+                        className={toolbar.view === Views.DAY ? 'rbc-active fs-6' : 'fs-6'}
+                        onClick={() => changeView(Views.DAY)}>
                         Day
                     </button>
                 </span>
@@ -164,17 +201,17 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     };
 
     return (
-        <div className='background_Color pt-1 pb-2'>
-            <div className='container-fluid px-4'>
-                <div className='row'>
-                    <div className='col'>
-                        <div className='mt-3'>
+        <div className="background_Color">
+            <div className="container-fluid px-2 mx-0">
+                <div className="row">
+                    <div className="col px-0 mx-0">
+                        <div className="mt-2">
                             <Calendar
                                 localizer={localizer}
                                 events={events}
                                 startAccessor="start"
                                 endAccessor="end"
-                                style={{ height: '68vh' }}
+                                style={{ height: '82vh' }}
                                 selectable
                                 onSelectEvent={handleEventClick}
                                 onSelectSlot={(slotInfo) => {
@@ -195,6 +232,31 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                                     event: CustomEvent,
                                     toolbar: CustomToolbar,
                                 }}
+                                eventPropGetter={(event) => {
+                                    const statusColors = {
+                                        pending: '#f1c40f',         // Yellow
+                                        proposed: '#3498db',        // Blue
+                                        booked: '#2ecc71',          // Light Green
+                                        arrived: '#27ae60',         // Green
+                                        fulfilled: '#9b59b6',       // Purple
+                                        cancelled: '#e74c3c',       // Red
+                                        noshow: '#e67e22',          // Orange
+                                        enteredinerror: '#95a5a6',  // Gray
+                                        checkedin: '#1abc9c',       // Teal
+                                        waitlist: '#8e44ad',        // Dark Purple
+                                    };
+                                
+                                    const bgColor = statusColors[event?.status?.toLowerCase()] || '#ccc'; // default color if status not found
+                                
+                                    return {
+                                        style: {
+                                            backgroundColor: bgColor,
+                                            color: 'white',
+                                            borderRadius: '0px',
+                                            padding: '2px 4px',
+                                        },
+                                    };
+                                }}
                                 onView={(view) => setCalendarView(view)}
                                 view={calendarView}
                             />
@@ -208,37 +270,22 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                     </div>
                 </div>
             </div>
-            {/* <Modal centered show={appModal} size='xl' onHide={closeAppModal}>
+            <Modal centered show={show} size="xl" onHide={closeAppModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
-                        <Col sm={11} className='text-center'>
-                            <h4>{selectedEvent ? "Appointment Details" : "Create New Appointment"}</h4>
+                        <Col sm={11} className="text-center">
+                            <h4>{selectedEvent ? 'Appointment Details' : 'Create New Appointment'}</h4>
                         </Col>
                         <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />
                         </Col>
                     </Row>
 
-                    {selectedEvent ? (
-                        <Row>
-                        </Row>
-                    ) : selectedSlot ? (
-                        <AppointmentForm selectedSlot={selectedSlot} />
-                    ) : null}
-                </Modal.Body>
-            </Modal> */}
-            <Modal centered show={show} size='xl' onHide={closeAppModal}>
-                <Modal.Body>
-                    <Row className="border-bottom mb-1 pb-2">
-                        <Col sm={11} className='text-center'>
-                            <h4>{selectedEvent ? "Appointment Details" : "Create New Appointment"}</h4>
-                        </Col>
-                        <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />
-                        </Col>
-                    </Row>
-
-                    <AppointmentForm selectedSlot={selectedSlot} appointmentId={selectedEvent?.event_id} calendarView={calendarView} />
+                    <AppointmentForm
+                        selectedSlot={selectedSlot}
+                        appointmentId={selectedEvent?.event_id}
+                        calendarView={calendarView}
+                    />
                 </Modal.Body>
             </Modal>
         </div>

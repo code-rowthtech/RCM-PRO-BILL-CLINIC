@@ -189,12 +189,12 @@ select.form-control:not([size]):not([multiple]) {
     color: black;
     font-weight: 500 !important;
     opacity: 0.6;
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .form-control {
     color: black !important;
-    font-weight: 550 !important;
+    font-weight: 500 !important;
     padding: 6px !important;
     font-size: 12px;
     background-color: #e8f0fe !important;
@@ -654,10 +654,13 @@ table {
     width: 8vw !important;
 }
 .rbc-event {
-    margin: 10px !important;
+    margin: 0px !important;
     font-weight: 600 !important;
+    margin-bottom: 3px !important;
+    /* background-color: #313a46 !important; */
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23) !important;
-    width: 100% !important;
+    width: 95% !important;
+    
 }
 
 .nav-tab-container .nav-link {
@@ -697,7 +700,18 @@ table {
 .cancellation-popup {
     z-index: 1111 !important;
 }
-
+.color-legend-tooltip {
+    position: absolute;
+    top: 25px;
+    left: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    z-index: 999;
+    width: 220px;
+  }
 .pendingColor {
     color: #f1c40f !important;
     border: 1px solid #f1c40f !important;
@@ -811,7 +825,7 @@ table {
 
 .topbar-dropdown-menu {
     right: -40% !important;
-    transform: translateY(40%) !important; /* a little dropdown animation feel */
+    transform: translateY(40%) !important;
 }
 .content-page {
     padding-top: 50px !important;
@@ -819,5 +833,67 @@ table {
 
 .page-height {
     height: 90vh !important;
-    overflow: scroll !important;
+}
+
+.textLeftSidebar {
+    color: #8391a2 !important;
+    font-size: 0.9375rem !important;
+}
+.textLeftSidebar:hover span {
+    color: #bccee4 !important;
+    transition-duration: 0.5s !important;
+}
+
+.lowerMenu {
+    height: 36vh;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.media_mob {
+    height: 64vh;
+}
+.patient-menu-container {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.active-patient-chart-tab,
+.submenuItem:hover {
+    color: #727cf5;
+    font-weight: 600;
+    background-color: #b9bcbe44;
+}
+.accordion-button::after {
+    background-size: 1rem !important;
+    background-position: center center !important;
+}
+.accordion-button {
+    padding: 0;
+    background-color: #b9bcbe44 !important;
+}
+.first-button {
+    clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);
+}
+.last-button {
+    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.border-menu-chart {
+    border-bottom: none !important;
+    border: 1px solid gainsboro;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+
+.hasSubmenuItems {
+    position: relative !important;
+}
+
+.patientChartscroll {
+    overflow-x: visible;
+    white-space: nowrap;
+}
+
+.z-3 {
+    z-index: 3;
 }

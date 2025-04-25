@@ -168,7 +168,7 @@ const Patients = () => {
                                                     patientsData && patientsData?.map((data, index) => (
                                                         <tr key={data?._id}>
                                                             <td>{index + 1}</td>
-                                                            <td>CH-{data?.chartNumber}</td>
+                                                            <td>{data?.chartNumber}</td>
                                                             <td className='text-capitalize'>{data?.name?.[0]?.text || 'N/A'}</td>
                                                             <td className='text-capitalize'>{data?.gender || 'N/A'}</td>
                                                             <td>{data?.telecom?.[1]?.value || 'N/A'}</td>

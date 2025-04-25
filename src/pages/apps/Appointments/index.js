@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Badge, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import classNames from 'classnames';
 import PageTitle from '../../../components/PageTitle';
@@ -16,15 +16,16 @@ import Spinner from '../../../constants/Spinner';
 import { getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
+import { FcViewDetails } from "react-icons/fc";
 import { useForm } from 'react-hook-form';
 import { appointmentStatus } from '../../../utils/DataSets/commonData';
-import AppointmentCalendar from './AppointmentCalendar'
+import AppointmentCalendar from './AppointmentCalendar';
 import { FaCalendar, FaCalendarWeek, FaRegListAlt } from 'react-icons/fa';
 import { LucideCalendarDays } from 'lucide-react';
 import { CiCalendar } from 'react-icons/ci';
 import Paginations from '../../../helpers/Paginations';
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-
+ 
 // Define the types for each order item
 type OrderListItems = {
     orderId: string,
@@ -42,13 +43,18 @@ type OrderListProps = {
 };
 
 // Component for Appointments List Table
-const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: OrderListProps): React$Element<React$FragmentType> => {
+const AppointmentsList = ({
+    patientsData,
+    appointmentPeriod,
+    setSkip,
+    skip,
+}: OrderListProps): React$Element<React$FragmentType> => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('')
+    const [selectedStatus, setSelectedStatus] = useState('');
     const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
     const {
         register,
@@ -59,7 +65,7 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
         if (updateSuccess === 200) {
             dispatch(getAppointmentsAction({ clinicId: clinicId, status: appointmentPeriod, skip: skip, limit: 15 }));
             setCancelationPopupRow(null);
-            setCancelationReason('')
+            setCancelationReason('');
         }
     }, [updateSuccess]);
     const formatTimeWithAmPm = (isoString) => {
@@ -84,19 +90,27 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
 
     const submitWithReason = (data) => {
         const payload = {
-            cancellationReason: [{
-                coding: [{
-                    system: "", code: "", display: cancelationReason
-                }],
-                text: cancelationReason, // use display text
-            }],
-            status: 'cancelled'
-        }
-        dispatch(rescheduleAppointmentAction({
-            id: cancelationPopupRow,
-            key: encryptMessage(payload)
-        }));
-    }
+            cancellationReason: [
+                {
+                    coding: [
+                        {
+                            system: '',
+                            code: '',
+                            display: cancelationReason,
+                        },
+                    ],
+                    text: cancelationReason, // use display text
+                },
+            ],
+            status: 'cancelled',
+        };
+        dispatch(
+            rescheduleAppointmentAction({
+                id: cancelationPopupRow,
+                key: encryptMessage(payload),
+            })
+        );
+    };
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
@@ -121,41 +135,42 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
                         <th className="text-white">Action</th>
                     </tr>
                 </thead>
-                <tbody className=''>
+                <tbody className="">
                     {store?.getAppointmentsReducer?.loading ? (
                         <tr>
                             <td colSpan={9} className="text-center">
                                 <Spinner />
                             </td>
                         </tr>
+                    ) : appointmentsList?.length === 0 ? (
+                        <tr>
+                            <td colSpan={9} className="text-center">
+                                <h5>No Appointments Found</h5>
+                            </td>
+                        </tr>
                     ) : (
-                        appointmentsList?.length === 0 ?
-                            <tr>
-                                <td colSpan={9} className="text-center">
-                                    <h5>No Appointments Found</h5>
-                                </td>
-                            </tr> :
-                            appointmentsList &&
-                            appointmentsList?.map((data, index) => (
-                                <tr key={index}>
-                                    <td>{index + 1}</td>
-                                    <td className="text-capitalize position-relative">
-                                        <Form.Select
-                                            defaultValue={data?.status}
-                                            onChange={(e) => {
-                                                setSelectedStatus(e.target.value)
-                                                if (e.target.value === 'cancelled') {
-                                                    setCancelationPopupRow(data?._id); // or use data?._id if preferred
-                                                } else {
-                                                    dispatch(rescheduleAppointmentAction({
+                        appointmentsList &&
+                        appointmentsList?.map((data, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td className="text-capitalize position-relative">
+                                    <Form.Select
+                                        defaultValue={data?.status}
+                                        onChange={(e) => {
+                                            setSelectedStatus(e.target.value);
+                                            if (e.target.value === 'cancelled') {
+                                                setCancelationPopupRow(data?._id); // or use data?._id if preferred
+                                            } else {
+                                                dispatch(
+                                                    rescheduleAppointmentAction({
                                                         id: data?._id,
-                                                        key: encryptMessage({ status: e.target.value })
-                                                    }));
-                                                    setCancelationPopupRow(null); // close popup if status changes again
-                                                }
-                                            }}
-
-                                            className={`schedule-status-select
+                                                        key: encryptMessage({ status: e.target.value }),
+                                                    })
+                                                );
+                                                setCancelationPopupRow(null); // close popup if status changes again
+                                            }
+                                        }}
+                                        className={`schedule-status-select
                                          ${data?.status === 'pending' && 'pendingColor'}
                                          ${data?.status === 'proposed' && 'proposedColor'}
                                          ${data?.status === 'booked' && 'bookedColor'}
@@ -167,82 +182,104 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
                                          ${data?.status === 'checked-in' && 'checkedinColor'}
                                          ${data?.status === 'waitlist' && 'waitlistColor'}
                                          `}>
-                                            {appointmentStatus?.map((data, index) => (
-                                                <option value={data?.code} key={index}> {data?.display}</option>
-                                            ))}
-                                        </Form.Select>
-                                        {cancelationPopupRow === data?._id && (
-                                            <div
-                                                className='position-absolute cancellation-popup border   bg-white'
-                                                style={{ left: '84%', top: '0%', width: "14vw", boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)" }}
-
-                                            >
-                                                <p className="fs-4 px-2 mb-0 text-end ">
-                                                    <IoCloseCircleOutline onClick={() => {
+                                        {appointmentStatus?.map((data, index) => (
+                                            <option value={data?.code} key={index}>
+                                                {' '}
+                                                {data?.display}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {cancelationPopupRow === data?._id && (
+                                        <div
+                                            className="position-absolute cancellation-popup border   bg-white"
+                                            style={{
+                                                left: '84%',
+                                                top: '0%',
+                                                width: '14vw',
+                                                boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+                                            }}>
+                                            <p className="fs-4 px-2 mb-0 text-end ">
+                                                <IoCloseCircleOutline
+                                                    onClick={() => {
                                                         setCancelationPopupRow(null);
-                                                    }} />
-                                                </p>
-                                                <div
-                                                    className=' p-2 pt-0'
-                                                >
-                                                    <Form onSubmit={handleSubmit(submitWithReason)}>
-                                                        <Form.Group>
-                                                            <Form.Label>Cancelation Reason</Form.Label>
-                                                            <Form.Control className='mb-2' onChange={(e) => setCancelationReason(e.target.value)} type='text' placeholder='Enter the cancellation reason' />
-                                                        </Form.Group>
-                                                        <div className='text-end'>
-                                                            <Button disabled={!cancelationReason} className='custom-buttons' type='submit'>Submit</Button>
-                                                        </div>
-                                                    </Form>
-                                                </div>
+                                                    }}
+                                                />
+                                            </p>
+                                            <div className=" p-2 pt-0">
+                                                <Form onSubmit={handleSubmit(submitWithReason)}>
+                                                    <Form.Group>
+                                                        <Form.Label>Cancelation Reason</Form.Label>
+                                                        <Form.Control
+                                                            className="mb-2"
+                                                            onChange={(e) => setCancelationReason(e.target.value)}
+                                                            type="text"
+                                                            placeholder="Enter the cancellation reason"
+                                                        />
+                                                    </Form.Group>
+                                                    <div className="text-end">
+                                                        <Button
+                                                            disabled={!cancelationReason}
+                                                            className="custom-buttons"
+                                                            type="submit">
+                                                            Submit
+                                                        </Button>
+                                                    </div>
+                                                </Form>
                                             </div>
-
-                                        )}
-
-                                    </td>
-                                    <td className="text-capitalize">
-                                        {data?.subject?.name?.[0]?.text}
-                                        <div className="d-flex gap-2">
-                                            <span>
-                                                {data?.subject?.birthDate
-                                                    ? new Date(data.subject.birthDate).toISOString().split('T')[0]
-                                                    : 'N/A'}
-                                            </span>
-                                            <span>
-                                                {
-                                                    data?.subject?.telecom?.find(
-                                                        (item) => item.system === 'phone' && item.value
-                                                    )?.value || 'No phone number'
-                                                }
-                                            </span>
                                         </div>
-                                    </td>
-                                    <td>
-                                        {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
-                                    </td>
-                                    <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
-                                    <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
-                                    <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.appointmentType?.coding?.[0]?.display}>
-                                        {data?.appointmentType?.coding?.[0]?.display?.length > 20
-                                            ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
-                                            : data?.appointmentType?.coding?.[0]?.display}
-                                    </td>
-                                    <td className="text-capitalize cursor-pointer" data-toggle="tooltip" data-placement="top" title={data?.reason?.[0]?.coding?.[0]?.display}>
-                                        {data?.reason?.[0]?.coding?.[0]?.display?.length > 20 ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...' : data?.reason?.[0]?.coding?.[0]?.display}
-                                    </td>
-                                    <td>
-                                        <Link
-                                            to={`/apps/appointments/newAppointment?updateid=${data?._id}`}
-                                            className="action-icon">
-                                            <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))
+                                    )}
+                                </td>
+                                <td className="text-capitalize">
+                                    {data?.subject?.name?.[0]?.text}
+                                    <div className="d-flex gap-2">
+                                        <span>
+                                            {data?.subject?.birthDate
+                                                ? new Date(data.subject.birthDate).toISOString().split('T')[0]
+                                                : 'N/A'}
+                                        </span>
+                                        <span>
+                                            {data?.subject?.telecom?.find(
+                                                (item) => item.system === 'phone' && item.value
+                                            )?.value || 'No phone number'}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
+                                </td>
+                                <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
+                                <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
+                                <td
+                                    className="text-capitalize cursor-pointer"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title={data?.appointmentType?.coding?.[0]?.display}>
+                                    {data?.appointmentType?.coding?.[0]?.display?.length > 20
+                                        ? data?.appointmentType?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                        : data?.appointmentType?.coding?.[0]?.display}
+                                </td>
+                                <td
+                                    className="text-capitalize cursor-pointer"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title={data?.reason?.[0]?.coding?.[0]?.display}>
+                                    {data?.reason?.[0]?.coding?.[0]?.display?.length > 20
+                                        ? data?.reason?.[0]?.coding?.[0]?.display?.slice(0, 19) + '...'
+                                        : data?.reason?.[0]?.coding?.[0]?.display}
+                                </td>
+                                <td>
+                                    <Link
+                                        to={`/apps/appointments/newAppointment?updateid=${data?._id}`}
+                                        className="action-icon">
+                                        <i className="mdi mdi-square-edit-outline cursor-pointer"></i>
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))
                     )}
                 </tbody>
             </Table>
-            <div className='mt-2 d-flex justify-content-end'>
+            <div className="mt-2 d-flex justify-content-end">
                 <Paginations
                     currentPage={skip}
                     totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
@@ -252,8 +289,6 @@ const AppointmentsList = ({ patientsData, appointmentPeriod, setSkip, skip }: Or
         </>
     );
 };
-
-
 
 // Main Appointments Component
 const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> }): React$Element<React$FragmentType> => {
@@ -270,7 +305,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const dispatch = useDispatch();
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const [doctorSearch, setDoctorSearch] = useState('');
-    const [skip, setSkip] = useState(1)
+    const [skip, setSkip] = useState(1);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data?._id,
@@ -282,7 +317,15 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     }, [dispatch, doctorSearch]);
     useEffect(() => {
         if (activeTab === 'appointments') {
-            dispatch(getAppointmentsAction({ clinicId: clinicId, doctorId: selectedDoctor?.value || '', status: appointmentPeriod, skip: skip, limit: 15 }));
+            dispatch(
+                getAppointmentsAction({
+                    clinicId: clinicId,
+                    doctorId: selectedDoctor?.value || '',
+                    status: appointmentPeriod,
+                    skip: skip,
+                    limit: 15,
+                })
+            );
         }
     }, [dispatch, selectedDoctor, appointmentPeriod, activeTab, skip]);
     const handleInputChange = (data, type) => {
@@ -292,43 +335,137 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     const handleChange = (selectedOption, type) => {
         setSelectedDoctor(selectedOption, 'Selected Option');
     };
+    const statusColors = {
+        pending: '#f1c40f', // Yellow
+        proposed: '#3498db', // Blue
+        booked: '#2ecc71', // Green
+        arrived: '#27ae60', // Dark Green
+        fulfilled: '#9b59b6', // Purple
+        cancelled: '#e74c3c', // Red
+        noshow: '#e67e22', // Oranges
+        enteredinerror: '#95a5a6', // Grey
+        checkedin: '#1abc9c', // Teal
+        waitlist: '#8e44ad', // Dark Purple
+    };
+    const [showTooltip, setShowTooltip] = useState(false);
+
     return (
         <>
             <Row className="mt-2">
-                <Col xs={12}>
+                <Col xs={12} className="px-0">
                     <Card className="scroll-container page-height">
-                        <Card.Body>
-                            <Row className="mb-2">
-                                <Col sm={4}>
+                        <Card.Body className="p-2">
+                            <Row className="">
+                                <Col className="px-0">
                                     <ul className="nav nav-underline">
                                         <li className="nav-item ms-md-2">
                                             <span
-                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
-                                                    active: activeTab === 'appointmentCalendar',
-                                                    'fw-bold': activeTab === 'appointmentCalendar',
-                                                })}
+                                                className={classNames(
+                                                    'nav-link fw-bold text-black cursor-pointer fs-6',
+                                                    {
+                                                        active: activeTab === 'appointmentCalendar',
+                                                        'fw-bold fs-6': activeTab === 'appointmentCalendar',
+                                                    }
+                                                )}
                                                 onClick={() => setActiveTab('appointmentCalendar')}>
                                                 <CiCalendar /> Appointment Calendar
                                             </span>
                                         </li>
                                         <li className="nav-item">
                                             <span
-                                                className={classNames('nav-link fw-bold text-black cursor-pointer', {
-                                                    active: activeTab === 'appointments',
-                                                    'fw-bold': activeTab === 'appointments',
-                                                })}
+                                                className={classNames(
+                                                    'nav-link fw-bold text-black cursor-pointer fs-6',
+                                                    {
+                                                        active: activeTab === 'appointments',
+                                                        'fw-bold fs-6': activeTab === 'appointments',
+                                                    }
+                                                )}
                                                 onClick={() => setActiveTab('appointments')}>
                                                 <FaRegListAlt /> Appointment List
                                             </span>
                                         </li>
                                     </ul>
                                 </Col>
-                                <Col sm={8} className="text-end mt-2 mt-md-0">
+
+                                <Col className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
+                                        <Col xs={1} className="position-relative d-flex align-items-center justify-content-end text-end">
+                                            {/* <div
+                                                > */}
+                                               <FcViewDetails onMouseEnter={() => setShowTooltip(true)}
+                                                onMouseLeave={() => setShowTooltip(false)} className='fs-3 text-dark'
+                                                 style={{cursor:'help'}} 
+                                                />
+                                            {/* </div> */}
+
+                                            {showTooltip && (
+                                                <div className="color-legend-tooltip">
+                                                    <div className="d-flex gap-3">
+                                                        <div
+                                                            className="d-flex flex-column gap-2"
+                                                            style={{ width: '50%' }}>
+                                                            {Object.entries(statusColors)
+                                                                .slice(
+                                                                    0,
+                                                                    Math.ceil(Object.entries(statusColors).length / 2)
+                                                                )
+                                                                .map(([status, color]) => (
+                                                                    <div
+                                                                        key={status}
+                                                                        className="d-flex align-items-center gap-1">
+                                                                        <div
+                                                                            style={{
+                                                                                width: '12px',
+                                                                                height: '12px',
+                                                                                borderRadius: '10%',
+                                                                                backgroundColor: color,
+                                                                                border: '1px solid #ccc',
+                                                                            }}
+                                                                        />
+                                                                        <span
+                                                                            className="text-capitalize"
+                                                                            style={{ fontSize: '12px' }}>
+                                                                            {status}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+
+                                                        <div
+                                                            className="d-flex flex-column gap-2"
+                                                            style={{ width: '50%' }}>
+                                                            {Object.entries(statusColors)
+                                                                .slice(
+                                                                    Math.ceil(Object.entries(statusColors).length / 2)
+                                                                )
+                                                                .map(([status, color]) => (
+                                                                    <div
+                                                                        key={status}
+                                                                        className="d-flex align-items-center gap-1">
+                                                                        <div
+                                                                            style={{
+                                                                                width: '12px',
+                                                                                height: '12px',
+                                                                                borderRadius: '10%',
+                                                                                backgroundColor: color,
+                                                                                border: '1px solid #ccc',
+                                                                            }}
+                                                                        />
+                                                                        <span
+                                                                            className="text-capitalize"
+                                                                            style={{ fontSize: '12px' }}>
+                                                                            {status}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </Col>
                                         <Col
-                                            xs={12}
                                             sm="auto"
-                                            className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select">
+                                            className="d-flex flex-wrap gap-2 align-items-center text-start justify-content-between responnsible-party-select px-0">
                                             <Select
                                                 className="basic-single"
                                                 classNamePrefix="select"
@@ -345,15 +482,15 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 }}
                                                 name="doctorName"
                                                 options={doctorOptions}
-                                                placeholder="Select Doctor"
+                                                placeholder="Select Provider"
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
                                                         minHeight: '30px',
                                                         height: '30px',
                                                         width: '200px',
-                                                        padding: '0px',
-                                                        fontSize: '14px',
+                                                        padding: '0px 0px 0px 7px',
+                                                        fontSize: '10px',
                                                         border: '0px',
                                                         backgroundColor: '#E8F0FE!important',
                                                         boxShadow: 'none',
@@ -375,6 +512,23 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                         fontWeight: 600,
                                                         color: '#0908084f',
                                                     }),
+                                                    option: (provided, state) => ({
+                                                        ...provided,
+                                                        backgroundColor: state.isFocused ? '#b9bcbe44' : '',
+                                                        fontSize: state.isFocused ? '10px' : '10px',
+                                                        color: 'black',
+                                                        padding: '10px 12px',
+                                                        cursor: 'pointer',
+                                                        zIndex: 9999,
+                                                    }),
+                                                    menu: (provided) => ({
+                                                        ...provided,
+                                                        zIndex: 9999, // 🔥 z-index for dropdown itself
+                                                    }),
+                                                    menuPortal: (provided) => ({
+                                                        ...provided,
+                                                        zIndex: 9999, // 🔥 z-index if using portal
+                                                    }),
                                                 }}
                                             />
 
@@ -395,33 +549,37 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                         </Col>
                                     </Row>
                                 </Col>
-                                {activeTab === 'appointments' &&
-                                    <Col md={12} className='mt-2'>
+
+                                {activeTab === 'appointments' && (
+                                    <Col md={12} className="mt-2">
                                         <div className="time-period-tabs">
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('today')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
                                                     </button>
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('upcoming')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
                                                     </button>
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'}`}
-                                                        onClick={() => setAppointmentPeriod('history')}
-                                                    >
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                        }`}
+                                                        onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History
                                                     </button>
@@ -429,14 +587,21 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             </ul>
                                         </div>
                                     </Col>
-                                }
+                                )}
                             </Row>
 
                             {/* Render table based on active tab */}
                             {activeTab === 'appointments' ? (
-                                <AppointmentsList setSkip={setSkip} patientsData={patientsData} appointmentPeriod={appointmentPeriod} />
+                                <AppointmentsList
+                                    setSkip={setSkip}
+                                    patientsData={patientsData}
+                                    appointmentPeriod={appointmentPeriod}
+                                />
                             ) : (
-                                <AppointmentCalendar appointmentPeriod={appointmentPeriod} selectedDoctor={selectedDoctor?.value} />
+                                <AppointmentCalendar
+                                    appointmentPeriod={appointmentPeriod}
+                                    selectedDoctor={selectedDoctor?.value}
+                                />
                             )}
                         </Card.Body>
                     </Card>
