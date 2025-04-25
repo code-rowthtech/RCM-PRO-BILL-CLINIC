@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 // import PageTitle from '../../../components/PageTitle'
-import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 // import { getRolesAction, updateRolesAction } from '../../../redux/actions'
 // import { stateEmptydAction } from '../../../redux/roles/actions'
-import Spinner from '../../../../constants/Spinner'
-import Paginations from '../../../../helpers/Paginations'
-import CreateRoleSetting from './CreateRoleSetting'
-import UpdateRoleSetting from './UpdateRoleSetting'
-import { encryptMessage } from '../../../../cryptoUtils'
-import { FormInput } from '../../../../components'
+import Spinner from '../../../../constants/Spinner';
+import Paginations from '../../../../helpers/Paginations';
+import CreateRoleSetting from './CreateRoleSetting';
+import UpdateRoleSetting from './UpdateRoleSetting';
+import { encryptMessage } from '../../../../cryptoUtils';
+import { FormInput } from '../../../../components';
 import {
     getRoleDataAction,
-    //  stateEmptydAction, 
-    updateRoleDataAction
-} from '../../../../redux/actions'
-import { IoSearchSharp } from 'react-icons/io5'
+    //  stateEmptydAction,
+    updateRoleDataAction,
+} from '../../../../redux/actions';
+import { IoSearchSharp } from 'react-icons/io5';
 
 const RoleSetting = () => {
     const [showModal, setShowModal] = useState(false);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [skip, setSkip] = useState(1);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState(true)
+    const [status, setStatus] = useState(true);
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const decryptedRolesData = store?.getRoleDataReducer?.data?.roles;
@@ -34,61 +34,116 @@ const RoleSetting = () => {
     const handleClosemodal = () => {
         setShowModal(false);
     };
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
+    // useEffect(() => {
+    //     // Trigger data fetch when the status changes or other dependencies change
+    //     dispatch(getRoleDataAction({
+    //         clinicId: clinicId,
+    //         limit: 10,
+    //         search: search,
+    //         createdById: '',
+    //         page: skip,
+    //         status: status
+    //     }));
+
+    //     // If there's a successful update or create, reset the modal and fetch updated data
+    //     if (updateSuccess === 200 || createSuccess === 200) {
+    //         // dispatch(stateEmptydAction());
+    //         handleClosemodal();
+    //         closeUpdateModal();
+    //         setShowUpdateModal(false);
+    //         setShowModal(false);
+    //         dispatch(getRoleDataAction({
+    //             clinicId: clinicId,
+    //             limit: 10,
+    //             search: search,
+    //             createdById: '',
+    //             page: skip,
+    //             status: status
+    //         }));
+    //     }
+    // }, [dispatch, updateSuccess, skip, search, createSuccess, status]);
     useEffect(() => {
-        // Trigger data fetch when the status changes or other dependencies change
-        dispatch(getRoleDataAction({
-            clinicId: clinicId,
-            limit: 10,
-            search: search,
-            createdById: '',
-            page: skip,
-            status: status
-        }));
-
-        // If there's a successful update or create, reset the modal and fetch updated data
-        if (updateSuccess === 200 || createSuccess === 200) {
-            // dispatch(stateEmptydAction());
-            handleClosemodal();
-            closeUpdateModal();
-            setShowUpdateModal(false);
-            setShowModal(false);
-            dispatch(getRoleDataAction({
+        dispatch(
+            getRoleDataAction({
                 clinicId: clinicId,
                 limit: 10,
                 search: search,
                 createdById: '',
                 page: skip,
-                status: status
-            }));
+                status: status,
+            })
+        );
+    }, [dispatch, skip, search, status, clinicId]);
+
+    // useEffect(() => {
+    //     if (createSuccess === 200) {
+    //         handleClosemodal();
+    //         closeUpdateModal();
+    //         setShowUpdateModal(false);
+    //         setShowModal(false);
+    //         dispatch(
+    //             getRoleDataAction({
+    //                 clinicId: clinicId,
+    //                 limit: 10,
+    //                 search: search,
+    //                 createdById: '',
+    //                 page: skip,
+    //                 status: status,
+    //             })
+    //         );
+    //     }
+    // }, [createSuccess]);
+    useEffect(() => {
+        if (updateSuccess === 200) {
+            handleClosemodal();
+            closeUpdateModal();
+            setShowUpdateModal(false);
+            setShowModal(false);
+            dispatch(
+                getRoleDataAction({
+                    clinicId: clinicId,
+                    limit: 10,
+                    search: search,
+                    createdById: '',
+                    page: skip,
+                    status: status,
+                })
+            );
         }
-    }, [dispatch, updateSuccess, skip, search, createSuccess, status]);
+    }, [updateSuccess]);
 
     const [dataToUpdate, setDataToUpdate] = useState(null);
 
     const closeUpdateModal = () => {
         setShowUpdateModal(false);
         setDataToUpdate(null);
-    }
+    };
 
     const handleUpdateDoctorStatus = (data) => {
         const payload = {
             id: data?._id,
-            status: !data?.status
-        }
+            status: !data?.status,
+        };
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
-        dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: search, createdById: '', page: skip, status: status }));
-
-
-    }
+        dispatch(
+            getRoleDataAction({
+                clinicId: clinicId,
+                limit: 10,
+                search: search,
+                createdById: '',
+                page: skip,
+                status: status,
+            })
+        );
+    };
     const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber)
-    }
+        setSkip(pageNumber);
+    };
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearch('');
-
     };
 
     const [expandedRowIndex, setExpandedRowIndex] = useState(null);
@@ -99,8 +154,8 @@ const RoleSetting = () => {
 
     return (
         <div>
-            <Row className='mt-2'>
-                <Col xs={12} className='px-0'>
+            <Row className="mt-2">
+                <Col xs={12} className="px-0">
                     <Card className="scroll-container page-height">
                         <Card.Body>
                             <Row className="mb-2 d-flex justify-content-between">
@@ -108,16 +163,18 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
-                                    >
+                                        className={`active_inactive_buttons ${
+                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'} me-2 py-1`}
-                                    >
+                                        className={`active_inactive_buttons ${
+                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -127,18 +184,17 @@ const RoleSetting = () => {
                                             <div
                                                 className="input_search_box"
                                                 style={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    borderRadius: "4px",
-                                                    backgroundColor: "#e8f0fe",
-                                                    padding: "0px 5px",
-                                                }}
-                                            >
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: '#e8f0fe',
+                                                    padding: '0px 5px',
+                                                }}>
                                                 <IoSearchSharp
                                                     style={{
-                                                        fontSize: "1.2rem",
-                                                        color: "black",
-                                                        marginRight: "10px",
+                                                        fontSize: '1.2rem',
+                                                        color: 'black',
+                                                        marginRight: '10px',
                                                     }}
                                                 />
                                                 <FormInput
@@ -159,32 +215,33 @@ const RoleSetting = () => {
                                                     }}
                                                     className="input_search_box"
                                                     style={{
-                                                        border: "none",
-                                                        outline: "none",
+                                                        border: 'none',
+                                                        outline: 'none',
                                                         flex: 1,
-                                                        backgroundColor: "#ccc",
-
+                                                        backgroundColor: '#ccc',
                                                     }}
                                                 />
                                             </div>
 
                                             <Button
                                                 className="custom-buttons py-1 d-none d-md-block"
-                                                onClick={() => setShowModal(true)}
-                                            >
+                                                onClick={() => setShowModal(true)}>
                                                 Add New Role
                                             </Button>
                                             <Button
                                                 className="custom-buttons d-md-none py-1"
-                                                onClick={() => setShowModal(true)}
-                                            >
+                                                onClick={() => setShowModal(true)}>
                                                 <span className="uil-plus"></span>
                                             </Button>
                                         </Col>
                                     </Row>
                                 </Col>
                                 <CreateRoleSetting show={showModal} closeModal={handleClosemodal} />
-                                <UpdateRoleSetting show={showUpdateModal} closeModal={closeUpdateModal} data={dataToUpdate} />
+                                <UpdateRoleSetting
+                                    show={showUpdateModal}
+                                    closeModal={closeUpdateModal}
+                                    data={dataToUpdate}
+                                />
                             </Row>
                             <Row>
                                 <Col className="h-100">
@@ -193,8 +250,7 @@ const RoleSetting = () => {
                                         className="table-centered table-nowrap mb-0 rounded"
                                         style={{
                                             height: decryptedRolesData?.length === 0 ? '76vh' : 'auto',
-                                        }}
-                                    >
+                                        }}>
                                         <thead className="text-white">
                                             <tr key="">
                                                 <th className="text-white py-2" style={{ fontSize: '13px' }}>
@@ -225,33 +281,34 @@ const RoleSetting = () => {
                                                 decryptedRolesData?.map((data, index) => (
                                                     <React.Fragment key={index}>
                                                         <tr className="cursor-pointer">
-                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td
+                                                                className="py-1"
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {index + 1}
                                                             </td>
                                                             <td
                                                                 className="cursor-pointer py-1"
-                                                                style={{ fontSize: '13px', fontWeight: '400' }}
-                                                            >
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <span
                                                                     data-bs-toggle="tooltip"
                                                                     title={
                                                                         'Permissions' +
-                                                                        ' : ' +
-                                                                        data?.permissions?.map(
-                                                                            (permission) => permission?.name
-                                                                        ).join(', ') || ''
+                                                                            ' : ' +
+                                                                            data?.permissions
+                                                                                ?.map((permission) => permission?.name)
+                                                                                .join(', ') || ''
                                                                     }
-                                                                    className="d-inline-block mt-1 text-truncate text-capitalize"
-                                                                >
+                                                                    className="d-inline-block mt-1 text-truncate text-capitalize">
                                                                     {data?.name?.charAt(0).toUpperCase() +
                                                                         data?.name?.slice(1)}
                                                                 </span>
                                                             </td>
-                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td
+                                                                className="py-1"
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <span
                                                                     className="text-truncate cursor-pointer"
-                                                                    title={data?.description}
-                                                                >
+                                                                    title={data?.description}>
                                                                     {data?.description
                                                                         ? data?.description.length > 50
                                                                             ? data?.description.slice(0, 49) + '...'
@@ -259,28 +316,32 @@ const RoleSetting = () => {
                                                                         : 'N/A'}
                                                                 </span>
                                                             </td>
-                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td
+                                                                className="py-1"
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Form.Switch
-                                                                    className={data?.status === true ? "custom-active" : ""}
+                                                                    className={
+                                                                        data?.status === true ? 'custom-active' : ''
+                                                                    }
                                                                     onClick={() => handleUpdateDoctorStatus(data)}
                                                                     checked={data?.status === true}
                                                                 />
                                                             </td>
-                                                            <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                            <td
+                                                                className="py-1"
+                                                                style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <Link
                                                                     to="#"
                                                                     className="action-icon"
                                                                     onClick={() => {
                                                                         setShowUpdateModal(true);
                                                                         setDataToUpdate(data);
-                                                                    }}
-                                                                >
+                                                                    }}>
                                                                     <i className="mdi mdi-square-edit-outline"></i>
                                                                 </Link>
                                                                 <i
                                                                     onClick={() => toggleRow(index)}
-                                                                    className="mdi mdi-eye fs-4"
-                                                                ></i>
+                                                                    className="mdi mdi-eye fs-4"></i>
                                                             </td>
                                                         </tr>
                                                         {expandedRowIndex === index && (
@@ -288,11 +349,11 @@ const RoleSetting = () => {
                                                                 <td colSpan="7">
                                                                     <div className="expanded-content px-5">
                                                                         <div
-                                                                            className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${data?.permissions?.length === 0
-                                                                                ? 'd-none'
-                                                                                : ''
-                                                                                }`}
-                                                                        >
+                                                                            className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${
+                                                                                data?.permissions?.length === 0
+                                                                                    ? 'd-none'
+                                                                                    : ''
+                                                                            }`}>
                                                                             <div className="col-1"></div>
                                                                             <div className="permission-name text-black fw-bold col-2">
                                                                                 Permission
@@ -325,23 +386,20 @@ const RoleSetting = () => {
                                 </Col>
                             </Row>
                             <Row>
-
-                                <Col className='mt-2 d-flex justify-content-end'>
+                                <Col className="mt-2 d-flex justify-content-end">
                                     <Paginations
                                         currentPage={skip}
                                         totalPages={rolePagination?.totalPages || 1}
                                         onPageChange={handlePageChange}
                                     />
-
                                 </Col>
                             </Row>
                         </Card.Body>
-
                     </Card>
                 </Col>
             </Row>
         </div>
-    )
-}
+    );
+};
 
 export default RoleSetting;

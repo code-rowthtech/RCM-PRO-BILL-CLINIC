@@ -91,27 +91,28 @@ const MenuItem = ({ item, className, linkClassName }) => {
 };
 
 const MenuItemLink = ({ item, className }) => {
-
-    const [show, setShow] = useState(false)
-    const handleCheckLogout = (data) => {
-        if (data === 'Logout') {
-            setShow(true);
-        }
-
-    }
+    const [show, setShow] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const handleLogout = () => {
-        dispatch(logoutUser())
-        navigate('account/logout')
-        // api.setLoggedInUser(null);
-        // setAuthorization(null);
-    }
+        dispatch(logoutUser());
+        navigate('account/logout');
+    };
+
     const closeModal = () => {
-        window.location.reload();
-    }
+        setShow(false);
+    };
+
+    const handleClick = (e) => {
+        if (item.label === 'Logout') {
+            e.preventDefault(); // prevent navigation
+            setShow(true);
+        }
+    };
+
     return (
+<<<<<<< HEAD
         <Link
             to={{ pathname: item.url }}
             target={item.target}
@@ -130,6 +131,52 @@ const MenuItemLink = ({ item, className }) => {
 
         </Link>
 
+=======
+        <>
+            <Link
+                to={item.url}
+                target={item.target}
+                className={classNames('side-nav-link-ref', 'side-sub-nav-link', className)}
+                onClick={handleClick}
+                data-menu-key={item.key}>
+                {item.icon && <i className={item.icon}></i>}
+                {item.badge && (
+                    <span
+                        className={classNames(
+                            'badge',
+                            'bg-' + item.badge.variant,
+                            'rounded-pill',
+                            'font-10',
+                            'float-end',
+                            {
+                                'text-dark': item.badge.variant === 'light',
+                            }
+                        )}>
+                        {item.badge.text}
+                    </span>
+                )}
+                <span>{item.label}</span>
+            </Link>
+
+            <Modal centered show={show} onHide={closeModal}>
+                <Modal.Body>
+                    <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
+                        <div className="card-body text-center">
+                            <h4 className="card-title">Are you sure you want to logout!</h4>
+                            <div className="d-flex justify-content-center gap-3">
+                                <Button className="cancel-button" onClick={closeModal}>
+                                    Cancel
+                                </Button>
+                                <Button type="button" className="custom-buttons" onClick={handleLogout}>
+                                    Logout
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        </>
+>>>>>>> cfd907f89933cfefd4164f7d7070c095ed118105
     );
 };
 
@@ -148,8 +195,8 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
     const [activeMenuItems, setActiveMenuItems] = useState([]);
 
     /*
-    * toggle the menus
-    */
+     * toggle the menus
+     */
     const toggleMenu = (menuItem, show) => {
         if (show && menuItem.key !== 'logout') {
             setActiveMenuItems([menuItem['key'], ...findAllParent(menuItems, menuItem)]);
@@ -188,6 +235,7 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
 
     return (
         <>
+<<<<<<< HEAD
             <ul className="side-nav " ref={menuRef} id="main-side-menu">
                 <li className='text-center py-3' >
                     {isCondensed ?
@@ -196,6 +244,10 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
                         <img src={logo} alt="" height="25" />
                     }
                 </li>
+=======
+            <ul className="side-nav" ref={menuRef} id="main-side-menu">
+                <li className="text-center py-3">{isCondensed ? <></> : <img src={logo} alt="" height="25" />}</li>
+>>>>>>> cfd907f89933cfefd4164f7d7070c095ed118105
                 {(menuItems || []).map((item, idx) => {
                     return (
                         <React.Fragment key={idx}>
@@ -218,7 +270,11 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
                                                 'menuitem-active':
                                                     activeMenuItems.includes(item.key) && item.key !== 'logout',
                                             })}
-                                            className={activeMenuItems.includes(item.key) && item.key !== 'logout' ? 'menuitem-active' : ''}
+                                            className={
+                                                activeMenuItems.includes(item.key) && item.key !== 'logout'
+                                                    ? 'menuitem-active'
+                                                    : ''
+                                            }
                                         />
                                     )}
                                 </>
@@ -230,6 +286,5 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
         </>
     );
 };
-
 
 export default AppMenu;

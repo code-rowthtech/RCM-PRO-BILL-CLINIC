@@ -28,6 +28,7 @@ type ProfileDropdownState = {
 };
 
 const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownState): React$Element<any> => {
+    console.log(props, 'propspropsprops')
     const {
         handleSubmit,
         // formState: { errors },

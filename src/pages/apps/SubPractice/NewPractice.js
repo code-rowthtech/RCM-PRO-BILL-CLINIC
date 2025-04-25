@@ -876,7 +876,7 @@ const NewPractice = () => {
         <>
             <div className="pt-1 pb-2">
                 <div className="container-fluid mt- px-0">
-                    <Card className="scroll-container px-md-2 py-md-2" style={{ height: '82vh', overflow: 'scroll' }}>
+                    <Card className="scroll-container px-md-2 py-md-2" style={{ height: '90vh', overflow: 'scroll' }}>
                         <div className="row">
                             <div className="col-12 d-flex justify-content-between align-items-center">
                                 <div>
@@ -1739,6 +1739,7 @@ const NewPractice = () => {
                                                         variant="primary"
                                                         type="submit"
                                                         className="custom-buttons"
+                                                        style={{width:'55px'}}
                                                         disabled={createLoading}>
                                                         {createLoading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />

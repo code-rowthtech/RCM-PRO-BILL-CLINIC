@@ -43,7 +43,7 @@ const Index = () => {
     return (
         <>
             <Row className="mt-2">
-                <Col xs={12} className=''>
+                <Col xs={12} className='px-0'>
                     <Card className="px-md-3 py-md-2 scroll-container page-height">
                         <Row className="mb-0">
                             <Col className="d-flex justify-content-between align-items-center">
