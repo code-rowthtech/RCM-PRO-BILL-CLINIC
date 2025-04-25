@@ -354,7 +354,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const consultationRoomData = useMemo(() => store?.getMastersDataReducer?.data1?.data?.result, [store]);
     const patientsData = useMemo(() => store?.getPatientsReducer?.data?.data, [store]);
 
-    const isLoading = store?.getDoctorsReducer?.loading || store?.getAppointmentByIdReducer?.loading || store?.getPatientsReducer?.loading
+    const isLoading = store?.getAppointmentByIdReducer?.loading
     const clinicId = useMemo(() => JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId, []);
     const [status, setStatus] = useState(true);
     const [patientId, setPatientId] = useState(null);
@@ -368,6 +368,13 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     const [appointmentDates, setAppointmentDates] = useState();
     const [appointmentReason, setAppointmentReason] = useState(null);
     const [scheduledDate, setScheduledDate] = useState()
+    function formatDateToYYYYMMDD(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 
     const { register, handleSubmit, watch, formState: { errors }, setValue, reset } = useForm({
         defaultValues: {
@@ -435,13 +442,12 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            setScheduledDate(new Date().toISOString().split('T')[0]);
+            // setScheduledDate(new Date().toISOString().split('T')[0]);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }
     }, [selectedSlot, calendarView, scheduledDate]);
 
-    console.log('selectedSlot:', selectedSlot)
     // Fetch doctors when search or status changes
     useEffect(() => {
         const doctorPayload = { status, search };
@@ -515,7 +521,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
         const selectedAppointmentRecurrence = appointmentRecurrence?.find((item) => item?.display === repeatType);
 
-        const startDateTime = new Date(`${data.scheduled}T${data.startTime}:00`);
+        const startDateTime = new Date(`${formatDateToYYYYMMDD(scheduledDate)}T${data.startTime}:00`);
         const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
         let recurrenceTemplate = {};
 
@@ -650,7 +656,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         {...register('patient', { required: 'Patient is required' })}
                                         style={{ paddingRight: '40px' }}>
                                         <option className="testing_select" value="" hidden>
-                                            Select Patient
+                                            {store?.getPatientsReducer?.loading ? "Loading..." : "Select Patient"}
                                         </option>
                                         {patientsData?.map((patient) => (
                                             <option key={patient?._id} value={patient?._id}>
@@ -684,7 +690,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         data-has-value={!!watchedDoctorName}
                                         {...register('doctorName', { required: 'Doctor is required' })}>
                                         <option value="" hidden>
-                                            Select Doctor
+                                            {store?.getDoctorsReducer?.loading ? "Loading..." : 'Select Doctor'}
                                         </option>
                                         {doctorDetails?.map((doctor) => (
                                             <option key={doctor?._id} value={doctor?._id}>
@@ -741,7 +747,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                             className=""
                                             {...register('scheduled', { required: 'Scheduled date is required' })}
                                             value={scheduledDate}
-                                            disabled={!watchedDoctorName}
+                                            // disabled={!watchedDoctorName}
                                             min={new Date().toISOString().split('T')[0]}
                                             onChange={(e) => setScheduledDate(e.target.value)}
                                             onClick={handleDisabledClick}

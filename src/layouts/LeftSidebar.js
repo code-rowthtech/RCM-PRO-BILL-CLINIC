@@ -11,10 +11,10 @@ import AppMenu from './Menu';
 // images
 import profileImg from '../assets/images/users/avatar-1.jpg';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDoctorsAction, getPatientsByAppointmentAction } from '../redux/actions';
+import { getDoctorsAction, getPatientsByAppointmentAction, logoutUser } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import Spinner from '../constants/Spinner';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
 import logo from '../assets/images/logo.png';
 import logo_sm from '../assets/images/logo_sm.png';
@@ -43,6 +43,7 @@ const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) =
     );
 };
 
+
 type LeftSidebarProps = {
     hideLogo: boolean,
     hideUserProfile: boolean,
@@ -57,6 +58,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log(patientsData, 'patientsDatapatientsDatapatientsData')
     const [search, setSearch] = useState('');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
@@ -125,6 +127,105 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+    const SideBarContentDown = ({ hideUserProfile }: SideBarContentProps) => {
+
+        const MENU_ITEMS_END = [
+            {
+                label: 'Tasks',
+                icon: "mdi-sticker-plus-outline",
+                redirectTo: "#",
+                url: "/dashboard/account",
+            },
+            {
+                label: 'Help & Support',
+                icon: "mdi-help-circle-outline",
+                redirectTo: "#",
+            },
+            {
+                label: 'Billing',
+                icon: "mdi-cash-fast",
+                redirectTo: "#",
+            },
+            {
+                key: 'logout',
+                label: 'Logout',
+                icon: 'mdi-logout',
+                // url: '/apps/logout/logout-model',
+            },
+        ];
+        const navigate = useNavigate();
+        const dispatch = useDispatch();
+        const [show, setShow] = useState(false)
+        const handleCheckLogout = (data) => {
+            if (data === 'Logout') {
+                setShow(true);
+            }
+        }
+
+        const handleLogout = () => {
+            dispatch(logoutUser())
+            navigate('account/logout')
+            // api.setLoggedInUser(null);
+            // setAuthorization(null);
+        }
+        const closeModal = () => {
+            window.location.reload();
+        }
+        return (
+            <>
+                {MENU_ITEMS_END.map((ele, index) => {
+                    const isLogout = ele.label === 'Logout';
+
+                    return (
+                        <div className='' key={index}>
+                            {isCondensed ? (
+                                <button
+                                    onClick={() => isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)}
+                                    className="px-3 py-2 w-100 d-flex justify-content-center align-items-center bg-transparent border-0"
+                                >
+                                    <span
+                                        className={`${ele.icon?.startsWith('mdi') ? 'mdi' : ''} ${ele.icon} mdi-18px textLeftSidebar`}
+                                    ></span>
+                                </button>
+                            ) : (
+                                <div className="info-color px-2 py-1 align-items-center">
+                                    <button
+                                        data-toggle={ele.label === 'Tasks' || ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={ele.label === 'Tasks' || ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
+                                        onClick={() => isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)}
+                                        className="px-2 textLeftSidebar bg-transparent border-0"
+                                    >
+                                        <span className={`mdi ${ele.icon} mdi-18px px-1 iconsLeftSidebar`}></span>
+                                        <span className="px-2 sidebar_listItems notranslate">{ele.label}</span>
+                                    </button>
+
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+
+                {/* Modal should be outside the loop */}
+                <Modal centered show={show} onHide={closeModal}>
+                    <Modal.Body>
+                        <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
+                            <div className="card-body text-center">
+                                <h4 className="card-title">Are you sure you want to logout!</h4>
+                                <div className="d-flex justify-content-center gap-3">
+                                    <Button className="cancel-button" onClick={closeModal}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="button" className="custom-buttons" onClick={handleLogout}>
+                                        Logout
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+            </>
+        );
+
+    };
     const renderFilterList = () => {
         if (activeFilter === "Doctors") {
             return (
@@ -205,6 +306,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
     }
+    const currentYear = new Date().getFullYear();
+
     return (
         <>
             <div className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`} ref={menuNodeRef}>
@@ -467,19 +570,67 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                         }
                     </>
                     :
-                    <>
-                        {!isCondensed && (
-                            <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
+                    // <>
+                    //     {!isCondensed && (
+                    //         <SimpleBar style={{ maxHeight: '100%' }} timeout={500} scrollbarMaxSize={320}>
+                    //             <SideBarContent
+                    //                 menuClickHandler={() => { }}
+                    //                 isLight={isLight}
+                    //                 hideUserProfile={hideUserProfile}
+                    //                 isCondensed={isCondensed}
+                    //             />
+                    //         </SimpleBar>
+                    //     )}
+                    //     {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
+                    // </>
+                    <div className="parentLeftSidebar mb-3">
+                        <div className="media_mob scroll-container">
+                            {!isCondensed && (
+                                <SimpleBar timeout={500} scrollbarMaxSize={320}>
+                                    <SideBarContent
+                                        data-aos="fade-down"
+                                        menuClickHandler={() => { }}
+                                        isLight={isLight}
+                                        hideUserProfile={hideUserProfile}
+                                    />
+                                </SimpleBar>
+                            )}
+                            {isCondensed && (
                                 <SideBarContent
-                                    menuClickHandler={() => { }}
                                     isLight={isLight}
                                     hideUserProfile={hideUserProfile}
-                                    isCondensed={isCondensed}
                                 />
-                            </SimpleBar>
-                        )}
-                        {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
-                    </>
+                            )}
+                        </div>
+                        <div className='lowerMenu scroll-container pb-3'>
+                            {!isCondensed && (
+                                <SimpleBar className='d' timeout={500} scrollbarMaxSize={320}>
+                                    {!isCondensed && <div className="leftSideBarLine"></div>}
+                                    <SideBarContentDown
+                                        data-aos="fade-down"
+                                        menuClickHandler={() => { }}
+                                        isLight={isLight}
+                                        hideUserProfile={hideUserProfile}
+                                    />
+                                    {/* <span style={{ marginLeft: "33px", fontFamily: "Nunito", fontWeight: 700 }}>
+                                        {!isCondensed && (
+                                            <div className="sf-footer ms-3">
+                                                &copy; {currentYear} - {metadata.buildMajor}.{metadata.buildMinor}
+                                                .{metadata.buildRevision} {metadata.buildTag}asdkmasd
+                                            </div>
+                                        )}
+                                    </span> */}
+                                </SimpleBar>
+                            )}
+                            {isCondensed && (
+                                <SideBarContentDown
+                                    isLight={isLight}
+                                    hideUserProfile={hideUserProfile}
+                                />
+                            )}
+                        </div>
+                    </div>
+
                 }
 
             </div>

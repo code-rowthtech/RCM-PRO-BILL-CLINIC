@@ -46,4 +46,4 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
     );
 };
 
-export default Paginations;
+export default Paginations; 

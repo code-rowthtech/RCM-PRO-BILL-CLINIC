@@ -28,7 +28,7 @@ import Select from 'react-select';
 import { error } from 'jquery';
 import { use } from 'react';
 
-const Demographicdetails = ({ patientId }) => {
+const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -430,8 +430,9 @@ const Demographicdetails = ({ patientId }) => {
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     return (
-        <div className="scroll-container" style={{ overflow: 'scroll', height: '65vh' }}>
-            <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
+        <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
+            <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '46.5vh' : '70vh' }}>
+
                 <IdentifierForm
                     defaultIdentifiers={[
                         {
@@ -1025,23 +1026,23 @@ const Demographicdetails = ({ patientId }) => {
                         </Form.Group>
                     </Col>
                 </Row>
-                <Row className="my-2">
-                    <Col className="d-flex justify-content-end">
-                        <Button
-                            className="custom-buttons btn-height"
-                            disabled={store?.updatePatientsReducer?.loading}
-                            style={{ width: '70px' }}
-                            type="submit">
-                            {store?.updatePatientsReducer?.loading ? (
-                                <Spinner animation="border" variant="primary" size="sm" />
-                            ) : (
-                                'Update'
-                            )}
-                        </Button>
-                    </Col>
-                </Row>
-            </Form>
-        </div>
+            </div>
+            <Row className="my-2">
+                <Col className="d-flex justify-content-end">
+                    <Button
+                        className="custom-buttons btn-height"
+                        disabled={store?.updatePatientsReducer?.loading}
+                        style={{ width: '70px' }}
+                        type="submit">
+                        {store?.updatePatientsReducer?.loading ? (
+                            <Spinner animation="border" variant="primary" size="sm" />
+                        ) : (
+                            'Update'
+                        )}
+                    </Button>
+                </Col>
+            </Row>
+        </Form>
     );
 };
 

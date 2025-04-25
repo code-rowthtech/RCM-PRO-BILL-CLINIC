@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import {  Form, Button } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createInsuranceAction, getCitiesAction, getStatesByCountryAction, updateInsuranceAction } from '../../../../redux/actions';
 import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 
-const WorkersCamp = ({ patientId, activeTab }) => {
+const WorkersCamp = ({ patientId, activeTab, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const { handleSubmit, register, setValue } = useForm();
@@ -107,7 +107,7 @@ const WorkersCamp = ({ patientId, activeTab }) => {
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
-                <div className="row">
+                <div className="row scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '42vh' : '65vh' }}>
                     <div className="col-3">
                         <Form.Group>
                             <Form.Label className='mb-0'>Insurance Provider</Form.Label>

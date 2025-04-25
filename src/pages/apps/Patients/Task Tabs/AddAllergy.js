@@ -177,7 +177,6 @@ const AddAllergy = ({ onCancel }) => {
         };
 
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
 
     const formattedCodeOption = useMemo(

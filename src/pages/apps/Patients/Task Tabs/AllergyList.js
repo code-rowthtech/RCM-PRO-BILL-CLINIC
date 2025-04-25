@@ -39,7 +39,7 @@ const AllergyList = () => {
         setSelectedAllergy(allergy);
         setShowUpdateAllergy(true);
     };
- 
+
     useEffect(() => {
         if (deleteStatus === 200) {
             const data = {
@@ -47,10 +47,10 @@ const AllergyList = () => {
             };
             dispatch(getAllergiesOfPatientAction(data));
         }
-    },[deleteStatus, dispatch, patientId]);
+    }, [deleteStatus, dispatch, patientId]);
 
     return (
-        <div>
+        <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
             {showAddAllergy ? (
                 <AddAllergy onCancel={() => setShowAddAllergy(false)} />
             ) : showUpdateAllergy ? (
@@ -128,11 +128,11 @@ const AllergyList = () => {
                                                     &nbsp;
                                                     <MdDeleteOutline
                                                         className="fs-4 cursor-pointer text-black"
-                                                        onClick={()=>{
+                                                        onClick={() => {
                                                             const requestData = {
                                                                 id: data?._id,
                                                             };
-                                                            dispatch(deleteAllergyAction(requestData)); 
+                                                            dispatch(deleteAllergyAction(requestData));
                                                         }}
                                                     />
                                                 </td>

@@ -35,7 +35,7 @@ const MENU_ITEMS = [
     },
     {
         key: 'schedule',
-        label: 'Schedule',
+        label: 'Provider Schedule',
         icon: 'uil-clock',
         url: '/apps/schedule/list',
     },
@@ -124,12 +124,12 @@ const MENU_ITEMS = [
             },
         ]
     },
-    {
-        key: 'logout',
-        label: 'Logout',
-        icon: 'uil uil-sign-out-alt',
-        // url: '/apps/logout/logout-model',
-    },
+    // {
+    //     key: 'logout',
+    //     label: 'Logout',
+    //     icon: 'uil uil-sign-out-alt',
+    //     // url: '/apps/logout/logout-model',
+    // },
 ];
 
 export default MENU_ITEMS;

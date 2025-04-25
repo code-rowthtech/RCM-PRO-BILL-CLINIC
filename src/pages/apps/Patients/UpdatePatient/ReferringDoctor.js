@@ -12,7 +12,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import AddressForm from '../../Common Pages/AddressForm';
 import { useSearchParams } from 'react-router-dom';
 
-const ReferringDoctor = ({ setActiveTab, activeTab }) => {
+const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
@@ -33,30 +33,9 @@ const ReferringDoctor = ({ setActiveTab, activeTab }) => {
     const [submissionType, setSubmissionType] = useState(null);
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const createResponseReferring = store?.addReferringDoctorReducer?.data?.status;
-    // useEffect(() => {
-    //     if (createResponseReferring === 201) {
-    //         if (submissionType === 'Update') {
-    //             setActiveTab('insurance');
-    //         } else if (submissionType === 'saveAndReset') {
-    //             setActiveTab('personalDetails');
-    //         }
-    //     }
-    // }, [createResponseReferring]);
+
     const primaryState = watch('primaryStateName');
     const primaryCitySearch = watch('primaryCity');
-
-    // useEffect(() => {
-    //     dispatch(getStatesByCountryAction());
-    // }, [dispatch]);
-
-    // useEffect(() => {
-    //     if (primaryState) {
-    //         const stateCity = store?.getStatesReducer?.data?.states?.find(
-    //             (data) => data?.state_code === primaryState
-    //         )?.id;
-    //         dispatch(getCitiesAction({ state_code: stateCity, name: primaryCitySearch, limit: 25 }));
-    //     }
-    // }, [primaryState, primaryCitySearch, dispatch]);
     useEffect(() => {
         if (patientDetails) {
             setValue('firstName', patientDetails?.referringDocId?.name?.[0]?.given?.[0]);
@@ -132,120 +111,109 @@ const ReferringDoctor = ({ setActiveTab, activeTab }) => {
 
     return (
         <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-            <Row className="pb-2">
-                <Col sm={12}>
-                    <span className="text-black fw-semibold form-label">Personal Details</span>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Prefix</Form.Label>
-                        <Form.Control {...register('prefix')} placeholder="Prefix (Dr., Mr., Ms.)" type="text" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">First Name</Form.Label>
-                        <Form.Control {...register('firstName')} placeholder="First Name" type="text" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Middle Name</Form.Label>
-                        <Form.Control {...register('middleName')} placeholder="Middle Name" type="text" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Last Name</Form.Label>
-                        <Form.Control {...register('lastName')} placeholder="Last Name" type="text" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Suffix</Form.Label>
-                        <Form.Control {...register('suffix')} placeholder="Suffix" type="text" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">
-                            NPI Number <span className="text-danger">*</span>
-                        </Form.Label>
-                        <Form.Control
-                            {...register('npiNumber', {
-                                required: 'This field is required',
-                                minLength: { value: 10, message: 'NPI must be exactly 10 digits' },
-                                maxLength: { value: 10, message: 'NPI must be exactly 10 digits' },
-                                pattern: { value: /^[0-9]+$/, message: 'NPI must be numeric' },
-                            })}
-                            maxLength={10}
-                            placeholder="NPI Number"
-                            type="text"
-                        />
-                        {errors.npiNumber && <span className="text-danger">{errors.npiNumber.message}</span>}
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Email</Form.Label>
-                        <Form.Control {...register('email')} placeholder="Email" type="email" />
-                    </Form.Group>
-                </Col>
-                <Col sm={3}>
-                    <Form.Group className="mb-0 position-relative">
-                        <Form.Label className="mb-0">
-                            Phone <span className="text-danger">*</span>
-                        </Form.Label>
-                        <InputGroup>
-                            <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
-                                <img src={us} alt="country code flag" width={16} />
-                                +1
-                            </InputGroup.Text>
+            <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '46.5vh' : '70vh' }}>
+
+                <Row className="pb-2">
+                    <Col sm={12}>
+                        <span className="text-black fw-semibold form-label">Personal Details</span>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Prefix</Form.Label>
+                            <Form.Control {...register('prefix')} placeholder="Prefix (Dr., Mr., Ms.)" type="text" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">First Name</Form.Label>
+                            <Form.Control {...register('firstName')} placeholder="First Name" type="text" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Middle Name</Form.Label>
+                            <Form.Control {...register('middleName')} placeholder="Middle Name" type="text" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Last Name</Form.Label>
+                            <Form.Control {...register('lastName')} placeholder="Last Name" type="text" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Suffix</Form.Label>
+                            <Form.Control {...register('suffix')} placeholder="Suffix" type="text" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">
+                                NPI Number <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
-                                type="tel"
-                                {...register('phone', {
+                                {...register('npiNumber', {
                                     required: 'This field is required',
-                                    pattern: {
-                                        value: /^\(\d{3}\)\d{3}-\d{4}$/,
-                                        message: 'Format: (XXX)XXX-XXXX',
-                                    },
+                                    minLength: { value: 10, message: 'NPI must be exactly 10 digits' },
+                                    maxLength: { value: 10, message: 'NPI must be exactly 10 digits' },
+                                    pattern: { value: /^[0-9]+$/, message: 'NPI must be numeric' },
                                 })}
-                                onChange={(e) => {
-                                    let rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
-                                    e.target.value = rawValue.replace(/(\d{3})(\d{3})(\d{4})/, '($1)$2-$3');
-                                    clearErrors('phone');
-                                }}
-                                placeholder="(XXX)XXX-XXXX"
+                                maxLength={10}
+                                placeholder="NPI Number"
+                                type="text"
                             />
-                        </InputGroup>
-                        {/* <div
+                            {errors.npiNumber && <span className="text-danger">{errors.npiNumber.message}</span>}
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Email</Form.Label>
+                            <Form.Control {...register('email')} placeholder="Email" type="email" />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={3}>
+                        <Form.Group className="mb-0 position-relative">
+                            <Form.Label className="mb-0">
+                                Phone <span className="text-danger">*</span>
+                            </Form.Label>
+                            <InputGroup>
+                                <InputGroup.Text className="p-0 px-1 d-flex align-items-center justify-content-center fs-6 gap-1 fw-bold text-black">
+                                    <img src={us} alt="country code flag" width={16} />
+                                    +1
+                                </InputGroup.Text>
+                                <Form.Control
+                                    type="tel"
+                                    {...register('phone', {
+                                        required: 'This field is required',
+                                        pattern: {
+                                            value: /^\(\d{3}\)\d{3}-\d{4}$/,
+                                            message: 'Format: (XXX)XXX-XXXX',
+                                        },
+                                    })}
+                                    onChange={(e) => {
+                                        let rawValue = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                        e.target.value = rawValue.replace(/(\d{3})(\d{3})(\d{4})/, '($1)$2-$3');
+                                        clearErrors('phone');
+                                    }}
+                                    placeholder="(XXX)XXX-XXXX"
+                                />
+                            </InputGroup>
+                            {/* <div
                             className="position-absolute"
                             style={{ top: '54%', left: '1%', transform: 'translateY(-16%)' }}>
                             <img src={us} alt="country code flag" width={20} />
                         </div> */}
-                        {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
-                    </Form.Group>
-                </Col>
-            </Row>
-            <hr />
-            <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
+                            {errors.phone && <span className="text-danger">{errors.phone.message}</span>}
+                        </Form.Group>
+                    </Col>
+                </Row>
+                <hr />
+                <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
+            </div>
             <Row className="mt-2">
-                <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
-                    {/* <Button
-                        onClick={() => {
-                            setSubmissionType('Update');
-                        }}
-                        disabled={store?.createReferringDoctorReducer?.loading}
-                        className="custom-buttons"
-                        style= {{width:'70px'}}
-                        type="submit">
-                        {store?.createReferringDoctorReducer?.loading ? (
-                            <Spinner color="white" className="spinner-border-sm" />
-                        ) : (
-                            'Update'
-                        )}
-                    </Button> */}
-                    <div className="d-flex gap-2 justify-content-end mb-2 mt-md-4">
+                <div className="d-flex gap-2 justify-content-end mb-1">
+                    <div className="d-flex gap-2 justify-content-end ">
                         <Button className="cancel-button" onClick={() => reset()}>
                             Clear
                         </Button>

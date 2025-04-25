@@ -116,7 +116,6 @@ const MenuItemLink = ({ item, className }) => {
             to={{ pathname: item.url }}
             target={item.target}
             className={classNames('side-nav-link-ref', 'side-sub-nav-link', className)}
-            onClick={() => handleCheckLogout(item.label)}
             data-menu-key={item.key}>
             {item.icon && <i className={item.icon}></i>}
             {item.badge && (
@@ -128,23 +127,7 @@ const MenuItemLink = ({ item, className }) => {
                 </span>
             )}
             <span> {item.label} </span>
-            <Modal centered show={show} onHide={closeModal}>
-                <Modal.Body>
-                    <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
-                        <div className="card-body text-center">
-                            <h4 className="card-title">Are you sure you want to logout!</h4>
-                            <div className="d-flex justify-content-center gap-3">
-                                <Button className="cancel-button" onClick={closeModal}>
-                                    Cancel
-                                </Button>
-                                <Button type="button" className="custom-buttons " onClick={handleLogout}>
-                                    Logout
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
+
         </Link>
 
     );
@@ -205,7 +188,7 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
 
     return (
         <>
-            <ul className="side-nav" ref={menuRef} id="main-side-menu">
+            <ul className="side-nav " ref={menuRef} id="main-side-menu">
                 <li className='text-center py-3' >
                     {isCondensed ?
                         <></>
