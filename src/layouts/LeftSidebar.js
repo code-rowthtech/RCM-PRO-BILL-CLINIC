@@ -9,7 +9,7 @@ import { getMenuItems } from '../helpers/menu';
 import AppMenu from './Menu';
 
 // images
-import profileImg from '../assets/images/users/avatar-1.jpg';
+import dummyProfile from '../assets/images/dummyProfile.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getPatientsByAppointmentAction, logoutUser } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
@@ -18,6 +18,9 @@ import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
 import logo from '../assets/images/logo.png';
 import logo_sm from '../assets/images/logo_sm.png';
+import { FaUserCircle } from 'react-icons/fa';
+import { FaChevronDown } from 'react-icons/fa6';
+import classNames from 'classnames';
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -30,7 +33,7 @@ const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) =
             {!hideUserProfile && (
                 <div className="leftbar-user">
                     <Link to="/">
-                        <img src={profileImg} alt="" height="42" className="rounded-circle shadow-sm" />
+                        <img src={dummyProfile} alt="" height="42" className="rounded-circle shadow-sm" />
                         <span className="leftbar-user-name">Dominic Keller</span>
                     </Link>
                 </div>
@@ -57,8 +60,19 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const patientsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
-    console.log(patientsData, 'patientsDatapatientsDatapatientsData')
+    const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    const statusColors = {
+        pending: '#f1c40f', // Yellow
+        proposed: '#3498db', // Blue
+        booked: '#2ecc71', // Green
+        arrived: '#27ae60', // Dark Green
+        fulfilled: '#9b59b6', // Purple
+        cancelled: '#e74c3c', // Red
+        noshow: '#e67e22', // Oranges
+        enteredinerror: '#95a5a6', // Grey
+        checkedin: '#1abc9c', // Teal
+        waitlist: '#8e44ad', // Dark Purple
+    };
     const [search, setSearch] = useState('');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchParams] = useSearchParams();
@@ -306,7 +320,22 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
         }
     }
-    const currentYear = new Date().getFullYear();
+
+    const patientId = searchParams.get('id');
+    const groupAppointmentsByPatient = (appointments) => {
+        const grouped = {};
+        appointments?.forEach((appointment) => {
+            const patientId = appointment?.subject?._id;
+            if (!grouped[patientId]) {
+                grouped[patientId] = {
+                    patientInfo: appointment?.subject,
+                    appointments: []
+                };
+            }
+            grouped[patientId].appointments.push(appointment);
+        });
+        return Object.values(grouped);
+    };
 
     return (
         <>
@@ -316,7 +345,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                         {!isCondensed ?
                             <ul style={{ listStyle: 'none' }} className='px-0'>
                                 <li className='text-center py-3' >
-                                    <img src={logo} alt="" height="25" />
+                                    <img onClick={() => navigate('/')} className='cursor-pointer' src={logo} alt="" height="25" />
                                 </li>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
                                     <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
@@ -362,55 +391,105 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                 <div className={`text-end text-white me-1 ${selectedDoctor ? '' : 'd-none'}`}>
                                     <u className='cursor-pointer' onClick={() => setSelectedDoctor(null)}>Clear filters</u>
                                 </div>
-                                {store?.getPatientsByAppointmentReducer?.loading ?
-                                    <div className='text-center my-5'>
-                                        <Spinner color='white' />
-                                    </div>
-                                    :
-                                    patientsData?.length === 0 ?
-                                        <li className='text-white text-center py-5'>
-                                            No Appointments Found
-                                        </li>
-                                        :
-                                        patientsData &&
-                                        patientsData?.map((data, index) => (
-                                            <li
-                                                key={index}
-                                                className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
-                                                style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                                onClick={() => navigate(`/apps/patients/update-patient?id=${data?.patient?._id}`)}
-                                            >
-                                                <div className="d-flex gap-2 align-items-center">
-                                                    <img
-                                                        height='40'
-                                                        width='40'
-                                                        src={data?.photo?.[0]?.url ? data?.photo?.[0]?.url : profileImg}
-                                                        // style={{ height: '5vh' }}
-                                                        className="rounded-circle border border-black"
-                                                        alt="profile image"
-                                                    />
-                                                    <div>
+
+                                <ul className='px-0 scroll-container' style={{ height: '76vh', overflow: 'scroll' }}>
+                                    {store?.getPatientsByAppointmentReducer?.loading ? (
+                                        <div className='text-center my-5'>
+                                            <Spinner color='white' />
+                                        </div>
+                                    ) : appointmentsData?.length === 0 ? (
+                                        <li className='text-white text-center py-5'>No Appointments Found</li>
+                                    ) : (
+                                        (activeTab === 'Upcoming' || activeTab === 'History' ? (
+                                            groupAppointmentsByPatient(appointmentsData)?.map((patientGroup, index) => (
+                                                <li key={index} className="mb-2">
+                                                    <div
+                                                        className="py-1 cursor-pointer patient-item px-1 d-flex justify-content-between align-items-center bg-dark text-white"
+                                                        style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                    >
+                                                        <div onClick={() => navigate(`/apps/patients/update-patient?id=${patientGroup?.patientInfo?._id}`)} className="d-flex gap-2 align-items-center">
+                                                            <img
+                                                                height='35'
+                                                                width='35'
+                                                                src={patientGroup.patientInfo?.photo?.[0]?.url || dummyProfile}
+                                                                className="rounded-circle border border-black object-fit-cover"
+                                                                alt="profile image"
+                                                            />
+                                                            <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
+                                                                {patientGroup.patientInfo?.name?.find((ele) => ele?.use === 'official')?.text}
+                                                            </p>
+                                                        </div>
+                                                        <span
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target={`#collapse-${index}`}
+                                                            aria-expanded="false"
+                                                            aria-controls={`collapse-${index}`}
+                                                            className='fs-6 pe-2'><FaChevronDown /></span>
+                                                    </div>
+
+                                                    <ul id={`collapse-${index}`} className="collapse px-2">
+                                                        {patientGroup?.appointments?.map((appointment, idx) => (
+                                                            <li
+                                                                key={idx}
+                                                                className="py-1 cursor-pointer d-flex justify-content-between align-items-start text-white border-bottom"
+                                                                style={{ fontSize: '12px', borderColor: 'rgb(127 123 123 / 40%)' }}
+                                                                onClick={() => navigate(`/apps/patients/update-patient?id=${appointment?.subject?._id}`)}
+                                                            >
+                                                                <div>
+                                                                    <p className='mb-0'>
+                                                                        {new Date(appointment?.start).toISOString().split("T")[0]}&nbsp;
+                                                                        ({appointment?.start.split("T")[1].split(":").slice(0, 2).join(":") + "-" + appointment?.end.split("T")[1].split(":").slice(0, 2).join(":")})
+                                                                    </p>
+                                                                    <p className='mb-0'>{appointment?.reason?.[0]?.coding?.[0]?.display}</p>
+                                                                </div>
+                                                                <h6 className='text-capitalize fw-semibold' style={{ color: statusColors[appointment?.status] }}>
+                                                                    {appointment?.status}
+                                                                </h6>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </li>
+                                            ))
+                                        ) : (
+                                            appointmentsData?.map((data, index) => (
+                                                <li
+                                                    key={index}
+                                                    className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between ${data?.subject?._id === patientId ? 'bg-secondary text-white' : ''}`}
+                                                    style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                    onClick={() => navigate(`/apps/patients/update-patient?id=${data?.subject?._id}`)}
+                                                >
+                                                    <div className="d-flex gap-2 align-items-center">
+                                                        <img
+                                                            height='35'
+                                                            width='35'
+                                                            src={data?.subject?.photo?.[0]?.url || dummyProfile}
+                                                            className="rounded-circle border border-black object-fit-cover"
+                                                            alt="profile image"
+                                                        />
+                                                        <div>
+                                                            <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
+                                                                {data?.subject?.name?.find((ele) => ele?.use === 'official')?.text}
+                                                            </p>
+                                                            <p className="mb-0 fw-semibold" style={{ fontSize: '10px' }}>
+                                                                {(data?.doctorId?.name?.[0]?.prefix?.[0] ? data?.doctorId?.name?.[0]?.prefix?.[0] + ' ' : '') + (data?.doctorId?.name?.[0]?.text || '')}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='d-flex flex-column'>
                                                         <p className="mb-0 text-capitalize" style={{ fontSize: '12px' }}>
-                                                            {data?.patient?.firstName} {data?.patient?.lastName}
-
+                                                            ({data?.start.split("T")[1].split(":").slice(0, 2).join(":") + "-" + data?.end.split("T")[1].split(":").slice(0, 2).join(":")})
                                                         </p>
-                                                        <p className="mb-0 " style={{ fontSize: '10px' }}>{data?.doctor?.userId?.firstName}{data?.doctor?.userId?.lastName}</p>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div>
-                                                        <p className='mb-0' style={{ fontSize: '10px' }}><span>{new Date(data?.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>&nbsp;&nbsp;
-                                                            <span>{new Date(`1970-01-01T${data?.startTime}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
+                                                        <p className="mb-0 fw-semibold text-capitalize" style={{ fontSize: '10px', color: statusColors[data?.status] }}>
+                                                            {data?.status}
                                                         </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className='mb-0 text-end pt-1' style={{ fontSize: '10px' }}>{data?.profile}</p>
-                                                    </div>
 
-                                                </div>
-                                            </li>
+                                                    </div>
+                                                </li>
+                                            ))
                                         ))
-                                }
+                                    )}
+                                </ul>
+
 
                                 {showFilterDropDown && (
                                     <div
@@ -469,7 +548,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                             // small side bar
                             <ul style={{ listStyle: 'none' }} className='px-0 '>
                                 <li className='text-center py-3' >
-                                    <img src={logo_sm} alt="" height="30" />
+                                    <img className='cursor-pointer' onClick={() => navigate('/')} src={logo_sm} alt="" height="30" />
                                 </li>
                                 <div className={`text-end text-white me-1 ${selectedDoctor ? '' : 'd-none'}`}>
                                     <u className='cursor-pointer' onClick={() => setSelectedDoctor(null)}>Clear filters</u>
@@ -479,39 +558,40 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                         <Spinner color='white' />
                                     </div>
                                     :
-                                    patientsData?.length === 0 ?
+                                    appointmentsData?.length === 0 ?
                                         <li className='text-white text-center py-5'>
                                             No Appointments Found
                                         </li>
                                         :
-                                        patientsData &&
-                                        patientsData?.map((data, index) => (
-                                            <li
-                                                key={index}
-                                                className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
-                                                style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
-                                                onClick={() => navigate(`/apps/patients/update-patient?id=${data?.patient?._id}`)}
-                                            >
-                                                <div className="text-center">
-                                                    <img
-                                                        height='40'
-                                                        width='40'
-                                                        src={data?.patient?.patientChartPhoto?.url ? data?.patient?.patientChartPhoto?.url : profileImg}
-                                                        // style={{ height: '5vh' }}
-                                                        className="rounded-circle border border-black"
-                                                        alt="profile image"
-                                                    />
-                                                    <div>
-                                                        <p className="mb-0 mt-1 text-capitalize" style={{ fontSize: '12px' }}>
-                                                            {data?.patient?.firstName}
+                                        <ul className='ps-0 scroll-container' style={{ height: '90vh' }}>
+                                            {appointmentsData &&
+                                                appointmentsData?.map((data, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className={`py-1 cursor-pointer patient-item px-1 d-flex justify-content-between`}
+                                                        style={{ borderBottom: '1px solid rgb(127 123 123 / 67%)' }}
+                                                        onClick={() => navigate(`/apps/patients/update-patient?id=${data?.subject?._id}`)}
+                                                    >
+                                                        <div className="text-center">
+                                                            <img
+                                                                height='40'
+                                                                width='40'
+                                                                src={data?.subject?.photo?.[0]?.url ? data?.subject?.photo?.[0]?.url : dummyProfile}
+                                                                // style={{ height: '5vh' }}
+                                                                className="rounded-circle border border-black object-fit-cover"
+                                                                alt="profile image"
+                                                            />
+                                                            <div>
+                                                                <p className="mb-0 mt-1 text-capitalize fw-semibold" style={{ fontSize: '9px' }}>
+                                                                    {data?.subject?.name?.find((ele) => ele?.use === 'official')?.text}
 
-                                                        </p>
-                                                        <p className="mb-0 " style={{ fontSize: '10px' }}>Dr.{data?.doctor?.userId?.firstName} </p>
-                                                    </div>
-                                                </div>
+                                                                </p>
+                                                            </div>
+                                                        </div>
 
-                                            </li>
-                                        ))
+                                                    </li>
+                                                ))}
+                                        </ul>
                                 }
 
                                 {showFilterDropDown && (

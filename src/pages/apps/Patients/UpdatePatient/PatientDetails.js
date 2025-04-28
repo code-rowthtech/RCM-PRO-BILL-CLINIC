@@ -160,7 +160,8 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
             preferredCommunication: data?.preferredCommunication || '',
             reminderLanguage: data?.reminderLanguage || '',
             patientStatus: data?.patientStatus || '',
-            doctorId: selectedDoctor?.value || '', // Ensure _id of selected doctor is sent
+            ...(selectedDoctor?.value && { doctorId: selectedDoctor.value }), // Ensure _id of selected doctor is sent
+            // doctorId: selectedDoctor?.value || '', // Ensure _id of selected doctor is sent
         };
 
         // **Name structure (FHIR compliant)**
@@ -246,7 +247,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
     return (
         <>
             <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-                <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '48.5vh' : '70vh' }}>
+                <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '53vh' : '70vh' }}>
                     <div className="row my-2">
                         <div className="col-md-3 col-12">
                             <Form.Group>
@@ -766,7 +767,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                 </div>
 
                 {/* Buttons */}
-                <div className="d-flex gap-2 justify-content-end my-2">
+                <div className="d-flex gap-2 justify-content-end my-1">
                     <Button
                         type="submit"
                         className="custom-buttons btn-height"

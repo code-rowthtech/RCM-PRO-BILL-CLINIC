@@ -28,7 +28,6 @@ type ProfileDropdownState = {
 };
 
 const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownState): React$Element<any> => {
-    console.log(props, 'propspropsprops')
     const {
         handleSubmit,
         // formState: { errors },
@@ -58,7 +57,6 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
     const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
-    console.log(logo, 'logologologologo')
     const handleOtpGeneration = () => {
         dispatch(changeEmailAction())
     }

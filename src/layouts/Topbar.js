@@ -19,6 +19,7 @@ import logo from '../assets/images/logo-light.png';
 
 //constants
 import * as layoutConstants from '../constants/layout';
+import { Button } from 'react-bootstrap';
 
 const ProfileMenus = [
     // {
@@ -161,7 +162,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                 <i className="mdi mdi-menu fs-3 " />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h5 className="">{pageTitle}</h5>
+                            <h5 className="">
+
+                                {pageTitle}
+                            </h5>
                         </div>
                     )}
 

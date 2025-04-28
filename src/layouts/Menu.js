@@ -112,26 +112,6 @@ const MenuItemLink = ({ item, className }) => {
     };
 
     return (
-<<<<<<< HEAD
-        <Link
-            to={{ pathname: item.url }}
-            target={item.target}
-            className={classNames('side-nav-link-ref', 'side-sub-nav-link', className)}
-            data-menu-key={item.key}>
-            {item.icon && <i className={item.icon}></i>}
-            {item.badge && (
-                <span
-                    className={classNames('badge', 'bg-' + item.badge.variant, 'rounded-pill', 'font-10', 'float-end', {
-                        'text-dark': item.badge.variant === 'light',
-                    })}>
-                    {item.badge.text}
-                </span>
-            )}
-            <span> {item.label} </span>
-
-        </Link>
-
-=======
         <>
             <Link
                 to={item.url}
@@ -176,7 +156,6 @@ const MenuItemLink = ({ item, className }) => {
                 </Modal.Body>
             </Modal>
         </>
->>>>>>> cfd907f89933cfefd4164f7d7070c095ed118105
     );
 };
 
@@ -235,19 +214,8 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
 
     return (
         <>
-<<<<<<< HEAD
-            <ul className="side-nav " ref={menuRef} id="main-side-menu">
-                <li className='text-center py-3' >
-                    {isCondensed ?
-                        <></>
-                        :
-                        <img src={logo} alt="" height="25" />
-                    }
-                </li>
-=======
             <ul className="side-nav" ref={menuRef} id="main-side-menu">
                 <li className="text-center py-3">{isCondensed ? <></> : <img src={logo} alt="" height="25" />}</li>
->>>>>>> cfd907f89933cfefd4164f7d7070c095ed118105
                 {(menuItems || []).map((item, idx) => {
                     return (
                         <React.Fragment key={idx}>

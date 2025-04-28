@@ -211,7 +211,7 @@ const UpdatePatientIndex = () => {
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
-    const [activeKey, setActiveKey] = useState(null);
+    const [activeKey, setActiveKey] = useState('0');
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const isAccordionOpen = activeKey === "0"; // true or false
 
@@ -430,15 +430,15 @@ const UpdatePatientIndex = () => {
                                                                 <Table className='h-100 box-shadow-none'>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Phone:</th>
-                                                                        <td className='fs-6  text-nowrap text-black'>+1-{patientDetails?.telecom[1]?.value || 'Missing'}</td>
+                                                                        <td className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find((data) => data?.system === 'phone')?.value ? 'text-black' : 'text-danger'}`}>{'+1-' + patientDetails?.telecom?.find((data) => data?.system === 'phone')?.value || 'Missing'}</td>
                                                                     </tr>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Email:</th>
-                                                                        <td className='fs-6  text-nowrap text-black'>{patientDetails?.telecom[3]?.value}</td>
+                                                                        <td className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find((item) => item?.system === 'email')?.value ? 'text-black' : 'text-danger'}`}>{patientDetails?.telecom?.find((item) => item?.system === 'email')?.value || 'Missing'}</td>
                                                                     </tr>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Address:</th>
-                                                                        <td className='fs-6  text-nowrap text-black'>
+                                                                        <td className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city && patientDetails?.address?.[0]?.state ? 'text-black' : 'text-danger'}`}>
                                                                             {patientDetails?.address?.[0]?.city && patientDetails?.address?.[0]?.state
                                                                                 ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
                                                                                 : 'Missing'}
@@ -452,7 +452,7 @@ const UpdatePatientIndex = () => {
                                                                 <Table className='h-100 box-shadow-none'>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Primary Provider:</th>
-                                                                        <td className='fs-6 text-nowrap text-black'>{patientDetails?.doctorId?.name?.[0]?.text}</td>
+                                                                        <td className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]?.text ? "text-black" : "text-danger"}`}>{patientDetails?.doctorId?.name?.[0]?.text || 'Missing'}</td>
                                                                     </tr>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Date Added:</th>
@@ -462,10 +462,8 @@ const UpdatePatientIndex = () => {
                                                                     </tr>
                                                                     <tr className=''>
                                                                         <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Insurance:</th>
-                                                                        <td className='fs-6  text-nowrap text-black'>
-                                                                            {/* {patientDetails?.address?.[0]?.city && patientDetails?.address?.[0]?.state
-                                                                                ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
-                                                                                : 'Missing'} */}
+                                                                        <td className='fs-6  text-nowrap text-danger'>
+                                                                            Missing
                                                                         </td>
                                                                     </tr>
 
@@ -483,7 +481,7 @@ const UpdatePatientIndex = () => {
                                                                     </tr>
                                                                     <tr className=''>
                                                                         <th className='fs-6 px-2 text-nowrap text-muted fw-bold'>Follow Up Reason:</th>
-                                                                        <td className='fs-6 pe-2 text-nowrap text-black'>{patientDetails?.followupReason || 'Missing'}</td>
+                                                                        <td className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason ? 'text-black' : 'text-danger'}`}>{patientDetails?.followupReason || 'Missing'}</td>
                                                                     </tr>
                                                                 </Table>
                                                             </Col>
@@ -518,7 +516,7 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2" style={{ height: isAccordionOpen ? '62vh' : '85vh' }}>
+                                        <Card className="px-2" style={{ height: isAccordionOpen ? '65.5vh' : '85vh' }}>
                                             <div className="d-flex justify-content-between pt-2 px-2">
                                                 <div className='' style={{ overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
                                                     <ul className="border-bottom border-secondary  nav nav-underline" style={{ minWidth: 'max-content' }}>
@@ -557,12 +555,12 @@ const UpdatePatientIndex = () => {
                                                         &nbsp;Task
                                                     </Button> */}
 
-                                                    <Button
+                                                    {/* <Button
                                                         className="custom-buttons"
                                                         as={Link}
                                                         to={'/apps/patients/list'}>
                                                         Back
-                                                    </Button>
+                                                    </Button> */}
                                                 </div>
                                             </div>
 

@@ -352,7 +352,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: data?.employerAddress,
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
