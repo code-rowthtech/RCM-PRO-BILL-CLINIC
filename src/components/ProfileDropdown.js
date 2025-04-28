@@ -1,6 +1,6 @@
 // @flow
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Col, Dropdown, Modal, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import classNames from 'classnames';
 import { FaUserCircle } from 'react-icons/fa';
@@ -37,6 +37,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [show, setShow] = useState(false);
     const dispatch = useDispatch();
+    const navigate = useNavigate(); // initialize navigate
     const [otp, setOtp] = useState(Array(6).fill(''));
     const store = useSelector((state) => state);
     const changeEmailApiResponse = store?.changeEmailReducer?.data?.status;
@@ -47,7 +48,8 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const handleLogout = () => {
         // Handle the logout logic (e.g., clearing session data, redirecting to login page)
         sessionStorage.clear(); // Clear sessionStorage or any other logout logic
-        window.location.href = '/account/logout'; // Or use history.push('/account/logout') if using React Router
+        navigate('/account/logout'); // redirect without page reload
+        // Or use history.push('/account/logout') if using React Router
     };
 
     const handleCloseModal = () => {

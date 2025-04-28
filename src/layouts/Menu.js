@@ -119,7 +119,7 @@ const MenuItemLink = ({ item, className }) => {
             data-menu-key={item.key}>
             {item.icon && <i className={item.icon}></i>}
             {item.badge && (
-                <span
+                <span 
                     className={classNames('badge', 'bg-' + item.badge.variant, 'rounded-pill', 'font-10', 'float-end', {
                         'text-dark': item.badge.variant === 'light',
                     })}>
