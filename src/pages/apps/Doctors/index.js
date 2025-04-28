@@ -25,7 +25,7 @@ const Doctors = () => {
     useEffect(() => {
         const payload = { status: status, search: search, page: skip, limit: 10 };
         dispatch(getDoctorsAction(payload));
-    }, [dispatch, status, search,skip]);
+    }, [dispatch, status, search, skip]);
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result) || [];
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     const closeStatusModal = () => setStatusModal(false); // Close status change modal
@@ -40,7 +40,7 @@ const Doctors = () => {
     };
     useEffect(() => {
         if (updateStatus === 200) {
-            const payload = { status: status, search: search ,page: skip, limit: 10};
+            const payload = { status: status, search: search, page: skip, limit: 10 };
             dispatch(getDoctorsAction(payload));
         }
     }, [updateStatus]);
@@ -175,11 +175,7 @@ const Doctors = () => {
                                                     </tr>
                                                 ) : (
                                                     filteredDoctors.map((data, index) => (
-                                                        <tr
-                                                            key={index}
-                                                            onClick={() => {
-                                                                navigate(`/apps/doctors/new-doctor?id=${data?._id}`);
-                                                            }}>
+                                                        <tr key={index}>
                                                             {/* <td
                                                                 className="py1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -188,7 +184,12 @@ const Doctors = () => {
                                                             <td
                                                                 className="text-capitalize py-1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <div>
+                                                                <div
+                                                                    onClick={() => {
+                                                                        navigate(
+                                                                            `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                        );
+                                                                    }}>
                                                                     <div className="d-flex align-items-center gap-2">
                                                                         <img
                                                                             src={data?.photo?.[0]?.url || profileDummy}
@@ -216,7 +217,12 @@ const Doctors = () => {
                                                             <td
                                                                 className="py-1"
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                                <div>
+                                                                <div
+                                                                    onClick={() => {
+                                                                        navigate(
+                                                                            `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                        );
+                                                                    }}>
                                                                     <div className="d-flex flex-column justify-content-center">
                                                                         <p className="mb-0">
                                                                             {data?.address?.[0]?.line &&
@@ -262,12 +268,22 @@ const Doctors = () => {
                                                             </td>
                                                             <td
                                                                 className="py-1"
+                                                                onClick={() => {
+                                                                    navigate(
+                                                                        `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                    );
+                                                                }}
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {data?.userId?.email || 'N/A'}
                                                             </td>
 
                                                             <td
                                                                 className="py-1"
+                                                                onClick={() => {
+                                                                    navigate(
+                                                                        `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                    );
+                                                                }}
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 {data?.specialties?.[0] || 'N/A'}
 

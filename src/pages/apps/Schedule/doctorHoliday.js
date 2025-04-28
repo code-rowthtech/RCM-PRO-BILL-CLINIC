@@ -10,6 +10,7 @@ const DoctorHoliday = () => {
   const store = useSelector((state) => state);
   const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const scheduleResponse = store?.getScheduleReducer?.data?.holidays || [];
+  console.log(store?.getScheduleReducer, 'scheduleResponse')
   const isLoading = store?.getScheduleReducer?.loading;
   const deleteResponse = store?.deleteScheduleReducer?.data?.response?.status;
   useEffect(() => {
