@@ -3,12 +3,19 @@ import { ScheduleActionTypes } from './constants';
 
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
-import { createScheduleApi, createTimingsApi, deleteScheduleApi, getDoctorsListApi, getPractitionerTimingsApi, getScheduleApi, updateTimingsApi } from './api';
+import {
+    createScheduleApi,
+    createTimingsApi,
+    deleteScheduleApi,
+    getDoctorsListApi,
+    getPractitionerTimingsApi,
+    getScheduleApi,
+    updateTimingsApi,
+} from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
  */
-
 
 function* createScheduleFunction(data) {
     try {
@@ -23,6 +30,10 @@ function* createScheduleFunction(data) {
             yield put({
                 type: ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS,
                 payload: { response },
+            });
+            yield put({
+                type: ScheduleActionTypes.CREATE_SCHEDULE_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -52,6 +63,10 @@ function* createTimingsFunction(data) {
                 type: ScheduleActionTypes.CREATE_TIMINGS_SUCCESS,
                 payload: { response },
             });
+            yield put({
+                type: ScheduleActionTypes.CREATE_TIMINGS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: ScheduleActionTypes.CREATE_TIMINGS_ERROR,
@@ -80,6 +95,10 @@ function* updateTimingsFunction(data) {
                 type: ScheduleActionTypes.UPDATE_TIMINGS_SUCCESS,
                 payload: { response },
             });
+            yield put({
+                type: ScheduleActionTypes.UPDATE_TIMINGS_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: ScheduleActionTypes.UPDATE_TIMINGS_ERROR,
@@ -100,7 +119,6 @@ function* getDoctorListFunction(data) {
         yield put({
             type: ScheduleActionTypes.GET_DOCTORS_LIST_LOADING,
             payload: {},
-
         });
         const response = yield call(getDoctorsListApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
@@ -110,6 +128,10 @@ function* getDoctorListFunction(data) {
                 type: ScheduleActionTypes.GET_DOCTORS_LIST_SUCCESS,
                 payload: { ...decryptedData },
             });
+            // yield put({
+            //     type: ScheduleActionTypes.GET_DOCTORS_LIST_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: ScheduleActionTypes.GET_DOCTORS_LIST_ERROR,
@@ -129,7 +151,6 @@ function* getScheduleFunction(data) {
         yield put({
             type: ScheduleActionTypes.GET_SCHEDULE_LOADING,
             payload: {},
-
         });
         const response = yield call(getScheduleApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
@@ -139,6 +160,10 @@ function* getScheduleFunction(data) {
                 type: ScheduleActionTypes.GET_SCHEDULE_SUCCESS,
                 payload: { ...decryptedData },
             });
+            // yield put({
+            //     type: ScheduleActionTypes.GET_SCHEDULE_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: ScheduleActionTypes.GET_SCHEDULE_ERROR,
@@ -158,7 +183,6 @@ function* getPractitionerTimingsFunction(data) {
         yield put({
             type: ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_LOADING,
             payload: {},
-
         });
         const response = yield call(getPractitionerTimingsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
@@ -168,6 +192,10 @@ function* getPractitionerTimingsFunction(data) {
                 type: ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_SUCCESS,
                 payload: { ...decryptedData },
             });
+            // yield put({
+            //     type: ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_ERROR,
@@ -182,7 +210,6 @@ function* getPractitionerTimingsFunction(data) {
     }
 }
 
-
 function* deleteScheduleFunction(data) {
     try {
         yield put({
@@ -196,6 +223,10 @@ function* deleteScheduleFunction(data) {
             yield put({
                 type: ScheduleActionTypes.DELETE_SCHEDULE_SUCCESS,
                 payload: { response },
+            });
+            yield put({
+                type: ScheduleActionTypes.DELETE_SCHEDULE_RESET,
+                payload: {},
             });
         } else {
             yield put({
