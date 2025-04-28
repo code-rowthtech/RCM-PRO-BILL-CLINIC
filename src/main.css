@@ -867,16 +867,12 @@ table {
 .accordion-button::after {
     background-size: 1rem !important;
     background-position: center center !important;
+    padding-right: 3rem !important;
 }
+
 .accordion-button {
     padding: 0;
     background-color: #b9bcbe44 !important;
-}
-.first-button {
-    clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 0% 100%);
-}
-.last-button {
-    clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
 }
 
 .border-menu-chart {
@@ -893,6 +889,9 @@ table {
 .patientChartscroll {
     overflow-x: visible;
     white-space: nowrap;
+    border-bottom: none !important;
+    border-bottom-left-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
 }
 
 .z-3 {

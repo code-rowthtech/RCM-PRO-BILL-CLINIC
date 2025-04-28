@@ -471,7 +471,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                                                 {data?.subject?.name?.find((ele) => ele?.use === 'official')?.text}
                                                             </p>
                                                             <p className="mb-0 fw-semibold" style={{ fontSize: '10px' }}>
-                                                                {(data?.doctorId?.name?.[0]?.prefix?.[0] ? data?.doctorId?.name?.[0]?.prefix?.[0] + ' ' : '') + (data?.doctorId?.name?.[0]?.text || '')}
+                                                                Dr. {(data?.doctorId?.name?.[0]?.prefix?.[0] ? data?.doctorId?.name?.[0]?.prefix?.[0] + ' ' : '') + (data?.doctorId?.name?.[0]?.text || '')}
                                                             </p>
                                                         </div>
                                                     </div>
