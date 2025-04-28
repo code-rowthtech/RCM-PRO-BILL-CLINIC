@@ -42,6 +42,7 @@ function* login({ payload }) {
         }
         const encryptedUserData = encryptMessage(userData)
         localStorage.setItem('userData', JSON.stringify(user));
+        localStorage.setItem('encryptedUserData', encryptedUserData)
         api.setLoggedInUser(userData);
         setAuthorization(userData?.token);
 

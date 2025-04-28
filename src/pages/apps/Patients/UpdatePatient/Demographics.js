@@ -317,16 +317,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 ],
             }),
             ...(data?.notes && { notes: data.notes }),
-            // ✅ Fixing Emergency Contact Field
-            // ...(data?.emergencyContactName && {
-            // contact: [
-            //     {
-            //         relationship: [{...rela,text:rela.display}],
-            //         name: { text: data?.emergencyContactName },
-            //         telecom: [{ system: 'phone', value: data?.emergencyContactPhone?.replace(/\D/g, '') }],
 
-            //     },
-            // ],
             contact: [
                 {
                     relationship: [
@@ -352,7 +343,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                 occupation: data?.occupation,
                 workLocation: {
                     address: {
-                        line: data?.employerAddress,
+                        line: [data?.employerAddress],
                         city: data?.employerCity,
                         state: data?.employerStateName,
                         postalCode: data?.employerZip,
@@ -429,576 +420,578 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
     const selectedRelationOption =
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
+
     return (
-        <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '46.5vh' : '70vh' }}>
+        <>
+            <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
+                <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '46.5vh' : '70vh' }}>
 
-                <IdentifierForm
-                    defaultIdentifiers={[
-                        {
-                            label: 'National Provider Identifier (NPI)',
-                            value: 'http://hl7.org/fhir/sid/us-npi',
-                            code: 'NPI',
-                        },
-                    ]}
-                    identifiers={identifiers}
-                    setIdentifiers={setIdentifiers}
-                />
+                    <IdentifierForm
+                        defaultIdentifiers={[
+                            {
+                                label: 'National Provider Identifier (NPI)',
+                                value: 'http://hl7.org/fhir/sid/us-npi',
+                                code: 'NPI',
+                            },
+                        ]}
+                        identifiers={identifiers}
+                        setIdentifiers={setIdentifiers}
+                    />
 
-                <hr className="mt-0" />
-                <Row className="pb-2">
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Sex</Form.Label>
-                            <Form.Select {...register('sex')}>
-                                <option value="" hidden>
-                                    Select Sex
-                                </option>
-                                {sexAssignedAtBirthOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Gender Identity</Form.Label>
-                            <Form.Select {...register('genderIdentity')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                {genderIdentityOptions?.map((option) => (
-                                    <option key={option?.value} value={option?.value}>
-                                        {option?.show}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
-                            <Form.Select {...register('sexParameter')}>
-                                <option value="" hidden>
-                                    Select
-                                </option>
-                                {sexParameterOptions.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.show}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Personal Pronouns</Form.Label>
-                            <Form.Select {...register('personalPronouns')}>
-                                <option value="" hidden>
-                                    Select Pronouns
-                                </option>
-                                {personalPronounsOptions?.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.show}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Race</Form.Label>
-                            <Form.Select {...register('race')}>
-                                <option value="">Select Race</option>
-                                {raceOptions.map((race) => (
-                                    <option key={race.code} value={race.display} className="text-capitalize">
-                                        {race.display}
-                                    </option>
-                                ))}
-                                <option value="Declined To Specify">Declined To Specify</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Ethnicity</Form.Label>
-                            <Select
-                                options={formattedEthnicityOptions}
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                // value={
-                                // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
-                                // } // Show selected value
-                                value={selectedEthnicityOption}
-                                onChange={handleEthnicityChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Preferred Language</Form.Label>
-                            <Form.Select {...register('preferredLanguage')}>
-                                <option value="">Select Preferred Language</option>
-                                <option value="English">English</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="French">French</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Portugese">Portugese</option>
-                                <option value="Russian">Russian</option>
-                                <option value="Castilian">Castilian</option>
-                                <option value="Other">Other</option>
-                                <option value="Unknown">Unknown</option>
-                                <option value="Declined to specify">Declined to specify</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Tribal Entity</Form.Label>
-                            <Select
-                                options={formattedTribleOptions} // Use the formatted array
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
-                                value={selectedTribleOption}
-                                placeholder="&nbsp; Select "
-                                onChange={handleTribalChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label htmlFor="marital" className="mb-0">
-                                Marital Status
-                            </Form.Label>
-                            <Form.Select id="marital" {...register('maritalStatus')}>
-                                <option value="">Select marital status</option>
-                                {maritalStatusOptions.map((option) => (
-                                    <option key={option.value} value={option?.show}>
-                                        {option.show}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {errors.maritalStatus && (
-                                <span className="text-danger">{errors.maritalStatus.message}</span>
-                            )}
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <hr />
-                <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
-                <hr />
-
-                <Row className="mt-1 pb-2">
-                    <Col sm={12}>
-                        <h5>Emergency Contact Details</h5>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
-                            <Form.Control
-                                {...register('emergencyContactName')}
-                                type="text"
-                                placeholder="Enter Emergency Contact Name"
-                            />
-                            {errors.emergencyContactName && (
-                                <span className="text-danger">{errors.emergencyContactName.message}</span>
-                            )}
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group className="mb-0 position-relative">
-                            <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
+                    <hr className="mt-0" />
+                    <Row className="pb-2">
+                        <Col sm={3}>
                             <Form.Group>
-                                <InputGroup>
-                                    <InputGroup.Text
-                                        className="ps-3 pe-1 fw-bold text-black"
-                                        style={{ height: '33px' }}>
-                                        &nbsp;+1
-                                    </InputGroup.Text>{' '}
-                                    {/* This is the prefix */}
-                                    <Form.Control
-                                        type="tel"
-                                        style={{ height: '33px' }}
-                                        {...register('emergencyContactPhone', {
-                                            pattern: {
-                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                            },
-                                            maxLength: {
-                                                value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                message: 'Contact must not exceed 13 characters',
-                                            },
-                                            minLength: {
-                                                value: 13,
-                                                message: 'Contact must not be less than 13 characters',
-                                            },
-                                        })}
-                                        onChange={(e) => {
-                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                            const formattedValue = rawValue.replace(
-                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                (match, p1, p2, p3) => {
-                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                    if (p2) return `(${p1})${p2}`;
-                                                    return `(${p1}`;
-                                                }
-                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                            e.target.value = formattedValue; // Update input value
-                                            clearErrors('emergencyContactPhone'); // Clear validation errors
-                                        }}
-                                        placeholder="(XXX)XXX-XXXX"
-                                        maxLength={14}
-                                        onKeyPress={(event) => {
-                                            // Only allow numeric characters (0-9)
-                                            if (!/[0-9]/.test(event.key)) {
-                                                event.preventDefault();
-                                            }
-                                        }}
-                                    />
-                                </InputGroup>
+                                <Form.Label className="mb-0">Sex</Form.Label>
+                                <Form.Select {...register('sex')}>
+                                    <option value="" hidden>
+                                        Select Sex
+                                    </option>
+                                    {sexAssignedAtBirthOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </Form.Select>
                             </Form.Group>
+                        </Col>
 
-                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                <img src={us} alt="country code flag" width={20} />
-                            </div>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={3}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
-                            <Select
-                                options={relationshipOption} // Use the formatted array
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select "
-                                // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
-                                value={selectedRelationOption}
-                                onChange={handleRelationChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
-                <hr />
-                <Row>
-                    <Col sm={12}>
-                        <Row>
-                            <Col sm={12} className="mt-1">
-                                <h5>Employer Details</h5>
-                            </Col>
-                            <Col sm={12}>
-                                <Row>
-                                    <Col sm={3}>
-                                        <Form.Group>
-                                            <Form.Label className="mb-0">Employer Name</Form.Label>
-                                            <Form.Control
-                                                {...register('employerName')}
-                                                type="text"
-                                                placeholder="Enter Employer Name"
-                                            />
-                                            {errors.employerName && (
-                                                <span className="text-danger">{errors.employerName.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={3}>
-                                        <Form.Group className="mb-0 position-relative">
-                                            <Form.Label className="mb-0">Employer Phone </Form.Label>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Gender Identity</Form.Label>
+                                <Form.Select {...register('genderIdentity')}>
+                                    <option value="" hidden>
+                                        Select
+                                    </option>
+                                    {genderIdentityOptions?.map((option) => (
+                                        <option key={option?.value} value={option?.value}>
+                                            {option?.show}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Sex Parameter for Clinical Use</Form.Label>
+                                <Form.Select {...register('sexParameter')}>
+                                    <option value="" hidden>
+                                        Select
+                                    </option>
+                                    {sexParameterOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.show}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Personal Pronouns</Form.Label>
+                                <Form.Select {...register('personalPronouns')}>
+                                    <option value="" hidden>
+                                        Select Pronouns
+                                    </option>
+                                    {personalPronounsOptions?.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.show}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Race</Form.Label>
+                                <Form.Select {...register('race')}>
+                                    <option value="">Select Race</option>
+                                    {raceOptions.map((race) => (
+                                        <option key={race.code} value={race.display} className="text-capitalize">
+                                            {race.display}
+                                        </option>
+                                    ))}
+                                    <option value="Declined To Specify">Declined To Specify</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Ethnicity</Form.Label>
+                                <Select
+                                    options={formattedEthnicityOptions}
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select"
+                                    // value={
+                                    // formattedEthnicityOptions.find((option) => option?.value?.display === eth||option?.value?.display === eth?.display) || null
+                                    // } // Show selected value
+                                    value={selectedEthnicityOption}
+                                    onChange={handleEthnicityChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Preferred Language</Form.Label>
+                                <Form.Select {...register('preferredLanguage')}>
+                                    <option value="">Select Preferred Language</option>
+                                    <option value="English">English</option>
+                                    <option value="Chinese">Chinese</option>
+                                    <option value="French">French</option>
+                                    <option value="Italian">Italian</option>
+                                    <option value="Japanese">Japanese</option>
+                                    <option value="Spanish">Spanish</option>
+                                    <option value="Portugese">Portugese</option>
+                                    <option value="Russian">Russian</option>
+                                    <option value="Castilian">Castilian</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Unknown">Unknown</option>
+                                    <option value="Declined to specify">Declined to specify</option>
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Tribal Entity</Form.Label>
+                                <Select
+                                    options={formattedTribleOptions} // Use the formatted array
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    // value={formattedTribleOptions.find((option) => option?.value?.display === tri) || null} // Show selected value
+                                    value={selectedTribleOption}
+                                    placeholder="&nbsp; Select "
+                                    onChange={handleTribalChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label htmlFor="marital" className="mb-0">
+                                    Marital Status
+                                </Form.Label>
+                                <Form.Select id="marital" {...register('maritalStatus')}>
+                                    <option value="">Select marital status</option>
+                                    {maritalStatusOptions.map((option) => (
+                                        <option key={option.value} value={option?.show}>
+                                            {option.show}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                                {errors.maritalStatus && (
+                                    <span className="text-danger">{errors.maritalStatus.message}</span>
+                                )}
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <hr />
+                    <AddressForm addresses={demographicAddresses} setAddresses={setDemographicAddresses} />
+                    <hr />
+
+                    <Row className="mt-1 pb-2">
+                        <Col sm={12}>
+                            <h5>Emergency Contact Details</h5>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Emergency Contact Name</Form.Label>
+                                <Form.Control
+                                    {...register('emergencyContactName')}
+                                    type="text"
+                                    placeholder="Enter Emergency Contact Name"
+                                />
+                                {errors.emergencyContactName && (
+                                    <span className="text-danger">{errors.emergencyContactName.message}</span>
+                                )}
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group className="mb-0 position-relative">
+                                <Form.Label className="mb-0">Emergency Contact Phone </Form.Label>
+                                <Form.Group>
+                                    <InputGroup>
+                                        <InputGroup.Text
+                                            className="ps-3 pe-1 fw-bold text-black"
+                                            style={{ height: '33px' }}>
+                                            &nbsp;+1
+                                        </InputGroup.Text>{' '}
+                                        {/* This is the prefix */}
+                                        <Form.Control
+                                            type="tel"
+                                            style={{ height: '33px' }}
+                                            {...register('emergencyContactPhone', {
+                                                pattern: {
+                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                },
+                                                maxLength: {
+                                                    value: 13, // Includes characters for (XXX)XXX-XXXX
+                                                    message: 'Contact must not exceed 13 characters',
+                                                },
+                                                minLength: {
+                                                    value: 13,
+                                                    message: 'Contact must not be less than 13 characters',
+                                                },
+                                            })}
+                                            onChange={(e) => {
+                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                const formattedValue = rawValue.replace(
+                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                    (match, p1, p2, p3) => {
+                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                        if (p2) return `(${p1})${p2}`;
+                                                        return `(${p1}`;
+                                                    }
+                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                e.target.value = formattedValue; // Update input value
+                                                clearErrors('emergencyContactPhone'); // Clear validation errors
+                                            }}
+                                            placeholder="(XXX)XXX-XXXX"
+                                            maxLength={14}
+                                            onKeyPress={(event) => {
+                                                // Only allow numeric characters (0-9)
+                                                if (!/[0-9]/.test(event.key)) {
+                                                    event.preventDefault();
+                                                }
+                                            }}
+                                        />
+                                    </InputGroup>
+                                </Form.Group>
+
+                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                    <img src={us} alt="country code flag" width={20} />
+                                </div>
+                            </Form.Group>
+                        </Col>
+                        <Col sm={3}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
+                                <Select
+                                    options={relationshipOption} // Use the formatted array
+                                    isSearchable
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select "
+                                    // value={relationshipOption.find((option) => option?.value?.display === rela) || null} // Show selected value
+                                    value={selectedRelationOption}
+                                    onChange={handleRelationChange}
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                        <Col sm={12}>
+                            <Row>
+                                <Col sm={12} className="mt-1">
+                                    <h5>Employer Details</h5>
+                                </Col>
+                                <Col sm={12}>
+                                    <Row>
+                                        <Col sm={3}>
                                             <Form.Group>
-                                                <InputGroup>
-                                                    <InputGroup.Text
-                                                        className="ps-3 pe-1 fw-bold text-black"
-                                                        style={{ height: '33px' }}>
-                                                        &nbsp;+1
-                                                    </InputGroup.Text>{' '}
-                                                    {/* This is the prefix */}
-                                                    <Form.Control
-                                                        type="tel"
-                                                        style={{ height: '33px' }}
-                                                        {...register('employerPhone', {
-                                                            pattern: {
-                                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                message: 'Contact must be in the format (XXX)XXX-XXXX',
-                                                            },
-                                                            maxLength: {
-                                                                value: 13, // Includes characters for (XXX)XXX-XXXX
-                                                                message: 'Contact must not exceed 13 characters',
-                                                            },
-                                                            minLength: {
-                                                                value: 13,
-                                                                message: 'Contact must not be less than 13 characters',
-                                                            },
-                                                        })}
-                                                        onChange={(e) => {
-                                                            let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
-                                                            if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
-                                                            const formattedValue = rawValue.replace(
-                                                                /(\d{1,3})(\d{0,3})(\d{0,4})/,
-                                                                (match, p1, p2, p3) => {
-                                                                    if (p3) return `(${p1})${p2}-${p3}`;
-                                                                    if (p2) return `(${p1})${p2}`;
-                                                                    return `(${p1}`;
-                                                                }
-                                                            ); // Format dynamically as (XXX)XXX-XXXX
-                                                            e.target.value = formattedValue; // Update input value
-                                                            clearErrors('employerPhone'); // Clear validation errors
-                                                        }}
-                                                        placeholder="(XXX)XXX-XXXX"
-                                                        maxLength={14}
-                                                        onKeyPress={(event) => {
-                                                            if (!/[0-9]/.test(event.key)) {
-                                                                event.preventDefault();
-                                                            }
-                                                        }}
-                                                    />
-                                                    {errors.employerPhone && (
-                                                        <span className="text-danger">
-                                                            {errors.employerPhone.message}
-                                                        </span>
-                                                    )}
-                                                </InputGroup>
+                                                <Form.Label className="mb-0">Employer Name</Form.Label>
+                                                <Form.Control
+                                                    {...register('employerName')}
+                                                    type="text"
+                                                    placeholder="Enter Employer Name"
+                                                />
+                                                {errors.employerName && (
+                                                    <span className="text-danger">{errors.employerName.message}</span>
+                                                )}
                                             </Form.Group>
+                                        </Col>
+                                        <Col sm={3}>
+                                            <Form.Group className="mb-0 position-relative">
+                                                <Form.Label className="mb-0">Employer Phone </Form.Label>
+                                                <Form.Group>
+                                                    <InputGroup>
+                                                        <InputGroup.Text
+                                                            className="ps-3 pe-1 fw-bold text-black"
+                                                            style={{ height: '33px' }}>
+                                                            &nbsp;+1
+                                                        </InputGroup.Text>{' '}
+                                                        {/* This is the prefix */}
+                                                        <Form.Control
+                                                            type="tel"
+                                                            style={{ height: '33px' }}
+                                                            {...register('employerPhone', {
+                                                                pattern: {
+                                                                    value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                    message: 'Contact must be in the format (XXX)XXX-XXXX',
+                                                                },
+                                                                maxLength: {
+                                                                    value: 13, // Includes characters for (XXX)XXX-XXXX
+                                                                    message: 'Contact must not exceed 13 characters',
+                                                                },
+                                                                minLength: {
+                                                                    value: 13,
+                                                                    message: 'Contact must not be less than 13 characters',
+                                                                },
+                                                            })}
+                                                            onChange={(e) => {
+                                                                let rawValue = e.target.value.replace(/\D/g, ''); // Remove all non-numeric characters
+                                                                if (rawValue.length > 10) rawValue = rawValue.slice(0, 10); // Limit to 10 digits
+                                                                const formattedValue = rawValue.replace(
+                                                                    /(\d{1,3})(\d{0,3})(\d{0,4})/,
+                                                                    (match, p1, p2, p3) => {
+                                                                        if (p3) return `(${p1})${p2}-${p3}`;
+                                                                        if (p2) return `(${p1})${p2}`;
+                                                                        return `(${p1}`;
+                                                                    }
+                                                                ); // Format dynamically as (XXX)XXX-XXXX
+                                                                e.target.value = formattedValue; // Update input value
+                                                                clearErrors('employerPhone'); // Clear validation errors
+                                                            }}
+                                                            placeholder="(XXX)XXX-XXXX"
+                                                            maxLength={14}
+                                                            onKeyPress={(event) => {
+                                                                if (!/[0-9]/.test(event.key)) {
+                                                                    event.preventDefault();
+                                                                }
+                                                            }}
+                                                        />
+                                                        {errors.employerPhone && (
+                                                            <span className="text-danger">
+                                                                {errors.employerPhone.message}
+                                                            </span>
+                                                        )}
+                                                    </InputGroup>
+                                                </Form.Group>
 
-                                            <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
-                                                <img src={us} alt="country code flag" width={20} />
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={3}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Employment Status</Form.Label>
-                                            <Form.Select {...register('employmentStatus')}>
-                                                <option value="">Select Employment Status</option>
-                                                <option value="employed">Employed</option>
-                                                <option value="self-employed">Self-Employed</option>
-                                                <option value="unemployed">Unemployed</option>
-                                                <option value="retired">Retired</option>
-                                                <option value="student">Student</option>
-                                                <option value="unknown">Unknown</option>
-                                            </Form.Select>
-                                            {errors.employmentStatus && (
-                                                <span className="text-danger">{errors.employmentStatus.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={3}>
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className="mb-1">Occupation</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Enter Occupation"
-                                                {...register('occupation', {
-                                                    minLength: {
-                                                        value: 2,
-                                                        message: 'Occupation must be at least 2 characters long',
-                                                    },
-                                                })}
-                                            />
-                                            {errors.occupation && (
-                                                <span className="text-danger">{errors.occupation.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row className="position-relative">
-                                    <Col sm={12}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Address</Form.Label>
-                                            <div style={{ position: 'relative' }}>
+                                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                                    <img src={us} alt="country code flag" width={20} />
+                                                </div>
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={3}>
+                                            <Form.Group className="mb-2">
+                                                <Form.Label className="mb-1">Employment Status</Form.Label>
+                                                <Form.Select {...register('employmentStatus')}>
+                                                    <option value="">Select Employment Status</option>
+                                                    <option value="employed">Employed</option>
+                                                    <option value="self-employed">Self-Employed</option>
+                                                    <option value="unemployed">Unemployed</option>
+                                                    <option value="retired">Retired</option>
+                                                    <option value="student">Student</option>
+                                                    <option value="unknown">Unknown</option>
+                                                </Form.Select>
+                                                {errors.employmentStatus && (
+                                                    <span className="text-danger">{errors.employmentStatus.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={3}>
+                                            <Form.Group className="mb-2">
+                                                <Form.Label className="mb-1">Occupation</Form.Label>
                                                 <Form.Control
                                                     type="text"
-                                                    {...register('employerAddress', {})}
-                                                    onChange={(e) => {
-                                                        getEmployerGeolocation(e);
-                                                        setEmployerFocused(true);
-                                                        clearErrors('employerAddress');
-                                                    }}
-                                                    onFocus={() => setEmployerFocused(true)}
-                                                    onBlur={() => {
-                                                        setTimeout(() => setEmployerFocused(false), 200);
-                                                    }}
-                                                    placeholder="Search for address"
-                                                    autoComplete="off"
+                                                    placeholder="Enter Occupation"
+                                                    {...register('occupation', {
+                                                        minLength: {
+                                                            value: 2,
+                                                            message: 'Occupation must be at least 2 characters long',
+                                                        },
+                                                    })}
                                                 />
-                                                <div
-                                                    style={{
-                                                        position: 'absolute',
-                                                        top: '100%',
-                                                        left: 0,
-                                                        width: '100%',
-                                                        maxHeight: '150px',
-                                                        zIndex: 111,
-                                                        backgroundColor: '#fff',
-                                                        border: '1px solid #ced4da',
-                                                        borderTop: 'none',
-                                                    }}
-                                                    className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                        ? 'd-none'
-                                                        : ''
-                                                        }`}>
-                                                    {searchedEmployerLocations?.map((data, index) => (
-                                                        <p
-                                                            key={index}
-                                                            onClick={() => {
-                                                                setValue('employerZip', data?.components?.postcode);
-                                                                setValue(
-                                                                    'employerStateName',
-                                                                    data?.components?.state_code
-                                                                );
-                                                                setValue('employerStreet', data?.components?.road);
-                                                                setValue(
-                                                                    'employerTimeZone',
-                                                                    data?.annotations?.timezone?.name
-                                                                );
-                                                                setEmployerCitySearch(data?.components?.county);
-                                                                setEmployerLatitude(data?.bounds?.southwest?.lat);
-                                                                setEmployerLongitude(data?.bounds?.southwest?.lng);
-                                                                setValue('employerAddress', data?.formatted);
-                                                                setEmployerFocused(false);
-                                                            }}
-                                                            style={{
-                                                                margin: 0,
-                                                                padding: '8px 12px',
-                                                                cursor: 'pointer',
-                                                            }}
-                                                            className="hover-bg-change text-black">
-                                                            {data?.formatted}
-                                                        </p>
-                                                    ))}
-                                                    {searchedLocations?.length === 0 && (
-                                                        <p className="text-muted px-2 py-1">No results found</p>
-                                                    )}
+                                                {errors.occupation && (
+                                                    <span className="text-danger">{errors.occupation.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col sm={6}>
+                                    <Row className="position-relative">
+                                        <Col sm={12}>
+                                            <Form.Group className="">
+                                                <Form.Label className="mb-0">Address</Form.Label>
+                                                <div style={{ position: 'relative' }}>
+                                                    <Form.Control
+                                                        type="text"
+                                                        {...register('employerAddress', {})}
+                                                        onChange={(e) => {
+                                                            getEmployerGeolocation(e);
+                                                            setEmployerFocused(true);
+                                                            clearErrors('employerAddress');
+                                                        }}
+                                                        onFocus={() => setEmployerFocused(true)}
+                                                        onBlur={() => {
+                                                            setTimeout(() => setEmployerFocused(false), 200);
+                                                        }}
+                                                        placeholder="Search for address"
+                                                        autoComplete="off"
+                                                    />
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            top: '100%',
+                                                            left: 0,
+                                                            width: '100%',
+                                                            maxHeight: '150px',
+                                                            zIndex: 111,
+                                                            backgroundColor: '#fff',
+                                                            border: '1px solid #ced4da',
+                                                            borderTop: 'none',
+                                                        }}
+                                                        className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
+                                                            ? 'd-none'
+                                                            : ''
+                                                            }`}>
+                                                        {searchedEmployerLocations?.map((data, index) => (
+                                                            <p
+                                                                key={index}
+                                                                onClick={() => {
+                                                                    setValue('employerZip', data?.components?.postcode);
+                                                                    setValue(
+                                                                        'employerStateName',
+                                                                        data?.components?.state_code
+                                                                    );
+                                                                    setValue('employerStreet', data?.components?.road);
+                                                                    setValue(
+                                                                        'employerTimeZone',
+                                                                        data?.annotations?.timezone?.name
+                                                                    );
+                                                                    setEmployerCitySearch(data?.components?.county);
+                                                                    setEmployerLatitude(data?.bounds?.southwest?.lat);
+                                                                    setEmployerLongitude(data?.bounds?.southwest?.lng);
+                                                                    setValue('employerAddress', data?.formatted);
+                                                                    setEmployerFocused(false);
+                                                                }}
+                                                                style={{
+                                                                    margin: 0,
+                                                                    padding: '8px 12px',
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                                className="hover-bg-change text-black">
+                                                                {data?.formatted}
+                                                            </p>
+                                                        ))}
+                                                        {searchedLocations?.length === 0 && (
+                                                            <p className="text-muted px-2 py-1">No results found</p>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {errors.employerAddress && (
-                                                <span className="text-danger">{errors.employerAddress.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">State</Form.Label>
-                                            <Form.Select {...register('employerStateName')}>
-                                                <option value="" hidden>
-                                                    State
-                                                </option>
-                                                {statesData?.states?.map((data) => (
-                                                    <option
-                                                        key={data?.name}
-                                                        data-key={data?.id}
-                                                        value={data?.state_code}>
-                                                        {data?.name}
+                                                {errors.employerAddress && (
+                                                    <span className="text-danger">{errors.employerAddress.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={6}>
+                                            <Form.Group className="">
+                                                <Form.Label className="mb-0">State</Form.Label>
+                                                <Form.Select {...register('employerStateName')}>
+                                                    <option value="" hidden>
+                                                        State
                                                     </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerStateName && (
-                                                <span className="text-danger">{errors.employerStateName.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">City</Form.Label>
-                                            <Form.Select
-                                                disabled={store?.getCitiesReducer?.loading}
-                                                {...register('employerCity')}>
-                                                <option hidden value="">
-                                                    {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
-                                                </option>
-                                                {cities3?.map((data) => (
-                                                    <option key={data?.name} value={data?.name}>
-                                                        {data?.name}
+                                                    {statesData?.states?.map((data) => (
+                                                        <option
+                                                            key={data?.name}
+                                                            data-key={data?.id}
+                                                            value={data?.state_code}>
+                                                            {data?.name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                                {errors.employerStateName && (
+                                                    <span className="text-danger">{errors.employerStateName.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                        <Col sm={6}>
+                                            <Form.Group className="">
+                                                <Form.Label className="mb-0">City</Form.Label>
+                                                <Form.Select
+                                                    disabled={store?.getCitiesReducer?.loading}
+                                                    {...register('employerCity')}>
+                                                    <option hidden value="">
+                                                        {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                     </option>
-                                                ))}
-                                            </Form.Select>
-                                            {errors.employerCity && (
-                                                <span className="text-danger">{errors.employerCity.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </Col>
-                            <Col sm={6}>
-                                <Row>
-                                    <Col sm={6}>
-                                        <Form.Group className="">
-                                            <Form.Label className="mb-0">Zip</Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                {...register('employerZip', {
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: 'ZIP code must be at least 5 characters long',
-                                                    },
-                                                    pattern: {
-                                                        value: /^[0-9]+$/,
-                                                        message: 'ZIP code must contain numbers only',
-                                                    },
-                                                })}
-                                                placeholder="Zip"
-                                                maxLength={5}
-                                            />
-                                            {errors.employerZip && (
-                                                <span className="text-danger">{errors.employerZip.message}</span>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    {/* <Col sm={6}>
+                                                    {cities3?.map((data) => (
+                                                        <option key={data?.name} value={data?.name}>
+                                                            {data?.name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                                {errors.employerCity && (
+                                                    <span className="text-danger">{errors.employerCity.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                    </Row>
+                                </Col>
+                                <Col sm={6}>
+                                    <Row>
+                                        <Col sm={6}>
+                                            <Form.Group className="">
+                                                <Form.Label className="mb-0">Zip</Form.Label>
+                                                <Form.Control
+                                                    type="text"
+                                                    {...register('employerZip', {
+                                                        minLength: {
+                                                            value: 5,
+                                                            message: 'ZIP code must be at least 5 characters long',
+                                                        },
+                                                        pattern: {
+                                                            value: /^[0-9]+$/,
+                                                            message: 'ZIP code must contain numbers only',
+                                                        },
+                                                    })}
+                                                    placeholder="Zip"
+                                                    maxLength={5}
+                                                />
+                                                {errors.employerZip && (
+                                                    <span className="text-danger">{errors.employerZip.message}</span>
+                                                )}
+                                            </Form.Group>
+                                        </Col>
+                                        {/* <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">Time Zone</Form.Label>
                                             <Form.Control
@@ -1011,38 +1004,39 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
                                             )}
                                         </Form.Group>
                                     </Col> */}
-                                </Row>
-                            </Col>
-                        </Row>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                    <hr />
+                    <Row>
+                        <Col sm={6}>
+                            <Form.Group>
+                                <Form.Label className="mb-0">Notes</Form.Label>
+                                <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
+                                {errors.notes && <span className="text-danger">{errors.notes.message}</span>}
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                </div>
+                <Row className="my-2">
+                    <Col className="d-flex justify-content-end">
+                        <Button
+                            className="custom-buttons btn-height"
+                            disabled={store?.updatePatientsReducer?.loading}
+                            style={{ width: '70px' }}
+                            type="submit">
+                            {store?.updatePatientsReducer?.loading ? (
+                                <Spinner animation="border" variant="primary" size="sm" />
+                            ) : (
+                                'Update'
+                            )}
+                        </Button>
                     </Col>
                 </Row>
-                <hr />
-                <Row>
-                    <Col sm={6}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Notes</Form.Label>
-                            <Form.Control type="text" placeholder="Enter Notes" {...register('notes')} />
-                            {errors.notes && <span className="text-danger">{errors.notes.message}</span>}
-                        </Form.Group>
-                    </Col>
-                </Row>
-            </div>
-            <Row className="my-2">
-                <Col className="d-flex justify-content-end">
-                    <Button
-                        className="custom-buttons btn-height"
-                        disabled={store?.updatePatientsReducer?.loading}
-                        style={{ width: '70px' }}
-                        type="submit">
-                        {store?.updatePatientsReducer?.loading ? (
-                            <Spinner animation="border" variant="primary" size="sm" />
-                        ) : (
-                            'Update'
-                        )}
-                    </Button>
-                </Col>
-            </Row>
-        </Form>
+            </Form>
+        </>
     );
 };
 

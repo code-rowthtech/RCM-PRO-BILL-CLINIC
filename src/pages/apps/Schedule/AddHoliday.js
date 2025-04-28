@@ -14,6 +14,7 @@ const AddHoliday = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [status, setStatus] = useState(true);
+    const [skip, setSkip] = useState(1);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const addResponse = store?.createScheduleReducer?.data?.response?.status;
@@ -29,11 +30,13 @@ const AddHoliday = () => {
             const payload = {
                 search: doctorSearch,
                 status: status,
+                page: skip,
+                limit: 10,
             };
             dispatch(getDoctorsAction(payload));
             navigate('/apps/schedule/list');
         }
-    }, [addResponse]);
+    }, [addResponse, status, skip , ]);
     const {
         register,
         handleSubmit,
@@ -60,9 +63,11 @@ const AddHoliday = () => {
         const payload = {
             search: doctorSearch,
             status: status,
+            page: skip,
+            limit:10,
         };
         dispatch(getDoctorsAction(payload));
-    }, [dispatch, doctorSearch]);
+    }, [dispatch, doctorSearch , status, skip]);
 
     const handleInputChange = (data, type) => {
         if (type === 'doctor') {
@@ -176,7 +181,9 @@ const AddHoliday = () => {
                                     <Button
                                         className="custom-buttons"
                                         disabled={store?.createScheduleReducer?.loading}
-                                        type="submit">
+                                        type="submit"
+                                        style={{width:'55px'}}
+                                        >
                                         {store?.createScheduleReducer?.loading ? (
                                             <Spinner className="spinner-border-sm" color="white" />
                                         ) : (

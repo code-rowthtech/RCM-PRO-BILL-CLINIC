@@ -3,7 +3,7 @@ import React from 'react';
 const Paginations = ({ currentPage, totalPages, onPageChange }) => {
     return (
         <nav aria-label="Page navigation example">
-            <ul className="pagination justify-content-end">
+            <ul className="pagination d-flex align-items-center justify-content-end">
                 {/* Previous Button */}
                 <li className={`page-item ${currentPage === 1 ? 'disabled  text-light' : ' '}`}>
                     <button
@@ -19,10 +19,10 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                     <li
                         key={index + 1}
                         style={{ margin: '0 2px' }}
-                        className={`page-item ${currentPage === index + 1 ? 'active px-1' : ''}`}
+                        className={`page-item fw-semibold fs-5  `}
                     >
                         <button
-                            className="page-link rounded-circle"
+                            className={`page-link p-1  py-0 ${currentPage === index + 1 ? 'active-pagination px-1' : ''} rounded-2`}
                             onClick={() => onPageChange(index + 1)}
                             disabled={currentPage === index + 1}
                         >

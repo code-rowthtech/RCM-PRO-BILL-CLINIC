@@ -23,9 +23,11 @@ const Schedule = () => {
     const [endDate, setEndDate] = useState(null);
     const [status, setStatus] = useState(true);
     const dispatch = useDispatch();
+    const [skip , setSkip] = useState(1);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log( 'doctorDetails', doctorDetails);
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
@@ -36,9 +38,11 @@ const Schedule = () => {
         const payload = {
             search: doctorSearch,
             status: status,
+            page: skip,
+            limit: 10,
         };
         dispatch(getDoctorsAction(payload));
-    }, [dispatch, doctorSearch]);
+    }, [dispatch, doctorSearch , status, skip]);
 
     const renderTabContent = () => {
         switch (activeTab) {

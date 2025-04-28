@@ -34,6 +34,7 @@ function* createAppointmentFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger')
         yield put({
             type: AppointmentActionTypes.CREATE_APPOINTMENT_ERROR,
             payload: error,
