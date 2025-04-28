@@ -369,6 +369,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                     type="submit"
                                     className="custom-buttons"
                                     disabled={store?.createtDoctorsDetailReducer?.loading}
+                                    style={{ width: '120px' }}
+
                                 >
                                     {store?.createtDoctorsDetailReducer?.loading ? (
                                         <Spinner color="white" className="spinner-border-sm" />

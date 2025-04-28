@@ -183,8 +183,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             // setAuthorization(null);
         }
         const closeModal = () => {
-            window.location.reload();
-        }
+            setShow(false); // just close the modal, no reload
+        };
         return (
             <>
                 {MENU_ITEMS_END.map((ele, index) => {
