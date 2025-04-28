@@ -10,11 +10,12 @@ import { RiImageEditFill } from 'react-icons/ri';
 import { GiGrowth } from 'react-icons/gi';
 import { MdCorporateFare } from 'react-icons/md';
 import { FiPlus } from 'react-icons/fi';
+import { IoDocumentsOutline } from 'react-icons/io5';
 
 export const patientMenuItems = [
     { label: 'Patient Summary', tab: "Patient Details", icon: <MdMedicalInformation /> },
     { label: 'Demographics', tab: "Demographics", icon: <TbHeartRateMonitor /> },
-    { label: 'Appointments', tab: "Appointments", icon: <FaPersonBooth /> },
+    { label: 'Documents', tab: "Documents", icon: <IoDocumentsOutline /> },
     { label: 'Encounters', tab: "Encounter", icon: <FaPersonHarassing /> },
     {
         label: 'Clinical Review',
@@ -27,7 +28,7 @@ export const patientMenuItems = [
         ],
     },
     {
-        label: 'Related Information',
+        label: 'Social History',
         icon: <MdOutlinePreview />,
         subItems: [
             { label: 'Tabacco', tab: "Tabacco", icon: <FiPlus /> },

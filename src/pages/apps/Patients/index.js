@@ -14,11 +14,12 @@ const Patients = () => {
     const [smShow, setSmShow] = useState(false);
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1)
+    const [status, setStatus] = useState(true);
+
     const dispatch = useDispatch();
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const store = useSelector((state) => state);
     const patientsData = store?.getPatientsReducer?.data?.data;
-    console.log('patientsData', patientsData)
     useEffect(() => {
         const data = {
             clinicId: clinicId,
@@ -58,11 +59,25 @@ const Patients = () => {
     return (
         <>
             <Row className='mt-2'>
-                <Col xs={12}>
+                <Col xs={12} className='px-0'>
                     <Card>
                         <Card.Body className='page-height scroll-container'>
                             <Row className="mb-2">
-                                <Col sm={6}>
+                                <Col style={{ cursor: 'not-allowed' }} title={'In-progress'} sm={6} xs={6}>
+                                    <Button
+                                        onClick={() => setStatus(true)}
+                                        disabled
+                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        Active
+                                    </Button>
+                                    <Button
+                                        onClick={() => setStatus(false)}
+                                        disabled
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        Inactive
+                                    </Button>
                                 </Col>
 
 
