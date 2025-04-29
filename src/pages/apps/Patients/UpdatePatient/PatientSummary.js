@@ -1,10 +1,23 @@
-import React from 'react';
-import { Card, Col, Row, Badge, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, Badge, Table, Form } from 'react-bootstrap';
 import { MdOutlinePrint, MdAddCircleOutline } from 'react-icons/md';
 import { FaHeartbeat, FaAllergies, FaProcedures, FaPills, FaUserMd, FaCalendarAlt } from 'react-icons/fa';
 import { GiHealthNormal } from 'react-icons/gi';
 import './patientSummary.css'; // Assuming you have a CSS file for styles
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { getVitalsByPatientIdAction } from '../../../../redux/actions';
 const PatientSummary = ({ isAccordionOpen }) => {
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
+    const [effectiveDateTime, setEffectiveDateTime] = useState('')
+
+    useEffect(() => {
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+    }, [dispatch, patientId, effectiveDateTime]);
     const patientSummary = {
         vitals: {
             heartRate: 72,
@@ -63,6 +76,11 @@ const PatientSummary = ({ isAccordionOpen }) => {
         return <span className={`ms-2 text-${variantMap[status]}`}>{status}</span>;
     };
 
+    useEffect(() => {
+        if (patientVitals) {
+            setEffectiveDateTime(patientVitals?.effectiveDateTime ? new Date(patientVitals?.effectiveDateTime)?.toISOString().split("T")[0] : '')
+        }
+    }, [patientVitals])
     return (
         <div className="patient-summary">
 
@@ -75,33 +93,43 @@ const PatientSummary = ({ isAccordionOpen }) => {
                                 <FaHeartbeat className="me-2 text-secondary" />
                                 <span className="fw-bold fs-6">Vitals</span>
                             </div>
-                            <div>
+                            <div className='d-flex align-items-center'>
+                                <Form.Control
+                                    type='date'
+                                    value={effectiveDateTime}
+                                    onChange={(e) => setEffectiveDateTime(e.target.value)} />
                                 <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
                                 <MdOutlinePrint className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
-                        <Card.Body className='p-2'>
+                        <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
                             <div className="vitals-grid fs-6">
-                                <div className="vital-item">
-                                    <span className="text-muted">Heart Rate</span>
-                                    <div className="fw-bold">{patientSummary.vitals.heartRate} <span>bpm</span></div>
-                                </div>
-                                <div className="vital-item">
-                                    <span className="text-muted">Blood Pressure</span>
-                                    <div className="fw-bold">{patientSummary.vitals.bloodPressure}</div>
-                                </div>
-                                <div className="vital-item">
-                                    <span className="text-muted">Temperature</span>
-                                    <div className="fw-bold">{patientSummary.vitals.temperature}</div>
-                                </div>
-                                <div className="vital-item">
-                                    <span className="text-muted">Respiratory Rate</span>
-                                    <div className="fw-bold">{patientSummary.vitals.respiratoryRate} <span>breaths/min</span></div>
-                                </div>
-                                <div className="vital-item">
-                                    <span className="text-muted">Oxygen Sat.</span>
-                                    <div className="fw-bold">{patientSummary.vitals.oxygenSaturation}</div>
-                                </div>
+                                {patientVitals?.vitals?.map((data) => (
+                                    <div className="vital-item">
+                                        <span className="text-muted">{data?.code?.coding?.[0]?.display}</span>
+                                        {data?.valueString &&
+                                            <div className="fw-bold">{data?.valueString || 'N/A'}</div>
+                                        }
+                                        {data?.valueQuantity &&
+                                            <div className="fw-bold">{data?.valueQuantity?.value || 'N/A'} <span>{data?.valueQuantity?.unit}</span></div>}
+                                        {data?.component && !data?.valueString && !data?.valueQuantity && (
+                                            <div className="fw-bold">
+                                                {(() => {
+                                                    const systolic = data.component.find(c =>
+                                                        c.code?.coding?.[0]?.code === '8480-6'
+                                                    )?.valueQuantity?.value;
+
+                                                    const diastolic = data.component.find(c =>
+                                                        c.code?.coding?.[0]?.code === '8462-4'
+                                                    )?.valueQuantity?.value;
+
+                                                    return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
+                                                })()}
+                                            </div>
+                                        )}
+
+                                    </div>
+                                ))}
                             </div>
                         </Card.Body>
                     </Card>
@@ -308,7 +336,7 @@ const PatientSummary = ({ isAccordionOpen }) => {
                     </Card>
                 </Col>
             </Row>
-        </div>
+        </div >
     );
 };
 

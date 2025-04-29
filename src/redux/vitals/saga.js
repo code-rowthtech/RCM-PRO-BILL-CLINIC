@@ -20,10 +20,13 @@ function* createVitalsFunction(data) {
         const response = yield call(createVitalsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
-            ToastHandle(decryptedData?.message, 'success')
             yield put({
                 type: VitalsActionTypes.CREATE_VITALS_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: VitalsActionTypes.CREATE_VITALS_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -31,7 +34,6 @@ function* createVitalsFunction(data) {
                 payload: { ...decryptedData },
             });
         }
-
     } catch (error) {
         ToastHandle(error, 'danger')
         yield put({
@@ -40,6 +42,7 @@ function* createVitalsFunction(data) {
         });
     }
 }
+
 
 function* getVitalsFunction(data) {
     try {

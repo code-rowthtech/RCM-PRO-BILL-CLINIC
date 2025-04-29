@@ -72,6 +72,12 @@ const UpdatePatientIndex = () => {
     };
 
     useEffect(() => {
+        const tab = sessionStorage?.getItem('selectedMainTab')
+        if (tab) {
+            setSelectedMainTab(tab)
+        }
+    }, [])
+    useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
                 setActiveSubmenu(null);
@@ -227,6 +233,7 @@ const UpdatePatientIndex = () => {
                                                     // setActiveSubmenu(null);
                                                 } else {
                                                     setSelectedMainTab(item.tab);
+                                                    sessionStorage.setItem('selectedMainTab', item.tab);
                                                     setActiveSubmenu(null);
                                                 }
                                             }}
@@ -253,6 +260,8 @@ const UpdatePatientIndex = () => {
                                                             key={subIndex}
                                                             onClick={() => {
                                                                 setSelectedMainTab(subItem.tab);
+                                                                sessionStorage.setItem('selectedMainTab', subItem.tab);
+
                                                                 // setActiveSubmenu(null);
                                                                 // setShowMoreMenu(false);
                                                             }}
@@ -278,6 +287,7 @@ const UpdatePatientIndex = () => {
                                                         key={index}
                                                         onClick={() => {
                                                             setSelectedMainTab(data.tab);
+                                                            sessionStorage.setItem('selectedMainTab', data.tab);
                                                             setShowMoreMenu(false);
                                                             // setShowMoreMenu(false);
                                                             // setShowMoreMenu(false);
@@ -521,7 +531,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medication List' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Vitals List' && <VitalStatus />}
+                                                {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Tabacco' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>}
@@ -534,9 +544,6 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Vital Status' && (
-                                                    <VitalStatus isAccordionOpen={isAccordionOpen} patientId={patientDetails?._id} />
-                                                )}
                                                 {selectedMainTab === 'Balance' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Payment' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Allergy List' && <AllergyList />}
