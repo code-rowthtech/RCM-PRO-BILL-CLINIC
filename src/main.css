@@ -905,3 +905,22 @@ tbody tr:hover {
     transition-timing-function: ease-in-out !important;
     /* box-shadow: 0 2px 2px rgba(0, 0, 0, 0.16), 0 2px 2px rgba(0, 0, 0, 0.23) !important; */
 }
+
+.vitalsTableBorder {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.281) !important;
+}
+.vitalsTable tr td {
+    font-size: 12px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+    height: auto !important;
+}
+
+.vitalsTable > :not(caption) > * > * {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+.vitalsFormControl .form-control {
+    font-size: 13px !important;
+    padding: 0 10px !important;
+}

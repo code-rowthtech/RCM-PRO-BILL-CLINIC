@@ -217,7 +217,6 @@ const ScheduleTab = () => {
             return updatedDays;
         });
     };
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <p className="mt-0 form_heading">Edit Schedule</p>

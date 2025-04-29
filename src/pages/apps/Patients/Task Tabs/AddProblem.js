@@ -69,12 +69,12 @@ const AddProblem = () => {
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
-                <Col sm={12} className="d-flex justify-content-between">
+                {/* <Col sm={12} className="d-flex justify-content-between">
                     <h4>Add Problem</h4>
                     <Button className="custom-buttons" type="button">
                         Back
                     </Button>
-                </Col>
+                </Col> */}
 
                 {/* Problem selection with dynamic ICD lookup */}
                 <Col sm={6}>
@@ -172,12 +172,12 @@ const AddProblem = () => {
                 </Col>
 
                 {/* Onset Date */}
-                <Col sm={6}>
+                {/* <Col sm={6}>
                     <Form.Group>
                         <Form.Label className="mb-0">Datetime Onset</Form.Label>
                         <Form.Control type="date" {...register('onsetDate')} />
                     </Form.Group>
-                </Col>
+                </Col> */}
 
                 {/* Note */}
                 <Col sm={12}>
@@ -188,12 +188,12 @@ const AddProblem = () => {
                 </Col>
 
                 {/* Action Buttons */}
-                <Col sm={12} className="d-flex justify-content-end gap-1 mt-3">
-                    <Button className="custom-buttons" type="button" onClick={() => reset()}>
-                        Cancel
+                <Col sm={12} className="d-flex justify-content-end gap-1 mt-3" >
+                    <Button className="custom-buttons"style={{width:'150px'}} type="button" onClick={() => reset()}>
+                        Save & Add Another
                     </Button>
-                    <Button className="custom-buttons" type="submit">
-                        Save
+                    <Button className="custom-buttons" type="submit" style={{ width: '120px' }}>
+                        Add Problem
                     </Button>
                 </Col>
             </Row>
