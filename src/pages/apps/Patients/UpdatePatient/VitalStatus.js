@@ -7,6 +7,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 
 const VitalStatus = ({ patientId }) => {
+
     const [yesterdayVitals, setYesterdayVitals] = useState({});
     const [todayVitals, setTodayVitals] = useState({ weight: '', height: '', bmi: '', smoking_status: '' });
     const [todayDate, setTodayDate] = useState(new Date());
@@ -15,8 +16,9 @@ const VitalStatus = ({ patientId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.vitals;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: patientId }) }))
+        dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: patientDetails?._id }) }))
     }, [patientId, dispatch]);
 
     const smokingOptions = [
@@ -66,7 +68,7 @@ const VitalStatus = ({ patientId }) => {
     const handleSubmit = () => {
 
         const payload = {
-            patientId: patientId,
+            subjectId: patientDetails?._id,
             temperature: { value: todayVitals.temperature, unit: 'F' },
             pulse: { value: todayVitals.pulse, unit: 'bpm' },
             blood_pressure: { systolic: todayVitals.systolic, diastolic: todayVitals.diastolic, unit: 'mmHg' },
@@ -83,7 +85,8 @@ const VitalStatus = ({ patientId }) => {
             oxygen_concentration: { value: todayVitals.oxygen_concentration, unit: '%' },
             inhaled_oxygen_flow_rate: { value: todayVitals.inhaled_oxygen_flow_rate, unit: 'l/min' },
         };
-        dispatch(createVitalsAction({ key: encryptMessage(payload) }))
+        console.log('payload', payload)
+        // dispatch(createVitalsAction({ key: encryptMessage(payload) }))
 
     };
 
