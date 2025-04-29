@@ -511,7 +511,7 @@ const UpdatePatientIndex = () => {
                                         <Card className="px-2" style={{ height: isAccordionOpen ? '65.5vh' : '85vh' }}>
                                             <div
                                                 className="mt-2 px-0">
-                                                {selectedMainTab === 'Patient Details' && <PatientSummary isAccordionOpen={isAccordionOpen} />}
+                                                {selectedMainTab === 'Patient Details' && <PatientSummary isAccordionOpen={isAccordionOpen} setSelectedMainTab={setSelectedMainTab} />}
                                                 {selectedMainTab === 'Demographics' && <Subtabs isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Responsible Party' && <ResponsibleParty isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Reffering Doctor' && <ReferringDoctor isAccordionOpen={isAccordionOpen} />}

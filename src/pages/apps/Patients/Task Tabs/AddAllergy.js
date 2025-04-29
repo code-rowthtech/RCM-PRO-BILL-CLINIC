@@ -159,7 +159,7 @@ const AddAllergy = ({ onCancel }) => {
                     // ],
                 },
             ],
-            appointmentId: data?.appointment || '',
+            // appointmentId: data?.appointment || '',
             // encounterId: data?.encounter,
             note: [
                 {
@@ -178,6 +178,10 @@ const AddAllergy = ({ onCancel }) => {
                 },
             ],
         };
+        if (data?.appointment) {
+            payload.appointmentId = data.appointment;
+        }
+        
 
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
     };
