@@ -521,7 +521,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medication List' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Vitals List' && <p>In progress...</p>}
+                                                {selectedMainTab === 'Vitals List' && <VitalStatus />}
                                                 {selectedMainTab === 'Tabacco' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>}
