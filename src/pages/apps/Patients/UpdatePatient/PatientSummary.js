@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Badge, Table, Form } from 'react-bootstrap';
+import { Card, Col, Row, Badge, Table, Form, Modal } from 'react-bootstrap';
 import { MdOutlinePrint, MdAddCircleOutline } from 'react-icons/md';
 import { FaHeartbeat, FaAllergies, FaProcedures, FaPills, FaUserMd, FaCalendarAlt } from 'react-icons/fa';
 import { GiHealthNormal } from 'react-icons/gi';
@@ -7,17 +7,23 @@ import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { getVitalsByPatientIdAction } from '../../../../redux/actions';
-const PatientSummary = ({ isAccordionOpen }) => {
+import { handlePrintAllergies } from '../Task Tabs/PDFfiles/allergyPDF';
+import { getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
+import AddAllergy from '../Task Tabs/AddAllergy';
+const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
+    const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [effectiveDateTime, setEffectiveDateTime] = useState('')
 
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
     }, [dispatch, patientId, effectiveDateTime]);
+
     const patientSummary = {
         vitals: {
             heartRate: 72,
@@ -49,22 +55,52 @@ const PatientSummary = ({ isAccordionOpen }) => {
         },
         encounters: [
             { date: '2025-03-15', type: 'Routine Checkup', provider: 'Dr. Smith', location: 'Primary Care' },
-            { date: '2025-02-20', type: 'Emergency Room Visit', provider: 'Dr. Johnson', location: 'City General Hospital' },
-            { date: '2025-01-10', type: 'Follow-up Appointment', provider: 'Dr. Williams', location: 'Cardiology Clinic' },
+            {
+                date: '2025-02-20',
+                type: 'Emergency Room Visit',
+                provider: 'Dr. Johnson',
+                location: 'City General Hospital',
+            },
+            {
+                date: '2025-01-10',
+                type: 'Follow-up Appointment',
+                provider: 'Dr. Williams',
+                location: 'Cardiology Clinic',
+            },
         ],
         appointments: [
-            { date: '2025-04-30', time: '10:00 AM', provider: 'Dr. Smith', type: 'Routine Checkup', location: 'Main Clinic' },
-            { date: '2025-05-15', time: '1:30 PM', provider: 'Dr. Johnson', type: 'Endocrinology Follow-up', location: 'Diabetes Center' },
+            {
+                date: '2025-04-30',
+                time: '10:00 AM',
+                provider: 'Dr. Smith',
+                type: 'Routine Checkup',
+                location: 'Main Clinic',
+            },
+            {
+                date: '2025-05-15',
+                time: '1:30 PM',
+                provider: 'Dr. Johnson',
+                type: 'Endocrinology Follow-up',
+                location: 'Diabetes Center',
+            },
         ],
     };
-
     const getSeverityBadge = (severity) => {
+        if (!severity || !severity.code || !severity.display) return null;
+
+        const code = severity.code.toLowerCase();
+
         const variantMap = {
-            'Severe': 'danger',
-            'Moderate': 'warning',
-            'Mild': 'info'
+            high: 'danger',
+            severe: 'danger',
+            moderate: 'warning',
+            low: 'info',
+            mild: 'info',
         };
-        return <span className={`ms-2 text-${variantMap[severity]}`}>{severity}</span>;
+
+        const variant = variantMap[code] || 'secondary';
+
+        return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
 
     const getStatusBadge = (status) => {
@@ -81,6 +117,17 @@ const PatientSummary = ({ isAccordionOpen }) => {
             setEffectiveDateTime(patientVitals?.effectiveDateTime ? new Date(patientVitals?.effectiveDateTime)?.toISOString().split("T")[0] : '')
         }
     }, [patientVitals])
+    useEffect(() => {
+        const data = {
+            patientId: patientId,
+        };
+
+        dispatch(getAllergiesOfPatientAction(data));
+    }, [dispatch, patientId]);
+    const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
+
+    const handleAddAllergyOpen = () => setShowAddAllergyModal(true);
+    const handleAddAllergyClose = () => setShowAddAllergyModal(false);
     return (
         <div className="patient-summary">
 
@@ -138,33 +185,74 @@ const PatientSummary = ({ isAccordionOpen }) => {
                 {/* Allergies Card */}
                 <Col sm={4}>
                     <Card className="h-100 shadow-sm">
-                        <Card.Header className='p-1 d-flex justify-content-between align-items-center bg-light'>
+                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
                                 <FaAllergies className="me-2 text-secondary" />
                                 <span className="fw-bold fs-6">Allergies</span>
                             </div>
                             <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                                <MdAddCircleOutline
+                                    className="text-primary me-2 cursor-pointer"
+                                    onClick={handleAddAllergyOpen}
+                                />
+                                <MdOutlinePrint
+                                    className="text-secondary cursor-pointer"
+                                    title="Print all Allergies"
+                                    onClick={() => handlePrintAllergies({ patientDetails, allergyData })}
+                                />
                             </div>
                         </Card.Header>
-                        <Card.Body className='p-2'>
-                            <ul className="list-unstyled">
-                                {patientSummary.allergies.map((allergy, index) => (
-                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-center">
-                                        <div className='fs-6'>
-                                            <strong>{allergy.name}</strong>
-                                            <div className="text-muted ">{allergy.reaction}</div>
-                                        </div>
-                                        <span className='fs-6 fw-semibold'>
-                                            {getSeverityBadge(allergy.severity)}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
+                        <Card.Body className="p-2 pb-0">
+                            {allergyData && allergyData.length > 0 ? (
+                                <ul className="list-unstyled pb-0 mb-0">
+                                    {allergyData.slice(0, 4).map((allergy, index) => (
+                                        <li
+                                            key={index}
+                                            className="mb-2 d-flex justify-content-between align-items-center">
+                                            <div className="fs-6">
+                                                <strong>{allergy.code?.text || 'Unknown Allergy'}</strong>
+                                                <div className="text-muted small">
+                                                    {allergy.clinicalStatus?.text || 'Status not available'}
+                                                </div>
+                                            </div>
+                                            <span className="fs-6 fw-semibold">
+                                                {getSeverityBadge(allergy.criticality)}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <ul className="list-unstyled">
+                                    {(patientSummary?.allergies || []).map((allergy, index) => (
+                                        <li
+                                            key={index}
+                                            className="mb-2 d-flex justify-content-between align-items-center">
+                                            <div className="fs-6">
+                                                <strong>{allergy.name || 'Unknown Allergy'}</strong>
+                                                <div className="text-muted small">
+                                                    Since {allergy.reaction || 'N/A'}
+                                                </div>
+                                            </div>
+                                            <span className="fs-6 fw-semibold">
+                                                {getSeverityBadge({
+                                                    code: allergy.severity,
+                                                    display: allergy.severity,
+                                                    status: true,
+                                                })}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </Card.Body>
+                        <div
+                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                            onClick={() => setSelectedMainTab('Allergy List')}>
+                            Go To Allergies List
+                        </div>
                     </Card>
                 </Col>
+
 
                 {/* Problems Card */}
                 <Col sm={4}>
@@ -336,6 +424,14 @@ const PatientSummary = ({ isAccordionOpen }) => {
                     </Card>
                 </Col>
             </Row>
+            <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
+                <Modal.Header closeButton className="px-2 py-0">
+                    <Modal.Title className="">Add Allergy</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <AddAllergy onCancel={handleAddAllergyClose} />
+                </Modal.Body>
+            </Modal>
         </div >
     );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FiEdit, FiPlus } from 'react-icons/fi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
@@ -19,7 +19,9 @@ const AllergyList = () => {
     const [showAddAllergy, setShowAddAllergy] = useState(false);
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
     const [selectedAllergy, setSelectedAllergy] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [searchParams] = useSearchParams();
+    const [allergyModal, setAllergyModal] = useState(false);
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -38,6 +40,7 @@ const AllergyList = () => {
     const handleEditClick = (allergy) => {
         setSelectedAllergy(allergy);
         setShowUpdateAllergy(true);
+        setAllergyModal(true); // Open Modal
     };
 
     useEffect(() => {
@@ -50,16 +53,23 @@ const AllergyList = () => {
     }, [deleteStatus, dispatch, patientId]);
 
     return (
-        <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
-            {showAddAllergy ? (
-                <AddAllergy onCancel={() => setShowAddAllergy(false)} />
-            ) : showUpdateAllergy ? (
-                <UpdateAllergy allergy={selectedAllergy} onCancel={() => setShowUpdateAllergy(false)} />
-            ) : (
+        <>
+            <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
+                {/* {showAddAllergy ? (
+                    <AddAllergy onCancel={() => setShowAddAllergy(false)} />
+                ) : showUpdateAllergy ? (
+                    <UpdateAllergy allergy={selectedAllergy} onCancel={() => setShowUpdateAllergy(false)} />
+                ) : ( */}
                 <Row>
                     <Col sm={12} className="d-flex justify-content-between">
                         <h4>Allergy List</h4>
-                        <Button className="custom-buttons text-nowrap" onClick={() => setShowAddAllergy(true)}>
+                        <Button
+                            className="custom-buttons text-nowrap"
+                            onClick={() => {
+                                setSelectedAllergy(null); // Clear any previously selected allergy
+                                setShowUpdateAllergy(false); // Ensure update mode is off
+                                setAllergyModal(true); // Open the modal
+                            }}>
                             <FiPlus className="fs-5 text-white" />
                             &nbsp; Add Allergy
                         </Button>
@@ -69,11 +79,13 @@ const AllergyList = () => {
                             <thead className="text-white bg-dark">
                                 <tr key="">
                                     <th className="text-white">Sr.No.</th>
-                                    <th className="text-white">Clinic Status</th>
-                                    <th className="text-white">Verification Status</th>
-                                    <th className="text-white">Allergy Type</th>
+
+                                    {/* <th className="text-white">Verification Status</th> */}
+                                    <th className="text-white">Clinical Status</th>
                                     <th className="text-white">Category</th>
-                                    <th className="text-white">Criticality</th>
+                                    <th className="text-white">Allergy</th>
+                                    {/* <th className="text-white">Verification Status</th> */}
+                                    {/* <th className="text-white">Criticality</th> */}
                                     <th className="text-white">Notes</th>
                                     <th className="text-white">Action</th>
                                 </tr>
@@ -100,17 +112,21 @@ const AllergyList = () => {
                                                     {data?.clinicalStatus?.coding?.[0]?.display || 'N/A'}
                                                 </td>
                                                 <td className="text-capitalize">
-                                                    {data?.verificationStatus?.coding?.[0]?.display || 'N/A'}
-                                                </td>
-                                                <td className="text-capitalize">
-                                                    {data?.type?.coding?.[0]?.display || 'N/A'}
-                                                </td>
-                                                <td className="text-capitalize">
                                                     {data?.category?.[0]?.display || 'N/A'}
                                                 </td>
                                                 <td className="text-capitalize">
-                                                    {data?.criticality?.display || 'N/A'}
+                                                    {data?.code?.coding?.[0]?.display || 'N/A'}
                                                 </td>
+                                                {/* <td className="text-capitalize">
+                                                        {data?.verificationStatus?.coding?.[0]?.display || 'N/A'}
+                                                    </td> */}
+                                                {/* <td className="text-capitalize">
+                                                        {data?.type?.coding?.[0]?.display || 'N/A'}
+                                                    </td> */}
+
+                                                {/* <td className="text-capitalize">
+                                                        {data?.criticality?.display || 'N/A'}
+                                                    </td> */}
                                                 <td className="text-capitalize">{data?.note?.[0]?.text || 'N/A'}</td>
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
@@ -144,8 +160,33 @@ const AllergyList = () => {
                         </Table>
                     </Col>
                 </Row>
-            )}
-        </div>
+                {/* )} */}
+            </div>
+
+            <Modal show={allergyModal} onHide={() => setAllergyModal(false)} size="lg" centered>
+                <Modal.Header closeButton className="px-2 py-0 ">
+                    <Modal.Title className="mb-0"> {showUpdateAllergy ? 'Update Allergy' : 'Add Allergy'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {showUpdateAllergy ? (
+                        <UpdateAllergy
+                            allergy={selectedAllergy}
+                            onCancel={() => {
+                                setShowUpdateAllergy(false);
+                                setAllergyModal(false);
+                            }}
+                        />
+                    ) : (
+                        <AddAllergy
+                            onCancel={() => {
+                                setShowUpdateAllergy(false); // in case it's set
+                                setAllergyModal(false);
+                            }}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+        </>
     );
 };
 
