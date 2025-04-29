@@ -117,7 +117,9 @@ const PatientSummary = ({ isAccordionOpen }) => {
                             </div>
                             <div>
                                 <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                                <MdOutlinePrint className="text-secondary cursor-pointer" onClick={()=>{
+                                    console.log('Print allergies');
+                                }}/>
                             </div>
                         </Card.Header>
                         <Card.Body className='p-2'>

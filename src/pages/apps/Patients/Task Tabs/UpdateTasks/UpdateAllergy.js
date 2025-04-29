@@ -23,6 +23,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const patientId = searchParams.get('id');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
+    console.log(userId, 'userId');
     const [code, setCode] = useState(null);
     const [substance, setSubstance] = useState(null);
     const appointments = store?.getPatientAppointmentReducer?.data || [];
@@ -69,7 +70,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     //         ...(updateAllergy?.allergyType ? { allergyType: updateAllergy?.allergyType } : {}),
     //         ...(updateAllergy?.allergyname ? { allergyname: updateAllergy?.allergyname } : {}),
     //         ...(updateAllergy?.reaction ? { reaction: updateAllergy?.reaction } : {}),
-    //         ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
+            // ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
     //         ...(updateAllergy?.severity ? { severity: updateAllergy?.severity } : {}),
     //         ...(updateAllergy?.notes ? { notes: updateAllergy?.notes } : {}),
     //     };
@@ -118,16 +119,16 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                 ],
                 text: selectedStatus?.display,
             },
-            verificationStatus: {
-                coding: [
-                    {
-                        system: selectedVerificationStatus?.system,
-                        code: selectedVerificationStatus?.code,
-                        display: selectedVerificationStatus?.display,
-                    },
-                ],
-                text: selectedVerificationStatus?.display,
-            },
+            // verificationStatus: {
+            //     coding: [
+            //         {
+            //             system: selectedVerificationStatus?.system,
+            //             code: selectedVerificationStatus?.code,
+            //             display: selectedVerificationStatus?.display,
+            //         },
+            //     ],
+            //     text: selectedVerificationStatus?.display,
+            // },
             category: [
                 {
                     system: selectedCategory?.system,
@@ -146,47 +147,47 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
             },
             reaction: [
                 {
-                    substance: {
-                        coding: code,
-                    },
-                    manifestation: [
-                        {
-                            concept: {
-                                coding: manifestation,
-                                text: code?.display, // use display text
-                            },
-                        },
-                    ],
-                    severity: {
-                        coding: [
-                            {
-                                system: selectedSeverityOption?.system,
-                                code: selectedSeverityOption?.code,
-                                display: selectedSeverityOption?.display,
-                            },
-                        ],
-                        text: selectedSeverityOption?.display,
-                    },
-                    exposureRoute: {
-                        coding: exposureRoute,
-                        text: exposureRoute?.display,
-                    },
-                    note: [
-                        {
-                            text: '',
-                            time: '',
-                            authorReference: {
-                                reference: '',
-                                type: '',
-                                identifier: {
-                                    use: '',
-                                    system: '',
-                                    value: '',
-                                },
-                                display: '',
-                            },
-                        },
-                    ],
+                    // substance: {
+                    //     coding: code,
+                    // },
+                    // manifestation: [
+                    //     {
+                    //         concept: {
+                    //             coding: manifestation,
+                    //             text: code?.display, // use display text
+                    //         },
+                    //     },
+                    // ],
+                    // severity: {
+                    //     coding: [
+                    //         {
+                    //             system: selectedSeverityOption?.system,
+                    //             code: selectedSeverityOption?.code,
+                    //             display: selectedSeverityOption?.display,
+                    //         },
+                    //     ],
+                    //     text: selectedSeverityOption?.display,
+                    // },
+                    // exposureRoute: {
+                    //     coding: exposureRoute,
+                    //     text: exposureRoute?.display,
+                    // },
+                    // note: [
+                    //     {
+                    //         text: '',
+                    //         time: '',
+                    //         authorReference: {
+                    //             reference: '',
+                    //             type: '',
+                    //             identifier: {
+                    //                 use: '',
+                    //                 system: '',
+                    //                 value: '',
+                    //             },
+                    //             display: '',
+                    //         },
+                    //     },
+                    // ],
                 },
             ],
             appointmentId: data?.appointment,
@@ -314,9 +315,10 @@ useEffect(()=>{
             patientId: patientId,
         };
         dispatch(getAllergiesOfPatientAction(data));
+       onCancel();
     }
    
-},[updateStatus, dispatch, patientId]);
+},[updateStatus, dispatch, patientId ,onCancel]);
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -326,14 +328,14 @@ useEffect(()=>{
                     </div>
                 ) : (
                     <Row>
-                        <Col sm={12} className="d-flex justify-content-between">
+                        {/* <Col sm={12} className="d-flex justify-content-between">
                             <h4>Update Allergy</h4>
                             <Button className="custom-buttons" onClick={onCancel}>
                                 Back
                             </Button>
-                        </Col>
+                        </Col> */}
 
-                        <Col sm={4}>
+                        {/* <Col sm={4}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="allergyType" className="mb-0">
                                     Allergy Type
@@ -354,9 +356,9 @@ useEffect(()=>{
                                     <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
                                 )}
                             </Form.Group>
-                        </Col>
+                        </Col> */}
 
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="category" className="mb-0">
                                     Allergy Category
@@ -379,7 +381,7 @@ useEffect(()=>{
                             </Form.Group>
                         </Col>
 
-                        <Col sm={4}>
+                        <Col sm={6}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="criticality" className="mb-0">
                                     Criticality
@@ -402,7 +404,7 @@ useEffect(()=>{
                             </Form.Group>
                         </Col>
 
-                        <Col sm={4}>
+                        {/* <Col sm={4}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="verificationStatus" className="mb-0">
                                     Verification Status
@@ -418,10 +420,10 @@ useEffect(()=>{
                                     ))}
                                 </Form.Select>
                             </Form.Group>
-                        </Col>
-                        <Col sm={4}>
+                        </Col> */}
+                        <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Allergy Code</Form.Label>
+                                <Form.Label className="mb-0">Select Allergy </Form.Label>
                                 <AsyncSelect
                                     loadOptions={loadCodeOptions}
                                     defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
@@ -449,7 +451,7 @@ useEffect(()=>{
                             </Form.Group>
                         </Col>
 
-                        <Col sm={4}>
+                        {/* <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Substance</Form.Label>
                                 <AsyncSelect
@@ -477,8 +479,8 @@ useEffect(()=>{
                                     }}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col sm={4}>
+                        </Col> */}
+                        {/* <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Manifestation</Form.Label>
                                 <AsyncSelect
@@ -506,8 +508,8 @@ useEffect(()=>{
                                     }}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col sm={4}>
+                        </Col> */}
+                        <Col sm={6}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="status" className="mb-0">
                                     Clinical Status
@@ -526,7 +528,7 @@ useEffect(()=>{
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
+                        {/* <Col sm={6}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="severity" className="mb-0">
                                     Severity
@@ -544,9 +546,9 @@ useEffect(()=>{
                                     ))}
                                 </Form.Select>
                             </Form.Group>
-                        </Col>
+                        </Col> */}
 
-                        <Col sm={4}>
+                        {/* <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0"> Exposure Route</Form.Label>
                                 <AsyncSelect
@@ -574,8 +576,8 @@ useEffect(()=>{
                                     }}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col sm={4}>
+                        </Col> */}
+                        <Col sm={6}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Appointment</Form.Label>
                                 <Form.Select {...register('appointment')}>
@@ -588,7 +590,7 @@ useEffect(()=>{
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
+                        {/* <Col sm={4}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="Encounter" className="mb-0">
                                     Encounter
@@ -603,9 +605,9 @@ useEffect(()=>{
                                     <option value="2">Encounter 2</option>
                                 </Form.Select>
                             </Form.Group>
-                        </Col>
+                        </Col> */}
 
-                        <Col sm={8}>
+                        <Col sm={12}>
                             <Form.Group className="mb-1">
                                 <Form.Label htmlFor="notes" className="mb-0">
                                     Note

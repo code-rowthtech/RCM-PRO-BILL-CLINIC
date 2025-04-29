@@ -26,6 +26,7 @@ const AddAllergy = ({ onCancel }) => {
     console.log(appointments, 'appointments');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
+    console.log(userId, 'userId');
     const createStatus = store?.createAllergyReducer?.data?.status;
     console.log(clinicId, 'clinicId');
     const [code, setCode] = useState(null);
@@ -65,11 +66,12 @@ const AddAllergy = ({ onCancel }) => {
             // asserterId: userId,
             recorderId: userId,
             resourceType: 'AllergyIntolerance',
-            type: {
+            type:  {
                 coding: [
                     {
                         system: selectedType?.system,
-                        code: selectedType?.code,
+                        // code: selectedType?.code,
+                        code: 'Allergy',
                         display: selectedType?.display,
                     },
                 ],
@@ -85,16 +87,16 @@ const AddAllergy = ({ onCancel }) => {
                 ],
                 text: selectedStatus?.display,
             },
-            verificationStatus: {
-                coding: [
-                    {
-                        system: selectedVerificationStatus?.system,
-                        code: selectedVerificationStatus?.code,
-                        display: selectedVerificationStatus?.display,
-                    },
-                ],
-                text: selectedVerificationStatus?.display,
-            },
+            // verificationStatus: {
+            //     coding: [
+            //         {
+            //             system: selectedVerificationStatus?.system,
+            //             code: selectedVerificationStatus?.code,
+            //             display: selectedVerificationStatus?.display,
+            //         },
+            //     ],
+            //     text: selectedVerificationStatus?.display,
+            // },
             category: [
                 {
                     system: selectedCategory?.system,
@@ -113,51 +115,52 @@ const AddAllergy = ({ onCancel }) => {
             },
             reaction: [
                 {
-                    substance: {
-                        coding: code,
-                    },
-                    manifestation: [
-                        {
-                            concept: {
-                                coding: manifestation,
-                                text: code?.display, // use display text
-                            },
-                        },
-                    ],
-                    severity: {
-                        coding: [
-                            {
-                                system: selectedSeverityOption?.system,
-                                code: selectedSeverityOption?.code,
-                                display: selectedSeverityOption?.display,
-                            },
-                        ],
-                        text: selectedSeverityOption?.display,
-                    },
-                    exposureRoute: {
-                        coding: exposureRoute,
-                        text: exposureRoute?.display,
-                    },
-                    appointmentId: data?.appointment,
-                    note: [
-                        {
-                            text: '',
-                            time: '',
-                            authorReference: {
-                                reference: '',
-                                type: '',
-                                identifier: {
-                                    use: '',
-                                    system: '',
-                                    value: '',
-                                },
-                                display: '',
-                            },
-                        },
-                    ],
+                    // substance: {
+                    //     coding: code,
+                    // },
+                    // manifestation: [
+                    //     {
+                    //         concept: {
+                    //             coding: manifestation,
+                    //             text: code?.display, // use display text
+                    //         },
+                    //     },
+                    // ],
+                    // severity: {
+                    //     coding: [
+                    //         {
+                    //             system: selectedSeverityOption?.system,
+                    //             code: selectedSeverityOption?.code,
+                    //             display: selectedSeverityOption?.display,
+                    //         },
+                    //     ],
+                    //     text: selectedSeverityOption?.display,
+                    // },
+                    // exposureRoute: {
+                    //     coding: exposureRoute,
+                    //     text: exposureRoute?.display,
+                    // },
+                    // appointmentId: data?.appointment,
+                    // note: [
+                    //     {
+                    //         text: '',
+                    //         time: '',
+                    //         authorReference: {
+                    //             reference: '',
+                    //             type: '',
+                    //             identifier: {
+                    //                 use: '',
+                    //                 system: '',
+                    //                 value: '',
+                    //             },
+                    //             display: '',
+                    //         },
+                    //     },
+                    // ],
                 },
             ],
-            appointmentId: data?.appointment,
+            appointmentId: data?.appointment || '',
+            // encounterId: data?.encounter,
             note: [
                 {
                     text: data?.notes,
@@ -300,21 +303,23 @@ const AddAllergy = ({ onCancel }) => {
             setExposureRoute(null); // Reset the exposure route state
             // if (selectRef.current) selectRef.current.clearValue();
             // Fetch updated appointments
+            onCancel();
+
         }
-    }, [createStatus, reset, patientId, dispatch]);
+    }, [createStatus, reset, patientId, dispatch ,onCancel]);
 
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row className="">
-                    <Col sm={12} className="d-flex justify-content-between">
+                    {/* <Col sm={12} className="d-flex justify-content-between">
                         <h4>Add Allergy</h4>
                         <Button className="custom-buttons" onClick={onCancel}>
                             Back
                         </Button>
-                    </Col>
+                    </Col> */}
 
-                    <Col sm={4}>
+                    {/* <Col sm={4}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="allergyType" className="mb-0">
                                 Allergy Type
@@ -335,9 +340,9 @@ const AddAllergy = ({ onCancel }) => {
                                 <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
                             )}
                         </Form.Group>
-                    </Col>
+                    </Col> */}
 
-                    <Col sm={4}>
+                    <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="category" className="mb-0">
                                 Allergy Category
@@ -360,49 +365,9 @@ const AddAllergy = ({ onCancel }) => {
                         </Form.Group>
                     </Col>
 
-                    <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="criticality" className="mb-0">
-                                Criticality
-                            </Form.Label>
-                            <Form.Select
-                                {...register('criticality', { required: 'Criticality is required' })}
-                                data-has-value={!!watch('criticality')}>
-                                <option value="" hidden>
-                                    Select Criticality
-                                </option>
-                                {criticality?.map((item) => (
-                                    <option key={item?.code} value={item?.code}>
-                                        {item?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {errors.criticality && (
-                                <Form.Text className="text-danger">{errors.criticality.message}</Form.Text>
-                            )}
-                        </Form.Group>
-                    </Col>
-
-                    <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="verificationStatus" className="mb-0">
-                                Verification Status
-                            </Form.Label>
-                            <Form.Select
-                                {...register('verificationStatus', { required: 'Verification Status is required' })}
-                                data-has-value={!!watch('verificationStatus')}>
-                                <option value="">Select Verification Status</option>
-                                {verificationStatus.map((status) => (
-                                    <option key={status?.code} value={status?.code} className="text-capitalize">
-                                        {status?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
-                    <Col sm={4}>
+                    <Col sm={6}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Allergy Code</Form.Label>
+                            <Form.Label className="mb-0">Select Allergy </Form.Label>
                             <AsyncSelect
                                 // ref={selectRef}
                                 loadOptions={loadCodeOptions}
@@ -431,7 +396,69 @@ const AddAllergy = ({ onCancel }) => {
                         </Form.Group>
                     </Col>
 
+                    {/* <Col sm={6}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="severity" className="mb-0">
+                                Severity
+                            </Form.Label>
+                            <Form.Select
+                                {...register('severity', { required: 'Clinical severity is required' })}
+                                data-has-value={!!watch('severity')}>
+                                <option value="" hidden>
+                                    Select Clinical Status
+                                </option>
+                                {severityData?.map((severity) => (
+                                    <option key={severity?.code} value={severity?.code}>
+                                        {severity?.display}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col> */}
+
+                    <Col sm={6}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="criticality" className="mb-0">
+                                Criticality
+                            </Form.Label>
+                            <Form.Select
+                                {...register('criticality', { required: 'Criticality is required' })}
+                                data-has-value={!!watch('criticality')}>
+                                <option value="" hidden>
+                                    Select Criticality
+                                </option>
+                                {criticality?.map((item) => (
+                                    <option key={item?.code} value={item?.code}>
+                                        {item?.display}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            {errors.criticality && (
+                                <Form.Text className="text-danger">{errors.criticality.message}</Form.Text>
+                            )}
+                        </Form.Group>
+                    </Col>
+{/* 
                     <Col sm={4}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="verificationStatus" className="mb-0">
+                             Verification Status
+                            </Form.Label>
+                            <Form.Select
+                                {...register('verificationStatus', { required: 'Verification Status is required' })}
+                                data-has-value={!!watch('verificationStatus')}>
+                                <option value="">Select Verification Status</option>
+                                {verificationStatus.map((status) => (
+                                    <option key={status?.code} value={status?.code} className="text-capitalize">
+                                        {status?.display}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col> */}
+                  
+
+                    {/* <Col sm={4}>
                         <Form.Group>
                             <Form.Label className="mb-0">Substance</Form.Label>
                             <AsyncSelect
@@ -460,8 +487,8 @@ const AddAllergy = ({ onCancel }) => {
                                 }}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col sm={4}>
+                    </Col> */}
+                    {/* <Col sm={4}>
                         <Form.Group>
                             <Form.Label className="mb-0">Manifestation</Form.Label>
                             <AsyncSelect
@@ -490,8 +517,8 @@ const AddAllergy = ({ onCancel }) => {
                                 }}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col sm={4}>
+                    </Col> */}
+                    <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="status" className="mb-0">
                                 Clinical Status
@@ -510,27 +537,9 @@ const AddAllergy = ({ onCancel }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="severity" className="mb-0">
-                                Severity
-                            </Form.Label>
-                            <Form.Select
-                                {...register('severity', { required: 'Clinical severity is required' })}
-                                data-has-value={!!watch('severity')}>
-                                <option value="" hidden>
-                                    Select Clinical Status
-                                </option>
-                                {severityData?.map((severity) => (
-                                    <option key={severity?.code} value={severity?.code}>
-                                        {severity?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
+                  
 
-                    <Col sm={4}>
+                    {/* <Col sm={4}>
                         <Form.Group>
                             <Form.Label className="mb-0"> Exposure Route</Form.Label>
                             <AsyncSelect
@@ -559,8 +568,8 @@ const AddAllergy = ({ onCancel }) => {
                                 }}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col sm={4}>
+                    </Col> */}
+                    <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Appointment</Form.Label>
                             <Form.Select {...register('appointment')}>
@@ -572,7 +581,7 @@ const AddAllergy = ({ onCancel }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col sm={4}>
+                    {/* <Col sm={4}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="Encounter" className="mb-0">
                                 Encounter
@@ -587,9 +596,9 @@ const AddAllergy = ({ onCancel }) => {
                                 <option value="2">Encounter 2</option>
                             </Form.Select>
                         </Form.Group>
-                    </Col>
+                    </Col> */}
 
-                    <Col sm={8}>
+                    <Col sm={12}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="notes" className="mb-0">
                                 Note
@@ -604,20 +613,20 @@ const AddAllergy = ({ onCancel }) => {
                             />
                         </Form.Group>
                     </Col>
-                    <Col sm={12} className="d-flex justify-content-end gap-1 mt-1">
+                    <Col sm={12} className="d-flex justify-content-end gap-1 mt-2">
                         <Button className="custom-buttons" onClick={() => setCode(null)}>
-                            Cancel
+                            Save & Add Another
                         </Button>
                         {/* <Button className='custom-buttons'>Save and Add Another</Button> */}
                         <Button
                             className="custom-buttons"
                             type="submit"
-                            style={{ width: '55px' }}
+                            style={{ width: '100px' }}
                             disabled={store?.createAllergyReducer?.loading}>
                             {store?.createAllergyReducer?.loading ? (
                                 <Spinner animation="border" size="sm" className="text-white" />
                             ) : (
-                                'Save'
+                                'Save & Exit'
                             )}
                         </Button>
                     </Col>

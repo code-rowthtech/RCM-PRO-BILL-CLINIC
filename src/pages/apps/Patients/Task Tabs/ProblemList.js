@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FiEdit, FiPlus } from 'react-icons/fi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
@@ -20,6 +20,8 @@ const ProblemList = () => {
     const [showAddProblem, setShowAddProblem] = useState(false);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+    const [problemModal, setProblemModal] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [showUpdateProblem, setShowUpdateProblem] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const store = useSelector((state) => state);
@@ -33,19 +35,21 @@ const ProblemList = () => {
     }, [dispatch, patientId]);
     const handleEditClick = (problem) => {
         setSelectedProblem(problem);
-        setShowUpdateProblem(true);
+        setIsEditMode(true);
+        setProblemModal(true);
     };
     // delete function
     // const handleDelete = (data) =>{
     //     dispatch(deleteProblemListAction({id:data?._id} ));
     // }
     return (
-        <div>
-            {showAddProblem ? (
+        <>
+            <div>
+                {/* {showAddProblem ? (
                 <AddProblem onCancel={() => setShowAddProblem(false)} />
             ) : showUpdateProblem ? (
                 <UpdateProblem problem={selectedProblem} onCancel={() => setShowUpdateProblem(false)} />
-            ) : (
+            ) : ( */}
                 <Row>
                     <Col sm={12} className="d-flex justify-content-between">
                         <h4>Active Problem</h4>
@@ -58,7 +62,14 @@ const ProblemList = () => {
                                 <input className="form-check-input bg-primary me-1" type="checkbox" />
                                 Patient has no known active problem
                             </p>
-                            <Button className="custom-buttons text-nowrap" onClick={() => setShowAddProblem(true)}>
+                            <Button
+                                className="custom-buttons text-nowrap"
+                                //  onClick={() => setShowAddProblem(true)}
+                                onClick={() => {
+                                    setIsEditMode(false);
+                                    setSelectedProblem(null);
+                                    setProblemModal(true);
+                                }}>
                                 <FiPlus className="fs-5 text-white" />
                                 &nbsp; Problem
                             </Button>
@@ -121,8 +132,7 @@ const ProblemList = () => {
                                                     }}
                                                 />
                                                 &nbsp;
-                                             
-                                                  <MdDeleteOutline
+                                                <MdDeleteOutline
                                                     className="fs-4 cursor-pointer text-black"
                                                     // onClick={() => {
                                                     //     handleDelete(data);
@@ -136,8 +146,21 @@ const ProblemList = () => {
                         </Table>
                     </Col>
                 </Row>
-            )}
-        </div>
+                {/* // )} */}
+            </div>
+            <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>{isEditMode ? 'Update Problem' : 'Add Problem'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {isEditMode ? (
+                        <UpdateProblem problem={selectedProblem} onCancel={() => setProblemModal(false)} />
+                    ) : (
+                        <AddProblem onCancel={() => setProblemModal(false)} />
+                    )}
+                </Modal.Body>
+            </Modal>
+        </>
     );
 };
 
