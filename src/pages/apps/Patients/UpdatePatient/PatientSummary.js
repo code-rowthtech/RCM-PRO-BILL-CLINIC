@@ -10,6 +10,9 @@ import { getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { handlePrintAllergies } from '../Task Tabs/PDFfiles/allergyPDF';
 import { getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import AddAllergy from '../Task Tabs/AddAllergy';
+import { handlePrintVitals } from '../../../../helpers/printVitals';
+import VitalStatus from './VitalStatus';
+import Spinner from '../../../../constants/Spinner';
 const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -128,6 +131,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
 
     const handleAddAllergyOpen = () => setShowAddAllergyModal(true);
     const handleAddAllergyClose = () => setShowAddAllergyModal(false);
+    const [vitalsModal, setVitalsModal] = useState(false)
+
+    const closeVitalsModal = () => {
+        setVitalsModal(false)
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+    }
     return (
         <div className="patient-summary">
 
@@ -145,39 +154,46 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     type='date'
                                     value={effectiveDateTime}
                                     onChange={(e) => setEffectiveDateTime(e.target.value)} />
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                                <MdAddCircleOutline onClick={() => setVitalsModal(true)} className="text-primary me-2 cursor-pointer" />
+                                <MdOutlinePrint
+                                    onClick={() => handlePrintVitals({ vitals: store?.getVitalsByPatientIdReducer?.data?.data, patientDetails: patientDetails })}
+                                    className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
                         <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
-                            <div className="vitals-grid fs-6">
-                                {patientVitals?.vitals?.map((data) => (
-                                    <div className="vital-item">
-                                        <span className="text-muted">{data?.code?.coding?.[0]?.display}</span>
-                                        {data?.valueString &&
-                                            <div className="fw-bold">{data?.valueString || 'N/A'}</div>
-                                        }
-                                        {data?.valueQuantity &&
-                                            <div className="fw-bold">{data?.valueQuantity?.value || 'N/A'} <span>{data?.valueQuantity?.unit}</span></div>}
-                                        {data?.component && !data?.valueString && !data?.valueQuantity && (
-                                            <div className="fw-bold">
-                                                {(() => {
-                                                    const systolic = data.component.find(c =>
-                                                        c.code?.coding?.[0]?.code === '8480-6'
-                                                    )?.valueQuantity?.value;
+                            {store?.getVitalsByPatientIdReducer?.loading ?
+                                <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
+                                    <Spinner className='spinner-border-sm' />
+                                </div>
+                                :
+                                <div className="vitals-grid fs-6">
+                                    {patientVitals?.vitals?.map((data) => (
+                                        <div key={data?._id} className="vital-item">
+                                            <span className="text-muted">{data?.code?.coding?.[0]?.display}</span>
+                                            {data?.valueString &&
+                                                <div className="fw-bold">{data?.valueString || 'N/A'}</div>
+                                            }
+                                            {data?.valueQuantity &&
+                                                <div className="fw-bold">{data?.valueQuantity?.value || 'N/A'} <span>{data?.valueQuantity?.unit}</span></div>}
+                                            {data?.component && !data?.valueString && !data?.valueQuantity && (
+                                                <div className="fw-bold">
+                                                    {(() => {
+                                                        const systolic = data.component.find(c =>
+                                                            c.code?.coding?.[0]?.code === '8480-6'
+                                                        )?.valueQuantity?.value;
 
-                                                    const diastolic = data.component.find(c =>
-                                                        c.code?.coding?.[0]?.code === '8462-4'
-                                                    )?.valueQuantity?.value;
+                                                        const diastolic = data.component.find(c =>
+                                                            c.code?.coding?.[0]?.code === '8462-4'
+                                                        )?.valueQuantity?.value;
 
-                                                    return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
-                                                })()}
-                                            </div>
-                                        )}
+                                                        return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
+                                                    })()}
+                                                </div>
+                                            )}
 
-                                    </div>
-                                ))}
-                            </div>
+                                        </div>
+                                    ))}
+                                </div>}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -430,6 +446,14 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Modal.Header>
                 <Modal.Body>
                     <AddAllergy onCancel={handleAddAllergyClose} />
+                </Modal.Body>
+            </Modal>
+            <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
+                <Modal.Header closeButton className="px-2 py-0">
+                    <Modal.Title className="">Add Vitals</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <VitalStatus />
                 </Modal.Body>
             </Modal>
         </div >

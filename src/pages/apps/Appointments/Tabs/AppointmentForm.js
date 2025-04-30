@@ -713,8 +713,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         Select
                                     </option>
                                     {appointmentTypeOptions.map((option) => (
-                                        <option key={option.value} value={option.show}>
-                                            {option.show}
+                                        <option key={option?.value} value={option?.show}>
+                                            {option?.show}
                                         </option>
                                     ))}
                                 </Form.Select>
@@ -862,13 +862,21 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     {...register('status', { required: 'Status is required' })}
                                     defaultValue="Scheduled">
                                     <option value='' key={''} hidden>Select Status</option>
-                                    {appointmentStatus?.map((data, index) => (
-                                        <option value={data?.code} key={index}>{data?.display}</option>
+                                    {(id
+                                        ? appointmentStatus
+                                        : appointmentStatus.filter(data =>
+                                            ['proposed', 'booked', 'arrived', 'checked-in'].includes(data.code)
+                                        )
+                                    ).map((data, index) => (
+                                        <option value={data.code} key={index}>
+                                            {data.display}
+                                        </option>
                                     ))}
                                 </Form.Control>
                                 {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
                             </Form.Group>
                         </Col>
+
                     </Row>
                     <Row>
                         {repeat && (
