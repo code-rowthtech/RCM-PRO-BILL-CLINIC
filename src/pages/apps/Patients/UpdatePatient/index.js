@@ -30,6 +30,7 @@ import { patientMenuItems } from './patientsMenuItems';
 import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
 import Medication from './Medication';
+import Subsocialtabindex from './Subsocialtabindex';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -496,17 +497,17 @@ const UpdatePatientIndex = () => {
                                                             <Button
                                                                 as={Link}
                                                                 to="/apps/appointments/newAppointment"
-                                                                className="custom-buttons">
+                                                                className="shadow-none" style={{fontSize:'10px' , borderRadius:'8px' , padding:"3px 7px 3px 7px" , width:'100px' ,backgroundColor:' #6169d0'}}>
                                                                 New Appointment
                                                             </Button>
                                                             <Button
                                                                 as={Link}
                                                                 to="#"
-                                                                className="mt-1 custom-buttons">
+                                                                className="mt-1 shadow-none" style={{fontSize:'10px' , borderRadius:'8px' , padding:"3px 7px 3px 7px" ,width:'100px',backgroundColor:' #6169d0'}}>
                                                                 New Encounter
                                                             </Button>
 
-                                                            <div className="mt-1 d-flex justify-content-center gap-2 ps-2 ">
+                                                            <div className="mt-2 d-flex justify-content-center gap-2 ps-2 ">
                                                                 <IoPrintSharp className="fs-4 text-black" />
                                                                 <LiaReceiptSolid className="fs-4 text-black" />
                                                             </div>
@@ -533,7 +534,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medication List' && <Medication />}
                                                 {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Tabacco' && <p>In progress...</p>}
+                                                {selectedMainTab === 'Tabacco' && <Subsocialtabindex isAccordionOpen= {isAccordionOpen}/>}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Alcohol' && <p>In progress...</p>}

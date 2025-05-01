@@ -568,7 +568,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                     <Modal.Title className="">Add Appointment </Modal.Title>
                 </Modal.Header>
                 <Modal.Body className='p-0'>
-                    <NewAppointment onCancel={handleAppointmentClose} />
+                    <NewAppointment isModal={true}  onCancel={handleAppointmentClose} />
                 </Modal.Body>
             </Modal>
         </div>
