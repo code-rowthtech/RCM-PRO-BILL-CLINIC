@@ -7,6 +7,11 @@ export function createMedicationApi(params: any): any {
     return api.create(URL.createMedication, data);
 }
 
+export function updateMedicationApi(params: any): any {
+    const { data } = params;
+    return api.update(`${URL.updateMedication}/${data?.medicationId}`, data);
+}
+
 export function getMedicationDrugsApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.getMedicationDrugs}?page=${data?.skip}&query=${data?.search}`);

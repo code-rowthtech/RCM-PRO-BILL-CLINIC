@@ -74,6 +74,7 @@ const Demographicdetails = ({ patientId, isAccordionOpen }) => {
         { type: 'physical', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
     ]);
 
+    console.log(patientDetails,'patientDetails')
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     const formatPhoneNumber = (phone) => {
         if (!phone) return '';

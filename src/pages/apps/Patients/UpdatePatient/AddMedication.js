@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Modal, Form, Button, Row, Col, Accordion } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { createMedicationAction, getDrugsAction, getMedicationAction } from '../../../../redux/actions';
+import { createMedicationAction, getDrugsAction, getMedicationAction, updateMedicationAction } from '../../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { debounce, set } from 'lodash';
 import Datetime from 'react-datetime';
@@ -14,7 +14,6 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 
 export default function AddMedication({ show, onCancel, selectedMedication }) {
-  console.log(selectedMedication, 'problemListselectedMedication')
   const { register, handleSubmit, setValue, reset } = useForm();
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get('id');
@@ -26,7 +25,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [additionalInstruction, setAdditionalInstruction] = useState();
   const createSuccess = store?.createMedicationReducer?.data?.status;
-  console.log(createSuccess, 'createSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccess')
+  const updateSuccess = store?.updateMedicationReducer?.data?.status;
   useEffect(() => {
     if (createSuccess === 201) {
       onCancel();
@@ -34,13 +33,21 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
       dispatch(getMedicationAction({ patientId: patientId }))
     }
   }, [createSuccess]);
+  useEffect(() => {
+    if (updateSuccess === 200) {
+      onCancel();
+      reset();
+      dispatch(getMedicationAction({ patientId: patientId }))
+    }
+  }, [updateSuccess]);
+
   const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
   // Debounced search (memoized)
   const debouncedSearch = useMemo(
     () =>
       debounce((searchValue) => {
         dispatch(getDrugsAction({ skip: 1, search: searchValue }));
-      }, 500),
+      }, 100),
     [dispatch]
   );
 
@@ -53,6 +60,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
       setValue('sequence', selectedMedication?.dosageInstruction?.[0]?.sequence);
       setValue('relatedProblem', selectedMedication?.problemId);
       setValue('status', selectedMedication?.status);
+      setValue('notes', selectedMedication?.note?.[0]?.text);
+      const updatedAdditionalInstruction = selectedMedication?.dosageInstruction?.[0]?.additionalInstruction?.[0]?.coding?.[0];
+      setAdditionalInstruction(updatedAdditionalInstruction);
       setValue(
         'medicationStart',
         selectedMedication?.startDate
@@ -91,7 +101,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
         }
       ],
       dosageInstruction: {
-        sequence: data?.sequence,
+        sequence: parseInt(data?.sequence),
         text: additionalInstruction?.display,
         additionalInstruction: [
           {
@@ -113,23 +123,31 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
           }
         },
       },
-      drugId: selectedDrug?._id,
-      startDate: data?.medicationStart,
+      ...(!selectedMedication&&{drugId: selectedDrug?._id}),
+      ...(!selectedMedication&&{startDate: data?.medicationStart}),
+      ...(!selectedMedication&&{problemId: data?.relatedProblem}),
       endDate: data?.medicationEnd,
-      problemId: data?.relatedProblem,
       subject: patientId
     };
-    dispatch(createMedicationAction({ key: encryptMessage(medicationData) }))
+
+    if(selectedMedication){
+dispatch(updateMedicationAction({ key: encryptMessage(medicationData), medicationId: selectedMedication?._id }))
+}else{
+      dispatch(createMedicationAction({ key: encryptMessage(medicationData) }))
+    }
   };
 
   const additionalInstructionOptions = additionalInformation?.map((item) => ({
-    value: item?.code,
-    data: item,
+    value: item,
     label: item.display,
   }));
+  
+  const selectedInstruction =
+  additionalInstructionOptions.find((option) => option?.value?.code === additionalInstruction?.[0]?.code) ||
+  additionalInstructionOptions.find((option) => option?.value?.display === additionalInstruction);
 
   const additionalInstructionChange = (selectedOptions) => {
-    setAdditionalInstruction(selectedOptions?.data);
+    setAdditionalInstruction(selectedOptions?.value);
   };
 
   const dropdownRef = useRef(null);
@@ -242,7 +260,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                   className="basic-single"
                   classNamePrefix="select"
                   placeholder="&nbsp; Select"
-                  value={additionalInstruction?.value}
+                  value={selectedInstruction}
                   onChange={additionalInstructionChange}
                 />
               </Form.Group>
@@ -303,7 +321,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             }} className="me-2 custom-buttons">
               Cancel
             </Button>
-            <Button type="submit" className='custom-buttons'>
+            <Button disabled={store?.createMedicationReducer?.loading||store?.updateMedicationReducer?.loading} type="submit" className='custom-buttons'>
               {selectedMedication ? 'Update' : "Save"}
             </Button>
           </div>

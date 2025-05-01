@@ -32,7 +32,6 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
 
-    console.log(medicationList, 'medicationList');
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false)
@@ -217,40 +216,42 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             </div>
                         </Card.Header>
                         <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
-                            {store?.getVitalsByPatientIdReducer?.loading ?
+                            {store?.getVitalsByPatientIdReducer?.loading ? (
                                 <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
                                     <Spinner className='spinner-border-sm' />
                                 </div>
-                                :
+                            ) : (
                                 <div className="vitals-grid fs-6">
-                                    {patientVitals?.vitals?.map((data) => (
-                                        <div key={data?._id} className="vital-item">
-                                            <span className="text-muted">{data?.code?.coding?.[0]?.display}</span>
-                                            {data?.valueString &&
-                                                <div className="fw-bold">{data?.valueString || 'N/A'}</div>
+                                    {(!patientVitals?.vitals || patientVitals.vitals.length === 0) ? (
+                                        <div className='fw-bold text-nowrap fs-6' style={{ height: '100%' }}>No Vitals Found</div>
+                                    ) : (
+                                        patientVitals.vitals.map((data) => {
+                                            const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
+
+                                            const value =
+                                                data?.valueString ??
+                                                (data?.valueQuantity?.value ? `${data.valueQuantity.value} ${data.valueQuantity.unit || ''}` : null) ??
+                                                (data?.valueBoolean !== undefined ? (data.valueBoolean ? 'Yes' : 'No') : null);
+
+                                            let bpReading = null;
+                                            if (data.component && !value) {
+                                                const systolic = data.component.find(c => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
+                                                const diastolic = data.component.find(c => c.code?.coding?.[0]?.code === '8462-4')?.valueQuantity?.value;
+                                                bpReading = `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
                                             }
-                                            {data?.valueQuantity &&
-                                                <div className="fw-bold">{data?.valueQuantity?.value || 'N/A'} <span>{data?.valueQuantity?.unit}</span></div>}
-                                            {data?.component && !data?.valueString && !data?.valueQuantity && (
-                                                <div className="fw-bold">
-                                                    {(() => {
-                                                        const systolic = data.component.find(c =>
-                                                            c.code?.coding?.[0]?.code === '8480-6'
-                                                        )?.valueQuantity?.value;
 
-                                                        const diastolic = data.component.find(c =>
-                                                            c.code?.coding?.[0]?.code === '8462-4'
-                                                        )?.valueQuantity?.value;
-
-                                                        return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
-                                                    })()}
+                                            return (
+                                                <div key={data?._id} className="vital-item">
+                                                    <span className="text-muted">{codeDisplay}</span>
+                                                    <div className="fw-bold">{value || bpReading || 'N/A'}</div>
                                                 </div>
-                                            )}
-
-                                        </div>
-                                    ))}
-                                </div>}
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            )}
                         </Card.Body>
+
                     </Card>
                 </Col>
 
@@ -416,7 +417,13 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </div>
                                 :
                                 <ul className="list-unstyled">
-                                    {medicationList?.slice(0, 4)?.map((medication, index) => (
+                                    {medicationList?.length === 0||!medicationList ? (
+                                        <li className="mb-2">
+                                            <div className="fs-6  d-flex justify-content-between align-items-center">
+                                                <strong>No Medications Found</strong>
+                                            </div>
+                                        </li>
+                                    ) : medicationList?.slice(0, 4)?.map((medication, index) => (
                                         <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
                                             <div className="fs-6">
                                                 <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
@@ -435,9 +442,11 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </ul>
                             }
                         </Card.Body>
-                        <Card.Footer className='border-0 pb-1 text-end'>
-                            <u onClick={() => setSelectedMainTab('Medication List')} className='text-info cursor-pointer'>View All</u>
-                        </Card.Footer>
+                        <div
+                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                            onClick={() => setSelectedMainTab('Medication List')}>
+                            Go To Medication List
+                        </div>
                     </Card>
                 </Col>
 

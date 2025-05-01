@@ -27,7 +27,7 @@ import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, ge
 import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
 import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
 import { createSuggestionsReducer } from './suggestions/reducer';
-import { createMedicationReducer, getDrugsReducer, getMedicationReducer } from './medication/reducer';
+import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -56,5 +56,5 @@ export default (combineReducers({
     // allergy list
     createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer, deleteAllergyReducer,
     // suggestions
-    createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer
+    createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer,updateMedicationReducer
 }): any);
