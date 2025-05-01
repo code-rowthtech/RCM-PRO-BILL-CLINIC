@@ -27,7 +27,6 @@ const AllergyList = () => {
     const store = useSelector((state) => state);
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const deleteStatus = store?.deleteAllergyReducer?.data?.status;
-    console.log('allergyData', allergyData);
 
     useEffect(() => {
         const data = {
@@ -86,6 +85,7 @@ const AllergyList = () => {
                                     <th className="text-white">Allergy</th>
                                     {/* <th className="text-white">Verification Status</th> */}
                                     {/* <th className="text-white">Criticality</th> */}
+                                    <th className="text-white">Date</th>
                                     <th className="text-white">Notes</th>
                                     <th className="text-white">Action</th>
                                 </tr>
@@ -127,6 +127,12 @@ const AllergyList = () => {
                                                 {/* <td className="text-capitalize">
                                                         {data?.criticality?.display || 'N/A'}
                                                     </td> */}
+                                                <td className="text-capitalize">
+                                                    {data?.onset?.onsetDateTime
+                                                        ? new Date(data.onset.onsetDateTime).toISOString().split('T')[0]
+                                                        : 'N/A'}
+                                                </td>
+
                                                 <td className="text-capitalize">{data?.note?.[0]?.text || 'N/A'}</td>
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />

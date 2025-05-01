@@ -2,7 +2,15 @@ import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects'
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { ProblemListActionTypes } from './constants';
-import { createProblemListApi, deleteProblemListApi, getAllCodeApi, getPatientAppointmentsApi, getProblemDetailsApi, getProblemListApi, updateProblemListApi } from './api';
+import {
+    createProblemListApi,
+    deleteProblemListApi,
+    getAllCodeApi,
+    getPatientAppointmentsApi,
+    getProblemDetailsApi,
+    getProblemListApi,
+    updateProblemListApi,
+} from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -50,6 +58,10 @@ function* createProblemListFunction(data) {
                 type: ProblemListActionTypes.CREATE_PROBLEM_LIST_SUCCESS,
                 payload: { ...decryptedData },
             });
+            yield put({
+                type: ProblemListActionTypes.CREATE_PROBLEM_LIST_RESET,
+                payload: {},
+            });
         } else {
             yield put({
                 type: ProblemListActionTypes.CREATE_PROBLEM_LIST_ERROR,
@@ -73,11 +85,16 @@ function* deleteProblemFunction(data) {
         });
         const response = yield call(deleteProblemListApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
+
+        if (response?.status === 200) {
+            ToastHandle(decryptedData?.message, 'danger');
             yield put({
                 type: ProblemListActionTypes.DELETE_PROBLEM_LIST_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: ProblemListActionTypes.DELETE_PROBLEM_LIST_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -93,7 +110,6 @@ function* deleteProblemFunction(data) {
         });
     }
 }
-
 function* updateProblemListFunction(data) {
     try {
         yield put({
@@ -107,6 +123,10 @@ function* updateProblemListFunction(data) {
             yield put({
                 type: ProblemListActionTypes.UPDATE_PROBLEM_LIST_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: ProblemListActionTypes.UPDATE_PROBLEM_LIST_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -177,7 +197,6 @@ function* getPatientAppointmentFunction(data) {
         });
     }
 }
-
 
 function* getProblemDetailsFunction(data) {
     try {

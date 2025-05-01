@@ -21,7 +21,16 @@ export function getPractitionerScheduleApi(params: any): any {
 
 export function getAppointmentsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getAppointments}${data?.clinicId}?status=${data?.status}&doctorId=${data?.doctorId || ''}&page=${data?.skip}&limit=${data?.limit}&monthYear=${data?.monthYear || ''}`);
+    let query = `${URL.getAppointments}${data?.clinicId}?status=${data?.status}&doctorId=${data?.doctorId || ''}&page=${
+        data?.skip
+    }&limit=${data?.limit}&monthYear=${data?.monthYear || ''}`;
+
+    if (data?.patientId) {
+        query += `&patientId=${data.patientId}`;
+    }
+
+    return api.get(query);
+    // return api.get(`${URL.getAppointments}${data?.clinicId}?status=${data?.status}&doctorId=${data?.doctorId || ''}&patientId=${data?.patientId}&page=${data?.skip}&limit=${data?.limit}&monthYear=${data?.monthYear || ''}`);
 }
 
 export function getAppointmentByIdApi(params: any): any {
@@ -33,4 +42,3 @@ export function getPractitionerSlotsApi(params: any): any {
     const { data } = params;
     return api.create(URL.getPractitionerSlots, data);
 }
-

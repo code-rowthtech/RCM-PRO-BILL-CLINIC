@@ -27,7 +27,7 @@ const ProblemList = () => {
     const store = useSelector((state) => state);
     const problemList = store?.getProblemListReducer?.data?.problems;
     const isLoading = store?.getProblemListReducer?.loading;
-
+    const deleteResponse = store?.deleteProblemListReducer?.data?.status;
     useEffect(() => {
         if (patientId) {
             dispatch(getProblemListAction({ patientId }));
@@ -39,9 +39,15 @@ const ProblemList = () => {
         setProblemModal(true);
     };
     // delete function
-    // const handleDelete = (data) =>{
-    //     dispatch(deleteProblemListAction({id:data?._id} ));
-    // }
+    const handleDelete = (data) =>{
+        dispatch(deleteProblemListAction({id:data?._id} ));
+    }
+
+    useEffect(() => {
+        if (deleteResponse === 200) {
+            dispatch(getProblemListAction({ patientId }));
+        }
+    }, [deleteResponse, dispatch, patientId]);
     return (
         <>
             <div>
@@ -80,14 +86,14 @@ const ProblemList = () => {
                             <thead className="text-white bg-dark">
                                 <tr>
                                     <th className="text-white">Problem</th>
-                                    <th className="text-white">Codes</th>
+                                    {/* <th className="text-white">Codes</th> */}
                                     <th className="text-white">ICD-CM Code</th>
-                                    <th className="text-white">Snomed</th>
+                                    {/* <th className="text-white">Snomed</th> */}
                                     <th className="text-white">Diagnosed Date</th>
-                                    <th className="text-white">Date Changed</th>
+                                    {/* <th className="text-white">Date Changed</th> */}
                                     <th className="text-white">Status</th>
                                     <th className="text-white">Notes</th>
-                                    <th className="text-white">Updates</th>
+                                    {/* <th className="text-white">Updates</th> */}
                                     <th className="text-white">Action</th>
                                 </tr>
                             </thead>
@@ -107,17 +113,13 @@ const ProblemList = () => {
                                 ) : (
                                     problemList?.map((data, index) => (
                                         <tr key={data.id || index}>
-                                            <td>{data.problem || 'N/A'}</td>
-                                            <td>{data.icdCode || 'N/A'}</td>
-                                            <td>{data.icdVersion || 'N/A'}</td>
-                                            <td>{data.snomed || 'N/A'}</td>
-                                            <td>{new Date(data.datetimeChanged).toLocaleDateString('en-GB')}</td>
-                                            <td>{data.dateChanged || 'N/A'}</td>
-                                            <td>{data.status || 'N/A'}</td>
+                                            <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
+                                            <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
+                                            <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
                                             <td>
-                                                <FaEye className="fs-4 ms-2 cursor-pointer text-black" />
+                                                {data.clinicalStatus?.coding?.[0]?.display || 'N/A'}
                                             </td>
-                                            <td>{data.updates || 'N/A'}</td>
+                                            <td>{data?.note?.[0]?.text || 'N/A'}</td>
                                             <td>
                                                 <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                 &nbsp;
@@ -134,9 +136,9 @@ const ProblemList = () => {
                                                 &nbsp;
                                                 <MdDeleteOutline
                                                     className="fs-4 cursor-pointer text-black"
-                                                    // onClick={() => {
-                                                    //     handleDelete(data);
-                                                    // }}
+                                                    onClick={() => {
+                                                        handleDelete(data);
+                                                    }}
                                                 />
                                             </td>
                                         </tr>
@@ -149,7 +151,7 @@ const ProblemList = () => {
                 {/* // )} */}
             </div>
             <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
-                <Modal.Header closeButton>
+                <Modal.Header closeButton className='px-2 py-0'>
                     <Modal.Title>{isEditMode ? 'Update Problem' : 'Add Problem'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

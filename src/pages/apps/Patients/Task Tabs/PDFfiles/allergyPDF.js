@@ -7,8 +7,11 @@ export const handlePrintAllergies = ({ patientDetails, allergyData = [] }) => {
 
     const formatDate = (dateStr) => {
         if (!dateStr) return '';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-GB');
+        const date = new Date(dateStr);
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const year = date.getUTCFullYear();
+        return `${day}-${month}-${year}`;
     };
 
     const getAgeString = (birthDate) => {
@@ -27,39 +30,44 @@ export const handlePrintAllergies = ({ patientDetails, allergyData = [] }) => {
   <table>
     <thead>
       <tr>
-        <th>TYPE</th>
         <th>ALLERGY</th>
         <th>CATEGORY</th>
+        <th>Date</th>
         <th>CLINICAL STATUS</th>
+        <th>NOTES</th>
       </tr>
     </thead>
     <tbody>
-      ${
-          filteredAllergies.length === 0
-              ? `<tr><td colspan="4">No allergies recorded</td></tr>`
-              : filteredAllergies
-                    .map((a) => {
-                        const typeMap = {
-                            medication: 'Drug',
-                            food: 'Food',
-                            environment: 'Environmental',
-                        };
-                        const category = a.category?.[0]?.code?.toUpperCase();
-                        const typeLabel = typeMap[category] || '-';
-                        const substance = a.code?.text || a.code?.coding?.[0]?.display || '-';
-                        const reactions = a.reaction?.[0];
-                        const clinicalStatus = a.clinicalStatus?.text || a.clinicalStatus?.[0]?.coding?.[0]?.display || '-';
-                        const type = a.code?.text || '-';
-                        return `
+    
+    ${
+        filteredAllergies.length === 0
+            ? `<tr><td colspan="5">No allergies recorded</td></tr>`
+            : filteredAllergies
+                  .map((a) => {
+                      const typeMap = {
+                          medication: 'Drug',
+                          food: 'Food',
+                          environment: 'Environmental',
+                      };
+                      const category = a.category?.[0]?.code?.toLowerCase();
+                      const typeLabel = typeMap[category] || '-';
+                      const substance = a.code?.text || a.code?.coding?.[0]?.display || '-';
+                      const reactions = a.reaction?.[0];
+                      const clinicalStatus =
+                          a.clinicalStatus?.text || a.clinicalStatus?.[0]?.coding?.[0]?.display || '-';
+                      const date = a.onset?.onsetDateTime;
+                      const notes = a.note?.[0]?.text || a.note?.[0]?.coding?.[0]?.display || '-';
+                      return `
                 <tr>
-                  <td>${type}</td>
                   <td>${substance}</td>
-                 <td>${category}</td>
+                  <td>${typeLabel}</td>
+                  <td>${formatDate(date)}</td>
                   <td>${clinicalStatus}</td>
+                  <td>${notes}</td>
                 </tr>`;
-                    })
-                    .join('')
-      }
+                  })
+                  .join('')
+    }
     </tbody>
   </table>
 `;

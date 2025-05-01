@@ -15,6 +15,7 @@ import { manifestationData } from '../../../../utils/DataSets/Allergy/manificati
 import { exposureRouteData } from '../../../../utils/DataSets/Allergy/exposureRoute';
 import { createAllergyAction, getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import { getPatientAppointmentAction } from '../../../../redux/ProblemList/action';
+import { createSuggestionAction } from '../../../../redux/suggestions/action';
 
 const AddAllergy = ({ onCancel }) => {
     const dispatch = useDispatch();
@@ -23,16 +24,18 @@ const AddAllergy = ({ onCancel }) => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const appointments = store?.getPatientAppointmentReducer?.data || [];
-    console.log(appointments, 'appointments');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
-    console.log(userId, 'userId');
     const createStatus = store?.createAllergyReducer?.data?.status;
-    console.log(clinicId, 'clinicId');
+    const suggestionDataget = store?.createSuggestionsReducer;
+    console.log(suggestionDataget, 'suggestionDataget');
     const [code, setCode] = useState(null);
+    console.log(code, 'code');
     const [substance, setSubstance] = useState(null);
     const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
     const [exposureRoute, setExposureRoute] = useState(null); // State to store selected exposure route
+    const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
+    const [submissionType, setSubmissionType] = useState(null);
     const {
         register,
         handleSubmit,
@@ -57,7 +60,6 @@ const AddAllergy = ({ onCancel }) => {
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
         const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
-        console.log(severityData, 'severityData');
 
         const payload = {
             patientId: patientId,
@@ -66,7 +68,7 @@ const AddAllergy = ({ onCancel }) => {
             // asserterId: userId,
             recorderId: userId,
             resourceType: 'AllergyIntolerance',
-            type:  {
+            type: {
                 coding: [
                     {
                         system: selectedType?.system,
@@ -178,12 +180,19 @@ const AddAllergy = ({ onCancel }) => {
                 },
             ],
         };
-        if (data?.appointment) {
-            payload.appointmentId = data.appointment;
+        if (selectMode === 'appointment' && data.appointment) {
+            let appData = JSON.parse(data.appointment);
+            payload.appointmentId = appData?._id;
+            payload.onset = {
+                onsetDateTime: appData?.date, // optionally use actual date
+            };
+        } else if (selectMode === 'date' && data.appointmentDate) {
+            payload.onset = {
+                onsetDateTime: data.appointmentDate,
+            };
         }
-        
-
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'allergypayload');
     };
 
     const formattedCodeOption = useMemo(
@@ -195,7 +204,16 @@ const AddAllergy = ({ onCancel }) => {
         []
     );
     const handleCodeChange = useCallback((selectedOption) => {
+        // console.log(selectedOption,"selectedOption")
         setCode(selectedOption ? selectedOption.value : '');
+        dispatch(
+            createSuggestionAction({
+                module: 'allergy',
+                usedFor: 'notes',
+                type: 'clinical',
+                relatedTo: selectedOption?.label,
+            })
+        );
     }, []);
 
     const selectedCodeOption = useMemo(() => {
@@ -294,58 +312,41 @@ const AddAllergy = ({ onCancel }) => {
         },
         [formattedExposurRouteOption]
     );
+    // useEffect(() => {
+    //     if (createStatus === 200) {
+
+    //     }
+    // }, [createStatus, reset, patientId, dispatch, onCancel]);
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
     useEffect(() => {
         if (createStatus === 200) {
-            const data = {
-                patientId: patientId,
-            };
-            dispatch(getAllergiesOfPatientAction(data));
-            reset(); // Reset the form fields
-            setCode(null); // Reset the code state
-            setSubstance(null); // Reset the substance state
-            setManifestation(null); // Reset the manifestation state
-            setExposureRoute(null); // Reset the exposure route state
-            // if (selectRef.current) selectRef.current.clearValue();
-            // Fetch updated appointments
-            onCancel();
-
+            if (submissionType === 'saveAndNext') {
+                const data = {
+                    patientId: patientId,
+                };
+                dispatch(getAllergiesOfPatientAction(data));
+                reset(); // Reset the form fields
+                setCode(null); // Reset the code state
+                setSubstance(null); // Reset the substance state
+                setManifestation(null); // Reset the manifestation state
+                setExposureRoute(null); // Reset the exposure route state
+                onCancel();
+            } else if (submissionType === 'saveAndReset') {
+                reset();
+                setCode(null);
+                setSubstance(null);
+                setManifestation(null);
+                setExposureRoute(null);
+                setSelectMode('appointment');
+            }
         }
-    }, [createStatus, reset, patientId, dispatch ,onCancel]);
+    }, [createStatus, patientId, reset, dispatch, onCancel, submissionType]);
 
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <Row className="">
-                    {/* <Col sm={12} className="d-flex justify-content-between">
-                        <h4>Add Allergy</h4>
-                        <Button className="custom-buttons" onClick={onCancel}>
-                            Back
-                        </Button>
-                    </Col> */}
-
-                    {/* <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="allergyType" className="mb-0">
-                                Allergy Type
-                            </Form.Label>
-                            <Form.Select
-                                {...register('allergyType', { required: 'Allergy Type is required' })}
-                                data-has-value={!!watch('allergyType')}>
-                                <option value="" hidden>
-                                    Select Allergy Type
-                                </option>
-                                {allergyType?.map((type) => (
-                                    <option key={type?.code} value={type?.code}>
-                                        {type?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {errors.allergyType && (
-                                <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
-                            )}
-                        </Form.Group>
-                    </Col> */}
-
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="category" className="mb-0">
@@ -368,7 +369,6 @@ const AddAllergy = ({ onCancel }) => {
                             )}
                         </Form.Group>
                     </Col>
-
                     <Col sm={6}>
                         <Form.Group>
                             <Form.Label className="mb-0">Select Allergy </Form.Label>
@@ -400,26 +400,6 @@ const AddAllergy = ({ onCancel }) => {
                         </Form.Group>
                     </Col>
 
-                    {/* <Col sm={6}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="severity" className="mb-0">
-                                Severity
-                            </Form.Label>
-                            <Form.Select
-                                {...register('severity', { required: 'Clinical severity is required' })}
-                                data-has-value={!!watch('severity')}>
-                                <option value="" hidden>
-                                    Select Clinical Status
-                                </option>
-                                {severityData?.map((severity) => (
-                                    <option key={severity?.code} value={severity?.code}>
-                                        {severity?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */}
-
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="criticality" className="mb-0">
@@ -442,86 +422,7 @@ const AddAllergy = ({ onCancel }) => {
                             )}
                         </Form.Group>
                     </Col>
-{/* 
-                    <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="verificationStatus" className="mb-0">
-                             Verification Status
-                            </Form.Label>
-                            <Form.Select
-                                {...register('verificationStatus', { required: 'Verification Status is required' })}
-                                data-has-value={!!watch('verificationStatus')}>
-                                <option value="">Select Verification Status</option>
-                                {verificationStatus.map((status) => (
-                                    <option key={status?.code} value={status?.code} className="text-capitalize">
-                                        {status?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */}
-                  
 
-                    {/* <Col sm={4}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Substance</Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadCodeOptions}
-                                defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedCodeOption}
-                                onChange={handleCodeChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */}
-                    {/* <Col sm={4}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Manifestation</Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadManifestationOptions}
-                                defaultOptions={formattedManifestationOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedManifestationOption} // Ensure this matches the { label, value } format
-                                onChange={handleManifestationChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */}
                     <Col sm={6}>
                         <Form.Group className="mb-1">
                             <Form.Label htmlFor="status" className="mb-0">
@@ -541,9 +442,144 @@ const AddAllergy = ({ onCancel }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                  
 
-                    {/* <Col sm={4}>
+                    <Col sm={6}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Select Mode</Form.Label>
+                            <div className="d-flex gap-3 mb-0">
+                                <Form.Check
+                                    type="radio"
+                                    label="By Appointment"
+                                    name="selectionMode"
+                                    value="appointment"
+                                    checked={selectMode === 'appointment'}
+                                    onChange={() => setSelectMode('appointment')}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="By Date"
+                                    name="selectionMode"
+                                    value="date"
+                                    checked={selectMode === 'date'}
+                                    onChange={() => setSelectMode('date')}
+                                />
+                            </div>
+
+                            {selectMode === 'appointment' ? (
+                                <>
+                                    <Form.Label className="mb-0">Appointment</Form.Label>
+                                    <Form.Select {...register('appointment')}>
+                                        <option>Select Appointment Date </option>
+                                        {appointments?.map((item) => (
+                                            <option key={item?._id} value={JSON.stringify(item)}>
+                                                {item?.date ? new Date(item.date).toISOString().split('T')[0] : 'N/A'}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </>
+                            ) : (
+                                <>
+                                    <Form.Label className="mb-0">Select Date (till today)</Form.Label>
+                                    <Form.Control type="date" max={today} {...register('appointmentDate')} />
+                                </>
+                            )}
+                        </Form.Group>
+                    </Col>
+
+                    <Col sm={12}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="notes" className="mb-0">
+                                Notes
+                            </Form.Label>
+                            <Form.Control
+                                id="notes"
+                                as="textarea"
+                                placeholder="Note"
+                                rows={4}
+                                {...register('notes', { required: 'Note is required' })}
+                                data-has-value={!!watch('notes')}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col sm={12} className="d-flex justify-content-end gap-1 mt-2">
+                        <Button
+                            className="custom-buttons"
+                            type="submit"
+                            onClick={() => setSubmissionType('saveAndReset')}
+                            disabled={store?.createAllergyReducer?.loading}
+                            style={{ width: '150px' }}>
+                            {store?.createAllergyReducer?.loading && submissionType === 'saveAndReset' ? (
+                                <Spinner animation="border" size="sm" className="text-white" />
+                            ) : (
+                                'Save & Add Another'
+                            )}
+                        </Button>
+                        {/* <Button className='custom-buttons'>Save and Add Another</Button> */}
+                        <Button
+                            className="custom-buttons"
+                            type="submit"
+                            onClick={() => setSubmissionType('saveAndNext')}
+                            style={{ width: '100px' }}
+                            disabled={store?.createAllergyReducer?.loading}>
+                            {store?.createAllergyReducer?.loading && submissionType === 'saveAndNext' ? (
+                                <Spinner animation="border" size="sm" className="text-white" />
+                            ) : (
+                                'Save & Exit'
+                            )}
+                        </Button>
+                    </Col>
+                </Row>
+            </Form>
+        </div>
+    );
+};
+
+export default AddAllergy;
+
+// commented code
+
+{
+    /* <Col sm={6}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="severity" className="mb-0">
+                                Severity
+                            </Form.Label>
+                            <Form.Select
+                                {...register('severity', { required: 'Clinical severity is required' })}
+                                data-has-value={!!watch('severity')}>
+                                <option value="" hidden>
+                                    Select Clinical Status
+                                </option>
+                                {severityData?.map((severity) => (
+                                    <option key={severity?.code} value={severity?.code}>
+                                        {severity?.display}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    </Col> */
+}
+
+{
+    /* <Col sm={4}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="Encounter" className="mb-0">
+                                Encounter
+                            </Form.Label>
+                            <Form.Select
+                                {...register('encounter', { required: 'Encounter is required' })}
+                                data-has-value={!!watch('encounter')}>
+                                <option value="" hidden>
+                                    Select Encounter
+                                </option>
+                                <option value="1">Encounter 1</option>
+                                <option value="2">Encounter 2</option>
+                            </Form.Select>
+                        </Form.Group>
+                    </Col> */
+}
+{
+    /* <Col sm={4}>
                         <Form.Group>
                             <Form.Label className="mb-0"> Exposure Route</Form.Label>
                             <AsyncSelect
@@ -572,72 +608,123 @@ const AddAllergy = ({ onCancel }) => {
                                 }}
                             />
                         </Form.Group>
-                    </Col> */}
-                    <Col sm={6}>
+                    </Col> */
+}
+
+{
+    /* <Col sm={4}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Appointment</Form.Label>
-                            <Form.Select {...register('appointment')}>
-                                {appointments?.map((item) => (
-                                    <option key={item?._id} value={item?._id}>
-                                        {item?.date ? new Date(item?.date).toISOString().split('T')[0] : 'N/A'}
+                            <Form.Label className="mb-0">Manifestation</Form.Label>
+                            <AsyncSelect
+                                // ref={selectRef}
+                                loadOptions={loadManifestationOptions}
+                                defaultOptions={formattedManifestationOption.slice(0, 10)} // Show first 10 options initially
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select"
+                                value={selectedManifestationOption} // Ensure this matches the { label, value } format
+                                onChange={handleManifestationChange}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
+                            />
+                        </Form.Group>
+                    </Col> */
+}
+
+{
+    /* 
+                    <Col sm={4}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="verificationStatus" className="mb-0">
+                             Verification Status
+                            </Form.Label>
+                            <Form.Select
+                                {...register('verificationStatus', { required: 'Verification Status is required' })}
+                                data-has-value={!!watch('verificationStatus')}>
+                                <option value="">Select Verification Status</option>
+                                {verificationStatus.map((status) => (
+                                    <option key={status?.code} value={status?.code} className="text-capitalize">
+                                        {status?.display}
                                     </option>
                                 ))}
                             </Form.Select>
                         </Form.Group>
-                    </Col>
-                    {/* <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="Encounter" className="mb-0">
-                                Encounter
-                            </Form.Label>
-                            <Form.Select
-                                {...register('encounter', { required: 'Encounter is required' })}
-                                data-has-value={!!watch('encounter')}>
-                                <option value="" hidden>
-                                    Select Encounter
-                                </option>
-                                <option value="1">Encounter 1</option>
-                                <option value="2">Encounter 2</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */}
-
-                    <Col sm={12}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="notes" className="mb-0">
-                                Note
-                            </Form.Label>
-                            <Form.Control
-                                id="notes"
-                                as="textarea"
-                                placeholder="Note"
-                                rows={4}
-                                {...register('notes', { required: 'Note is required' })}
-                                data-has-value={!!watch('notes')}
+                    </Col> */
+}
+{
+    /* <Col sm={4}>
+                        <Form.Group>
+                            <Form.Label className="mb-0">Substance</Form.Label>
+                            <AsyncSelect
+                                // ref={selectRef}
+                                loadOptions={loadCodeOptions}
+                                defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
+                                isSearchable
+                                className="basic-single"
+                                classNamePrefix="select"
+                                placeholder="&nbsp; Select"
+                                value={selectedCodeOption}
+                                onChange={handleCodeChange}
+                                styles={{
+                                    control: (provided) => ({
+                                        ...provided,
+                                        height: '30px',
+                                        minHeight: '30px',
+                                        border: '0px',
+                                    }),
+                                    placeholder: (provided) => ({
+                                        ...provided,
+                                        fontWeight: 'bold',
+                                        fontSize: '12px',
+                                        paddingBottom: '5px',
+                                    }),
+                                }}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col sm={12} className="d-flex justify-content-end gap-1 mt-2">
-                        <Button className="custom-buttons" onClick={() => setCode(null)}>
-                            Save & Add Another
+                    </Col> */
+}
+{
+    /* <Col sm={12} className="d-flex justify-content-between">
+                        <h4>Add Allergy</h4>
+                        <Button className="custom-buttons" onClick={onCancel}>
+                            Back
                         </Button>
-                        {/* <Button className='custom-buttons'>Save and Add Another</Button> */}
-                        <Button
-                            className="custom-buttons"
-                            type="submit"
-                            style={{ width: '100px' }}
-                            disabled={store?.createAllergyReducer?.loading}>
-                            {store?.createAllergyReducer?.loading ? (
-                                <Spinner animation="border" size="sm" className="text-white" />
-                            ) : (
-                                'Save & Exit'
+                    </Col> */
+}
+{
+    /* <Col sm={4}>
+                        <Form.Group className="mb-1">
+                            <Form.Label htmlFor="allergyType" className="mb-0">
+                                Allergy Type
+                            </Form.Label>
+                            <Form.Select
+                                {...register('allergyType', { required: 'Allergy Type is required' })}
+                                data-has-value={!!watch('allergyType')}>
+                                <option value="" hidden>
+                                    Select Allergy Type
+                                </option>
+                                {allergyType?.map((type) => (
+                                    <option key={type?.code} value={type?.code}>
+                                        {type?.display}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            {errors.allergyType && (
+                                <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
                             )}
-                        </Button>
-                    </Col>
-                </Row>
-            </Form>
-        </div>
-    );
-};
-
-export default AddAllergy;
+                        </Form.Group>
+                    </Col> */
+}

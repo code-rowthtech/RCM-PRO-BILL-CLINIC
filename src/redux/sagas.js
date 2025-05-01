@@ -19,12 +19,13 @@ import vitalsSaga from './vitals/saga';
 import clinicNotesSaga from './assigntasks/saga';
 import ProblemListSaga from './ProblemList/saga';
 import alleryListSaga from './allergyList/saga';
+import suggestionsListSaga from './suggestions/saga';
 import medicationSaga from './medication/saga';
 
 
 export default function* rootSaga(): any {
-    yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(),
-    dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga(), clinicNotesSaga(), ProblemListSaga(), alleryListSaga(), medicationSaga()]);
+    yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), medicationSaga(),
+    dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga(), clinicNotesSaga(), ProblemListSaga(), alleryListSaga(), suggestionsListSaga()]);
 }
 // export default function* rootSaga(): any {
 //     yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(),settingsSaga(),scheduleSaga() ]);
