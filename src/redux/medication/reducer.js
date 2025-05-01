@@ -52,7 +52,7 @@ export const createMedicationReducer = (state = CREATE_MEDICATION_INITIAL_STATE,
                 loading: false,
             };
         default:
-            return state;
+            return { ...state };
     }
 };
 
@@ -94,11 +94,6 @@ export const getMedicationReducer = (state = GET_MEDICATION_INITIAL_STATE, actio
         case MedicationActionTypes.GET_MEDICATION_SUCCESS:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case MedicationActionTypes.GET_MEDICATION_RESET:
-            return {
-                data: [],
                 loading: false,
             };
 

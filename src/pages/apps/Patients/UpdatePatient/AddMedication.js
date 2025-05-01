@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Modal, Form, Button, Row, Col, Accordion } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { createMedicationAction, getDrugsAction } from '../../../../redux/actions';
+import { createMedicationAction, getDrugsAction, getMedicationAction } from '../../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { debounce, set } from 'lodash';
 import Datetime from 'react-datetime';
@@ -14,19 +14,26 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 
 export default function AddMedication({ show, onCancel, selectedMedication }) {
-  const { register, handleSubmit, setValue } = useForm();
+  console.log(selectedMedication, 'problemListselectedMedication')
+  const { register, handleSubmit, setValue, reset } = useForm();
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get('id');
   const dispatch = useDispatch();
   const store = useSelector((state) => state);
   const drugsData = store?.getDrugsReducer?.data?.ndcProducts || [];
   const problemList = store?.getProblemListReducer?.data?.problems;
-  console.log(problemList, 'problemList')
   const [selectedDrug, setSelectedDrug] = useState(null);
-  console.log(selectedDrug, 'selectedDrugselectedDrug')
   const [showDropdown, setShowDropdown] = useState(false);
   const [additionalInstruction, setAdditionalInstruction] = useState();
-
+  const createSuccess = store?.createMedicationReducer?.data?.status;
+  console.log(createSuccess, 'createSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccesscreateSuccess')
+  useEffect(() => {
+    if (createSuccess === 201) {
+      onCancel();
+      reset();
+      dispatch(getMedicationAction({ patientId: patientId }))
+    }
+  }, [createSuccess]);
   const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
   // Debounced search (memoized)
   const debouncedSearch = useMemo(
@@ -37,6 +44,30 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     [dispatch]
   );
 
+  useEffect(() => {
+    if (selectedMedication) {
+      setValue('drugInfo', selectedMedication?.drugId?.proprietaryName + ' (' + selectedMedication?.drugId?.nonProprietaryName + ')');
+      setValue('frequency', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.frequency);
+      setValue('period', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.period);
+      setValue('periodUnit', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.periodUnit);
+      setValue('sequence', selectedMedication?.dosageInstruction?.[0]?.sequence);
+      setValue('relatedProblem', selectedMedication?.problemId);
+      setValue('status', selectedMedication?.status);
+      setValue(
+        'medicationStart',
+        selectedMedication?.startDate
+          ? new Date(selectedMedication.startDate).toISOString().split('T')[0]
+          : ''
+      );
+      setValue(
+        'medicationEnd',
+        selectedMedication?.endDate
+          ? new Date(selectedMedication.endDate).toISOString().split('T')[0]
+          : ''
+      );
+
+    }
+  }, [selectedMedication])
   const handleInputChange = (e) => {
     const value = e.target.value;
     setShowDropdown(true);
@@ -47,14 +78,11 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
 
   const handleSelectDrug = (item) => {
     setSelectedDrug(item);
-    console.log(item?.proprietaryName, 'item?.proprietaryName')
     setValue('drugInfo', item?.proprietaryName + ' (' + item?.nonProprietaryName + ')');
     setShowDropdown(false);
   };
 
-  console.log(selectedDrug, 'selectedDrug')
   const onSubmit = (data) => {
-    console.log(data, 'data')
     const medicationData = {
       status: data.status,
       note: [
@@ -92,7 +120,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
       subject: patientId
     };
     dispatch(createMedicationAction({ key: encryptMessage(medicationData) }))
-    console.log(medicationData, 'medicationData')
   };
 
   const additionalInstructionOptions = additionalInformation?.map((item) => ({
@@ -120,7 +147,10 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     };
   }, []);
   return (
-    <Modal show={show} onHide={onCancel} size="md" centered>
+    <Modal show={show} onHide={() => {
+      onCancel();
+      reset();
+    }} size="md" centered>
       <Modal.Header closeButton className="px-2 py-0">
         <Modal.Title className="mb-0">{selectedMedication ? "Update" : 'Add'} Medication</Modal.Title>
       </Modal.Header>
@@ -190,10 +220,10 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                 <Form.Label className="mb-0">Period Unit</Form.Label>
                 <Form.Select {...register('periodUnit')}>
                   <option value="">Select unit</option>
-                  <option value="h">Hour(s)</option>
-                  <option value="d">Day(s)</option>
-                  <option value="wk">Week(s)</option>
-                  <option value="mo">Month(s)</option>
+                  <option value="hours">Hour(s)</option>
+                  <option value="days">Day(s)</option>
+                  <option value="weeks">Week(s)</option>
+                  <option value="months">Month(s)</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -223,7 +253,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
               <Form.Group>
                 <Form.Label className="mb-0">Related Problem</Form.Label>
                 <Form.Select {...register('relatedProblem')} disabled={selectedMedication}>
-                  <option value="">Select status</option>
+                  <option value="">Select Related Problem</option>
                   {problemList?.map((option) => (
                     <option key={option?._id} value={option?._id}>
                       {option?.code?.text}
@@ -267,10 +297,13 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
           </Row>
 
           <div className="d-flex justify-content-end mt-3">
-            <Button variant="secondary" onClick={onCancel} className="me-2">
+            <Button onClick={() => {
+              onCancel();
+              reset();
+            }} className="me-2 custom-buttons">
               Cancel
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" className='custom-buttons'>
               {selectedMedication ? 'Update' : "Save"}
             </Button>
           </div>

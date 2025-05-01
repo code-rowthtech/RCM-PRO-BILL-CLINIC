@@ -18,6 +18,7 @@ import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintProblems } from '../Task Tabs/PDFfiles/problemPDF';
 import Paginations from '../../../../helpers/Paginations';
 import NewAppointment from '../../Appointments/NewAppointment';
+import AddMedication from './AddMedication';
 const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -29,11 +30,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const problemData = store?.getProblemListReducer?.data?.problems;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(appointmentsList, 'appiontmn');
-    console.log(store?.getProblemListReducer, 'problemData');
+    const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+
+    console.log(medicationList, 'medicationList');
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
-
+    const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
     }, [dispatch, patientId, effectiveDateTime]);
@@ -176,6 +178,22 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
+    const statusColorMap = {
+        active: 'text-success',
+        'on-hold': 'text-warning',
+        cancelled: 'text-danger',
+        completed: 'text-primary',
+        'entered-in-error': 'text-danger',
+        stopped: 'text-secondary',
+        draft: 'text-muted',
+        unknown: 'text-dark'
+    };
+
+    const closeMedicationModal = () => {
+        setMedicationModal(false)
+    }
+
     return (
         <div className="patient-summary">
             <Row className={`scroll-container  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
@@ -386,25 +404,40 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <span className="fw-bold fs-6">Medications</span>
                             </div>
                             <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                                <MdAddCircleOutline onClick={() => setMedicationModal(true)} className="text-primary me-2 cursor-pointer" />
+                                <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
                                 <MdOutlinePrint className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
-                        <Card.Body className="p-2">
-                            <ul className="list-unstyled">
-                                {patientSummary.medications.map((medication, index) => (
-                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                        <div className="fs-6">
-                                            <strong className="">{medication.name}</strong>
-                                            <div className="text-muted ">
-                                                {medication.dosage} • {medication.frequency}
+                        <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
+                            {store?.getMedicationReducer?.loading ?
+                                <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
+                                    <Spinner className='spinner-border-sm' />
+                                </div>
+                                :
+                                <ul className="list-unstyled">
+                                    {medicationList?.slice(0, 4)?.map((medication, index) => (
+                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                            <div className="fs-6">
+                                                <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
+                                                <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
+                                                    {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
+                                                </div>
+                                                <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
+                                                    {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <span className="fw-semibold fs-6">{getStatusBadge(medication.status)}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                                            <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                {medication.status}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
                         </Card.Body>
+                        <Card.Footer className='border-0 pb-1 text-end'>
+                            <u onClick={() => setSelectedMainTab('Medication List')} className='text-info cursor-pointer'>View All</u>
+                        </Card.Footer>
                     </Card>
                 </Col>
 
