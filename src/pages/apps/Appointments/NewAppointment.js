@@ -6,12 +6,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentByIdAction, resetUpdateAction } from '../../../redux/actions';
 import Spinner from '../../../constants/Spinner';
-import { RxPlusCircled } from "react-icons/rx";
+import { RxPlusCircled } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
 
-
-const NewAppointment = ({ appointmentId , onCancel }) => {
-
+const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Appointment');
     const [searchParams] = useSearchParams();
@@ -22,17 +20,17 @@ const NewAppointment = ({ appointmentId , onCancel }) => {
     const rescheduleResponse = store?.rescheduleAppointmentReducer?.data?.status;
     useEffect(() => {
         if (id) {
-            dispatch(getAppointmentByIdAction({ id: id }))
+            dispatch(getAppointmentByIdAction({ id: id }));
         }
-    }, [id])
+    }, [id]);
 
     useEffect(() => {
         if (rescheduleResponse === 200) {
             dispatch(getAppointmentByIdAction({ id: id }));
             dispatch(resetUpdateAction());
-            onCancel()
+            onCancel();
         }
-    }, [rescheduleResponse])
+    }, [rescheduleResponse]);
 
     const tabs = [
         'Appointment',
@@ -50,24 +48,25 @@ const NewAppointment = ({ appointmentId , onCancel }) => {
     };
 
     const handleAppointment = () => {
-        navigate("/apps/appointments/list");
+        navigate('/apps/appointments/list');
     };
     const closeVitalsModal = () => {
         setVitalsModal(false);
-    }
+    };
     return (
-        <div className='mt-2'>
-            <Card className="scroll-container px-2 py-2 page-height">
-                <Row className="mb-2">
+        <div className={`${!isModal ? 'mt-2' : ''}`}>
+            <Card className={`scroll-container px-2 py-2 ${!isModal ? 'page-height' : ''}`}>
+                <Row className={`${!isModal ? 'mb-2' : ''}`}>
                     <Col sm={8}>
                         <ul className="nav nav-underline">
                             {tabs.map((tab) => (
                                 <li className="nav-item" key={tab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${activeTab === tab ? 'active fw-bold' : ''}`}
+                                        className={`nav-link text-black me-2 ${
+                                            activeTab === tab ? 'active fw-bold' : ''
+                                        }`}
                                         onClick={() => handleTabClick(tab)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
+                                        style={{ cursor: 'pointer' }}>
                                         {tab}
                                     </a>
                                 </li>
@@ -75,16 +74,14 @@ const NewAppointment = ({ appointmentId , onCancel }) => {
                         </ul>
                     </Col>
                     <Col sm={4} className="d-flex gap-2 justify-content-end">
-                        <Button
-                            className='custom-buttons'
-                            onClick={() => setVitalsModal(true)}
-                        >
-                            <RxPlusCircled className='fs-5' />&nbsp;Vitals
+                        <Button className="custom-buttons" onClick={() => setVitalsModal(true)}>
+                            <RxPlusCircled className="fs-5" />
+                            &nbsp;Vitals
                         </Button>
-                        <Modal centered show={vitalsModal} size='xl' onHide={closeVitalsModal}>
+                        <Modal centered show={vitalsModal} size="xl" onHide={closeVitalsModal}>
                             <Modal.Body>
                                 <Row className="border-bottom mb-1 pb-2">
-                                    <Col sm={11} className='text-center'>
+                                    <Col sm={11} className="text-center">
                                         <h4>Vitals</h4>
                                     </Col>
                                     <Col sm={1}>
@@ -94,30 +91,25 @@ const NewAppointment = ({ appointmentId , onCancel }) => {
                                 <Vitals />
                             </Modal.Body>
                         </Modal>
-                        <Button
-                            className='cancel-button'
-                            onClick={handleAppointment}
-                        >
+                        <Button className="cancel-button" onClick={handleAppointment}>
                             Back
                         </Button>
                     </Col>
                 </Row>
-                {
-                    store?.getPatientByIdReducer?.loading ?
-                        <Spinner />
-                        :
-                        <div className=" ">
-                            {activeTab === 'Appointment' && <AppointmentForm />}
-                            {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
-                            {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
-                            {/* {activeTab === 'Vitals' && <Vitals />}
+                {store?.getPatientByIdReducer?.loading ? (
+                    <Spinner />
+                ) : (
+                    <div className=" ">
+                        {activeTab === 'Appointment' && <AppointmentForm />}
+                        {activeTab === 'Billing' && <p>Billing Content In Progress...</p>}
+                        {activeTab === 'Eligibility' && <p>Eligibility Content In Progress...</p>}
+                        {/* {activeTab === 'Vitals' && <Vitals />}
                             {activeTab === 'Growthcharts' && <p>Growthcharts Content In Progress...</p>}
                             {activeTab === 'Log Comm.' && <p>Log Comm. Content In Progress...</p>}
                             {activeTab === 'Revisions' && <p>Revisions Content In Progress...</p>}
                             {activeTab === 'Mu Helper' && <p>Mu Helper Content In Progress...</p>} */}
-                        </div>
-                }
-
+                    </div>
+                )}
             </Card>
         </div>
     );

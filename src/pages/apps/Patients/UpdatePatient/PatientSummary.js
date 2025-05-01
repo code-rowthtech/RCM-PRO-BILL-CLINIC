@@ -166,12 +166,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const handleAddAppointmentOpen = () => setShowAppointmentModal(true);
 
     const handleAddAllergyClose = () => setShowAddAllergyModal(false);
-    const [vitalsModal, setVitalsModal] = useState(false)
+    const [vitalsModal, setVitalsModal] = useState(false);
 
     const closeVitalsModal = () => {
-        setVitalsModal(false)
+        setVitalsModal(false);
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
-    }
+    };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);
     const handlePageChange = (pageNumber) => {
@@ -208,11 +208,21 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <Form.Control
                                     type="date"
                                     value={effectiveDateTime}
-                                    onChange={(e) => setEffectiveDateTime(e.target.value)} />
-                                <MdAddCircleOutline onClick={() => setVitalsModal(true)} className="text-primary me-2 cursor-pointer" />
+                                    onChange={(e) => setEffectiveDateTime(e.target.value)}
+                                />
+                                <MdAddCircleOutline
+                                    onClick={() => setVitalsModal(true)}
+                                    className="text-primary me-2 cursor-pointer"
+                                />
                                 <MdOutlinePrint
-                                    onClick={() => handlePrintVitals({ vitals: store?.getVitalsByPatientIdReducer?.data?.data, patientDetails: patientDetails })}
-                                    className="text-secondary cursor-pointer" />
+                                    onClick={() =>
+                                        handlePrintVitals({
+                                            vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                            patientDetails: patientDetails,
+                                        })
+                                    }
+                                    className="text-secondary cursor-pointer"
+                                />
                             </div>
                         </Card.Header>
                         <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
@@ -276,7 +286,13 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2 pb-0">
-                            {allergyData && allergyData.length > 0 ? (
+                            {store?.getAllergiesOfAPatientReducer?.loading ? (
+                                <div
+                                    className="d-flex justify-content-center align-items-center w-100 p-5"
+                                    style={{ height: '100%' }}>
+                                    <Spinner className="spinner-border-sm" />
+                                </div>
+                            ) : allergyData && allergyData.length > 0 ? (
                                 <ul className="list-unstyled pb-0 mb-0">
                                     {allergyData.slice(0, 4).map((allergy, index) => (
                                         <li
@@ -346,7 +362,13 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2">
-                            {problemData && problemData.length > 0 ? (
+                            {store?.getProblemListReducer?.loading ? (
+                                <div
+                                    className="d-flex justify-content-center align-items-center w-100 p-5"
+                                    style={{ height: '100%' }}>
+                                    <Spinner className="spinner-border-sm" />
+                                </div>
+                            ) : problemData && problemData.length > 0 ? (
                                 <ul className="list-unstyled pb-0 mb-0">
                                     {problemData.slice(0, 4).map((problem, index) => (
                                         <li
@@ -356,8 +378,8 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                                 <strong title={problem?.code?.text}>
                                                     {problem?.code?.text?.length > 30
                                                         ? problem.code.text.slice(0, 30) + '...'
-                                                        : problem?.code?.text || 'Unknown Allergy'}
-                                                </strong>{' '}
+                                                        : problem?.code?.text || 'Unknown Problem'}
+                                                </strong>
                                                 <div className="text-muted small">
                                                     {problem?.clinicalStatus?.text || 'Status not available'}
                                                 </div>
@@ -374,7 +396,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </ul>
                             ) : (
                                 <ul className="list-unstyled">
-                                    {patientSummary.problems.map((problem, index) => (
+                                    {(patientSummary?.problems || []).map((problem, index) => (
                                         <li
                                             key={index}
                                             className="mb-2 d-flex justify-content-between align-items-center">
@@ -523,7 +545,10 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <span className="fw-bold fs-6">Upcoming Appointments</span>
                             </div>
                             <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" onClick={handleAddAppointmentOpen} />
+                                <MdAddCircleOutline
+                                    className="text-primary me-2 cursor-pointer"
+                                    onClick={handleAddAppointmentOpen}
+                                />
                                 <MdOutlinePrint className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
@@ -540,33 +565,49 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {appointmentsList?.map((appointment, index) => (
-                                            <tr key={index}>
-                                                <td className="fs-6">
-                                                    {appointment?.date
-                                                        ? new Date(appointment?.date).toLocaleDateString('en-GB', {
-                                                            day: '2-digit',
-                                                            month: 'short',
-                                                            year: 'numeric',
-                                                        })
-                                                        : ''}
-                                                </td>{' '}
-                                                <td className="fs-6">
-                                                    {appointment?.start
-                                                        ? new Date(appointment?.start).toLocaleTimeString('en-US', {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                            hour12: true,
-                                                        })
-                                                        : ''}
-                                                </td>{' '}
-                                                <td className="fs-6">{appointment?.doctorId?.name?.[0]?.text}</td>
-                                                <td className="fs-6">
-                                                    {appointment?.appointmentType?.coding?.[0]?.display}
+                                        {store?.getAppointmentsReducer?.loading ? (
+                                            <tr>
+                                                <td colSpan="4" className="text-center py-5">
+                                                    <Spinner className="spinner-border-sm" />
                                                 </td>
-                                                {/* <td className="fs-6">{appointment.location}</td> */}
                                             </tr>
-                                        ))}
+                                        ) : appointmentsList && appointmentsList.length > 0 ? (
+                                            appointmentsList.map((appointment, index) => (
+                                                <tr key={index}>
+                                                    <td className="fs-6">
+                                                        {appointment?.date
+                                                            ? new Date(appointment.date).toLocaleDateString('en-GB', {
+                                                                  day: '2-digit',
+                                                                  month: 'short',
+                                                                  year: 'numeric',
+                                                              })
+                                                            : ''}
+                                                    </td>
+                                                    <td className="fs-6">
+                                                        {appointment?.start
+                                                            ? new Date(appointment.start).toLocaleTimeString('en-US', {
+                                                                  hour: '2-digit',
+                                                                  minute: '2-digit',
+                                                                  hour12: true,
+                                                              })
+                                                            : ''}
+                                                    </td>
+                                                    <td className="fs-6">
+                                                        {appointment?.doctorId?.name?.[0]?.text || 'Unknown'}
+                                                    </td>
+                                                    <td className="fs-6">
+                                                        {appointment?.appointmentType?.coding?.[0]?.display ||
+                                                            'Not Specified'}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" className="text-center py-5 text-muted">
+                                                    No upcoming appointments found
+                                                </td>
+                                            </tr>
+                                        )}
                                     </tbody>
                                 </Table>
                                 <Col className="mt-2 d-flex justify-content-end">
@@ -609,8 +650,8 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 <Modal.Header closeButton className="px-2 py-0">
                     <Modal.Title className="">Add Appointment </Modal.Title>
                 </Modal.Header>
-                <Modal.Body className='p-0'>
-                    <NewAppointment onCancel={handleAppointmentClose} />
+                <Modal.Body className="p-0">
+                    <NewAppointment isModal={true} onCancel={handleAppointmentClose} />
                 </Modal.Body>
             </Modal>
         </div>
