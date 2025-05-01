@@ -29,6 +29,7 @@ import ReferringDoctor from './ReferringDoctor';
 import { patientMenuItems } from './patientsMenuItems';
 import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
+import Medication from './Medication';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -530,7 +531,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Medication List' && <p>In progress...</p>}
+                                                {selectedMainTab === 'Medication List' && <Medication />}
                                                 {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Tabacco' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}

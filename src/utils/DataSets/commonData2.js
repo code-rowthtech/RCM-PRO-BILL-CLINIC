@@ -16,3 +16,15 @@ export const defaultVitals = [
     { name: 'Oxygen Concentration', code: "19994-3", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
     { name: 'Inhaled Oxygen Flow Rate', code: "3151-8", system: "http://loinc.org", unit: 'l/min', value: '', type: 'number' },
 ];
+
+export const medicationStatus = [
+    { value: 'active', label: 'Active' },
+    { value: 'on-hold', label: 'On Hold' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'entered-in-error', label: 'Entered In Error' },
+    { value: 'stopped', label: 'Stopped' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'unknown', label: 'Unknown' }
+]
+

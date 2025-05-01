@@ -25,7 +25,8 @@ import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsRed
 import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
 import { createProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
-import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer,deleteAllergyReducer } from './allergyList/reducer';
+import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
+import { createMedicationReducer, getDrugsReducer, getMedicationReducer } from './medication/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -48,9 +49,9 @@ export default (combineReducers({
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer, getVitalsByAppointmentIdReducer,
     getPatientsByAppointmentReducer,
     // assign task
-    getClinicEmployeesReducer, createTaskReducer,getTaskReducer,updateTaskReducer,getTaskDetailsReducer,
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer, getTaskDetailsReducer,
     // problem list
-    createProblemListReducer,getProblemListReducer,updateProblemListReducer,getALLCodesReducer,getProblemDetailsReducer,getPatientAppointmentReducer,
+    createProblemListReducer, getProblemListReducer, updateProblemListReducer, getALLCodesReducer, getProblemDetailsReducer, getPatientAppointmentReducer,
     // allergy list
-    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,deleteAllergyReducer
+    createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer, deleteAllergyReducer, getDrugsReducer, getMedicationReducer, createMedicationReducer
 }): any);

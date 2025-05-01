@@ -12,3 +12,4 @@ export * from './subscriptions/actions';
 export * from './appointments/action';
 export * from './vitals/actions';
 export * from './assigntasks/action';
+export * from './medication/action';

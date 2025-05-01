@@ -126,3 +126,7 @@ export const getVitalsByPatientId = `${BaseRoute}/vitalsByPatientId`;
 export const getVitalsByAppointmentId = `${BaseRoute}/vitalsByAppointmentId`;
 export const updateVitals = `${BaseRoute}/updateVitals`;
 
+// Medication
+export const getMedicationDrugs = `${BaseRoute}/codes/search-ndc-products`;
+export const createMedication = `${BaseRoute}/medication`;
+export const getMedication = `${BaseRoute}/medication`;

@@ -1,26 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Button, Modal, Spinner } from 'react-bootstrap';
 import { FiPlus, FiEdit } from 'react-icons/fi';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { MdDeleteOutline } from 'react-icons/md';
 import AddMedication from './AddMedication';
+import { getMedicationAction } from '../../../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 
 // Placeholder components for Add / Update
 // const AddMedication = ({ onCancel }) => <div><AddMedication/></div>;
-const UpdateMedication = ({ medication, onCancel }) => <div>Update Medication Form <Button onClick={onCancel}>Cancel</Button></div>;
 
 const Medication = () => {
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const store = useSelector((state) => state);
+  const patientId = searchParams.get('id');
   const [medicationData, setMedicationData] = useState([]);
   const [showUpdateMedication, setShowUpdateMedication] = useState(false);
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationModal, setMedicationModal] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const createSuccess = store?.createMedicationReducer?.data?.status;
+  const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+  useEffect(() => {
+    if (createSuccess === 201) {
+      setMedicationModal(false);
+      dispatch(getMedicationAction({ patientId: patientId }))
+    }
+  }, [createSuccess]);
+  useEffect(() => {
+    dispatch(getMedicationAction({ patientId: patientId }))
+  }, [dispatch]);
   const handleEditClick = (data) => {
     setSelectedMedication(data);
-    setShowUpdateMedication(true);
+    // setShowUpdateMedication(true);
     setMedicationModal(true);
   };
+
+  const closeMedicationModal = () => {
+    setMedicationModal(false)
+    setSelectedMedication(null)
+  }
 
   return (
     <>
@@ -32,7 +53,7 @@ const Medication = () => {
               className="custom-buttons text-nowrap"
               onClick={() => {
                 setSelectedMedication(null);
-                setShowUpdateMedication(false);
+                // setShowUpdateMedication(false);
                 setMedicationModal(true);
               }}
             >
@@ -45,11 +66,12 @@ const Medication = () => {
             <Table responsive className="table-centered table-nowrap mb-0">
               <thead className="text-white bg-dark">
                 <tr>
-                  <th className="text-white">Sr.No.</th>
+                  <th className="text-white">S. No.</th>
                   <th className="text-white">Status</th>
                   <th className="text-white">Medication</th>
-                  <th className="text-white">Dosage</th>
-                  <th className="text-white">Route</th>
+                  <th className="text-white">Dosage Instruction</th>
+                  <th className="text-white">Start Date</th>
+                  <th className="text-white">End Date</th>
                   <th className="text-white">Notes</th>
                   <th className="text-white">Action</th>
                 </tr>
@@ -64,35 +86,37 @@ const Medication = () => {
                 </tbody>
               ) : (
                 <tbody>
-                  {medicationData?.length === 0 ? (
+                  {medicationList?.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center">
-                        <h3 className="my-5">No Medication Found!</h3>
+                        <h4 className="my-5">No Medication Found!</h4>
                       </td>
                     </tr>
                   ) : (
-                    medicationData.map((data, index) => (
+                    medicationList?.map((data, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{data.status || 'N/A'}</td>
-                        <td>{data.medication || 'N/A'}</td>
-                        <td>{data.dosage || 'N/A'}</td>
-                        <td>{data.route || 'N/A'}</td>
-                        <td>{data.notes || 'N/A'}</td>
+                        <td className='text-capitalize'>{data?.status || 'N/A'}</td>
                         <td>
-                          <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
-                          &nbsp;
+                          <div className='d-flex flex-column'>
+                            <span> {data?.drugId?.proprietaryName || 'N/A'}</span>
+                            <small className='text-muted' title={data?.drugId?.nonProprietaryName}> {data?.drugId?.nonProprietaryName?.length > 30 ? data?.drugId?.nonProprietaryName?.slice(0, 29) + '...' : data?.drugId?.nonProprietaryName || 'N/A'}</small>
+                          </div>
+                        </td>
+                        <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
+                        <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
+                        <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
+                        <td title={data?.note?.[0]?.text}>
+                          {
+                            data?.note?.[0]?.text
+                              ? (data.note[0].text.charAt(0).toUpperCase() + data.note[0].text.slice(1)).slice(0, 29) + (data.note[0].text.length > 30 ? '...' : '')
+                              : 'N/A'
+                          }
+                        </td>
+                        <td>
                           <FiEdit
                             className="fs-4 cursor-pointer text-black"
                             onClick={() => handleEditClick(data)}
-                          />
-                          &nbsp;
-                          <MdDeleteOutline
-                            className="fs-4 cursor-pointer text-black"
-                            onClick={() => {
-                              // Replace with delete logic
-                              console.log('Delete:', data.id);
-                            }}
                           />
                         </td>
                       </tr>
@@ -105,7 +129,9 @@ const Medication = () => {
         </Row>
       </div>
 
-      <Modal show={medicationModal} onHide={() => setMedicationModal(false)} size="lg" centered>
+
+      <AddMedication show={medicationModal} onCancel={closeMedicationModal} selectedMedication={selectedMedication} />
+      {/* <Modal show={medicationModal} onHide={() => setMedicationModal(false)} size="lg" centered>
         <Modal.Header closeButton className="px-2 py-0">
           <Modal.Title className="mb-0">
             {showUpdateMedication ? 'Update Medication' : 'Add Medication'}
@@ -129,7 +155,7 @@ const Medication = () => {
             />
           )}
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
