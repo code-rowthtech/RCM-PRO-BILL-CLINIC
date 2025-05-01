@@ -24,8 +24,9 @@ import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from
 import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsReducer, getPractitionerScheduleReducer, getPractitionerSlotsReducer, rescheduleAppointmentReducer } from './appointments/reducers';
 import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
 import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
-import { createProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
+import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
 import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer,deleteAllergyReducer } from './allergyList/reducer';
+import { createSuggestionsReducer } from './suggestions/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -50,7 +51,9 @@ export default (combineReducers({
     // assign task
     getClinicEmployeesReducer, createTaskReducer,getTaskReducer,updateTaskReducer,getTaskDetailsReducer,
     // problem list
-    createProblemListReducer,getProblemListReducer,updateProblemListReducer,getALLCodesReducer,getProblemDetailsReducer,getPatientAppointmentReducer,
+    createProblemListReducer,getProblemListReducer,updateProblemListReducer,getALLCodesReducer,getProblemDetailsReducer,getPatientAppointmentReducer,deleteProblemListReducer,
     // allergy list
-    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,deleteAllergyReducer
+    createAllergyReducer,getAllergyDetailsReducer,getAllergiesOfAPatientReducer,updateAllergyReducer,deleteAllergyReducer,
+    // suggestions
+    createSuggestionsReducer,
 }): any);

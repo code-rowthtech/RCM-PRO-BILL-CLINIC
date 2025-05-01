@@ -548,7 +548,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Payment' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Allergy List' && <AllergyList />}
                                                 {selectedMainTab === 'Problem List' && (
-                                                    <ProblemList patientId={patientDetails?._id} isAccordionOpen={isAccordionOpen} />
+                                                    <ProblemList isAccordionOpen={isAccordionOpen} />
                                                 )}
                                             </div>
                                         </Card>

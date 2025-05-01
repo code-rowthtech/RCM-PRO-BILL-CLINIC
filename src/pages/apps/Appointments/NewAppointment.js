@@ -10,7 +10,7 @@ import { RxPlusCircled } from "react-icons/rx";
 import { IoMdClose } from 'react-icons/io';
 
 
-const NewAppointment = ({ appointmentId }) => {
+const NewAppointment = ({ appointmentId , onCancel }) => {
 
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('Appointment');
@@ -30,6 +30,7 @@ const NewAppointment = ({ appointmentId }) => {
         if (rescheduleResponse === 200) {
             dispatch(getAppointmentByIdAction({ id: id }));
             dispatch(resetUpdateAction());
+            onCancel()
         }
     }, [rescheduleResponse])
 

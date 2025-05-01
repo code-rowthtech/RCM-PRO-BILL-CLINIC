@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { createProblemListAction, getAllCodeAction, getPatientAppointmentAction } from '../../../../redux/ProblemList/action';
+import {
+    createProblemListAction,
+    getAllCodeAction,
+    getPatientAppointmentAction,
+    getProblemListAction,
+} from '../../../../redux/ProblemList/action';
+import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatus';
 
-const AddProblem = () => {
+const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
@@ -14,6 +20,10 @@ const AddProblem = () => {
     const store = useSelector((state) => state);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const appointments = store?.getPatientAppointmentReducer?.data || [];
+    const [submissionType, setSubmissionType] = useState(null);
+    const [selectedProblem, setSelectedProblem] = useState(null);
+    const addProblemStatus = store?.createProblemListReducer?.data?.status;
+
     const {
         register,
         handleSubmit,
@@ -24,13 +34,13 @@ const AddProblem = () => {
         watch,
     } = useForm();
 
-    const selectedProblem = watch('problem');
-
     // Fetch dynamic ICD codes
     useEffect(() => {
-        if (searchQuery) {
+        const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
-        }
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
 
     // Fetch dynamic appointments
@@ -41,30 +51,90 @@ const AddProblem = () => {
     // Set ICD code from selected problem
     useEffect(() => {
         if (selectedProblem) {
-            setValue('icdCode', selectedProblem.value);
+            setValue('icdCode', selectedProblem.value || '');
+        } else {
+            setValue('icdCode', '');
         }
     }, [selectedProblem, setValue]);
 
     const formattedOptions = allCodeICDs.map((code) => ({
         value: code.value,
-        label: `${code.value} - ${code.title} - ${code.codeType}`,
+        label: `${code.title} - ${code.codeType}`,
+        system: 'http://hl7.org/fhir/condition-code',
+        display: code.title,
     }));
 
     const onSubmit = (data) => {
+        const selected = data.problem;
+        const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
         const payload = {
-            patientId: patientId,
-            problem: data.problem,
-            icdVersion: data.icdVersion,
+            code: {
+                coding: [
+                    {
+                        system: selected?.system,
+                        code: selected?.value,
+                        display: selected?.display,
+                    },
+                ],
+                text: selected?.display,
+            },
+            // recorder: '',
+            // asserter: '',
+            // encounter: '',
+            subject: patientId,
+            // problem: data.problem,
+            // icdVersion: data.icdVersion,
             icdCode: data.icdCode,
-            status: data.status,
+            clinicalStatus: {
+                coding: [
+                    {
+                        system: selectedStatus?.system,
+                        code: selectedStatus?.code,
+                        display: selectedStatus?.display,
+                    },
+                ],
+                text: selectedStatus?.display,
+            },
             appointment: data.appointment,
-            diagnosisDate: data.diagnosisDate,
-            onsetDate: data.onsetDate,
-            note: data.note,
-        }
+            onsetDateTime: data.diagnosisDate,
+            // onsetDate: data.onsetDate,
+            note: [
+                {
+                    authorReference: {
+                        reference: '',
+                        type: '',
+                        display: '',
+                    },
+                    authorString: ' ',
+                    time: '',
+                    text: data?.note,
+                },
+            ],
+        };
         console.log('Form Data:', payload);
         dispatch(createProblemListAction(payload)); // Uncomment to dispatch the action
     };
+
+    useEffect(() => {
+        if (addProblemStatus === 201) {
+            if (submissionType === 'saveAndNext') {
+                const data = {
+                    patientId: patientId,
+                };
+                dispatch(getProblemListAction(data));
+                onCancel();
+            } else if (submissionType === 'saveAndReset') {
+                reset({
+                    problem: null,
+                    note: '',
+                    status: '',
+                    appointment: '',
+                    diagnosisDate: '', // Resetting other fields like diagnosisDate
+                });
+                setSelectedProblem(null);
+            }
+        }
+    }, [addProblemStatus, submissionType]);
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
@@ -89,7 +159,15 @@ const AddProblem = () => {
                                     {...field}
                                     classNamePrefix="select"
                                     options={formattedOptions}
-                                    onInputChange={(value) => setSearchQuery(value)}
+                                    onChange={(selected) => {
+                                        field.onChange(selected);
+                                        setSelectedProblem(selected); // 🔁 update local state
+                                    }}
+                                    onInputChange={(value, { action }) => {
+                                        if (action === 'input-change') {
+                                            setSearchQuery(value);
+                                        }
+                                    }}
                                     placeholder="Search Problem"
                                     isClearable
                                     isSearchable
@@ -119,14 +197,14 @@ const AddProblem = () => {
                 </Col>
 
                 {/* ICD Version - fixed to ICD-10 */}
-                <Col sm={6}>
+                {/* <Col sm={6}>
                     <Form.Group>
                         <Form.Label className="mb-0">ICD Version</Form.Label>
                         <Form.Select disabled {...register('icdVersion')} style={{ cursor: 'not-allowed' }}>
                             <option value="ICD-10">ICD-10</option>
                         </Form.Select>
                     </Form.Group>
-                </Col>
+                </Col> */}
 
                 {/* ICD 10 Code - auto-filled */}
                 <Col sm={6}>
@@ -135,15 +213,22 @@ const AddProblem = () => {
                         <Form.Control type="text" placeholder="Enter ICD 10 Code" {...register('icdCode')} readOnly />
                     </Form.Group>
                 </Col>
-
-                {/* Status */}
                 <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Status</Form.Label>
-                        <Form.Select {...register('status')}>
-                            <option value="">Select Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                    <Form.Group className="mb-1">
+                        <Form.Label htmlFor="status" className="mb-0">
+                            Status
+                        </Form.Label>
+                        <Form.Select
+                            {...register('status', { required: 'Clinical Status is required' })}
+                            data-has-value={!!watch('status')}>
+                            <option value="" hidden>
+                                Select Clinical Status
+                            </option>
+                            {clinicalStatus?.map((status) => (
+                                <option key={status?.code} value={status?.code}>
+                                    {status?.display}
+                                </option>
+                            ))}
                         </Form.Select>
                     </Form.Group>
                 </Col>
@@ -188,12 +273,30 @@ const AddProblem = () => {
                 </Col>
 
                 {/* Action Buttons */}
-                <Col sm={12} className="d-flex justify-content-end gap-1 mt-3" >
-                    <Button className="custom-buttons"style={{width:'150px'}} type="button" onClick={() => reset()}>
-                        Save & Add Another
+                <Col sm={12} className="d-flex justify-content-end gap-1 mt-3">
+                    <Button
+                        className="custom-buttons"
+                        style={{ width: '150px' }}
+                        type="submit"
+                        disabled={store?.createProblemListReducer?.loading}
+                        onClick={() => setSubmissionType('saveAndReset')}>
+                        {store?.createProblemListReducer?.loading && submissionType === 'saveAndReset' ? (
+                            <Spinner animation="border" size="sm" className="text-white" />
+                        ) : (
+                            'Save & Add Another'
+                        )}
                     </Button>
-                    <Button className="custom-buttons" type="submit" style={{ width: '120px' }}>
-                        Add Problem
+                    <Button
+                        className="custom-buttons"
+                        type="submit"
+                        style={{ width: '120px' }}
+                        disabled={store?.createProblemListReducer?.loading}
+                        onClick={() => setSubmissionType('saveAndNext')}>
+                        {store?.createProblemListReducer?.loading && submissionType === 'saveAndNext' ? (
+                            <Spinner animation="border" size="sm" className="text-white" />
+                        ) : (
+                            'Save & Next'
+                        )}
                     </Button>
                 </Col>
             </Row>

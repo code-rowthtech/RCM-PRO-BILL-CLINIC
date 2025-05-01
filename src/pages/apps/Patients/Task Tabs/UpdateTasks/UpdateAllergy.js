@@ -30,6 +30,8 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
     const [exposureRoute, setExposureRoute] = useState(null);
     const updateStatus = store?.updateAllergyReducer?.data?.status;
+        const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
+    
     const {
         register,
         handleSubmit,
@@ -60,6 +62,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         setExposureRoute(allergyDetails?.reaction?.[0]?.exposureRoute?.coding?.[0]);
         setSubstance(allergyDetails?.reaction[0]?.substance?.coding[0]);
         setValue('appointment', allergyDetails?.appointmentId);
+        setValue('appointmentDate', allergyDetails?.onset?.onsetDateTime);
     }, [allergyDetails]);
 
     // const onSubmit = (data) => {
@@ -70,7 +73,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     //         ...(updateAllergy?.allergyType ? { allergyType: updateAllergy?.allergyType } : {}),
     //         ...(updateAllergy?.allergyname ? { allergyname: updateAllergy?.allergyname } : {}),
     //         ...(updateAllergy?.reaction ? { reaction: updateAllergy?.reaction } : {}),
-            // ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
+    // ...(updateAllergy?.status ? { status: updateAllergy?.status } : {}),
     //         ...(updateAllergy?.severity ? { severity: updateAllergy?.severity } : {}),
     //         ...(updateAllergy?.notes ? { notes: updateAllergy?.notes } : {}),
     //     };
@@ -190,7 +193,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                     // ],
                 },
             ],
-            appointmentId: data?.appointment,
             note: [
                 {
                     text: data?.notes,
@@ -208,6 +210,17 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                 },
             ],
         };
+        if (selectMode === 'appointment' && data.appointment) {
+            let appData = JSON.parse(data.appointment);
+            payload.appointmentId = appData?._id;
+            payload.onset = {
+                onsetDateTime: appData?.date, // optionally use actual date
+            };
+        } else if (selectMode === 'date' && data.appointmentDate) {
+            payload.onset = {
+                onsetDateTime: data.appointmentDate,
+            };
+        }
 
         dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
         console.log(payload, 'payload');
@@ -309,16 +322,17 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         },
         [formattedExposurRouteOption]
     );
-useEffect(()=>{
-    if(updateStatus === 200){
-        const data = {
-            patientId: patientId,
-        };
-        dispatch(getAllergiesOfPatientAction(data));
-       onCancel();
-    }
-   
-},[updateStatus, dispatch, patientId ,onCancel]);
+    useEffect(() => {
+        if (updateStatus === 200) {
+            const data = {
+                patientId: patientId,
+            };
+            dispatch(getAllergiesOfPatientAction(data));
+            onCancel();
+        }
+    }, [updateStatus, dispatch, patientId, onCancel]);  
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -515,7 +529,9 @@ useEffect(()=>{
                                     Clinical Status
                                 </Form.Label>
                                 <Form.Select
-                                    {...register('status', { required: 'Clinical Status is required' })}
+                                    {...register('status',
+                                        //  { required: 'Clinical Status is required' }
+                                        )}
                                     data-has-value={!!watch('status')}>
                                     <option value="" hidden>
                                         Select Clinical Status
@@ -579,15 +595,46 @@ useEffect(()=>{
                         </Col> */}
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Appointment</Form.Label>
-                                <Form.Select {...register('appointment')}>
-                                    <option value="">Select Appointment</option>
-                                    {appointments?.map((item) => (
-                                        <option key={item._id} value={item._id}>
-                                            {item?.date ? new Date(item?.date).toISOString().split('T')[0] : 'N/A'}
-                                        </option>
-                                    ))}
-                                </Form.Select>
+                                <Form.Label className="mb-0">Select Mode</Form.Label>
+                                <div className="d-flex gap-3 mb-0">
+                                    <Form.Check
+                                        type="radio"
+                                        label="By Appointment"
+                                        name="selectionMode"
+                                        value="appointment"
+                                        checked={selectMode === 'appointment'}
+                                        onChange={() => setSelectMode('appointment')}
+                                    />
+                                    <Form.Check
+                                        type="radio"
+                                        label="By Date"
+                                        name="selectionMode"
+                                        value="date"
+                                        checked={selectMode === 'date'}
+                                        onChange={() => setSelectMode('date')}
+                                    />
+                                </div>
+
+                                {selectMode === 'appointment' ? (
+                                    <>
+                                        <Form.Label className="mb-0">Appointment</Form.Label>
+                                        <Form.Select {...register('appointment')}>
+                                            <option>Select Appointment Date </option>
+                                            {appointments?.map((item) => (
+                                                <option key={item?._id} value={JSON.stringify(item)}>
+                                                    {item?.date
+                                                        ? new Date(item.date).toISOString().split('T')[0]
+                                                        : 'N/A'}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Form.Label className="mb-0">Select Date (till today)</Form.Label>
+                                        <Form.Control type="date" max={today} {...register('appointmentDate')} />
+                                    </>
+                                )}
                             </Form.Group>
                         </Col>
                         {/* <Col sm={4}>

@@ -126,3 +126,5 @@ export const getVitalsByPatientId = `${BaseRoute}/vitalsByPatientId`;
 export const getVitalsByAppointmentId = `${BaseRoute}/vitalsByAppointmentId`;
 export const updateVitals = `${BaseRoute}/updateVitals`;
 
+// Suggestions
+export const createSuggestions = `${BaseRoute}/suggestions`;

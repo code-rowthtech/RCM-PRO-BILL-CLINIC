@@ -1,313 +1,243 @@
+// Replace with your existing imports
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { encryptMessage } from '../../../../../cryptoUtils';
+import { useSearchParams } from 'react-router-dom';
+import Select from 'react-select';
 import {
     getAllCodeAction,
     getPatientAppointmentAction,
     getProblemListAction,
     updateProblemListAction,
 } from '../../../../../redux/ProblemList/action';
-import { useSearchParams } from 'react-router-dom';
-import Spinner from '../../../../../constants/Spinner';
+import { encryptMessage } from '../../../../../cryptoUtils';
+import { clinicalStatus } from '../../../../../utils/DataSets/Allergy/clinicalStatus';
 
 const UpdateProblem = ({ onCancel, problem }) => {
+    console.log(problem, 'problem');
     const [searchParams] = useSearchParams();
-    const patientId = searchParams.get('id');
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [filteredICDCodes, setFilteredICDCodes] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
     const dispatch = useDispatch();
+    const [searchQuery, setSearchQuery] = useState('');
+    const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
+    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
+    const appointments = store?.getPatientAppointmentReducer?.data || [];
+    const updateProblemListResponse = store?.updateProblemListReducer?.data?.status;
+
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        control,
+        setValue,
         watch,
         reset,
-        setValue,
+        formState: { errors },
     } = useForm();
-    const patientAppointmentproblem = store?.getPatientAppointmentReducer?.data?.appointments || [];
-    const problemDetails = store?.getProblemDetailsReducer?.data?.problem;
-    const updateStatus = store?.updateProblemListReducer?.data?.status;
-    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
+    const [selectedProblem, setSelectedProblem] = useState(null);
 
-
-    const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${year}-${month}-${day}`; // Format for input type="date"
-    };
-
-    // Watch for changes in the ICD code field
-    const icdCodeValue = watch('icdCode');
-
-    // Function to filter ICD-10 codes based on user input
-    const handleICDSearch = (e) => {
-        const query = e.target.value;
-        setSearchQuery(query);
-        if (query.length > 0) {
-            const filtered = allCodeICDs.filter(
-                (code) =>
-                    code.value.toLowerCase().includes(query.toLowerCase()) ||
-                    code.title.toLowerCase().includes(query.toLowerCase())
-            );
-            setFilteredICDCodes(filtered);
-            setShowDropdown(true);
-        } else {
-            setShowDropdown(false);
-        }
-    };
-    // Function to select an ICD-10 code
-    const selectICDCode = (code) => {
-        setValue('icdCode', code.value);
-        setSearchQuery(code.value);
-        setShowDropdown(false);
-    };
+    const formattedOptions = allCodeICDs.map((code) => ({
+        value: code.value,
+        label: `${code.title} - ${code.codeType}`,
+        system: 'http://hl7.org/fhir/condition-code',
+        display: code.title,
+    }));
+    useEffect(() => {
+        dispatch(getPatientAppointmentAction({ patientId }));
+    }, [dispatch, patientId]);
 
     useEffect(() => {
-        dispatch(getAllCodeAction({ search: searchQuery }));
+        const delayDebounce = setTimeout(() => {
+            dispatch(getAllCodeAction({ search: searchQuery }));
+        }, 300); // 300ms debounce
+        return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
 
     useEffect(() => {
-        setValue('problem', problemDetails?.problem);
-        setValue('icdVersion', problemDetails?.icdVersion);
-        setValue('icdCode', problemDetails?.icdCode);
-        setValue('status', problemDetails?.status);
-        setValue('notes', problemDetails?.notes);
-        setValue('datetimeDiagnosis', formatDate(problemDetails?.datetimeDiagnosis));
-        setValue('datetimeOnset', formatDate(problemDetails?.datetimeOnset));
-        setValue('datetimeChanged', formatDate(problemDetails?.datetimeChanged));
-    }, [problemDetails, patientAppointmentproblem]);
-    useEffect(() => {
-        if (patientAppointmentproblem?.length > 0 && problemDetails) {
-            setValue(
-                'appointment',
-                patientAppointmentproblem &&
-                    patientAppointmentproblem?.find((data) => data?._id === problemDetails?.appointmentId)?._id
-            );
+        if (selectedProblem) {
+            setValue('icdCode', selectedProblem.value);
         }
-    }, [patientAppointmentproblem, problemDetails]);
+    }, [selectedProblem, setValue]);
     useEffect(() => {
-        if (patientId) {
-            dispatch(getPatientAppointmentAction({ key: encryptMessage({ patientId }) }));
+        if (problem) {
+            setSelectedProblem(problem?.code?.coding?.[0]?.display);
+            setValue('icdCode', problem?.code?.coding?.[0]?.code);
+            setValue('status', problem?.clinicalStatus?.coding?.[0]?.code);
+            setValue('appointment', problem?.appointment);
+            setValue('datetimeDiagnosis', problem?.onsetDateTime.split('T')[0]);
+            // setValue('datetimeOnset', problem?.datetimeOnset.split('T')[0]);
+            setValue('notes', problem?.note?.[0]?.text);
         }
-    }, [dispatch, patientId]);
-
+    }, [problem, reset]);
     const onSubmit = (data) => {
-        const updateData = { ...data };
-
+        const selected = data.problem;
+        const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
         const payload = {
             id: problem?._id,
-            ...(updateData?.problem ? { problem: updateData?.problem } : {}),
-            ...(updateData?.icdVersion ? { icdVersion: updateData?.icdVersion } : {}),
-            ...(updateData?.icdCode ? { icdCode: updateData?.icdCode } : {}),
-            ...(updateData?.status ? { status: updateData?.status } : {}),
-            ...(updateData?.appointment ? { appointment: updateData?.appointment } : {}),
-            ...(updateData?.notes ? { notes: updateData?.notes } : {}),
-            ...(updateData?.datetimeDiagnosis ? { datetimeDiagnosis: updateData?.datetimeDiagnosis } : {}),
-            ...(updateData?.datetimeOnset ? { datetimeOnset: updateData?.datetimeOnset } : {}),
-            ...(updateData?.datetimeChanged ? { datetimeChanged: updateData?.datetimeChanged } : {}),
+            subject: patientId,
+            code: {
+                coding: [
+                    {
+                        system: selected?.system,
+                        code: selected?.value,
+                        display: selected?.display,
+                    },
+                ],
+                text: selected?.display,
+            },
+            // recorder: '',
+            // asserter: '',
+            // encounter: '',
+            problem: data.problem,
+            // icdVersion: data.icdVersion,
+            icdCode: data.icdCode,
+            clinicalStatus: {
+                coding: [
+                    {
+                        system: selectedStatus?.system,
+                        code: selectedStatus?.code,
+                        display: selectedStatus?.display,
+                    },
+                ],
+                text: selectedStatus?.display,
+            },
+            appointment: data.appointment,
+            onsetDateTime: data.diagnosisDate,
+            // onsetDate: data.onsetDate,
+            note: [
+                {
+                    authorReference: {
+                        reference: '',
+                        type: '',
+                        display: '',
+                    },
+                    authorString: ' ',
+                    time: '',
+                    text: data?.notes,
+                },
+            ],
         };
-
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));
+        console.log('Form Data:', payload);
     };
+
     useEffect(() => {
-        if (updateStatus === 200) {
-            dispatch(getProblemListAction({ patientId }));
+        if (updateProblemListResponse === 200) {
+            onCancel();
+            const data = {
+                patientId: patientId,
+            };
+            dispatch(getProblemListAction(data));
         }
-    }, [updateStatus, dispatch]);
+    }, [updateProblemListResponse, dispatch]);
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
-                <Col sm={12} className="d-flex justify-content-between">
-                    <h4>Update Problem</h4>
-                    <Button className="custom-buttons" onClick={onCancel} type="button">
-                        Back
-                    </Button>
-                </Col>
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Problem</Form.Label>
-                        <Form.Control
-                            type="text"
-                            data-has-value={!!watch('problem')}
-                            placeholder="Enter Problem"
-                            {...register('problem', { required: 'Problem is required' })}
-                        />
-                        {errors.problem && <small className="text-danger">{errors.problem.message}</small>}
-                    </Form.Group>
-                </Col>
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">ICD Version</Form.Label>
-                        <Form.Select {...register('icdVersion')} data-has-value={!!watch('icdVersion')}>
-                            <option value="">Select ICD Version</option>
-                            <option value="ICD-10">ICD-10</option>
-                            <option value="ICD-10">ICD-10</option>
-                        </Form.Select>
-                    </Form.Group>
-                </Col>
-
-                {/* <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">ICD 10 Code</Form.Label>
-                        <Form.Control
-                            type="text"
-                            data-has-value={!!watch('icdCode')}
-                            placeholder="Enter ICD 10 Code"
-                            {...register('icdCode')}
-                        />
-                    </Form.Group>
-                </Col> */}
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">ICD 10 Code</Form.Label>
-                        <div style={{ position: 'relative' }}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter ICD 10 Code"
-                                {...register('icdCode', { required: 'ICD 10 Code is required' })}
-                                onChange={handleICDSearch}
-                                onFocus={() => setShowDropdown(true)}
-                                onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-                            />
-                            {errors.icdCode && <small className="text-danger">{errors.icdCode.message}</small>}
-
-                            {/* Dropdown for ICD Code Search */}
-                            {showDropdown && filteredICDCodes.length > 0 && (
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        left: 0,
-                                        width: '100%',
-                                        maxHeight: '200px',
-                                        overflowY: 'auto',
-                                        zIndex: 111,
-                                        backgroundColor: '#fff',
-                                        border: '1px solid #ced4da',
-                                        borderTop: 'none',
-                                    }}
-                                    className="scroll-container">
-                                    {filteredICDCodes.map((code) => (
-                                        <p
-                                            key={code._id}
-                                            onClick={() => selectICDCode(code)}
-                                            style={{
-                                                margin: 0,
-                                                padding: '8px 12px',
-                                                cursor: 'pointer',
-                                            }}
-                                            className="hover-bg-change text-black">
-                                            {code.value} - {code.title} - {code.codeType}
-                                        </p>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </Form.Group>
-                </Col>
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Status</Form.Label>
-                        <Form.Select {...register('status')} data-has-value={!!watch('status')}>
-                            <option value="">Select Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </Form.Select>
-                    </Form.Group>
-                </Col>
-                {/* Appointment */}
                 <Col sm={6}>
                     <Form.Group className="mb-1">
-                        <Form.Label htmlFor="Appointment" className="mb-0">
-                            Appointment
-                        </Form.Label>
-                        <Form.Select {...register('appointment')} data-has-value={!!watch('appointment')}>
-                            <option value="">Select Appointment</option>
-                            {patientAppointmentproblem?.length === 0 ? (
-                                <option value="">{store?.getPatientAppointmentReducer?.data?.message}</option>
-                            ) : (
-                                patientAppointmentproblem?.map((appointment) => {
-                                    // Convert ISO date to dd/mm/yyyy
-                                    const dateObj = new Date(appointment?.date);
-                                    const formattedDate = `${String(dateObj.getDate()).padStart(2, '0')}/${String(
-                                        dateObj.getMonth() + 1
-                                    ).padStart(2, '0')}/${dateObj.getFullYear()}`;
-
-                                    return (
-                                        <option key={appointment?._id} value={appointment?._id}>
-                                            {formattedDate || 'NO APPOINTMENT SCHEDULED YET'}
-                                        </option>
-                                    );
-                                })
+                        <Form.Label className="mb-0">Problem</Form.Label>
+                        <Controller
+                            name="problem"
+                            control={control}
+                            rules={{ required: 'Problem is required' }}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    classNamePrefix="select"
+                                    options={formattedOptions}
+                                    onChange={(selected) => {
+                                        field.onChange(selected);
+                                        setSelectedProblem(selected); // 🔁 update local state
+                                    }}
+                                    onInputChange={(value, { action }) => {
+                                        if (action === 'input-change') {
+                                            setSearchQuery(value);
+                                        }
+                                    }}
+                                    placeholder="Search Problem"
+                                    isClearable
+                                    isSearchable
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                        valueContainer: (provided) => ({
+                                            ...provided,
+                                            padding: '0px 6px',
+                                        }),
+                                    }}
+                                />
                             )}
+                        />
+                        {errors.problem && <Form.Text className="text-danger">{errors.problem.message}</Form.Text>}
+                    </Form.Group>
+                </Col>
+
+                <Col sm={6}>
+                    <Form.Group>
+                        <Form.Label>ICD 10 Code</Form.Label>
+                        <Form.Control type="text" readOnly {...register('icdCode')} />
+                    </Form.Group>
+                </Col>
+
+                <Col sm={6}>
+                    <Form.Group className="mb-1">
+                        <Form.Label>Status</Form.Label>
+                        <Form.Select {...register('status', { required: 'Status is required' })}>
+                            <option value="" hidden>
+                                Select Clinical Status
+                            </option>
+                            {clinicalStatus?.map((status) => (
+                                <option key={status.code} value={status.code}>
+                                    {status.display}
+                                </option>
+                            ))}
+                        </Form.Select>
+                        {errors.status && <Form.Text className="text-danger">{errors.status.message}</Form.Text>}
+                    </Form.Group>
+                </Col>
+
+                <Col sm={6}>
+                    <Form.Group>
+                        <Form.Label>Appointment</Form.Label>
+                        <Form.Select {...register('appointment')}>
+                            <option value="">Select Appointment</option>
+                            {appointments?.map((item) => (
+                                <option key={item._id} value={item._id}>
+                                    {item.date ? new Date(item.date).toISOString().split('T')[0] : 'N/A'}
+                                </option>
+                            ))}
                         </Form.Select>
                     </Form.Group>
                 </Col>
 
                 <Col sm={6}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Datetime Diagnosis</Form.Label>
-                        <Form.Control
-                            type="date"
-                            {...register('datetimeDiagnosis')}
-                            data-has-value={!!watch('datetimeDiagnosis')}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Datetime Onset</Form.Label>
-                        <Form.Control
-                            type="date"
-                            {...register('datetimeOnset')}
-                            data-has-value={!!watch('datetimeOnset')}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Datetime Changed</Form.Label>
-                        <Form.Control
-                            type="date"
-                            {...register('datetimeChanged')}
-                            data-has-value={!!watch('datetimeChanged')}
-                        />
+                        <Form.Label>Date Diagnosis</Form.Label>
+                        <Form.Control type="date" {...register('datetimeDiagnosis')} />
                     </Form.Group>
                 </Col>
 
                 <Col sm={12}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Note</Form.Label>
-                        <Form.Control
-                            as="textarea"
-                            placeholder="Note"
-                            rows={4}
-                            {...register('notes')}
-                            data-has-value={!!watch('notes')}
-                        />
+                        <Form.Label>Note</Form.Label>
+                        <Form.Control as="textarea" rows={4} {...register('notes')} />
                     </Form.Group>
                 </Col>
 
-                <Col sm={12} className="d-flex justify-content-end mt-3">
-                    <Button className="custom-buttons" type="submit">
-                        {store?.updateProblemListReducer?.loading ? (
-                            <Spinner color="white" className="spinner-border-sm" />
-                        ) : (
-                            'Update'
-                        )}
+                <Col sm={12} className="d-flex justify-content-end gap-2 mt-3">
+                    <Button type="submit" className="custom-buttons">
+                        Update
                     </Button>
                 </Col>
             </Row>

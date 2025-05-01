@@ -156,7 +156,7 @@ function* deleteAllergyFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response?.status === 200) {
-            ToastHandle(response?.message, 'danger');
+            ToastHandle(decryptedData?.message, 'danger');
             yield put({
                 type: AllergyListActionTypes.DELETE_ALLERGY_SUCCESS,
                 payload: { ...decryptedData },
@@ -173,7 +173,6 @@ function* deleteAllergyFunction(data) {
         }
     } catch (error) {
         ToastHandle(error, 'danger');
-
         yield put({
             type: AllergyListActionTypes.DELETE_ALLERGY_ERROR,
             payload: error,
