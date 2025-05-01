@@ -457,7 +457,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                                 </div>
                                             </div>
                                             <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                {medication.status}
+                                                {medication?.status}
                                             </span>
                                         </li>
                                     ))}

@@ -39,6 +39,16 @@ const Medication = ({ isAccordionOpen }) => {
     setMedicationModal(false)
     setSelectedMedication(null)
   }
+  const statusColorMap = {
+    active: 'text-success',
+    'on-hold': 'text-warning',
+    cancelled: 'text-danger',
+    completed: 'text-primary',
+    'entered-in-error': 'text-danger',
+    stopped: 'text-secondary',
+    draft: 'text-muted',
+    unknown: 'text-dark'
+};
 
   return (
     <>
@@ -100,7 +110,7 @@ const Medication = ({ isAccordionOpen }) => {
                       medicationList?.map((data, index) => (
                         <tr key={index}>
                           <td>{index + 1}</td>
-                          <td className='text-capitalize'>{data?.status || 'N/A'}</td>
+                          <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
                           <td>
                             <div className='d-flex flex-column'>
                               <span className='text-capitalize'> {data?.drugId?.proprietaryName || 'N/A'}</span>

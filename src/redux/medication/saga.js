@@ -44,6 +44,7 @@ function* createMedicationFunction(data) {
             });
         }
     } catch (error) {
+        ToastHandle(error, 'danger');
         yield put({
             type: MedicationActionTypes.CREATE_MEDICATION_ERROR,
             payload: error,
