@@ -65,8 +65,7 @@ const FamilyHistory = () => {
                 },
             ],
 
-            relationship:
-            {
+            relationship: {
                 coding: [rela], //code:'I" , system:url, display:'Ins Company
                 text: data?.display,
             },
@@ -308,32 +307,44 @@ const FamilyHistory = () => {
                             <h5>Family History</h5>
                         </Card.Title>
                         <Row>
-                            <Col xs={12} className='scroll-container' style={{ height: '49vh' }}>
+                            <Col xs={12} className="scroll-container" style={{ height: '49vh' }}>
                                 {familyGeneticHistory?.length === 0 ? (
-                                    <p>No family records added yet.</p>
+                                    <div className="text-center py-4 text-muted">
+                                        <i className="bi bi-journal-x fs-1"></i>
+                                        <p className="mt-2 mb-0">No family records added yet</p>
+                                    </div>
                                 ) : (
                                     <ListGroup>
                                         {familyGeneticHistory?.map((item, index) => (
                                             <ListGroup.Item key={index}>
                                                 <strong>Relationship:</strong>{' '}
                                                 {item?.relationship?.coding?.[0]?.display || 'N/A'} <br />
-                                                <strong>Name:</strong><span className='text-capitalize'>{item?.name}</span> <br />
-                                                <strong>Date of Birth:</strong> {item?.bornDate ? new Date(item?.bornDate)?.toLocaleDateString('en-GB') : ''} <br />
-                                                <strong>Sex:</strong>{' '}
-                                                {item?.gender || 'N/A'}{' '}
+                                                <strong>Name:</strong>
+                                                <span className="text-capitalize">{item?.name}</span> <br />
+                                                <strong>Date of Birth:</strong>{' '}
+                                                {item?.bornDate
+                                                    ? new Date(item?.bornDate)?.toLocaleDateString('en-GB')
+                                                    : ''}{' '}
                                                 <br />
-                                                <strong>Condition:</strong> {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'} <br />
+                                                <strong>Sex:</strong> {item?.gender || 'N/A'} <br />
+                                                <strong>Condition:</strong>{' '}
+                                                {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'} <br />
                                                 {!item.problem?.display && item?.note && (
                                                     <>
                                                         <strong>Notes:</strong>
-                                                        <div dangerouslySetInnerHTML={{ __html: item?.note?.[0]?.text }} />
+                                                        <div
+                                                            dangerouslySetInnerHTML={{ __html: item?.note?.[0]?.text }}
+                                                        />
                                                     </>
                                                 )}
                                                 <strong>Deceased:</strong> {item.deceased === 'yes' ? 'Yes' : 'No'}{' '}
                                                 <br />
                                                 {item.deceased === 'yes' && (
                                                     <>
-                                                        <strong>Date of Death:</strong>  {data?.dateOfDeath ? new Date(data?.dateOfDeath)?.toLocaleDateString('en-GB') : ''}
+                                                        <strong>Date of Death:</strong>{' '}
+                                                        {item?.dateOfDeath
+                                                            ? new Date(item?.dateOfDeath)?.toLocaleDateString('en-GB')
+                                                            : ''}
                                                     </>
                                                 )}
                                             </ListGroup.Item>
