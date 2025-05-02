@@ -22,6 +22,7 @@ const Medication = ({ isAccordionOpen }) => {
   const [medicationModal, setMedicationModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+  console.log(medicationList, 'medicationListmedicationListmedicationListmedicationList')
   const createSuccess = store?.createMedicationReducer?.data?.status;
   useEffect(() => {
     if (createSuccess === 201) {
@@ -48,7 +49,7 @@ const Medication = ({ isAccordionOpen }) => {
     stopped: 'text-secondary',
     draft: 'text-muted',
     unknown: 'text-dark'
-};
+  };
 
   return (
     <>

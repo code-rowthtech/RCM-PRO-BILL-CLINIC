@@ -21,10 +21,10 @@ import ProblemListSaga from './ProblemList/saga';
 import alleryListSaga from './allergyList/saga';
 import suggestionsListSaga from './suggestions/saga';
 import medicationSaga from './medication/saga';
-
+import clinicalHistorySaga from './socialHistory/saga'
 
 export default function* rootSaga(): any {
-    yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), medicationSaga(),
+    yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), medicationSaga(), clinicalHistorySaga(),
     dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga(), clinicNotesSaga(), ProblemListSaga(), alleryListSaga(), suggestionsListSaga()]);
 }
 // export default function* rootSaga(): any {

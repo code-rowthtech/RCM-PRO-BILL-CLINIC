@@ -114,8 +114,8 @@ const AllergyList = () => {
                                                 <td className="text-capitalize">
                                                     {data?.category?.[0]?.display || 'N/A'}
                                                 </td>
-                                                <td className="text-capitalize">
-                                                    {data?.code?.coding?.[0]?.display || 'N/A'}
+                                                <td className="text-capitalize" title={data?.code?.coding?.[0]?.display}>
+                                                    {data?.code?.coding?.[0]?.display?.length > 30 ? data?.code?.coding?.[0]?.display?.slice(0, 29) + '...' : data?.code?.coding?.[0]?.display || 'N/A'}
                                                 </td>
                                                 {/* <td className="text-capitalize">
                                                         {data?.verificationStatus?.coding?.[0]?.display || 'N/A'}
@@ -133,7 +133,9 @@ const AllergyList = () => {
                                                         : 'N/A'}
                                                 </td>
 
-                                                <td className="text-capitalize">{data?.note?.[0]?.text || 'N/A'}</td>
+                                                <td className="text-capitalize" title={data?.note?.[0]?.text}>
+                                                    {data?.note?.[0]?.text?.length > 35 ? data?.note?.[0]?.text?.slice(0, 34) + '...' : data?.note?.[0]?.text || 'N/A'}
+                                                </td>
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                     &nbsp;
