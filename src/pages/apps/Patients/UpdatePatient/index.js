@@ -522,7 +522,7 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2" style={{ height: isAccordionOpen ? '65.5vh' : '85vh' }}>
+                                        <Card className="px-2" style={{ height: isAccordionOpen ? '70.5vh' : '85vh' }}>
                                             <div
                                                 className="mt-2 px-0">
                                                 {selectedMainTab === 'Patient Details' && <PatientSummary isAccordionOpen={isAccordionOpen} setSelectedMainTab={setSelectedMainTab} />}

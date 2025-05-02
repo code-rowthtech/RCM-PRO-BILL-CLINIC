@@ -6,7 +6,7 @@ import { GiHealthNormal } from 'react-icons/gi';
 import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { getAppointmentsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { getAppointmentsAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { handlePrintAllergies } from '../Task Tabs/PDFfiles/allergyPDF';
 import { getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import AddAllergy from '../Task Tabs/AddAllergy';
@@ -26,20 +26,22 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
-    console.log('patientVitals', patientVitals);
+    const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
+    console.log(tobaccoHistory, 'tobaccoHistorytobaccoHistory')
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
-
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+        dispatch(getTobaccooAction({ patientId: patientId }));
     }, [dispatch, patientId, effectiveDateTime]);
+
     useEffect(() => {
         if (patientId) {
             dispatch(getProblemListAction({ patientId }));
