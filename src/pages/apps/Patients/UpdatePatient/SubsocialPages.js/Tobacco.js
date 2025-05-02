@@ -331,7 +331,7 @@ const Tobacco = () => {
                                 <p className="mt-2 mb-0">No tobacco use records found</p>
                             </div>
                         ) : (
-                            <div className="scroll-container" style={{ overflowY: 'auto' }}>
+                            <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
                                 <ListGroup variant="flush">
                                     {tobaccoHistory?.map((item, index) => (
                                         <ListGroup.Item key={index} className="pb-3 px-0 border-bottom">

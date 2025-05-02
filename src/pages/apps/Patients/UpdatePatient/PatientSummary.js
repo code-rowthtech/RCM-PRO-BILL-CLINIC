@@ -6,7 +6,7 @@ import { GiHealthNormal } from 'react-icons/gi';
 import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { getAppointmentsAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { getAppointmentsAction, getFamilyGeneticAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { handlePrintAllergies } from '../Task Tabs/PDFfiles/allergyPDF';
 import { getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import AddAllergy from '../Task Tabs/AddAllergy';
@@ -26,8 +26,21 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
-    const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
-    console.log(tobaccoHistory, 'tobaccoHistorytobaccoHistory')
+    const tobaccoHistory = Array.isArray(store?.getTobaccooReducer?.data?.tobaccoHistory)
+        ? store.getTobaccooReducer.data.tobaccoHistory
+        : [];
+
+    const familyGeneticHistory = Array.isArray(store?.getFamilyGeneticReducer?.data?.familyMedicalHistory)
+        ? store.getFamilyGeneticReducer.data.familyMedicalHistory
+        : [];
+
+    const socialHistoryData = [
+        ...tobaccoHistory.slice(0, 2),
+        ...familyGeneticHistory.slice(0, 2)
+    ];
+
+
+    console.log(socialHistoryData, 'socialHistoryDatasocialHistoryData')
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
@@ -40,6 +53,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
         dispatch(getTobaccooAction({ patientId: patientId }));
+        dispatch(getFamilyGeneticAction({ patientId: patientId }));
     }, [dispatch, patientId, effectiveDateTime]);
 
     useEffect(() => {
@@ -471,23 +485,28 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2">
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Smoking</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.smoking}</div>
-                            </div>
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Alcohol</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.alcohol}</div>
-                            </div>
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Exercise</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.exercise}</div>
-                            </div>
-                            <div className="social-history-item">
-                                <span className="text-muted fs-6">Diet</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.diet}</div>
-                            </div>
+                            {store?.getFamilyGeneticReducer?.loading && store?.getTobaccooReducer?.loading ?
+                                <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                    <Spinner className='spinner-border-sm' />
+                                </div>
+                                : socialHistoryData?.length > 0 ?
+                                    socialHistoryData?.map((data, index) => (
+                                        <div className="social-history-item  py-2 d-flex align-items-center justify-content-between" key={index}>
+                                            <span className="text-muted fs-6">{data?.tobaccoUse || data?.condition?.[0]?.code?.coding?.[0]?.display}</span>
+                                            <div className="fs-6 fw-semibold">{data?.effectiveDateTime ? new Date(data?.effectiveDateTime)?.toLocaleDateString('en-GB') : '' ||
+                                                data?.deceasedDate ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB') : '' || 'N/A'}</div>
+                                        </div>
+                                    )) :
+                                    <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                        No Social Histoy Found
+                                    </div>
+                            }
                         </Card.Body>
+                        <div
+                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                            onClick={() => setSelectedMainTab('Tabacco')}>
+                            Go To Social History
+                        </div>
                     </Card>
                 </Col>
 
@@ -506,6 +525,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                         </Card.Header>
                         <Card.Body className="p-2">
                             <ul className="list-unstyled">
+
                                 {patientSummary.encounters.map((encounter, index) => (
                                     <li key={index} className="mb-3">
                                         <div className="d-flex fs-6 justify-content-between">

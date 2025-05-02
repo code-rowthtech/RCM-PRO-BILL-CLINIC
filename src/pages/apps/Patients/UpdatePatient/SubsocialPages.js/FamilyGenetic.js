@@ -34,7 +34,6 @@ const FamilyHistory = () => {
     const isDeceased = watch('deceased') === 'yes';
     const createResponse = store?.createFamilyGeneticReducer?.data?.status;
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory || [];
-    console.log(store?.getFamilyGeneticReducer, 'getFamilyGeneticReducergetFamilyGeneticReducer')
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
@@ -66,12 +65,12 @@ const FamilyHistory = () => {
                 },
             ],
 
-            relationship: 
-                {
-                    coding: [rela], //code:'I" , system:url, display:'Ins Company
-                    text: data?.display,
-                },
-            
+            relationship:
+            {
+                coding: [rela], //code:'I" , system:url, display:'Ins Company
+                text: data?.display,
+            },
+
             gender: selectedSexOption?.label,
             bornDate: data?.dob,
             deceasedBoolean: data?.deceased,
@@ -309,7 +308,7 @@ const FamilyHistory = () => {
                             <h5>Family History</h5>
                         </Card.Title>
                         <Row>
-                            <Col xs={12}>
+                            <Col xs={12} className='scroll-container' style={{ height: '49vh' }}>
                                 {familyGeneticHistory?.length === 0 ? (
                                     <p>No family records added yet.</p>
                                 ) : (
@@ -318,10 +317,10 @@ const FamilyHistory = () => {
                                             <ListGroup.Item key={index}>
                                                 <strong>Relationship:</strong>{' '}
                                                 {item?.relationship?.coding?.[0]?.display || 'N/A'} <br />
-                                                <strong>Name:</strong> {item?.name} <br />
-                                                <strong>Date of Birth:</strong> {item?.bornDate} <br />
+                                                <strong>Name:</strong><span className='text-capitalize'>{item?.name}</span> <br />
+                                                <strong>Date of Birth:</strong> {item?.bornDate ? new Date(item?.bornDate)?.toLocaleDateString('en-GB') : ''} <br />
                                                 <strong>Sex:</strong>{' '}
-                                                { item?.gender|| 'N/A'}{' '}
+                                                {item?.gender || 'N/A'}{' '}
                                                 <br />
                                                 <strong>Condition:</strong> {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'} <br />
                                                 {!item.problem?.display && item?.note && (
@@ -334,7 +333,7 @@ const FamilyHistory = () => {
                                                 <br />
                                                 {item.deceased === 'yes' && (
                                                     <>
-                                                        <strong>Date of Death:</strong> {item.dateOfDeath}
+                                                        <strong>Date of Death:</strong>  {data?.dateOfDeath ? new Date(data?.dateOfDeath)?.toLocaleDateString('en-GB') : ''}
                                                     </>
                                                 )}
                                             </ListGroup.Item>
