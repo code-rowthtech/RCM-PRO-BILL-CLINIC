@@ -333,7 +333,7 @@ const FamilyHistory = () => {
                                                 <br />
                                                 {item.deceased === 'yes' && (
                                                     <>
-                                                        <strong>Date of Death:</strong>  {data?.dateOfDeath ? new Date(data?.dateOfDeath)?.toLocaleDateString('en-GB') : ''}
+                                                        <strong>Date of Death:</strong>  {item?.dateOfDeath ? new Date(item?.dateOfDeath)?.toLocaleDateString('en-GB') : ''}
                                                     </>
                                                 )}
                                             </ListGroup.Item>
