@@ -7,6 +7,10 @@ import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
 import { sexAssignedAtBirthOptions } from '../../../../../utils/DataSets/sex';
 import { useDispatch, useSelector } from 'react-redux';
 import { dataList } from '../../../../../utils/DataSets/relations.data';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
+import { useSearchParams } from 'react-router-dom';
+import { createFamilyGeneticAction, getFamilyGeneticAction } from '../../../../../redux/actions';
+import { encryptMessage } from '../../../../../cryptoUtils';
 
 const FamilyHistory = () => {
     const dispatch = useDispatch();
@@ -21,11 +25,16 @@ const FamilyHistory = () => {
     const [rela, setRela] = useState(null); // Store selected relationship
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const [familyList, setFamilyList] = useState([]);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const selectedCondition = watch('condition');
     const isDeceased = watch('deceased') === 'yes';
+    const createResponse = store?.createFamilyGeneticReducer?.data?.status;
+    const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory || [];
+    console.log(store?.getFamilyGeneticReducer, 'getFamilyGeneticReducergetFamilyGeneticReducer')
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
@@ -39,34 +48,54 @@ const FamilyHistory = () => {
 
         setFamilyList((prev) => [...prev, data]);
         const payload = {
-            code: {
-                coding: [
-                    {
-                        system: selected?.system,
-                        code: selected?.value,
-                        display: selected?.display,
-                    },
-                ],
-                text: selected?.display,
-            },
-            relationship: [
+            name: data?.name,
+            clinicId: loggedInUser?._id,
+            subject: patientId,
+            condition: [
                 {
-                    coding: [rela], //code:'I" , system:url, display:'Ins Company
-                    text: data?.emergencyContactName,
+                    code: {
+                        coding: [
+                            {
+                                system: selected?.system,
+                                code: selected?.value,
+                                display: selected?.display,
+                            },
+                        ],
+                        text: selected?.display,
+                    },
                 },
             ],
-            birthSex: [
+
+            relationship: 
                 {
-                    ...selectedSexOption,
-                    code: selectedSexOption?.value,
-                    display: selectedSexOption?.label,
-                    system: selectedSexOption?.system,
+                    coding: [rela], //code:'I" , system:url, display:'Ins Company
+                    text: data?.display,
+                },
+            
+            gender: selectedSexOption?.label,
+            bornDate: data?.dob,
+            deceasedBoolean: data?.deceased,
+            deceasedDate: data?.dateOfDeath,
+            note: [
+                {
+                    text: data?.notes,
                 },
             ],
         };
-
-        reset();
+        dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payload');
     };
+    useEffect(() => {
+        dispatch(getFamilyGeneticAction({ patientId: patientId }));
+    }, [dispatch, patientId]);
+
+    useEffect(() => {
+        if (createResponse === 201) {
+            dispatch(getFamilyGeneticAction({ patientId: patientId }));
+            reset();
+        }
+    }, [createResponse, dispatch, patientId, reset]);
+
     const relationshipOption = dataList?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
@@ -85,99 +114,26 @@ const FamilyHistory = () => {
         display: code.title,
     }));
     return (
-        <Row className="mt-3 scroll-container"
-            // style={{ overflowY: 'scroll', overflowX: 'hidden', height: '55vh' }}
-        >
-            {/* Left side - Form */}
-            <Col md={6} className='px-2' style={{borderRight:'1px solid black'}}>
-                <h5 className="mb-3">Add Family Medical History</h5>
-                <Form onSubmit={handleSubmit(onSubmit)}>
-                    <Row>
-                        <Col xs={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Relationship</Form.Label>
-                                <Select
-                                    options={relationshipOption}
-                                    isSearchable
-                                    className="basic-single"
-                                    classNamePrefix="select"
-                                    placeholder="Select"
-                                    value={selectedRelationOption}
-                                    onChange={handleRelationChange}
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            height: '30px',
-                                            minHeight: '30px',
-                                            border: '0px',
-                                        }),
-                                        placeholder: (provided) => ({
-                                            ...provided,
-                                            fontWeight: 'bold',
-                                            fontSize: '12px',
-                                            paddingBottom: '5px',
-                                        }),
-                                    }}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Name</Form.Label>
-                                <Form.Control {...register('name')} required />
-                            </Form.Group>
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col xs={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Date of Birth</Form.Label>
-                                <Form.Control type="date" {...register('dob')} required />
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Sex</Form.Label>
-                                <Form.Select {...register('sex')}>
-                                    <option value="" hidden>
-                                        Select Sex
-                                    </option>
-                                    {sexAssignedAtBirthOptions.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col xs={6}>
-                            <Form.Group className="mb-1">
-                                <Form.Label className="mb-0">Condition</Form.Label>
-                                <Controller
-                                    name="problem"
-                                    control={control}
-                                    rules={{ required: 'Problem is required' }}
-                                    render={({ field }) => (
+        <Row className="">
+            <Col md={6} className="pe-0 border-end tobaccooCardContainer">
+                <Card className="shadow-sm tobaccooCard">
+                    <Card.Body>
+                        <Card.Title className="border-bottom">
+                            <h5 className="">Add Family Medical History</h5>
+                        </Card.Title>
+                        <Form onSubmit={handleSubmit(onSubmit)}>
+                            <Row>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Relationship</Form.Label>
                                         <Select
-                                            {...field}
-                                            classNamePrefix="select"
-                                            options={formattedOptions}
-                                            onChange={(selected) => {
-                                                field.onChange(selected);
-                                                setSelectedProblem(selected);
-                                            }}
-                                            onInputChange={(value, { action }) => {
-                                                if (action === 'input-change') {
-                                                    setSearchQuery(value);
-                                                }
-                                            }}
-                                            placeholder="Search Problem"
-                                            isClearable
+                                            options={relationshipOption}
                                             isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="Select"
+                                            value={selectedRelationOption}
+                                            onChange={handleRelationChange}
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
@@ -191,110 +147,204 @@ const FamilyHistory = () => {
                                                     fontSize: '12px',
                                                     paddingBottom: '5px',
                                                 }),
-                                                valueContainer: (provided) => ({
-                                                    ...provided,
-                                                    padding: '0px 6px',
-                                                }),
                                             }}
                                         />
-                                    )}
-                                />
-                                {errors.problem && (
-                                    <Form.Text className="text-danger">{errors.problem.message}</Form.Text>
-                                )}
-                            </Form.Group>
-                        </Col>
-                        <Col xs={6}>
-                            <Form.Group>
-                                <Form.Label className="mb-0">Deceased</Form.Label>
-                                <div>
-                                    <Form.Check inline label="Yes" type="radio" value="yes" {...register('deceased')} />
-                                    <Form.Check inline label="No" type="radio" value="no" {...register('deceased')} />
-                                </div>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Name</Form.Label>
+                                        <Form.Control {...register('name')} required />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                    {isDeceased && (
-                        <Row>
-                            <Col xs={6}>
-                                <Form.Group>
-                                    <Form.Label className='mb-0'>Date of Death</Form.Label>
-                                    <Form.Control type="date" {...register('dateOfDeath')} />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    )}
+                            <Row>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Date of Birth</Form.Label>
+                                        <Form.Control type="date" {...register('dob')} required />
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Sex</Form.Label>
+                                        <Form.Select {...register('sex')}>
+                                            <option value="" hidden>
+                                                Select Sex
+                                            </option>
+                                            {sexAssignedAtBirthOptions.map((option) => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                    {!selectedCondition && (
-                        <Row>
-                            <Col xs={12}>
-                                <Form.Group>
-                                    <Form.Label>Notes</Form.Label>
-                                    <Controller
-                                        name="notes"
-                                        control={control}
-                                        defaultValue=""
-                                        render={({ field: { onChange, value } }) => (
-                                            <ReactQuill
-                                                value={value}
-                                                onChange={onChange}
-                                                theme="snow"
-                                                placeholder="Enter detailed notes..."
-                                            />
+                            <Row>
+                                <Col xs={6}>
+                                    <Form.Group className="mb-1">
+                                        <Form.Label className="mb-0">Condition</Form.Label>
+                                        <Controller
+                                            name="problem"
+                                            control={control}
+                                            rules={{ required: 'Problem is required' }}
+                                            render={({ field }) => (
+                                                <Select
+                                                    {...field}
+                                                    classNamePrefix="select"
+                                                    options={formattedOptions}
+                                                    onChange={(selected) => {
+                                                        field.onChange(selected);
+                                                        setSelectedProblem(selected);
+                                                    }}
+                                                    onInputChange={(value, { action }) => {
+                                                        if (action === 'input-change') {
+                                                            setSearchQuery(value);
+                                                        }
+                                                    }}
+                                                    placeholder="Search Problem"
+                                                    isClearable
+                                                    isSearchable
+                                                    styles={{
+                                                        control: (provided) => ({
+                                                            ...provided,
+                                                            height: '30px',
+                                                            minHeight: '30px',
+                                                            border: '0px',
+                                                        }),
+                                                        placeholder: (provided) => ({
+                                                            ...provided,
+                                                            fontWeight: 'bold',
+                                                            fontSize: '12px',
+                                                            paddingBottom: '5px',
+                                                        }),
+                                                        valueContainer: (provided) => ({
+                                                            ...provided,
+                                                            padding: '0px 6px',
+                                                        }),
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                        {errors.problem && (
+                                            <Form.Text className="text-danger">{errors.problem.message}</Form.Text>
                                         )}
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    )}
+                                    </Form.Group>
+                                </Col>
+                                <Col xs={6}>
+                                    <Form.Group>
+                                        <Form.Label className="mb-0">Deceased</Form.Label>
+                                        <div>
+                                            <Form.Check
+                                                inline
+                                                label="Yes"
+                                                type="radio"
+                                                value="yes"
+                                                {...register('deceased')}
+                                            />
+                                            <Form.Check
+                                                inline
+                                                label="No"
+                                                type="radio"
+                                                value="no"
+                                                {...register('deceased')}
+                                            />
+                                        </div>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-                    <div className="d-flex justify-content-end mt-3">
-                        <Button type="submit" className="custom-buttons">
-                            Add
-                        </Button>
-                    </div>
-                </Form>
+                            {isDeceased && (
+                                <Row>
+                                    <Col xs={6}>
+                                        <Form.Group>
+                                            <Form.Label className="mb-0">Date of Death</Form.Label>
+                                            <Form.Control type="date" {...register('dateOfDeath')} />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            )}
+
+                            {!selectedCondition && (
+                                <Row>
+                                    <Col xs={12}>
+                                        <Form.Group>
+                                            <Form.Label>Notes</Form.Label>
+                                            <Controller
+                                                name="notes"
+                                                control={control}
+                                                defaultValue=""
+                                                render={({ field: { onChange, value } }) => (
+                                                    <ReactQuill
+                                                        value={value}
+                                                        onChange={onChange}
+                                                        theme="snow"
+                                                        placeholder="Enter detailed notes..."
+                                                    />
+                                                )}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            )}
+
+                            <div className="d-flex justify-content-end mt-2">
+                                <Button type="submit" className="custom-buttons">
+                                    Add
+                                </Button>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
             </Col>
 
             {/* Right side - Display */}
-            <Col md={6} className='px-2'>
-                <Row>
-                    <Col xs={12}>
-                        <h5>Family History</h5>
-                        {familyList.length === 0 ? (
-                            <p>No family records added yet.</p>
-                        ) : (
-                            <ListGroup>
-                                {familyList.map((item, index) => (
-                                    <ListGroup.Item key={index}>
-                                        <strong>Relationship:</strong>{' '}
-                                        {item?.relationship?.[0]?.coding?.[0]?.display || 'N/A'} <br />
-                                        <strong>Name:</strong> {item.name} <br />
-                                        <strong>Date of Birth:</strong> {item.dob} <br />
-                                        <strong>Sex:</strong>{' '}
-                                        {sexAssignedAtBirthOptions.find((opt) => opt.value === item.sex)?.label ||
-                                            'N/A'}{' '}
-                                        <br />
-                                        <strong>Condition:</strong> {item.problem?.display || 'None'} <br />
-                                        {!item.problem?.display && item.notes && (
-                                            <>
-                                                <strong>Notes:</strong>
-                                                <div dangerouslySetInnerHTML={{ __html: item.notes }} />
-                                            </>
-                                        )}
-                                        <strong>Deceased:</strong> {item.deceased === 'yes' ? 'Yes' : 'No'} <br />
-                                        {item.deceased === 'yes' && (
-                                            <>
-                                                <strong>Date of Death:</strong> {item.dateOfDeath}
-                                            </>
-                                        )}
-                                    </ListGroup.Item>
-                                ))}
-                            </ListGroup>
-                        )}
-                    </Col>
-                </Row>
+            <Col md={6} className="ps-0 tobaccooCardContainer">
+                <Card className="shadow-sm tobaccooCard">
+                    <Card.Body>
+                        <Card.Title className="border-bottom">
+                            <h5>Family History</h5>
+                        </Card.Title>
+                        <Row>
+                            <Col xs={12}>
+                                {familyGeneticHistory?.length === 0 ? (
+                                    <p>No family records added yet.</p>
+                                ) : (
+                                    <ListGroup>
+                                        {familyGeneticHistory?.map((item, index) => (
+                                            <ListGroup.Item key={index}>
+                                                <strong>Relationship:</strong>{' '}
+                                                {item?.relationship?.coding?.[0]?.display || 'N/A'} <br />
+                                                <strong>Name:</strong> {item?.name} <br />
+                                                <strong>Date of Birth:</strong> {item?.bornDate} <br />
+                                                <strong>Sex:</strong>{' '}
+                                                { item?.gender|| 'N/A'}{' '}
+                                                <br />
+                                                <strong>Condition:</strong> {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'} <br />
+                                                {!item.problem?.display && item?.note && (
+                                                    <>
+                                                        <strong>Notes:</strong>
+                                                        <div dangerouslySetInnerHTML={{ __html: item?.note?.[0]?.text }} />
+                                                    </>
+                                                )}
+                                                <strong>Deceased:</strong> {item.deceased === 'yes' ? 'Yes' : 'No'}{' '}
+                                                <br />
+                                                {item.deceased === 'yes' && (
+                                                    <>
+                                                        <strong>Date of Death:</strong> {item.dateOfDeath}
+                                                    </>
+                                                )}
+                                            </ListGroup.Item>
+                                        ))}
+                                    </ListGroup>
+                                )}
+                            </Col>
+                        </Row>
+                    </Card.Body>
+                </Card>
             </Col>
         </Row>
     );

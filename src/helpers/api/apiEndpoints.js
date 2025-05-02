@@ -137,3 +137,12 @@ export const createSuggestions = `${BaseRoute}/suggestions`;
 // Tobaccoo
 export const createTobaccoo = `${BaseRoute}/tobaccoHistory`;
 export const getTobaccoo = `${BaseRoute}/tobaccoHistory`;
+
+// Family/Genetic
+export const createFamily = `${BaseRoute}/familyMedicalHistory`;
+export const updateFamily = `${BaseRoute}/familyMedicalHistory/`;
+export const getFamily = `${BaseRoute}/familyMedicalHistory`;
+export const deleteFamily = `${BaseRoute}/familyMedicalHistory/`;
+
+
+
