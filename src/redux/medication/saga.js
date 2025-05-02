@@ -5,7 +5,8 @@ import { MedicationActionTypes } from './constants';
 import {
     createMedicationApi,
     getMedicationApi,
-    getMedicationDrugsApi
+    getMedicationDrugsApi,
+    updateMedicationApi
     // deleteAllergyApi,
     // getAllergiesOfAPatientApi,
     // getAllergyDetailsApi,
@@ -26,7 +27,7 @@ function* createMedicationFunction(data) {
         });
         const response = yield call(createMedicationApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
+        if (response.status === 201) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: MedicationActionTypes.CREATE_MEDICATION_SUCCESS,
@@ -46,6 +47,38 @@ function* createMedicationFunction(data) {
         ToastHandle(error, 'danger');
         yield put({
             type: MedicationActionTypes.CREATE_MEDICATION_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateMedicationFunction(data) {
+    try {
+        yield put({
+            type: MedicationActionTypes.UPDATE_MEDICATION_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateMedicationApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: MedicationActionTypes.UPDATE_MEDICATION_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: MedicationActionTypes.UPDATE_MEDICATION_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: MedicationActionTypes.UPDATE_MEDICATION_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: MedicationActionTypes.UPDATE_MEDICATION_ERROR,
             payload: error,
         });
     }
@@ -95,6 +128,10 @@ function* getMedicationFunction(data) {
                 type: MedicationActionTypes.GET_MEDICATION_SUCCESS,
                 payload: { ...decryptedData },
             });
+            // yield put({
+            //     type: MedicationActionTypes.GET_MEDICATION_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: MedicationActionTypes.GET_MEDICATION_ERROR,
@@ -188,6 +225,10 @@ export function* watchCreateMedication() {
     yield takeEvery(MedicationActionTypes.CREATE_MEDICATION, createMedicationFunction);
 }
 
+export function* watchUpdateMedication() {
+    yield takeEvery(MedicationActionTypes.UPDATE_MEDICATION, updateMedicationFunction);
+}
+
 export function* watchGetMedicalDrugs() {
     yield takeEvery(MedicationActionTypes.GET_MEDICATION_DRUGS, getDrugsFunction);
 }
@@ -211,6 +252,7 @@ function* medicationSaga() {
         fork(watchCreateMedication),
         fork(watchGetMedicalDrugs),
         fork(watchGetMedication),
+        fork(watchUpdateMedication),
     ]);
 }
 export default medicationSaga;

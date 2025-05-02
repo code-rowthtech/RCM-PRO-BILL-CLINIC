@@ -18,6 +18,7 @@ import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintProblems } from '../Task Tabs/PDFfiles/problemPDF';
 import Paginations from '../../../../helpers/Paginations';
 import NewAppointment from '../../Appointments/NewAppointment';
+import AddMedication from './AddMedication';
 const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -29,11 +30,11 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const problemData = store?.getProblemListReducer?.data?.problems;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(appointmentsList, 'appiontmn');
-    console.log(store?.getProblemListReducer, 'problemData');
+    const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
-
+    const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
     }, [dispatch, patientId, effectiveDateTime]);
@@ -176,6 +177,22 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
+    const statusColorMap = {
+        active: 'text-success',
+        'on-hold': 'text-warning',
+        cancelled: 'text-danger',
+        completed: 'text-primary',
+        'entered-in-error': 'text-danger',
+        stopped: 'text-secondary',
+        draft: 'text-muted',
+        unknown: 'text-dark'
+    };
+
+    const closeMedicationModal = () => {
+        setMedicationModal(false)
+    }
+
     return (
         <div className="patient-summary">
             <Row className={`scroll-container  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
@@ -208,47 +225,43 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 />
                             </div>
                         </Card.Header>
-                        <Card.Body className="p-2 scroll-container" style={{ height: '22vh' }}>
+                        <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
                             {store?.getVitalsByPatientIdReducer?.loading ? (
-                                <div
-                                    className="d-flex justify-content-center align-items-center w-100 p-5"
-                                    style={{ height: '100%' }}>
-                                    <Spinner className="spinner-border-sm" />
+                                <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
+                                    <Spinner className='spinner-border-sm' />
                                 </div>
                             ) : (
                                 <div className="vitals-grid fs-6">
-                                    {patientVitals?.vitals?.map((data) => (
-                                        <div key={data?._id} className="vital-item">
-                                            <span className="text-muted">{data?.code?.coding?.[0]?.display}</span>
-                                            {data?.valueString && (
-                                                <div className="fw-bold">{data?.valueString || 'N/A'}</div>
-                                            )}
-                                            {data?.valueQuantity && (
-                                                <div className="fw-bold">
-                                                    {data?.valueQuantity?.value || 'N/A'}{' '}
-                                                    <span>{data?.valueQuantity?.unit}</span>
-                                                </div>
-                                            )}
-                                            {data?.component && !data?.valueString && !data?.valueQuantity && (
-                                                <div className="fw-bold">
-                                                    {(() => {
-                                                        const systolic = data.component.find(
-                                                            (c) => c.code?.coding?.[0]?.code === '8480-6'
-                                                        )?.valueQuantity?.value;
+                                    {(!patientVitals?.vitals || patientVitals.vitals.length === 0) ? (
+                                        <div className='fw-bold text-nowrap fs-6' style={{ height: '100%' }}>No Vitals Found</div>
+                                    ) : (
+                                        patientVitals.vitals.map((data) => {
+                                            const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
 
-                                                        const diastolic = data.component.find(
-                                                            (c) => c.code?.coding?.[0]?.code === '8462-4'
-                                                        )?.valueQuantity?.value;
+                                            const value =
+                                                data?.valueString ??
+                                                (data?.valueQuantity?.value ? `${data.valueQuantity.value} ${data.valueQuantity.unit || ''}` : null) ??
+                                                (data?.valueBoolean !== undefined ? (data.valueBoolean ? 'Yes' : 'No') : null);
 
-                                                        return `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
-                                                    })()}
+                                            let bpReading = null;
+                                            if (data.component && !value) {
+                                                const systolic = data.component.find(c => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
+                                                const diastolic = data.component.find(c => c.code?.coding?.[0]?.code === '8462-4')?.valueQuantity?.value;
+                                                bpReading = `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
+                                            }
+
+                                            return (
+                                                <div key={data?._id} className="vital-item">
+                                                    <span className="text-muted">{codeDisplay}</span>
+                                                    <div className="fw-bold">{value || bpReading || 'N/A'}</div>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                            );
+                                        })
+                                    )}
                                 </div>
                             )}
                         </Card.Body>
+
                     </Card>
                 </Col>
 
@@ -414,25 +427,48 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <span className="fw-bold fs-6">Medications</span>
                             </div>
                             <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                                <MdAddCircleOutline onClick={() => setMedicationModal(true)} className="text-primary me-2 cursor-pointer" />
+                                <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
                                 <MdOutlinePrint className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
-                        <Card.Body className="p-2">
-                            <ul className="list-unstyled">
-                                {patientSummary.medications.map((medication, index) => (
-                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                        <div className="fs-6">
-                                            <strong className="">{medication.name}</strong>
-                                            <div className="text-muted ">
-                                                {medication.dosage} • {medication.frequency}
+                        <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
+                            {store?.getMedicationReducer?.loading ?
+                                <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
+                                    <Spinner className='spinner-border-sm' />
+                                </div>
+                                :
+                                <ul className="list-unstyled">
+                                    {medicationList?.length === 0||!medicationList ? (
+                                        <li className="mb-2">
+                                            <div className="fs-6  d-flex justify-content-between align-items-center">
+                                                <strong>No Medications Found</strong>
                                             </div>
-                                        </div>
-                                        <span className="fw-semibold fs-6">{getStatusBadge(medication.status)}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                                        </li>
+                                    ) : medicationList?.slice(0, 4)?.map((medication, index) => (
+                                        <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                            <div className="fs-6">
+                                                <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
+                                                <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
+                                                    {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
+                                                </div>
+                                                <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
+                                                    {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
+                                                </div>
+                                            </div>
+                                            <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                {medication?.status}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
                         </Card.Body>
+                        <div
+                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                            onClick={() => setSelectedMainTab('Medication List')}>
+                            Go To Medication List
+                        </div>
                     </Card>
                 </Col>
 

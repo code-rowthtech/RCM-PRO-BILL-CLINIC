@@ -72,7 +72,7 @@ function* getAllergyDetailsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
+        // ToastHandle(error, 'danger');
         yield put({
             type: AllergyListActionTypes.GET_ALLERGY_DETAILS_ERROR,
             payload: error,
@@ -105,7 +105,7 @@ function* getAllergiesOfAPatientFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
+        // ToastHandle(error, 'danger');
         yield put({
             type: AllergyListActionTypes.GET_ALLERGIES_OF_A_PATIENT_ERROR,
             payload: error,

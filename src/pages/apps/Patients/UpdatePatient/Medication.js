@@ -11,7 +11,7 @@ import { useSearchParams } from 'react-router-dom';
 // Placeholder components for Add / Update
 // const AddMedication = ({ onCancel }) => <div><AddMedication/></div>;
 
-const Medication = () => {
+const Medication = ({ isAccordionOpen }) => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const store = useSelector((state) => state);
@@ -21,17 +21,14 @@ const Medication = () => {
   const [selectedMedication, setSelectedMedication] = useState(null);
   const [medicationModal, setMedicationModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const createSuccess = store?.createMedicationReducer?.data?.status;
   const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+  const createSuccess = store?.createMedicationReducer?.data?.status;
   useEffect(() => {
     if (createSuccess === 201) {
-      setMedicationModal(false);
-      dispatch(getMedicationAction({ patientId: patientId }))
+      setSelectedMedication(null);
     }
   }, [createSuccess]);
-  useEffect(() => {
-    dispatch(getMedicationAction({ patientId: patientId }))
-  }, [dispatch]);
+
   const handleEditClick = (data) => {
     setSelectedMedication(data);
     // setShowUpdateMedication(true);
@@ -42,10 +39,20 @@ const Medication = () => {
     setMedicationModal(false)
     setSelectedMedication(null)
   }
+  const statusColorMap = {
+    active: 'text-success',
+    'on-hold': 'text-warning',
+    cancelled: 'text-danger',
+    completed: 'text-primary',
+    'entered-in-error': 'text-danger',
+    stopped: 'text-secondary',
+    draft: 'text-muted',
+    unknown: 'text-dark'
+};
 
   return (
     <>
-      <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
+      <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
         <Row>
           <Col sm={12} className="d-flex justify-content-between">
             <h4>Medication List</h4>
@@ -86,42 +93,49 @@ const Medication = () => {
                 </tbody>
               ) : (
                 <tbody>
-                  {medicationList?.length === 0 ? (
+                  {store?.getMedicationReducer?.loading ?
                     <tr>
-                      <td colSpan={7} className="text-center">
-                        <h4 className="my-5">No Medication Found!</h4>
+                      <td colSpan={8} className="text-center">
+                        <Spinner />
                       </td>
                     </tr>
-                  ) : (
-                    medicationList?.map((data, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td className='text-capitalize'>{data?.status || 'N/A'}</td>
-                        <td>
-                          <div className='d-flex flex-column'>
-                            <span> {data?.drugId?.proprietaryName || 'N/A'}</span>
-                            <small className='text-muted' title={data?.drugId?.nonProprietaryName}> {data?.drugId?.nonProprietaryName?.length > 30 ? data?.drugId?.nonProprietaryName?.slice(0, 29) + '...' : data?.drugId?.nonProprietaryName || 'N/A'}</small>
-                          </div>
-                        </td>
-                        <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
-                        <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
-                        <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
-                        <td title={data?.note?.[0]?.text}>
-                          {
-                            data?.note?.[0]?.text
-                              ? (data.note[0].text.charAt(0).toUpperCase() + data.note[0].text.slice(1)).slice(0, 29) + (data.note[0].text.length > 30 ? '...' : '')
-                              : 'N/A'
-                          }
-                        </td>
-                        <td>
-                          <FiEdit
-                            className="fs-4 cursor-pointer text-black"
-                            onClick={() => handleEditClick(data)}
-                          />
+                    :
+                    medicationList?.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="text-center">
+                          <h4 className="my-5">No Medication Found!</h4>
                         </td>
                       </tr>
-                    ))
-                  )}
+                    ) : (
+                      medicationList?.map((data, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
+                          <td>
+                            <div className='d-flex flex-column'>
+                              <span className='text-capitalize'> {data?.drugId?.proprietaryName || 'N/A'}</span>
+                              <small className='text-muted' title={data?.drugId?.nonProprietaryName}> {data?.drugId?.nonProprietaryName?.length > 30 ? data?.drugId?.nonProprietaryName?.slice(0, 29) + '...' : data?.drugId?.nonProprietaryName || 'N/A'}</small>
+                            </div>
+                          </td>
+                          <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
+                          <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
+                          <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
+                          <td title={data?.note?.[0]?.text}>
+                            {
+                              data?.note?.[0]?.text
+                                ? (data.note[0].text.charAt(0).toUpperCase() + data.note[0].text.slice(1)).slice(0, 29) + (data.note[0].text.length > 30 ? '...' : '')
+                                : 'N/A'
+                            }
+                          </td>
+                          <td>
+                            <FiEdit
+                              className="fs-4 cursor-pointer text-black"
+                              onClick={() => handleEditClick(data)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    )}
                 </tbody>
               )}
             </Table>

@@ -129,6 +129,7 @@ export const updateVitals = `${BaseRoute}/updateVitals`;
 // Medication
 export const getMedicationDrugs = `${BaseRoute}/codes/search-ndc-products`;
 export const createMedication = `${BaseRoute}/medication`;
+export const updateMedication = `${BaseRoute}/medication`;
 export const getMedication = `${BaseRoute}/medication`;
 // Suggestions
 export const createSuggestions = `${BaseRoute}/suggestions`;

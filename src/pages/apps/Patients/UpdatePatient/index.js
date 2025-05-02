@@ -9,7 +9,7 @@ import { TbCapture, TbHeartRateMonitor } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import PatientDetails from './PatientDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPatientByIdAction, getStatesByCountryAction, resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
+import { getMedicationAction, getPatientByIdAction, getStatesByCountryAction, resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
@@ -99,6 +99,7 @@ const UpdatePatientIndex = () => {
         };
         if (id) {
             dispatch(getPatientByIdAction(payload));
+            dispatch(getMedicationAction({ patientId: id }))
         }
         if (
             updateSuccess === 200 ||
@@ -532,7 +533,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Medication List' && <Medication />}
+                                                {selectedMainTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Tabacco' && <Subsocialtabindex isAccordionOpen= {isAccordionOpen}/>}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}
