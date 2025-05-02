@@ -47,6 +47,13 @@ export const handlePrintMedication = ({ medicationList, patientDetails }) => {
     .capitalize-first {
   text-transform: capitalize;
 }
+  .drug-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  }
+  h5{
+  margin-bottom:0px;}
 
   </style>
 </head>
@@ -64,9 +71,13 @@ export const handlePrintMedication = ({ medicationList, patientDetails }) => {
   <h4>Drug Details</h4>
 ${medicationList?.map((data, index) => (
         `  <div class='border-bottom'>
-  <h5>${index + 1}${data?.drugId?.proprietaryName} ${data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}-${data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</h5>
-  <small>${data?.drugId?.nonPoprietaryName}</small>
-  <p class='capitalize-first ${statusClass(data?.status)}'>${data?.status}</p>
+<div class='drug-header'>
+<div>
+<h5>${index + 1}. ${data?.drugId?.proprietaryName} ${data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}-${data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</h5>
+<small>${data?.drugId?.nonProprietaryName}</small>
+</div>
+<strong class='capitalize-first ${statusClass(data?.status)}'>${data?.status}</strong>
+</div>
   <p>${data?.dosageInstruction?.[0]?.text}</p>
   <p>${data?.note?.[0]?.text}</p>
   </div>`

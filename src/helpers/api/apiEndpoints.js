@@ -133,3 +133,7 @@ export const updateMedication = `${BaseRoute}/medication`;
 export const getMedication = `${BaseRoute}/medication`;
 // Suggestions
 export const createSuggestions = `${BaseRoute}/suggestions`;
+
+// Tobaccoo
+export const createTobaccoo = `${BaseRoute}/tobaccoHistory`;
+export const getTobaccoo = `${BaseRoute}/tobaccoHistory`;
