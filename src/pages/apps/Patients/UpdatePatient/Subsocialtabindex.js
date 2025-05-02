@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Tobacco from './SubsocialPages.js/Tobacco';
 import Alcohol from './SubsocialPages.js/Alcohol';
+import FamilyHistory from './SubsocialPages.js/FamilyGenetic';
 
 
 const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
@@ -37,7 +38,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
                     {activeSocialTabs === 'Tabacco' && <Tobacco />}
                     {activeSocialTabs === 'Medical' && <p>Medical</p>}
                     {activeSocialTabs === 'Surgical' && <p>Surgical</p>}
-                    {activeSocialTabs === 'Family /Genetic' && <p>family</p>}
+                    {activeSocialTabs === 'Family /Genetic' && <FamilyHistory />}
                     {activeSocialTabs === 'Alcohol' && <Alcohol />}
                     {activeSocialTabs === 'Vaccination' && <>In-progress...</>}
                 </div>

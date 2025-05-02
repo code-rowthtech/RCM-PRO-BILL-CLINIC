@@ -15,3 +15,22 @@ export const getTobaccooAction = (data): AuthAction => ({
 });
 
 
+// Family/genetic
+export const createFamilyGeneticAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_FAMILY_GENETIC,
+    data
+});
+export const updateFamilyGeneticction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_FAMILY_GENETIC,
+    data
+});
+
+export const getFamilyGeneticAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_FAMILY_GENTIC_DATA,
+    data
+});
+
+export const deleteFamilyGeneticAction = (data): AuthAction =>({
+    type: TobaccooActionTypes.DELETE_FAMILY_GENTIC,
+    data
+})
