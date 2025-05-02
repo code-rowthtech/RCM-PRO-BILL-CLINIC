@@ -924,3 +924,46 @@ tbody tr:hover {
     font-size: 13px !important;
     padding: 0 10px !important;
 }
+
+.tobaccooCardContainer .tobaccooCard {
+    border: none !important;
+}
+
+.suggestions-box {
+    font-size: 0.875rem;
+    padding: 0.25rem;
+}
+
+.suggestion-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.skeleton-line {
+    height: 14px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    animation: pulse 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: #e0e0e0;
+    }
+    50% {
+        background-color: #f0f0f0;
+    }
+    100% {
+        background-color: #e0e0e0;
+    }
+}

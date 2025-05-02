@@ -228,7 +228,8 @@ const UpdatePatientIndex = () => {
                                             className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
                                                        py-1 flex-fill text-center position-relative
                                                        ${item?.subItems ? "hasSubmenuItems" : ""}
-                                                       ${selectedMainTab === item?.tab ? 'active-patient-chart-tab fw-medium' : ''}`}
+                                                      ${selectedMainTab === item?.tab || item?.subItems?.some(sub => sub.tab === selectedMainTab)
+                                                    ? 'active-patient-chart-tab fw-medium' : ''}`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (item.subItems) {
@@ -494,17 +495,17 @@ const UpdatePatientIndex = () => {
                                                     </Col>
 
                                                     <Col sm={2} className="d-flex justify-content-end pe-3">
-                                                        <div className="text-center">
+                                                        <div className="text-center d-flex flex-column">
                                                             <Button
                                                                 as={Link}
                                                                 to="/apps/appointments/newAppointment"
-                                                                className="shadow-none" style={{fontSize:'10px' , borderRadius:'8px' , padding:"3px 7px 3px 7px" , width:'100px' ,backgroundColor:' #6169d0'}}>
+                                                                className="shadow-none" style={{ fontSize: '10px', borderRadius: '8px', padding: "3px 7px 3px 7px", width: '100px', backgroundColor: ' #6169d0' }}>
                                                                 New Appointment
                                                             </Button>
                                                             <Button
                                                                 as={Link}
                                                                 to="#"
-                                                                className="mt-1 shadow-none" style={{fontSize:'10px' , borderRadius:'8px' , padding:"3px 7px 3px 7px" ,width:'100px',backgroundColor:' #6169d0'}}>
+                                                                className="mt-1 shadow-none" style={{ fontSize: '10px', borderRadius: '8px', padding: "3px 7px 3px 7px", width: '100px', backgroundColor: ' #6169d0' }}>
                                                                 New Encounter
                                                             </Button>
 
@@ -521,7 +522,7 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2" style={{ height: isAccordionOpen ? '65.5vh' : '85vh' }}>
+                                        <Card className="px-2" style={{ height: isAccordionOpen ? '70.5vh' : '85vh' }}>
                                             <div
                                                 className="mt-2 px-0">
                                                 {selectedMainTab === 'Patient Details' && <PatientSummary isAccordionOpen={isAccordionOpen} setSelectedMainTab={setSelectedMainTab} />}
@@ -535,7 +536,7 @@ const UpdatePatientIndex = () => {
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Tabacco' && <Subsocialtabindex isAccordionOpen= {isAccordionOpen}/>}
+                                                {selectedMainTab === 'Tabacco' && <Subsocialtabindex isAccordionOpen={isAccordionOpen} />}
                                                 {selectedMainTab === 'Medical' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Alcohol' && <p>In progress...</p>}

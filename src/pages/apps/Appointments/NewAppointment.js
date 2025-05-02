@@ -55,7 +55,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     };
     return (
         <div className={`${!isModal ? 'mt-2' : ''}`}>
-            <Card className={`scroll-container px-2 py-2 ${!isModal ? 'page-height' : ''}`}>
+            <Card className={`scroll-container mb-0 px-2 py-2 ${!isModal ? 'page-height' : ''}`}>
                 <Row className={`${!isModal ? 'mb-2' : ''}`}>
                     <Col sm={8}>
                         <ul className="nav nav-underline">

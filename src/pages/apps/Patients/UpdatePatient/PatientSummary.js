@@ -6,7 +6,7 @@ import { GiHealthNormal } from 'react-icons/gi';
 import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
-import { getAppointmentsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { getAppointmentsAction, getFamilyGeneticAction, getTobaccooAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { handlePrintAllergies } from '../Task Tabs/PDFfiles/allergyPDF';
 import { getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import AddAllergy from '../Task Tabs/AddAllergy';
@@ -19,25 +19,43 @@ import { handlePrintProblems } from '../Task Tabs/PDFfiles/problemPDF';
 import Paginations from '../../../../helpers/Paginations';
 import NewAppointment from '../../Appointments/NewAppointment';
 import AddMedication from './AddMedication';
+import { handlePrintMedication } from '../../../../helpers/printMedication';
 const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
+    const tobaccoHistory = Array.isArray(store?.getTobaccooReducer?.data?.tobaccoHistory)
+        ? store.getTobaccooReducer.data.tobaccoHistory
+        : [];
+
+    const familyGeneticHistory = Array.isArray(store?.getFamilyGeneticReducer?.data?.familyMedicalHistory)
+        ? store.getFamilyGeneticReducer.data.familyMedicalHistory
+        : [];
+
+    const socialHistoryData = [
+        ...tobaccoHistory.slice(0, 2),
+        ...familyGeneticHistory.slice(0, 2)
+    ];
+
+
+    console.log(socialHistoryData, 'socialHistoryDatasocialHistoryData')
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
-
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+        dispatch(getTobaccooAction({ patientId: patientId }));
+        dispatch(getFamilyGeneticAction({ patientId: patientId }));
     }, [dispatch, patientId, effectiveDateTime]);
+
     useEffect(() => {
         if (patientId) {
             dispatch(getProblemListAction({ patientId }));
@@ -205,7 +223,8 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <span className="fw-bold fs-6">Vitals</span>
                             </div>
                             <div className="d-flex align-items-center">
-                                <Form.Control
+                                <input
+                                    className='fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted'
                                     type="date"
                                     value={effectiveDateTime}
                                     onChange={(e) => setEffectiveDateTime(e.target.value)}
@@ -231,9 +250,9 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     <Spinner className='spinner-border-sm' />
                                 </div>
                             ) : (
-                                <div className="vitals-grid fs-6">
+                                <div className={`${!patientVitals?.vitals || patientVitals.vitals.length === 0 ? 'h-100 d-flex align-items-center justify-content-center bg-white' : 'vitals-grid'} fs-6`}>
                                     {(!patientVitals?.vitals || patientVitals.vitals.length === 0) ? (
-                                        <div className='fw-bold text-nowrap fs-6' style={{ height: '100%' }}>No Vitals Found</div>
+                                        <div className='fw-bold  w-100 h-100 text-nowrap d-flex align-items-center justify-content-center fs-6' style={{ height: '100%', width: '100%' }}>No Vitals Found</div>
                                     ) : (
                                         patientVitals.vitals.map((data) => {
                                             const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
@@ -297,40 +316,26 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     {allergyData.slice(0, 4).map((allergy, index) => (
                                         <li
                                             key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-center">
+                                            className="mb-2 d-flex justify-content-between align-items-start">
                                             <div className="fs-6">
-                                                <strong>{allergy.code?.text || 'Unknown Allergy'}</strong>
-                                                <div className="text-muted small">
+                                                <strong title={allergy.code?.text}>{allergy.code?.text?.length > 30 ? allergy.code?.text?.slice(0, 29) + '...' : allergy.code?.text || 'Unknown Allergy'}</strong>
+                                                <div className="text-muted  small">
                                                     {allergy.clinicalStatus?.text || 'Status not available'}
                                                 </div>
                                             </div>
-                                            <span className="fs-6 fw-semibold">
+                                            <span className="fs-6 fw-semibold text-nowrap">
                                                 {getSeverityBadge(allergy.criticality)}
                                             </span>
                                         </li>
                                     ))}
                                 </ul>
                             ) : (
-                                <ul className="list-unstyled">
-                                    {(patientSummary?.allergies || []).map((allergy, index) => (
-                                        <li
-                                            key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-center">
-                                            <div className="fs-6">
-                                                <strong>{allergy.name || 'Unknown Allergy'}</strong>
-                                                <div className="text-muted small">
-                                                    Since {allergy.reaction || 'N/A'}
-                                                </div>
-                                            </div>
-                                            <span className="fs-6 fw-semibold">
-                                                {getSeverityBadge({
-                                                    code: allergy.severity,
-                                                    display: allergy.severity,
-                                                    status: true,
-                                                })}
-                                            </span>
-                                        </li>
-                                    ))}
+                                <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
+                                    <li className="mb-2">
+                                        <div className="fs-6  d-flex justify-content-between align-items-center">
+                                            <strong>No Allergies Found</strong>
+                                        </div>
+                                    </li>
                                 </ul>
                             )}
                         </Card.Body>
@@ -373,7 +378,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     {problemData.slice(0, 4).map((problem, index) => (
                                         <li
                                             key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-center">
+                                            className="mb-2 d-flex justify-content-between align-items-start">
                                             <div className="fs-6">
                                                 <strong title={problem?.code?.text}>
                                                     {problem?.code?.text?.length > 30
@@ -395,18 +400,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     ))}
                                 </ul>
                             ) : (
-                                <ul className="list-unstyled">
-                                    {(patientSummary?.problems || []).map((problem, index) => (
-                                        <li
-                                            key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-center">
-                                            <div className="fs-6">
-                                                <strong>{problem.name}</strong>
-                                                <div className="text-muted small">Since {problem.since}</div>
-                                            </div>
-                                            <span className="fs-6 fw-semibold">{getStatusBadge(problem.status)}</span>
-                                        </li>
-                                    ))}
+                                <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
+                                    <li className="mb-2">
+                                        <div className="fs-6  d-flex justify-content-between align-items-center">
+                                            <strong>No Problems Found</strong>
+                                        </div>
+                                    </li>
                                 </ul>
                             )}
                         </Card.Body>
@@ -429,7 +428,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             <div>
                                 <MdAddCircleOutline onClick={() => setMedicationModal(true)} className="text-primary me-2 cursor-pointer" />
                                 <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                                <MdOutlinePrint onClick={() => handlePrintMedication({ medicationList: medicationList, patientDetails: patientDetails })} className="text-secondary cursor-pointer" />
                             </div>
                         </Card.Header>
                         <Card.Body className='p-2 scroll-container' style={{ height: '22vh' }}>
@@ -438,9 +437,9 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     <Spinner className='spinner-border-sm' />
                                 </div>
                                 :
-                                <ul className="list-unstyled">
-                                    {medicationList?.length === 0||!medicationList ? (
-                                        <li className="mb-2">
+                                <ul className="list-unstyled h-100">
+                                    {medicationList?.length === 0 || !medicationList ? (
+                                        <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
                                             <div className="fs-6  d-flex justify-content-between align-items-center">
                                                 <strong>No Medications Found</strong>
                                             </div>
@@ -486,23 +485,28 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                             </div>
                         </Card.Header>
                         <Card.Body className="p-2">
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Smoking</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.smoking}</div>
-                            </div>
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Alcohol</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.alcohol}</div>
-                            </div>
-                            <div className="social-history-item mb-2">
-                                <span className="text-muted fs-6">Exercise</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.exercise}</div>
-                            </div>
-                            <div className="social-history-item">
-                                <span className="text-muted fs-6">Diet</span>
-                                <div className="fs-6 fw-semibold">{patientSummary.socialHistory.diet}</div>
-                            </div>
+                            {store?.getFamilyGeneticReducer?.loading && store?.getTobaccooReducer?.loading ?
+                                <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                    <Spinner className='spinner-border-sm' />
+                                </div>
+                                : socialHistoryData?.length > 0 ?
+                                    socialHistoryData?.map((data, index) => (
+                                        <div className="social-history-item  py-2 d-flex align-items-center justify-content-between" key={index}>
+                                            <span className="text-muted fs-6">{data?.tobaccoUse || data?.condition?.[0]?.code?.coding?.[0]?.display}</span>
+                                            <div className="fs-6 fw-semibold">{data?.effectiveDateTime ? new Date(data?.effectiveDateTime)?.toLocaleDateString('en-GB') : '' ||
+                                                data?.deceasedDate ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB') : '' || 'N/A'}</div>
+                                        </div>
+                                    )) :
+                                    <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                        No Social Histoy Found
+                                    </div>
+                            }
                         </Card.Body>
+                        <div
+                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                            onClick={() => setSelectedMainTab('Tabacco')}>
+                            Go To Social History
+                        </div>
                     </Card>
                 </Col>
 
@@ -521,6 +525,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                         </Card.Header>
                         <Card.Body className="p-2">
                             <ul className="list-unstyled">
+
                                 {patientSummary.encounters.map((encounter, index) => (
                                     <li key={index} className="mb-3">
                                         <div className="d-flex fs-6 justify-content-between">
@@ -577,19 +582,19 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                                     <td className="fs-6">
                                                         {appointment?.date
                                                             ? new Date(appointment.date).toLocaleDateString('en-GB', {
-                                                                  day: '2-digit',
-                                                                  month: 'short',
-                                                                  year: 'numeric',
-                                                              })
+                                                                day: '2-digit',
+                                                                month: 'short',
+                                                                year: 'numeric',
+                                                            })
                                                             : ''}
                                                     </td>
                                                     <td className="fs-6">
                                                         {appointment?.start
                                                             ? new Date(appointment.start).toLocaleTimeString('en-US', {
-                                                                  hour: '2-digit',
-                                                                  minute: '2-digit',
-                                                                  hour12: true,
-                                                              })
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                                hour12: true,
+                                                            })
                                                             : ''}
                                                     </td>
                                                     <td className="fs-6">
