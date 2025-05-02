@@ -60,15 +60,21 @@ const UpdateProblem = ({ onCancel, problem }) => {
     }, [selectedProblem, setValue]);
     useEffect(() => {
         if (problem) {
-            setSelectedProblem(problem?.code?.coding?.[0]?.display);
+            const selected = {
+                value: problem?.code?.coding?.[0]?.code,
+                label: problem?.code?.coding?.[0]?.display,
+                display: problem?.code?.coding?.[0]?.display,
+                system: 'http://hl7.org/fhir/condition-code',
+            };
+            setSelectedProblem(selected); // if you need it
+            setValue('problem', selected); // 👈 this is critical
             setValue('icdCode', problem?.code?.coding?.[0]?.code);
             setValue('status', problem?.clinicalStatus?.coding?.[0]?.code);
             setValue('appointment', problem?.appointment);
-            setValue('datetimeDiagnosis', problem?.onsetDateTime.split('T')[0]);
-            // setValue('datetimeOnset', problem?.datetimeOnset.split('T')[0]);
+            setValue('datetimeDiagnosis', problem?.onsetDateTime?.split('T')[0]);
             setValue('notes', problem?.note?.[0]?.text);
         }
-    }, [problem, reset]);
+    }, [problem, setValue]);
     const onSubmit = (data) => {
         const selected = data.problem;
         const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
@@ -138,47 +144,49 @@ const UpdateProblem = ({ onCancel, problem }) => {
                     <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Problem</Form.Label>
                         <Controller
-                            name="problem"
-                            control={control}
-                            rules={{ required: 'Problem is required' }}
-                            render={({ field }) => (
-                                <Select
-                                    {...field}
-                                    classNamePrefix="select"
-                                    options={formattedOptions}
-                                    onChange={(selected) => {
-                                        field.onChange(selected);
-                                        setSelectedProblem(selected); // 🔁 update local state
-                                    }}
-                                    onInputChange={(value, { action }) => {
-                                        if (action === 'input-change') {
-                                            setSearchQuery(value);
-                                        }
-                                    }}
-                                    placeholder="Search Problem"
-                                    isClearable
-                                    isSearchable
-                                    styles={{
-                                        control: (provided) => ({
-                                            ...provided,
-                                            height: '30px',
-                                            minHeight: '30px',
-                                            border: '0px',
-                                        }),
-                                        placeholder: (provided) => ({
-                                            ...provided,
-                                            fontWeight: 'bold',
-                                            fontSize: '12px',
-                                            paddingBottom: '5px',
-                                        }),
-                                        valueContainer: (provided) => ({
-                                            ...provided,
-                                            padding: '0px 6px',
-                                        }),
-                                    }}
-                                />
-                            )}
-                        />
+    name="problem"
+    control={control}
+    rules={{ required: 'Problem is required' }}
+    render={({ field }) => (
+        <Select
+            {...field}
+            value={field.value} // ← This ensures the Select input is controlled
+            classNamePrefix="select"
+            options={formattedOptions}
+            onChange={(selected) => {
+                field.onChange(selected);
+                setSelectedProblem(selected); // For updating icdCode
+            }}
+            onInputChange={(value, { action }) => {
+                if (action === 'input-change') {
+                    setSearchQuery(value);
+                }
+            }}
+            placeholder="Search Problem"
+            isClearable
+            isSearchable
+            styles={{
+                control: (provided) => ({
+                    ...provided,
+                    height: '30px',
+                    minHeight: '30px',
+                    border: '0px',
+                }),
+                placeholder: (provided) => ({
+                    ...provided,
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    paddingBottom: '5px',
+                }),
+                valueContainer: (provided) => ({
+                    ...provided,
+                    padding: '0px 6px',
+                }),
+            }}
+        />
+    )}
+/>
+
                         {errors.problem && <Form.Text className="text-danger">{errors.problem.message}</Form.Text>}
                     </Form.Group>
                 </Col>
