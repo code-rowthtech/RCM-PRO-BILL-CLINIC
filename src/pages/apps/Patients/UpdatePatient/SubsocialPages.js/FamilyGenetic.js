@@ -329,14 +329,15 @@ const FamilyHistory = () => {
                                                 <strong>Sex:</strong> {item?.gender || 'N/A'} <br />
                                                 <strong>Condition:</strong>{' '}
                                                 {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'} <br />
-                                                {!item.problem?.display && item?.note && (
-                                                    <>
-                                                        <strong>Notes:</strong>
-                                                        <div
-                                                            dangerouslySetInnerHTML={{ __html: item?.note?.[0]?.text }}
-                                                        />
-                                                    </>
-                                                )}
+                                                {item.note?.[0]?.text && (
+                                                <div className="mt-2">
+                                                    <div
+                                                        className="ql-editor p-0"
+                                                        dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                        style={{ fontSize: '0.875rem' }}
+                                                    />
+                                                </div>
+                                            )}
                                                 <strong>Deceased:</strong> {item.deceased === 'yes' ? 'Yes' : 'No'}{' '}
                                                 <br />
                                                 {item.deceased === 'yes' && (
