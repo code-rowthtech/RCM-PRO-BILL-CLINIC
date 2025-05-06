@@ -22,12 +22,15 @@ const Doctors = () => {
     const navigate = useNavigate('');
     const [skip, setSkip] = useState(1);
     const dispatch = useDispatch();
-    useEffect(() => {
-        const payload = { status: status, search: search, page: skip, limit: 10 };
-        dispatch(getDoctorsAction(payload));
-    }, [dispatch, status, search, skip]);
-    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result) || [];
+    const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result);
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
+    useEffect(() => {
+        const hasFilters = skip !== 1 || doctorDetails === undefined;
+        if (hasFilters) {
+            dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
+        }
+    }, [dispatch, skip]);
+   
     const closeStatusModal = () => setStatusModal(false); // Close status change modal
     const filteredDoctors = doctorDetails;
     const handleStatusChange = () => {
@@ -50,6 +53,10 @@ const Doctors = () => {
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+    const handleActiveTab = (isActive) => {
+        setStatus(isActive);
+        dispatch(getDoctorsAction({ status: isActive, search: search, page: skip, limit: 10 }));
+    };
     return (
         <>
             <Row className="mt-2">
@@ -59,14 +66,14 @@ const Doctors = () => {
                             <Row className="mb-2">
                                 <Col sm={6} xs={6}>
                                     <Button
-                                        onClick={() => setStatus(true)}
+                                        onClick={() => handleActiveTab(true)}
                                         className={`me-md-2 active_inactive_buttons ${
                                             status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
                                         }`}>
                                         Active
                                     </Button>
                                     <Button
-                                        onClick={() => setStatus(false)}
+                                        onClick={() => handleActiveTab(false)}
                                         className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
                                             !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
                                         }`}>
@@ -96,7 +103,18 @@ const Doctors = () => {
                                                 <FormInput
                                                     type="text"
                                                     value={search}
-                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    onChange={(e) => {
+                                                        const currentValue = e.target.value;
+                                                        setSearch(currentValue);
+                                                        dispatch(
+                                                            getDoctorsAction({
+                                                                search: currentValue,
+                                                                page: 1,
+                                                                limit: 10,
+                                                                status: true,
+                                                            })
+                                                        );
+                                                    }}
                                                     className="input_search_box"
                                                     style={{
                                                         border: 'none',
@@ -164,7 +182,7 @@ const Doctors = () => {
                                             </tbody>
                                         ) : (
                                             <tbody>
-                                                {filteredDoctors.length === 0 ? (
+                                                {filteredDoctors?.length === 0 ? (
                                                     <tr>
                                                         <td colSpan={7} className="text-center">
                                                             <h3 className="my-3">
@@ -174,7 +192,7 @@ const Doctors = () => {
                                                         </td>
                                                     </tr>
                                                 ) : (
-                                                    filteredDoctors.map((data, index) => (
+                                                    filteredDoctors?.map((data, index) => (
                                                         <tr key={index}>
                                                             {/* <td
                                                                 className="py1"

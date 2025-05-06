@@ -50,7 +50,22 @@ const AllergyList = () => {
             dispatch(getAllergiesOfPatientAction(data));
         }
     }, [deleteStatus, dispatch, patientId]);
-
+    const stripHtml = (html) => {
+        // Remove any <ul> or <li> tags with margin
+        return (
+            html
+                ?.replace(/<ul>/g, '<ul style="margin-bottom: 0px !important;">')
+                .replace(/<li>/g, '<li style="margin-bottom: 0px;">')
+                ?.replace(/<[^>]+>/g, '') || ''
+        );
+    };
+    const sanitizeNoteHtml = (html) => {
+        if (!html) return 'N/A';
+        return html
+            .replace(/<ul>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
+            .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
+            .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
+    };
     return (
         <>
             <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
@@ -60,7 +75,7 @@ const AllergyList = () => {
                     <UpdateAllergy allergy={selectedAllergy} onCancel={() => setShowUpdateAllergy(false)} />
                 ) : ( */}
                 <Row>
-                    <Col sm={12} className="d-flex justify-content-between">
+                    <Col sm={12} className="d-flex justify-content-between mt-2">
                         <h4>Allergy List</h4>
                         <Button
                             className="custom-buttons text-nowrap"
@@ -114,8 +129,12 @@ const AllergyList = () => {
                                                 <td className="text-capitalize">
                                                     {data?.category?.[0]?.display || 'N/A'}
                                                 </td>
-                                                <td className="text-capitalize" title={data?.code?.coding?.[0]?.display}>
-                                                    {data?.code?.coding?.[0]?.display?.length > 30 ? data?.code?.coding?.[0]?.display?.slice(0, 29) + '...' : data?.code?.coding?.[0]?.display || 'N/A'}
+                                                <td
+                                                    className="text-capitalize"
+                                                    title={data?.code?.coding?.[0]?.display}>
+                                                    {data?.code?.coding?.[0]?.display?.length > 30
+                                                        ? data?.code?.coding?.[0]?.display?.slice(0, 29) + '...'
+                                                        : data?.code?.coding?.[0]?.display || 'N/A'}
                                                 </td>
                                                 {/* <td className="text-capitalize">
                                                         {data?.verificationStatus?.coding?.[0]?.display || 'N/A'}
@@ -133,8 +152,19 @@ const AllergyList = () => {
                                                         : 'N/A'}
                                                 </td>
 
-                                                <td className="text-capitalize" title={data?.note?.[0]?.text}>
-                                                    {data?.note?.[0]?.text?.length > 35 ? data?.note?.[0]?.text?.slice(0, 34) + '...' : data?.note?.[0]?.text || 'N/A'}
+                                                <td
+                                                    className="text-capitalize mb-0"
+                                                    title={stripHtml(data?.note?.[0]?.text)}>
+                                                    <div
+                                                        dangerouslySetInnerHTML={{
+                                                            __html:
+                                                                data?.note?.[0]?.text?.length > 35
+                                                                    ? sanitizeNoteHtml(
+                                                                          data?.note?.[0]?.text.slice(0, 34)
+                                                                      ) + '...'
+                                                                    : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
+                                                        }}
+                                                    />
                                                 </td>
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />

@@ -9,7 +9,13 @@ import { TbCapture, TbHeartRateMonitor } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import PatientDetails from './PatientDetails';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMedicationAction, getPatientByIdAction, getStatesByCountryAction, resetUpdateAction, updatePatientsAction } from '../../../../redux/actions';
+import {
+    getMedicationAction,
+    getPatientByIdAction,
+    getStatesByCountryAction,
+    resetUpdateAction,
+    updatePatientsAction,
+} from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
@@ -31,6 +37,7 @@ import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
 import Medication from './Medication';
 import Subsocialtabindex from './Subsocialtabindex';
+import SubAllergytabs from './SubAllergytabs';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -70,15 +77,15 @@ const UpdatePatientIndex = () => {
 
     const [activeSubmenu, setActiveSubmenu] = useState(null);
     const toggleSubmenu = (label) => {
-        setActiveSubmenu(prev => prev === label ? null : label);
+        setActiveSubmenu((prev) => (prev === label ? null : label));
     };
 
     useEffect(() => {
-        const tab = sessionStorage?.getItem('selectedMainTab')
+        const tab = sessionStorage?.getItem('selectedMainTab');
         if (tab) {
-            setSelectedMainTab(tab)
+            setSelectedMainTab(tab);
         }
-    }, [])
+    }, []);
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -97,9 +104,10 @@ const UpdatePatientIndex = () => {
         const payload = {
             id: id,
         };
+        // check this api it create 19 api hit 
         if (id) {
             dispatch(getPatientByIdAction(payload));
-            dispatch(getMedicationAction({ patientId: id }))
+            dispatch(getMedicationAction({ patientId: id }));
         }
         if (
             updateSuccess === 200 ||
@@ -114,8 +122,8 @@ const UpdatePatientIndex = () => {
         }
     }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
     useEffect(() => {
-        dispatch(getStatesByCountryAction())
-    }, [dispatch])
+        dispatch(getStatesByCountryAction());
+    }, [dispatch]);
     const handleTabClick = (tab) => {
         setSelectedSubTab(tab);
     };
@@ -197,39 +205,49 @@ const UpdatePatientIndex = () => {
             ...(logo?.url === null
                 ? []
                 : {
-                    photo: [{
-                        url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
-                        title: logoName,
-                    }],
-                }),
+                      photo: [
+                          {
+                              url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
+                              title: logoName,
+                          },
+                      ],
+                  }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
     const [activeKey, setActiveKey] = useState('0');
     const [showMoreMenu, setShowMoreMenu] = useState(false);
-    const isAccordionOpen = activeKey === "0"; // true or false
+    const isAccordionOpen = activeKey === '0'; // true or false
 
     return (
-        <div className='mt-1 g-0  px-0 mx-0'>
+        <div className="mt-1 g-0  px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
                 <div className="row mb-2">
                     {store?.getPatientByIdReducer?.loading ? (
-                        <div style={{ height: "80vh" }} className="col-12 d-flex align-items-center justify-content-center">
+                        <div
+                            style={{ height: '80vh' }}
+                            className="col-12 d-flex align-items-center justify-content-center">
                             <Spinner />
                         </div>
                     ) : (
                         <Row className=" align-items-stretch pe-0">
-                            <Col xs={12} className='mb-0 pe-0 ps-0'>
-                                <ul ref={menuRef} className='list-group border border-muted d-flex flex-row patientChartscroll position-relative'>
+                            <Col xs={12} className="mb-0 pe-0 ps-0">
+                                <ul
+                                    ref={menuRef}
+                                    className="list-group border border-muted d-flex flex-row patientChartscroll position-relative">
                                     {patientMenuItems?.slice(0, 9)?.map((item, index) => (
                                         <li
                                             key={index}
                                             className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
-                                                       py-1 flex-fill text-center position-relative
-                                                       ${item?.subItems ? "hasSubmenuItems" : ""}
-                                                      ${selectedMainTab === item?.tab || item?.subItems?.some(sub => sub.tab === selectedMainTab)
-                                                    ? 'active-patient-chart-tab fw-medium' : ''}`}
+                                                       py-1 flex-fill text-center position-relative fw-bold
+                                                       ${item?.subItems ? 'hasSubmenuItems' : ''}
+                                                      ${
+                                                          selectedMainTab === item?.tab ||
+                                                          item?.subItems?.some((sub) => sub.tab === selectedMainTab)
+                                                              ? 'active-patient-chart-tab fw-medium'
+                                                              : ''
+                                                      }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (item.subItems) {
@@ -240,10 +258,9 @@ const UpdatePatientIndex = () => {
                                                     sessionStorage.setItem('selectedMainTab', item.tab);
                                                     setActiveSubmenu(null);
                                                 }
-                                            }}
-                                        >
+                                            }}>
                                             <div>
-                                                <span className='px-1 d-flex gap-2 align-items-center justify-content-center'>
+                                                <span className="px-1 d-flex gap-2 align-items-center justify-content-center">
                                                     {item.label}
                                                     {item?.subItems && (
                                                         <span>
@@ -258,7 +275,7 @@ const UpdatePatientIndex = () => {
                                             </div>
 
                                             {activeSubmenu === item.label && item.subItems && (
-                                                <ul className='list-group position-absolute start-0 top-100 mt-1 bg-white shadow rounded w-100 z-3'>
+                                                <ul className="list-group position-absolute start-0 top-100 mt-1 bg-white shadow rounded w-100 z-3">
                                                     {item.subItems.map((subItem, subIndex) => (
                                                         <li
                                                             key={subIndex}
@@ -269,8 +286,7 @@ const UpdatePatientIndex = () => {
                                                                 // setActiveSubmenu(null);
                                                                 // setShowMoreMenu(false);
                                                             }}
-                                                            className='list-group-item submenuItem py-1 text-start fs-6'
-                                                        >
+                                                            className="list-group-item submenuItem py-1 text-start fs-6">
                                                             {subItem.label}
                                                         </li>
                                                     ))}
@@ -280,12 +296,11 @@ const UpdatePatientIndex = () => {
                                     ))}
 
                                     <li
-                                        className='list-group-item py-1 text-center fs-6 position-relative cursor-pointer'
-                                        onClick={() => setShowMoreMenu(prev => !prev)}
-                                    >
+                                        className="list-group-item py-1 text-center fs-6 position-relative cursor-pointer"
+                                        onClick={() => setShowMoreMenu((prev) => !prev)}>
                                         <i className="bi bi-three-dots" />
                                         {showMoreMenu && (
-                                            <ul className='list-group position-absolute end-50 top-100 mt-1 bg-white shadow rounded w-auto z-3'>
+                                            <ul className="list-group position-absolute end-50 top-100 mt-1 bg-white shadow rounded w-auto z-3">
                                                 {patientMenuItems?.slice(9)?.map((data, index) => (
                                                     <li
                                                         key={index}
@@ -296,11 +311,8 @@ const UpdatePatientIndex = () => {
                                                             // setShowMoreMenu(false);
                                                             // setShowMoreMenu(false);
                                                             // setShowMoreMenu(false);
-
-
                                                         }}
-                                                        className='list-group-item submenuItem py-1 text-start fs-6'
-                                                    >
+                                                        className="list-group-item submenuItem py-1 text-start fs-6">
                                                         {data.label}
                                                     </li>
                                                 ))}
@@ -310,16 +322,23 @@ const UpdatePatientIndex = () => {
                                 </ul>
                             </Col>
                             <Col xs={12} className=" pe-0 ps-0">
-                                <Accordion className='' activeKey={activeKey} onSelect={(eventKey) => setActiveKey(eventKey)}>
-                                    <Accordion.Item eventKey="0" >
-                                        <Accordion.Header className='p-0  m-0'>
-                                            <div className='ps-2 py-1'>
-                                                <p
-                                                    className="text-nowrap fs-6 mb-0">
+                                <Accordion
+                                    className=""
+                                    activeKey={activeKey}
+                                    onSelect={(eventKey) => setActiveKey(eventKey)}>
+                                    <Accordion.Item eventKey="0">
+                                        <Accordion.Header className="p-0  m-0">
+                                            <div className="ps-2 py-1">
+                                                <p className="text-nowrap fs-6 mb-0">
                                                     <span
                                                         className="fw-bold text-capitalize pe-1 ps-0"
-                                                        style={{ color: 'rgb(249, 139, 55)', borderRight: '1px solid gray' }}>
-                                                        {patientDetails?.name?.[0]?.prefix + ' ' || ''}{patientDetails?.name?.[0]?.given?.join(' ') + ' ' || 'N/A'}{patientDetails?.name?.[0]?.family || ''}
+                                                        style={{
+                                                            color: 'rgb(249, 139, 55)',
+                                                            borderRight: '1px solid gray',
+                                                        }}>
+                                                        {patientDetails?.name?.[0]?.prefix + ' ' || ''}
+                                                        {patientDetails?.name?.[0]?.given?.join(' ') + ' ' || 'N/A'}
+                                                        {patientDetails?.name?.[0]?.family || ''}
                                                     </span>{' '}
                                                     <span
                                                         style={{ borderRight: '1px solid gray' }}
@@ -330,33 +349,33 @@ const UpdatePatientIndex = () => {
                                                         style={{ borderRight: '1px solid gray' }}
                                                         className="fs-6 fw-bold text-capitalize px-1">
                                                         {patientDetails?.birthDate
-                                                            ? new Date(patientDetails.birthDate).toLocaleDateString('en-GB')
-                                                            : 'N/A'}
-                                                        {' '}
-                                                        {patientDetails?.approxAge && (() => {
-                                                            const years = Math.floor(patientDetails.approxAge);
-                                                            const months = Math.round((patientDetails.approxAge - years) * 12);
-                                                            return `(${years} year${years !== 1 ? 's old)' : ''} `;
-                                                        })()}
+                                                            ? new Date(patientDetails.birthDate).toLocaleDateString(
+                                                                  'en-GB'
+                                                              )
+                                                            : 'N/A'}{' '}
+                                                        {patientDetails?.approxAge &&
+                                                            (() => {
+                                                                const years = Math.floor(patientDetails.approxAge);
+                                                                const months = Math.round(
+                                                                    (patientDetails.approxAge - years) * 12
+                                                                );
+                                                                return `(${years} year${years !== 1 ? 's old)' : ''} `;
+                                                            })()}
                                                     </span>
-                                                    <span
-                                                        className="fs-6 fw-bold text-capitalize px-1">
+                                                    <span className="fs-6 fw-bold text-capitalize px-1">
                                                         Chart ID: {patientDetails?.chartNumber || ''}
                                                     </span>
-
                                                 </p>
                                             </div>
                                         </Accordion.Header>
-                                        <Accordion.Body className='p-0'>
+                                        <Accordion.Body className="p-0">
                                             <Card.Body className="py-2 px-0">
-                                                <Row className='p-0 mx-0'>
+                                                <Row className="p-0 mx-0">
                                                     <Col sm={1} className="px-0 pt-1">
                                                         <Form
                                                             onSubmit={handleSubmit(onSubmit)}
                                                             className="d-flex flex-column align-items-center">
-                                                            <div
-                                                                className="position-relative w-75 d-flex align-items-center flex-column justify-content-center"
-                                                            >
+                                                            <div className="position-relative w-75 d-flex align-items-center flex-column justify-content-center">
                                                                 {isCameraOpen ? (
                                                                     <video
                                                                         ref={videoRef}
@@ -376,10 +395,9 @@ const UpdatePatientIndex = () => {
                                                                         src={
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
-                                                                                :
-                                                                                patientDetails?.photo[0]?.url
-                                                                                    ? patientDetails.photo[0]?.url
-                                                                                    : profilePhoto
+                                                                                : patientDetails?.photo[0]?.url
+                                                                                ? patientDetails.photo[0]?.url
+                                                                                : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded object-fit-cover"
@@ -392,8 +410,9 @@ const UpdatePatientIndex = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                            }`}
+                                                                        className={`position-absolute fs-4 text-primary ${
+                                                                            uploading ? 'd-none' : ''
+                                                                        }`}
                                                                         style={{
                                                                             top: '-9%',
                                                                             right: '-10%',
@@ -411,7 +430,9 @@ const UpdatePatientIndex = () => {
                                                                             className="custom-buttons">
                                                                             <TbCapture className="text-white fs-5" />{' '}
                                                                         </Button>
-                                                                        <Button onClick={stopCamera} className="custom-buttons">
+                                                                        <Button
+                                                                            onClick={stopCamera}
+                                                                            className="custom-buttons">
                                                                             <IoClose className="text-white fs-5" />
                                                                         </Button>
                                                                     </div>
@@ -423,8 +444,10 @@ const UpdatePatientIndex = () => {
                                                             {/* Submit button that sends the form after upload */}
                                                             <Button
                                                                 // onClick={onSubmit}
-                                                                type='submit'
-                                                                className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'}`}
+                                                                type="submit"
+                                                                className={`${
+                                                                    !logo ? 'd-none' : 'mt-1 custom-buttons'
+                                                                }`}
                                                                 disabled={!logo}>
                                                                 Submit
                                                             </Button>
@@ -432,62 +455,132 @@ const UpdatePatientIndex = () => {
                                                     </Col>
                                                     <Col sm={9}>
                                                         <Row className="pt-1 px-2">
-                                                            <Col className='' sm={6} md={4}>
-                                                                <Table className='h-100 box-shadow-none'>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Phone:</th>
-                                                                        <td className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find((data) => data?.system === 'phone')?.value ? 'text-black' : 'text-danger'}`}>{'+1-' + patientDetails?.telecom?.find((data) => data?.system === 'phone')?.value || 'Missing'}</td>
+                                                            <Col className="" sm={6} md={4}>
+                                                                <Table className="h-100 box-shadow-none">
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Phone:
+                                                                        </th>
+                                                                        <td
+                                                                            className={`fs-6  text-nowrap  ${
+                                                                                patientDetails?.telecom?.find(
+                                                                                    (data) => data?.system === 'phone'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                            }`}>
+                                                                            {'+1-' +
+                                                                                patientDetails?.telecom?.find(
+                                                                                    (data) => data?.system === 'phone'
+                                                                                )?.value || 'Missing'}
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Email:</th>
-                                                                        <td className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find((item) => item?.system === 'email')?.value ? 'text-black' : 'text-danger'}`}>{patientDetails?.telecom?.find((item) => item?.system === 'email')?.value || 'Missing'}</td>
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Email:
+                                                                        </th>
+                                                                        <td
+                                                                            className={`fs-6  text-nowrap text-black ${
+                                                                                patientDetails?.telecom?.find(
+                                                                                    (item) => item?.system === 'email'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                            }`}>
+                                                                            {patientDetails?.telecom?.find(
+                                                                                (item) => item?.system === 'email'
+                                                                            )?.value || 'Missing'}
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Address:</th>
-                                                                        <td className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city && patientDetails?.address?.[0]?.state ? 'text-black' : 'text-danger'}`}>
-                                                                            {patientDetails?.address?.[0]?.city && patientDetails?.address?.[0]?.state
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Address:
+                                                                        </th>
+                                                                        <td
+                                                                            className={`fs-6  text-nowrap ${
+                                                                                patientDetails?.address?.[0]?.city &&
+                                                                                patientDetails?.address?.[0]?.state
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                            }`}>
+                                                                            {patientDetails?.address?.[0]?.city &&
+                                                                            patientDetails?.address?.[0]?.state
                                                                                 ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
                                                                                 : 'Missing'}
                                                                         </td>
                                                                     </tr>
-
                                                                 </Table>
                                                             </Col>
 
-                                                            <Col className='' sm={6} md={4}>
-                                                                <Table className='h-100 box-shadow-none'>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Primary Provider:</th>
-                                                                        <td className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]?.text ? "text-black" : "text-danger"}`}>{patientDetails?.doctorId?.name?.[0]?.text || 'Missing'}</td>
+                                                            <Col className="" sm={6} md={4}>
+                                                                <Table className="h-100 box-shadow-none">
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Primary Provider:
+                                                                        </th>
+                                                                        <td
+                                                                            className={`fs-6 text-nowrap ${
+                                                                                patientDetails?.doctorId?.name?.[0]
+                                                                                    ?.text
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                            }`}>
+                                                                            {patientDetails?.doctorId?.name?.[0]
+                                                                                ?.text || 'Missing'}
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Date Added:</th>
-                                                                        <td className='fs-6 text-nowrap text-black'>  {new Date(
-                                                                            patientDetails?.createdAt
-                                                                        )?.toLocaleDateString('en-GB')}</td>
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Date Added:
+                                                                        </th>
+                                                                        <td className="fs-6 text-nowrap text-black">
+                                                                            {' '}
+                                                                            {new Date(
+                                                                                patientDetails?.createdAt
+                                                                            )?.toLocaleDateString('en-GB')}
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 ps-2 text-nowrap text-muted fw-bold'>Insurance:</th>
-                                                                        <td className='fs-6  text-nowrap text-danger'>
+                                                                    <tr className="">
+                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                            Insurance:
+                                                                        </th>
+                                                                        <td className="fs-6  text-nowrap text-danger">
                                                                             Missing
                                                                         </td>
                                                                     </tr>
-
                                                                 </Table>
                                                             </Col>
                                                             <Col sm={4}>
-                                                                <Table className='h-100 box-shadow-none'>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 px-2 text-nowrap text-muted fw-bold'>Last Appointment:</th>
-                                                                        <td className='fs-6 pe-2 text-nowrap text-black'>16/04/2025</td>
+                                                                <Table className="h-100 box-shadow-none">
+                                                                    <tr className="">
+                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                            Last Appointment:
+                                                                        </th>
+                                                                        <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                            16/04/2025
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 px-2 text-nowrap text-muted fw-bold'>Next Appointment:</th>
-                                                                        <td className='fs-6 pe-2 text-nowrap text-black'>26/05/2025</td>
+                                                                    <tr className="">
+                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                            Next Appointment:
+                                                                        </th>
+                                                                        <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                            26/05/2025
+                                                                        </td>
                                                                     </tr>
-                                                                    <tr className=''>
-                                                                        <th className='fs-6 px-2 text-nowrap text-muted fw-bold'>Follow Up Reason:</th>
-                                                                        <td className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason ? 'text-black' : 'text-danger'}`}>{patientDetails?.followupReason || 'Missing'}</td>
+                                                                    <tr className="">
+                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                            Follow Up Reason:
+                                                                        </th>
+                                                                        <td
+                                                                            className={`fs-6 pe-2 text-nowrap ${
+                                                                                patientDetails?.followupReason
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                            }`}>
+                                                                            {patientDetails?.followupReason ||
+                                                                                'Missing'}
+                                                                        </td>
                                                                     </tr>
                                                                 </Table>
                                                             </Col>
@@ -499,13 +592,27 @@ const UpdatePatientIndex = () => {
                                                             <Button
                                                                 as={Link}
                                                                 to="/apps/appointments/newAppointment"
-                                                                className="shadow-none" style={{ fontSize: '10px', borderRadius: '8px', padding: "3px 7px 3px 7px", width: '100px', backgroundColor: ' #6169d0' }}>
+                                                                className="shadow-none"
+                                                                style={{
+                                                                    fontSize: '10px',
+                                                                    borderRadius: '8px',
+                                                                    padding: '3px 7px 3px 7px',
+                                                                    width: '100px',
+                                                                    backgroundColor: ' #6169d0',
+                                                                }}>
                                                                 New Appointment
                                                             </Button>
                                                             <Button
                                                                 as={Link}
                                                                 to="#"
-                                                                className="mt-1 shadow-none" style={{ fontSize: '10px', borderRadius: '8px', padding: "3px 7px 3px 7px", width: '100px', backgroundColor: ' #6169d0' }}>
+                                                                className="mt-1 shadow-none"
+                                                                style={{
+                                                                    fontSize: '10px',
+                                                                    borderRadius: '8px',
+                                                                    padding: '3px 7px 3px 7px',
+                                                                    width: '100px',
+                                                                    backgroundColor: ' #6169d0',
+                                                                }}>
                                                                 New Encounter
                                                             </Button>
 
@@ -523,51 +630,76 @@ const UpdatePatientIndex = () => {
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
                                         <Card className="px-2" style={{ height: isAccordionOpen ? '70.5vh' : '85vh' }}>
-                                            <div
-                                                className="mt-2 px-0">
-                                                {selectedMainTab === 'Patient Details' && <PatientSummary isAccordionOpen={isAccordionOpen} setSelectedMainTab={setSelectedMainTab} />}
-                                                {selectedMainTab === 'Demographics' && <Subtabs isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Responsible Party' && <ResponsibleParty isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Reffering Doctor' && <ReferringDoctor isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Insurances' && <Insurances isAccordionOpen={isAccordionOpen} />}
+                                            <div className="mt-2 px-0">
+                                                {selectedMainTab === 'Patient Details' && (
+                                                    <PatientSummary
+                                                        isAccordionOpen={isAccordionOpen}
+                                                        setSelectedMainTab={setSelectedMainTab}
+                                                    />
+                                                )}
+                                                {selectedMainTab === 'Demographics' && (
+                                                    <Subtabs isAccordionOpen={isAccordionOpen} />
+                                                )}
+                                                {selectedMainTab === 'Responsible Party' && (
+                                                    <ResponsibleParty isAccordionOpen={isAccordionOpen} />
+                                                )}
+                                                {selectedMainTab === 'Reffering Doctor' && (
+                                                    <ReferringDoctor isAccordionOpen={isAccordionOpen} />
+                                                )}
+                                                {selectedMainTab === 'Insurances' && (
+                                                    <Insurances isAccordionOpen={isAccordionOpen} />
+                                                )}
                                                 {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Encounter' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Tabacco' && <Subsocialtabindex isAccordionOpen={isAccordionOpen} />}
-                                                {selectedMainTab === 'Medical' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Alcohol' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Vaccination' && <p>In progress...</p>}
+                                                {/* {selectedMainTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />} */}
+                                                {/* {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />} */}
+                                                {[
+                                                    'Tabacco',
+                                                    'Medical',
+                                                    'Surgical',
+                                                    'Family / Genetic',
+                                                    'Alcohol',
+                                                    'Vaccination',
+                                                ].includes(selectedMainTab) && (
+                                                    <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
+                                                )}
+                                                {/* {selectedMainTab === 'Medical' && <p>In progress...</p>} */}
+                                                {/* {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>} */}
+                                                {/* {selectedMainTab === 'Alcohol' && <p>In progress...</p>} */}
+                                                {/* {selectedMainTab === 'Vaccination' && <p>In progress...</p>} */}
                                                 {selectedMainTab === 'Communication' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Task' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Surgical' && <p>In progress...</p>}
+                                                {/* {selectedMainTab === 'Surgical' && <p>In progress...</p>} */}
                                                 {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
                                                 {selectedMainTab === 'Balance' && <p>In Progress...</p>}
                                                 {selectedMainTab === 'Payment' && <p>In Progress...</p>}
-                                                {selectedMainTab === 'Allergy List' && <AllergyList />}
-                                                {selectedMainTab === 'Problem List' && (
+                                                {/* {selectedMainTab === 'Allergy List' && <AllergyList />} */}
+                                                {/* {selectedMainTab === 'Problem List' && (
                                                     <ProblemList isAccordionOpen={isAccordionOpen} />
+                                                )} */}
+                                                {[
+                                                    'Allergy List',
+                                                    'Problem List',
+                                                    'Medication List',
+                                                    'Vitals List',
+                                                ].includes(selectedMainTab) && (
+                                                    <SubAllergytabs isAccordionOpen={isAccordionOpen} />
                                                 )}
                                             </div>
                                         </Card>
                                     </div>
                                 )}
                             </Col>
-
                         </Row>
-
-
                     )}
                 </div>
             </div>
-        </div >
-
+        </div>
     );
 };
 

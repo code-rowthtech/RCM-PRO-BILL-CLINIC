@@ -7,7 +7,7 @@ import Breaks from './breaks';
 import ScheduleTab from './scheduleTab';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiSearch } from 'react-icons/fi';
-import DatePicker from "react-datepicker";
+import DatePicker from 'react-datepicker';
 import { encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
 import { getScheduleAction } from '../../../redux/schedule/action';
@@ -23,11 +23,12 @@ const Schedule = () => {
     const [endDate, setEndDate] = useState(null);
     const [status, setStatus] = useState(true);
     const dispatch = useDispatch();
-    const [skip , setSkip] = useState(1);
+    const [skip, setSkip] = useState(1);
     const [doctorSearch, setDoctorSearch] = useState('');
     const [selectedDoctor, setSelectedDoctor] = useState(null);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log( 'doctorDetails', doctorDetails);
+    const scheduleResponse = store?.getScheduleReducer?.data?.holidays;
+
     const navigate = useNavigate('');
     const doctorOptions = doctorDetails?.map((data) => ({
         value: data._id,
@@ -42,7 +43,7 @@ const Schedule = () => {
             limit: 10,
         };
         dispatch(getDoctorsAction(payload));
-    }, [dispatch, doctorSearch , status, skip]);
+    }, [dispatch, doctorSearch, status, skip]);
 
     const renderTabContent = () => {
         switch (activeTab) {
@@ -62,7 +63,18 @@ const Schedule = () => {
         setStartDate(start);
         setEndDate(end);
     };
-
+    // useEffect(() => {
+    //     const hasFilters = (startDate) !== null ||  (endDate) !== null || scheduleResponse === undefined  ;
+    //     const payload = {
+    //         clinicId: clinicId,
+    //         fromDate: startDate || null,
+    //         toDate: endDate || null,
+    //         ...(selectedDoctor?.value ? { doctorId: selectedDoctor?.value } : {}),
+    //     };
+    //     if (hasFilters) {
+    //         dispatch(getScheduleAction({ key: encryptMessage(payload) }));
+    //     }
+    // }, [dispatch, startDate , endDate ]);
     useEffect(() => {
         const payload = {
             clinicId: clinicId,
@@ -86,8 +98,8 @@ const Schedule = () => {
         }
     };
     const handleAddHoliday = () => {
-        navigate("/apps/schedule/addHoliday");
-    }
+        navigate('/apps/schedule/addHoliday');
+    };
 
     return (
         <div className="schedule-container">
@@ -102,23 +114,20 @@ const Schedule = () => {
                                         {['DoctorHolidays', 'breaks', 'schedules'].map((tab, index) => (
                                             <li className="nav-item" key={index}>
                                                 <a
-                                                    className={classNames(
-                                                        'nav-link fw-bold text-black',
-                                                        { active: activeTab === tab }
-                                                    )}
+                                                    className={classNames('nav-link fw-bold text-black', {
+                                                        active: activeTab === tab,
+                                                    })}
                                                     href="#"
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         setActiveTab(tab);
-                                                    }}
-                                                >
+                                                    }}>
                                                     {tab === 'DoctorHolidays' && 'Doctor Time Off'}
                                                     {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>
                                             </li>
                                         ))}
-
                                     </ul>
                                 </Col>
 
@@ -134,7 +143,9 @@ const Schedule = () => {
                                                         isLoading={store?.getDoctorsReducer?.loading}
                                                         isClearable
                                                         isSearchable
-                                                        onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
+                                                        onInputChange={(inputValue) =>
+                                                            handleInputChange(inputValue, 'doctor')
+                                                        }
                                                         onChange={(data) => handleSearchInputChange(data, 'doctor')}
                                                         name="doctorName"
                                                         options={doctorOptions}
@@ -182,25 +193,18 @@ const Schedule = () => {
                                                 />
                                                 <Button
                                                     className="custom-buttons d-none d-md-block"
-                                                    onClick={handleAddHoliday}
-
-                                                >
+                                                    onClick={handleAddHoliday}>
                                                     Add Holiday
                                                 </Button>
                                                 <Button
                                                     className="custom-buttons d-md-none py-1"
-                                                    onClick={handleAddHoliday}
-                                                >
+                                                    onClick={handleAddHoliday}>
                                                     +
                                                 </Button>
                                             </div>
                                         )}
                                         {activeTab === 'breaks' && (
-                                            <Button
-                                                className="custom-buttons"
-                                                as={Link}
-                                                to="/apps/schedule/addBreak"
-                                            >
+                                            <Button className="custom-buttons" as={Link} to="/apps/schedule/addBreak">
                                                 Add Break
                                             </Button>
                                         )}

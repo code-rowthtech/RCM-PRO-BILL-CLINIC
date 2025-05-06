@@ -39,15 +39,31 @@ const ProblemList = () => {
         setProblemModal(true);
     };
     // delete function
-    const handleDelete = (data) =>{
-        dispatch(deleteProblemListAction({id:data?._id} ));
-    }
+    const handleDelete = (data) => {
+        dispatch(deleteProblemListAction({ id: data?._id }));
+    };
 
     useEffect(() => {
         if (deleteResponse === 200) {
             dispatch(getProblemListAction({ patientId }));
         }
     }, [deleteResponse, dispatch, patientId]);
+    const stripHtml = (html) => {
+        // Remove any <ul> or <li> tags with margin
+        return (
+            html
+                ?.replace(/<ul>/g, '<ul style="margin-bottom: 0px !important;">')
+                .replace(/<li>/g, '<li style="margin-bottom: 0px;">')
+                ?.replace(/<[^>]+>/g, '') || ''
+        );
+    };
+    const sanitizeNoteHtml = (html) => {
+        if (!html) return 'N/A';
+        return html
+            .replace(/<ul>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
+            .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
+            .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
+    };
     return (
         <>
             <div>
@@ -57,7 +73,7 @@ const ProblemList = () => {
                 <UpdateProblem problem={selectedProblem} onCancel={() => setShowUpdateProblem(false)} />
             ) : ( */}
                 <Row>
-                    <Col sm={12} className="d-flex justify-content-between">
+                    <Col sm={12} className="d-flex justify-content-between mt-2">
                         <h4>Active Problem</h4>
                         <div className="d-flex gap-2">
                             <p className="mb-0 mt-1">
@@ -116,10 +132,20 @@ const ProblemList = () => {
                                             <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
                                             <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
-                                            <td>
-                                                {data.clinicalStatus?.coding?.[0]?.display || 'N/A'}
-                                            </td>
-                                            <td>{data?.note?.[0]?.text || 'N/A'}</td>
+                                            <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
+                                            <td
+                                                className="text-capitalize mb-0"
+                                                title={stripHtml(data?.note?.[0]?.text)}>
+                                                <div
+                                                    dangerouslySetInnerHTML={{
+                                                        __html:
+                                                            data?.note?.[0]?.text?.length > 35
+                                                                ? sanitizeNoteHtml(data?.note?.[0]?.text.slice(0, 34)) +
+                                                                  '...'
+                                                                : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
+                                                    }}
+                                                />
+                                            </td>{' '}
                                             <td>
                                                 <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                 &nbsp;
@@ -151,7 +177,7 @@ const ProblemList = () => {
                 {/* // )} */}
             </div>
             <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
-                <Modal.Header closeButton className='px-2 py-0'>
+                <Modal.Header closeButton className="px-2 py-0">
                     <Modal.Title>{isEditMode ? 'Update Problem' : 'Add Problem'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

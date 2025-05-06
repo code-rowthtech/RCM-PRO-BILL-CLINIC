@@ -967,3 +967,9 @@ tbody tr:hover {
         background-color: #e0e0e0;
     }
 }
+.offcanvas {
+    z-index: 1080 !important; /* Higher than Bootstrap modal (z-index: 1050) */
+}
+.custom-suggestion-offcanvas.offcanvas {
+    z-index: 1080 !important;
+}

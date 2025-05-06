@@ -55,7 +55,7 @@ const Medication = ({ isAccordionOpen }) => {
     <>
       <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
         <Row>
-          <Col sm={12} className="d-flex justify-content-between">
+          <Col sm={12} className="d-flex justify-content-between mt-2">
             <h4>Medication List</h4>
             <Button
               className="custom-buttons text-nowrap"

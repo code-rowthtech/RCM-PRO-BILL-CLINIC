@@ -1,32 +1,31 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Col, Form, Row, Spinner } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { createDoctorDetailAction } from "../../../redux/actions";
-import { encryptMessage } from "../../../cryptoUtils";
-import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
-import { FiUploadCloud } from "react-icons/fi";
-import { CiCircleMinus } from "react-icons/ci";
-import { handleUpload } from "../../../helpers/HandleUpload";
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { createDoctorDetailAction } from '../../../redux/actions';
+import { encryptMessage } from '../../../cryptoUtils';
+import { useForm } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
+import { FiUploadCloud } from 'react-icons/fi';
+import { CiCircleMinus } from 'react-icons/ci';
+import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
-import { qualificationsData } from "../../../utils/DataSets/qualification.data";
+import { qualificationsData } from '../../../utils/DataSets/qualification.data';
 
 const DoctorQualifications = ({ setActiveTab, docId }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const id = doctorDetails?._id;
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        clearErrors,
-    } = useForm();
+    const { register, handleSubmit, setValue, clearErrors } = useForm();
     const [searchParams] = useSearchParams();
 
     const updateId = searchParams.get('id');
-    const [qualifications, setQualifications] = useState([{ degreeName: '', degreeFile: null, issuerOrganisation: '' }]);
-    const [documents, setDocuments] = useState([{ name: '', number: '', issuingAuthority: '', document: null, note: '' }]);
+    const [qualifications, setQualifications] = useState([
+        { degreeName: '', degreeFile: null, issuerOrganisation: '' },
+    ]);
+    const [documents, setDocuments] = useState([
+        { name: '', number: '', issuingAuthority: '', document: null, note: '' },
+    ]);
     const [documentUploading, setDocumentUploading] = useState(false);
     const addQualification = () => {
         const newQualification = { degreeName: '', degreeFile: null, issuerOrganisation: '' };
@@ -34,7 +33,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     };
 
     const removeQualification = (index) => {
-        if (qualifications.length > 1) { // Ensure at least one row remains
+        if (qualifications.length > 1) {
+            // Ensure at least one row remains
             const updatedQualifications = qualifications.filter((_, i) => i !== index);
             setQualifications(updatedQualifications);
         }
@@ -43,7 +43,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     // Handle changes in qualification fields
     const handleQualificationChange = (index, field, value) => {
         if (field === 'degreeName') {
-            const selectedQualification = qualificationsData.find((qualification) => qualification.code === value?.data?.code);
+            const selectedQualification = qualificationsData.find(
+                (qualification) => qualification.code === value?.data?.code
+            );
             if (selectedQualification) {
                 const updatedQualifications = qualifications.map((qual, i) =>
                     i === index ? { ...qual, [field]: selectedQualification, degreeFile: null } : qual
@@ -62,11 +64,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         const file = event.target.files[0];
         try {
             const url = await handleUpload(file, setDegreeUploading);
-            const fileName = file.name
+            const fileName = file.name;
             handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
-        } catch (error) {
-
-        }
+        } catch (error) {}
     };
     const [degreeUploading, setDegreeUploading] = useState(false);
     const QualificationOptions = qualificationsData.map((qualification) => ({
@@ -75,20 +75,19 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         data: qualification, // Store full object for later use
     }));
 
-
     const onsubmit = (data) => {
         const qualificationData = qualifications?.map((item) => ({
             code: item?.degreeName?.data || item?.degreeName,
             documents: item?.degreeFile,
             issuer: item?.issuerOrganisation,
-        }))
+        }));
         const payload = {
             ...(updateId ? { doctorId: id } : { doctorId: docId }),
             qualification: qualificationData,
-            otherDocuments: documents
-        }
+            otherDocuments: documents,
+        };
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
-    }
+    };
     useEffect(() => {
         if (doctorDetails && updateId) {
             // Set qualifications data
@@ -97,7 +96,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                     code: item?.code?.code,
                     display: item?.code?.display,
                     definition: item?.code?.display,
-                    system: item?.code?.system
+                    system: item?.code?.system,
                 },
                 specialties: item?.specialties?.[0] || 'N/A',
                 degreeFile: item?.documents?.[0] || null, // Use the first document if available
@@ -110,12 +109,11 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                 issuingAuthority: item?.issuingAuthority || '',
                 document: item?.document || null,
                 note: item?.note || '',
-            }))
+            }));
             setQualifications(updatedQualifications);
-            setDocuments(updateDocuments)
+            setDocuments(updateDocuments);
         }
     }, [doctorDetails, setValue, updateId]);
-
 
     const addDocuments = () => {
         setDocuments((prev) => [
@@ -141,29 +139,24 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         const file = event.target.files[0];
         try {
             const url = await handleUpload(file, setDocumentUploading);
-            const fileName = file.name
+            const fileName = file.name;
             handleDocumentsChange(index, 'document', { url: url?.url, fileName });
-        } catch (error) {
-
-        }
+        } catch (error) {}
     };
 
     const removeDocument = (index) => {
         setDocuments((prev) => prev.filter((_, i) => i !== index));
-    }
+    };
 
     return (
         <>
             <div className="container-fluid">
                 <Form onSubmit={handleSubmit(onsubmit)}>
-                    {store?.getDoctorDetailsReducer?.loading ?
-                        <div
-                            className="d-flex justify-content-center align-items-center"
-                            style={{ height: '75vh' }}
-                        >
+                    {store?.getDoctorDetailsReducer?.loading ? (
+                        <div className="d-flex justify-content-center align-items-center" style={{ height: '75vh' }}>
                             <Spinner />
                         </div>
-                        :
+                    ) : (
                         <>
                             <Row>
                                 <Col sm={12}>
@@ -172,8 +165,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                             Qualifications
                                             <span
                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                onClick={addQualification}
-                                            ></span>
+                                                onClick={addQualification}></span>
                                         </h5>
                                         {qualifications?.map((qualification, index) => (
                                             <React.Fragment key={index}>
@@ -186,9 +178,16 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                             className="basic-single"
                                                             classNamePrefix="select"
                                                             placeholder="&nbsp; Select "
-                                                            value={QualificationOptions.find(option => option.value === qualification?.degreeName?.code)}
+                                                            value={QualificationOptions.find(
+                                                                (option) =>
+                                                                    option.value === qualification?.degreeName?.code
+                                                            )}
                                                             onChange={(selectedOption) =>
-                                                                handleQualificationChange(index, 'degreeName', selectedOption)
+                                                                handleQualificationChange(
+                                                                    index,
+                                                                    'degreeName',
+                                                                    selectedOption
+                                                                )
                                                             }
                                                             styles={{
                                                                 control: (provided) => ({
@@ -211,11 +210,25 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                     <div className="mb-1 d-flex flex-column position-relative">
                                                         <Form.Label className="mb-0">Degree</Form.Label>
                                                         <div
-                                                            onClick={() => document.getElementById(`degree-file-input-${index}`).click()}
+                                                            onClick={() =>
+                                                                document
+                                                                    .getElementById(`degree-file-input-${index}`)
+                                                                    .click()
+                                                            }
                                                             // onClick={() => degreeFileInputRef.current.click()}
-                                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile ? '' : 'custom-form-fields'}`}
-                                                        >
-                                                            {degreeUploading ? 'Uploading...' : qualification.degreeFile?.fileName ? qualification.degreeFile.fileName : 'Upload Degree'}
+                                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${
+                                                                qualification.degreeName || qualification.degreeFile
+                                                                    ? ''
+                                                                    : 'custom-form-fields'
+                                                            }`}>
+                                                            {degreeUploading
+                                                                ? 'Uploading...'
+                                                                : qualification.degreeFile?.fileName
+                                                                ? qualification.degreeFile.fileName.length > 30
+                                                                    ? qualification.degreeFile.fileName.slice(0, 35) +
+                                                                      '...'
+                                                                    : qualification.degreeFile.fileName
+                                                                : 'Upload Degree'}{' '}
                                                             <p className="mb-0">
                                                                 <FiUploadCloud />
                                                             </p>
@@ -235,7 +248,13 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         <Form.Control
                                                             type="text"
                                                             value={qualification.issuerOrganisation}
-                                                            onChange={(e) => handleQualificationChange(index, 'issuerOrganisation', e.target.value)}
+                                                            onChange={(e) =>
+                                                                handleQualificationChange(
+                                                                    index,
+                                                                    'issuerOrganisation',
+                                                                    e.target.value
+                                                                )
+                                                            }
                                                             placeholder="Enter Issuer Organisation"
                                                         />
                                                     </Form.Group>
@@ -250,8 +269,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         </span>
                                                     </div>
                                                 )}
-                                                {qualifications?.length > 1 && index < qualifications.length - 1 && <hr className="mt-2" />}
-
+                                                {qualifications?.length > 1 && index < qualifications.length - 1 && (
+                                                    <hr className="mt-2" />
+                                                )}
                                             </React.Fragment>
                                         ))}
                                     </Row>
@@ -265,12 +285,11 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                             Other Documents
                                             <span
                                                 className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                onClick={addDocuments}
-                                            ></span>
+                                                onClick={addDocuments}></span>
                                         </h5>
                                         {documents?.map((data, index) => (
                                             <>
-                                                <Row key={data.id} >
+                                                <Row key={data.id}>
                                                     <div className="col-md-3 col-12">
                                                         <Form.Group className="mb-1">
                                                             <Form.Label className="mb-0">Document Name</Form.Label>
@@ -278,7 +297,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 type="text"
                                                                 value={data?.name}
                                                                 // {...register(`documentName[${index}]`)}
-                                                                onChange={(e) => handleDocumentsChange(index, 'name', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleDocumentsChange(index, 'name', e.target.value)
+                                                                }
                                                                 placeholder="Enter Document Name"
                                                             />
                                                         </Form.Group>
@@ -290,7 +311,13 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 type="text"
                                                                 value={data?.number}
                                                                 // {...register(`documentNumber[${index}]`)}
-                                                                onChange={(e) => handleDocumentsChange(index, 'number', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleDocumentsChange(
+                                                                        index,
+                                                                        'number',
+                                                                        e.target.value
+                                                                    )
+                                                                }
                                                                 placeholder="Enter Document Number"
                                                             />
                                                         </div>
@@ -302,7 +329,13 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 type="text"
                                                                 value={data?.issuingAuthority}
                                                                 // {...register(`issuingAuthority[${index}]`)}
-                                                                onChange={(e) => handleDocumentsChange(index, 'issuingAuthority', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleDocumentsChange(
+                                                                        index,
+                                                                        'issuingAuthority',
+                                                                        e.target.value
+                                                                    )
+                                                                }
                                                                 placeholder="Enter Issuing Authority"
                                                             />
                                                         </Form.Group>
@@ -312,11 +345,22 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         <div className="mb-1 d-flex flex-column position-relative">
                                                             <Form.Label className="mb-0">Document</Form.Label>
                                                             <div
-                                                                onClick={() => document.getElementById(`documents-file-input-${index}`).click()}
+                                                                onClick={() =>
+                                                                    document
+                                                                        .getElementById(`documents-file-input-${index}`)
+                                                                        .click()
+                                                                }
                                                                 // onClick={() => documentsFileInputRef.current.click()}
-                                                                className={`custom-file-upload justify-content-between cursor-pointer form-control ${data?.document?.fileName || data.degreeFile ? '' : 'custom-form-fields'}`}
-                                                            >
-                                                                {documentUploading ? 'Uploading...' : data?.document?.fileName ? data?.document.fileName : 'Upload Degree'}
+                                                                className={`custom-file-upload justify-content-between cursor-pointer form-control ${
+                                                                    data?.document?.fileName || data.degreeFile
+                                                                        ? ''
+                                                                        : 'custom-form-fields'
+                                                                }`}>
+                                                                {documentUploading
+                                                                    ? 'Uploading...'
+                                                                    : data?.document?.fileName
+                                                                    ? data?.document.fileName
+                                                                    : 'Upload Degree'}
                                                                 <p className="mb-0">
                                                                     <FiUploadCloud />
                                                                 </p>
@@ -327,7 +371,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                 className="d-none"
                                                                 id={`documents-file-input-${index}`}
                                                                 // ref={documentsFileInputRef}
-                                                                onChange={(event) => handleFileChangeDocuments(index, event)}
+                                                                onChange={(event) =>
+                                                                    handleFileChangeDocuments(index, event)
+                                                                }
                                                             />
                                                         </div>
                                                     </div>
@@ -335,10 +381,12 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                         <Form.Group className="mb-1">
                                                             <Form.Label className="mb-0">Note</Form.Label>
                                                             <Form.Control
-                                                                as='textarea'
+                                                                as="textarea"
                                                                 value={data?.note}
                                                                 // {...register(`note[${index}]`)}
-                                                                onChange={(e) => handleDocumentsChange(index, 'note', e.target.value)}
+                                                                onChange={(e) =>
+                                                                    handleDocumentsChange(index, 'note', e.target.value)
+                                                                }
                                                                 placeholder="Enter Note"
                                                             />
                                                         </Form.Group>
@@ -352,7 +400,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                             </span>
                                                         </div>
                                                     )}
-                                                    {documents?.length > 1 && index < documents.length - 1 && <hr className="mt-2" />}
+                                                    {documents?.length > 1 && index < documents.length - 1 && (
+                                                        <hr className="mt-2" />
+                                                    )}
                                                 </Row>
                                             </>
                                         ))}
@@ -369,19 +419,16 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                     type="submit"
                                     className="custom-buttons"
                                     disabled={store?.createtDoctorsDetailReducer?.loading}
-                                    style={{ width: '120px' }}
-
-                                >
+                                    style={{ width: '120px' }}>
                                     {store?.createtDoctorsDetailReducer?.loading ? (
                                         <Spinner color="white" className="spinner-border-sm" />
                                     ) : (
                                         'Update & Exit'
                                     )}
                                 </Button>
-
                             </div>
                         </>
-                    }
+                    )}
                 </Form>
             </div>
         </>
