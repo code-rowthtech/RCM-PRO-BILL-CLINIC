@@ -5,26 +5,6 @@ const CREATE_SUGGESTIONS_INITIAL_STATE = {
     loading: false,
 };
 
-// const GET_ALLERGY_DETAILS_INITIAL_STATE = {
-//     data: [],
-//     loading: false,
-// };
-
-// export const GET_ALLERGIES_OF_A_PATIENT_INITIAL_STATE = {
-//     data: [],
-//     loading: false,
-// };
-
-// export const UPDATE_ALLERGY_INITIAL_STATE = {
-//     data: [],
-//     loading: false,
-// };
-
-// export const DELETE_ALLERGY_INITIAL_STATE = {
-//     data: [],
-//     loading: false,
-// };
-
 export const createSuggestionsReducer = (state = CREATE_SUGGESTIONS_INITIAL_STATE, action) => {
     switch (action.type) {
         case SuggestionsListActionTypes.CREATE_SUGGESTION_LOADING:

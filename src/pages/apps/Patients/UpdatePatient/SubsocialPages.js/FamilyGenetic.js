@@ -86,11 +86,10 @@ const FamilyHistory = () => {
             ],
         };
         dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
-    useEffect(() => {
-        dispatch(getFamilyGeneticAction({ patientId: patientId }));
-    }, [dispatch, patientId]);
+    // useEffect(() => {
+    //     dispatch(getFamilyGeneticAction({ patientId: patientId }));
+    // }, [dispatch, patientId]);
 
     useEffect(() => {
         if (createResponse === 201) {
@@ -417,8 +416,8 @@ const FamilyHistory = () => {
                                                             <strong>Date of Death:</strong>
                                                             {item?.dateOfDeath
                                                                 ? new Date(item?.dateOfDeath)?.toLocaleDateString(
-                                                                      'en-GB'
-                                                                  )
+                                                                    'en-GB'
+                                                                )
                                                                 : ''}
                                                         </>
                                                     )}

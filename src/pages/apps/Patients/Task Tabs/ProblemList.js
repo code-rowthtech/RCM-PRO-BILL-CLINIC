@@ -28,11 +28,11 @@ const ProblemList = () => {
     const problemList = store?.getProblemListReducer?.data?.problems;
     const isLoading = store?.getProblemListReducer?.loading;
     const deleteResponse = store?.deleteProblemListReducer?.data?.status;
-    useEffect(() => {
-        if (patientId) {
-            dispatch(getProblemListAction({ patientId }));
-        }
-    }, [dispatch, patientId]);
+    // useEffect(() => {
+    //     if (patientId) {
+    //         dispatch(getProblemListAction({ patientId }));
+    //     }
+    // }, [dispatch, patientId]);
     const handleEditClick = (problem) => {
         setSelectedProblem(problem);
         setIsEditMode(true);
@@ -141,7 +141,7 @@ const ProblemList = () => {
                                                         __html:
                                                             data?.note?.[0]?.text?.length > 35
                                                                 ? sanitizeNoteHtml(data?.note?.[0]?.text.slice(0, 34)) +
-                                                                  '...'
+                                                                '...'
                                                                 : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
                                                     }}
                                                 />
