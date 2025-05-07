@@ -505,12 +505,12 @@ const NewDoctor = () => {
                                                                                               maxLength: {
                                                                                                   value: 13,
                                                                                                   message:
-                                                                                                      'Contact must not exceed 13 digits',
+                                                                                                      'Contact must not exceed 10 digits',
                                                                                               },
                                                                                               minLength: {
                                                                                                   value: 13,
                                                                                                   message:
-                                                                                                      'Contact must not be less than 13 digits',
+                                                                                                      'Contact must not be less than 10 digits',
                                                                                               },
                                                                                           }
                                                                                         : {}
@@ -788,10 +788,12 @@ const NewDoctor = () => {
                                                                             ? ''
                                                                             : 'custom-form-fields'
                                                                     }`}>
-                                                                    {logoName
-                                                                        ? logoName
-                                                                        : logoUploading
+                                                                    {logoUploading
                                                                         ? 'Uploading...'
+                                                                        : logoName
+                                                                        ? logoName.length > 30
+                                                                            ? logoName.slice(0, 25) + '...'
+                                                                            : logoName
                                                                         : 'Upload Profile Image'}
                                                                     <p className="mb-0">
                                                                         <FiUploadCloud />
@@ -839,8 +841,7 @@ const NewDoctor = () => {
                                                         type="submit"
                                                         className="custom-buttons"
                                                         disabled={store?.createtDoctorsReducer?.loading}
-                                                        style={{width:'120px'}}
-                                                        >
+                                                        style={{ width: '120px' }}>
                                                         {store?.createtDoctorsReducer?.loading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />
                                                         ) : id ? (

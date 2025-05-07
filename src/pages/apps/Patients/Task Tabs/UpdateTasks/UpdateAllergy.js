@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import AsyncSelect from 'react-select/async';
@@ -14,6 +14,9 @@ import { exposureRouteData } from '../../../../../utils/DataSets/Allergy/exposur
 import { useSearchParams } from 'react-router-dom';
 import { getAllergiesOfPatientAction, updateAllergyAction } from '../../../../../redux/allergyList/action';
 import { getPatientAppointmentAction } from '../../../../../redux/ProblemList/action';
+import { createSuggestionAction } from '../../../../../redux/suggestions/action';
+import ReactQuill from 'react-quill';
+import SuggestionOffcanvas from '../../UpdatePatient/SuggestionOffcanvas';
 
 const UpdateAllergy = ({ onCancel, allergy }) => {
     console.log(allergy, 'allergy');
@@ -30,13 +33,15 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
     const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
     const [exposureRoute, setExposureRoute] = useState(null);
     const updateStatus = store?.updateAllergyReducer?.data?.status;
-        const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
-    
+    const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue,
+        control,
         reset,
         clearErrors,
         watch,
@@ -56,14 +61,33 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         setValue('reaction', allergyDetails?.reaction[0]?.manifestation[0]?.concept?.coding[0]?.code);
         setValue('status', allergyDetails?.clinicalStatus?.coding[0]?.code);
         setValue('severity', allergyDetails?.reaction[0]?.severity?.coding[0]?.code);
-        setValue('notes', allergyDetails?.note[0]?.text);
+        setValue('note', allergyDetails?.note[0]?.text);
         setManifestation(allergyDetails?.reaction?.[0]?.manifestation?.[0]?.concept?.coding[0]);
         setCode(allergyDetails?.code?.coding[0]);
         setExposureRoute(allergyDetails?.reaction?.[0]?.exposureRoute?.coding?.[0]);
         setSubstance(allergyDetails?.reaction[0]?.substance?.coding[0]);
-        setValue('appointment', allergyDetails?.appointmentId);
-        setValue('appointmentDate', allergyDetails?.onset?.onsetDateTime);
-    }, [allergyDetails]);
+        // setValue('appointment', allergyDetails?.appointmentId?.date);
+        // setValue('appointmentDate', allergyDetails?.onset?.onsetDateTime);
+        if (allergyDetails) {
+            if (allergyDetails?.appointmentId) {
+                setSelectMode('appointment');
+                const selected = appointments.find(
+                    (appt) =>
+                        appt._id === allergyDetails.appointmentId._id || appt.id === allergyDetails.appointmentId.id
+                );
+                if (selected) {
+                    setValue('appointment', JSON.stringify(selected));
+                }
+                // Clear the date field to avoid conflict
+                setValue('appointmentDate', null);
+            } else if (allergyDetails?.onset?.onsetDateTime) {
+                setSelectMode('date');
+                setValue('appointmentDate', new Date(allergyDetails.onset.onsetDateTime).toISOString().split('T')[0]);
+                // Clear the appointment select to avoid conflict
+                setValue('appointment', null);
+            }
+        }
+    }, [allergyDetails, setValue, appointments]);
 
     // const onSubmit = (data) => {
     //     const updateAllergy = { ...data };
@@ -195,7 +219,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
             ],
             note: [
                 {
-                    text: data?.notes,
+                    text: data?.note,
                     time: '',
                     authorReference: {
                         reference: '',
@@ -330,9 +354,17 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
             dispatch(getAllergiesOfPatientAction(data));
             onCancel();
         }
-    }, [updateStatus, dispatch, patientId, onCancel]);  
+    }, [updateStatus, dispatch, patientId, onCancel]);
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
+    const handleEditorFocus = () => {
+        dispatch(createSuggestionAction({ module: 'allergy' }));
+        setShowSuggestions(true);
+    };
+    const handleSuggestionSelect = (suggestionText) => {
+        // Append suggestion to existing note
+        const current = getValues('note'); // from useFormContext or pass as prop
+        setValue('note', `${current}<p>${suggestionText}</p>`);
+    };
     return (
         <div>
             <Form onSubmit={handleSubmit(onSubmit)}>
@@ -529,9 +561,10 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                                     Clinical Status
                                 </Form.Label>
                                 <Form.Select
-                                    {...register('status',
+                                    {...register(
+                                        'status'
                                         //  { required: 'Clinical Status is required' }
-                                        )}
+                                    )}
                                     data-has-value={!!watch('status')}>
                                     <option value="" hidden>
                                         Select Clinical Status
@@ -654,18 +687,51 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                             </Form.Group>
                         </Col> */}
 
-                        <Col sm={12}>
-                            <Form.Group className="mb-1">
-                                <Form.Label htmlFor="notes" className="mb-0">
-                                    Note
+                        <Col xs={12}>
+                            <Form.Group controlId="note">
+                                <Form.Label className="fw-medium mb-0">
+                                    Notes{' '}
+                                    <span
+                                        style={{ cursor: 'pointer' }}
+                                        title="Notes Suggestions"
+                                        onClick={handleEditorFocus}>
+                                        ✨
+                                    </span>
                                 </Form.Label>
-                                <Form.Control
-                                    id="notes"
-                                    as="textarea"
-                                    placeholder="Note"
-                                    rows={4}
-                                    {...register('notes', { required: 'Note is required' })}
-                                    data-has-value={!!watch('notes')}
+
+                                <Controller
+                                    name="note"
+                                    control={control}
+                                    defaultValue="<ul><li></li></ul>"
+                                    render={({ field: { onChange, value } }) => (
+                                        <ReactQuill
+                                            value={value}
+                                            onChange={(content, delta, source) => {
+                                                if (source === 'user') {
+                                                    onChange(content);
+                                                }
+                                            }}
+                                            theme="snow"
+                                            placeholder="Enter detailed notes here..."
+                                            style={{ backgroundColor: 'white' }}
+                                            modules={{
+                                                toolbar: [
+                                                    [{ header: [1, 2, false] }],
+                                                    ['bold', 'italic', 'underline', 'strike'],
+                                                    [{ list: 'ordered' }, { list: 'bullet' }],
+                                                    ['link', 'image'],
+                                                    ['clean'],
+                                                ],
+                                            }}
+                                        />
+                                    )}
+                                />
+
+                                <SuggestionOffcanvas
+                                    show={showSuggestions}
+                                    onClose={() => setShowSuggestions(false)}
+                                    onSelect={handleSuggestionSelect}
+                                    className="custom-suggestion-offcanvas"
                                 />
                             </Form.Group>
                         </Col>

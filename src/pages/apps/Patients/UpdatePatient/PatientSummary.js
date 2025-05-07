@@ -38,9 +38,6 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
         ...tobaccoHistory.slice(0, 2),
         ...familyGeneticHistory.slice(0, 2)
     ];
-
-
-    console.log(socialHistoryData, 'socialHistoryDatasocialHistoryData')
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
@@ -375,7 +372,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </div>
                             ) : problemData && problemData.length > 0 ? (
                                 <ul className="list-unstyled pb-0 mb-0">
-                                    {problemData.slice(0, 4).map((problem, index) => (
+                                    {problemData?.slice(0, 4)?.map((problem, index) => (
                                         <li
                                             key={index}
                                             className="mb-2 d-flex justify-content-between align-items-start">
@@ -565,6 +562,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                             <th className="fs-6 text-white">Date</th>
                                             <th className="fs-6 text-white">Time</th>
                                             <th className="fs-6 text-white">Provider</th>
+                                            <th className="fs-6 text-white">Reason</th>
                                             <th className="fs-6 text-white">Type</th>
                                             {/* <th className="fs-6 text-white">Location</th> */}
                                         </tr>
@@ -572,7 +570,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     <tbody>
                                         {store?.getAppointmentsReducer?.loading ? (
                                             <tr>
-                                                <td colSpan="4" className="text-center py-5">
+                                                <td colSpan="6" className="text-center py-5">
                                                     <Spinner className="spinner-border-sm" />
                                                 </td>
                                             </tr>
@@ -599,6 +597,9 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                                     </td>
                                                     <td className="fs-6">
                                                         {appointment?.doctorId?.name?.[0]?.text || 'Unknown'}
+                                                    </td>
+                                                    <td className='fs-6'>
+                                                        {appointment?.reason?.[0]?.coding?.[0]?.display}
                                                     </td>
                                                     <td className="fs-6">
                                                         {appointment?.appointmentType?.coding?.[0]?.display ||
@@ -651,7 +652,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                     <AddProblem onCancel={handleAddProblemClose} />
                 </Modal.Body>
             </Modal>
-            <Modal show={showAppointmentModal} onHide={handleAppointmentClose} size="lg" centered>
+            <Modal show={showAppointmentModal} onHide={handleAppointmentClose} size="xl" centered>
                 <Modal.Header closeButton className="px-2 py-0">
                     <Modal.Title className="">Add Appointment </Modal.Title>
                 </Modal.Header>

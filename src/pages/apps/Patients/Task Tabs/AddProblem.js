@@ -11,6 +11,9 @@ import {
     getProblemListAction,
 } from '../../../../redux/ProblemList/action';
 import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatus';
+import SuggestionOffcanvas from '../UpdatePatient/SuggestionOffcanvas';
+import { createSuggestionAction } from '../../../../redux/suggestions/action';
+import ReactQuill from 'react-quill';
 
 const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();
@@ -22,6 +25,8 @@ const AddProblem = ({ onCancel }) => {
     const appointments = store?.getPatientAppointmentReducer?.data || [];
     const [submissionType, setSubmissionType] = useState(null);
     const [selectedProblem, setSelectedProblem] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
     const addProblemStatus = store?.createProblemListReducer?.data?.status;
 
     const {
@@ -30,6 +35,7 @@ const AddProblem = ({ onCancel }) => {
         control,
         formState: { errors },
         reset,
+        getValues,
         setValue,
         watch,
     } = useForm();
@@ -135,7 +141,15 @@ const AddProblem = ({ onCancel }) => {
             }
         }
     }, [addProblemStatus, submissionType]);
-
+    const handleEditorFocus = () => {
+        dispatch(createSuggestionAction({ module: 'problem' }));
+        setShowSuggestions(true);
+    };
+    const handleSuggestionSelect = (suggestionText) => {
+        // Append suggestion to existing note
+        const current = getValues('note'); // from useFormContext or pass as prop
+        setValue('note', `${current}<p>${suggestionText}</p>`);
+    };
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
@@ -265,10 +279,49 @@ const AddProblem = ({ onCancel }) => {
                 </Col> */}
 
                 {/* Note */}
-                <Col sm={12}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Note</Form.Label>
-                        <Form.Control as="textarea" placeholder="Note" rows={4} {...register('note')} />
+                <Col xs={12}>
+                    <Form.Group controlId="note">
+                        <Form.Label className="fw-medium mb-0">
+                            Notes{' '}
+                            <span style={{ cursor: 'pointer' }} title="Notes Suggestions" onClick={handleEditorFocus}>
+                                ✨
+                            </span>
+                        </Form.Label>
+
+                        <Controller
+                            name="note"
+                            control={control}
+                            defaultValue="<ul><li></li></ul>"
+                            render={({ field: { onChange, value } }) => (
+                                <ReactQuill
+                                    value={value}
+                                    onChange={(content, delta, source) => {
+                                        if (source === 'user') {
+                                            onChange(content);
+                                        }
+                                    }}
+                                    theme="snow"
+                                    placeholder="Enter detailed notes here..."
+                                    style={{ backgroundColor: 'white' }}
+                                    modules={{
+                                        toolbar: [
+                                            [{ header: [1, 2, false] }],
+                                            ['bold', 'italic', 'underline', 'strike'],
+                                            [{ list: 'ordered' }, { list: 'bullet' }],
+                                            ['link', 'image'],
+                                            ['clean'],
+                                        ],
+                                    }}
+                                />
+                            )}
+                        />
+
+                        <SuggestionOffcanvas
+                            show={showSuggestions}
+                            onClose={() => setShowSuggestions(false)}
+                            onSelect={handleSuggestionSelect}
+                            className="custom-suggestion-offcanvas"
+                        />
                     </Form.Group>
                 </Col>
 

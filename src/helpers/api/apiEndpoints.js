@@ -144,5 +144,17 @@ export const updateFamily = `${BaseRoute}/familyMedicalHistory/`;
 export const getFamily = `${BaseRoute}/familyMedicalHistory`;
 export const deleteFamily = `${BaseRoute}/familyMedicalHistory/`;
 
+// Surgical 
+export const createSurgicalHistory = `${BaseRoute}/surgicalHistory`;
+export const updateSurgicalHistory = `${BaseRoute}/surgicalHistory`;
+export const getSurgicalHistory = `${BaseRoute}/surgicalHistory`;
+export const deleteSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 
 
+// Surgical 
+export const createMedicalHistory = `${BaseRoute}/medicalHistory`;
+export const updateMedicalHistory = `${BaseRoute}/medicalHistory/`;
+export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
+export const deleteMedicalHistory = `${BaseRoute}/medicalHistory/`;
+// ICD CODES
+export const icdProcedures = `${BaseRoute}/codes/pcs`;

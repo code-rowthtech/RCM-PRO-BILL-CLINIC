@@ -14,3 +14,4 @@ export * from './vitals/actions';
 export * from './assigntasks/action';
 export * from './medication/action';
 export * from './socialHistory/action';
+export * from './icdCodes/action';

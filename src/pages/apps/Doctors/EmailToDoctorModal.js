@@ -22,6 +22,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
     }
     const store = useSelector((state) => state);
     const createResponse = store?.createDoctorsReducer?.data?.status
+    console.log(store?.createDoctorsReducer,'create')
 
     useEffect(() => {
         if (createResponse === 200) {
@@ -38,7 +39,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                     <Row className="border-bottom mb-2 pb-2 d-flex align-items-center">
                         <Col sm={1}></Col>
                         <Col sm={10}>
-                            <h4 className="mb-0 text-center">Email to Doctor</h4>
+                            <h4 className="mb-0 text-center">Email to Provider</h4>
                         </Col>
                         <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
@@ -60,13 +61,13 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                                 </Form.Group>
 
                                 <div className='text-center'>
-                                    <p className='mb-0'>The Doctor will receive an onboarding email on</p>
+                                    <p className='mb-0'>The Provider will receive an onboarding email on</p>
                                     <p className='fw-bold'> "{formData?.email}"</p>
                                 </div>
                             </Col>
                         </Row>
                         <Modal.Footer className='d-flex justify-content-center'>
-                            <Button type="submit" className="custom-buttons" disabled={store?.createDoctorsReducer?.loading}>
+                            <Button type="submit" className="custom-buttons" style={{width:'55px'}} disabled={store?.createDoctorsReducer?.loading}>
                                 {store?.createtDoctorsReducer?.loading ?
                                     <Spinner color='white' className='spinner-border-sm' />
                                     :

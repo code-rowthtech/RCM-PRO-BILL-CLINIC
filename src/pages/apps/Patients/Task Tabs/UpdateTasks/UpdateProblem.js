@@ -13,6 +13,9 @@ import {
 } from '../../../../../redux/ProblemList/action';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { clinicalStatus } from '../../../../../utils/DataSets/Allergy/clinicalStatus';
+import SuggestionOffcanvas from '../../UpdatePatient/SuggestionOffcanvas';
+import ReactQuill from 'react-quill';
+import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 
 const UpdateProblem = ({ onCancel, problem }) => {
     console.log(problem, 'problem');
@@ -24,12 +27,14 @@ const UpdateProblem = ({ onCancel, problem }) => {
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const appointments = store?.getPatientAppointmentReducer?.data || [];
     const updateProblemListResponse = store?.updateProblemListReducer?.data?.status;
+    const [showSuggestions, setShowSuggestions] = useState(false);
 
     const {
         register,
         handleSubmit,
         control,
         setValue,
+        getValues,
         watch,
         reset,
         formState: { errors },
@@ -72,7 +77,7 @@ const UpdateProblem = ({ onCancel, problem }) => {
             setValue('status', problem?.clinicalStatus?.coding?.[0]?.code);
             setValue('appointment', problem?.appointment);
             setValue('datetimeDiagnosis', problem?.onsetDateTime?.split('T')[0]);
-            setValue('notes', problem?.note?.[0]?.text);
+            setValue('note', problem?.note?.[0]?.text);
         }
     }, [problem, setValue]);
     const onSubmit = (data) => {
@@ -119,7 +124,7 @@ const UpdateProblem = ({ onCancel, problem }) => {
                     },
                     authorString: ' ',
                     time: '',
-                    text: data?.notes,
+                    text: data?.note,
                 },
             ],
         };
@@ -136,7 +141,15 @@ const UpdateProblem = ({ onCancel, problem }) => {
             dispatch(getProblemListAction(data));
         }
     }, [updateProblemListResponse, dispatch]);
-
+    const handleEditorFocus = () => {
+        dispatch(createSuggestionAction({ module: 'problem' }));
+        setShowSuggestions(true);
+    };
+    const handleSuggestionSelect = (suggestionText) => {
+        // Append suggestion to existing note
+        const current = getValues('note'); // from useFormContext or pass as prop
+        setValue('note', `${current}<p>${suggestionText}</p>`);
+    };
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
@@ -144,48 +157,48 @@ const UpdateProblem = ({ onCancel, problem }) => {
                     <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Problem</Form.Label>
                         <Controller
-    name="problem"
-    control={control}
-    rules={{ required: 'Problem is required' }}
-    render={({ field }) => (
-        <Select
-            {...field}
-            value={field.value} // ← This ensures the Select input is controlled
-            classNamePrefix="select"
-            options={formattedOptions}
-            onChange={(selected) => {
-                field.onChange(selected);
-                setSelectedProblem(selected); // For updating icdCode
-            }}
-            onInputChange={(value, { action }) => {
-                if (action === 'input-change') {
-                    setSearchQuery(value);
-                }
-            }}
-            placeholder="Search Problem"
-            isClearable
-            isSearchable
-            styles={{
-                control: (provided) => ({
-                    ...provided,
-                    height: '30px',
-                    minHeight: '30px',
-                    border: '0px',
-                }),
-                placeholder: (provided) => ({
-                    ...provided,
-                    fontWeight: 'bold',
-                    fontSize: '12px',
-                    paddingBottom: '5px',
-                }),
-                valueContainer: (provided) => ({
-                    ...provided,
-                    padding: '0px 6px',
-                }),
-            }}
-        />
-    )}
-/>
+                            name="problem"
+                            control={control}
+                            rules={{ required: 'Problem is required' }}
+                            render={({ field }) => (
+                                <Select
+                                    {...field}
+                                    value={field.value} // ← This ensures the Select input is controlled
+                                    classNamePrefix="select"
+                                    options={formattedOptions}
+                                    onChange={(selected) => {
+                                        field.onChange(selected);
+                                        setSelectedProblem(selected); // For updating icdCode
+                                    }}
+                                    onInputChange={(value, { action }) => {
+                                        if (action === 'input-change') {
+                                            setSearchQuery(value);
+                                        }
+                                    }}
+                                    placeholder="Search Problem"
+                                    isClearable
+                                    isSearchable
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '0px',
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                        valueContainer: (provided) => ({
+                                            ...provided,
+                                            padding: '0px 6px',
+                                        }),
+                                    }}
+                                />
+                            )}
+                        />
 
                         {errors.problem && <Form.Text className="text-danger">{errors.problem.message}</Form.Text>}
                     </Form.Group>
@@ -235,11 +248,49 @@ const UpdateProblem = ({ onCancel, problem }) => {
                         <Form.Control type="date" {...register('datetimeDiagnosis')} />
                     </Form.Group>
                 </Col>
+                <Col xs={12}>
+                    <Form.Group controlId="note">
+                        <Form.Label className="fw-medium mb-0">
+                            Notes{' '}
+                            <span style={{ cursor: 'pointer' }} title="Notes Suggestions" onClick={handleEditorFocus}>
+                                ✨
+                            </span>
+                        </Form.Label>
 
-                <Col sm={12}>
-                    <Form.Group>
-                        <Form.Label>Note</Form.Label>
-                        <Form.Control as="textarea" rows={4} {...register('notes')} />
+                        <Controller
+                            name="note"
+                            control={control}
+                            defaultValue="<ul><li></li></ul>"
+                            render={({ field: { onChange, value } }) => (
+                                <ReactQuill
+                                    value={value}
+                                    onChange={(content, delta, source) => {
+                                        if (source === 'user') {
+                                            onChange(content);
+                                        }
+                                    }}
+                                    theme="snow"
+                                    placeholder="Enter detailed notes here..."
+                                    style={{ backgroundColor: 'white' }}
+                                    modules={{
+                                        toolbar: [
+                                            [{ header: [1, 2, false] }],
+                                            ['bold', 'italic', 'underline', 'strike'],
+                                            [{ list: 'ordered' }, { list: 'bullet' }],
+                                            ['link', 'image'],
+                                            ['clean'],
+                                        ],
+                                    }}
+                                />
+                            )}
+                        />
+
+                        <SuggestionOffcanvas
+                            show={showSuggestions}
+                            onClose={() => setShowSuggestions(false)}
+                            onSelect={handleSuggestionSelect}
+                            className="custom-suggestion-offcanvas"
+                        />
                     </Form.Group>
                 </Col>
 

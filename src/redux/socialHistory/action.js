@@ -30,7 +30,48 @@ export const getFamilyGeneticAction = (data): AuthAction => ({
     data
 });
 
-export const deleteFamilyGeneticAction = (data): AuthAction =>({
+export const deleteFamilyGeneticAction = (data): AuthAction => ({
     type: TobaccooActionTypes.DELETE_FAMILY_GENTIC,
+    data
+})
+
+
+// SURGICAL HISTORY
+export const createSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY,
+    data
+});
+export const updateSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY,
+    data
+});
+
+export const getSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_SURGICAL_HISTORY,
+    data
+});
+
+export const deleteSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY,
+    data
+})
+
+// Medical History
+export const createMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_MEDICAL_HISTORY,
+    data
+});
+export const updateMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_MEDICAL_HISTORY,
+    data
+});
+
+export const getMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_MEDICAL_HISTORY,
+    data
+});
+
+export const deleteMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_MEDICAL_HISTORY,
     data
 })
