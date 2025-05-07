@@ -19,41 +19,22 @@ const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
     const analyticsResponse = store?.getAnalyticsReducer;
     return (
         <div className='scroll-container page-height' >
-            {/* <PageTitle
-                breadCrumbItems={[
-                    { label: 'Dashboard', path: '/', active: true },
-                ]}
-                title={'Dashboard'}
-            /> */}
+            <h4 className=''>IN-PROGRESS</h4>
 
-            <Statistics data={analyticsResponse} />
+            {/* <Statistics data={analyticsResponse} />
 
             <Row>
-                {/* <Col lg={4}>
-                    <Status />
-                </Col> */}
+               
                 <Col lg={12}>
                     <Tasks />
                 </Col>
             </Row>
 
             <Row>
-                <Col xs={12}>
-                    {/* <TasksChart /> */}
-                </Col>
-                {/* <Col xl={4}>
-                    <Activity />
-                </Col> */}
-            </Row>
-
-            <Row>
                 <Col>
                     <Activity />
                 </Col>
-                {/* <Col xl={7}>
-                    <Calendar />
-                </Col> */}
-            </Row>
+            </Row> */}
         </div>
     );
 };

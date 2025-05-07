@@ -205,13 +205,13 @@ const UpdatePatientIndex = () => {
             ...(logo?.url === null
                 ? []
                 : {
-                      photo: [
-                          {
-                              url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
-                              title: logoName,
-                          },
-                      ],
-                  }),
+                    photo: [
+                        {
+                            url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
+                            title: logoName,
+                        },
+                    ],
+                }),
         };
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
@@ -242,12 +242,11 @@ const UpdatePatientIndex = () => {
                                             className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
                                                        py-1 flex-fill text-center position-relative fw-bold
                                                        ${item?.subItems ? 'hasSubmenuItems' : ''}
-                                                      ${
-                                                          selectedMainTab === item?.tab ||
-                                                          item?.subItems?.some((sub) => sub.tab === selectedMainTab)
-                                                              ? 'active-patient-chart-tab fw-medium'
-                                                              : ''
-                                                      }`}
+                                                      ${selectedMainTab === item?.tab ||
+                                                    item?.subItems?.some((sub) => sub.tab === selectedMainTab)
+                                                    ? 'active-patient-chart-tab fw-medium'
+                                                    : ''
+                                                }`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 if (item.subItems) {
@@ -300,7 +299,7 @@ const UpdatePatientIndex = () => {
                                         onClick={() => setShowMoreMenu((prev) => !prev)}>
                                         <i className="bi bi-three-dots" />
                                         {showMoreMenu && (
-                                            <ul className="list-group position-absolute end-50 top-100 mt-1 bg-white shadow rounded w-auto z-3">
+                                            <ul className="list-group position-absolute end-50 top-100 mt-1  shadow rounded w-auto z-3">
                                                 {patientMenuItems?.slice(9)?.map((data, index) => (
                                                     <li
                                                         key={index}
@@ -350,8 +349,8 @@ const UpdatePatientIndex = () => {
                                                         className="fs-6 fw-bold text-capitalize px-1">
                                                         {patientDetails?.birthDate
                                                             ? new Date(patientDetails.birthDate).toLocaleDateString(
-                                                                  'en-GB'
-                                                              )
+                                                                'en-GB'
+                                                            )
                                                             : 'N/A'}{' '}
                                                         {patientDetails?.approxAge &&
                                                             (() => {
@@ -396,8 +395,8 @@ const UpdatePatientIndex = () => {
                                                                             logo?.url
                                                                                 ? logo.url.split('?')[0]
                                                                                 : patientDetails?.photo[0]?.url
-                                                                                ? patientDetails.photo[0]?.url
-                                                                                : profilePhoto
+                                                                                    ? patientDetails.photo[0]?.url
+                                                                                    : profilePhoto
                                                                         }
                                                                         alt="Patient Profile"
                                                                         className="img-fluid rounded object-fit-cover"
@@ -410,9 +409,8 @@ const UpdatePatientIndex = () => {
 
                                                                 {!isCameraOpen && (
                                                                     <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${
-                                                                            uploading ? 'd-none' : ''
-                                                                        }`}
+                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                            }`}
                                                                         style={{
                                                                             top: '-9%',
                                                                             right: '-10%',
@@ -445,9 +443,8 @@ const UpdatePatientIndex = () => {
                                                             <Button
                                                                 // onClick={onSubmit}
                                                                 type="submit"
-                                                                className={`${
-                                                                    !logo ? 'd-none' : 'mt-1 custom-buttons'
-                                                                }`}
+                                                                className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'
+                                                                    }`}
                                                                 disabled={!logo}>
                                                                 Submit
                                                             </Button>
@@ -462,13 +459,12 @@ const UpdatePatientIndex = () => {
                                                                             Phone:
                                                                         </th>
                                                                         <td
-                                                                            className={`fs-6  text-nowrap  ${
-                                                                                patientDetails?.telecom?.find(
-                                                                                    (data) => data?.system === 'phone'
-                                                                                )?.value
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                            }`}>
+                                                                            className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find(
+                                                                                (data) => data?.system === 'phone'
+                                                                            )?.value
+                                                                                ? 'text-black'
+                                                                                : 'text-danger'
+                                                                                }`}>
                                                                             {'+1-' +
                                                                                 patientDetails?.telecom?.find(
                                                                                     (data) => data?.system === 'phone'
@@ -480,13 +476,12 @@ const UpdatePatientIndex = () => {
                                                                             Email:
                                                                         </th>
                                                                         <td
-                                                                            className={`fs-6  text-nowrap text-black ${
-                                                                                patientDetails?.telecom?.find(
-                                                                                    (item) => item?.system === 'email'
-                                                                                )?.value
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                            }`}>
+                                                                            className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find(
+                                                                                (item) => item?.system === 'email'
+                                                                            )?.value
+                                                                                ? 'text-black'
+                                                                                : 'text-danger'
+                                                                                }`}>
                                                                             {patientDetails?.telecom?.find(
                                                                                 (item) => item?.system === 'email'
                                                                             )?.value || 'Missing'}
@@ -497,14 +492,13 @@ const UpdatePatientIndex = () => {
                                                                             Address:
                                                                         </th>
                                                                         <td
-                                                                            className={`fs-6  text-nowrap ${
-                                                                                patientDetails?.address?.[0]?.city &&
+                                                                            className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city &&
                                                                                 patientDetails?.address?.[0]?.state
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                            }`}>
+                                                                                ? 'text-black'
+                                                                                : 'text-danger'
+                                                                                }`}>
                                                                             {patientDetails?.address?.[0]?.city &&
-                                                                            patientDetails?.address?.[0]?.state
+                                                                                patientDetails?.address?.[0]?.state
                                                                                 ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
                                                                                 : 'Missing'}
                                                                         </td>
@@ -519,12 +513,11 @@ const UpdatePatientIndex = () => {
                                                                             Primary Provider:
                                                                         </th>
                                                                         <td
-                                                                            className={`fs-6 text-nowrap ${
-                                                                                patientDetails?.doctorId?.name?.[0]
-                                                                                    ?.text
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                            }`}>
+                                                                            className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]
+                                                                                ?.text
+                                                                                ? 'text-black'
+                                                                                : 'text-danger'
+                                                                                }`}>
                                                                             {patientDetails?.doctorId?.name?.[0]
                                                                                 ?.text || 'Missing'}
                                                                         </td>
@@ -573,11 +566,10 @@ const UpdatePatientIndex = () => {
                                                                             Follow Up Reason:
                                                                         </th>
                                                                         <td
-                                                                            className={`fs-6 pe-2 text-nowrap ${
-                                                                                patientDetails?.followupReason
-                                                                                    ? 'text-black'
-                                                                                    : 'text-danger'
-                                                                            }`}>
+                                                                            className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason
+                                                                                ? 'text-black'
+                                                                                : 'text-danger'
+                                                                                }`}>
                                                                             {patientDetails?.followupReason ||
                                                                                 'Missing'}
                                                                         </td>
@@ -629,7 +621,7 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2" style={{ height: isAccordionOpen ? '70.5vh' : '85vh' }}>
+                                        <Card className="px-2 " style={{ height: isAccordionOpen ? '66vh' : '85vh' }}>
                                             <div className="mt-2 px-0">
                                                 {selectedMainTab === 'Patient Details' && (
                                                     <PatientSummary
@@ -663,8 +655,8 @@ const UpdatePatientIndex = () => {
                                                     'Alcohol',
                                                     'Vaccination',
                                                 ].includes(selectedMainTab) && (
-                                                    <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
-                                                )}
+                                                        <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
+                                                    )}
                                                 {/* {selectedMainTab === 'Medical' && <p>In progress...</p>} */}
                                                 {/* {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>} */}
                                                 {/* {selectedMainTab === 'Alcohol' && <p>In progress...</p>} */}
@@ -688,8 +680,8 @@ const UpdatePatientIndex = () => {
                                                     'Medication List',
                                                     'Vitals List',
                                                 ].includes(selectedMainTab) && (
-                                                    <SubAllergytabs isAccordionOpen={isAccordionOpen} />
-                                                )}
+                                                        <SubAllergytabs isAccordionOpen={isAccordionOpen} />
+                                                    )}
                                             </div>
                                         </Card>
                                     </div>

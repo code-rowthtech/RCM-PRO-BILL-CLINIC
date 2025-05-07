@@ -973,3 +973,7 @@ tbody tr:hover {
 .custom-suggestion-offcanvas.offcanvas {
     z-index: 1080 !important;
 }
+
+.striped-data .striped-data-item:nth-child(even) {
+    background-color: rgba(212, 211, 211, 0.434) !important;
+}
