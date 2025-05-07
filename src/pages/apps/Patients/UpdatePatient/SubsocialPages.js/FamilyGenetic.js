@@ -81,7 +81,7 @@ const FamilyHistory = () => {
             deceasedDate: data?.dateOfDeath,
             note: [
                 {
-                    text: data?.notes,
+                    text: data?.note,
                 },
             ],
         };
@@ -96,6 +96,10 @@ const FamilyHistory = () => {
         if (createResponse === 201) {
             dispatch(getFamilyGeneticAction({ patientId: patientId }));
             reset();
+            setRela(null);
+            setSelectedProblem(null);
+            // setSearchQuery('');
+
         }
     }, [createResponse, dispatch, patientId, reset]);
 
@@ -107,7 +111,7 @@ const FamilyHistory = () => {
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : '');
+        setRela(selectedOption ? selectedOption.value : selectedRelationOption);
     };
 
     const formattedOptions = allCodeICDs.map((code) => ({
@@ -145,7 +149,7 @@ const FamilyHistory = () => {
                                             className="basic-single"
                                             classNamePrefix="select"
                                             placeholder="Select"
-                                            value={selectedRelationOption}
+                                            value={rela} // important to allow clearing
                                             onChange={handleRelationChange}
                                             styles={{
                                                 control: (provided) => ({
@@ -209,7 +213,8 @@ const FamilyHistory = () => {
                                                     {...field}
                                                     classNamePrefix="select"
                                                     options={formattedOptions}
-                                                    onChange={(selected) => {
+                                                    value={selectedProblem || null} // this reflects external state
+                                                        onChange={(selected) => {
                                                         field.onChange(selected);
                                                         setSelectedProblem(selected);
                                                     }}
