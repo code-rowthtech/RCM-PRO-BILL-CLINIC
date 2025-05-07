@@ -255,7 +255,7 @@ function* updateSurgicalHistoryFunction(data) {
         });
         const response = yield call(updateSurgicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_SUCCESS,
@@ -287,7 +287,7 @@ function* deleteSurgicalHistoryFunction(data) {
         });
         const response = yield call(deleteSurgicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_SUCCESS,

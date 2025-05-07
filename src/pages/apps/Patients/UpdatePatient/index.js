@@ -13,6 +13,7 @@ import {
     getMedicationAction,
     getPatientByIdAction,
     getStatesByCountryAction,
+    getSurgicalHistoryAction,
     resetUpdateAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
@@ -108,6 +109,7 @@ const UpdatePatientIndex = () => {
         if (id) {
             dispatch(getPatientByIdAction(payload));
             dispatch(getMedicationAction({ patientId: id }));
+            dispatch(getSurgicalHistoryAction({ patientId: id }));
         }
         if (
             updateSuccess === 200 ||

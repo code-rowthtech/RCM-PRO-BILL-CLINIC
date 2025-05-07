@@ -1,13 +1,12 @@
 // components/SuggestionOffcanvas.js
 import React from 'react';
-import { Offcanvas, Spinner } from 'react-bootstrap';
+import { ListGroup, Offcanvas, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
     const store = useSelector((state) => state);
     const suggestions = store?.createSuggestionsReducer?.data?.data;
     const loading = store?.createSuggestionsReducer?.loading;
-    console.log(store?.createSuggestionsReducer, 'suggestions');
     const TobaccoSkeleton = () => {
         const skeletonItems = Array.from({ length: 7 });
 
@@ -30,9 +29,7 @@ const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
             </Offcanvas.Header>
             <Offcanvas.Body className="scroll-container">
                 {loading ? (
-                    <div className="d-flex justify-content-center align-items-center" style={{ height: '100%' }}>
-                        <Spinner />
-                    </div>
+                    <TobaccoSkeleton />
                 ) : (
                     suggestions?.map((data, index) => (
                         <div
