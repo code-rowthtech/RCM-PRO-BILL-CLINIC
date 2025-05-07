@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Tobacco from './SubsocialPages.js/Tobacco';
 import Alcohol from './SubsocialPages.js/Alcohol';
 import FamilyHistory from './SubsocialPages.js/FamilyGenetic';
+import SurgicalHistory from './SubsocialPages.js/surgicalHistory';
 
 const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
     const [activeSocialTabs, setActiveSocialTabs] = useState('Tobacco');
@@ -18,9 +19,8 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
                 {tabs.map((tab) => (
                     <li className="nav-item" key={tab}>
                         <a
-                            className={`nav-link me-3 fs-6 pb-0 tab-font-family ${
-                                activeSocialTabs === tab ? 'active text-primary' : 'text-black'
-                            }`}
+                            className={`nav-link me-3 fs-6 pb-0 tab-font-family ${activeSocialTabs === tab ? 'active text-primary' : 'text-black'
+                                }`}
                             onClick={() => handleSocialTabChange(tab)}
                             style={{ cursor: 'pointer', fontWeight: 600 }}>
                             {tab}
@@ -32,7 +32,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
             <div className="mt-2">
                 {activeSocialTabs === 'Tobacco' && <Tobacco patientId={patientId} isAccordionOpen={isAccordionOpen} />}
                 {activeSocialTabs === 'Medical' && <p>Medical Section - In Progress</p>}
-                {activeSocialTabs === 'Surgical' && <p>Surgical Section - In Progress</p>}
+                {activeSocialTabs === 'Surgical' && <SurgicalHistory />}
                 {activeSocialTabs === 'Family /Genetic' && (
                     <FamilyHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />
                 )}

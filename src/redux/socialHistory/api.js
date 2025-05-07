@@ -37,3 +37,24 @@ export function deleteFamilyGeneticApi(params: any): any {
 }
 
 
+// SURGICAL HISTORY
+
+export function createSurgicalHistoryApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createSurgicalHistory, data);
+}
+export function updateSurgicalHistoryApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.updateSurgicalHistory, data);
+}
+export function getSurgicalHistoryApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getSurgicalHistory}?subject=${data?.patientId}`);
+}
+
+export function deleteSurgicalHistoryApi(params: any): any {
+    const { data } = params;
+    return api.delete(URL.deleteSurgicalHistory, data);
+}
+
+

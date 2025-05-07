@@ -22,7 +22,6 @@ const Medication = ({ isAccordionOpen }) => {
   const [medicationModal, setMedicationModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
-  console.log(medicationList, 'medicationListmedicationListmedicationListmedicationList')
   const createSuccess = store?.createMedicationReducer?.data?.status;
   useEffect(() => {
     if (createSuccess === 201) {
@@ -80,7 +79,7 @@ const Medication = ({ isAccordionOpen }) => {
                   <th className="text-white">Dosage Instruction</th>
                   <th className="text-white">Start Date</th>
                   <th className="text-white">End Date</th>
-                  <th className="text-white">Notes</th>
+                  {/* <th className="text-white">Notes</th> */}
                   <th className="text-white">Action</th>
                 </tr>
               </thead>
@@ -121,13 +120,13 @@ const Medication = ({ isAccordionOpen }) => {
                           <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
                           <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
                           <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
-                          <td title={data?.note?.[0]?.text}>
+                          {/* <td title={data?.note?.[0]?.text}>
                             {
                               data?.note?.[0]?.text
                                 ? (data.note[0].text.charAt(0).toUpperCase() + data.note[0].text.slice(1)).slice(0, 29) + (data.note[0].text.length > 30 ? '...' : '')
                                 : 'N/A'
                             }
-                          </td>
+                          </td> */}
                           <td>
                             <FiEdit
                               className="fs-4 cursor-pointer text-black"

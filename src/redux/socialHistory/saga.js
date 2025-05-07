@@ -4,10 +4,14 @@ import ToastHandle from '../../helpers/ToastMessage';
 import { TobaccooActionTypes } from './constants';
 import {
     createFamilyGeneticApi,
+    createSurgicalHistoryApi,
     createTobaccooApi,
+    deleteSurgicalHistoryApi,
     getFamilyGeneticApi,
+    getSurgicalHistoryApi,
     getTobaccooApi,
     updateFamilyGeneticApi,
+    updateSurgicalHistoryApi,
     updateTobaccooApi
 } from './api';
 /**
@@ -208,6 +212,137 @@ function* getFamilyGeneticFunction(data) {
     }
 }
 
+// SURGICAL HISTORY
+
+function* createSurgicalHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(createSurgicalHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateSurgicalHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateSurgicalHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* deleteSurgicalHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteSurgicalHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getSurgicalHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.GET_SURGICAL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(getSurgicalHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: TobaccooActionTypes.GET_SURGICAL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.GET_SURGICAL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.GET_SURGICAL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.GET_SURGICAL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+
 export function* watchCreateTobaccoo() {
     yield takeEvery(TobaccooActionTypes.CREATE_TOBACCOO, createTobaccooFunction);
 }
@@ -233,14 +368,28 @@ export function* watchGetFamilyGenetic() {
     yield takeEvery(TobaccooActionTypes.GET_FAMILY_GENTIC_DATA, getFamilyGeneticFunction);
 }
 
+// SURGICAL HISTORY
+export function* watchCreateSurgicalHistory() {
+    yield takeEvery(TobaccooActionTypes.CREATE_SURGICAL_HISTORY, createSurgicalHistoryFunction);
+}
+
+export function* watchUpdateSurgicalHistory() {
+    yield takeEvery(TobaccooActionTypes.UPDATE_SURGICAL_HISTORY, updateSurgicalHistoryFunction);
+}
+
+export function* watchGetSurgicalHistory() {
+    yield takeEvery(TobaccooActionTypes.GET_SURGICAL_HISTORY, getSurgicalHistoryFunction);
+}
+
+export function* watchDeleteSurgicalHistory() {
+    yield takeEvery(TobaccooActionTypes.DELETE_SURGICAL_HISTORY, deleteSurgicalHistoryFunction);
+}
+
 function* clinicalHistorySaga() {
     yield all([
-        fork(watchCreateTobaccoo),
-        fork(watchGetTobaccoo),
-        fork(watchUpdateTobaccoo),
-        fork(watchCreateFamilyGenetic),
-        fork(watchUpdateFamilyGenetic),
-        fork(watchGetFamilyGenetic),
+        fork(watchCreateTobaccoo), fork(watchGetTobaccoo),
+        fork(watchUpdateTobaccoo), fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic),
+        fork(watchCreateSurgicalHistory), fork(watchUpdateSurgicalHistory), fork(watchGetSurgicalHistory), fork(watchDeleteSurgicalHistory),
     ]);
 }
 export default clinicalHistorySaga;

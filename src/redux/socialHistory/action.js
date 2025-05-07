@@ -30,7 +30,29 @@ export const getFamilyGeneticAction = (data): AuthAction => ({
     data
 });
 
-export const deleteFamilyGeneticAction = (data): AuthAction =>({
+export const deleteFamilyGeneticAction = (data): AuthAction => ({
     type: TobaccooActionTypes.DELETE_FAMILY_GENTIC,
     data
 })
+
+
+// SURGICAL HISTORY
+export const createSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_SURGICAL_HISTORY,
+    data
+});
+export const updateSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_SURGICAL_HISTORY,
+    data
+});
+
+export const getSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_SURGICAL_HISTORY,
+    data
+});
+
+export const deleteSurgicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_SURGICAL_HISTORY,
+    data
+})
+
