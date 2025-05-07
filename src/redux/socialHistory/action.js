@@ -56,3 +56,22 @@ export const deleteSurgicalHistoryAction = (data): AuthAction => ({
     data
 })
 
+// Medical History
+export const createMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_MEDICAL_HISTORY,
+    data
+});
+export const updateMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_MEDICAL_HISTORY,
+    data
+});
+
+export const getMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_MEDICAL_HISTORY,
+    data
+});
+
+export const deleteMedicalHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_MEDICAL_HISTORY,
+    data
+})

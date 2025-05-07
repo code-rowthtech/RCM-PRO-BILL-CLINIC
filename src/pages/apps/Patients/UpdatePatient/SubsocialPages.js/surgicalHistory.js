@@ -130,8 +130,8 @@ const SurgicalHistory = () => {
     }
     return (
         <Row className="mt-0 g-0 pt-0 px-1 h-100 scroll-container" style={{ height: 'calc(100vh - 100px)', overflowY: "scroll" }}>
-            <Col md={6} className="d-flex  flex-column border-end  pt-0 mt-0 pe-1 ">
-                <div className=" border-danger  h-100">
+            <Col md={6} className="d-flex  flex-column   pt-0 mt-0 pe-1 ">
+                <div className="h-100">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
                         <Card.Title className="border-bottom pb-2 pt-0 mb-1">
                             <h5 className="fw-semibold mb-0">Add Surgical History</h5>
