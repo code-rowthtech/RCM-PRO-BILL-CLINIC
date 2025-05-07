@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTobaccooAction, getTobaccooAction } from '../../../../../redux/actions';
+import { createMedicalHistoryAction, getMedicalHistoryAction } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
@@ -22,8 +22,9 @@ const MedicalHistory = () => {
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    const createSuccess = store?.createTobaccooReducer?.data?.status;
-    const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
+    const createSuccess = store?.createMedicalHistoryReducer?.data?.status;
+    const medicalHistory = store?.getMedicalHistoryReducer?.data?.medicalHistory;
+    console.log(medicalHistory, 'MEDICAL');
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const {
@@ -35,32 +36,46 @@ const MedicalHistory = () => {
         control,
         setValue,
     } = useForm();
-
-    // useEffect(() => {
-    //     dispatch(getTobaccooAction({ patientId: patientId }));
-    // }, [dispatch, patientId]);
-
+    useEffect(() => {
+        dispatch(getMedicalHistoryAction({ patientId: patientId }));
+    }, [dispatch, patientId]);
     useEffect(() => {
         if (createSuccess === 201) {
-            dispatch(getTobaccooAction({ patientId: patientId }));
+            dispatch(getMedicalHistoryAction({ patientId: patientId }));
             reset();
         }
     }, [createSuccess, dispatch, patientId, reset]);
 
     const onSubmit = (data) => {
-        data.subject = patientId;
-        data.effectivePeriod = {
-            start: data.startDate,
-            end: data.endDate,
-        };
-        data.note = [
-            {
-                text: data.note,
-                time: new Date().toISOString(),
+        const selected = data.problem;
+
+        const payload = {
+            clinicId: loggedInUser?._id,
+            code: {
+                coding: [
+                    {
+                        system: selected?.system,
+                        code: selected?.value,
+                        display: selected?.display,
+                    },
+                ],
+                text: selected?.display,
             },
-        ];
-        data.clinicId = loggedInUser?._id;
-        dispatch(createTobaccooAction({ key: encryptMessage(data) }));
+            effectivePeriod: {
+                start: data.startDate,
+                end: data.endDate,
+            },
+            note: [
+                {
+                    text: data.note,
+                    time: new Date().toISOString(),
+                },
+            ],
+            subject: patientId,
+        };
+
+        dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'medical data');
     };
 
     const handleEditorFocus = () => {
@@ -153,7 +168,7 @@ const MedicalHistory = () => {
                                             )}
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6} className=''>
+                                    <Col md={6} className="">
                                         <Form.Group controlId="startDate">
                                             <Form.Label className="fw-medium mb-0">Start Date</Form.Label>
                                             <Form.Control
@@ -164,7 +179,7 @@ const MedicalHistory = () => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6} className='mt-0'>
+                                    <Col md={6} className="">
                                         <Form.Group controlId="endDate">
                                             <Form.Label className="fw-medium mb-0">End Date</Form.Label>
                                             <Form.Control
@@ -240,40 +255,65 @@ const MedicalHistory = () => {
             </Col>
 
             {/* History Side */}
-            {/* History Side */}
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
-                <div className=" border-danger  h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
+            <Col md={6} className="d-flex flex-column pt-0 mt-0 ps-1">
+                <Card className="h-100 shadow-sm rounded-3">
+                    <Card.Body className="d-flex flex-column py-0">
+                        <Card.Title className="border-bottom pb-2 mb-3">
                             <h5 className="fw-semibold mb-0">Medical History</h5>
                         </Card.Title>
 
-                        {isLoading && !tobaccoHistory?.length ? (
+                        {isLoading && !medicalHistory?.length ? (
                             <div className="text-center py-4">
                                 <Spinner />
                             </div>
-                        ) : tobaccoHistory?.length === 0 ? (
+                        ) : medicalHistory?.length === 0 ? (
                             <div className="text-center py-4 text-muted">
                                 <i className="bi bi-journal-x fs-1"></i>
                                 <p className="mt-2 mb-0">No Medical History found</p>
                             </div>
                         ) : (
                             <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush" className="striped-data">
-                                    {tobaccoHistory?.map((item, index) => (
+                                <ListGroup variant="flush">
+                                    {medicalHistory?.map((item, index) => (
                                         <ListGroup.Item
                                             key={index}
-                                            className="pb-3 striped-data-item px-0 border-bottom">
-                                            <div className="d-flex justify-content-between align-items-start px-1 mb-1">
-                                                <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
-                                                <small className="text-muted">
-                                                    {item?.start
-                                                        ? new Date(item?.start).toLocaleDateString()
-                                                        : 'No date'}
-                                                </small>
+                                            className="px-3 py-3 border-bottom bg-light bg-opacity-50 rounded-2 mb-2">
+                                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <strong className="fw-semibold text-dark">
+                                                        {item?.code?.coding?.[0]?.display || '—'}
+                                                    </strong>
+                                                </div>
+                                                <div>
+                                                    <div className="d-flex justify-content-start text-muted small mb-1">
+                                                        <div className="me-1">
+                                                            <i className="bi bi-calendar-event me-1"></i>
+                                                            <span>
+                                                                Start:{' '}
+                                                                {item?.effectivePeriod?.start
+                                                                    ? new Date(
+                                                                          item?.effectivePeriod.start
+                                                                      ).toLocaleDateString('en-GB')
+                                                                    : '—'}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <i className="bi bi-calendar-check me-1"></i>
+                                                            <span>
+                                                                End:{' '}
+                                                                {item?.effectivePeriod?.end
+                                                                    ? new Date(
+                                                                          item?.effectivePeriod.end
+                                                                      ).toLocaleDateString('en-GB')
+                                                                    : '—'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                             {item.note?.[0]?.text && (
-                                                <div className="mt-2">
+                                                <div className="mt-2 small text-secondary">
                                                     <div
                                                         className="ql-editor p-0"
                                                         dangerouslySetInnerHTML={{ __html: item.note[0].text }}
@@ -287,7 +327,7 @@ const MedicalHistory = () => {
                             </div>
                         )}
                     </Card.Body>
-                </div>
+                </Card>
             </Col>
         </Row>
     );

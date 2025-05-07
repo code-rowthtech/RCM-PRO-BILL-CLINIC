@@ -108,7 +108,7 @@ const ProblemList = () => {
                                     <th className="text-white">Diagnosed Date</th>
                                     {/* <th className="text-white">Date Changed</th> */}
                                     <th className="text-white">Status</th>
-                                    <th className="text-white">Notes</th>
+                                    {/* <th className="text-white">Notes</th> */}
                                     {/* <th className="text-white">Updates</th> */}
                                     <th className="text-white">Action</th>
                                 </tr>
@@ -133,7 +133,7 @@ const ProblemList = () => {
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
                                             <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
                                             <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
-                                            <td
+                                            {/* <td
                                                 className="text-capitalize mb-0"
                                                 title={stripHtml(data?.note?.[0]?.text)}>
                                                 <div
@@ -145,7 +145,7 @@ const ProblemList = () => {
                                                                 : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
                                                     }}
                                                 />
-                                            </td>{' '}
+                                            </td>{' '} */}
                                             <td>
                                                 <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                 &nbsp;

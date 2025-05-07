@@ -69,11 +69,6 @@ const AllergyList = () => {
     return (
         <>
             <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
-                {/* {showAddAllergy ? (
-                    <AddAllergy onCancel={() => setShowAddAllergy(false)} />
-                ) : showUpdateAllergy ? (
-                    <UpdateAllergy allergy={selectedAllergy} onCancel={() => setShowUpdateAllergy(false)} />
-                ) : ( */}
                 <Row>
                     <Col sm={12} className="d-flex justify-content-between mt-2">
                         <h4>Allergy List</h4>
@@ -101,7 +96,7 @@ const AllergyList = () => {
                                     {/* <th className="text-white">Verification Status</th> */}
                                     {/* <th className="text-white">Criticality</th> */}
                                     <th className="text-white">Date</th>
-                                    <th className="text-white">Notes</th>
+                                    {/* <th className="text-white">Notes</th> */}
                                     <th className="text-white">Action</th>
                                 </tr>
                             </thead>
@@ -152,7 +147,7 @@ const AllergyList = () => {
                                                         : 'N/A'}
                                                 </td>
 
-                                                <td
+                                                {/* <td
                                                     className="text-capitalize mb-0"
                                                     title={stripHtml(data?.note?.[0]?.text)}>
                                                     <div
@@ -165,7 +160,7 @@ const AllergyList = () => {
                                                                     : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
                                                         }}
                                                     />
-                                                </td>
+                                                </td> */}
                                                 <td>
                                                     <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
                                                     &nbsp;
