@@ -507,7 +507,10 @@ const AddAllergy = ({ onCancel }) => {
                         <Form.Group controlId="note">
                             <Form.Label className="fw-medium mb-0">
                                 Notes{' '}
-                                <span style={{ cursor: 'pointer' }} title='Notes Suggestions' onClick={handleEditorFocus}>
+                                <span
+                                    style={{ cursor: 'pointer' }}
+                                    title="Notes Suggestions"
+                                    onClick={handleEditorFocus}>
                                     ✨
                                 </span>
                             </Form.Label>
@@ -545,7 +548,6 @@ const AddAllergy = ({ onCancel }) => {
                                 onClose={() => setShowSuggestions(false)}
                                 onSelect={handleSuggestionSelect}
                                 className="custom-suggestion-offcanvas"
-
                             />
                         </Form.Group>
                     </Col>

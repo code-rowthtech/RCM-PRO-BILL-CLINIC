@@ -39,6 +39,7 @@ const FamilyHistory = () => {
     const isDeceased = watch('deceased') === 'yes';
     const createResponse = store?.createFamilyGeneticReducer?.data?.status;
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory || [];
+    console.log(familyGeneticHistory, 'family');
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
@@ -77,7 +78,7 @@ const FamilyHistory = () => {
 
             gender: selectedSexOption?.label,
             bornDate: data?.dob,
-            deceasedBoolean: data?.deceased,
+            deceasedBoolean: data.deceased === 'yes',
             deceasedDate: data?.dateOfDeath,
             note: [
                 {
@@ -86,6 +87,7 @@ const FamilyHistory = () => {
             ],
         };
         dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
+        console.log(payload, 'payoad');
     };
     // useEffect(() => {
     //     dispatch(getFamilyGeneticAction({ patientId: patientId }));
@@ -98,7 +100,6 @@ const FamilyHistory = () => {
             setRela(null);
             setSelectedProblem(null);
             // setSearchQuery('');
-
         }
     }, [createResponse, dispatch, patientId, reset]);
 
@@ -110,7 +111,7 @@ const FamilyHistory = () => {
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
     const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : selectedRelationOption);
+        setRela(selectedOption ? selectedOption.value : null);
     };
 
     const formattedOptions = allCodeICDs.map((code) => ({
@@ -148,7 +149,7 @@ const FamilyHistory = () => {
                                             className="basic-single"
                                             classNamePrefix="select"
                                             placeholder="Select"
-                                            value={rela} // important to allow clearing
+                                            value={selectedRelationOption}
                                             onChange={handleRelationChange}
                                             styles={{
                                                 control: (provided) => ({
@@ -213,7 +214,7 @@ const FamilyHistory = () => {
                                                     classNamePrefix="select"
                                                     options={formattedOptions}
                                                     value={selectedProblem || null} // this reflects external state
-                                                        onChange={(selected) => {
+                                                    onChange={(selected) => {
                                                         field.onChange(selected);
                                                         setSelectedProblem(selected);
                                                     }}
@@ -295,7 +296,10 @@ const FamilyHistory = () => {
                                         <Form.Group controlId="notes">
                                             <Form.Label className="fw-medium mb-0">
                                                 Notes{' '}
-                                                <span style={{ cursor: 'pointer' }} title='Notes Suggestions' onClick={handleEditorFocus}>
+                                                <span
+                                                    style={{ cursor: 'pointer' }}
+                                                    title="Notes Suggestions"
+                                                    onClick={handleEditorFocus}>
                                                     ✨
                                                 </span>
                                             </Form.Label>
@@ -375,50 +379,75 @@ const FamilyHistory = () => {
                                                 <div>
                                                     <div className="d-flex justify-content-between align-items-end">
                                                         <div>
-                                                            <strong>Relationship:</strong>
-                                                            {item?.relationship?.coding?.[0]?.display || 'N/A'} <br />
-                                                            <strong>Date of Birth:</strong>
-                                                            {item?.bornDate
-                                                                ? new Date(item?.bornDate)?.toLocaleDateString('en-GB')
-                                                                : ''}
+                                                            <span className="fs-6 fw-bold">Relationship:</span>
+                                                            <span className="ms-1 fs-6">
+                                                                {item?.relationship?.coding?.[0]?.display || 'N/A'}
+                                                            </span>
+                                                            <br />
+                                                            <span className="fs-6 fw-bold">Date of Birth:</span>
+                                                            <span className="ms-1 fs-6">
+                                                                {item?.bornDate
+                                                                    ? new Date(item?.bornDate)?.toLocaleDateString(
+                                                                          'en-GB'
+                                                                      )
+                                                                    : ''}
+                                                            </span>
                                                         </div>
 
                                                         <div>
-                                                            <strong>Name:</strong>
-                                                            <span className="text-capitalize">{item?.name}</span> <br />
-                                                            <strong>Sex:</strong> {item?.gender || 'N/A'} <br />
+                                                            <span className="fs-6 fw-bold">Name:</span>
+                                                            <span className="text-capitalize ms-1 fs-6">
+                                                                {item?.name}
+                                                            </span>
+                                                            <br />
+                                                            <span className="fs-6 fw-bold">Sex:</span>
+                                                            <span className="ms-1 fs-6">{item?.gender || 'N/A'}</span>
+                                                            <br />
                                                         </div>
                                                     </div>
                                                     <p
-                                                        className="mb-1 text-truncate"
+                                                        className="mb-0 text-truncate fs-6"
                                                         style={{ maxWidth: '100%' }}
                                                         title={item?.condition?.[0]?.code?.coding?.[0]?.display}>
-                                                        <strong>Condition:</strong>{' '}
-                                                        {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
+                                                        <span className="fw-bold">Condition:</span>
+                                                        <span className="ms-1">
+                                                            {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
+                                                        </span>
                                                     </p>
-                                                    {item.note?.[0]?.text && (
-                                                        <div className="mt-2">
-                                                            <div
-                                                                className="ql-editor p-0"
-                                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                                style={{
-                                                                    fontSize: '0.875rem',
-                                                                    maxHeight: '150px', // Limit the height of notes
-                                                                    overflowY: 'auto', // Scrollable if content is too long
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <strong>Deceased:</strong> {item.deceased === 'yes' ? 'Yes' : 'No'}{' '}
+                                                    <div className="d-flex">
+                                                        <span className="fs-6 fw-bold">Notes:</span>
+                                                        <span>
+                                                            {' '}
+                                                            {item.note?.[0]?.text && (
+                                                                <div className=" ms-1">
+                                                                    <div
+                                                                        className="ql-editor p-0 fs-6"
+                                                                        dangerouslySetInnerHTML={{
+                                                                            __html: item?.note[0]?.text,
+                                                                        }}
+                                                                        style={{
+                                                                            fontSize: '0.875rem',
+                                                                            maxHeight: '150px', // Limit the height of notes
+                                                                            overflowY: 'auto', // Scrollable if content is too long
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    <span className="fs-6 fw-bold">Deceased:</span>
+                                                    <span className="ms-1 fs-6">
+                                                        {item.deceasedBoolean ? 'Yes' : 'No'}
+                                                    </span>
                                                     <br />
-                                                    {item.deceased === 'yes' && (
+                                                    {item.deceasedBoolean && item.deceasedDate && (
                                                         <>
-                                                            <strong>Date of Death:</strong>
-                                                            {item?.dateOfDeath
-                                                                ? new Date(item?.dateOfDeath)?.toLocaleDateString(
+                                                            <span className="fs-6 fw-bold">Date of Death:</span>
+                                                            <span className="fs-6 ms-1">
+                                                                {new Date(item?.deceasedDate).toLocaleDateString(
                                                                     'en-GB'
-                                                                )
-                                                                : ''}
+                                                                )}
+                                                            </span>
                                                         </>
                                                     )}
                                                 </div>

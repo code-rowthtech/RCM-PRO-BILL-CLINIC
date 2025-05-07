@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Tobacco from './SubsocialPages.js/Tobacco';
 import Alcohol from './SubsocialPages.js/Alcohol';
 import FamilyHistory from './SubsocialPages.js/FamilyGenetic';
+import MedicalHistory from './SubsocialPages.js/MedicalHistory';
 
 const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
     const [activeSocialTabs, setActiveSocialTabs] = useState('Tobacco');
@@ -10,7 +11,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
         setActiveSocialTabs(tab);
     };
 
-    const tabs = ['Tobacco', 'Medical', 'Surgical', 'Family /Genetic', 'Alcohol', 'Vaccination'];
+    const tabs = ['Tobacco', 'Medical History', 'Surgical', 'Family /Genetic', 'Alcohol', 'Vaccination'];
 
     return (
         <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
@@ -31,7 +32,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
 
             <div className="mt-2">
                 {activeSocialTabs === 'Tobacco' && <Tobacco patientId={patientId} isAccordionOpen={isAccordionOpen} />}
-                {activeSocialTabs === 'Medical' && <p>Medical Section - In Progress</p>}
+                {activeSocialTabs === 'Medical History' && <MedicalHistory patientId = {patientId} isAccordionOpen={isAccordionOpen}/>}
                 {activeSocialTabs === 'Surgical' && <p>Surgical Section - In Progress</p>}
                 {activeSocialTabs === 'Family /Genetic' && (
                     <FamilyHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />

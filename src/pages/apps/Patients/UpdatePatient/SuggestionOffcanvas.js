@@ -1,6 +1,6 @@
 // components/SuggestionOffcanvas.js
 import React from 'react';
-import { Offcanvas, Spinner } from 'react-bootstrap';
+import { ListGroup, Offcanvas, Spinner } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
