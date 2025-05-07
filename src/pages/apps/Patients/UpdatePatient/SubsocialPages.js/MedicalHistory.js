@@ -106,8 +106,8 @@ const MedicalHistory = () => {
         <Row
             className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
             style={{ height: 'calc(100vh - 100px)', overflowY: 'scroll' }}>
-            <Col md={6} className="d-flex  flex-column border-end  pt-0 mt-0 pe-1 ">
-                <div className=" border-danger  h-100">
+            <Col md={6} className="d-flex flex-column border-end  pt-0 mt-0 pe-1 ">
+                <div className=" h-100">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
                         <Card.Title className="border-bottom pb-2 pt-0 mb-1">
                             <h5 className="fw-semibold mb-0">Add Medical History</h5>
@@ -116,7 +116,7 @@ const MedicalHistory = () => {
                         <Form onSubmit={handleSubmit(onSubmit)}>
                             <div
                                 className="scroll-container mb-3 px-2"
-                                style={{ maxHeight: '55vh', overflowY: 'auto' }}>
+                                style={{ maxHeight: 'calc(100vh - 56vh)', overflowY: 'auto' }}>
                                 <Row className="g-3">
                                     <Col sm={6}>
                                         <Form.Group className="mb-1">
@@ -179,7 +179,7 @@ const MedicalHistory = () => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md={6} className="">
+                                    <Col md={6} className="mt-0">
                                         <Form.Group controlId="endDate">
                                             <Form.Label className="fw-medium mb-0">End Date</Form.Label>
                                             <Form.Control
@@ -292,8 +292,8 @@ const MedicalHistory = () => {
                                                                 Start:{' '}
                                                                 {item?.effectivePeriod?.start
                                                                     ? new Date(
-                                                                          item?.effectivePeriod.start
-                                                                      ).toLocaleDateString('en-GB')
+                                                                        item?.effectivePeriod.start
+                                                                    ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>
@@ -303,8 +303,8 @@ const MedicalHistory = () => {
                                                                 End:{' '}
                                                                 {item?.effectivePeriod?.end
                                                                     ? new Date(
-                                                                          item?.effectivePeriod.end
-                                                                      ).toLocaleDateString('en-GB')
+                                                                        item?.effectivePeriod.end
+                                                                    ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>

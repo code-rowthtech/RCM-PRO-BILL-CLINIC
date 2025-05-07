@@ -28,7 +28,7 @@ import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer,
 import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
 import { createSuggestionsReducer } from './suggestions/reducer';
 import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
-import { createFamilyGeneticReducer, createMedicalHistoryReducer, createSurgicalHistoryReducer, createTobaccooReducer, getFamilyGeneticReducer, getMedicalHistoryReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateTobaccooReducer } from './socialHistory/reducer';
+import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
 export default (combineReducers({
     Auth,
@@ -60,6 +60,5 @@ export default (combineReducers({
     // suggestions
     createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer, updateMedicationReducer,
     createTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
-    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer,createMedicalHistoryReducer,getMedicalHistoryReducer,
-    
+    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer
 }): any);

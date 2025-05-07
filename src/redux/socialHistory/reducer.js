@@ -263,6 +263,58 @@ export const createSurgicalHistoryReducer = (state = CREATE_SURGICAL_HISTORY_INI
             return { ...state };
     }
 };
+export const updateSurgicalHistoryReducer = (state = UPDATE_SURGICAL_HISTORY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.UPDATE_SURGICAL_HISTORY_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+export const deleteSurgicalHistoryReducer = (state = DELETE_SURGICAL_HISTORY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.DELETE_SURGICAL_HISTORY_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.DELETE_SURGICAL_HISTORY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_SURGICAL_HISTORY_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_SURGICAL_HISTORY_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
 
 export const getSurgicalHistoryReducer = (state = GET_SURGICAL_HISTORY_INITIAL_STATE, action) => {
     switch (action.type) {

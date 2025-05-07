@@ -4,7 +4,7 @@
 
     /* Custom Scrollbar */
     scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #c1c1c1 transparent; /* thumb and track for Firefox */
+    scrollbar-color: #c1c1c191 transparent; /* thumb and track for Firefox */
 }
 
 /* Webkit Browsers (Chrome, Edge, Safari) */

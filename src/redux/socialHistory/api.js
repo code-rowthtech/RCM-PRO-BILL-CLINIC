@@ -45,7 +45,7 @@ export function createSurgicalHistoryApi(params: any): any {
 }
 export function updateSurgicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updateSurgicalHistory, data);
+    return api.update(URL.updateSurgicalHistory, data);
 }
 export function getSurgicalHistoryApi(params: any): any {
     const { data } = params;
@@ -54,7 +54,7 @@ export function getSurgicalHistoryApi(params: any): any {
 
 export function deleteSurgicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.delete(URL.deleteSurgicalHistory, data);
+    return api.delete(`${URL.deleteSurgicalHistory}?id=${data?.id}`);
 }
 
 // MEDICAL HISTORY
