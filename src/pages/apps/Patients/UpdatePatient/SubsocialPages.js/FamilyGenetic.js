@@ -421,7 +421,7 @@ const FamilyHistory = () => {
                                                             {item.note?.[0]?.text && (
                                                                 <div className=" ms-1">
                                                                     <div
-                                                                        className="ql-editor p-0 fs-6"
+                                                                        className="ql-editor scroll-container p-0 fs-6"
                                                                         dangerouslySetInnerHTML={{
                                                                             __html: item?.note[0]?.text,
                                                                         }}

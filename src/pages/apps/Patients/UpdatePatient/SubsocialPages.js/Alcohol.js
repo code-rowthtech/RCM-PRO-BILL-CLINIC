@@ -137,7 +137,7 @@ const Alcohol = () => {
                 <div className="h-100">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
                         <Card.Title className="border-bottom pb-2 pt-0 mb-1">
-                            <h5 className="fw-semibold mb-0">Add Surgical History</h5>
+                            <h5 className="fw-semibold mb-0">Add Alcohol History</h5>
                         </Card.Title>
 
                         <Form onSubmit={handleSubmit(onSubmit)}>
