@@ -255,7 +255,7 @@ form textarea::placeholder {
 
 .table > :not(caption) > * > * {
     padding: 0.35rem 0.55rem !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
 }
 
 /* Optional: Specific for form-control class (Bootstrap inputs) */
