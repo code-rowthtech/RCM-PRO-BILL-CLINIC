@@ -24,7 +24,6 @@ const Adddepartment = ({ addDepartmentModal,setAddDesiginationModal, setAddDepar
         };
 
         dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-        console.log("create", payload);
 
 
     };
@@ -48,7 +47,6 @@ const Adddepartment = ({ addDepartmentModal,setAddDesiginationModal, setAddDepar
         };
        
           dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
-          console.log("create", payload);
     
     
       };

@@ -18,7 +18,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
     const [permissionError, setPermissionError] = useState(false)
     const store = useSelector((state) => state);
     const createSuccess = store?.createRoleDataReducer?.data?.status;
-    console.log({createSuccess})
     const decryptedPermissionsData = store?.getPermissionsDataReducer?.data?.data?.map((item) => ({
         ...item,
         name: `${item?.permission}`,
@@ -45,7 +44,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
     }, [show])
 
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
-
     const onSubmit = (data) => {
         if (selectedPermissionIds?.length === 0) {
             setPermissionError(true);
@@ -54,7 +52,6 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 name: data.name,
                 description: data.description,
                 permissions: selectedPermissionIds,
-               
                 // clinicId: clinicId,
                 // createdById: idFromStorage?._id,
                 // showto: 'clinic'
@@ -63,11 +60,8 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 reset();
                 closeModal();
             }
-            console.log(payload,'role')
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
             dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '',createdById:'', page: 1, status: true }));
-        
-
         }
     };
 

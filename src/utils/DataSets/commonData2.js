@@ -1,0 +1,30 @@
+export const defaultVitals = [
+    { name: 'Temperature', code: "8310-5", system: "http://loinc.org", unitKey: 'Temperature', value: '', type: 'number' },
+    { name: 'Pulse', code: "8867-4", system: "http://loinc.org", unit: 'bpm', value: '', type: 'number' },
+    { name: 'Blood Pressure', code: "85354-9", system: "http://loinc.org", unit: 'mmHg', value: { systolic: '', diastolic: '' }, type: 'bp' },
+    { name: 'Respiratory Rate', code: "9279-1", system: "http://loinc.org", unit: 'rpm', value: '', type: 'number' },
+    { name: 'Oxygen Saturation', code: "59408-5", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
+    { name: 'Height', code: "8302-2", system: "http://loinc.org", unitKey: 'Height', value: '', type: 'number' },
+    { name: 'Weight', code: "29463-7", system: "http://loinc.org", unitKey: 'Weight', value: '', type: 'number' },
+    { name: 'BMI', code: "39156-5", system: "http://loinc.org", unit: 'kg/m²', value: '', type: 'number' },
+    { name: 'Pain', code: "72514-3", system: "http://loinc.org", unit: '(0–10)', value: '', type: 'number' },
+    { name: 'Smoking Status', code: "72166-2", system: "http://loinc.org", unit: '', value: '', type: 'dropdown', options: ['Smoker', 'Non-Smoker', 'Former Smoker'] },
+    { name: 'Head Circumference', code: "8287-5", system: "http://loinc.org", unit: 'in', value: '', type: 'number' },
+    { name: 'Weight-for-Length Percentile', code: "8289-1", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
+    { name: 'Head Occipital-frontal Circumference Percentile', code: "8288-3", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
+    { name: 'BMI Percentile', code: "59574-4", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
+    { name: 'Oxygen Concentration', code: "19994-3", system: "http://loinc.org", unit: '%', value: '', type: 'number' },
+    { name: 'Inhaled Oxygen Flow Rate', code: "3151-8", system: "http://loinc.org", unit: 'l/min', value: '', type: 'number' },
+];
+
+export const medicationStatus = [
+    { value: 'active', label: 'Active' },
+    { value: 'on-hold', label: 'On Hold' },
+    { value: 'cancelled', label: 'Cancelled' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'entered-in-error', label: 'Entered In Error' },
+    { value: 'stopped', label: 'Stopped' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'unknown', label: 'Unknown' }
+]
+

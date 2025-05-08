@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SubClinicsActionTypes } from './constants';
 import { createSubClinicApi, createUpgradeApi, getSubClinicApi, getSubClinicTypeApi, getSubscriptionApi, updateSubClinicApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
@@ -17,10 +17,14 @@ function* createSubClinicsFunction(data) {
         const response = yield call(createSubClinicApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
-            ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: SubClinicsActionTypes.CREATE_SUBCLINIC_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: SubClinicsActionTypes.CREATE_SUBCLINIC_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -29,7 +33,7 @@ function* createSubClinicsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: SubClinicsActionTypes.CREATE_SUBCLINIC_ERROR,
             payload: error,
@@ -100,10 +104,14 @@ function* updateSubClinicFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData.message,'success')
+            ToastHandle(decryptedData.message, 'success')
             yield put({
                 type: SubClinicsActionTypes.UPDATE_SUBCLINIC_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: SubClinicsActionTypes.UPDATE_SUBCLINIC_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -112,7 +120,7 @@ function* updateSubClinicFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error,'danger')
+        ToastHandle(error, 'danger')
         yield put({
             type: SubClinicsActionTypes.UPDATE_SUBCLINIC_ERROR,
             payload: error,
@@ -228,13 +236,13 @@ export function* watchgetSubscription() {
 
 function* subclinicsSaga() {
     yield all([
-       
-         fork(watchCreateClinics),
-         fork(watchGetClinics),
-         fork(watchgetClinicsTypeState),
-         fork(watchgetCityState),
-         fork(watchUpgrade),
-         fork(watchupdateSubClinic)
+
+        fork(watchCreateClinics),
+        fork(watchGetClinics),
+        fork(watchgetClinicsTypeState),
+        fork(watchgetCityState),
+        fork(watchUpgrade),
+        fork(watchupdateSubClinic)
     ]);
 }
 export default subclinicsSaga;

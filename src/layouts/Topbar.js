@@ -19,6 +19,7 @@ import logo from '../assets/images/logo-light.png';
 
 //constants
 import * as layoutConstants from '../constants/layout';
+import { Button } from 'react-bootstrap';
 
 const ProfileMenus = [
     // {
@@ -46,23 +47,24 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
 
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
-
     // Define a mapping of paths to titles
     const pathToTitleMap = {
         '/dashboard': 'Dashboard',
         '/dashboard/project': 'Dashboard',
         '/apps/appointments/list': 'Appointments',
         '/apps/appointments/newAppointment': 'New Appointments',
-        '/apps/doctors/list': 'Doctors',
+        '/apps/doctors/list': 'Provider List',
         '/apps/Practice/list': 'Sub Practice',
         '/apps/Practice/new-practice': 'Add New Practice Location',
-        '/apps/doctors/new-doctor': 'New Doctors',
+        '/apps/doctors/new-doctor': 'New Provider',
         '/apps/patients/list': 'Patients',
         '/apps/patients/new-patient': 'New Patient',
-        '/apps/role-management/list': 'Role Management',
+        '/apps/role-management/list': 'User Management',
         '/apps/crm/addclinic': 'Practice',
         '/apps/settings/department': 'Department',
         '/apps/settings/desigination': 'Desigination',
+        '/apps/settings/consultationroom': 'Consultation Room',
+        '/apps/settings/office': 'Office',
         '/apps/settings/role': 'Role',
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
@@ -70,7 +72,9 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
-        '/apps/patients/update-patient': 'Update Patient'
+        '/apps/patients/update-patient': 'Update Patient',
+        '/apps/settings/templates': 'Templates',
+        '/apps/settings/notesType': 'Notes Type',
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {
@@ -144,8 +148,6 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
 
                     <ul className="list-unstyled topbar-menu float-end mb-0">
                         <li className="dropdown notification-list">
-                        </li>
-                        <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}
                                 menuItems={ProfileMenus}
@@ -154,14 +156,16 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             />
                         </li>
                     </ul>
-
                     {(layoutType === layoutConstants.LAYOUT_VERTICAL || layoutType === layoutConstants.LAYOUT_FULL) && (
-                        <div className='d-flex align-items-center'>
+                        <div className="d-flex align-items-center">
                             <button className="button-menu-mobile open-left" onClick={handleLeftMenuCallBack}>
-                                <i className="mdi mdi-menu" />
+                                <i className="mdi mdi-menu fs-3 " />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h4 className=''>{pageTitle}</h4>
+                            <h5 className="">
+
+                                {pageTitle}
+                            </h5>
                         </div>
                     )}
 

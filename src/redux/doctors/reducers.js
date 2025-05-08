@@ -87,20 +87,19 @@ export const createtDoctorsReducer = (state = CREATE_DOCTORS_INITIAL_STATE, acti
                 data: action.payload,
                 loading: false
             }
+        case DoctorsActionTypes.CREATE_DOCTORS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.CREATE_DOCTORS_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
         default: return state
     }
 }
-
 export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.GET_DOCTORS_DETAILS_LOADING:
@@ -139,14 +138,14 @@ export const createtDoctorsDetailReducer = (state = GET_DOCTORS_INITIAL_STATE, a
                 data: action.payload,
                 loading: false
             }
+        case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
         case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_ERROR:
             return {
                 data: action.payload,
-                loading: false
-            }
-        case DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false
             }
         default: return state

@@ -18,7 +18,6 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [selectedPermissions, setSelectedPermissions] = useState([]);
-    console.log({ selectedPermissions })
     const [initialPermissions, setInitialPermissions] = useState(data?.permissions || []);
     const updateSuccess = store?.updateRoleDataReducer?.data?.status;
 
@@ -84,7 +83,6 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
             status: true
         };
 
-        console.log(payload, 'editrole');
         dispatch(updateRoleDataAction({ key: encryptMessage(payload) }));
 
         if (updateSuccess === 200) {
@@ -153,9 +151,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                         </Col>
                     </Row>
                     <Modal.Footer>
-                        <Button type="button" className="custom-buttons" onClick={closeModal}>
+                        {/* <Button type="button" className="custom-buttons" onClick={closeModal}>
                             Cancel
-                        </Button>
+                        </Button> */}
                         <Button type="submit" className="custom-buttons" disabled={store?.updateRoleDataReducer?.loading}>
                             {store?.updateRoleDataReducer?.loading ?
                                 <Spinner className="spinner-border-sm" color="white" /> :

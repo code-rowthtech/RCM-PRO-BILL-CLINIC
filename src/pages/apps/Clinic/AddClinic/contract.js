@@ -79,9 +79,9 @@ const Contract = ({ billingId, activeTab }) => {
                                         </span>
                                     </td>
                                     <td>{contract?.contract?.sentDate ||
-                                         (contract?.standardContract?.createdAt ? 
+                                        (contract?.standardContract?.createdAt ?
                                             new Date(contract.standardContract.createdAt)
-                                              .toLocaleDateString('en-GB') : // 'en-GB' ensures DD/MM/YYYY format
+                                                .toLocaleDateString('en-GB') : // 'en-GB' ensures DD/MM/YYYY format
                                             'N/A')}</td>
                                     <td>
                                         <i
@@ -116,8 +116,8 @@ const Contract = ({ billingId, activeTab }) => {
                     </Row>
                     <Row>
                         <Col sm={12}>
-                         
-                             <iframe
+
+                            <iframe
                                 src={contract?.contract?.contractSignStatus === true ? contract?.contract?.documentFileUrl : contract?.contract?.contractTemplateId?.fileUrl || contract?.standardContract?.fileUrl}
                                 title={contract?.contract?.contractSignStatus === true ? contract?.contract?.documentFileName : contract?.contract?.contractName}
                                 width="100%"
@@ -125,6 +125,9 @@ const Contract = ({ billingId, activeTab }) => {
                                 className="px-4"
                                 style={{ border: 'none' }}
                             />
+
+
+
                         </Col>
                     </Row>
                 </Modal.Body>

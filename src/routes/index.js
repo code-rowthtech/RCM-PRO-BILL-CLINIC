@@ -14,7 +14,6 @@ import FullLayout from '../layouts/Full';
 import schedule from '../pages/apps/Schedule/schedule';
 import AddHoliday from '../pages/apps/Schedule/AddHoliday';
 import AddBreak from '../pages/apps/Schedule/AddBreak';
-import ToastHandle from '../helpers/ToastMessage';
 
 // lazy load all the views
 
@@ -42,9 +41,6 @@ const LockScreen2 = React.lazy(() => import('../pages/account2/LockScreen2'));
 const ProjectDashboard = React.lazy(() => import('../pages/dashboard/Project'));
 // const AllClinics = React.lazy(() => import('../pages/apps/Clinic/AllClinics'));
 const AddClinics = React.lazy(() => import('../pages/apps/Clinic/AddClinic/index'));
-const ClinicForm = React.lazy(() => import('../pages/apps/Clinic/AddClinic/clinicForm'));
-const Billing = React.lazy(() => import('../pages/apps/Clinic/AddClinic/billing'));
-const Contract = React.lazy(() => import('../pages/apps/Clinic/AddClinic/contract'));
 
 // const UpdateClinic = React.lazy(() => import('../pages/apps/Clinic/AllClinics/updateClinic'));
 const AppointmentsList = React.lazy(() => import('../pages/apps/Appointments/index'));
@@ -76,6 +72,10 @@ const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
 const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
 const PurposeOfVisit = React.lazy(() => import('../pages/apps/Settings/Purpose/PurposeOfVisit'));
+const ConsultationRoom = React.lazy(() => import('../pages/apps/Settings/Consultation Room/ConsultationRoom'));
+const Office = React.lazy(() => import('../pages/apps/Settings/Office/Office'));
+const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/notesType'))
+const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
 
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
@@ -87,7 +87,6 @@ const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSet
 
 const Permissions = React.lazy(() => import('../pages/apps/Permissions/index'))
 const Roles = React.lazy(() => import('../pages/apps/Roles/index'))
-
 // pages
 
 const ErrorPageNotFound = React.lazy(() => import('../pages/error/PageNotFound'));
@@ -135,9 +134,6 @@ const LogoutModel = React.lazy(() => import('../components/LogoutModel'));
 // const Ratings = React.lazy(() => import('../pages/uikit/Ratings'));
 
 // icons
-const Dripicons = React.lazy(() => import('../pages/icons/Dripicons'));
-const MDIIcons = React.lazy(() => import('../pages/icons/MDIIcons'));
-const Unicons = React.lazy(() => import('../pages/icons/Unicons'));
 
 // forms
 // const BasicForms = React.lazy(() => import('../pages/forms/Basic'));
@@ -450,6 +446,38 @@ const AllRoutes = () => {
                                     ),
                                 },
                                 {
+                                    path: 'consultationroom',
+                                    element: hasPermission('view consultationroom settings') ? (
+                                        <LoadComponent component={ConsultationRoom} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'notesType',
+                                    element: hasPermission('view notestype settings') ? (
+                                        <LoadComponent component={NotesType} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'templates',
+                                    element: hasPermission('view templates settings') ? (
+                                        <LoadComponent component={Templates} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
+                                    path: 'office',
+                                    element: hasPermission('view office settings') ? (
+                                        <LoadComponent component={Office} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                                {
                                     path: 'role',
                                     element: hasPermission('view role settings') ? (
                                         <LoadComponent component={RoleSetting} />
@@ -490,6 +518,7 @@ const AllRoutes = () => {
                                         <div className="disabled-content">You don't have permission to create a new patient.</div>
                                     ),
                                 },
+
                                 {
                                     path: 'update-patient',
                                     element: hasPermission("UPDATE_A_PATIENT") ? (

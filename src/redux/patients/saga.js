@@ -213,7 +213,6 @@ function* updatePatientsFunction(data) {
         });
         const response = yield call(updatePatientsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
@@ -243,7 +242,6 @@ function* updateInsuranceFunction(data) {
         });
         const response = yield call(updateInsuranceApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        console.log(decryptedData, 'decryptedData')
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({

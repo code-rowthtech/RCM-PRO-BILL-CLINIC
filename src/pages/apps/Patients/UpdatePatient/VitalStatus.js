@@ -1,222 +1,565 @@
+// VitalStatus.js
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
-import axios from 'axios';
+import { FaPlus } from 'react-icons/fa';
+import { Table, Button, Form } from 'react-bootstrap';
+import { defaultVitals } from '../../../../utils/DataSets/commonData2';
+import { useSearchParams } from 'react-router-dom';
+import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import { useDispatch, useSelector } from 'react-redux';
 import { createVitalsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { handlePrintVitals } from '../../../../helpers/printVitals';
 import Spinner from '../../../../constants/Spinner';
 
-const VitalStatus = ({ patientId }) => {
-    const [yesterdayVitals, setYesterdayVitals] = useState({});
-    const [todayVitals, setTodayVitals] = useState({ weight: '', height: '', bmi: '', smoking_status: '' });
-    const [todayDate, setTodayDate] = useState(new Date());
-    const [yesterdayDate, setYesterdayDate] = useState(new Date());
-    const [previousVitals, setPreviousVitals] = useState();
+const conversionMap = {
+    Temperature: { imperial: '°F', metric: '°C' },
+    Height: { imperial: 'in', metric: 'cm' },
+    Weight: { imperial: 'lbs', metric: 'kg' },
+};
+
+const imperialUnits = {
+    Temperature: '°F',
+    Height: 'in',
+    Weight: 'lbs',
+};
+
+const metricUnits = {
+    Temperature: '°C',
+    Height: 'cm',
+    Weight: 'kg',
+};
+
+const convertValue = (value, fromUnit, toUnit) => {
+    const num = parseFloat(value);
+    if (isNaN(num)) return value;
+
+    if (fromUnit === 'kg' && toUnit === 'lbs') return (num * 2.20462).toFixed(2);
+    if (fromUnit === 'lbs' && toUnit === 'kg') return (num / 2.20462).toFixed(2);
+
+    if (fromUnit === 'cm' && toUnit === 'in') return (num / 2.54).toFixed(2);
+    if (fromUnit === 'in' && toUnit === 'cm') return (num * 2.54).toFixed(2);
+
+    if (fromUnit === 'C' && toUnit === 'F') return ((num * 9) / 5 + 32).toFixed(2);
+    if (fromUnit === 'F' && toUnit === 'C') return (((num - 32) * 5) / 9).toFixed(2);
+
+    return value;
+};
+
+const getVitalType = (vitalName) => {
+    switch (vitalName) {
+        case 'Blood Glucose':
+        case 'Cholesterol':
+        case 'Triglycerides':
+            return 'dropdown';
+        case 'Waist Circumference':
+        case 'Hip Circumference':
+            return 'number';
+        default:
+            return 'number';
+    }
+};
+
+const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+};
+
+export default function VitalStatus({ isAccordionOpen }) {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.vitals;
+    const [unitSystem, setUnitSystem] = useState('imperial');
+    const [vitals, setVitals] = useState(defaultVitals);
+    const [newVital, setNewVital] = useState('');
+    const [searchParams] = useSearchParams();
+    const patientId = searchParams.get('id');
+    const visitTime = new Date().toLocaleString();
+    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
+    const now = new Date();
+    const formatTwoDigits = (n) => n.toString().padStart(2, '0');
+
+
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ key: encryptMessage({ patientId: patientId }) }))
-    }, [patientId, dispatch]);
+        dispatch(getVitalsByPatientIdAction({ patientId }));
+    }, [dispatch, patientId]);
+    const validationSchema = {
+        Temperature: { min: 93, max: 108 }, // °F
+        Pulse: { min: 30, max: 200 },       // bpm
+        'Blood Pressure': { systolic: { min: 70, max: 250 }, diastolic: { min: 40, max: 150 } }, // mmHg
+        'Respiratory Rate': { min: 8, max: 40 }, // rpm
+        'Oxygen Saturation': { min: 70, max: 100 }, // %
+        Height: { min: 30 }, // cm or in (handle by unitSystem)
+        Weight: { min: 2 }, // kg or lbs
+        BMI: { min: 10, max: 60 },
+        Pain: { min: 0, max: 10 },
+        'Head Circumference': { min: 10, max: 60 },
+    };
 
-    const smokingOptions = [
-        'Former smoker', 'Smoker, current status unknown', 'Never smoker', 'Unknown if ever smoked',
-        'Current every day smoker', 'Light tobacco smoker', 'Heavy tobacco smoker', 'Current some day smoker'
-    ];
+    const [validationErrors, setValidationErrors] = useState({});
+    const validateVital = (vital, unitSystem) => {
+        const rules = validationSchema[vital.name];
+        if (!rules) return '';
 
-    const vitalsList = [
-        { key: 'temperature', label: 'Temperature', unit: '°F' },
-        { key: 'height', label: 'Height', unit: 'in' },
-        { key: 'systolic', label: 'Systolic BP', unit: 'mmHg' },
-        { key: 'diastolic', label: 'Diastolic BP', unit: 'mmHg' },
-        { key: 'respiratory_rate', label: 'Respiratory Rate', unit: 'rpm' },
-        { key: 'oxygen_saturation', label: 'Oxygen Saturation', unit: '%' },
-        { key: 'pulse', label: 'Pulse', unit: 'bpm' },
-        { key: 'weight', label: 'Weight', unit: 'lbs' },
-        { key: 'bmi', label: 'BMI', unit: 'kg/m²', calculated: true },
-        { key: 'pain_level', label: 'Pain', unit: '(0-10)' },
-        { key: 'head_circumference', label: 'Head Circumference', unit: 'in' },
-        { key: 'weight_for_length_percentile', label: 'Weight-for-length Percentile', unit: '%' },
-        { key: 'bmi_percentile', label: 'BMI Percentile', unit: '%' },
-        { key: 'oxygen_concentration', label: 'Oxygen Concentration', unit: '%' },
-        { key: 'inhaled_oxygen_flow_rate', label: 'Inhaled Oxygen Flow Rate', unit: 'l/min' },
-        { key: 'smoking_status', label: 'Smoking Status' },
-    ];
+        if (vital.type === 'bp') {
+            const s = parseFloat(vital.value.systolic);
+            const d = parseFloat(vital.value.diastolic);
+            if (isNaN(s) || isNaN(d)) return 'Please enter valid systolic and diastolic values.';
+            if (s < rules.systolic.min || s > rules.systolic.max) return `Systolic must be between ${rules.systolic.min} and ${rules.systolic.max}.`;
+            if (d < rules.diastolic.min || d > rules.diastolic.max) return `Diastolic must be between ${rules.diastolic.min} and ${rules.diastolic.max}.`;
+            return '';
+        }
 
-    const handleInputChange = (key, value) => {
-        setTodayVitals((prevVitals) => {
-            const newVitals = { ...prevVitals, [key]: key === 'smoking_status' ? value : parseInt(value) };
+        const val = parseFloat(vital.value);
+        if (isNaN(val)) return 'Please enter a valid number.';
 
-            // Calculate BMI when weight or height changes
-            if (key === 'weight' || key === 'height') {
-                const weight = (newVitals.weight) || 0;
-                const height = (newVitals.height) || 0;
+        let { min, max } = rules;
+        // Adjust for imperial units if needed
+        if (unitSystem === 'imperial') {
+            if (vital.unitKey === 'Height') {
+                min /= 2.54;
+                max /= 2.54;
+            }
+            if (vital.unitKey === 'Weight') {
+                min *= 2.20462;
+                max *= 2.20462;
+            }
+            if (vital.unitKey === 'Temperature') {
+                min = (min * 9 / 5) + 32;
+                max = (max * 9 / 5) + 32;
+            }
+        }
 
-                if (weight > 0 && height > 0) {
-                    newVitals.bmi = parseInt(((weight / (height * height)) * 703).toFixed(2));
-                } else {
-                    newVitals.bmi = '';
-                }
+        if (val < min || val > max) return `${vital.name} must be between ${min.toFixed(1)} and ${max.toFixed(1)}.`;
+
+        return '';
+    };
+    useEffect(() => {
+        const heightVital = vitals.find(v => v.name === 'Height');
+        const weightVital = vitals.find(v => v.name === 'Weight');
+        const bmiVitalIndex = vitals.findIndex(v => v.name === 'BMI');
+
+        if (!heightVital || !weightVital || bmiVitalIndex === -1) return;
+
+        const height = parseFloat(heightVital.value);
+        const weight = parseFloat(weightVital.value);
+
+        if (!height || !weight) return;
+
+        let bmi = 0;
+
+        if (unitSystem === 'imperial') {
+            // Convert inches to meters: inches * 0.0254
+            const heightInMeters = height * 0.0254;
+            // Convert pounds to kg: lbs / 2.20462
+            const weightInKg = weight / 2.20462;
+            bmi = weightInKg / (heightInMeters * heightInMeters);
+        } else {
+            // Metric: height in cm needs to be converted to meters
+            const heightInMeters = height / 100;
+            bmi = weight / (heightInMeters * heightInMeters);
+        }
+
+        const bmiValue = bmi.toFixed(1);
+
+        // Only update if BMI has changed
+        if (vitals[bmiVitalIndex].value !== bmiValue) {
+            setVitals(prev => {
+                const updated = [...prev];
+                updated[bmiVitalIndex] = { ...updated[bmiVitalIndex], value: bmiValue };
+                return updated;
+            });
+
+            // Dispatch the BMI observation
+            const bmiVital = vitals[bmiVitalIndex];
+            if (bmiVital) {
+                const effectiveDateTime = formatEffectiveDateTime();
+                const observation = {
+                    code: {
+                        coding: [{
+                            system: bmiVital.system,
+                            code: bmiVital.code,
+                            display: bmiVital.name
+                        }]
+                    },
+                    effectiveDateTime,
+                    subject: patientId,
+                    createdBy: loggedInUser?._id,
+                    valueQuantity: {
+                        value: parseFloat(bmiValue),
+                        unit: "kg/m2",
+                        system: "http://unitsofmeasure.org",
+                        code: "kg/m2"
+                    }
+                };
+                dispatch(createVitalsAction({ key: encryptMessage(observation) }));
+            }
+        }
+    }, [vitals.find(v => v.name === 'Height')?.value, vitals.find(v => v.name === 'Weight')?.value, unitSystem]);
+
+    // Group vitals by date and sort by date (newest first)
+    const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
+        const date = vitalGroup.effectiveDateTime;
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(...vitalGroup.vitals);
+        return acc;
+    }, {});
+
+    // Get sorted dates (newest first)
+    const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
+        new Date(b) - new Date(a)
+    );
+
+    const getDisplayUnit = (vital) => {
+        if (vital.unitKey) {
+            return unitSystem === 'imperial' ? imperialUnits[vital.unitKey] : metricUnits[vital.unitKey];
+        }
+        return vital.unit || '';
+    };
+
+    const handleUnitChange = (newSystem) => {
+        setUnitSystem(newSystem);
+    };
+
+    const handleVitalChange = (index, field, value) => {
+        setVitals(prevVitals => {
+            const updated = [...prevVitals];
+            const vital = { ...updated[index] };
+
+            if (vital.type === 'bp') {
+                vital.value = { ...vital.value, [field]: value };
+            } else {
+                vital.value = value;
             }
 
-            return newVitals;
+            updated[index] = vital;
+            return updated;
         });
     };
 
-    const handleSubmit = () => {
-        // console.log(todayVitals);
+    const submitObservation = (vital) => {
+        if (!vital) return;
+        const effectiveDateTime = formatEffectiveDateTime();
 
-        const payload = {
-            patientId: patientId,
-            temperature: { value: todayVitals.temperature, unit: 'F' },
-            pulse: { value: todayVitals.pulse, unit: 'bpm' },
-            blood_pressure: { systolic: todayVitals.systolic, diastolic: todayVitals.diastolic, unit: 'mmHg' },
-            respiratory_rate: { value: todayVitals.respiratory_rate, unit: 'rpm' },
-            oxygen_saturation: { value: todayVitals.oxygen_saturation, unit: '%' },
-            height: { value: todayVitals.height, unit: 'in' },
-            weight: { value: todayVitals.weight, unit: 'lbs' },
-            bmi: { value: todayVitals.bmi, unit: 'kg/m²' },
-            pain_level: { value: todayVitals.pain_level, unit: 'scale (0-10)' },
-            ...(todayVitals.smoking_status !== '' ? { smoking_status: todayVitals.smoking_status } : {}),
-            head_circumference: { value: todayVitals.head_circumference, unit: 'in' },
-            weight_for_length_percentile: { value: todayVitals.weight_for_length_percentile, unit: '%' },
-            bmi_percentile: { value: todayVitals.bmi_percentile, unit: '%' },
-            oxygen_concentration: { value: todayVitals.oxygen_concentration, unit: '%' },
-            inhaled_oxygen_flow_rate: { value: todayVitals.inhaled_oxygen_flow_rate, unit: 'l/min' },
+        const baseObservation = {
+            code: {
+                coding: [{
+                    system: vital.system,
+                    code: vital.code,
+                    display: vital.name
+                }]
+            },
+            effectiveDateTime,
+            subject: patientId,
+            createdBy: loggedInUser?._id,
         };
-        dispatch(createVitalsAction({ key: encryptMessage(payload) }))
 
+        if (vital.type === 'bp' && vital.value?.systolic && vital.value?.diastolic) {
+            const bpObservation = {
+                ...baseObservation,
+                component: [
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8480-6",
+                                display: "Systolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(vital.value.systolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    },
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8462-4",
+                                display: "Diastolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(vital.value.diastolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    }
+                ]
+
+            };
+            dispatch(createVitalsAction({ key: encryptMessage(bpObservation) }));
+        } else if (vital.type === 'dropdown') {
+            const observation = {
+                ...baseObservation,
+                valueString: vital.value
+            };
+            dispatch(createVitalsAction({ key: encryptMessage(observation) }));
+        } else if (vital.type === 'number' && vital.value !== '') {
+            const observation = {
+                ...baseObservation,
+                valueQuantity: {
+                    value: parseFloat(vital.value),
+                    unit: getDisplayUnit(vital),
+                }
+            };
+            dispatch(createVitalsAction({ key: encryptMessage(observation) }));
+        }
     };
 
-    useEffect(() => {
-        if (patientVitals && patientVitals.length > 0) {
-            // Sort vitals by date (newest first)
-            const sortedVitals = [...patientVitals].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const findVitalValue = (vitalName, date) => {
+        if (!groupedVitals[date]) return null;
 
-            // The latest entry will be the first after sorting
-            const latestVitals = sortedVitals[0];
+        const vital = groupedVitals[date].find(v =>
+            v.code?.coding?.[0]?.display === vitalName ||
+            v.code?.text === vitalName
+        );
 
-            setTodayVitals({
-                temperature: latestVitals.temperature?.value || '',
-                height: latestVitals.height?.value || '',
-                systolic: latestVitals.blood_pressure?.systolic || '',
-                diastolic: latestVitals.blood_pressure?.diastolic || '',
-                respiratory_rate: latestVitals.respiratory_rate?.value || '',
-                oxygen_saturation: latestVitals.oxygen_saturation?.value || '',
-                pulse: latestVitals.pulse?.value || '',
-                weight: latestVitals.weight?.value || '',
-                bmi: latestVitals.bmi?.value || '',
-                pain_level: latestVitals.pain_level?.value || '',
-                head_circumference: latestVitals.head_circumference?.value || '',
-                weight_for_length_percentile: latestVitals.weight_for_length_percentile?.value || '',
-                bmi_percentile: latestVitals.bmi_percentile?.value || '',
-                oxygen_concentration: latestVitals.oxygen_concentration?.value || '',
-                inhaled_oxygen_flow_rate: latestVitals.inhaled_oxygen_flow_rate?.value || '',
-                smoking_status: latestVitals.smoking_status || '',
-            });
+        if (!vital) return null;
 
-            // Store all previous vitals (excluding the latest one)
-            setPreviousVitals(sortedVitals.slice(1));
+        if (vital.component && vital.component.length > 0) {
+            // Handle blood pressure case
+            const systolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8480-6"
+            )?.valueQuantity?.value;
 
-            setTodayDate(new Date(latestVitals.date));
+            const diastolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8462-4"
+            )?.valueQuantity?.value;
+
+            return { systolic: systolic || '', diastolic: diastolic || '' };
         }
-    }, [patientVitals]);
 
+        return vital.valueQuantity?.value || vital.valueString || '';
+    };
 
-    return (
-        <>
-            {store?.getVitalsByPatientIdReducer?.loading ?
-                <div className='d-flex justify-content-center align-items-center'>
-                    <Spinner />
+    const renderVitalCell = (vital, date) => {
+        const value = findVitalValue(vital.name, date);
+
+        if (vital.type === 'bp') {
+            const bpValue = value || { systolic: '', diastolic: '' };
+            return (
+                <div className="d-flex">
+                    <span>{bpValue.systolic || '-'}</span>
+                    <span>/</span>
+                    <span>{bpValue.diastolic || '-'}</span>
                 </div>
-                :
-                <div className='mb-2'>
-                    <div className='rounded' style={{ border: '1px solid #ced4da' }}>
-                        <div className='px-2'>
-                            <Row className='pb-1' style={{ background: '#313A46', borderTopLeftRadius: '3px', borderTopRightRadius: '3px' }}>
-                                <Col sm={3}><p className='text-nowrap mt-2 mb-0 fw-bold text-white'>System Vitals</p></Col>
-                                <Col sm={9} className='d-flex gap-1 justify-content-end pt-1'>
-                                    <p className='text-nowrap mt-1 mb-0 fw-bold text-white'>Note Rendering Options:</p>
-                                    <Form.Group controlId="newestToOldest">
-                                        <Form.Select style={{ height: '33px' }}>
-                                            <option value='1'>Newest to oldest</option>
-                                            <option value='-1'>Oldest to newest</option>
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <div className='px-2'>
-                                <Row className='' >
-                                    <Col className='px-0'
-                                    ><p className='m-0  fw-bold'></p></Col>
-                                    {previousVitals && previousVitals?.map((data) => (
-                                        <Col key={data?._id} style={{ background: '#E6EBFF' }}>
-                                            <p className='m-0 fw-bold'>
-                                                {new Date(data?.date).toISOString().split('T')[0]}
-                                            </p>
-                                        </Col>
-                                    ))}
-                                    <Col className='text-center px-0'
-                                        style={{ background: '#E6EBFF' }}
-                                    >
-                                        <p className='m-0 fw-bold'>{todayDate.toISOString().split('T')[0]}</p>
-                                    </Col>
-                                </Row>
-                            </div>
+            );
+        }
 
+        return value || '-';
+    };
 
-                            {vitalsList.map((vital, index) => (
-                                <React.Fragment key={index}>
-                                    {/* Vital Name & Today's Data */}
-                                    <Row className='border-bottom px-2'>
-                                        <Col className='px-0'>
-                                            <p className='mb-0'>{vital.label} <span className='text-secondary'>{vital.unit}</span></p>
-                                        </Col>
+    const formatEffectiveDateTime = () => {
+        const { date, time } = visitDateTime;
+        if (!date || !time) return new Date().toISOString(); // fallback
 
-                                        {/* Display previous vitals under respective sections */}
-                                        {previousVitals?.map((prev, idx) => (
-                                            <Col key={idx} className="px-0 text-center" style={{ background: idx % 2 === 0 ? '#E6EBFF' : '#E6EBFF' }}>
-                                                {/* Check if the vital is blood_pressure and render systolic and diastolic */}
-                                                {vital.key === 'systolic' ? (
-                                                    prev.blood_pressure?.systolic || '—'
-                                                ) : vital.key === 'diastolic' ? (
-                                                    prev.blood_pressure?.diastolic || '—'
-                                                ) : (
-                                                    prev[vital.key]?.value || '—'
-                                                )}
-                                            </Col>
-                                        ))}
+        return `${date}T${time}:00`; // keep local time, no 'Z'
+    };
+    const [visitDateTime, setVisitDateTime] = useState({
+        date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
+        time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
+    });
 
-                                        {/* Today's Value */}
-                                        <Col className='px-0'>
-                                            {vital.key === 'bmi' ? (
-                                                <p className='mb-0'>{todayVitals.bmi || '—'}</p>
-                                            ) : vital.key === 'smoking_status' ? (
-                                                <Form.Select value={todayVitals.smoking_status} onChange={(e) => handleInputChange('smoking_status', e.target.value)}>
-                                                    <option value="" hidden>Select Smoking Status</option>
-                                                    {smokingOptions.map(opt => <option key={opt}>{opt}</option>)}
-                                                </Form.Select>
-                                            ) : (
+    // Extract disabled dates
+    const disabledDates = patientVitals?.map(vital => vital.effectiveDateTime) || [];
+
+    // Check if a date is disabled
+    const isDateDisabled = (dateString) => disabledDates.includes(dateString);
+
+    // Handle date change
+    const handleDateChange = (e) => {
+        const newDate = e.target.value;
+
+        if (isDateDisabled(newDate)) {
+            alert("This date already has recorded vitals. Please choose another date.");
+            return;
+        }
+
+        setVisitDateTime(prev => ({
+            ...prev,
+            date: newDate,
+        }));
+    };
+
+    // Handle time change (unchanged)
+    const handleTimeChange = (e) => {
+        setVisitDateTime(prev => ({
+            ...prev,
+            time: e.target.value,
+        }));
+    };
+    return (
+        <div>
+            <div className="row mb-2">
+                <div className="col-9">
+                    <h5>Vitals</h5>
+                </div>
+
+                <div className="col-3 d-flex gap-2 align-items-center">
+                    {!store?.getVitalsByPatientIdReducer?.loading &&
+                        <span title='Print all vitals'
+                            onClick={() => handlePrintVitals({ vitals: patientVitals, patientDetails: patientDetails })}
+                            className='uil-print text-primary fs-4 cursor-pointer' />}
+                    <div className="d-flex gap-1  border-start  ps-2 align-items-center w-100" >
+                        <span className='fw-semibold fs-6'>Units:</span>
+                        <Form.Select
+                            onChange={(e) => handleUnitChange(e.target.value)}
+                            value={unitSystem}
+                            className="w-100"
+                        >
+                            <option value='imperial'>Imperial</option>
+                            <option value='metric'>Metric</option>
+                        </Form.Select>
+                    </div>
+                </div>
+            </div>
+
+            <div className='scroll-container ' style={{
+                height: isAccordionOpen ? "55vh" : "73vh",
+                overflowX: 'auto',
+                overflowY: 'auto'
+            }}>
+                <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
+                    <thead>
+                        <tr className='border'>
+                            <th className='text-white'>
+                                Vital Name
+                            </th>
+                            {sortedDates?.map(date => (
+                                <th className='text-white' key={date}>
+                                    {formatDate(date)}
+                                </th>
+                            ))}
+                            <th style={{ background: '#f8f9fa' }}>
+                                <div className="d-flex vitalsFormControl gap-2">
+                                    <Form.Control
+                                        type="date"
+                                        value={visitDateTime.date}
+                                        onChange={handleDateChange}
+                                        min="2000-01-01" // Optional: Set a min date
+                                        max="2100-12-31" // Optional: Set a max date
+                                    />
+
+                                    <Form.Control
+                                        type="time"
+                                        value={visitDateTime.time}
+                                        onChange={handleTimeChange}
+                                    />
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {vitals.map((vital, index) => (
+                            <tr className='' key={vital.name}>
+                                <td className='p-0 vitalsTableBorder'>
+                                    {vital.name} {getDisplayUnit(vital) && (
+                                        <small className="text-muted">({getDisplayUnit(vital)})</small>
+                                    )}
+                                </td>
+
+                                {sortedDates.map(date => (
+                                    <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                                        {renderVitalCell(vital, date)}
+                                    </td>
+                                ))}
+
+                                <td className='p-0 fs-6 w-25 vitalsTableBorder' style={{ background: '#f8f9fa' }}>
+                                    {vital.name === 'BMI' ? (
+                                        // Special case for BMI - disabled field
+                                        <Form.Control
+                                            type="number"
+                                            value={vital.value}
+                                            readOnly
+                                            disabled
+                                            size="sm"
+                                            className="bg-light" // Optional: Add light background to visually indicate disabled state
+                                        />
+                                    ) : vital.type === 'bp' ? (
+                                        <>
+                                            <div className="d-flex">
                                                 <Form.Control
                                                     type="number"
-                                                    value={todayVitals[vital.key] || ''}
-                                                    onChange={(e) => handleInputChange(vital.key, e.target.value)}
+                                                    value={vital.value.systolic}
+                                                    className="me-1"
+                                                    step="0.1"
+                                                    onChange={(e) => handleVitalChange(index, 'systolic', e.target.value)}
+                                                    onBlur={() => {
+                                                        const error = validateVital(vital);
+                                                        setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                        if (!error) submitObservation(vital);
+                                                    }}
+                                                    size="sm"
                                                 />
+                                                /
+                                                <Form.Control
+                                                    type="number"
+                                                    value={vital.value.diastolic}
+                                                    className="ms-1"
+                                                    step="0.1"
+                                                    onChange={(e) => handleVitalChange(index, 'diastolic', e.target.value)}
+                                                    onBlur={() => {
+                                                        const error = validateVital(vital);
+                                                        setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                        if (!error) submitObservation(vital);
+                                                    }}
+                                                    size="sm"
+                                                />
+                                            </div>
+                                            {validationErrors[vital.name] && (
+                                                <div className="text-danger small">{validationErrors[vital.name]}</div>
                                             )}
-                                        </Col>
-                                    </Row>
-                                </React.Fragment>
-                            ))}
-
+                                        </>
+                                    ) : vital.type === 'dropdown' ? (
+                                        <Form.Select
+                                            value={vital.value}
+                                            onChange={(e) => handleVitalChange(index, null, e.target.value)}
+                                            onBlur={() => {
+                                                const error = validateVital(vital);
+                                                setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                if (!error) submitObservation(vital);
+                                            }}
+                                            size="sm"
+                                        >
+                                            <option value="">Select</option>
+                                            {vital.options.map(opt => <option key={opt}>{opt}</option>)}
+                                        </Form.Select>
+                                    ) : (
+                                        <>
+                                            <Form.Control
+                                                type="number"
+                                                step="0.1"
+                                                value={vital.value}
+                                                onChange={(e) => handleVitalChange(index, null, e.target.value)}
+                                                onBlur={() => {
+                                                    const error = validateVital(vital);
+                                                    setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                    if (!error) submitObservation(vital);
+                                                }}
+                                                size="sm"
+                                            />
+                                            {validationErrors[vital.name] && (
+                                                <div className="text-danger small">{validationErrors[vital.name]}</div>
+                                            )}
+                                        </>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                    {store?.getVitalsByPatientIdReducer?.loading &&
+                        <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                            <Spinner />
                         </div>
-                    </div>
-                    <Row><Col className='d-flex justify-content-end  mt-2'><Button disabled={store?.createVitalsReducer?.loading}
-                        onClick={handleSubmit} className='custom-buttons'>Mark as Done</Button></Col></Row>
-                </div>
-            }
-        </>
-
+                    }
+                </Table>
+            </div>
+        </div>
     );
-};
-
-export default VitalStatus;
+}

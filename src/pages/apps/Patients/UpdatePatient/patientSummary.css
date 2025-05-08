@@ -1,0 +1,54 @@
+.scroll-container {
+    overflow-y: auto;
+    padding-bottom: 20px;
+
+    /* Custom Scrollbar */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #c1c1c191 transparent; /* thumb and track for Firefox */
+}
+
+/* Webkit Browsers (Chrome, Edge, Safari) */
+.scroll-container::-webkit-scrollbar {
+    width: 6px; /* thin scrollbar */
+}
+
+.scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+.summary-expanded {
+    height: 63vh;
+}
+.summary-collapsed {
+    height: 75vh;
+}
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+.vital-item {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+.card {
+    box-shadow: none !important;
+    border: 1px solid #e0e0e087 !important;
+}
+.social-history-item {
+    padding: 0px 0;
+    border-bottom: 1px solid #eee;
+}
+.social-history-item:last-child {
+    border-bottom: none;
+}
+.cursor-pointer {
+    cursor: pointer;
+}

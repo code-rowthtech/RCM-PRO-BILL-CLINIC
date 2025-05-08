@@ -7,7 +7,7 @@ import { getPermissionsDataReducer, createPermissionsDataReducer, deletePermissi
 import { createRolesReducer, getRolesDataReducer, updateRolesReducer, getUserDataReducer, deleteRolesDataReducer, viewPasswordReducer } from './roles/reducers';
 import { createMastersDataReducer, getMastersDataReducer, updateMastersDataReducer, getDepartmentDataReducer } from './settings/reducers';
 import {
-    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, updateClinicsReducer, getStatesReducer,
+    createClinicsReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
     getCitiesReducer, createSubscriptionPlanReducer, getClinicTypeReducer, createContractReducer, standardContractReducer, changeEmailReducer
 } from './clinics/reducers';
 import { getDoctorsReducer, getDoctorsRolesReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer } from './doctors/reducers';
@@ -23,6 +23,13 @@ import { createScheduleReducer, getDoctorsListReducer, getScheduleReducer, delet
 import { createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer } from './settings/rolesetting/reducers';
 import { createAppointmentReducer, getAppointmentByIdReducer, getAppointmentsReducer, getPractitionerScheduleReducer, getPractitionerSlotsReducer, rescheduleAppointmentReducer } from './appointments/reducers';
 import { createVitalsReducer, getVitalsByAppointmentIdReducer, getVitalsByPatientIdReducer, getVitalsReducer, updateVitalsReducer } from './vitals/reducers';
+import { createTaskReducer, getClinicEmployeesReducer, getTaskDetailsReducer, getTaskReducer, updateTaskReducer } from './assigntasks/reducer';
+import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer, getPatientAppointmentReducer, getProblemDetailsReducer, getProblemListReducer, updateProblemListReducer } from './ProblemList/reducer';
+import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
+import { createSuggestionsReducer } from './suggestions/reducer';
+import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
+import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer } from './socialHistory/reducer';
+import { getIcdProcedureReducer } from './icdCodes/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -43,5 +50,15 @@ export default (combineReducers({
     rescheduleAppointmentReducer, viewPasswordReducer, getCitiesReducer, getInsuranceByIdReducer,
     // vitals
     createVitalsReducer, updateVitalsReducer, getVitalsReducer, getVitalsByPatientIdReducer, getVitalsByAppointmentIdReducer,
-    getPatientsByAppointmentReducer
+    getPatientsByAppointmentReducer,
+    // assign task
+    getClinicEmployeesReducer, createTaskReducer, getTaskReducer, updateTaskReducer, getTaskDetailsReducer,
+    // problem list
+    createProblemListReducer, getProblemListReducer, updateProblemListReducer, getALLCodesReducer, getProblemDetailsReducer, getPatientAppointmentReducer, deleteProblemListReducer,
+    // allergy list
+    createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer, deleteAllergyReducer,
+    // suggestions
+    createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer, updateMedicationReducer,
+    createTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
+    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer
 }): any);

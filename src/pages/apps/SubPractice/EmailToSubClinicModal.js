@@ -29,7 +29,6 @@ const dispatch=useDispatch();
             phone: formData?.userId?.phone,
 
         }
-console.log(payload,'pankaj')
         dispatch(createSubClinicAction({ key: encryptMessage(payload) }));
     };
 

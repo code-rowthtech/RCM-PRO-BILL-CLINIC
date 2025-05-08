@@ -1,8 +1,7 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { SubscriptionsActionTypes } from './constants';
 import { getSubscriptionsApi, getSubSubscriptionsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
-import ToastHandle from '../../helpers/ToastMessage';
 /**
  * Login the user
  * @param {*} payload - username and password
@@ -66,7 +65,7 @@ function* getSubSubscriptionsFunction(data) {
 }
 
 export function* callStateEmpty() {
-    put({
+    yield put({
         type: SubscriptionsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });

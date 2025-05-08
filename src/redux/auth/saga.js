@@ -30,7 +30,6 @@ function* login({ payload }) {
         const response = yield call(loginApi, encryptedPayload);
 
         const user = JSON.parse(decryptMessage(response?.data?.data));
-        console.log({ user })
         const userData = {
             name: user?.name,
             permission: user?.permission,
@@ -41,12 +40,11 @@ function* login({ payload }) {
             logo: user?.logo?.url,
             clinicId: user?.clinicId
         }
+        const encryptedUserData = encryptMessage(userData)
         localStorage.setItem('userData', JSON.stringify(user));
-
-        // NOTE - You can change this according to response format from your api
+        localStorage.setItem('encryptedUserData', encryptedUserData)
         api.setLoggedInUser(userData);
-        // setAuthorization(user['token']);
-        setAuthorization(userData?.token); // Corrected to use userData.token
+        setAuthorization(userData?.token);
 
         yield put(authApiResponseSuccess(AuthActionTypes.LOGIN_USER, userData));
     } catch (error) {

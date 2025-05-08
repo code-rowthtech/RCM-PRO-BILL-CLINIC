@@ -1,7 +1,3 @@
-import { Children } from "react";
-import { IoMdLogOut } from "react-icons/io";
-
-
 const MENU_ITEMS = [
     // { key: 'navigation', label: 'Navigation', isTitle: true },
     {
@@ -33,13 +29,13 @@ const MENU_ITEMS = [
     // },
     {
         key: 'doctors',
-        label: 'Doctor',
+        label: 'Provider',
         icon: 'dripicons-medical',
         url: '/apps/doctors/list',
     },
     {
         key: 'schedule',
-        label: 'Schedule',
+        label: 'Provider Schedule',
         icon: 'uil-clock',
         url: '/apps/schedule/list',
     },
@@ -57,14 +53,14 @@ const MENU_ITEMS = [
     // },
     {
         key: 'roleManagement',
-        label: 'Role Management',
+        label: 'User Management',
         url: '/apps/role-management/list',
         icon: 'uil uil-users-alt',
     },
 
     {
         key: 'apps-crm',
-        label: 'Profile',
+        label: 'Practice',
         url: '/apps/crm/addclinic',
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },
@@ -97,19 +93,43 @@ const MENU_ITEMS = [
                 parentKey: 'setting',
             },
             {
+                key: 'consultationroom',
+                label: 'Consultation Room',
+                url: '/apps/settings/consultationroom',
+                parentKey: 'setting',
+            },
+            {
+                key: 'office',
+                label: 'Office',
+                url: '/apps/settings/office',
+                parentKey: 'setting',
+            },
+            {
                 key: 'rolesetting',
                 label: 'Role',
                 url: '/apps/settings/role',
                 parentKey: 'setting',
             },
+            {
+                key: 'notesType',
+                label: 'Notes Type',
+                url: '/apps/settings/notesType',
+                parentKey: 'setting',
+            },
+            {
+                key: 'templates',
+                label: 'Templates',
+                url: '/apps/settings/templates',
+                parentKey: 'setting',
+            },
         ]
     },
-    {
-        key: 'logout',
-        label: 'Logout',
-        icon: 'uil uil-sign-out-alt',
-        // url: '/apps/logout/logout-model',
-    },
+    // {
+    //     key: 'logout',
+    //     label: 'Logout',
+    //     icon: 'uil uil-sign-out-alt',
+    //     // url: '/apps/logout/logout-model',
+    // },
 ];
 
 export default MENU_ITEMS;

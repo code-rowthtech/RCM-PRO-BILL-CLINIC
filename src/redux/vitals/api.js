@@ -14,11 +14,11 @@ export function getVitalsApi(params: any): any {
 }
 export function getVitalsByPatientApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getVitalsByPatientId, data);
+    return api.get(`${URL.getVitalsByPatientId}?patientId=${data?.patientId}&effectiveDateTime=${data?.effectiveDateTime || ''}`);
 }
 export function getVitalsByAppointmentApi(params: any): any {
     const { data } = params;
-    return api.create(URL.getVitalsByAppointmentId, data);
+    return api.get(URL.getVitalsByAppointmentId, data);
 }
 
 export function updateVitalsApi(params: any): any {
