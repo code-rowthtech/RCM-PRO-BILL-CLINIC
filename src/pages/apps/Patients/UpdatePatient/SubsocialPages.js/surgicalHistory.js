@@ -178,6 +178,7 @@ const SurgicalHistory = () => {
                                                 {...register('effectiveDateTime', {
                                                     required: true
                                                 })}
+                                                max={new Date().toISOString().slice(0, 10)}
                                                 className="form-control-sm"
                                             />
                                             {errors.effectiveDateTime && (

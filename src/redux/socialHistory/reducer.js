@@ -10,6 +10,11 @@ const UPDATE_MEDICATION_INITIAL_STATE = {
     loading: false,
 };
 
+const DELETE_TOBACCOO_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
 const GET_TOBACCOO_INITIAL_STATE = {
     data: [],
     loading: false,
@@ -88,6 +93,33 @@ export const createTobaccooReducer = (state = CREATE_TOBACCOO_INITIAL_STATE, act
                 loading: false,
             };
         case TobaccooActionTypes.CREATE_TOBACCOO_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const deleteTobaccooReducer = (state = DELETE_TOBACCOO_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.DELETE_TOBACCOO_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.DELETE_TOBACCOO_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_TOBACCOO_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_TOBACCOO_ERROR:
             return {
                 data: action.payload,
                 loading: false,

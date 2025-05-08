@@ -9,6 +9,11 @@ export const updateTobaccooAction = (data): AuthAction => ({
     data
 });
 
+export const deleteTobaccooAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_TOBACCOO,
+    data
+});
+
 export const getTobaccooAction = (data): AuthAction => ({
     type: TobaccooActionTypes.GET_TOBACCOO,
     data
