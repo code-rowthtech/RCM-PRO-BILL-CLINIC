@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const DeletionModal = ({ show, onHide, onConfirm, item = 'item' }) => {
+const DeletionModal = ({ show, onHide, onConfirm, item = 'item', isLoading = false }) => {
 
     return (
         <Modal show={show} onHide={onHide} size="md" centered>
@@ -10,10 +10,10 @@ const DeletionModal = ({ show, onHide, onConfirm, item = 'item' }) => {
             </Modal.Header>
             <Modal.Body className='text-center py-4 fs-5'>Are you sure you want to delete the selected <strong>{item}</strong>?</Modal.Body>
             <Modal.Footer>
-                <Button className='custom-buttons' onClick={onHide}>
+                <Button disabled={isLoading} className='custom-buttons' onClick={onHide}>
                     Cancel
                 </Button>
-                <Button className='custom-buttons' onClick={onConfirm}>
+                <Button disabled={isLoading} className='custom-buttons' onClick={onConfirm}>
                     Delete
                 </Button>
             </Modal.Footer>

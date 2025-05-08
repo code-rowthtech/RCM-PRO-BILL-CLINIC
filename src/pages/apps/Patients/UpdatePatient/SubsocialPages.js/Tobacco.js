@@ -26,13 +26,8 @@ const Tobacco = () => {
     const [toEdit, setToEdit] = useState(null);
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
-    const deleteSuccess = store?.deleteTobaccooReducer
-    console.log(deleteSuccess, 'deleteSuccess')
-
-
+    const deleteSuccess = store?.deleteTobaccooReducer?.data?.status
     const updateSuccess = store?.updateTobaccooReducer
-    console.log(updateSuccess, 'updateSuccess')
-
     useEffect(() => {
         if (toEdit) {
             setValue('tobaccoUse', toEdit?.tobaccoUse)
@@ -48,11 +43,11 @@ const Tobacco = () => {
         setDeleteModal(false);
     }
     const deleteHistory = () => {
-        console.log(toDelete, 'setToDelete')
         dispatch(deleteTobaccooAction({ id: toDelete }))
     }
     useEffect(() => {
-        if (deleteSuccess?.data?.status === 200) {
+        if (deleteSuccess === 200) {
+            dispatch(getTobaccooAction({ patientId: patientId }));
             setToDelete(null);
             setDeleteModal(false);
         }
@@ -60,6 +55,7 @@ const Tobacco = () => {
     useEffect(() => {
         if (createSuccess === 201 || updateSuccess?.data?.status === 200) {
             dispatch(getTobaccooAction({ patientId: patientId }));
+            setToEdit(null)
             reset();
         }
     }, [createSuccess, updateSuccess]);
@@ -74,9 +70,8 @@ const Tobacco = () => {
         ];
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
-            data.id = toEdit?._id;
-            dispatch(updateTobaccooAction({ key: encryptMessage(data) }))
-            console.log(data, 'asjdioasdok')
+            // data.id = toEdit?._id;
+            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));
         }
@@ -289,7 +284,7 @@ const Tobacco = () => {
                                                 )}
 
                                             </div>
-                                            <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteHistory} item='tobaccoo history' />
+                                            <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteHistory} item='tobaccoo history' isLoading={store?.deleteTobaccooReducer?.loading} />
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>

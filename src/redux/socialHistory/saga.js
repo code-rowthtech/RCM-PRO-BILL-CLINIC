@@ -65,7 +65,7 @@ function* updateTobaccooFunction(data) {
         });
         const response = yield call(updateTobaccooApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.UPDATE_TOBACCOO_SUCCESS,
@@ -97,7 +97,7 @@ function* deleteTobaccooFunction(data) {
         });
         const response = yield call(deleteTobaccooApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.DELETE_TOBACCOO_SUCCESS,
@@ -114,14 +114,12 @@ function* deleteTobaccooFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
         yield put({
             type: TobaccooActionTypes.DELETE_TOBACCOO_ERROR,
             payload: error,
         });
     }
 }
-
 
 function* getTobaccooFunction(data) {
     try {

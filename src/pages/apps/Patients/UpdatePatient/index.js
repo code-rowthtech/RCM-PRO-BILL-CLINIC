@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Accordion, Button, Card, Col, Form, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
-import { FormInput } from '../../../../components';
 import profileDummy from '../../../../assets/images/profileDummy.png';
-import { IoClose, IoFilter, IoPrintSharp } from 'react-icons/io5';
-import Demographics from './Demographics';
-import { TbCapture, TbHeartRateMonitor } from 'react-icons/tb';
+import { IoClose, IoPrintSharp } from 'react-icons/io5';
+import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
-import PatientDetails from './PatientDetails';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    getFamilyGeneticAction,
     getMedicationAction,
     getPatientByIdAction,
     getStatesByCountryAction,
     getSurgicalHistoryAction,
+    getTobaccooAction,
+    getVitalsByPatientIdAction,
     resetUpdateAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
@@ -39,6 +39,7 @@ import PatientSummary from './PatientSummary';
 import Medication from './Medication';
 import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
+import { getProblemListAction } from '../../../../redux/ProblemList/action';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -62,20 +63,13 @@ const UpdatePatientIndex = () => {
     const updateResponsibleParty = store?.updateResponsiblePartyReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('Patient Details');
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
     const [selectedSubTab, setSelectedSubTab] = useState('Allergy List');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
-    const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-    const [isClinicalReviewExpandedData, setIsClinicalReviewExpandedData] = useState(true);
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
-    const [isClinicalReviewExpanded, setIsClinicalReviewExpanded] = useState(false);
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
-    const [openSubmenus, setOpenSubmenus] = useState(false);
-
     const [activeSubmenu, setActiveSubmenu] = useState(null);
     const toggleSubmenu = (label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
@@ -101,56 +95,46 @@ const UpdatePatientIndex = () => {
         };
     }, []);
 
-    useEffect(() => {
-        const payload = {
-            id: id,
-        };
-        // check this api it create 19 api hit 
-        if (id) {
-            dispatch(getPatientByIdAction(payload));
-            dispatch(getMedicationAction({ patientId: id }));
-            dispatch(getSurgicalHistoryAction({ patientId: id }));
-        }
-        if (
-            updateSuccess === 200 ||
-            updateResponsibleParty === 200 ||
-            store?.createResponsiblePartyReducer?.data?.status === 201
-        ) {
-            dispatch(getPatientByIdAction(payload));
-            dispatch(resetUpdateAction());
-            setLogo(null);
-            setLogoName('');
-            setProfilePhoto(null);
-        }
-    }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
+    // useEffect(() => {
+    //     const payload = {
+    //         id: id,
+    //     };
+    //     // check this api it create 19 api hit 
+    //     if (id) {
+    //     }
+    // }, [id])
+    // useEffect(() => {
+    //     const payload = {
+    //         id: id,
+    //     };
+    //     // check this api it create 19 api hit 
+    //     if (id) {
+    //         dispatch(getMedicationAction({ patientId: id }));
+    //         dispatch(getSurgicalHistoryAction({ patientId: id }));
+    //     }
+    //     if (
+    //         updateSuccess === 200 ||
+    //         updateResponsibleParty === 200 ||
+    //         store?.createResponsiblePartyReducer?.data?.status === 201
+    //     ) {
+    //         dispatch(getPatientByIdAction(payload));
+    //         dispatch(resetUpdateAction());
+    //         setLogo(null);
+    //         setLogoName('');
+    //         setProfilePhoto(null);
+    //     }
+    // }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
     useEffect(() => {
         dispatch(getStatesByCountryAction());
+        dispatch(getPatientByIdAction({ id: id }));
+        dispatch(getSurgicalHistoryAction({ patientId: id }));
+        dispatch(getTobaccooAction({ patientId: id }));
+        dispatch(getFamilyGeneticAction({ patientId: id }));
+        dispatch(getProblemListAction({ patientId: id }));
     }, [dispatch]);
-    const handleTabClick = (tab) => {
-        setSelectedSubTab(tab);
-    };
+    // useEffect(() => {
 
-    const handleMainTabChange = (tab) => {
-        setSelectedMainTab(tab);
-        setVisibleSection('patient'); // Show Patient Section, Hide Task Section
-    };
-    const handleSubTabChange = (subTab) => {
-        setSelectedSubTab(subTab);
-        setVisibleSection('task'); // Show Task Section, Hide Patient Section
-    };
-
-    const handleSidebarToggle = () => {
-        setSidebarCollapsed(!isSidebarCollapsed);
-    };
-
-    const handleToggle = () => {
-        setIsClinicalReviewExpandedData(!isClinicalReviewExpandedData);
-    };
-
-    const handleClinicalReviewToggle = () => {
-        setIsClinicalReviewExpanded(!isClinicalReviewExpanded);
-        setVisibleSection('task');
-    };
+    // }, [dispatch]);
 
     const openCamera = async () => {
         setIsCameraOpen(true);

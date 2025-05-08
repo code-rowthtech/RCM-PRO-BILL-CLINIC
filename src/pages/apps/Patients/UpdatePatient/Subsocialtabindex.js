@@ -12,7 +12,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
         setActiveSocialTabs(tab);
     };
 
-    const tabs = ['Tobacco', 'Medical History', 'Surgical', 'Family /Genetic', 'Alcohol', 'Vaccination'];
+    const tabs = ['Tobacco', 'Medical History', 'Surgical History', 'Family /Genetic', 'Alcohol', 'Vaccination'];
 
     return (
         <div style={{ overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
@@ -32,8 +32,8 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen }) => {
 
             <div className="mt-2">
                 {activeSocialTabs === 'Tobacco' && <Tobacco patientId={patientId} isAccordionOpen={isAccordionOpen} />}
-                {activeSocialTabs === 'Medical History' && <MedicalHistory patientId = {patientId} isAccordionOpen={isAccordionOpen}/>}
-                {activeSocialTabs === 'Surgical' && <SurgicalHistory />}
+                {activeSocialTabs === 'Medical History' && <MedicalHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />}
+                {activeSocialTabs === 'Surgical History' && <SurgicalHistory />}
                 {activeSocialTabs === 'Family /Genetic' && (
                     <FamilyHistory patientId={patientId} isAccordionOpen={isAccordionOpen} />
                 )}
