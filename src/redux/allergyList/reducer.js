@@ -119,7 +119,7 @@ export const updateAllergyReducer = (state = UPDATE_ALLERGY_INITIAL_STATE, actio
                 data: action.payload,
                 loading: false,
             };
-        case AllergyListActionTypes.GET_ALLERGIES_OF_A_PATIENT_RESET:
+        case AllergyListActionTypes.UPDATE_ALLERGY_RESET:
             return {
                 data: [],
                 loading: false,

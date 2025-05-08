@@ -67,9 +67,9 @@ const AllergyList = () => {
             .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
     };
 
-      const handleDelete = (data) => {
-            dispatch(deleteAllergyAction({ id: data?._id }));
-        };
+    const handleDelete = (data) => {
+        dispatch(deleteAllergyAction({ id: data?._id }));
+    };
     return (
         <>
             <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
@@ -179,7 +179,7 @@ const AllergyList = () => {
                                                         }}
                                                     />
                                                     &nbsp;
-                                                      <MdDeleteOutline
+                                                    <MdDeleteOutline
                                                         className="fs-4 cursor-pointer text-black"
                                                         onClick={() => {
                                                             handleDelete(data);
