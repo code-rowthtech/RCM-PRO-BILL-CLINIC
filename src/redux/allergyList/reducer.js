@@ -64,11 +64,11 @@ export const getAllergyDetailsReducer = (state = GET_ALLERGY_DETAILS_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
-        case AllergyListActionTypes.GET_ALLERGY_DETAILS_RESET:
-            return {
-                data: [],
-                loading: false,
-            };
+        // case AllergyListActionTypes.GET_ALLERGY_DETAILS_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
 
         case AllergyListActionTypes.GET_ALLERGY_DETAILS_ERROR:
             return {

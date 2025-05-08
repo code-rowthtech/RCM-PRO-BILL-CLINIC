@@ -220,12 +220,6 @@ export const getFamilyGeneticReducer = (state = GET_FAMILY_GENETIC_INITIAL_STATE
                 data: action.payload,
                 loading: false,
             };
-        // case TobaccooActionTypes.GET_FAMILY_GENTIC_DATA_RESET:
-        //     return {
-        //         data: [],
-        //         loading: false,
-        //     };
-
         case TobaccooActionTypes.GET_FAMILY_GENTIC_DATA_ERROR:
             return {
                 data: action.payload,
