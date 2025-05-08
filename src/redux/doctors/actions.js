@@ -14,7 +14,7 @@ export const getDoctorsrolesAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionDoctors = (): LayoutAction => ({
     type: DoctorsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });

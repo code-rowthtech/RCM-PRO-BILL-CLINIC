@@ -1,29 +1,19 @@
 // File: Index.jsx
 import React, { useEffect, useState } from 'react';
-import PageTitle from '../../../../components/PageTitle';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getRolesAction } from '../../../../redux/actions';
-import { getClinicTypeAction, stateEmptydAction } from '../../../../redux/clinics/actions';
-import ToastHandle from '../../../../helpers/ToastMessage';
+import { getClinicTypeAction } from '../../../../redux/clinics/actions';
 import ClinicForm from './clinicForm';
 import BillingForm from './billing';
 import Contract from './contract';
 import { useNavigate } from 'react-router-dom';
-import SendEmailModal from './SendEmailModal';
 
 const Index = () => {
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('clinic');
     const [clinicId, setClinicId] = useState(null);
     const [billingId, setBillingId] = useState(null);
-
-    // const [showModal, setShowModal] = useState(false); // Modal visibility state
-    // const [mailId, setMailId] = useState({ email: 'clinic@example.com' }); // Mock email for demo
-    const store = useSelector((state) => state);
-
-    const navigate = useNavigate();
-
     useEffect(() => {
         dispatch(getClinicTypeAction())
     }, [dispatch]);
@@ -31,14 +21,6 @@ const Index = () => {
     const handleActiveTab = (data) => {
         setActiveTab(data);
     };
-
-    // const handleOpenModal = () => {
-    //     setShowModal(true);
-    // };
-
-    // const handleCloseModal = () => {
-    //     setShowModal(false);
-    // };
 
     return (
         <>
@@ -64,12 +46,6 @@ const Index = () => {
                                         </span>
                                     ))}
                                 </div>
-                                {/* <div className="d-flex gap-2">
-                                    <Button className="custom-buttons" onClick={handleOpenModal}>
-                                        Email to Clinic
-                                    </Button>
-                                    <Button className="custom-buttons">View</Button>
-                                </div> */}
                             </Col>
                         </Row>
 
@@ -94,9 +70,6 @@ const Index = () => {
                     </Card>
                 </Col>
             </Row>
-
-            {/* Include Modal */}
-            {/* <SendEmailModal show={showModal} closeModal={handleCloseModal} mailId={mailId} /> */}
         </>
     );
 };

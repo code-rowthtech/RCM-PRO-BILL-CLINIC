@@ -1641,3 +1641,16 @@ $kbd-color:                         var(--#{$variable-prefix}kbd-color);
 $kbd-bg:                            var(--#{$variable-prefix}kbd-bg);
 
 $pre-color:                         null;
+
+// scss-docs-start pre-variables
+
+
+// SCSS variable (for Bootstrap)
+$link-color: #0d6efd;
+$link-hover-color: #0a58ca;
+
+// Optional CSS variables (for runtime use)
+:root {
+  --ct-link-color: #{$link-color};
+  --ct-link-hover-color: #{$link-hover-color};
+}

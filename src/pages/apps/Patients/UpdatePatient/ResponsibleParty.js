@@ -1,14 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { BiEdit } from 'react-icons/bi';
-import { FiUploadCloud } from 'react-icons/fi';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import AddressForm from '../../Common Pages/AddressForm';
 import TelecomFrom from '../../Common Pages/TelecomFrom';
 import { useDispatch, useSelector } from 'react-redux';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { createResponsiblePartyAction, stateEmptydAction } from '../../../../redux/actions';
+import { createResponsiblePartyAction } from '../../../../redux/actions';
 import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
 
@@ -32,7 +30,6 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         formState: { errors },
         setValue,
         reset,
-        clearErrors,
     } = useForm();
 
     useEffect(() => {

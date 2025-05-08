@@ -9,11 +9,9 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
     getMastersDataAction,
-    // stateEmptydAction,
     updateMastersDataAction,
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
-import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 
@@ -29,7 +27,6 @@ const Designation = () => {
         formState: { errors },
     } = useForm();
     const dispatch = useDispatch();
-    const nameValue = watch('name');
     const [addDesiginationModal, setAddDesiginationModal] = useState(false);
     const [edit, setEdit] = useState(null);
     const [search, setSearch] = useState('');
@@ -37,7 +34,6 @@ const Designation = () => {
     const [skip, setSkip] = useState(1);
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
-    const pagination = store?.getMastersDataReducer?.data1?.data;
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
     const closeAddModal = () => {
         setAddDesiginationModal(false);
@@ -116,17 +112,15 @@ const Designation = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={` active_inactive_buttons ${
-                                        status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${
-                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -247,11 +241,6 @@ const Designation = () => {
                                 )}
                             </tbody>
                         </Table>
-                        {/* <Paginations
-              currentPage={skip}
-              totalPages={store?.getMastersDataReducer?.data?.pagination?.totalPages}
-              onPageChange={handlePageChange}
-            /> */}
                     </Card.Body>
                 </Card>
             </Col>
@@ -312,7 +301,6 @@ const Designation = () => {
                                         placeholder="Re-enter Desigination Name"
                                         onInput={(e) => {
                                             const value = e.target.value;
-                                            // Prevent spaces when input is empty
                                             if (value.trim() === '') {
                                                 e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                                             }
@@ -321,18 +309,11 @@ const Designation = () => {
                                     {errors.reEnterName && <p className="text-danger">{errors.reEnterName.message}</p>}
                                 </Form.Group>
                             </Col>
-                            {/* <Col md={12}>
-                  <Form.Group className="mb-2">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control as="textarea" rows={3} {...register("description")} placeholder="Enter description" />
-                  </Form.Group>
-                </Col> */}
                         </Row>
                         <Modal.Footer>
-                            {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
