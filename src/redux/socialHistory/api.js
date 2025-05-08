@@ -73,5 +73,5 @@ export function getMedicalHistoryApi(params: any): any {
 }
 export function deleteMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.delete(URL.deleteMedicalHistory, data);
+    return api.delete(`${URL.deleteMedicalHistory}?id=${data?.id}`);
 }

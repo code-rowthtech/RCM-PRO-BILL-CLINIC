@@ -3,7 +3,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
-import { createMedicalHistoryAction, getMedicalHistoryAction } from '../../../../../redux/actions';
+import {
+    createMedicalHistoryAction,
+    deleteMedicalHistoryAction,
+    getMedicalHistoryAction,
+} from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
@@ -13,6 +17,8 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
+import { FiEdit } from 'react-icons/fi';
+import { MdDeleteOutline } from 'react-icons/md';
 
 const MedicalHistory = () => {
     const dispatch = useDispatch();
@@ -24,7 +30,7 @@ const MedicalHistory = () => {
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const createSuccess = store?.createMedicalHistoryReducer?.data?.status;
     const medicalHistory = store?.getMedicalHistoryReducer?.data?.medicalHistory;
-    console.log(medicalHistory, 'MEDICAL');
+    const deleteResponse = store?.deleteMedicalHistoryReducer?.data?.status;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const {
@@ -34,8 +40,10 @@ const MedicalHistory = () => {
         reset,
         getValues,
         control,
+        watch,
         setValue,
     } = useForm();
+
     useEffect(() => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
     }, [dispatch, patientId]);
@@ -45,7 +53,11 @@ const MedicalHistory = () => {
             reset();
         }
     }, [createSuccess, dispatch, patientId, reset]);
-
+    useEffect(() => {
+        if (deleteResponse === 200) {
+            dispatch(getMedicalHistoryAction({ patientId: patientId }));
+        }
+    }, [dispatch, patientId]);
     const onSubmit = (data) => {
         const selected = data.problem;
 
@@ -102,6 +114,10 @@ const MedicalHistory = () => {
         system: 'http://hl7.org/fhir/condition-code',
         display: code.title,
     }));
+    const startDate = watch('startDate'); // Watch startDate dynamically
+    const handleDelete = (item) => {
+        dispatch(deleteMedicalHistoryAction({ id: item?._id }));
+    };
     return (
         <Row
             className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
@@ -187,6 +203,7 @@ const MedicalHistory = () => {
                                                 {...register('endDate')}
                                                 required
                                                 className="form-control-sm"
+                                                min={startDate || undefined} // blocks dates before startDate
                                             />
                                         </Form.Group>
                                     </Col>
@@ -273,11 +290,11 @@ const MedicalHistory = () => {
                             </div>
                         ) : (
                             <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush">
+                                <ListGroup variant="flush" className="striped-data">
                                     {medicalHistory?.map((item, index) => (
                                         <ListGroup.Item
                                             key={index}
-                                            className="px-3 py-3 border-bottom bg-light bg-opacity-50 rounded-2 mb-2">
+                                            className="px-3 py-3 border-bottom striped-data-item bg-opacity-50 rounded-2">
                                             <div className="d-flex justify-content-between align-items-center mb-2">
                                                 <div>
                                                     <strong className="fw-semibold text-dark">
@@ -292,8 +309,8 @@ const MedicalHistory = () => {
                                                                 Start:{' '}
                                                                 {item?.effectivePeriod?.start
                                                                     ? new Date(
-                                                                        item?.effectivePeriod.start
-                                                                    ).toLocaleDateString('en-GB')
+                                                                          item?.effectivePeriod.start
+                                                                      ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>
@@ -303,8 +320,8 @@ const MedicalHistory = () => {
                                                                 End:{' '}
                                                                 {item?.effectivePeriod?.end
                                                                     ? new Date(
-                                                                        item?.effectivePeriod.end
-                                                                    ).toLocaleDateString('en-GB')
+                                                                          item?.effectivePeriod.end
+                                                                      ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>
@@ -319,8 +336,27 @@ const MedicalHistory = () => {
                                                         dangerouslySetInnerHTML={{ __html: item.note[0].text }}
                                                         style={{ fontSize: '0.875rem' }}
                                                     />
+                                                 
                                                 </div>
                                             )}
+                                               <div className="d-flex justify-content-end align-items-center ">
+                                                        <FiEdit
+                                                            className="fs-4 cursor-pointer text-black"
+                                                            // onClick={() => {
+                                                            //     handleEditClick(data);
+                                                            //     const requestData = {
+                                                            //         id: data?._id,
+                                                            //     };
+                                                            //     dispatch(getAllergyDetailsAction(requestData));
+                                                            // }}
+                                                        />
+                                                        <MdDeleteOutline
+                                                            className="fs-4 cursor-pointer text-danger"
+                                                            onClick={() => {
+                                                                handleDelete(item);
+                                                            }}
+                                                        />
+                                                    </div>
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>
