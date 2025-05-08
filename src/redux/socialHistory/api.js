@@ -7,9 +7,20 @@ export function createTobaccooApi(params: any): any {
     return api.create(URL.createTobaccoo, data);
 }
 
+
 export function updateTobaccooApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateMedication}/${data?.medicationId}`, data);
+    return api.update(`${URL.updateTobacco}/${data?.id}`, data);
+}
+
+// export function updateTobaccooApi(params: any): any {
+//     const { data } = params;
+//     return api.update(`${URL.updateMedication}/${data?.medicationId}`, data);
+// }
+
+export function deleteTobaccooApi(params: any): any {
+    const { data } = params;
+    return api.delete(`${URL.deleteTobaccoo}/${data?.id}`);
 }
 
 export function getTobaccooApi(params: any): any {

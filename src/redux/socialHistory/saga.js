@@ -9,6 +9,7 @@ import {
     createTobaccooApi,
     deleteMedicalHistoryApi,
     deleteSurgicalHistoryApi,
+    deleteTobaccooApi,
     getFamilyGeneticApi,
     getMedicalHistoryApi,
     getSurgicalHistoryApi,
@@ -64,7 +65,7 @@ function* updateTobaccooFunction(data) {
         });
         const response = yield call(updateTobaccooApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.UPDATE_TOBACCOO_SUCCESS,
@@ -83,6 +84,38 @@ function* updateTobaccooFunction(data) {
     } catch (error) {
         yield put({
             type: TobaccooActionTypes.UPDATE_TOBACCOO_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* deleteTobaccooFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.DELETE_TOBACCOO_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteTobaccooApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.DELETE_TOBACCOO_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.DELETE_TOBACCOO_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.DELETE_TOBACCOO_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.DELETE_TOBACCOO_ERROR,
             payload: error,
         });
     }
@@ -484,6 +517,10 @@ export function* watchUpdateTobaccoo() {
     yield takeEvery(TobaccooActionTypes.UPDATE_TOBACCOO, updateTobaccooFunction);
 }
 
+export function* watchDeleteTobaccoo() {
+    yield takeEvery(TobaccooActionTypes.DELETE_TOBACCOO, deleteTobaccooFunction);
+}
+
 export function* watchGetTobaccoo() {
     yield takeEvery(TobaccooActionTypes.GET_TOBACCOO, getTobaccooFunction);
 }
@@ -538,10 +575,10 @@ export function* watchDeleteMedicalHistory() {
 
 function* clinicalHistorySaga() {
     yield all([
-        fork(watchCreateTobaccoo), fork(watchGetTobaccoo),
-        fork(watchUpdateTobaccoo), fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic),
+        fork(watchCreateTobaccoo), fork(watchGetTobaccoo), fork(watchDeleteTobaccoo), fork(watchUpdateTobaccoo),
+        fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic),
         fork(watchCreateSurgicalHistory), fork(watchUpdateSurgicalHistory), fork(watchGetSurgicalHistory), fork(watchDeleteSurgicalHistory),
-        fork(watchCreateMedicalHistory), fork(watchUpdateMedicalHistory), fork(watchGetMedicalHistory),fork(watchDeleteMedicalHistory)
+        fork(watchCreateMedicalHistory), fork(watchUpdateMedicalHistory), fork(watchGetMedicalHistory), fork(watchDeleteMedicalHistory)
     ]);
 }
 export default clinicalHistorySaga;

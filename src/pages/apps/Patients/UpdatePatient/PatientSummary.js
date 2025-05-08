@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Badge, Table, Form, Modal } from 'react-bootstrap';
 import { MdOutlinePrint, MdAddCircleOutline } from 'react-icons/md';
 import { FaHeartbeat, FaAllergies, FaProcedures, FaPills, FaUserMd, FaCalendarAlt } from 'react-icons/fa';
-import { GiHealthNormal } from 'react-icons/gi';
 import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -14,12 +13,12 @@ import { handlePrintVitals } from '../../../../helpers/printVitals';
 import VitalStatus from './VitalStatus';
 import Spinner from '../../../../constants/Spinner';
 import AddProblem from '../Task Tabs/AddProblem';
-import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintProblems } from '../Task Tabs/PDFfiles/problemPDF';
 import Paginations from '../../../../helpers/Paginations';
 import NewAppointment from '../../Appointments/NewAppointment';
 import AddMedication from './AddMedication';
 import { handlePrintMedication } from '../../../../helpers/printMedication';
+import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
@@ -49,15 +48,9 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
-        dispatch(getTobaccooAction({ patientId: patientId }));
-        dispatch(getFamilyGeneticAction({ patientId: patientId }));
-    }, [dispatch, patientId, effectiveDateTime]);
 
-    useEffect(() => {
-        if (patientId) {
-            dispatch(getProblemListAction({ patientId }));
-        }
-    }, [dispatch, patientId]);
+    }, [dispatch]);
+
     const patientSummary = {
         vitals: {
             heartRate: 72,
@@ -137,18 +130,10 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
 
-    const getStatusBadge = (status) => {
-        const variantMap = {
-            Active: 'primary',
-            Controlled: 'success',
-            PRN: 'secondary',
-        };
-        return <span className={`ms-2 text-${variantMap[status]}`}>{status}</span>;
-    };
     useEffect(() => {
         dispatch(
             getAppointmentsAction({
-                clinicId: clinicId,
+                clinicId: loggedInUser?.clinicId,
                 patientId: patientId,
                 status: 'upcoming',
                 skip: skip,
@@ -156,6 +141,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
             })
         );
     }, [dispatch, skip]);
+
     useEffect(() => {
         if (patientVitals) {
             setEffectiveDateTime(

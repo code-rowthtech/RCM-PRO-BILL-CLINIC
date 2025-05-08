@@ -7,6 +7,7 @@ import {
     createMedicalHistoryAction,
     deleteMedicalHistoryAction,
     getMedicalHistoryAction,
+    updateMedicalHistoryAction,
 } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
@@ -19,6 +20,7 @@ import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
 import { FiEdit } from 'react-icons/fi';
 import { MdDeleteOutline } from 'react-icons/md';
+import DeletionModal from '../../../../../helpers/deletionModal';
 
 const MedicalHistory = () => {
     const dispatch = useDispatch();
@@ -33,6 +35,11 @@ const MedicalHistory = () => {
     const deleteResponse = store?.deleteMedicalHistoryReducer?.data?.status;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [toDelete, setToDelete] = useState(null);
+    const [toEdit, setToEdit] = useState(null);
+    console.log(toEdit,'toEditupdate')
+    const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const {
         register,
         handleSubmit,
@@ -48,16 +55,46 @@ const MedicalHistory = () => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
     }, [dispatch, patientId]);
     useEffect(() => {
-        if (createSuccess === 201) {
+        if (createSuccess === 201 || updateResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
+            setToEdit(null);
+            setSelectedProblem(null);  // clear local state
             reset();
         }
     }, [createSuccess, dispatch, patientId, reset]);
+
+    const deleteHistory = () => {
+        dispatch(deleteMedicalHistoryAction({ id: toDelete }));
+    };
     useEffect(() => {
         if (deleteResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
+            setToDelete(null);
+            setDeleteModal(false);
         }
-    }, [dispatch, patientId]);
+    }, [deleteResponse]);
+
+    const closeDeleteModal = () => {
+        setToDelete(null);
+        setDeleteModal(false);
+    };
+
+    useEffect(() => {
+        if (toEdit) {
+            setSelectedProblem(toEdit?.code?.coding?.[0]?.display)
+            setValue(
+                'startDate',
+                toEdit?.effectivePeriod?.start ? new Date(toEdit?.effectivePeriod?.start).toISOString().split('T')[0] : ''
+            );
+            setValue(
+                'endDate',
+                toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end).toISOString().split('T')[0] : ''
+            );
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
+        } else {
+            reset();
+        }
+    }, [toEdit]);
     const onSubmit = (data) => {
         const selected = data.problem;
 
@@ -85,8 +122,11 @@ const MedicalHistory = () => {
             ],
             subject: patientId,
         };
-
-        dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
+        if (toEdit) {
+            dispatch(updateMedicalHistoryAction({ key: encryptMessage(payload), id: toEdit?._id }));
+        } else {
+            dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
+        }
         console.log(payload, 'medical data');
     };
 
@@ -115,9 +155,6 @@ const MedicalHistory = () => {
         display: code.title,
     }));
     const startDate = watch('startDate'); // Watch startDate dynamically
-    const handleDelete = (item) => {
-        dispatch(deleteMedicalHistoryAction({ id: item?._id }));
-    };
     return (
         <Row
             className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
@@ -336,27 +373,54 @@ const MedicalHistory = () => {
                                                         dangerouslySetInnerHTML={{ __html: item.note[0].text }}
                                                         style={{ fontSize: '0.875rem' }}
                                                     />
-                                                 
                                                 </div>
                                             )}
-                                               <div className="d-flex justify-content-end align-items-center ">
-                                                        <FiEdit
-                                                            className="fs-4 cursor-pointer text-black"
-                                                            // onClick={() => {
-                                                            //     handleEditClick(data);
-                                                            //     const requestData = {
-                                                            //         id: data?._id,
-                                                            //     };
-                                                            //     dispatch(getAllergyDetailsAction(requestData));
-                                                            // }}
-                                                        />
-                                                        <MdDeleteOutline
-                                                            className="fs-4 cursor-pointer text-danger"
-                                                            onClick={() => {
-                                                                handleDelete(item);
-                                                            }}
-                                                        />
-                                                    </div>
+
+                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
+                                                <i
+                                                    className="bi bi-trash-fill text-danger cursor-pointer"
+                                                    onClick={() => {
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}></i>
+                                                {toEdit && toEdit._id === item._id ? (
+                                                    <i
+                                                        onClick={() => {
+                                                            setToEdit(null);
+                                                            setToEdit(item);
+                                                        }}
+                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                ) : (
+                                                    <i
+                                                        onClick={() => setToEdit(item)}
+                                                        className="bi bi-pencil text-info cursor-pointer"></i>
+                                                )}
+                                            </div>
+                                            {/* <div className="d-flex justify-content-end align-items-center ">
+                                                <FiEdit
+                                                    className="fs-4 cursor-pointer text-black"
+                                                    // onClick={() => {
+                                                    //     handleEditClick(data);
+                                                    //     const requestData = {
+                                                    //         id: data?._id,
+                                                    //     };
+                                                    //     dispatch(getAllergyDetailsAction(requestData));
+                                                    // }}
+                                                />
+                                                <MdDeleteOutline
+                                                    className="fs-4 cursor-pointer text-danger"
+                                                    onClick={() => {
+                                                        handleDelete(item);
+                                                    }}
+                                                />
+                                            </div> */}
+                                            <DeletionModal
+                                                show={deleteModal}
+                                                onHide={closeDeleteModal}
+                                                onConfirm={deleteHistory}
+                                                item="medical history"
+                                                isLoading={store?.deleteMedicalHistoryAction?.loading}
+                                            />
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>
