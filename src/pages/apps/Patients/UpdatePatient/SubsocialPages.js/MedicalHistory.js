@@ -255,10 +255,10 @@ const MedicalHistory = () => {
             </Col>
 
             {/* History Side */}
-            <Col md={6} className="d-flex flex-column pt-0 mt-0 ps-1">
-                <Card className="h-100 shadow-sm rounded-3">
-                    <Card.Body className="d-flex flex-column py-0">
-                        <Card.Title className="border-bottom pb-2 mb-3">
+            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
+                <div className=" border-danger  h-100">
+                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
+                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
                             <h5 className="fw-semibold mb-0">Medical History</h5>
                         </Card.Title>
 
@@ -327,7 +327,7 @@ const MedicalHistory = () => {
                             </div>
                         )}
                     </Card.Body>
-                </Card>
+                </div>
             </Col>
         </Row>
     );
