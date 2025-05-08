@@ -1,0 +1,31 @@
+{
+  "ignoreUnresolved": [],
+  "ignoreUnused": [
+    "@testing-library/jest-dom",
+    "bootstrap",
+    "dayjs",
+    "frappe-gantt",
+    "fullcalendar-scheduler",
+    "jquery",
+    "jsvectormap",
+    "lucide-react",
+    "prop-types",
+    "react-apexcharts",
+    "react-beautiful-dnd",
+    "react-bootstrap-typeahead",
+    "react-chartjs-2",
+    "react-dropzone",
+    "react-scripts",
+    "react-table",
+    "react-time-picker",
+    "react-tooltip",
+    "sass",
+    "web-vitals"
+  ],
+  "ignoreUnimported": [
+    "C:\\Users\\nishc\\Desktop\\RCM-PRO-BILL-CLINIC\\src\\pages\\dashboard\\Project\\Status.js",
+    "C:\\Users\\nishc\\Desktop\\RCM-PRO-BILL-CLINIC\\src\\pages\\dashboard\\Project\\TasksChart.js",
+    "C:\\Users\\nishc\\Desktop\\RCM-PRO-BILL-CLINIC\\src\\pages\\landing\\ContactUs.js",
+    "C:\\Users\\nishc\\Desktop\\RCM-PRO-BILL-CLINIC\\src\\pages\\landing\\index.js"
+  ]
+}
