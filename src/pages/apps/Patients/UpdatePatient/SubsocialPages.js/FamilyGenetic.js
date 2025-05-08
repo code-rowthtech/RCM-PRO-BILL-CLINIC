@@ -180,7 +180,7 @@ const FamilyHistory = () => {
                                 <Col xs={6}>
                                     <Form.Group>
                                         <Form.Label className="mb-0">Date of Birth</Form.Label>
-                                        <Form.Control type="date" {...register('dob')} required />
+                                        <Form.Control type="date" {...register('dob')} required max={new Date().toISOString().slice(0, 10)} />
                                     </Form.Group>
                                 </Col>
                                 <Col xs={6}>

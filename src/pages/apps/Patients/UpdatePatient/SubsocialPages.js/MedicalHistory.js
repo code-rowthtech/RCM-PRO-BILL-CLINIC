@@ -3,7 +3,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
-import { createMedicalHistoryAction, getMedicalHistoryAction } from '../../../../../redux/actions';
+import {
+    createMedicalHistoryAction,
+    deleteMedicalHistoryAction,
+    getMedicalHistoryAction,
+    updateMedicalHistoryAction,
+} from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
@@ -13,6 +18,9 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
+import { FiEdit } from 'react-icons/fi';
+import { MdDeleteOutline } from 'react-icons/md';
+import DeletionModal from '../../../../../helpers/deletionModal';
 
 const MedicalHistory = () => {
     const dispatch = useDispatch();
@@ -24,9 +32,14 @@ const MedicalHistory = () => {
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const createSuccess = store?.createMedicalHistoryReducer?.data?.status;
     const medicalHistory = store?.getMedicalHistoryReducer?.data?.medicalHistory;
-    console.log(medicalHistory, 'MEDICAL');
+    const deleteResponse = store?.deleteMedicalHistoryReducer?.data?.status;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [toDelete, setToDelete] = useState(null);
+    const [toEdit, setToEdit] = useState(null);
+    console.log(toEdit, 'toEditupdate')
+    const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const {
         register,
         handleSubmit,
@@ -34,18 +47,54 @@ const MedicalHistory = () => {
         reset,
         getValues,
         control,
+        watch,
         setValue,
     } = useForm();
+
     useEffect(() => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
     }, [dispatch, patientId]);
     useEffect(() => {
-        if (createSuccess === 201) {
+        if (createSuccess === 201 || updateResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
+            setToEdit(null);
+            setSelectedProblem(null);  // clear local state
             reset();
         }
     }, [createSuccess, dispatch, patientId, reset]);
 
+    const deleteHistory = () => {
+        dispatch(deleteMedicalHistoryAction({ id: toDelete }));
+    };
+    useEffect(() => {
+        if (deleteResponse === 200) {
+            dispatch(getMedicalHistoryAction({ patientId: patientId }));
+            setToDelete(null);
+            setDeleteModal(false);
+        }
+    }, [deleteResponse]);
+
+    const closeDeleteModal = () => {
+        setToDelete(null);
+        setDeleteModal(false);
+    };
+
+    useEffect(() => {
+        if (toEdit) {
+            setSelectedProblem(toEdit?.code?.coding?.[0]?.display)
+            setValue(
+                'startDate',
+                toEdit?.effectivePeriod?.start ? new Date(toEdit?.effectivePeriod?.start).toISOString().split('T')[0] : ''
+            );
+            setValue(
+                'endDate',
+                toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end).toISOString().split('T')[0] : ''
+            );
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
+        } else {
+            reset();
+        }
+    }, [toEdit]);
     const onSubmit = (data) => {
         const selected = data.problem;
 
@@ -73,8 +122,11 @@ const MedicalHistory = () => {
             ],
             subject: patientId,
         };
-
-        dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
+        if (toEdit) {
+            dispatch(updateMedicalHistoryAction({ key: encryptMessage(payload), id: toEdit?._id }));
+        } else {
+            dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
+        }
         console.log(payload, 'medical data');
     };
 
@@ -102,6 +154,7 @@ const MedicalHistory = () => {
         system: 'http://hl7.org/fhir/condition-code',
         display: code.title,
     }));
+    const startDate = watch('startDate'); // Watch startDate dynamically
     return (
         <Row
             className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
@@ -130,6 +183,9 @@ const MedicalHistory = () => {
                                                         {...field}
                                                         classNamePrefix="select"
                                                         options={formattedOptions}
+                                                        value={
+                                                            selectedProblem || null
+                                                        }
                                                         onChange={(selected) => {
                                                             field.onChange(selected);
                                                             setSelectedProblem(selected); // 🔁 update local state
@@ -175,6 +231,7 @@ const MedicalHistory = () => {
                                                 type="date"
                                                 {...register('startDate')}
                                                 required
+                                                // max={new Date().toISOString().slice(0, 10)}
                                                 className="form-control-sm"
                                             />
                                         </Form.Group>
@@ -187,6 +244,7 @@ const MedicalHistory = () => {
                                                 {...register('endDate')}
                                                 required
                                                 className="form-control-sm"
+                                                min={startDate || undefined} // blocks dates before startDate
                                             />
                                         </Form.Group>
                                     </Col>
@@ -255,10 +313,10 @@ const MedicalHistory = () => {
             </Col>
 
             {/* History Side */}
-            <Col md={6} className="d-flex flex-column pt-0 mt-0 ps-1">
-                <Card className="h-100 shadow-sm rounded-3">
-                    <Card.Body className="d-flex flex-column py-0">
-                        <Card.Title className="border-bottom pb-2 mb-3">
+            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
+                <div className=" border-danger  h-100">
+                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
+                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
                             <h5 className="fw-semibold mb-0">Medical History</h5>
                         </Card.Title>
 
@@ -273,11 +331,11 @@ const MedicalHistory = () => {
                             </div>
                         ) : (
                             <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush">
+                                <ListGroup variant="flush" className="striped-data">
                                     {medicalHistory?.map((item, index) => (
                                         <ListGroup.Item
                                             key={index}
-                                            className="px-3 py-3 border-bottom bg-light bg-opacity-50 rounded-2 mb-2">
+                                            className="px-3 py-3 border-bottom striped-data-item bg-opacity-50 rounded-2">
                                             <div className="d-flex justify-content-between align-items-center mb-2">
                                                 <div>
                                                     <strong className="fw-semibold text-dark">
@@ -321,13 +379,59 @@ const MedicalHistory = () => {
                                                     />
                                                 </div>
                                             )}
+
+                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
+                                                <i
+                                                    className="bi bi-trash-fill text-danger cursor-pointer"
+                                                    onClick={() => {
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}></i>
+                                                {toEdit && toEdit._id === item._id ? (
+                                                    <i
+                                                        onClick={() => {
+                                                            setToEdit(null);
+                                                            setToEdit(item);
+                                                        }}
+                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                ) : (
+                                                    <i
+                                                        onClick={() => setToEdit(item)}
+                                                        className="bi bi-pencil text-info cursor-pointer"></i>
+                                                )}
+                                            </div>
+                                            {/* <div className="d-flex justify-content-end align-items-center ">
+                                                <FiEdit
+                                                    className="fs-4 cursor-pointer text-black"
+                                                    // onClick={() => {
+                                                    //     handleEditClick(data);
+                                                    //     const requestData = {
+                                                    //         id: data?._id,
+                                                    //     };
+                                                    //     dispatch(getAllergyDetailsAction(requestData));
+                                                    // }}
+                                                />
+                                                <MdDeleteOutline
+                                                    className="fs-4 cursor-pointer text-danger"
+                                                    onClick={() => {
+                                                        handleDelete(item);
+                                                    }}
+                                                />
+                                            </div> */}
+                                            <DeletionModal
+                                                show={deleteModal}
+                                                onHide={closeDeleteModal}
+                                                onConfirm={deleteHistory}
+                                                item="medical history"
+                                                isLoading={store?.deleteMedicalHistoryAction?.loading}
+                                            />
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>
                             </div>
                         )}
                     </Card.Body>
-                </Card>
+                </div>
             </Col>
         </Row>
     );

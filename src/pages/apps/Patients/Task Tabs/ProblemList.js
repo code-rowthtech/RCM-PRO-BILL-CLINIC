@@ -73,30 +73,6 @@ const ProblemList = () => {
                 <UpdateProblem problem={selectedProblem} onCancel={() => setShowUpdateProblem(false)} />
             ) : ( */}
                 <Row>
-                    <Col sm={12} className="d-flex justify-content-between mt-2">
-                        <h4>Active Problem</h4>
-                        <div className="d-flex gap-2">
-                            <p className="mb-0 mt-1">
-                                <input className="form-check-input bg-primary me-1" type="checkbox" />
-                                Show Inactive Problem
-                            </p>
-                            <p className="mb-0 mt-1">
-                                <input className="form-check-input bg-primary me-1" type="checkbox" />
-                                Patient has no known active problem
-                            </p>
-                            <Button
-                                className="custom-buttons text-nowrap"
-                                //  onClick={() => setShowAddProblem(true)}
-                                onClick={() => {
-                                    setIsEditMode(false);
-                                    setSelectedProblem(null);
-                                    setProblemModal(true);
-                                }}>
-                                <FiPlus className="fs-5 text-white" />
-                                &nbsp; Problem
-                            </Button>
-                        </div>
-                    </Col>
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">

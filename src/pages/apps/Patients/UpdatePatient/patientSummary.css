@@ -1,26 +1,4 @@
-.scroll-container {
-    overflow-y: auto;
-    padding-bottom: 20px;
 
-    /* Custom Scrollbar */
-    scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #c1c1c191 transparent; /* thumb and track for Firefox */
-}
-
-/* Webkit Browsers (Chrome, Edge, Safari) */
-.scroll-container::-webkit-scrollbar {
-    width: 6px; /* thin scrollbar */
-}
-
-.scroll-container::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-    background-color: #c1c1c1;
-    border-radius: 10px;
-    border: 1px solid transparent;
-}
 .summary-expanded {
     height: 63vh;
 }

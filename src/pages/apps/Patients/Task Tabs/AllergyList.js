@@ -66,13 +66,17 @@ const AllergyList = () => {
             .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
             .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
     };
+
+    const handleDelete = (data) => {
+        dispatch(deleteAllergyAction({ id: data?._id }));
+    };
     return (
         <>
-            <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
+            <div className="scroll-container" style={{  overflowX: 'hidden', height: '70vh' }}>
                 <Row>
-                    <Col sm={12} className="d-flex justify-content-between mt-2">
-                        <h4>Allergy List</h4>
-                        <Button
+                    {/* <Col sm={12} className="d-flex justify-content-between"> */}
+                        {/* <h6>Allergy List</h6> */}
+                        {/* <Button
                             className="custom-buttons text-nowrap"
                             onClick={() => {
                                 setSelectedAllergy(null); // Clear any previously selected allergy
@@ -81,8 +85,8 @@ const AllergyList = () => {
                             }}>
                             <FiPlus className="fs-5 text-white" />
                             &nbsp; Add Allergy
-                        </Button>
-                    </Col>
+                        </Button> */}
+                    {/* </Col> */}
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
@@ -178,10 +182,7 @@ const AllergyList = () => {
                                                     <MdDeleteOutline
                                                         className="fs-4 cursor-pointer text-black"
                                                         onClick={() => {
-                                                            const requestData = {
-                                                                id: data?._id,
-                                                            };
-                                                            dispatch(deleteAllergyAction(requestData));
+                                                            handleDelete(data);
                                                         }}
                                                     />
                                                 </td>

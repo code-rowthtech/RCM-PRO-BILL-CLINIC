@@ -28,7 +28,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
     const appointments = store?.getPatientAppointmentReducer?.data || [];
     const updateProblemListResponse = store?.updateProblemListReducer?.data?.status;
     const [showSuggestions, setShowSuggestions] = useState(false);
-
     const {
         register,
         handleSubmit,
