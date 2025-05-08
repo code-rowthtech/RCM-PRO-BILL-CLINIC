@@ -13,7 +13,7 @@ export const getSubclinicSubscriptionsAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionSubscription = (): LayoutAction => ({
     type: SubscriptionsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });

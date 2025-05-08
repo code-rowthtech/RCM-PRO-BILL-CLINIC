@@ -8,13 +8,10 @@ import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
-    getDepartmentDataAction,
     getMastersDataAction,
-    stateEmptydAction,
     updateMastersDataAction,
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
-import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 
@@ -96,16 +93,7 @@ const Department = () => {
         dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
       }
     },[updateResponse])
-    // useEffect(() => {
-    //     dispatch(getMastersDataAction({ status: status, category: 'Department', limit: 10, skip, search: search }));
-    //     if (createResponse === 200 || updateResponse === 200) {
-    //         dispatch(
-    //             getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip })
-    //         );
-    //         closeAddModal();
-    //     }
-    // }, [dispatch, createResponse, updateResponse, status, search, skip]);
-
+  
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearch('');
@@ -270,15 +258,6 @@ const Department = () => {
                             </tbody>
                         </Table>
 
-                        <Row>
-                            <Col className="mt-2 d-flex justify-content-end">
-                                {/* <Paginations
-                  currentPage={skip}
-                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
-                  onPageChange={handlePageChange}
-                /> */}
-                            </Col>
-                        </Row>
                     </Card.Body>
                 </Card>
             </Col>
@@ -314,7 +293,6 @@ const Department = () => {
                                         placeholder="Enter Department Name"
                                         onInput={(e) => {
                                             const value = e.target.value;
-                                            // Prevent spaces when input is empty
                                             if (value.trim() === '') {
                                                 e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                                             }
@@ -343,7 +321,6 @@ const Department = () => {
                                         placeholder="Re-enter Department Name"
                                         onInput={(e) => {
                                             const value = e.target.value;
-                                            // Prevent spaces when input is empty
                                             if (value.trim() === '') {
                                                 e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                                             }
@@ -363,7 +340,6 @@ const Department = () => {
                                         placeholder="Enter description"
                                         onInput={(e) => {
                                             const value = e.target.value;
-                                            // Prevent spaces when input is empty
                                             if (value.trim() === '') {
                                                 e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
                                             }
@@ -373,7 +349,6 @@ const Department = () => {
                             </Col>
                         </Row>
                         <Modal.Footer>
-                            {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
                                 store?.updateMastersDataReducer?.loading ? (

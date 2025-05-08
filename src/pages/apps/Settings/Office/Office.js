@@ -8,13 +8,10 @@ import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import {
   createMastersDataAction,
-  getDepartmentDataAction,
   getMastersDataAction,
-  // stateEmptydAction,
   updateMastersDataAction
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
-import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 
@@ -23,7 +20,6 @@ const Office = () => {
   const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
   const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm();
   const dispatch = useDispatch();
-  const nameValue = watch("name");
   const [office, setOffice] = useState(false);
   const [edit, setEdit] = useState(null);
   const [search, setSearch] = useState('');
@@ -46,7 +42,6 @@ const Office = () => {
 
   const addOffice = (data) => {
     const payload = {
-      //   id: edit?._id,
       ...(edit ? { id: edit?._id } : {}),
       name: data?.name,
       description: data?.description || 'N/A',
@@ -85,13 +80,13 @@ const Office = () => {
   }, [dispatch, status, search, skip]);
 
   useEffect(() => {
-    if(createResponse === 200){
+    if (createResponse === 200) {
       dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
     }
     closeAddModal();
   }, [createResponse]);
   useEffect(() => {
-    if(updateResponse === 200){
+    if (updateResponse === 200) {
       dispatch(getMastersDataAction({ status: status, category: 'Office', search: search, limit: 10, skip: skip }));
     }
     closeAddModal();
@@ -228,16 +223,6 @@ const Office = () => {
                 )}
               </tbody>
             </Table>
-
-            <Row>
-              <Col className='mt-2 d-flex justify-content-end'>
-                {/* <Paginations
-                  currentPage={skip}
-                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
-                  onPageChange={handlePageChange}
-                /> */}
-              </Col>
-            </Row>
           </Card.Body>
         </Card>
       </Col>
@@ -310,9 +295,8 @@ const Office = () => {
                     placeholder="Enter description"
                     onInput={(e) => {
                       const value = e.target.value;
-                      // Prevent spaces when input is empty
                       if (value.trim() === "") {
-                        e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                        e.target.value = value.replace(/\s/g, '');
                       }
                     }}
                   />
@@ -322,7 +306,6 @@ const Office = () => {
               </Col>
             </Row>
             <Modal.Footer>
-              {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">

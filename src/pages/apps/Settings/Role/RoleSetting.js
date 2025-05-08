@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
-// import PageTitle from '../../../components/PageTitle'
 import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { getRolesAction, updateRolesAction } from '../../../redux/actions'
-// import { stateEmptydAction } from '../../../redux/roles/actions'
 import Spinner from '../../../../constants/Spinner';
 import Paginations from '../../../../helpers/Paginations';
 import CreateRoleSetting from './CreateRoleSetting';
@@ -13,7 +10,6 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { FormInput } from '../../../../components';
 import {
     getRoleDataAction,
-    //  stateEmptydAction,
     updateRoleDataAction,
 } from '../../../../redux/actions';
 import { IoSearchSharp } from 'react-icons/io5';
@@ -35,35 +31,6 @@ const RoleSetting = () => {
         setShowModal(false);
     };
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-
-    // useEffect(() => {
-    //     // Trigger data fetch when the status changes or other dependencies change
-    //     dispatch(getRoleDataAction({
-    //         clinicId: clinicId,
-    //         limit: 10,
-    //         search: search,
-    //         createdById: '',
-    //         page: skip,
-    //         status: status
-    //     }));
-
-    //     // If there's a successful update or create, reset the modal and fetch updated data
-    //     if (updateSuccess === 200 || createSuccess === 200) {
-    //         // dispatch(stateEmptydAction());
-    //         handleClosemodal();
-    //         closeUpdateModal();
-    //         setShowUpdateModal(false);
-    //         setShowModal(false);
-    //         dispatch(getRoleDataAction({
-    //             clinicId: clinicId,
-    //             limit: 10,
-    //             search: search,
-    //             createdById: '',
-    //             page: skip,
-    //             status: status
-    //         }));
-    //     }
-    // }, [dispatch, updateSuccess, skip, search, createSuccess, status]);
     useEffect(() => {
         dispatch(
             getRoleDataAction({
@@ -77,24 +44,6 @@ const RoleSetting = () => {
         );
     }, [dispatch, skip, search, status, clinicId]);
 
-    // useEffect(() => {
-    //     if (createSuccess === 200) {
-    //         handleClosemodal();
-    //         closeUpdateModal();
-    //         setShowUpdateModal(false);
-    //         setShowModal(false);
-    //         dispatch(
-    //             getRoleDataAction({
-    //                 clinicId: clinicId,
-    //                 limit: 10,
-    //                 search: search,
-    //                 createdById: '',
-    //                 page: skip,
-    //                 status: status,
-    //             })
-    //         );
-    //     }
-    // }, [createSuccess]);
     useEffect(() => {
         if (updateSuccess === 200) {
             handleClosemodal();
@@ -163,18 +112,16 @@ const RoleSetting = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${
-                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2 py-1`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={`active_inactive_buttons ${
-                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                        className={`active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2 py-1`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -293,10 +240,10 @@ const RoleSetting = () => {
                                                                     data-bs-toggle="tooltip"
                                                                     title={
                                                                         'Permissions' +
-                                                                            ' : ' +
-                                                                            data?.permissions
-                                                                                ?.map((permission) => permission?.name)
-                                                                                .join(', ') || ''
+                                                                        ' : ' +
+                                                                        data?.permissions
+                                                                            ?.map((permission) => permission?.name)
+                                                                            .join(', ') || ''
                                                                     }
                                                                     className="d-inline-block mt-1 text-truncate text-capitalize">
                                                                     {data?.name?.charAt(0).toUpperCase() +
@@ -349,11 +296,10 @@ const RoleSetting = () => {
                                                                 <td colSpan="7">
                                                                     <div className="expanded-content px-5">
                                                                         <div
-                                                                            className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${
-                                                                                data?.permissions?.length === 0
-                                                                                    ? 'd-none'
-                                                                                    : ''
-                                                                            }`}>
+                                                                            className={`permissions-header fs-4 d-flex align-items-center font-weight-bold ${data?.permissions?.length === 0
+                                                                                ? 'd-none'
+                                                                                : ''
+                                                                                }`}>
                                                                             <div className="col-1"></div>
                                                                             <div className="permission-name text-black fw-bold col-2">
                                                                                 Permission

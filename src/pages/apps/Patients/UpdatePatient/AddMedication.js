@@ -65,9 +65,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             setValue(
                 'drugInfo',
                 selectedMedication?.drugId?.proprietaryName +
-                    ' (' +
-                    selectedMedication?.drugId?.nonProprietaryName +
-                    ')'
+                ' (' +
+                selectedMedication?.drugId?.nonProprietaryName +
+                ')'
             );
             setValue('frequency', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.frequency);
             setValue('period', selectedMedication?.dosageInstruction?.[0]?.timing?.repeat?.period);
@@ -362,7 +362,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                                     [{ header: [1, 2, false] }],
                                                     ['bold', 'italic', 'underline', 'strike'],
                                                     [{ list: 'ordered' }, { list: 'bullet' }],
-                                                    ['link', 'image'],
+                                                    // ['link', 'image'],
                                                     ['clean'],
                                                 ],
                                             }}

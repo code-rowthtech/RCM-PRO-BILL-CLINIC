@@ -324,7 +324,7 @@ const FamilyHistory = () => {
                                                                 [{ header: [1, 2, false] }],
                                                                 ['bold', 'italic', 'underline', 'strike'],
                                                                 [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                ['link', 'image'],
+                                                                // ['link', 'image'],
                                                                 ['clean'],
                                                             ],
                                                         }}
@@ -388,8 +388,8 @@ const FamilyHistory = () => {
                                                             <span className="ms-1 fs-6">
                                                                 {item?.bornDate
                                                                     ? new Date(item?.bornDate)?.toLocaleDateString(
-                                                                          'en-GB'
-                                                                      )
+                                                                        'en-GB'
+                                                                    )
                                                                     : ''}
                                                             </span>
                                                         </div>
