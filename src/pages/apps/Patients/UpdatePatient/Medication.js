@@ -52,23 +52,8 @@ const Medication = ({ isAccordionOpen }) => {
 
   return (
     <>
-      <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
+      <div className="scroll-container" style={{  overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
         <Row>
-          <Col sm={12} className="d-flex justify-content-between mt-2">
-            <h4>Medication List</h4>
-            <Button
-              className="custom-buttons text-nowrap"
-              onClick={() => {
-                setSelectedMedication(null);
-                // setShowUpdateMedication(false);
-                setMedicationModal(true);
-              }}
-            >
-              <FiPlus className="fs-5 text-white" />
-              &nbsp; Add Medication
-            </Button>
-          </Col>
-
           <Col sm={12}>
             <Table responsive className="table-centered table-nowrap mb-0">
               <thead className="text-white bg-dark">

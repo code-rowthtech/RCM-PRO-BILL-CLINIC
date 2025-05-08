@@ -4,7 +4,7 @@ import AppointmentForm from './Tabs/AppointmentForm';
 import Vitals from './Tabs/Vitals';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAppointmentByIdAction, resetUpdateAction } from '../../../redux/actions';
+import { getAppointmentByIdAction, resetUpdateActionAppiontment } from '../../../redux/actions';
 import Spinner from '../../../constants/Spinner';
 import { RxPlusCircled } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
@@ -27,7 +27,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     useEffect(() => {
         if (rescheduleResponse === 200) {
             dispatch(getAppointmentByIdAction({ id: id }));
-            dispatch(resetUpdateAction());
+            dispatch(resetUpdateActionAppiontment());
             onCancel();
         }
     }, [rescheduleResponse]);

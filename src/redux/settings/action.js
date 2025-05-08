@@ -25,7 +25,7 @@ export const updateMastersDataAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionSettings = (): LayoutAction => ({
     type: SettingsActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });

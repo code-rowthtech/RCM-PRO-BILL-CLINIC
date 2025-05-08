@@ -90,6 +90,6 @@ export const deleteClinicAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionAuth = (): LayoutAction => ({
     type: ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE,
 });

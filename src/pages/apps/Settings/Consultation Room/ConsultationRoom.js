@@ -8,13 +8,10 @@ import { useForm } from 'react-hook-form';
 import { encryptMessage } from '../../../../cryptoUtils';
 import {
     createMastersDataAction,
-    getDepartmentDataAction,
     getMastersDataAction,
-    // stateEmptydAction,
     updateMastersDataAction,
 } from '../../../../redux/settings/action';
 import { IoMdClose } from 'react-icons/io';
-import Paginations from '../../../../helpers/Paginations';
 import { formatDate } from '../../../../helpers/dateFormat';
 import { IoSearchSharp } from 'react-icons/io5';
 
@@ -146,18 +143,16 @@ const ConsultationRoom = () => {
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${
-                                        status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Active
                                 </Button>
 
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={` active_inactive_buttons ${
-                                        status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -285,16 +280,6 @@ const ConsultationRoom = () => {
                                 )}
                             </tbody>
                         </Table>
-
-                        <Row>
-                            <Col className="mt-2 d-flex justify-content-end">
-                                {/* <Paginations
-                  currentPage={skip}
-                  totalPages={store?.getMastersDataReducer?.data?.totalPages}
-                  onPageChange={handlePageChange}
-                /> */}
-                            </Col>
-                        </Row>
                     </Card.Body>
                 </Card>
             </Col>
@@ -379,9 +364,8 @@ const ConsultationRoom = () => {
                                         placeholder="Enter description"
                                         onInput={(e) => {
                                             const value = e.target.value;
-                                            // Prevent spaces when input is empty
                                             if (value.trim() === '') {
-                                                e.target.value = value.replace(/\s/g, ''); // Remove all spaces if empty
+                                                e.target.value = value.replace(/\s/g, '');
                                             }
                                         }}
                                     />
@@ -389,10 +373,9 @@ const ConsultationRoom = () => {
                             </Col>
                         </Row>
                         <Modal.Footer>
-                            {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

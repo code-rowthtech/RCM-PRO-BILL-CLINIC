@@ -6,13 +6,12 @@ import {
     getStatesByCountryAction,
     getCitiesAction,
     addReferringDoctorAction,
-    stateEmptydAction,
 } from '../../../redux/actions';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
 
-const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
+const ReferringDoctor = ({ patientId, setActiveTab }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const clinicId = JSON.parse(localStorage.getItem('hyper_user'))?.data?._id;
@@ -20,7 +19,6 @@ const ReferringDoctor = ({ patientId, activeTab, setActiveTab }) => {
         register,
         handleSubmit,
         formState: { errors },
-        setValue,
         reset,
         clearErrors,
         watch,

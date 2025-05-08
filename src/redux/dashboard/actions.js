@@ -9,7 +9,7 @@ export const getAnalyticsAction = (data): AuthAction => ({
     data
 });
 
-export const stateEmptydAction = (): LayoutAction => ({
+export const stateEmptydActionDashboard = (): LayoutAction => ({
     type: DashboardActionTypes.STATE_EMPTY_INTIAL_STATE,
 
 });

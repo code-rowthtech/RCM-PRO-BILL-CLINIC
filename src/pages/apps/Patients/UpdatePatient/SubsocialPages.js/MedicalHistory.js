@@ -183,6 +183,9 @@ const MedicalHistory = () => {
                                                         {...field}
                                                         classNamePrefix="select"
                                                         options={formattedOptions}
+                                                        value={
+                                                            selectedProblem || null
+                                                        }
                                                         onChange={(selected) => {
                                                             field.onChange(selected);
                                                             setSelectedProblem(selected); // 🔁 update local state
