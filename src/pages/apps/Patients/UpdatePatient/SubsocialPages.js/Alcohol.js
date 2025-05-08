@@ -4,9 +4,11 @@ import { useForm, Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
+import { useDispatch } from 'react-redux';
 
 const Alcohol = () => {
-    const { register, handleSubmit, reset, control, watch } = useForm();
+    const dispatch = useDispatch();
+    const { register, handleSubmit, reset, control, watch, getValues, setValue } = useForm();
     const [entries, setEntries] = useState([]);
     const watchUseStatus = watch("alcoholUseStatus");
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -154,7 +156,7 @@ const Alcohol = () => {
                                                             [{ header: [1, 2, false] }],
                                                             ['bold', 'italic', 'underline', 'strike'],
                                                             [{ list: 'ordered' }, { list: 'bullet' }],
-                                                            ['link', 'image'],
+                                                            // ['link', 'image'],
                                                             ['clean'],
                                                         ],
                                                     }}
