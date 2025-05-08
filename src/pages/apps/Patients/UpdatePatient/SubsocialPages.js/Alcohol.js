@@ -156,7 +156,7 @@ const Alcohol = () => {
                                                             [{ header: [1, 2, false] }],
                                                             ['bold', 'italic', 'underline', 'strike'],
                                                             [{ list: 'ordered' }, { list: 'bullet' }],
-                                                            ['link', 'image'],
+                                                            // ['link', 'image'],
                                                             ['clean'],
                                                         ],
                                                     }}
