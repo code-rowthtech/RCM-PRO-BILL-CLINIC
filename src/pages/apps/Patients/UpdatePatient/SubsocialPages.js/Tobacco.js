@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTobaccooAction, getTobaccooAction } from '../../../../../redux/actions';
+import { createTobaccooAction, deleteTobaccooAction, getTobaccooAction, updateTobaccooAction } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
@@ -11,6 +11,7 @@ import 'react-quill/dist/quill.snow.css';
 import Spinner from '../../../../../constants/Spinner';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
+import DeletionModal from '../../../../../helpers/deletionModal';
 
 const Tobacco = () => {
     const dispatch = useDispatch();
@@ -22,18 +23,42 @@ const Tobacco = () => {
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const { register, handleSubmit, reset, getValues, control, setValue } = useForm();
-
-    // useEffect(() => {
-    //     dispatch(getTobaccooAction({ patientId: patientId }));
-    // }, [dispatch, patientId]);
-
-
+    const [toEdit, setToEdit] = useState(null);
+    const [toDelete, setToDelete] = useState(null);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const deleteSuccess = store?.deleteTobaccooReducer?.data?.status
+    const updateSuccess = store?.updateTobaccooReducer
     useEffect(() => {
-        if (createSuccess === 201) {
-            dispatch(getTobaccooAction({ patientId: patientId }));
+        if (toEdit) {
+            setValue('tobaccoUse', toEdit?.tobaccoUse)
+            setValue('effectiveDateTime', toEdit?.effectiveDateTime ? new Date(toEdit?.effectiveDateTime).toISOString().split("T")[0] : '');
+            setValue('note', toEdit?.note?.[0]?.text || "<ul><li></li></ul>"); // fallback to default if empty
+        } else {
             reset();
         }
-    }, [createSuccess, dispatch, patientId, reset]);
+    }, [toEdit])
+
+    const closeDeleteModal = () => {
+        setToDelete(null);
+        setDeleteModal(false);
+    }
+    const deleteHistory = () => {
+        dispatch(deleteTobaccooAction({ id: toDelete }))
+    }
+    useEffect(() => {
+        if (deleteSuccess === 200) {
+            dispatch(getTobaccooAction({ patientId: patientId }));
+            setToDelete(null);
+            setDeleteModal(false);
+        }
+    }, [deleteSuccess])
+    useEffect(() => {
+        if (createSuccess === 201 || updateSuccess?.data?.status === 200) {
+            dispatch(getTobaccooAction({ patientId: patientId }));
+            setToEdit(null)
+            reset();
+        }
+    }, [createSuccess, updateSuccess]);
 
     const onSubmit = (data) => {
         data.subject = patientId;
@@ -44,7 +69,12 @@ const Tobacco = () => {
             },
         ];
         data.clinicId = loggedInUser?._id;
-        dispatch(createTobaccooAction({ key: encryptMessage(data) }));
+        if (toEdit) {
+            // data.id = toEdit?._id;
+            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
+        } else {
+            dispatch(createTobaccooAction({ key: encryptMessage(data) }));
+        }
     };
 
     const handleEditorFocus = () => {
@@ -127,6 +157,7 @@ const Tobacco = () => {
                                                 {...register('effectiveDateTime')}
                                                 required
                                                 className="form-control-sm"
+                                                max={new Date().toISOString().slice(0, 10)}
                                             />
                                         </Form.Group>
                                     </Col>
@@ -217,12 +248,13 @@ const Tobacco = () => {
                                             <div className="d-flex justify-content-between align-items-start px-1 mb-1">
                                                 <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
                                                 <small className="text-muted">
-                                                    {item?.effectiveDateTime
-                                                        ? new Date(item?.effectiveDateTime).toLocaleDateString()
+                                                    {item?.note?.[0]?.time
+                                                        ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(item.note[0].time).toLocaleTimeString()})`
                                                         : 'No date'}
                                                 </small>
+
                                             </div>
-                                            {item.note?.[0]?.text && (
+                                            {item?.note?.[0]?.text && (
                                                 <div className="mt-2">
                                                     <div
                                                         className="ql-editor p-0"
@@ -231,6 +263,28 @@ const Tobacco = () => {
                                                     />
                                                 </div>
                                             )}
+                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
+                                                <i className="bi bi-trash-fill text-danger cursor-pointer"
+                                                    onClick={() => {
+                                                        setToDelete(item?._id)
+                                                        setDeleteModal(true)
+                                                    }}></i>
+                                                {toEdit && toEdit._id === item._id ? (
+                                                    <i
+                                                        onClick={() => {
+                                                            setToEdit(null);
+                                                            setToEdit(item);
+                                                        }}
+                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                ) : (
+                                                    <i
+                                                        onClick={() => setToEdit(item)}
+                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                    ></i>
+                                                )}
+
+                                            </div>
+                                            <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteHistory} item='tobaccoo history' isLoading={store?.deleteTobaccooReducer?.loading} />
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>

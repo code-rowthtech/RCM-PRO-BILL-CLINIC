@@ -136,6 +136,8 @@ export const createSuggestions = `${BaseRoute}/suggestions`;
 
 // Tobaccoo
 export const createTobaccoo = `${BaseRoute}/tobaccoHistory`;
+export const deleteTobaccoo = `${BaseRoute}/tobaccoHistory`;
+export const updateTobacco = `${BaseRoute}/tobaccoHistory`;
 export const getTobaccoo = `${BaseRoute}/tobaccoHistory`;
 
 // Family/Genetic
@@ -149,7 +151,8 @@ export const createSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const updateSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const getSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const deleteSurgicalHistory = `${BaseRoute}/surgicalHistory`;
-
+// ALCOHOL HISTORY
+export const alcoholHistory = `${BaseRoute}/alcoholHistory`;
 
 // Surgical 
 export const createMedicalHistory = `${BaseRoute}/medicalHistory`;

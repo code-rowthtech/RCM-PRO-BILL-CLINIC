@@ -12,6 +12,7 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import Select from 'react-select';
 import { bodySite } from '../../../../../utils/DataSets/surgicalHistoryDataset';
+import DeletionModal from '../../../../../helpers/deletionModal';
 
 const SurgicalHistory = () => {
     const dispatch = useDispatch();
@@ -26,9 +27,18 @@ const SurgicalHistory = () => {
     const [selectedIcdProcedure, setSelectedIcdProcedure] = useState(null);
     const [bodySiteSelected, setBodySiteSelected] = useState(null);
     const [search, setSearch] = useState('');
+    const [deleteModal, setDeleteModal] = useState(false)
+    const [toDelete, setToDelete] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const { register, handleSubmit, reset, getValues, control, setValue, formState: { errors } } = useForm();
     const [toEdit, setToEdit] = useState(null);
+    const closeDeleteModal = () => {
+        setToDelete(null)
+        setDeleteModal(false)
+    }
+    const deleteSurgicalHistory = () => {
+        dispatch(deleteSurgicalHistoryAction({ id: toDelete }))
+    }
     useEffect(() => {
         if (toEdit) {
             setValue('effectiveDateTime', toEdit?.performedDateTime ? new Date(toEdit?.performedDateTime)?.toISOString().split("T")[0] : '');
@@ -57,6 +67,8 @@ const SurgicalHistory = () => {
         if (deleteSuccess === 200) {
             dispatch(getSurgicalHistoryAction({ patientId: patientId }));
             setSelectedIcdProcedure(null);
+            setToDelete(null);
+            setDeleteModal(false);
             reset();
         }
     }, [deleteSuccess, patientId]);
@@ -178,6 +190,7 @@ const SurgicalHistory = () => {
                                                 {...register('effectiveDateTime', {
                                                     required: true
                                                 })}
+                                                max={new Date().toISOString().slice(0, 10)}
                                                 className="form-control-sm"
                                             />
                                             {errors.effectiveDateTime && (
@@ -321,7 +334,8 @@ const SurgicalHistory = () => {
                                             <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
                                                 <i className="bi bi-trash-fill text-danger cursor-pointer"
                                                     onClick={() => {
-                                                        dispatch(deleteSurgicalHistoryAction({ id: item?._id }))
+                                                        setToDelete(item?._id)
+                                                        setDeleteModal(true)
                                                     }}></i>
                                                 {toEdit && toEdit._id === item._id ? (
                                                     <i
@@ -338,6 +352,7 @@ const SurgicalHistory = () => {
                                         </ListGroup.Item>
                                     ))}
                                 </ListGroup>
+                                <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteSurgicalHistory} item='surgical history' isLoading={store?.deleteTobaccooReducer?.loading} />
                             </div>
                         )}
                     </Card.Body>
