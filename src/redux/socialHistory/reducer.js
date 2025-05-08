@@ -427,11 +427,11 @@ export const getMedicalHistoryReducer = (state = GET_MEDICAL_HISTORY_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
-        case TobaccooActionTypes.GET_MEDICAL_HISTORY_RESET:
-            return {
-                data: [],
-                loading: false,
-            };
+        // case TobaccooActionTypes.GET_MEDICAL_HISTORY_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
 
         case TobaccooActionTypes.GET_MEDICAL_HISTORY_ERROR:
             return {
@@ -442,7 +442,58 @@ export const getMedicalHistoryReducer = (state = GET_MEDICAL_HISTORY_INITIAL_STA
             return state;
     }
 };
-
+export const updateMedicalHistoryReducer = (state = UPDATE_MEDICAL_HISTORY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.UPDATE_MEDICAL_HISTORY_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.UPDATE_MEDICAL_HISTORY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.UPDATE_MEDICAL_HISTORY_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.UPDATE_MEDICAL_HISTORY_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+export const deleteMedicalHistoryReducer = (state = DELETE_MEDICAL_HISTORY_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.DELETE_MEDICAL_HISTORY_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.DELETE_MEDICAL_HISTORY_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_MEDICAL_HISTORY_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_MEDICAL_HISTORY_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
 
 // ALCOHOL HISTORY
 export const createAlcoholHistoryReducer = (state = CREATE_ALCOHOL_HISTORY_INITIAL_STATE, action) => {

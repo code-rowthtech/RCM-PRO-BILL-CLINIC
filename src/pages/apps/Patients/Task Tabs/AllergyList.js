@@ -66,6 +66,10 @@ const AllergyList = () => {
             .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
             .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
     };
+
+    const handleDelete = (data) => {
+        dispatch(deleteAllergyAction({ id: data?._id }));
+    };
     return (
         <>
             <div className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: '70vh' }}>
@@ -178,10 +182,7 @@ const AllergyList = () => {
                                                     <MdDeleteOutline
                                                         className="fs-4 cursor-pointer text-black"
                                                         onClick={() => {
-                                                            const requestData = {
-                                                                id: data?._id,
-                                                            };
-                                                            dispatch(deleteAllergyAction(requestData));
+                                                            handleDelete(data);
                                                         }}
                                                     />
                                                 </td>

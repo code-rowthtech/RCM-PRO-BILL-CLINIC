@@ -458,7 +458,7 @@ function* deleteMedicalHistoryFunction(data) {
         });
         const response = yield call(deleteMedicalHistoryApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.DELETE_MEDICAL_HISTORY_SUCCESS,
@@ -495,10 +495,10 @@ function* getMedicalHistoryFunction(data) {
                 type: TobaccooActionTypes.GET_MEDICAL_HISTORY_SUCCESS,
                 payload: { ...decryptedData },
             });
-            yield put({
-                type: TobaccooActionTypes.GET_MEDICAL_HISTORY_RESET,
-                payload: {},
-            });
+            // yield put({
+            //     type: TobaccooActionTypes.GET_MEDICAL_HISTORY_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: TobaccooActionTypes.GET_MEDICAL_HISTORY_ERROR,
@@ -706,7 +706,6 @@ export function* watchGetMedicalHistory() {
 export function* watchDeleteMedicalHistory() {
     yield takeEvery(TobaccooActionTypes.DELETE_MEDICAL_HISTORY, deleteMedicalHistoryFunction);
 }
-
 // SURGICAL HISTORY
 export function* watchCreateAlcoholHistory() {
     yield takeEvery(TobaccooActionTypes.CREATE_ALCOHOL_HISTORY, createAlcoholHistoryFunction);

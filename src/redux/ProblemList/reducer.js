@@ -129,11 +129,6 @@ export const getALLCodesReducer = (state = GET_ALL_CODES_INITIAL_STATE, action) 
                 data: action.payload,
                 loading: false,
             };
-        case ProblemListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false,
-            };
         default:
             return state;
     }
@@ -154,11 +149,6 @@ export const getPatientAppointmentReducer = (state = GET_PATIENT_APPOINTMENT_INI
         case ProblemListActionTypes.GET_PATIENTS_APPOINTMENT_ERROR:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case ProblemListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false,
             };
         default:
@@ -207,11 +197,6 @@ export const getProblemDetailsReducer = (state = GET_PROBLEM_DETAILS_INITIAL_STA
         case ProblemListActionTypes.GET_PROBLEM_DETAILS_ERROR:
             return {
                 data: action.payload,
-                loading: false,
-            };
-        case ProblemListActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
                 loading: false,
             };
         default:
