@@ -35,7 +35,8 @@ export function createFamilyGeneticApi(params: any): any {
 }
 export function updateFamilyGeneticApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updateFamily, data);
+    return api.update(`${URL.updateFamily}/${data?.id}`, data);
+
 }
 export function getFamilyGeneticApi(params: any): any {
     const { data } = params;
@@ -76,7 +77,7 @@ export function createMedicalHistoryApi(params: any): any {
 }
 export function updateMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.updateMedicalHistory}`, data);
+    return api.update(`${URL.updateMedicalHistory}/${data?.id}`, data);
 }
 export function getMedicalHistoryApi(params: any): any {
     const { data } = params;
@@ -84,5 +85,26 @@ export function getMedicalHistoryApi(params: any): any {
 }
 export function deleteMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.delete(`${URL.deleteMedicalHistory}`,data);
+    return api.delete(`${URL.deleteMedicalHistory}/${data?.id}`);
+}
+
+
+// ALCOHOL HISTORY
+
+export function createAlcoholHistoryApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.alcoholHistory, data);
+}
+export function updateAlcoholHistoryApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.alcoholHistory, data);
+}
+export function getAlcoholHistoryApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.alcoholHistory}?subject=${data?.patientId}`);
+}
+
+export function deleteAlcoholHistoryApi(params: any): any {
+    const { data } = params;
+    return api.delete(`${URL.alcoholHistory}?id=${data?.id}`);
 }

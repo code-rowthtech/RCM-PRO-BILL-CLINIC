@@ -31,9 +31,7 @@ const AddAllergy = ({ onCancel }) => {
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
     const createStatus = store?.createAllergyReducer?.data?.status;
     const suggestionDataget = store?.createSuggestionsReducer;
-    console.log(suggestionDataget, 'suggestionDataget');
     const [code, setCode] = useState(null);
-    console.log(code, 'code');
     const [substance, setSubstance] = useState(null);
     const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
     const [exposureRoute, setExposureRoute] = useState(null); // State to store selected exposure route
@@ -199,7 +197,6 @@ const AddAllergy = ({ onCancel }) => {
             };
         }
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'allergypayload');
     };
     useEffect(() => {
         const handleClickOutside = (event) => {

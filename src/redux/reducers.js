@@ -28,7 +28,7 @@ import { createProblemListReducer, deleteProblemListReducer, getALLCodesReducer,
 import { createAllergyReducer, getAllergiesOfAPatientReducer, getAllergyDetailsReducer, updateAllergyReducer, deleteAllergyReducer } from './allergyList/reducer';
 import { createSuggestionsReducer } from './suggestions/reducer';
 import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
-import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
+import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
 export default (combineReducers({
     Auth,
@@ -59,6 +59,7 @@ export default (combineReducers({
     createAllergyReducer, getAllergyDetailsReducer, getAllergiesOfAPatientReducer, updateAllergyReducer, deleteAllergyReducer,
     // suggestions
     createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer, updateMedicationReducer,
-    createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,deleteFamilyGenticReducer,
-    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer,deleteMedicalHistoryReducer,
+    createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
+    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer,deleteFamilyGenticReducer,
+    createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer
 }): any);

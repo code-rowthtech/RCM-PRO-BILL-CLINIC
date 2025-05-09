@@ -3,18 +3,22 @@ import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { TobaccooActionTypes } from './constants';
 import {
+    createAlcoholHistoryApi,
     createFamilyGeneticApi,
     createMedicalHistoryApi,
     createSurgicalHistoryApi,
     createTobaccooApi,
     deleteFamilyGeneticApi,
+    deleteAlcoholHistoryApi,
     deleteMedicalHistoryApi,
     deleteSurgicalHistoryApi,
     deleteTobaccooApi,
+    getAlcoholHistoryApi,
     getFamilyGeneticApi,
     getMedicalHistoryApi,
     getSurgicalHistoryApi,
     getTobaccooApi,
+    updateAlcoholHistoryApi,
     updateFamilyGeneticApi,
     updateMedicalHistoryApi,
     updateSurgicalHistoryApi,
@@ -195,7 +199,7 @@ function* updateFamilyGeneticFunction(data) {
         });
         const response = yield call(updateFamilyGeneticApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: TobaccooActionTypes.UPDATE_FAMILY_GENETIC_SUCCESS,
@@ -541,6 +545,136 @@ function* getMedicalHistoryFunction(data) {
     }
 }
 
+// SURGICAL HISTORY
+function* getAlcoholHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.GET_ALCOHOL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(getAlcoholHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: TobaccooActionTypes.GET_ALCOHOL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.GET_ALCOHOL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.GET_ALCOHOL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.GET_ALCOHOL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+function* createAlcoholHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(createAlcoholHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateAlcoholHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateAlcoholHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* deleteAlcoholHistoryFunction(data) {
+    try {
+        yield put({
+            type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteAlcoholHistoryApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY_ERROR,
+            payload: error,
+        });
+    }
+}
+
+
+
 export function* watchCreateTobaccoo() {
     yield takeEvery(TobaccooActionTypes.CREATE_TOBACCOO, createTobaccooFunction);
 }
@@ -606,13 +740,30 @@ export function* watchGetMedicalHistory() {
 export function* watchDeleteMedicalHistory() {
     yield takeEvery(TobaccooActionTypes.DELETE_MEDICAL_HISTORY, deleteMedicalHistoryFunction);
 }
+// SURGICAL HISTORY
+export function* watchCreateAlcoholHistory() {
+    yield takeEvery(TobaccooActionTypes.CREATE_ALCOHOL_HISTORY, createAlcoholHistoryFunction);
+}
+
+export function* watchUpdateAlcoholHistory() {
+    yield takeEvery(TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY, updateAlcoholHistoryFunction);
+}
+
+export function* watchGetAlcoholHistory() {
+    yield takeEvery(TobaccooActionTypes.GET_ALCOHOL_HISTORY, getAlcoholHistoryFunction);
+}
+
+export function* watchDeleteAlcoholHistory() {
+    yield takeEvery(TobaccooActionTypes.DELETE_ALCOHOL_HISTORY, deleteAlcoholHistoryFunction);
+}
 
 function* clinicalHistorySaga() {
     yield all([
         fork(watchCreateTobaccoo), fork(watchGetTobaccoo), fork(watchDeleteTobaccoo), fork(watchUpdateTobaccoo),
         fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic),fork(watchDeleteFamilyGenetic),
         fork(watchCreateSurgicalHistory), fork(watchUpdateSurgicalHistory), fork(watchGetSurgicalHistory), fork(watchDeleteSurgicalHistory),
-        fork(watchCreateMedicalHistory), fork(watchUpdateMedicalHistory), fork(watchGetMedicalHistory), fork(watchDeleteMedicalHistory)
+        fork(watchCreateMedicalHistory), fork(watchUpdateMedicalHistory), fork(watchGetMedicalHistory), fork(watchDeleteMedicalHistory),
+        fork(watchCreateAlcoholHistory), fork(watchUpdateAlcoholHistory), fork(watchGetAlcoholHistory), fork(watchDeleteAlcoholHistory)
     ]);
 }
 export default clinicalHistorySaga;

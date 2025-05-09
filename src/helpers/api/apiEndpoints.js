@@ -142,7 +142,7 @@ export const getTobaccoo = `${BaseRoute}/tobaccoHistory`;
 
 // Family/Genetic
 export const createFamily = `${BaseRoute}/familyMedicalHistory`;
-export const updateFamily = `${BaseRoute}/familyMedicalHistory/`;
+export const updateFamily = `${BaseRoute}/familyMedicalHistory`;
 export const getFamily = `${BaseRoute}/familyMedicalHistory`;
 export const deleteFamily = `${BaseRoute}/familyMedicalHistory/`;
 
@@ -151,11 +151,12 @@ export const createSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const updateSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const getSurgicalHistory = `${BaseRoute}/surgicalHistory`;
 export const deleteSurgicalHistory = `${BaseRoute}/surgicalHistory`;
-
+// ALCOHOL HISTORY
+export const alcoholHistory = `${BaseRoute}/alcoholHistory`;
 
 // Surgical 
 export const createMedicalHistory = `${BaseRoute}/medicalHistory`;
-export const updateMedicalHistory = `${BaseRoute}/medicalHistory/`;
+export const updateMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
 // ICD CODES

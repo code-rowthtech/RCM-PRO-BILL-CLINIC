@@ -7,6 +7,7 @@ import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    getAlcoholHistoryAction,
     getFamilyGeneticAction,
     getMedicationAction,
     getPatientByIdAction,
@@ -131,7 +132,10 @@ const UpdatePatientIndex = () => {
         dispatch(getTobaccooAction({ patientId: id }));
         dispatch(getFamilyGeneticAction({ patientId: id }));
         dispatch(getProblemListAction({ patientId: id }));
-    }, [dispatch]);
+        dispatch(getAlcoholHistoryAction({ patientId: id }))
+        dispatch(getMedicationAction({ patientId: id }));
+
+    }, [dispatch, id]);
     // useEffect(() => {
 
     // }, [dispatch]);

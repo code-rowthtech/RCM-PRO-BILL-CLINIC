@@ -80,3 +80,23 @@ export const deleteMedicalHistoryAction = (data): AuthAction => ({
     type: TobaccooActionTypes.DELETE_MEDICAL_HISTORY,
     data
 })
+
+// ALCOHOL HISTORY
+export const createAlcoholHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.CREATE_ALCOHOL_HISTORY,
+    data
+});
+export const updateAlcoholHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.UPDATE_ALCOHOL_HISTORY,
+    data
+});
+
+export const getAlcoholHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.GET_ALCOHOL_HISTORY,
+    data
+});
+
+export const deleteAlcoholHistoryAction = (data): AuthAction => ({
+    type: TobaccooActionTypes.DELETE_ALCOHOL_HISTORY,
+    data
+})

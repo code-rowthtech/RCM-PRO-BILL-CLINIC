@@ -30,7 +30,7 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/';
+    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/patients/list';
 
     useEffect(() => {
         dispatch(resetAuth());
@@ -90,7 +90,7 @@ const Login = (): React$Element<any> => {
                 <VerticalForm
                     onSubmit={onSubmit}
                     resolver={schemaResolver}
-                    // defaultValues={{ username: 'test', password: 'test' }}
+                // defaultValues={{ username: 'test', password: 'test' }}
                 >
                     <FormInput
                         label={t('Email')}
@@ -98,14 +98,14 @@ const Login = (): React$Element<any> => {
                         name="username"
                         placeholder={t('Enter your Email')}
                         containerClass={'mb-3'}
-                        // onChange={(e) => {
-                        //     e.target.value = e.target.value.replace(/\s+/g, ''); // Remove spaces
-                        // }}
-                        // onKeyPress={(e) => {
-                        //     if (e.key === ' ') {
-                        //         e.preventDefault(); // Prevent space keypress
-                        //     }
-                        // }}
+                    // onChange={(e) => {
+                    //     e.target.value = e.target.value.replace(/\s+/g, ''); // Remove spaces
+                    // }}
+                    // onKeyPress={(e) => {
+                    //     if (e.key === ' ') {
+                    //         e.preventDefault(); // Prevent space keypress
+                    //     }
+                    // }}
                     />
 
                     <FormInput

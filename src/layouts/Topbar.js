@@ -1,6 +1,6 @@
 // @flow
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import classNames from 'classnames';
 
@@ -44,6 +44,7 @@ type TopbarProps = {
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
     const [isopen, setIsopen] = useState(false);
+    const navigate = useNavigate()
 
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
@@ -72,7 +73,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
-        '/apps/patients/update-patient': 'Update Patient',
+        '/apps/patients/update-patient': 'Patient Chart',
         '/apps/settings/templates': 'Templates',
         '/apps/settings/notesType': 'Notes Type',
     };
@@ -147,6 +148,15 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     )}
 
                     <ul className="list-unstyled topbar-menu float-end mb-0">
+                        {location.pathname === '/apps/patients/update-patient' &&
+                            <li className='notification-list'>
+                                <button
+                                    onClick={() => navigate('/apps/patients/list')}
+                                    className='custom mt-2 text-dark border-0  text-white px-2 bg-light fw-semibold'
+                                >
+                                    Back
+                                </button>
+                            </li>}
                         <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}

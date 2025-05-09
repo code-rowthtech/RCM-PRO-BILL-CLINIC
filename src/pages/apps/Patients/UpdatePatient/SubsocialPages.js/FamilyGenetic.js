@@ -41,7 +41,6 @@ const FamilyHistory = () => {
     const [familyList, setFamilyList] = useState([]);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
-    console.log(toEdit,'data coming')
     const [deleteModal, setDeleteModal] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
@@ -61,23 +60,46 @@ const FamilyHistory = () => {
     }, [dispatch, searchQuery]);
     useEffect(() => {
         if (toEdit) {
-            setRela(toEdit?.relationship?.coding?.[0]?.display);
-            setValue('name', toEdit?.name);
-            setValue('dob',toEdit?.bornDate ? new Date(toEdit?.bornDate).toDateString().split('T')[0]:'');
-            setValue('sex', toEdit?.gender)
-            setSelectedProblem(toEdit?.condition?.[0]?.code?.coding?.[0]?.display)
-            setValue('dateOfDeath',toEdit?.deceasedDate)
-            setValue('deceased', toEdit?.deceasedBoolean)
+            // const match = relationshipOption.find(
+            //     (opt) =>
+            //         opt.value.code === toEdit?.relationship?.coding?.[0]?.code &&
+            //         opt.value.system === toEdit?.relationship?.coding?.[0]?.system
+            // );
+            // if (match) {
+            //     setRela(match.value);
+            //     setValue('relationship', {
+            //         coding: [match.value],
+            //         text: match.value.display
+            //     });
+            // } else {
+            //     setRela(null);
+            //     setValue('relationship', null);
+            // }
+            // setRela(match?.value || null);
+            setRela(toEdit?.relationship?.coding?.[0]);
+            setValue('name', toEdit?.name || '');
+            setValue('dob', toEdit?.bornDate ? new Date(toEdit.bornDate).toISOString().split('T')[0] : '');
+            const genderOption = sexAssignedAtBirthOptions.find((option) => option.label === toEdit?.gender);
+            setValue('sex', genderOption?.value || '');
+            const conditionCode = toEdit?.condition?.[0]?.code?.coding?.[0];
+            const matchedProblem = formattedOptions.find(
+                (opt) => opt.value === conditionCode?.code && opt.display === conditionCode?.display
+            );
+            setSelectedProblem(matchedProblem || null);
+            setValue('problem', matchedProblem || null);
+            setValue(
+                'dateOfDeath',
+                toEdit?.deceasedDate ? new Date(toEdit.deceasedDate).toISOString().split('T')[0] : ''
+            );
+            setValue('deceased', toEdit?.deceasedBoolean ? 'yes' : 'no');
 
             setValue(
-                'effectiveDateTime',
-                toEdit?.effectiveDateTime ? new Date(toEdit?.effectiveDateTime).toISOString().split('T')[0] : ''
+                'dateOfDeath',
+                toEdit?.deceasedDate ? new Date(toEdit.deceasedDate).toISOString().split('T')[0] : ''
             );
-            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
-        } else {
-            reset();
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>');
         }
-    }, [toEdit]);
+    }, [toEdit, setValue]);
     const closeDeleteModal = () => {
         setToDelete(null);
         setDeleteModal(false);
@@ -95,7 +117,6 @@ const FamilyHistory = () => {
             name: data?.name,
             clinicId: loggedInUser?._id,
             subject: patientId,
-            id: toEdit?._id,
             condition: [
                 {
                     code: {
@@ -113,7 +134,7 @@ const FamilyHistory = () => {
 
             relationship: {
                 coding: [rela], //code:'I" , system:url, display:'Ins Company
-                text: data?.display,
+                text: rela?.display,
             },
 
             gender: selectedSexOption?.label,
@@ -127,17 +148,11 @@ const FamilyHistory = () => {
             ],
         };
         if (toEdit) {
-            // data.id = toEdit?._id;
-            dispatch(updateFamilyGeneticction({ key: encryptMessage(payload) }));
+            dispatch(updateFamilyGeneticction({ key: encryptMessage(payload), id: toEdit?._id }));
         } else {
             dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'payoad');
     };
-    // useEffect(() => {
-    //     dispatch(getFamilyGeneticAction({ patientId: patientId }));
-    // }, [dispatch, patientId]);
-
     useEffect(() => {
         if (createResponse === 201 || updateSuccess === 200) {
             dispatch(getFamilyGeneticAction({ patientId: patientId }));
@@ -146,7 +161,7 @@ const FamilyHistory = () => {
             setRela(null);
             setSelectedProblem(null);
         }
-    }, [createResponse, dispatch, patientId, reset]);
+    }, [createResponse, dispatch, patientId, reset, updateSuccess]);
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(getFamilyGeneticAction({ patientId: patientId }));
@@ -160,11 +175,12 @@ const FamilyHistory = () => {
     }));
     const selectedRelationOption =
         relationshipOption.find((option) => option?.value?.code === rela?.[0]?.code) ||
+        // relationshipOption.find((option) => option?.value?.code === rela?.code) ||
         relationshipOption.find((option) => option?.value?.display === rela?.[0]?.coding?.[0]?.display);
-    const handleRelationChange = (selectedOption) => {
-        setRela(selectedOption ? selectedOption.value : null);
-    };
 
+    const handleRelationChange = (selectedOption) => {
+        setRela(selectedOption ? selectedOption.value : '');
+    };
     const formattedOptions = allCodeICDs.map((code) => ({
         value: code.value,
         label: `${code.title} - ${code.codeType}`,
@@ -200,7 +216,7 @@ const FamilyHistory = () => {
                                             className="basic-single"
                                             classNamePrefix="select"
                                             placeholder="Select"
-                                            value={selectedRelationOption}
+                                            value={relationshipOption?.find((data) => data?.value?.code === rela?.code)}
                                             onChange={handleRelationChange}
                                             styles={{
                                                 control: (provided) => ({
@@ -397,15 +413,20 @@ const FamilyHistory = () => {
                                     </Col>
                                 </Row>
                             )}
-
                             <div className="d-flex justify-content-end mt-2">
                                 <Button
                                     type="submit"
                                     className="custom-buttons"
-                                    style={{ width: '55px' }}
-                                    disabled={store?.createFamilyGeneticReducer?.loading}>
-                                    {store?.createFamilyGeneticReducer?.loading ? (
+                                    style={{ width: '75px' }}
+                                    disabled={
+                                        store?.createFamilyGeneticReducer?.loading ||
+                                        store?.updateFamilyGeneticReducer?.loading
+                                    }>
+                                    {store?.createFamilyGeneticReducer?.loading ||
+                                    store?.updateFamilyGeneticReducer?.loading ? (
                                         <Spinner animation="border" size="sm" className="text-white" />
+                                    ) : toEdit ? (
+                                        'Update'
                                     ) : (
                                         'Add'
                                     )}
@@ -488,7 +509,7 @@ const FamilyHistory = () => {
                                                             {item.note?.[0]?.text && (
                                                                 <div className="ms-1">
                                                                     <div
-                                                                        className="ql-editor p-0 fs-6"
+                                                                        className="ql-editor scroll-container p-0 fs-6"
                                                                         dangerouslySetInnerHTML={{
                                                                             __html: item?.note[0]?.text,
                                                                         }}
