@@ -30,7 +30,7 @@ const Doctors = () => {
             dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
         }
     }, [dispatch, skip]);
-   
+
     const closeStatusModal = () => setStatusModal(false); // Close status change modal
     const filteredDoctors = doctorDetails;
     const handleStatusChange = () => {
@@ -67,16 +67,14 @@ const Doctors = () => {
                                 <Col sm={6} xs={6}>
                                     <Button
                                         onClick={() => handleActiveTab(true)}
-                                        className={`me-md-2 active_inactive_buttons ${
-                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => handleActiveTab(false)}
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -225,7 +223,7 @@ const Doctors = () => {
                                                                                 {data?.name?.[0]?.family || ''}
                                                                             </div>
                                                                             <div className="fs-6 fw-semibold">
-                                                                                {data?.telecom?.[0]?.value || 'N/A'}
+                                                                                {data?.telecom?.[0]?.value ? '+1-' + data?.telecom?.[0]?.value : 'N/A'}
                                                                             </div>
                                                                         </span>
                                                                     </div>
@@ -244,8 +242,8 @@ const Doctors = () => {
                                                                     <div className="d-flex flex-column justify-content-center">
                                                                         <p className="mb-0">
                                                                             {data?.address?.[0]?.line &&
-                                                                            data?.address?.[0]?.line.length > 0 &&
-                                                                            data?.address?.[0]?.line[0] !== '' ? (
+                                                                                data?.address?.[0]?.line.length > 0 &&
+                                                                                data?.address?.[0]?.line[0] !== '' ? (
                                                                                 <span
                                                                                     title={data?.address?.[0]?.line.join(
                                                                                         ''

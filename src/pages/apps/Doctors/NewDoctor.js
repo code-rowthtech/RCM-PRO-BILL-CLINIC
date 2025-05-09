@@ -290,7 +290,7 @@ const NewDoctor = () => {
     useEffect(() => {
         const isFirstNameValid = formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName);
         const isLastNameValid = formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName);
-        const isPhoneValid = formData?.phone?.trim()?.length === 14 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
+        const isPhoneValid = formData?.phone?.trim()?.length === 13 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
         const isDOBValid =
             formData?.dateOfBirth &&
             new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
@@ -304,7 +304,7 @@ const NewDoctor = () => {
                 formData?.confirmPassword === formData?.password);
 
         const isFormValid =
-            isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid;
+            isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid && isPhoneValid;
         setIsButtonDisabled(!isFormValid);
     }, [formData, id]);
 
@@ -324,27 +324,24 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'personalDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         Personal Details
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'departmentDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         Professional Information
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'qualifications' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         Qualifications
                                                     </button>
@@ -366,10 +363,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                  pointerEvents: 'none',
-                                                                                  opacity: 0.6, // Visual indication that the button is disabled
-                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                              }
+                                                                                pointerEvents: 'none',
+                                                                                opacity: 0.6, // Visual indication that the button is disabled
+                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                            }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -495,24 +492,24 @@ const NewDoctor = () => {
                                                                                     'phone',
                                                                                     !id
                                                                                         ? {
-                                                                                              required:
-                                                                                                  'This field is required',
-                                                                                              pattern: {
-                                                                                                  value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                                                  message:
-                                                                                                      'Contact must be in the format (XXX)XXX-XXXX',
-                                                                                              },
-                                                                                              maxLength: {
-                                                                                                  value: 13,
-                                                                                                  message:
-                                                                                                      'Contact must not exceed 10 digits',
-                                                                                              },
-                                                                                              minLength: {
-                                                                                                  value: 13,
-                                                                                                  message:
-                                                                                                      'Contact must not be less than 10 digits',
-                                                                                              },
-                                                                                          }
+                                                                                            required:
+                                                                                                'This field is required',
+                                                                                            pattern: {
+                                                                                                value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                                                message:
+                                                                                                    'Contact must be in the format (XXX)XXX-XXXX',
+                                                                                            },
+                                                                                            maxLength: {
+                                                                                                value: 13,
+                                                                                                message:
+                                                                                                    'Contact must not exceed 10 digits',
+                                                                                            },
+                                                                                            minLength: {
+                                                                                                value: 13,
+                                                                                                message:
+                                                                                                    'Contact must not be less than 10 digits',
+                                                                                            },
+                                                                                        }
                                                                                         : {}
                                                                                 )}
                                                                                 onChange={(e) => {
@@ -709,12 +706,12 @@ const NewDoctor = () => {
                                                                             ...(updateId
                                                                                 ? {} // Don't apply pattern if updating
                                                                                 : {
-                                                                                      pattern: {
-                                                                                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                          message:
-                                                                                              'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                      },
-                                                                                  }),
+                                                                                    pattern: {
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        message:
+                                                                                            'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                    },
+                                                                                }),
                                                                         })}
                                                                     />
 
@@ -783,18 +780,17 @@ const NewDoctor = () => {
                                                                 <Form.Label className="mb-0">Profile Image</Form.Label>
                                                                 <div
                                                                     onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                        logoName || logoUploading
-                                                                            ? ''
-                                                                            : 'custom-form-fields'
-                                                                    }`}>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
+                                                                        ? ''
+                                                                        : 'custom-form-fields'
+                                                                        }`}>
                                                                     {logoUploading
                                                                         ? 'Uploading...'
                                                                         : logoName
-                                                                        ? logoName.length > 30
-                                                                            ? logoName.slice(0, 25) + '...'
-                                                                            : logoName
-                                                                        : 'Upload Profile Image'}
+                                                                            ? logoName.length > 30
+                                                                                ? logoName.slice(0, 25) + '...'
+                                                                                : logoName
+                                                                            : 'Upload Profile Image'}
                                                                     <p className="mb-0">
                                                                         <FiUploadCloud />
                                                                     </p>

@@ -22,8 +22,8 @@ const Patients = () => {
     const patientsData = store?.getPatientsReducer?.data?.data;
 
     useEffect(() => {
-        const hasFilters =  skip !== 1 || patientsData === undefined;
-        const payload = {  search: search, page: skip, limit: 10, clinicId: clinicId };
+        const hasFilters = skip !== 1 || patientsData === undefined;
+        const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
         if (hasFilters) {
             dispatch(getPatientsAction(payload));
         }
@@ -75,17 +75,15 @@ const Patients = () => {
                                     <Button
                                         onClick={() => setStatus(true)}
                                         disabled
-                                        className={`me-md-2 active_inactive_buttons ${
-                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
                                         disabled
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                        }`}>
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -207,33 +205,31 @@ const Patients = () => {
                                                             <div className="text-capitalize">
                                                                 {data?.gender || 'N/A'}
                                                                 <div
-                                                                    className={`${
-                                                                        data?.birthDate
-                                                                            ? ''
-                                                                            : 'text-danger fs-6 fw-semibold'
-                                                                    }`}>
+                                                                    className={`${data?.birthDate
+                                                                        ? ''
+                                                                        : 'text-danger fs-6 fw-semibold'
+                                                                        }`}>
                                                                     {data?.birthDate
                                                                         ? new Date(data?.birthDate)
-                                                                              .toISOString()
-                                                                              .split('T')[0]
+                                                                            .toISOString()
+                                                                            .split('T')[0]
                                                                         : 'Missing'}
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div>
-                                                                {data?.telecom?.find(
-                                                                    (item) =>
-                                                                        item?.system === 'phone' && item?.use === 'home'
-                                                                )?.value || 'N/A'}
+                                                                {'+1-' + (data?.telecom?.find(
+                                                                    (item) => item?.system === 'phone' && item?.use === 'home'
+                                                                )?.value || 'N/A')}
+
                                                                 <div
-                                                                    className={`${
-                                                                        data?.telecom?.find(
-                                                                            (item) => item?.system === 'email'
-                                                                        )?.value
-                                                                            ? ''
-                                                                            : 'text-danger'
-                                                                    }`}>
+                                                                    className={`${data?.telecom?.find(
+                                                                        (item) => item?.system === 'email'
+                                                                    )?.value
+                                                                        ? ''
+                                                                        : 'text-danger'
+                                                                        }`}>
                                                                     {data?.telecom?.find(
                                                                         (item) => item?.system === 'email'
                                                                     )?.value || 'Email (Missing)'}
@@ -247,10 +243,10 @@ const Patients = () => {
                                                             {data?.address?.[0]?.line?.[0]?.length > 30
                                                                 ? data?.address?.[0]?.line?.[0]?.slice(0, 29) + '...'
                                                                 : data?.address?.[0]?.line?.[0] || (
-                                                                      <span className="text-danger fw-semibold fs-6">
-                                                                          Missing
-                                                                      </span>
-                                                                  )}
+                                                                    <span className="text-danger fw-semibold fs-6">
+                                                                        Missing
+                                                                    </span>
+                                                                )}
 
                                                             <div className="fw-semibold fs-6">
                                                                 {[data?.address?.[0]?.city, data?.address?.[0]?.state]

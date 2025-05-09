@@ -13,20 +13,38 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
         register,
         handleSubmit,
         formState: { errors },
-        reset,
+        reset, setValue
     } = useForm();
     const dispatch = useDispatch();
     const onSubmit = () => {
+        // alert(JSON.stringify(formData))
+        // console.log(formData, 'formData')
         dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }
     const store = useSelector((state) => state);
-    const createResponse = store?.createDoctorsReducer?.data?.status
+    const createResponse = store?.createtDoctorsReducer?.data?.status
+    const doctorRoleId = store?.getRoleDataReducer?.data?.roles?.[0]?._id;
 
+    useEffect(() => {
+        setValue('name', formData?.email)
+    }, [formData])
     useEffect(() => {
         if (createResponse === 200) {
             closeModal();
-            setFormData();
+            setFormData({
+                role: doctorRoleId,
+                email: '',
+                name: {
+                    use: 'official',
+                    text: '',
+                    family: '',
+                    given: '',
+                },
+                phone: '',
+                password: '',
+                confirmPassword: '',
+            });
             reset();
         }
     }, [createResponse])
@@ -54,14 +72,15 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                                         type="text"
                                         placeholder="Enter email address"
                                         {...register('name', { required: 'Name is required' })}
-                                        defaultValue={formData?.email}
+                                        readOnly
+                                    // defaultValue={formData?.email}
                                     />
                                     {/* {errors.name && <span className="text-danger">{errors.name.message}</span>} */}
                                 </Form.Group>
 
                                 <div className='text-center'>
                                     <p className='mb-0'>The Provider will receive an onboarding email on</p>
-                                    <p className='fw-bold'> "{formData?.email}"</p>
+                                    <strong> "{formData?.email}"</strong>
                                 </div>
                             </Col>
                         </Row>
