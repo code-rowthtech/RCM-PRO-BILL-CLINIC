@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, ListGroup, Spinner } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
@@ -9,10 +9,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { dataList } from '../../../../../utils/DataSets/relations.data';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { useSearchParams } from 'react-router-dom';
-import { createFamilyGeneticAction, getFamilyGeneticAction } from '../../../../../redux/actions';
+import {
+    createFamilyGeneticAction,
+    deleteFamilyGeneticAction,
+    getFamilyGeneticAction,
+    updateFamilyGeneticction,
+} from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
+import DeletionModal from '../../../../../helpers/deletionModal';
 
 const FamilyHistory = () => {
     const dispatch = useDispatch();
@@ -33,13 +39,19 @@ const FamilyHistory = () => {
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
     const [familyList, setFamilyList] = useState([]);
+    const [toDelete, setToDelete] = useState(null);
+    const [toEdit, setToEdit] = useState(null);
+    console.log(toEdit,'data coming')
+    const [deleteModal, setDeleteModal] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
     const selectedCondition = watch('condition');
     const isDeceased = watch('deceased') === 'yes';
     const createResponse = store?.createFamilyGeneticReducer?.data?.status;
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory || [];
-    console.log(familyGeneticHistory, 'family');
+    const updateSuccess = store?.updateFamilyGeneticReducer?.data?.status;
+    const deleteSuccess = store?.deleteFamilyGenticReducer?.data?.status;
+
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
@@ -47,6 +59,33 @@ const FamilyHistory = () => {
 
         return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
+    useEffect(() => {
+        if (toEdit) {
+            setRela(toEdit?.relationship?.coding?.[0]?.display);
+            setValue('name', toEdit?.name);
+            setValue('dob',toEdit?.bornDate ? new Date(toEdit?.bornDate).toDateString().split('T')[0]:'');
+            setValue('sex', toEdit?.gender)
+            setSelectedProblem(toEdit?.condition?.[0]?.code?.coding?.[0]?.display)
+            setValue('dateOfDeath',toEdit?.deceasedDate)
+            setValue('deceased', toEdit?.deceasedBoolean)
+
+            setValue(
+                'effectiveDateTime',
+                toEdit?.effectiveDateTime ? new Date(toEdit?.effectiveDateTime).toISOString().split('T')[0] : ''
+            );
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
+        } else {
+            reset();
+        }
+    }, [toEdit]);
+    const closeDeleteModal = () => {
+        setToDelete(null);
+        setDeleteModal(false);
+    };
+    const deleteHistory = () => {
+        dispatch(deleteFamilyGeneticAction({ id: toDelete }));
+    };
+
     const onSubmit = (data) => {
         const selected = data.problem;
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
@@ -56,6 +95,7 @@ const FamilyHistory = () => {
             name: data?.name,
             clinicId: loggedInUser?._id,
             subject: patientId,
+            id: toEdit?._id,
             condition: [
                 {
                     code: {
@@ -86,7 +126,12 @@ const FamilyHistory = () => {
                 },
             ],
         };
-        dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
+        if (toEdit) {
+            // data.id = toEdit?._id;
+            dispatch(updateFamilyGeneticction({ key: encryptMessage(payload) }));
+        } else {
+            dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
+        }
         console.log(payload, 'payoad');
     };
     // useEffect(() => {
@@ -94,15 +139,21 @@ const FamilyHistory = () => {
     // }, [dispatch, patientId]);
 
     useEffect(() => {
-        if (createResponse === 201) {
+        if (createResponse === 201 || updateSuccess === 200) {
             dispatch(getFamilyGeneticAction({ patientId: patientId }));
             reset();
+            setToEdit(null);
             setRela(null);
             setSelectedProblem(null);
-            // setSearchQuery('');
         }
     }, [createResponse, dispatch, patientId, reset]);
-
+    useEffect(() => {
+        if (deleteSuccess === 200) {
+            dispatch(getFamilyGeneticAction({ patientId: patientId }));
+            setToDelete(null);
+            setDeleteModal(false);
+        }
+    }, [deleteSuccess]);
     const relationshipOption = dataList?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
@@ -180,7 +231,12 @@ const FamilyHistory = () => {
                                 <Col xs={6}>
                                     <Form.Group>
                                         <Form.Label className="mb-0">Date of Birth</Form.Label>
-                                        <Form.Control type="date" {...register('dob')} required max={new Date().toISOString().slice(0, 10)} />
+                                        <Form.Control
+                                            type="date"
+                                            {...register('dob')}
+                                            required
+                                            max={new Date().toISOString().slice(0, 10)}
+                                        />
                                     </Form.Group>
                                 </Col>
                                 <Col xs={6}>
@@ -343,8 +399,16 @@ const FamilyHistory = () => {
                             )}
 
                             <div className="d-flex justify-content-end mt-2">
-                                <Button type="submit" className="custom-buttons">
-                                    Add
+                                <Button
+                                    type="submit"
+                                    className="custom-buttons"
+                                    style={{ width: '55px' }}
+                                    disabled={store?.createFamilyGeneticReducer?.loading}>
+                                    {store?.createFamilyGeneticReducer?.loading ? (
+                                        <Spinner animation="border" size="sm" className="text-white" />
+                                    ) : (
+                                        'Add'
+                                    )}
                                 </Button>
                             </div>
                         </Form>
@@ -361,7 +425,11 @@ const FamilyHistory = () => {
                         </Card.Title>
                         <Row>
                             <Col xs={12} className="scroll-container" style={{ height: '49vh', overflowY: 'auto' }}>
-                                {familyGeneticHistory?.length === 0 ? (
+                                {store?.getFamilyGeneticReducer?.loading ? (
+                                    <div className="text-center" colSpan={10}>
+                                        <Spinner className="my-5" />
+                                    </div>
+                                ) : familyGeneticHistory?.length === 0 ? (
                                     <div className="text-center py-4 text-muted">
                                         <i className="bi bi-journal-x fs-1"></i>
                                         <p className="mt-2 mb-0">No family records added yet</p>
@@ -388,8 +456,8 @@ const FamilyHistory = () => {
                                                             <span className="ms-1 fs-6">
                                                                 {item?.bornDate
                                                                     ? new Date(item?.bornDate)?.toLocaleDateString(
-                                                                        'en-GB'
-                                                                    )
+                                                                          'en-GB'
+                                                                      )
                                                                     : ''}
                                                             </span>
                                                         </div>
@@ -417,9 +485,8 @@ const FamilyHistory = () => {
                                                     <div className="d-flex">
                                                         <span className="fs-6 fw-bold">Notes:</span>
                                                         <span>
-                                                            {' '}
                                                             {item.note?.[0]?.text && (
-                                                                <div className=" ms-1">
+                                                                <div className="ms-1">
                                                                     <div
                                                                         className="ql-editor p-0 fs-6"
                                                                         dangerouslySetInnerHTML={{
@@ -427,8 +494,8 @@ const FamilyHistory = () => {
                                                                         }}
                                                                         style={{
                                                                             fontSize: '0.875rem',
-                                                                            maxHeight: '150px', // Limit the height of notes
-                                                                            overflowY: 'auto', // Scrollable if content is too long
+                                                                            maxHeight: '150px',
+                                                                            overflowY: 'auto',
                                                                         }}
                                                                     />
                                                                 </div>
@@ -450,7 +517,34 @@ const FamilyHistory = () => {
                                                             </span>
                                                         </>
                                                     )}
+                                                    <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
+                                                        <i
+                                                            className="bi bi-trash-fill text-danger cursor-pointer"
+                                                            onClick={() => {
+                                                                setToDelete(item?._id);
+                                                                setDeleteModal(true);
+                                                            }}></i>
+                                                        {toEdit && toEdit._id === item._id ? (
+                                                            <i
+                                                                onClick={() => {
+                                                                    setToEdit(null);
+                                                                    setToEdit(item);
+                                                                }}
+                                                                className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                        ) : (
+                                                            <i
+                                                                onClick={() => setToEdit(item)}
+                                                                className="bi bi-pencil text-info cursor-pointer"></i>
+                                                        )}
+                                                    </div>
                                                 </div>
+                                                <DeletionModal
+                                                    show={deleteModal}
+                                                    onHide={closeDeleteModal}
+                                                    onConfirm={deleteHistory}
+                                                    item="family history"
+                                                    isLoading={store?.deleteTobaccooReducer?.loading}
+                                                />
                                             </ListGroup.Item>
                                         ))}
                                     </ListGroup>

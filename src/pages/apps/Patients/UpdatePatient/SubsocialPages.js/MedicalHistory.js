@@ -38,8 +38,8 @@ const MedicalHistory = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
-    console.log(toEdit,'toEditupdate')
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
+    console.log(store?.updateMedicalHistoryReducer, 'updateResponse')
     const {
         register,
         handleSubmit,
@@ -97,8 +97,8 @@ const MedicalHistory = () => {
     }, [toEdit]);
     const onSubmit = (data) => {
         const selected = data.problem;
-
         const payload = {
+            id: toEdit?._id,
             clinicId: loggedInUser?._id,
             code: {
                 coding: [
@@ -123,7 +123,7 @@ const MedicalHistory = () => {
             subject: patientId,
         };
         if (toEdit) {
-            dispatch(updateMedicalHistoryAction({ key: encryptMessage(payload), id: toEdit?._id }));
+            dispatch(updateMedicalHistoryAction({ key: encryptMessage(payload),}));
         } else {
             dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
         }

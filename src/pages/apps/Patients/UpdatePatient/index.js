@@ -635,7 +635,7 @@ const UpdatePatientIndex = () => {
                                                 {/* {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />} */}
                                                 {[
                                                     'Tabacco',
-                                                    'Medical History',
+                                                    'Medical',
                                                     'Surgical',
                                                     'Family / Genetic',
                                                     'Alcohol',
