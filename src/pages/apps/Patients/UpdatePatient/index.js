@@ -133,7 +133,9 @@ const UpdatePatientIndex = () => {
         dispatch(getFamilyGeneticAction({ patientId: id }));
         dispatch(getProblemListAction({ patientId: id }));
         dispatch(getAlcoholHistoryAction({ patientId: id }))
-    }, [dispatch]);
+        dispatch(getMedicationAction({ patientId: id }));
+
+    }, [dispatch, id]);
     // useEffect(() => {
 
     // }, [dispatch]);

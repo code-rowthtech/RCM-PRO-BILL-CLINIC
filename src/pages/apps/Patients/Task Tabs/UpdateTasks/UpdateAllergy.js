@@ -19,14 +19,12 @@ import ReactQuill from 'react-quill';
 import SuggestionOffcanvas from '../../UpdatePatient/SuggestionOffcanvas';
 
 const UpdateAllergy = ({ onCancel, allergy }) => {
-    console.log(allergy, 'allergy');
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
-    console.log(userId, 'userId');
     const [code, setCode] = useState(null);
     const [substance, setSubstance] = useState(null);
     const appointments = store?.getPatientAppointmentReducer?.data || [];
@@ -52,7 +50,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         dispatch(getPatientAppointmentAction({ patientId }));
     }, [dispatch, patientId]);
     const allergyDetails = store?.getAllergyDetailsReducer?.data?.allergy;
-    console.log(allergyDetails, 'allergyDetails');
     useEffect(() => {
         setValue('allergyType', allergyDetails?.type?.coding[0]?.code);
         setValue('category', allergyDetails?.category?.[0]?.code);
@@ -115,7 +112,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
         const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
-        console.log(severityData, 'severityData');
 
         const payload = {
             id: allergyDetails?._id,
@@ -247,7 +243,6 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
         }
 
         dispatch(updateAllergyAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payload');
     };
     const formattedCodeOption = useMemo(
         () =>

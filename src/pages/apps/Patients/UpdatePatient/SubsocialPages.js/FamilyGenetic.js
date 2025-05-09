@@ -39,7 +39,6 @@ const FamilyHistory = () => {
     const isDeceased = watch('deceased') === 'yes';
     const createResponse = store?.createFamilyGeneticReducer?.data?.status;
     const familyGeneticHistory = store?.getFamilyGeneticReducer?.data?.familyMedicalHistory || [];
-    console.log(familyGeneticHistory, 'family');
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
@@ -87,7 +86,6 @@ const FamilyHistory = () => {
             ],
         };
         dispatch(createFamilyGeneticAction({ key: encryptMessage(payload) }));
-        console.log(payload, 'payoad');
     };
     // useEffect(() => {
     //     dispatch(getFamilyGeneticAction({ patientId: patientId }));

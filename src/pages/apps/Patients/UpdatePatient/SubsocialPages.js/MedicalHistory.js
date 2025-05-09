@@ -38,7 +38,6 @@ const MedicalHistory = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
-    console.log(toEdit, 'toEditupdate')
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const {
         register,
@@ -127,7 +126,6 @@ const MedicalHistory = () => {
         } else {
             dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'medical data');
     };
 
     const handleEditorFocus = () => {

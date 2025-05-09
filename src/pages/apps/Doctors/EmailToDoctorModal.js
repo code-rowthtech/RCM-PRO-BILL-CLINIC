@@ -22,7 +22,6 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
     }
     const store = useSelector((state) => state);
     const createResponse = store?.createDoctorsReducer?.data?.status
-    console.log(store?.createDoctorsReducer,'create')
 
     useEffect(() => {
         if (createResponse === 200) {
@@ -67,7 +66,7 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
                             </Col>
                         </Row>
                         <Modal.Footer className='d-flex justify-content-center'>
-                            <Button type="submit" className="custom-buttons" style={{width:'55px'}} disabled={store?.createDoctorsReducer?.loading}>
+                            <Button type="submit" className="custom-buttons" style={{ width: '55px' }} disabled={store?.createDoctorsReducer?.loading}>
                                 {store?.createtDoctorsReducer?.loading ?
                                     <Spinner color='white' className='spinner-border-sm' />
                                     :

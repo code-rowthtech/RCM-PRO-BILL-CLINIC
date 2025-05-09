@@ -18,7 +18,6 @@ import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 
 const UpdateProblem = ({ onCancel, problem }) => {
-    console.log(problem, 'problem');
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const [searchQuery, setSearchQuery] = useState('');
@@ -128,7 +127,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
             ],
         };
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));
-        console.log('Form Data:', payload);
     };
 
     useEffect(() => {
