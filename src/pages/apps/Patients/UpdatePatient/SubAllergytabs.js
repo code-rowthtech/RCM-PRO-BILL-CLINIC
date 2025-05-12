@@ -10,6 +10,9 @@ import AddAllergy from '../Task Tabs/AddAllergy';
 import AddProblem from '../Task Tabs/AddProblem';
 import UpdateProblem from '../Task Tabs/UpdateTasks/UpdateProblem';
 import AddMedication from './AddMedication';
+import { getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 const tabList = [
     { key: 'Allergy List', label: 'Allergy List' },
@@ -24,6 +27,9 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
     const [problemModal, setProblemModal] = useState(false);
     const [medicationModal, setMedicationModal] = useState(false);
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
+    const [searchParams] = useSearchParams();
+    const dispatch = useDispatch()
+    const patientId = searchParams.get('id');
 
     // Dummy state for edit mode and selected data
     const [isEditMode, setIsEditMode] = useState(false);
@@ -60,6 +66,7 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
         }
     };
 
+
     return (
         <div>
             <div
@@ -69,13 +76,24 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                     {tabList.map(({ key, label }) => (
                         <a
                             key={key}
-                            className={`nav-link fs-6 fw-bold py-1 px-2 tab-font-family ${
-                                activeTab === key
-                                    ? 'active text-primary border-bottom border-2 border-primary'
-                                    : 'text-muted'
-                            }`}
-                            style={{ cursor: 'pointer', fontWeight: 600 }}
-                            onClick={() => setActiveTab(key)}>
+                            className={`nav-link fs-6 fw-bold py-1 px-2 tab-font-family ${activeTab === key
+                                ? 'active text-primary border-bottom border-2 fw-bold border-primary'
+                                : 'text-muted'
+                                } ${disabled ? 'disabled' : ''}`}
+                            style={{
+                                cursor: disabled ? 'not-allowed' : 'pointer',
+                                fontWeight: 600,
+                                opacity: disabled ? 0.5 : 1,
+                            }}
+                            onClick={() => {
+                                if (!disabled && activeTab === 'Vitals' && key !== 'Vitals') {
+                                    dispatch(getVitalsByPatientIdAction({ patientId }));
+                                }
+                                if (!disabled) {
+                                    setActiveTab(key);
+                                }
+                            }}
+                        >
                             {label}
                         </a>
                     ))}

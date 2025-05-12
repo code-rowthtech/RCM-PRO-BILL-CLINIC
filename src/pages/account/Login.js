@@ -30,7 +30,7 @@ const Login = (): React$Element<any> => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
     const location = useLocation();
-    const redirectUrl = location.state && location.state.from ? location.state.from.pathname : '/apps/patients/list';
+    const redirectUrl = location.state && location.state.from ? '/apps/patients/list' : '/apps/patients/list';
 
     useEffect(() => {
         dispatch(resetAuth());
