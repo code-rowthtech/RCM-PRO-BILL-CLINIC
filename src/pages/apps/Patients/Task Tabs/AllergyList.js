@@ -72,11 +72,11 @@ const AllergyList = () => {
     };
     return (
         <>
-            <div className="scroll-container" style={{  overflowX: 'hidden', height: '70vh' }}>
+            <div className="scroll-container" style={{ overflowX: 'hidden', height: '70vh' }}>
                 <Row>
                     {/* <Col sm={12} className="d-flex justify-content-between"> */}
-                        {/* <h6>Allergy List</h6> */}
-                        {/* <Button
+                    {/* <h6>Allergy List</h6> */}
+                    {/* <Button
                             className="custom-buttons text-nowrap"
                             onClick={() => {
                                 setSelectedAllergy(null); // Clear any previously selected allergy
@@ -166,10 +166,8 @@ const AllergyList = () => {
                                                     />
                                                 </td> */}
                                                 <td>
-                                                    <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
-                                                    &nbsp;
-                                                    <FiEdit
-                                                        className="fs-4 cursor-pointer text-black"
+                                                    <i
+                                                        className=" bi bi-pencil text-info cursor-pointer"
                                                         onClick={() => {
                                                             handleEditClick(data);
                                                             const requestData = {
@@ -179,8 +177,8 @@ const AllergyList = () => {
                                                         }}
                                                     />
                                                     &nbsp;
-                                                    <MdDeleteOutline
-                                                        className="fs-4 cursor-pointer text-black"
+                                                    <i
+                                                        className="bi bi-trash-fill text-danger cursor-pointer"
                                                         onClick={() => {
                                                             handleDelete(data);
                                                         }}

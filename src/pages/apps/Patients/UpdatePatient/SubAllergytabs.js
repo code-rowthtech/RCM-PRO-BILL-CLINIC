@@ -71,11 +71,10 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                     {tabList.map(({ key, label, disabled }) => (
                         <a
                             key={key}
-                            className={`nav-link fs-6 fw-bold py-1 px-2 tab-font-family ${
-                                activeTab === key
-                                    ? 'active text-primary border-bottom border-2 fw-bold border-primary'
-                                    : 'text-muted'
-                            } ${disabled ? 'disabled' : ''}`}
+                            className={`nav-link fs-6 fw-bold py-1 px-2 tab-font-family ${activeTab === key
+                                ? 'active text-primary border-bottom border-2 fw-bold border-primary'
+                                : 'text-muted'
+                                } ${disabled ? 'disabled' : ''}`}
                             style={{
                                 cursor: disabled ? 'not-allowed' : 'pointer',
                                 fontWeight: 600,
@@ -88,12 +87,15 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                 </div>
 
                 {/* Add Icon */}
-                <MdAddCircleOutline
-                    size={22}
-                    className="text-primary cursor-pointer"
-                    onClick={handleAddIconClick}
-                    style={{ flexShrink: 0 }}
-                />
+                {activeTab !== 'Vitals' &&
+                    <MdAddCircleOutline
+                        size={22}
+                        className="text-primary cursor-pointer"
+                        onClick={handleAddIconClick}
+                        style={{ flexShrink: 0 }}
+                    />
+                }
+
             </div>
 
             <div className="pt-1">
@@ -131,7 +133,6 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                     )}
                 </Modal.Body>
             </Modal>
-
             {/* Medication Modal */}
             <AddMedication
                 show={medicationModal}

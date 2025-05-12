@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { TobaccooActionTypes } from './constants';
@@ -760,7 +760,7 @@ export function* watchDeleteAlcoholHistory() {
 function* clinicalHistorySaga() {
     yield all([
         fork(watchCreateTobaccoo), fork(watchGetTobaccoo), fork(watchDeleteTobaccoo), fork(watchUpdateTobaccoo),
-        fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic),fork(watchDeleteFamilyGenetic),
+        fork(watchCreateFamilyGenetic), fork(watchUpdateFamilyGenetic), fork(watchGetFamilyGenetic), fork(watchDeleteFamilyGenetic),
         fork(watchCreateSurgicalHistory), fork(watchUpdateSurgicalHistory), fork(watchGetSurgicalHistory), fork(watchDeleteSurgicalHistory),
         fork(watchCreateMedicalHistory), fork(watchUpdateMedicalHistory), fork(watchGetMedicalHistory), fork(watchDeleteMedicalHistory),
         fork(watchCreateAlcoholHistory), fork(watchUpdateAlcoholHistory), fork(watchGetAlcoholHistory), fork(watchDeleteAlcoholHistory)

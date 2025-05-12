@@ -237,6 +237,9 @@ const ScheduleTab = () => {
                         name="doctorName"
                         options={doctorOptions}
                         placeholder="Select Doctor"
+                        getOptionLabel={(e) =>
+                            e.label.replace(/\b\w/g, (char) => char.toUpperCase())
+                        }
                     />
                 </div>
 
@@ -349,9 +352,8 @@ const ScheduleTab = () => {
                                                     </td>
                                                     <td style={{ width: '20%' }}>
                                                         <span
-                                                            className={`uil-plus-circle plusicon fw-bold cursor-pointer ${
-                                                                day.slots.length >= 10 ? 'disabled' : ''
-                                                            }`}
+                                                            className={`uil-plus-circle plusicon fw-bold cursor-pointer ${day.slots.length >= 10 ? 'disabled' : ''
+                                                                }`}
                                                             onClick={() =>
                                                                 day.slots.length < 10 && handleAddSlots(dayIndex)
                                                             }></span>
