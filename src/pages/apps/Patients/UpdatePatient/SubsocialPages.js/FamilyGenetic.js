@@ -21,7 +21,7 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 
 // Utils & Data
 import { sexAssignedAtBirthOptions } from '../../../../../utils/DataSets/sex';
-import { dataList } from '../../../../../utils/DataSets/relations.data';
+import { dataList, familyGenticList } from '../../../../../utils/DataSets/relations.data';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
@@ -136,7 +136,7 @@ const FamilyHistory = () => {
     };
 
     // Data transformations
-    const relationshipOption = dataList?.map((relation) => ({
+    const relationshipOption = familyGenticList?.map((relation) => ({
         value: relation,
         label: relation.display,
     }));
@@ -415,7 +415,7 @@ const FamilyHistory = () => {
                                     variant="primary"
                                     disabled={isLoading}
                                     className="px-4 py-1 custom-buttons">
-                                    {toEdit ? 'Update' : 'Add Record'}
+                                    {toEdit ? 'Update' : 'Add'}
                                 </Button>
                             </div>
                         </Form>

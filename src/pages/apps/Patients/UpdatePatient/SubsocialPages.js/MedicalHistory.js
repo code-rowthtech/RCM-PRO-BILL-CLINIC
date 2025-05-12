@@ -159,6 +159,11 @@ const MedicalHistory = () => {
         display: code.title,
     }));
     const startDate = watch('startDate'); // Watch startDate dynamically
+    const handleReset = () => {
+        setToEdit(null);
+        setSelectedProblem(null);
+        reset();
+    };
     return (
         <Row
             className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
@@ -401,10 +406,7 @@ const MedicalHistory = () => {
                                                     }}></i>
                                                 {toEdit && toEdit._id === item._id ? (
                                                     <i
-                                                        onClick={() => {
-                                                            setToEdit(null);
-                                                            setToEdit(item);
-                                                        }}
+                                                        onClick={() => handleReset()}
                                                         className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
                                                 ) : (
                                                     <i

@@ -3,7 +3,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
-import { createTobaccooAction, deleteTobaccooAction, getTobaccooAction, updateTobaccooAction } from '../../../../../redux/actions';
+import {
+    createTobaccooAction,
+    deleteTobaccooAction,
+    getTobaccooAction,
+    updateTobaccooAction,
+} from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
@@ -26,36 +31,39 @@ const Tobacco = () => {
     const [toEdit, setToEdit] = useState(null);
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
-    const deleteSuccess = store?.deleteTobaccooReducer?.data?.status
-    const updateSuccess = store?.updateTobaccooReducer
+    const deleteSuccess = store?.deleteTobaccooReducer?.data?.status;
+    const updateSuccess = store?.updateTobaccooReducer;
     useEffect(() => {
         if (toEdit) {
-            setValue('tobaccoUse', toEdit?.tobaccoUse)
-            setValue('effectiveDateTime', toEdit?.effectiveDateTime ? new Date(toEdit?.effectiveDateTime).toISOString().split("T")[0] : '');
-            setValue('note', toEdit?.note?.[0]?.text || "<ul><li></li></ul>"); // fallback to default if empty
+            setValue('tobaccoUse', toEdit?.tobaccoUse);
+            setValue(
+                'effectiveDateTime',
+                toEdit?.effectiveDateTime ? new Date(toEdit?.effectiveDateTime).toISOString().split('T')[0] : ''
+            );
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
         } else {
             reset();
         }
-    }, [toEdit])
+    }, [toEdit]);
 
     const closeDeleteModal = () => {
         setToDelete(null);
         setDeleteModal(false);
-    }
+    };
     const deleteHistory = () => {
-        dispatch(deleteTobaccooAction({ id: toDelete }))
-    }
+        dispatch(deleteTobaccooAction({ id: toDelete }));
+    };
     useEffect(() => {
         if (deleteSuccess === 200) {
             dispatch(getTobaccooAction({ patientId: patientId }));
             setToDelete(null);
             setDeleteModal(false);
         }
-    }, [deleteSuccess])
+    }, [deleteSuccess]);
     useEffect(() => {
         if (createSuccess === 201 || updateSuccess?.data?.status === 200) {
             dispatch(getTobaccooAction({ patientId: patientId }));
-            setToEdit(null)
+            setToEdit(null);
             reset();
         }
     }, [createSuccess, updateSuccess]);
@@ -71,7 +79,7 @@ const Tobacco = () => {
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
             // data.id = toEdit?._id;
-            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
+            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }));
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));
         }
@@ -87,212 +95,174 @@ const Tobacco = () => {
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
     // const handleUserTyping = (content) => {};
-
+    const handleReset = () => {
+        reset();
+        setToEdit(null);
+        setToDelete(null);
+        setDeleteModal(false);
+        setShowSuggestions(false);
+    };
     return (
-        <Row className="mt-0 g-0 pt-0 px-1 h-100 scroll-container" style={{ height: 'calc(100vh - 100px)', overflowY: "scroll" }}>
-            <Col md={6} className="d-flex  flex-column border-end  pt-0 mt-0 pe-1 ">
-                <div className=" border-danger  h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pb-2 pt-0 mb-1">
-                            <h5 className="fw-semibold mb-0">Add Tobacco Use</h5>
-                        </Card.Title>
+        <Row className="px-2 py-0 m-auto">
+            {/* Left: Form Section */}
+            <Col md={6} className="d-flex flex-column border-end px-0 pe-2">
+                <Card.Body className="p-0 pt-2">
+                    {/* <Card.Title className="border-bottom">
+                        <h6 className="fw-bold">Add Tobacco Use</h6>
+                    </Card.Title> */}
 
-                        <Form className="scroll-container  d-flex flex-column justify-content-between" style={{ overflowY: 'auto', height: '50vh' }} onSubmit={handleSubmit(onSubmit)}>
-                            <div className="scroll-container mb-3 px-2" style={{ maxHeight: '57vh', overflowY: 'auto' }}>
-                                <Row className="g-2">
-                                    <Col md={6}>
-                                        <Form.Group controlId="tobaccoUser">
-                                            <Form.Label className="fw-medium mb-0">Current Tobacco Use</Form.Label>
-                                            <Form.Select
-                                                {...register('tobaccoUse')}
-                                                required
-                                                className="form-select-sm">
-                                                <option value="">Select an option</option>
-                                                <option value="Very heavy cigarette smoker (40+ cigs/day)">
-                                                    Very heavy cigarette smoker (40+ cigs/day)
-                                                </option>
-                                                <option value="Cigar smoker">Cigar smoker</option>
-                                                <option value="Pipe smoker">Pipe smoker</option>
-                                                <option value="Chews tobacco">Chews tobacco</option>
-                                                <option value="Chews products containing tobacco">
-                                                    Chews products containing tobacco
-                                                </option>
-                                                <option value="Snuff user">Snuff user</option>
-                                                <option value="Electronic cigarette user">
-                                                    Electronic cigarette user
-                                                </option>
-                                                <option value="Heavy tobacco smoker">Heavy tobacco smoker</option>
-                                                <option value="Light tobacco smoker">Light tobacco smoker</option>
-                                                <option value="Current some day smoker">Current some day smoker</option>
-                                                <option value="Non-Smoker">Non-Smoker</option>
-                                                <option value="Ex-Smoker">Ex-Smoker</option>
-                                                <option value="Ex-user of moist powdered tobacco">
-                                                    Ex-user of moist powdered tobacco
-                                                </option>
-                                                <option value="Smoker">Smoker</option>
-                                                <option value="Unknown if ever smoked">Unknown if ever smoked</option>
-                                                <option value="Current non smoker but past smoking history unknown">
-                                                    Current non smoker but past smoking history unknown
-                                                </option>
-                                                <option value="Current every day smoker">
-                                                    Current every day smoker
-                                                </option>
-                                                <option value="Light cigarette smoker (1-9 cigs/day)">
-                                                    Light cigarette smoker (1-9 cigs/day)
-                                                </option>
-                                                <option value="Moderate cigarette smoker (10-19 cigs/day)">
-                                                    Moderate cigarette smoker (10-19 cigs/day)
-                                                </option>
-                                                <option value="Heavy cigarette smoker (20-39 cigs/day)">
-                                                    Heavy cigarette smoker (20-39 cigs/day)
-                                                </option>
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group controlId="effectiveDateTime">
-                                            <Form.Label className="fw-medium mb-0">Effective Date</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                {...register('effectiveDateTime')}
-                                                required
-                                                className={`form-control-sm ${watch('effectiveDateTime') ? 'text-danger' : 'text-muted'}`}
-                                                max={new Date().toISOString().slice(0, 10)}
+                    <Form onSubmit={handleSubmit(onSubmit)} style={{height:'calc(100vh - 100px)',display:'flex',flexDirection:'column',alignItems:'end',justifyContent:'space-between'}}>
+                        <Row className="g-3">
+                            <Col md={6}>
+                                <Form.Group controlId="tobaccoUser">
+                                    <Form.Label className="fw-medium mb-1">Current Tobacco Use</Form.Label>
+                                    <Form.Select {...register('tobaccoUse')} required className="form-select-sm">
+                                        <option value="">Select an option</option>
+                                        {/* Keep your options here... */}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="effectiveDateTime">
+                                    <Form.Label className="fw-medium mb-1">Effective Date</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        {...register('effectiveDateTime')}
+                                        required
+                                        className="form-control-sm"
+                                        max={new Date().toISOString().slice(0, 10)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12}>
+                                <Form.Group controlId="notes">
+                                    <Form.Label className="fw-medium mb-1">
+                                        Notes{' '}
+                                        <span
+                                            style={{ cursor: 'pointer' }}
+                                            title="Notes Suggestions"
+                                            onClick={handleEditorFocus}>
+                                            ✨
+                                        </span>
+                                    </Form.Label>
+                                    <Controller
+                                        name="note"
+                                        control={control}
+                                        defaultValue="<ul><li></li></ul>"
+                                        render={({ field: { onChange, value } }) => (
+                                            <ReactQuill
+                                                value={value}
+                                                onChange={(content, delta, source) => {
+                                                    if (source === 'user') {
+                                                        onChange(content);
+                                                    }
+                                                }}
+                                                theme="snow"
+                                                placeholder="Enter detailed notes here..."
+                                                style={{ height: '25vh', backgroundColor: 'white' }}
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ header: [1, 2, false] }],
+                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                                        ['clean'],
+                                                    ],
+                                                }}
                                             />
-                                        </Form.Group>
-                                    </Col>
+                                        )}
+                                    />
+                                    <SuggestionOffcanvas
+                                        show={showSuggestions}
+                                        onClose={() => setShowSuggestions(false)}
+                                        onSelect={handleSuggestionSelect}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                                    <Col xs={12}>
-                                        <Form.Group controlId="notes">
-                                            <Form.Label className="fw-medium mb-0">
-                                                Notes{' '}
-                                                <span style={{ cursor: 'pointer' }} title='Notes Suggestions' onClick={handleEditorFocus}>
-                                                    ✨
-                                                </span>
-                                            </Form.Label>
-
-                                            <Controller
-                                                name="note"
-                                                control={control}
-                                                defaultValue="<ul><li></li></ul>"
-                                                render={({ field: { onChange, value } }) => (
-                                                    <ReactQuill
-                                                        value={value}
-                                                        onChange={(content, delta, source) => {
-                                                            if (source === 'user') {
-                                                                onChange(content);
-                                                            }
-                                                        }}
-                                                        theme="snow"
-                                                        placeholder="Enter detailed notes here..."
-                                                        style={{ height: '30vh', backgroundColor: 'white' }}
-                                                        modules={{
-                                                            toolbar: [
-                                                                [{ header: [1, 2, false] }],
-                                                                ['bold', 'italic', 'underline', 'strike'],
-                                                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                // ['link', 'image'],
-                                                                ['clean'],
-                                                            ],
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-
-                                            <SuggestionOffcanvas
-                                                show={showSuggestions}
-                                                onClose={() => setShowSuggestions(false)}
-                                                onSelect={handleSuggestionSelect}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </div>
-                            <div className="d-flex justify-content-end align-items-end pe-1 py-2">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    disabled={isLoading}
-                                    className="px-4 py-1 custom-buttons">
-                                    {toEdit ?
-                                        `Update`
-                                        :
-                                        `Add Record`
-                                    }
-                                </Button>
-                            </div>
-                        </Form>
-                    </Card.Body>
-                </div>
+                        <div className="d-flex justify-content-end mt-3">
+                            <Button type="submit" variant="primary" disabled={isLoading} className="px-4 py-1">
+                                {toEdit ? 'Update' : 'Add'}
+                            </Button>
+                        </div>
+                    </Form>
+                </Card.Body>
             </Col>
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1">
-                <div className=" border-danger  h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
-                            <h5 className="fw-semibold mb-0">Tobacco History</h5>
-                        </Card.Title>
 
-                        {isLoading && !tobaccoHistory?.length ? (
-                            <div className="text-center py-4">
-                                <Spinner />
-                            </div>
-                        ) : tobaccoHistory?.length === 0 ? (
-                            <div className="text-center py-4 text-muted">
-                                <i className="bi bi-journal-x fs-1"></i>
-                                <p className="mt-2 mb-0">No tobacco use records found</p>
-                            </div>
-                        ) : (
-                            <div className="scroll-container " style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush" className='striped-data'>
-                                    {tobaccoHistory?.map((item, index) => (
-                                        <ListGroup.Item key={index} className=" striped-data-item py-0 px-0 border-bottom">
-                                            <div className="d-flex pt-2 justify-content-between align-items-start px-1 mb-0">
-                                                <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
-                                                <div className=" d-flex justify-content-end align-items-center pe-2 gap-1">
-                                                    <i className="bi bi-trash-fill text-danger cursor-pointer"
-                                                        onClick={() => {
-                                                            setToDelete(item?._id)
-                                                            setDeleteModal(true)
-                                                        }}></i>
-                                                    {toEdit && toEdit._id === item._id ? (
-                                                        <i
-                                                            onClick={() => {
-                                                                setToEdit(null);
-                                                                setToEdit(item);
-                                                            }}
-                                                            className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
-                                                    ) : (
-                                                        <i
-                                                            onClick={() => setToEdit(item)}
-                                                            className="bi bi-pencil text-info cursor-pointer"
-                                                        ></i>
-                                                    )}
+            {/* Right: History Section */}
+            {/* <Col md={6} className="d-flex flex-column px-0">
+                <Card.Body className="p-0">
+                    <Card.Title className="border-bottom">
+                        <h5 className="fw-semibold mb-0">Tobacco History</h5>
+                    </Card.Title>
 
-                                                </div>
-                                            </div>
-                                            <small className="text-muted px-1 mb-0 mt-0">
-                                                {item?.note?.[0]?.time
-                                                    ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(item.note[0].time).toLocaleTimeString()})`
-                                                    : 'No date'}
-                                            </small>
-                                            {item?.note?.[0]?.text && (
-                                                <div className="mt-2 pb-2 scroll-container" style={{ maxHeight: '7rem ' }}>
-                                                    <div
-                                                        className="ql-editor p-0"
-                                                        dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                        style={{ fontSize: '0.875rem' }}
-                                                    />
-                                                </div>
+                    {isLoading && !tobaccoHistory?.length ? (
+                        <div className="text-center py-4">
+                            <Spinner />
+                        </div>
+                    ) : tobaccoHistory?.length === 0 ? (
+                        <div className="text-center py-4 text-muted">
+                            <i className="bi bi-journal-x fs-1"></i>
+                            <p className="mt-2 mb-0">No tobacco use records found</p>
+                        </div>
+                    ) : (
+                        <ListGroup variant="flush" className="striped-data">
+                            {tobaccoHistory.map((item, index) => (
+                                <ListGroup.Item key={index} className="py-2 px-2 border-bottom">
+                                    <div className="d-flex justify-content-between align-items-start mb-1">
+                                        <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
+                                        <div className="d-flex gap-2">
+                                            <i
+                                                className="bi bi-trash-fill text-danger cursor-pointer"
+                                                onClick={() => {
+                                                    setToDelete(item?._id);
+                                                    setDeleteModal(true);
+                                                }}
+                                            />
+                                            {toEdit && toEdit._id === item._id ? (
+                                                <i
+                                                    className="bi bi-x-circle-fill cursor-pointer text-danger"
+                                                    onClick={handleReset}
+                                                />
+                                            ) : (
+                                                <i
+                                                    className="bi bi-pencil text-info cursor-pointer"
+                                                    onClick={() => setToEdit(item)}
+                                                />
                                             )}
-                                            <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteHistory} item='tobaccoo history' isLoading={store?.deleteTobaccooReducer?.loading} />
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </div>
-                        )}
-                    </Card.Body>
-                </div>
-            </Col>
+                                        </div>
+                                    </div>
+                                    <small className="text-muted">
+                                        {item?.note?.[0]?.time
+                                            ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(
+                                                  item.note[0].time
+                                              ).toLocaleTimeString()})`
+                                            : 'No date'}
+                                    </small>
+                                    {item?.note?.[0]?.text && (
+                                        <div
+                                            className="mt-2 scroll-container"
+                                            style={{ maxHeight: '6rem', overflowY: 'auto' }}>
+                                            <div
+                                                className="ql-editor p-0"
+                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                style={{ fontSize: '0.875rem' }}
+                                            />
+                                        </div>
+                                    )}
+                                    <DeletionModal
+                                        show={deleteModal}
+                                        onHide={closeDeleteModal}
+                                        onConfirm={deleteHistory}
+                                        item="tobacco history"
+                                        isLoading={store?.deleteTobaccooReducer?.loading}
+                                    />
+                                </ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    )}
+                </Card.Body>
+            </Col> */}
         </Row>
     );
 };
