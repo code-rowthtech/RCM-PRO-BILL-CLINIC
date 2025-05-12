@@ -10,6 +10,9 @@ import AddAllergy from '../Task Tabs/AddAllergy';
 import AddProblem from '../Task Tabs/AddProblem';
 import UpdateProblem from '../Task Tabs/UpdateTasks/UpdateProblem';
 import AddMedication from './AddMedication';
+import { getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 const tabList = [
     { key: 'Allergy List', label: 'Allergy List' },
@@ -24,6 +27,9 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
     const [problemModal, setProblemModal] = useState(false);
     const [medicationModal, setMedicationModal] = useState(false);
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
+    const [searchParams] = useSearchParams();
+    const dispatch = useDispatch()
+    const patientId = searchParams.get('id');
 
     // Dummy state for edit mode and selected data
     const [isEditMode, setIsEditMode] = useState(false);
@@ -56,6 +62,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
         }
     };
 
+
     return (
         <div>
             <div
@@ -80,7 +87,15 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                                 fontWeight: 600,
                                 opacity: disabled ? 0.5 : 1,
                             }}
-                            onClick={() => !disabled && setActiveTab(key)}>
+                            onClick={() => {
+                                if (!disabled && activeTab === 'Vitals' && key !== 'Vitals') {
+                                    dispatch(getVitalsByPatientIdAction({ patientId }));
+                                }
+                                if (!disabled) {
+                                    setActiveTab(key);
+                                }
+                            }}
+                        >
                             {label}
                         </a>
                     ))}

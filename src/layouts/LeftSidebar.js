@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction, getPatientsByAppointmentAction, logoutUser } from '../redux/actions';
 import { encryptMessage } from '../cryptoUtils';
 import Spinner from '../constants/Spinner';
-import { Button, Col, Modal, Row } from 'react-bootstrap';
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import { IoMdAdd } from 'react-icons/io';
 import logo from '../assets/images/logo.png';
 import logo_sm from '../assets/images/logo_sm.png';
@@ -101,6 +101,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
 
     const createPatientsResponse = store?.createPatientsReducer?.data?.status;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
+    console.log(doctorDetails, 'doctorDetailsdoctorDetailsdoctorDetails')
     const appointmentDetails = [];
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID
@@ -125,6 +126,8 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                 search: search
             }
             dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
+            dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 20 }));
+
         }
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
 
@@ -348,8 +351,16 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     <img onClick={() => navigate('/')} className='cursor-pointer' src={logo} alt="" height="25" />
                                 </li>
                                 <li className='px-1 mb-1 d-flex gap-1 align-items-center'>
-                                    <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." />
-                                    <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i className="bi bi-filter"></i></Button>
+                                    {/* <input type="text" className='form-control' onChange={(e) => setSearch(e.target.value)} placeholder="Search..." /> */}
+                                    {/* <Button className='custom-buttons' onClick={togglePriorityDropdown} ><i className="bi bi-filter"></i></Button> */}
+                                    <Form.Select
+                                        className='text-capitalize'
+                                        onChange={(e) => setSelectedDoctor(e.target.value)}>
+                                        <option value='' key=''>All</option>
+                                        {doctorDetails?.map((data, index) => (
+                                            <option className='text-capitalize' value={data?._id} key={index}>{data?.name?.[0]?.text}</option>
+                                        ))}
+                                    </Form.Select>
                                 </li>
                                 <li className={`px-1 mb-1 ${location.pathname === '/apps/patients/new-patient' ? 'd-none' : ''}`}>
                                     <Link to='/apps/patients/new-patient'>

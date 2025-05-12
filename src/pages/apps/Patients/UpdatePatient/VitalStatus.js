@@ -80,9 +80,9 @@ export default function VitalStatus({ isAccordionOpen }) {
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
 
 
-    useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId }));
-    }, [dispatch, patientId]);
+    // useEffect(() => {
+    //     dispatch(getVitalsByPatientIdAction({ patientId }));
+    // }, [dispatch, patientId]);
     const validationSchema = {
         Temperature: { min: 93, max: 108 }, // °F
         Pulse: { min: 30, max: 200 },       // bpm
