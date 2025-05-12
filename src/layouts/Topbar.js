@@ -152,7 +152,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                             <li className='notification-list'>
                                 <button
                                     onClick={() => navigate('/apps/patients/list')}
-                                    className='custom mt-2 text-dark border-0  text-white px-2 bg-light fw-semibold'
+                                    className='custom mt-2 text-muted border-0  px-2 bg-light fw-semibold'
                                 >
                                     Back
                                 </button>

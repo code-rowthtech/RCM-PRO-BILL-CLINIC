@@ -603,6 +603,7 @@ const UpdatePatientIndex = () => {
                                                                             <Button
                                                                                 variant="primary"
                                                                                 size="sm"
+                                                                                className='custom-buttons'
                                                                                 onClick={() =>
                                                                                     handlePrintPatientSummary({
                                                                                         toBePrinted: printOptions,

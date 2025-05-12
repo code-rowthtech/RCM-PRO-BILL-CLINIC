@@ -70,7 +70,6 @@ const Tobacco = () => {
         ];
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
-            // data.id = toEdit?._id;
             dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));
@@ -82,11 +81,9 @@ const Tobacco = () => {
         setShowSuggestions(true);
     };
     const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
         const current = getValues('note'); // from useFormContext or pass as prop
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
-    // const handleUserTyping = (content) => {};
 
     return (
         <Row className="mt-0 g-0 pt-0 px-1 h-100 scroll-container" style={{ height: 'calc(100vh - 100px)', overflowY: "scroll" }}>

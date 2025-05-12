@@ -47,7 +47,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false)
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
 
     }, [dispatch]);
 
@@ -171,7 +171,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
-        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime }));
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
     };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);

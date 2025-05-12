@@ -356,7 +356,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     <Form.Select
                                         className='text-capitalize'
                                         onChange={(e) => setSelectedDoctor(e.target.value)}>
-                                        <option value='' key=''>All</option>
+                                        <option value='' key=''>All Providers</option>
                                         {doctorDetails?.map((data, index) => (
                                             <option className='text-capitalize' value={data?._id} key={index}>{data?.name?.[0]?.text}</option>
                                         ))}
@@ -444,7 +444,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                                                 key={idx}
                                                                 className="py-1 cursor-pointer d-flex justify-content-between align-items-start text-white border-bottom"
                                                                 style={{ fontSize: '12px', borderColor: 'rgb(127 123 123 / 40%)' }}
-                                                                onClick={() => navigate(`/apps/patients/update-patient?id=${appointment?.subject?._id}`)}
+                                                                onClick={() => navigate(`/apps/appointments/newAppointment?updateid=${appointment?._id}`)}
                                                             >
                                                                 <div>
                                                                     <p className='mb-0'>

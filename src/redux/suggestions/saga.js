@@ -19,7 +19,7 @@ function* createSuggestionsFunction(data) {
         const response = yield call(createSuggestionsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
+            // ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: SuggestionsListActionTypes.CREATE_SUGGESTION_SUCCESS,
                 payload: { ...decryptedData },

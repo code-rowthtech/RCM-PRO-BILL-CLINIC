@@ -16,17 +16,34 @@ const conversionMap = {
     Height: { imperial: 'in', metric: 'cm' },
     Weight: { imperial: 'lbs', metric: 'kg' },
 };
+// Add these helper functions near the top of your file
+const convertToImperial = (value, vitalName) => {
+    if (vitalName === 'Height') return (value / 2.54).toFixed(2); // cm to in
+    if (vitalName === 'Weight') return (value * 2.20462).toFixed(2); // kg to lbs
+    if (vitalName === 'Temperature') return ((value * 9) / 5 + 32).toFixed(2); // C to F
+    if (vitalName === 'Head Circumference') return (value / 2.54).toFixed(2)
+    return value;
+};
 
+const convertFromImperial = (value, vitalName) => {
+    if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
+    if (vitalName === 'Weight') return (value / 2.20462).toFixed(2); // lbs to kg
+    if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2); // F to C
+    if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2)
+    return value;
+};
 const imperialUnits = {
     Temperature: '°F',
     Height: 'in',
     Weight: 'lbs',
+    'Head Circumference': 'in',
 };
 
 const metricUnits = {
     Temperature: '°C',
     Height: 'cm',
     Weight: 'kg',
+    'Head Circumference': 'cm',
 };
 
 const convertValue = (value, fromUnit, toUnit) => {
@@ -60,29 +77,28 @@ const getVitalType = (vitalName) => {
 };
 
 const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    const options = { day: 'numeric', month: 'short' };
+    return new Date(dateString).toLocaleDateString('en-GB', options);
 };
 
-export default function VitalStatus({ isAccordionOpen }) {
+
+export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem }) {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const [unitSystem, setUnitSystem] = useState('imperial');
+    // const [unitSystem, setUnitSystem] = useState('imperial');
     const [vitals, setVitals] = useState(defaultVitals);
-    const [newVital, setNewVital] = useState('');
+    // const [newVital, setNewVital] = useState('');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
-    const visitTime = new Date().toLocaleString();
+    // const visitTime = new Date().toLocaleString();
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
-    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+    // const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
     const now = new Date();
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
 
 
-    // useEffect(() => {
-    //     dispatch(getVitalsByPatientIdAction({ patientId }));
-    // }, [dispatch, patientId]);
+
     const validationSchema = {
         Temperature: { min: 93, max: 108 }, // °F
         Pulse: { min: 30, max: 200 },       // bpm
@@ -219,9 +235,38 @@ export default function VitalStatus({ isAccordionOpen }) {
         return vital.unit || '';
     };
 
-    const handleUnitChange = (newSystem) => {
-        setUnitSystem(newSystem);
-    };
+    // const handleUnitChange = (newSystem) => {
+    //     // Convert all displayed values when unit system changes
+    //     setVitals(prevVitals => {
+    //         return prevVitals.map(vital => {
+    //             if (!vital.unitKey) return vital; // Skip vitals that don't need conversion
+
+    //             // For BP, we don't convert the values (mmHg is standard)
+    //             if (vital.type === 'bp') return vital;
+
+    //             // For BMI, we don't convert (it's unitless)
+    //             if (vital.name === 'BMI') return vital;
+
+    //             // Convert the displayed value
+    //             let newValue = vital.value;
+
+    //             if (unitSystem === 'imperial' && newSystem === 'metric') {
+    //                 // Convert from imperial to metric
+    //                 newValue = convertFromImperial(parseFloat(vital.value), vital.name);
+    //             } else if (unitSystem === 'metric' && newSystem === 'imperial') {
+    //                 // Convert from metric to imperial
+    //                 newValue = convertToImperial(parseFloat(vital.value), vital.name);
+    //             }
+
+    //             return {
+    //                 ...vital,
+    //                 value: newValue.toString()
+    //             };
+    //         });
+    //     });
+
+    //     setUnitSystem(newSystem);
+    // };
 
     const handleVitalChange = (index, field, value) => {
         setVitals(prevVitals => {
@@ -256,7 +301,8 @@ export default function VitalStatus({ isAccordionOpen }) {
             createdBy: loggedInUser?._id,
         };
 
-        if (vital.type === 'bp' && vital.value?.systolic && vital.value?.diastolic) {
+        if (vital.type === 'bp') {
+            // Blood pressure is always in mmHg (no conversion needed)
             const bpObservation = {
                 ...baseObservation,
                 component: [
@@ -291,27 +337,52 @@ export default function VitalStatus({ isAccordionOpen }) {
                         }
                     }
                 ]
-
             };
             dispatch(createVitalsAction({ key: encryptMessage(bpObservation) }));
-        } else if (vital.type === 'dropdown') {
+        }
+        else if (vital.type === 'dropdown') {
             const observation = {
                 ...baseObservation,
                 valueString: vital.value
             };
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
-        } else if (vital.type === 'number' && vital.value !== '') {
+        }
+        else if (vital.type === 'number' && vital.value !== '') {
+            // Convert to imperial before sending if needed
+            let valueToSend = parseFloat(vital.value);
+            let unitToSend = getDisplayUnit(vital);
+
+            if (unitSystem === 'metric') {
+                // Convert metric values to imperial before sending
+                if (vital.name === 'Height') {
+                    valueToSend = convertToImperial(valueToSend, 'Height');
+                    unitToSend = 'in';
+                }
+                else if (vital.name === 'Weight') {
+                    valueToSend = convertToImperial(valueToSend, 'Weight');
+                    unitToSend = 'lbs';
+                }
+                else if (vital.name === 'Temperature') {
+                    valueToSend = convertToImperial(valueToSend, 'Temperature');
+                    unitToSend = '°F';
+                }
+            }
+
             const observation = {
                 ...baseObservation,
                 valueQuantity: {
-                    value: parseFloat(vital.value),
-                    unit: getDisplayUnit(vital),
+                    value: valueToSend,
+                    unit: unitToSend,
+                    system: "http://unitsofmeasure.org",
+                    code: unitToSend === 'in' ? '[in_i]' :
+                        unitToSend === 'lbs' ? '[lb_av]' :
+                            unitToSend === '°F' ? '[degF]' : unitToSend
                 }
             };
             dispatch(createVitalsAction({ key: encryptMessage(observation) }));
         }
     };
-
+    // Update the findVitalValue function to handle unit conversions
     const findVitalValue = (vitalName, date) => {
         if (!groupedVitals[date]) return null;
 
@@ -323,7 +394,7 @@ export default function VitalStatus({ isAccordionOpen }) {
         if (!vital) return null;
 
         if (vital.component && vital.component.length > 0) {
-            // Handle blood pressure case
+            // Handle blood pressure case (no conversion needed)
             const systolic = vital.component.find(c =>
                 c.code?.coding?.[0]?.code === "8480-6"
             )?.valueQuantity?.value;
@@ -335,7 +406,23 @@ export default function VitalStatus({ isAccordionOpen }) {
             return { systolic: systolic || '', diastolic: diastolic || '' };
         }
 
-        return vital.valueQuantity?.value || vital.valueString || '';
+        // Get the stored value (always in imperial units)
+        let value = vital.valueQuantity?.value || vital.valueString || '';
+
+        // Convert to metric if needed for display
+        if (unitSystem === 'metric') {
+            if (vitalName === 'Height') {
+                value = convertFromImperial(value, 'Height');
+            }
+            else if (vitalName === 'Weight') {
+                value = convertFromImperial(value, 'Weight');
+            }
+            else if (vitalName === 'Temperature') {
+                value = convertFromImperial(value, 'Temperature');
+            }
+        }
+
+        return value;
     };
 
     const renderVitalCell = (vital, date) => {
@@ -394,18 +481,56 @@ export default function VitalStatus({ isAccordionOpen }) {
             time: e.target.value,
         }));
     };
+
+    // In your component
+    // const [currentPage, setCurrentPage] = useState(1);
+    // const pageSize = 7; // or whatever default you want
+
+    // useEffect(() => {
+    //     dispatch(getVitalsByPatientIdAction({ patientId, page: currentPage }));
+    // }, [currentPage]);
+
+    // const paginationData = store?.getVitalsByPatientIdReducer?.data?.pagination;
+
+    // const handlePreviousPage = () => {
+    //     if (currentPage > 1) {
+    //         setCurrentPage(currentPage - 1);
+    //     }
+    // };
+
+    // const handleNextPage = () => {
+    //     if (paginationData && currentPage < paginationData.totalPages) {
+    //         setCurrentPage(currentPage + 1);
+    //     }
+    // };
+
     return (
         <div>
             <div className="row mb-2">
-                <div className="col-9">
-                    <h5>Vitals</h5>
+                <div className="col-md-9">
+                    {/* <h6>Vitals</h6> */}
                 </div>
 
-                <div className="col-3 d-flex gap-2 align-items-center">
-                    {!store?.getVitalsByPatientIdReducer?.loading &&
-                        <span title='Print all vitals'
-                            onClick={() => handlePrintVitals({ vitals: patientVitals, patientDetails: patientDetails })}
-                            className='uil-print text-primary fs-4 cursor-pointer' />}
+                {/* <div className="col-md-3 d-flex gap-2 align-items-center">
+                    <i
+                        title='Previous'
+                        className={`bi cursor-pointer  ${currentPage === paginationData.totalPages ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-backward-circle`}
+                        onClick={handleNextPage}
+                        disabled={currentPage === paginationData.totalPages}
+                    />
+                    <i
+                        title='Next'
+                        className={`bi cursor-pointer  ${currentPage === 1 ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-forward-circle`}
+                        onClick={handlePreviousPage}
+                        disabled={currentPage === 1}
+
+                    />
+
+                    <span
+                        title='Print all vitals'
+                        onClick={() => handlePrintVitals({ vitals: patientVitals, patientDetails: patientDetails })}
+                        className='uil-print text-primary fs-4 cursor-pointer '
+                    />
                     <div className="d-flex gap-1  border-start  ps-2 align-items-center w-100" >
                         <span className='fw-semibold fs-6'>Units:</span>
                         <Form.Select
@@ -417,7 +542,7 @@ export default function VitalStatus({ isAccordionOpen }) {
                             <option value='metric'>Metric</option>
                         </Form.Select>
                     </div>
-                </div>
+                </div> */}
             </div>
 
             <div className='scroll-container ' style={{
@@ -442,8 +567,8 @@ export default function VitalStatus({ isAccordionOpen }) {
                                         type="date"
                                         value={visitDateTime.date}
                                         onChange={handleDateChange}
-                                        min="2000-01-01" // Optional: Set a min date
-                                        max="2100-12-31" // Optional: Set a max date
+                                        min={new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0]}
+                                        max={new Date().toISOString().split("T")[0]}
                                     />
 
                                     <Form.Control

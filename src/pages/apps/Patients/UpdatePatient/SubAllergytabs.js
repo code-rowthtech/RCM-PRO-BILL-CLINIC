@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AllergyList from '../Task Tabs/AllergyList';
 import ProblemList from '../Task Tabs/ProblemList';
 import Medication from './Medication';
 import VitalStatus from './VitalStatus';
 import { MdAddCircleOutline } from 'react-icons/md';
-import { Modal } from 'react-bootstrap';
+import { Form, Modal } from 'react-bootstrap';
 import UpdateAllergy from '../Task Tabs/UpdateTasks/UpdateAllergy';
 import AddAllergy from '../Task Tabs/AddAllergy';
 import AddProblem from '../Task Tabs/AddProblem';
@@ -13,7 +13,25 @@ import AddMedication from './AddMedication';
 import { getVitalsByPatientIdAction } from '../../../../redux/actions';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { handlePrintVitals } from '../../../../helpers/printVitals';
+import { useSelector } from 'react-redux';
+import { defaultVitals } from '../../../../utils/DataSets/commonData2';
 
+const convertToImperial = (value, vitalName) => {
+    if (vitalName === 'Height') return (value / 2.54).toFixed(2); // cm to in
+    if (vitalName === 'Weight') return (value * 2.20462).toFixed(2); // kg to lbs
+    if (vitalName === 'Temperature') return ((value * 9) / 5 + 32).toFixed(2); // C to F
+    if (vitalName === 'Head Circumference') return (value / 2.54).toFixed(2)
+    return value;
+};
+
+const convertFromImperial = (value, vitalName) => {
+    if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
+    if (vitalName === 'Weight') return (value / 2.20462).toFixed(2); // lbs to kg
+    if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2); // F to C
+    if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2)
+    return value;
+};
 const tabList = [
     { key: 'Allergy List', label: 'Allergy List' },
     { key: 'Problem List', label: 'Problem List' },
@@ -29,8 +47,47 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
     const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch()
+    const store = useSelector((state) => state);
     const patientId = searchParams.get('id');
+    const [unitSystem, setUnitSystem] = useState('imperial');
+    const [vitals, setVitals] = useState(defaultVitals);
+    // const [newVital, setNewVital] = useState('');
+    // const visitTime = new Date().toLocaleString();
+    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
+    const handleUnitChange = (newSystem) => {
+        // Convert all displayed values when unit system changes
+        setVitals(prevVitals => {
+            return prevVitals.map(vital => {
+                if (!vital.unitKey) return vital; // Skip vitals that don't need conversion
+
+                // For BP, we don't convert the values (mmHg is standard)
+                if (vital.type === 'bp') return vital;
+
+                // For BMI, we don't convert (it's unitless)
+                if (vital.name === 'BMI') return vital;
+
+                // Convert the displayed value
+                let newValue = vital.value;
+
+                if (unitSystem === 'imperial' && newSystem === 'metric') {
+                    // Convert from imperial to metric
+                    newValue = convertFromImperial(parseFloat(vital.value), vital.name);
+                } else if (unitSystem === 'metric' && newSystem === 'imperial') {
+                    // Convert from metric to imperial
+                    newValue = convertToImperial(parseFloat(vital.value), vital.name);
+                }
+
+                return {
+                    ...vital,
+                    value: newValue.toString()
+                };
+            });
+        });
+
+        setUnitSystem(newSystem);
+    };
     // Dummy state for edit mode and selected data
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
@@ -62,6 +119,25 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
         }
     };
 
+    const [currentPage, setCurrentPage] = useState(1);
+
+    useEffect(() => {
+        dispatch(getVitalsByPatientIdAction({ patientId, page: currentPage }));
+    }, [currentPage]);
+
+    const paginationData = store?.getVitalsByPatientIdReducer?.data?.pagination;
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (paginationData && currentPage < paginationData.totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
 
     return (
         <div>
@@ -110,6 +186,40 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                         style={{ flexShrink: 0 }}
                     />
                 }
+                {activeTab === 'Vitals' &&
+                    <div className="col-md-3 d-flex gap-2 align-items-center">
+                        <i
+                            title='Previous'
+                            className={`bi cursor-pointer  ${currentPage === paginationData.totalPages ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-backward-circle`}
+                            onClick={handleNextPage}
+                            disabled={currentPage === paginationData.totalPages}
+                        />
+                        <i
+                            title='Next'
+                            className={`bi cursor-pointer  ${currentPage === 1 ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-forward-circle`}
+                            onClick={handlePreviousPage}
+                            disabled={currentPage === 1}
+
+                        />
+
+                        <span
+                            title='Print all vitals'
+                            onClick={() => handlePrintVitals({ vitals: patientVitals, patientDetails: patientDetails })}
+                            className='uil-print text-primary fs-4 cursor-pointer '
+                        />
+                        <div className="d-flex gap-1  border-start  ps-2 align-items-center w-100" >
+                            <span className='fw-semibold fs-6'>Units:</span>
+                            <Form.Select
+                                onChange={(e) => handleUnitChange(e.target.value)}
+                                value={unitSystem}
+                                className="w-100"
+                            >
+                                <option value='imperial'>Imperial</option>
+                                <option value='metric'>Metric</option>
+                            </Form.Select>
+                        </div>
+                    </div>
+                }
 
             </div>
 
@@ -117,7 +227,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                 {activeTab === 'Allergy List' && <AllergyList />}
                 {activeTab === 'Problem List' && <ProblemList />}
                 {activeTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
-                {activeTab === 'Vitals' && <VitalStatus isAccordionOpen={isAccordionOpen} />}
+                {activeTab === 'Vitals' && <VitalStatus isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
             </div>
 
             {/* Allergy Modal */}
