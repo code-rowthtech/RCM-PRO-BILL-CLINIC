@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Accordion, Button, Card, Col, Form, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Accordion, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import profileDummy from '../../../../assets/images/profileDummy.png';
 import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { TbCapture } from 'react-icons/tb';
@@ -14,30 +14,19 @@ import {
     getStatesByCountryAction,
     getSurgicalHistoryAction,
     getTobaccooAction,
-    getVitalsByPatientIdAction,
-    resetUpdateAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import ResponsibleParty from './ResponsibleParty';
-import VitalStatus from './VitalStatus';
-import { BiEdit, BiSolidLocationPlus } from 'react-icons/bi';
+import { BiEdit } from 'react-icons/bi';
 import { useForm } from 'react-hook-form';
 import { handleUpload } from '../../../../helpers/HandleUpload';
 import Insurances from './Insurance/Insurance';
-import ProblemList from '../Task Tabs/ProblemList';
-import AssignTask from '../Task Tabs/AssignTask';
-import AllergyList from '../Task Tabs/AllergyList';
-import AddAssignTask from '../Task Tabs/AddAssignTask';
-import FilterModal from './FilterModal';
-import FilterDropdown from './FilterModal';
-import Responsiblle from './ResponsibleParty';
 import ReferringDoctor from './ReferringDoctor';
 import { patientMenuItems } from './patientsMenuItems';
 import Subtabs from './Subtabsindex';
 import PatientSummary from './PatientSummary';
-import Medication from './Medication';
 import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
 import { getProblemListAction } from '../../../../redux/ProblemList/action';
@@ -46,26 +35,16 @@ const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const {
-        register,
         handleSubmit,
         formState: { errors },
-        setValue,
-        reset,
-        clearErrors,
-        watch,
-        getValues,
     } = useForm();
-    const navigate = useNavigate();
     const menuRef = useRef(null);
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    const updateSuccess = store?.updatePatientsReducer?.data?.status;
-    const updateResponsibleParty = store?.updateResponsiblePartyReducer?.data?.status;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
-    const [selectedSubTab, setSelectedSubTab] = useState('Allergy List');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
@@ -96,35 +75,7 @@ const UpdatePatientIndex = () => {
         };
     }, []);
 
-    // useEffect(() => {
-    //     const payload = {
-    //         id: id,
-    //     };
-    //     // check this api it create 19 api hit 
-    //     if (id) {
-    //     }
-    // }, [id])
-    // useEffect(() => {
-    //     const payload = {
-    //         id: id,
-    //     };
-    //     // check this api it create 19 api hit 
-    //     if (id) {
-    //         dispatch(getMedicationAction({ patientId: id }));
-    //         dispatch(getSurgicalHistoryAction({ patientId: id }));
-    //     }
-    //     if (
-    //         updateSuccess === 200 ||
-    //         updateResponsibleParty === 200 ||
-    //         store?.createResponsiblePartyReducer?.data?.status === 201
-    //     ) {
-    //         dispatch(getPatientByIdAction(payload));
-    //         dispatch(resetUpdateAction());
-    //         setLogo(null);
-    //         setLogoName('');
-    //         setProfilePhoto(null);
-    //     }
-    // }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
+
     useEffect(() => {
         dispatch(getStatesByCountryAction());
         dispatch(getPatientByIdAction({ id: id }));
@@ -611,68 +562,58 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2 " style={{ height: isAccordionOpen ? '66vh' : '85vh' }}>
-                                            <div className="mt-1 px-0">
-                                                {selectedMainTab === 'Patient Details' && (
-                                                    <PatientSummary
-                                                        isAccordionOpen={isAccordionOpen}
-                                                        setSelectedMainTab={setSelectedMainTab}
-                                                    />
+                                        <Card className="px-2 scroll-container pt-2" style={{
+                                            height: isAccordionOpen ? 'calc(100vh - 270px)' : 'calc(100vh - 154px)',
+                                            maxHeight: '1000px'
+                                        }}>
+                                            {selectedMainTab === 'Patient Details' && (
+                                                <PatientSummary
+                                                    isAccordionOpen={isAccordionOpen}
+                                                    setSelectedMainTab={setSelectedMainTab}
+                                                />
+                                            )}
+                                            {selectedMainTab === 'Demographics' && (
+                                                <Subtabs isAccordionOpen={isAccordionOpen} />
+                                            )}
+                                            {selectedMainTab === 'Responsible Party' && (
+                                                <ResponsibleParty isAccordionOpen={isAccordionOpen} />
+                                            )}
+                                            {selectedMainTab === 'Reffering Doctor' && (
+                                                <ReferringDoctor isAccordionOpen={isAccordionOpen} />
+                                            )}
+                                            {selectedMainTab === 'Insurances' && (
+                                                <Insurances isAccordionOpen={isAccordionOpen} />
+                                            )}
+                                            {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Documents' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Encounter' && <p>In progress...</p>}
+                                            {[
+                                                'Tabacco',
+                                                'Medical',
+                                                'Surgical',
+                                                'Family / Genetic',
+                                                'Alcohol',
+                                                'Vaccination',
+                                            ].includes(selectedMainTab) && (
+                                                    <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
                                                 )}
-                                                {selectedMainTab === 'Demographics' && (
-                                                    <Subtabs isAccordionOpen={isAccordionOpen} />
+                                            {selectedMainTab === 'Communication' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Task' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Balance' && <p>In Progress...</p>}
+                                            {selectedMainTab === 'Payment' && <p>In Progress...</p>}
+                                            {[
+                                                'Allergy List',
+                                                'Problem List',
+                                                'Medication List',
+                                                'Vitals List',
+                                            ].includes(selectedMainTab) && (
+                                                    <SubAllergytabs isAccordionOpen={isAccordionOpen} />
                                                 )}
-                                                {selectedMainTab === 'Responsible Party' && (
-                                                    <ResponsibleParty isAccordionOpen={isAccordionOpen} />
-                                                )}
-                                                {selectedMainTab === 'Reffering Doctor' && (
-                                                    <ReferringDoctor isAccordionOpen={isAccordionOpen} />
-                                                )}
-                                                {selectedMainTab === 'Insurances' && (
-                                                    <Insurances isAccordionOpen={isAccordionOpen} />
-                                                )}
-                                                {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
-                                                {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
-                                                {selectedMainTab === 'Documents' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Encounter' && <p>In progress...</p>}
-                                                {/* {selectedMainTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />} */}
-                                                {/* {selectedMainTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} />} */}
-                                                {[
-                                                    'Tabacco',
-                                                    'Medical',
-                                                    'Surgical',
-                                                    'Family / Genetic',
-                                                    'Alcohol',
-                                                    'Vaccination',
-                                                ].includes(selectedMainTab) && (
-                                                        <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
-                                                    )}
-                                                {/* {selectedMainTab === 'Medical' && <p>In progress...</p>} */}
-                                                {/* {selectedMainTab === 'Family / Genetic' && <p>In progress...</p>} */}
-                                                {/* {selectedMainTab === 'Alcohol' && <p>In progress...</p>} */}
-                                                {/* {selectedMainTab === 'Vaccination' && <p>In progress...</p>} */}
-                                                {selectedMainTab === 'Communication' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Task' && <p>In progress...</p>}
-                                                {/* {selectedMainTab === 'Surgical' && <p>In progress...</p>} */}
-                                                {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
-                                                {selectedMainTab === 'Balance' && <p>In Progress...</p>}
-                                                {selectedMainTab === 'Payment' && <p>In Progress...</p>}
-                                                {/* {selectedMainTab === 'Allergy List' && <AllergyList />} */}
-                                                {/* {selectedMainTab === 'Problem List' && (
-                                                    <ProblemList isAccordionOpen={isAccordionOpen} />
-                                                )} */}
-                                                {[
-                                                    'Allergy List',
-                                                    'Problem List',
-                                                    'Medication List',
-                                                    'Vitals List',
-                                                ].includes(selectedMainTab) && (
-                                                        <SubAllergytabs isAccordionOpen={isAccordionOpen} />
-                                                    )}
-                                            </div>
                                         </Card>
                                     </div>
                                 )}

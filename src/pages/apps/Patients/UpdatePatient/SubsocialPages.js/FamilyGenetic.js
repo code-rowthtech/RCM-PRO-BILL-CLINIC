@@ -38,7 +38,6 @@ const FamilyHistory = () => {
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
-    const [familyList, setFamilyList] = useState([]);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
@@ -112,7 +111,7 @@ const FamilyHistory = () => {
         const selected = data.problem;
         const selectedSexOption = sexAssignedAtBirthOptions.find((option) => option.value === data.sex);
 
-        setFamilyList((prev) => [...prev, data]);
+        // setFamilyList((prev) => [...prev, data]);
         const payload = {
             name: data?.name,
             clinicId: loggedInUser?._id,
@@ -423,7 +422,7 @@ const FamilyHistory = () => {
                                         store?.updateFamilyGeneticReducer?.loading
                                     }>
                                     {store?.createFamilyGeneticReducer?.loading ||
-                                    store?.updateFamilyGeneticReducer?.loading ? (
+                                        store?.updateFamilyGeneticReducer?.loading ? (
                                         <Spinner animation="border" size="sm" className="text-white" />
                                     ) : toEdit ? (
                                         'Update'
@@ -477,8 +476,8 @@ const FamilyHistory = () => {
                                                             <span className="ms-1 fs-6">
                                                                 {item?.bornDate
                                                                     ? new Date(item?.bornDate)?.toLocaleDateString(
-                                                                          'en-GB'
-                                                                      )
+                                                                        'en-GB'
+                                                                    )
                                                                     : ''}
                                                             </span>
                                                         </div>

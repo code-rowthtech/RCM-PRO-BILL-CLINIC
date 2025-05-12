@@ -19,10 +19,10 @@ const GET_TOBACCOO_INITIAL_STATE = {
     data: [],
     loading: false,
 };
-const GET_MEDICATION_INITIAL_STATE = {
-    data: [],
-    loading: false,
-};
+// const GET_MEDICATION_INITIAL_STATE = {
+//     data: [],
+//     loading: false,
+// };
 
 // Family Genetic
 const CREATE_FAMILY_GENETIC_INITIAL_STATE = {
@@ -40,7 +40,7 @@ const GET_FAMILY_GENETIC_INITIAL_STATE = {
     loading: false,
 };
 
-const DELETE_FAMILY_GENETIC_INITIAL_STATE ={
+const DELETE_FAMILY_GENETIC_INITIAL_STATE = {
     data: [],
     loading: false,
 }

@@ -17,6 +17,10 @@ const GET_DOCTORS_DETAILS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+const CREATE_DOCTOR_DETAILS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
 const ADD_REFERRING_DOCTOR_DETAILS_INITIAL_STATE = {
     data: [],
@@ -126,7 +130,7 @@ export const getDoctorDetailsReducer = (state = GET_DOCTORS_DETAILS_INITIAL_STAT
     }
 }
 
-export const createtDoctorsDetailReducer = (state = GET_DOCTORS_INITIAL_STATE, action) => {
+export const createtDoctorsDetailReducer = (state = CREATE_DOCTOR_DETAILS_INITIAL_STATE, action) => {
     switch (action.type) {
         case DoctorsActionTypes.CREATE_DOCTORS_DETAIL_LOADING:
             return {

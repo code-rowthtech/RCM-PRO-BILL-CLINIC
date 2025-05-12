@@ -38,8 +38,7 @@ export default (combineReducers({
     getAnalyticsReducer, createMastersDataReducer, getMastersDataReducer, getDepartmentDataReducer, updateMastersDataReducer, createSubscriptionPlanReducer, createContractReducer, standardContractReducer,
     getDoctorsReducer, getClinicTypeReducer, updateSubClinicReducer,
     createClinicsReducer, changeEmailReducer, getClinicsReducer, getClinicByIdReducer, getStatesReducer,
-    createSubscriptionPlanReducer,
-    getDoctorsReducer, createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
+    createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,
     getPatientsReducer,
@@ -60,6 +59,6 @@ export default (combineReducers({
     // suggestions
     createSuggestionsReducer, createMedicationReducer, getMedicationReducer, getDrugsReducer, updateMedicationReducer,
     createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
-    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer,deleteFamilyGenticReducer,
+    getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
     createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer
 }): any);

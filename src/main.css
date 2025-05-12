@@ -1018,3 +1018,12 @@ tbody tr:hover {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+
+.form-select[data-has-value='true'] {
+    color: black !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+}

@@ -52,18 +52,18 @@ const Medication = ({ isAccordionOpen }) => {
 
   return (
     <>
-      <div className="scroll-container" style={{  overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
+      <div className="scroll-container" style={{ overflowX: 'hidden', height: isAccordionOpen ? '60vh' : '80vh' }}>
         <Row>
           <Col sm={12}>
             <Table responsive className="table-centered table-nowrap mb-0">
               <thead className="text-white bg-dark">
                 <tr>
                   <th className="text-white">S. No.</th>
-                  <th className="text-white">Status</th>
                   <th className="text-white">Medication</th>
                   <th className="text-white">Dosage Instruction</th>
                   <th className="text-white">Start Date</th>
                   <th className="text-white">End Date</th>
+                  <th className="text-white">Status</th>
                   {/* <th className="text-white">Notes</th> */}
                   <th className="text-white">Action</th>
                 </tr>
@@ -95,7 +95,6 @@ const Medication = ({ isAccordionOpen }) => {
                       medicationList?.map((data, index) => (
                         <tr key={index}>
                           <td>{index + 1}</td>
-                          <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
                           <td>
                             <div className='d-flex flex-column'>
                               <span className='text-capitalize'> {data?.drugId?.proprietaryName || 'N/A'}</span>
@@ -105,6 +104,7 @@ const Medication = ({ isAccordionOpen }) => {
                           <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
                           <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
                           <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
+                          <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
                           {/* <td title={data?.note?.[0]?.text}>
                             {
                               data?.note?.[0]?.text
@@ -113,8 +113,8 @@ const Medication = ({ isAccordionOpen }) => {
                             }
                           </td> */}
                           <td>
-                            <FiEdit
-                              className="fs-4 cursor-pointer text-black"
+                            <i
+                              className=" bi bi-pencil text-info cursor-pointer"
                               onClick={() => handleEditClick(data)}
                             />
                           </td>
