@@ -5,7 +5,7 @@ import FamilyHistory from './SubsocialPages.js/FamilyGenetic';
 import MedicalHistory from './SubsocialPages.js/MedicalHistory';
 import SurgicalHistory from './SubsocialPages.js/surgicalHistory';
 
-const Subsocialtabindex = ({ patientId, isAccordionOpen ,defaultTab }) => {
+const Subsocialtabindex = ({ patientId, isAccordionOpen, defaultTab }) => {
   const tabMapping = {
     'Tobacco': 'Tobacco History',
     'Medical': 'Medical History',
@@ -21,7 +21,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen ,defaultTab }) => {
     'Surgical History',
     'Family/Genetic History',
     'Alcohol History',
-    'Vaccination History',
+    // 'Vaccination History',
   ];
 
   const [activeSocialTabs, setActiveSocialTabs] = useState(tabMapping[defaultTab]);
@@ -36,7 +36,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen ,defaultTab }) => {
     setActiveSocialTabs(tab);
   };
 
-     return (
+  return (
     <div>
       <ul className="border-bottom border-secondary nav nav-underline" style={{ minWidth: 'max-content' }}>
         {tabs.map((tab) => (

@@ -36,7 +36,7 @@ export const patientMenuItems = [
             { label: 'Surgical History', tab: "Surgical", icon: <FiPlus /> },
             { label: 'Family History', tab: "Family / Genetic", icon: <FiPlus /> },
             { label: 'Alcohol History', tab: "Alcohol", icon: <FiPlus /> },
-            { label: 'Vaccination History', tab: "Vaccination", icon: <FiPlus /> },
+            // { label: 'Vaccination History', tab: "Vaccination", icon: <FiPlus /> },
         ],
     },
     { label: 'Drug Interactions', tab: "Drug Interactions", icon: <AiOutlineInteraction /> },
