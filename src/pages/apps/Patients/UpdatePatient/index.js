@@ -126,15 +126,22 @@ const UpdatePatientIndex = () => {
     //     }
     // }, [id, updateSuccess, updateResponsibleParty, store?.createResponsiblePartyReducer?.data?.status]);
     useEffect(() => {
-        dispatch(getStatesByCountryAction());
-        dispatch(getPatientByIdAction({ id: id }));
-        dispatch(getSurgicalHistoryAction({ patientId: id }));
-        dispatch(getTobaccooAction({ patientId: id }));
-        dispatch(getFamilyGeneticAction({ patientId: id }));
-        dispatch(getProblemListAction({ patientId: id }));
-        dispatch(getAlcoholHistoryAction({ patientId: id }))
-        dispatch(getMedicationAction({ patientId: id }));
-
+        const fetchData = async () => {
+            // First, get the core patient data
+            await dispatch(getPatientByIdAction({ id }));
+    
+            // Then, fetch important lists
+            await dispatch(getProblemListAction({ patientId: id }));
+            await dispatch(getMedicationAction({ patientId: id }));
+    
+            // Finally, fetch the remaining data in parallel
+            dispatch(getSurgicalHistoryAction({ patientId: id }));
+            dispatch(getTobaccooAction({ patientId: id }));
+            dispatch(getFamilyGeneticAction({ patientId: id }));
+            dispatch(getAlcoholHistoryAction({ patientId: id }));
+        };
+    
+        fetchData();
     }, [dispatch, id]);
     // useEffect(() => {
 
@@ -686,3 +693,4 @@ const UpdatePatientIndex = () => {
 };
 
 export default UpdatePatientIndex;
+// dispatch(getStatesByCountryAction());line 129
