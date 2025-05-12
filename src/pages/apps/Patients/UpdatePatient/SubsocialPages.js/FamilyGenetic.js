@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -213,40 +213,108 @@ const FamilyHistory = () => {
     };
 
     return (
-        <Row
-            className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
-            style={{ height: 'calc(100vh - 100px)', overflowY: 'scroll' }}>
+        <Row className="py-0 m-auto">
             {/* Left Side - Form */}
-            <Col md={6} className="d-flex flex-column border-end pt-0 mt-0 pe-1">
-                <div className="border-danger h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pb-2 pt-0 mb-1">
+            <Col md={6} className="d-flex flex-column border-end px-0 pe-2 scroll-container">
+                <Card.Body className="p-0 pt-2">
+                    {/* <Card.Title className="border-bottom pb-2 pt-0 mb-1">
                             <h5 className="fw-semibold mb-0">Add Family Medical History</h5>
-                        </Card.Title>
+                        </Card.Title> */}
 
-                        <Form
-                            className="scroll-container d-flex flex-column justify-content-between"
-                            style={{ overflowY: 'auto', height: '50vh' }}
-                            onSubmit={handleSubmit(onSubmit)}>
-                            <div
-                                className="scroll-container mb-3 px-2"
-                                style={{ maxHeight: '57vh', overflowY: 'auto' }}>
-                                <Row className="g-2">
-                                    <Col md={6}>
-                                        <Form.Group controlId="relationship">
-                                            <Form.Label className="fw-medium mb-0">Relationship</Form.Label>
+                    <Form
+                        onSubmit={handleSubmit(onSubmit)}
+                        style={{
+                            minHeight: 'calc(100vh - 330px)',
+                            height: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'end',
+                            justifyContent: 'space-between',
+                        }}>
+                        <Row className="g-3">
+                            <Col md={6}>
+                                <Form.Group controlId="relationship">
+                                    <Form.Label className="fw-medium mb-0">Relationship</Form.Label>
+                                    <Select
+                                        options={relationshipOption}
+                                        isSearchable
+                                        className="basic-single"
+                                        classNamePrefix="select"
+                                        placeholder="Select relationship"
+                                        value={
+                                            rela ? relationshipOption.find((opt) => opt.value.code === rela.code) : null
+                                        }
+                                        onChange={handleRelationChange}
+                                        styles={{
+                                            control: (provided) => ({
+                                                ...provided,
+                                                minHeight: '30px',
+                                                border: '0px',
+                                            }),
+                                        }}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="name">
+                                    <Form.Label className="fw-medium mb-0">Name</Form.Label>
+                                    <Form.Control
+                                        {...register('name', { required: 'Name is required' })}
+                                        className="form-control-sm"
+                                    />
+                                </Form.Group>
+                            </Col>
+
+                            <Col md={6} className="mt-0">
+                                <Form.Group controlId="dob">
+                                    <Form.Label className="fw-medium mb-0">Date of Birth</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        {...register('dob', { required: 'Date of birth is required' })}
+                                        className="form-control-sm"
+                                        max={new Date().toISOString().slice(0, 10)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6} className="mt-0">
+                                <Form.Group controlId="sex">
+                                    <Form.Label className="fw-medium mb-0">Sex</Form.Label>
+                                    <Form.Select
+                                        {...register('sex', { required: 'Sex is required' })}
+                                        className="form-select-sm">
+                                        <option value="" disabled>
+                                            Select Sex
+                                        </option>
+                                        {sexAssignedAtBirthOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+
+                            <Col md={6} className="mt-0">
+                                <Form.Group controlId="problem">
+                                    <Form.Label className="fw-medium mb-0">Condition</Form.Label>
+                                    <Controller
+                                        name="problem"
+                                        control={control}
+                                        rules={{ required: 'Condition is required' }}
+                                        render={({ field }) => (
                                             <Select
-                                                options={relationshipOption}
-                                                isSearchable
-                                                className="basic-single"
+                                                {...field}
                                                 classNamePrefix="select"
-                                                placeholder="Select relationship"
-                                                value={
-                                                    rela
-                                                        ? relationshipOption.find((opt) => opt.value.code === rela.code)
-                                                        : null
-                                                }
-                                                onChange={handleRelationChange}
+                                                options={formattedOptions}
+                                                value={selectedProblem}
+                                                onChange={(selected) => {
+                                                    field.onChange(selected);
+                                                    setSelectedProblem(selected);
+                                                }}
+                                                onInputChange={(value) => setSearchQuery(value)}
+                                                placeholder="Search condition"
+                                                isClearable
+                                                isSearchable
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
@@ -255,288 +323,183 @@ const FamilyHistory = () => {
                                                     }),
                                                 }}
                                             />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group controlId="name">
-                                            <Form.Label className="fw-medium mb-0">Name</Form.Label>
-                                            <Form.Control
-                                                {...register('name', { required: 'Name is required' })}
-                                                className="form-control-sm"
-                                            />
-                                        </Form.Group>
-                                    </Col>
+                                        )}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6} className="mt-0">
+                                <Form.Group controlId="deceased">
+                                    <Form.Label className="fw-medium mb-0">Deceased</Form.Label>
+                                    <div>
+                                        <Form.Check
+                                            inline
+                                            label="Yes"
+                                            type="radio"
+                                            value="yes"
+                                            {...register('deceased')}
+                                            className="form-check-inline"
+                                        />
+                                        <Form.Check
+                                            inline
+                                            label="No"
+                                            type="radio"
+                                            value="no"
+                                            {...register('deceased')}
+                                            className="form-check-inline"
+                                            defaultChecked
+                                        />
+                                    </div>
+                                </Form.Group>
+                            </Col>
 
-                                    <Col md={6}>
-                                        <Form.Group controlId="dob">
-                                            <Form.Label className="fw-medium mb-0">Date of Birth</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                {...register('dob', { required: 'Date of birth is required' })}
-                                                className="form-control-sm"
-                                                max={new Date().toISOString().slice(0, 10)}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group controlId="sex">
-                                            <Form.Label className="fw-medium mb-0">Sex</Form.Label>
-                                            <Form.Select
-                                                {...register('sex', { required: 'Sex is required' })}
-                                                className="form-select-sm">
-                                                <option value="" disabled>
-                                                    Select Sex
-                                                </option>
-                                                {sexAssignedAtBirthOptions.map((option) => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        </Form.Group>
-                                    </Col>
+                            {isDeceased && (
+                                <Col md={6}>
+                                    <Form.Group controlId="dateOfDeath">
+                                        <Form.Label className="fw-medium mb-0">Date of Death</Form.Label>
+                                        <Form.Control
+                                            type="date"
+                                            {...register('dateOfDeath')}
+                                            className="form-control-sm"
+                                            max={new Date().toISOString().split('T')[0]}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            )}
 
-                                    <Col md={6}>
-                                        <Form.Group controlId="problem">
-                                            <Form.Label className="fw-medium mb-0">Condition</Form.Label>
-                                            <Controller
-                                                name="problem"
-                                                control={control}
-                                                rules={{ required: 'Condition is required' }}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        {...field}
-                                                        classNamePrefix="select"
-                                                        options={formattedOptions}
-                                                        value={selectedProblem}
-                                                        onChange={(selected) => {
-                                                            field.onChange(selected);
-                                                            setSelectedProblem(selected);
-                                                        }}
-                                                        onInputChange={(value) => setSearchQuery(value)}
-                                                        placeholder="Search condition"
-                                                        isClearable
-                                                        isSearchable
-                                                        styles={{
-                                                            control: (provided) => ({
-                                                                ...provided,
-                                                                minHeight: '30px',
-                                                                border: '0px',
-                                                            }),
-                                                        }}
-                                                    />
-                                                )}
+                            <Col xs={12} className="mt-0">
+                                <Form.Group controlId="notes">
+                                    <Form.Label className="fw-medium mb-0">
+                                        Notes{' '}
+                                        <span
+                                            style={{ cursor: 'pointer' }}
+                                            title="Notes Suggestions"
+                                            onClick={handleEditorFocus}>
+                                            ✨
+                                        </span>
+                                    </Form.Label>
+                                    <Controller
+                                        name="note"
+                                        control={control}
+                                        render={({ field: { onChange, value } }) => (
+                                            <ReactQuill
+                                                value={value}
+                                                onChange={onChange}
+                                                theme="snow"
+                                                placeholder="Enter detailed notes here..."
+                                                style={{ height: '20vh', backgroundColor: 'white' }}
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ header: [1, 2, false] }],
+                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                                        ['clean'],
+                                                    ],
+                                                }}
                                             />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6}>
-                                        <Form.Group controlId="deceased">
-                                            <Form.Label className="fw-medium mb-0">Deceased</Form.Label>
-                                            <div>
-                                                <Form.Check
-                                                    inline
-                                                    label="Yes"
-                                                    type="radio"
-                                                    value="yes"
-                                                    {...register('deceased')}
-                                                    className="form-check-inline"
-                                                />
-                                                <Form.Check
-                                                    inline
-                                                    label="No"
-                                                    type="radio"
-                                                    value="no"
-                                                    {...register('deceased')}
-                                                    className="form-check-inline"
-                                                    defaultChecked
-                                                />
-                                            </div>
-                                        </Form.Group>
-                                    </Col>
-
-                                    {isDeceased && (
-                                        <Col md={6}>
-                                            <Form.Group controlId="dateOfDeath">
-                                                <Form.Label className="fw-medium mb-0">Date of Death</Form.Label>
-                                                <Form.Control
-                                                    type="date"
-                                                    {...register('dateOfDeath')}
-                                                    className="form-control-sm"
-                                                    max={new Date().toISOString().split('T')[0]}
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                    )}
-
-                                    <Col xs={12}>
-                                        <Form.Group controlId="notes">
-                                            <Form.Label className="fw-medium mb-0">
-                                                Notes{' '}
-                                                <span
-                                                    style={{ cursor: 'pointer' }}
-                                                    title="Notes Suggestions"
-                                                    onClick={handleEditorFocus}>
-                                                    ✨
-                                                </span>
-                                            </Form.Label>
-                                            <Controller
-                                                name="note"
-                                                control={control}
-                                                render={({ field: { onChange, value } }) => (
-                                                    <ReactQuill
-                                                        value={value}
-                                                        onChange={onChange}
-                                                        theme="snow"
-                                                        placeholder="Enter detailed notes here..."
-                                                        style={{ height: '20vh', backgroundColor: 'white' }}
-                                                        modules={{
-                                                            toolbar: [
-                                                                [{ header: [1, 2, false] }],
-                                                                ['bold', 'italic', 'underline', 'strike'],
-                                                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                ['clean'],
-                                                            ],
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-                                            <SuggestionOffcanvas
-                                                show={showSuggestions}
-                                                onClose={() => setShowSuggestions(false)}
-                                                onSelect={handleSuggestionSelect}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </div>
-                            <div className="d-flex justify-content-end align-items-end pe-1 py-2">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    disabled={isLoading}
-                                    className="px-4 py-1 custom-buttons">
-                                    {toEdit ? 'Update' : 'Add'}
-                                </Button>
-                            </div>
-                        </Form>
-                    </Card.Body>
-                </div>
+                                        )}
+                                    />
+                                    <SuggestionOffcanvas
+                                        show={showSuggestions}
+                                        onClose={() => setShowSuggestions(false)}
+                                        onSelect={handleSuggestionSelect}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <div className="d-flex justify-content-end align-items-end pe-1 py-2">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                disabled={isLoading}
+                                className="px-4 py-1 custom-buttons">
+                                {toEdit ? 'Update' : 'Add'}
+                            </Button>
+                        </div>
+                    </Form>
+                </Card.Body>
             </Col>
 
             {/* Right Side - Display */}
-            <Col md={6} className="d-flex flex-column pt-0 mt-0 ps-1">
-                <div className="border-danger h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
-                            <h5 className="fw-semibold mb-0">Family History</h5>
-                        </Card.Title>
-
-                        {isLoading && !familyGeneticHistory?.length ? (
-                            <div className="text-center py-4">
-                                <Spinner />
-                            </div>
-                        ) : familyGeneticHistory?.length === 0 ? (
-                            <div className="text-center py-4 text-muted">
-                                <i className="bi bi-journal-x fs-1"></i>
-                                <p className="mt-2 mb-0">No family records found</p>
-                            </div>
-                        ) : (
-                            <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush" className="striped-data">
-                                    {familyGeneticHistory?.map((item, index) => (
-                                        <ListGroup.Item
-                                            key={index}
-                                            className="striped-data-item py-0 px-0 border-bottom">
-                                            <div className="px-2">
-                                                <div className="d-flex justify-content-between align-items-end">
-                                                    <div>
-                                                        <span className="fs-6 fw-bold">Relationship:</span>
-                                                        <span className="ms-1 fs-6">
-                                                            {item?.relationship?.coding?.[0]?.display || 'N/A'}
-                                                        </span>
-                                                        <br />
-                                                        <span className="fs-6 fw-bold">Date of Birth:</span>
-                                                        <span className="ms-1 fs-6">
-                                                            {item?.bornDate
-                                                                ? new Date(item?.bornDate)?.toLocaleDateString('en-GB')
-                                                                : ''}
-                                                        </span>
-                                                    </div>
-
-                                                    <div>
-                                                        <span className="fs-6 fw-bold">Name:</span>
-                                                        <span className="text-capitalize ms-1 fs-6">{item?.name}</span>
-                                                        <br />
-                                                        <span className="fs-6 fw-bold">Sex:</span>
-                                                        <span className="ms-1 fs-6">{item?.gender || 'N/A'}</span>
-                                                        <br />
-                                                    </div>
-                                                </div>
-                                                <p
-                                                    className="mb-0 text-truncate fs-6"
-                                                    style={{ maxWidth: '100%' }}
-                                                    title={item?.condition?.[0]?.code?.coding?.[0]?.display}>
-                                                    <span className="fw-bold">Condition:</span>
-                                                    <span className="ms-1">
-                                                        {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
-                                                    </span>
-                                                </p>
-                                                <div className="d-flex">
-                                                    <span className="fs-6 fw-bold">Notes:</span>
-                                                    <span>
-                                                        {item.note?.[0]?.text && (
-                                                            <div className="ms-1">
-                                                                <div
-                                                                    className="ql-editor scroll-container p-0 fs-6"
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html: item?.note[0]?.text,
-                                                                    }}
-                                                                    style={{
-                                                                        fontSize: '0.875rem',
-                                                                        maxHeight: '150px',
-                                                                        overflowY: 'auto',
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                        )}
-                                                    </span>
-                                                </div>
-                                                <span className="fs-6 fw-bold">Deceased:</span>
-                                                <span className="ms-1 fs-6">{item.deceasedBoolean ? 'Yes' : 'No'}</span>
-                                                <br />
-                                                {item.deceasedBoolean && item.deceasedDate && (
-                                                    <>
-                                                        <span className="fs-6 fw-bold">Date of Death:</span>
-                                                        <span className="fs-6 ms-1">
-                                                            {new Date(item?.deceasedDate).toLocaleDateString('en-GB')}
-                                                        </span>
-                                                    </>
-                                                )}
-                                                <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
-                                                    <i
-                                                        className="bi bi-trash-fill text-danger cursor-pointer"
-                                                        onClick={() => {
-                                                            setToDelete(item?._id);
-                                                            setDeleteModal(true);
-                                                        }}></i>
-                                                    {toEdit && toEdit._id === item._id ? (
-                                                        <i
-                                                            onClick={() => handleReset()}
-                                                            className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
-                                                    ) : (
-                                                        <i
-                                                            onClick={() => setToEdit(item)}
-                                                            className="bi bi-pencil text-info cursor-pointer"></i>
-                                                    )}
-                                                </div>
+            <Col md={6} className="d-flex flex-column px-0 scroll-container">
+                <Card.Body className="ps-2 py-1 p-0">
+                    {isLoading && !familyGeneticHistory?.length ? (
+                        <div className="text-center py-4">
+                            <Spinner />
+                        </div>
+                    ) : familyGeneticHistory?.length === 0 ? (
+                        <div className="text-center py-4 text-muted">
+                            <i className="bi bi-journal-x fs-1"></i>
+                            <p className="mt-2 mb-0">No family records found</p>
+                        </div>
+                    ) : (
+                        <Accordion alwaysOpen flush>
+                            {familyGeneticHistory.map((item, index) => (
+                                <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
+                                    <Accordion.Header>
+                                        <div
+                                            className="d-flex justify-content-between align-items-center w-100"
+                                            style={{ marginRight: '-19px' }}>
+                                            <div className="d-flex align-items-center gap-1 p-2 pe-0">
+                                                <span className="text-black fs-6 tab-font-family fw-semibold">
+                                                    {index + 1}.
+                                                </span>
+                                                <span className="fw-normal fs-6 tab-font-family text-black">
+                                                    {item.name || 'Unnamed'} (
+                                                    {item.relationship?.coding?.[0]?.display || 'Unknown'})
+                                                </span>
+                                                <span className="fw-normal fs-6 tab-font-family text-black">
+                                                    had {item?.condition?.[0]?.code?.coding?.[0]?.display || 'None'}
+                                                </span>
                                             </div>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </div>
-                        )}
-                    </Card.Body>
-                </div>
+
+                                            <div className="d-flex gap-2 px-2" onClick={(e) => e.stopPropagation()}>
+                                                <i
+                                                    className="bi bi-trash text-danger cursor-pointer"
+                                                    onClick={() => {
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}
+                                                    title="Delete"
+                                                />
+                                                {toEdit && toEdit._id === item._id ? (
+                                                    <i
+                                                        className="bi bi-x-lg text-danger cursor-pointer"
+                                                        onClick={() => handleReset()}
+                                                        title="Cancel"
+                                                    />
+                                                ) : (
+                                                    <i
+                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        onClick={() => setToEdit(item)}
+                                                        title="Edit"
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </Accordion.Header>
+
+                                    <Accordion.Body className="pt-0 p-2">
+                                        <div className="mb-2">
+                                            {item.note?.[0]?.text ? (
+                                                <div
+                                                    className="ql-editor p-1 rounded scroll-container"
+                                                    dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                    style={{
+                                                        fontSize: '0.875rem',
+                                                        maxHeight: '150px',
+                                                        overflowY: 'auto',
+                                                    }}
+                                                />
+                                            ) : (
+                                                <span className="ms-2 text-muted fst-italic"> No notes available</span>
+                                            )}
+                                        </div>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
+                        </Accordion>
+                    )}
+                </Card.Body>
             </Col>
 
             <DeletionModal

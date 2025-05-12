@@ -120,7 +120,7 @@ const Tobacco = () => {
                             justifyContent: 'space-between',
                         }}>
                         <Row className="g-3">
-                            <Col md={6}>
+                            <Col md={6} className='mb-0'>
                                 <Form.Group controlId="tobaccoUser">
                                     <Form.Label className="fw-medium mb-1">Current Tobacco Use</Form.Label>
                                     <Form.Select {...register('tobaccoUse')} required className="form-select-sm">
@@ -162,7 +162,7 @@ const Tobacco = () => {
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
+                            <Col md={6} className='mb-0'>
                                 <Form.Group controlId="effectiveDateTime">
                                     <Form.Label className="fw-medium mb-1">Effective Date</Form.Label>
                                     <Form.Control
@@ -174,7 +174,7 @@ const Tobacco = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col xs={12}>
+                            <Col xs={12} className='mt-0'>
                                 <Form.Group controlId="notes">
                                     <Form.Label className="fw-medium mb-1">
                                         Notes{' '}
