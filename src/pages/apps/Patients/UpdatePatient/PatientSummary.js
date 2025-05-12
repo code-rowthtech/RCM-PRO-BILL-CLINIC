@@ -487,7 +487,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                         </Card.Body>
                         <div
                             className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Tabacco')}>
+                            onClick={() => setSelectedMainTab('Tobacco')}>
                             Go To Social History
                         </div>
                     </Card>

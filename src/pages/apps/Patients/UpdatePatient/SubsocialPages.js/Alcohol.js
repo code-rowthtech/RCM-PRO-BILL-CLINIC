@@ -131,7 +131,7 @@ const Alcohol = () => {
 
     const heavyFrequency = watch('frequency')
     return (
-        <Row className="mt-2 scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
+        <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
             {/* Left Side - Form */}
             <Col md={6} className="d-flex  flex-column   pt-0 mt-0 pe-1 ">
                 <div className="h-100">
@@ -144,7 +144,7 @@ const Alcohol = () => {
                             <div style={{ maxHeight: '48vh' }} className='d-flex px-2 scroll-container flex-column justify-content-between'>
                                 <Row>
                                     <Col sm={12}>
-                                        <Form.Group className="mb-3 mt-3">
+                                        <Form.Group className="">
                                             <Form.Label className='mb-0'>Alcohol Use Status</Form.Label>
                                             <Form.Select
                                                 {...register('useStatus', { required: true })}
@@ -299,11 +299,11 @@ const Alcohol = () => {
                                 )}
                             </div>
                             <div className="d-flex justify-content-end mt-3 align-items-center">
-                                <Button variant="primary" type="submit" className="custom-buttons">
+                                <Button variant="primary" type="submit" className="custom-buttons px-4 py-1">
                                     {toEdit ?
                                         `Update`
                                         :
-                                        `Add Record`
+                                        `Add`
                                     }
                                 </Button>
                             </div>
