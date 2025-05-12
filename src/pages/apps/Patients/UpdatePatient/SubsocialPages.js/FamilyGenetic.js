@@ -447,7 +447,7 @@ const FamilyHistory = () => {
                                         <ListGroup.Item
                                             key={index}
                                             className="striped-data-item py-0 px-0 border-bottom">
-                                            <div className='px-2'>
+                                            <div className="px-2">
                                                 <div className="d-flex justify-content-between align-items-end">
                                                     <div>
                                                         <span className="fs-6 fw-bold">Relationship:</span>
