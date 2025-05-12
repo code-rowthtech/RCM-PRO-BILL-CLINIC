@@ -36,11 +36,11 @@ const tabList = [
     { key: 'Allergy List', label: 'Allergy List' },
     { key: 'Problem List', label: 'Problem List' },
     { key: 'Medication List', label: 'Medication List' },
-    { key: 'Vitals', label: 'Vitals' },
+    { key: 'Vitals List', label: 'Vitals List' },
 ];
 
-const SubAllergytabs = ({ isAccordionOpen }) => {
-    const [activeTab, setActiveTab] = useState('Allergy List');
+const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
+    const [activeTab, setActiveTab] = useState(defaultTab);
     const [allergyModal, setAllergyModal] = useState(false);
     const [problemModal, setProblemModal] = useState(false);
     const [medicationModal, setMedicationModal] = useState(false);
@@ -56,6 +56,11 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
 
+    useEffect(() => {
+        if (defaultTab) {
+            setActiveTab(defaultTab)
+        }
+    }, [defaultTab])
     const handleUnitChange = (newSystem) => {
         // Convert all displayed values when unit system changes
         setVitals(prevVitals => {
@@ -111,7 +116,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
             case 'Medication List':
                 setMedicationModal(true);
                 break;
-            case 'Vitals':
+            case 'Vitals List':
                 // Optional: Handle vital add modal if needed
                 break;
             default:
@@ -134,7 +139,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
     };
 
     const handleNextPage = () => {
-        if (paginationData && currentPage < paginationData.totalPages) {
+        if (paginationData && currentPage < paginationData?.totalPages) {
             setCurrentPage(currentPage + 1);
         }
     };
@@ -164,7 +169,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                                 opacity: disabled ? 0.5 : 1,
                             }}
                             onClick={() => {
-                                if (!disabled && activeTab === 'Vitals' && key !== 'Vitals') {
+                                if (!disabled && activeTab === 'Vitals List' && key !== 'Vitals List') {
                                     dispatch(getVitalsByPatientIdAction({ patientId }));
                                 }
                                 if (!disabled) {
@@ -178,7 +183,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                 </div>
 
                 {/* Add Icon */}
-                {activeTab !== 'Vitals' &&
+                {activeTab !== 'Vitals List' &&
                     <MdAddCircleOutline
                         size={22}
                         className="text-primary cursor-pointer"
@@ -186,13 +191,13 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                         style={{ flexShrink: 0 }}
                     />
                 }
-                {activeTab === 'Vitals' &&
+                {activeTab === 'Vitals List' &&
                     <div className="col-md-3 d-flex gap-2 align-items-center">
                         <i
                             title='Previous'
-                            className={`bi cursor-pointer  ${currentPage === paginationData.totalPages ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-backward-circle`}
+                            className={`bi cursor-pointer  ${currentPage === paginationData?.totalPages ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-backward-circle`}
                             onClick={handleNextPage}
-                            disabled={currentPage === paginationData.totalPages}
+                            disabled={currentPage === paginationData?.totalPages}
                         />
                         <i
                             title='Next'
@@ -227,7 +232,7 @@ const SubAllergytabs = ({ isAccordionOpen }) => {
                 {activeTab === 'Allergy List' && <AllergyList />}
                 {activeTab === 'Problem List' && <ProblemList />}
                 {activeTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
-                {activeTab === 'Vitals' && <VitalStatus isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
+                {activeTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
             </div>
 
             {/* Allergy Modal */}
