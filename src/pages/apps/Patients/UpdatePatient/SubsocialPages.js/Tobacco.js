@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -103,22 +103,64 @@ const Tobacco = () => {
         setShowSuggestions(false);
     };
     return (
-        <Row className="px-2 py-0 m-auto">
+        <Row className=" py-0 m-auto">
             {/* Left: Form Section */}
-            <Col md={6} className="d-flex flex-column border-end px-0 pe-2">
+            <Col md={6} className="d-flex flex-column border-end px-0 pe-2 scroll-container">
                 <Card.Body className="p-0 pt-2">
                     {/* <Card.Title className="border-bottom">
                         <h6 className="fw-bold">Add Tobacco Use</h6>
                     </Card.Title> */}
 
-                    <Form onSubmit={handleSubmit(onSubmit)} style={{height:'calc(100vh - 100px)',display:'flex',flexDirection:'column',alignItems:'end',justifyContent:'space-between'}}>
+                    <Form
+                        onSubmit={handleSubmit(onSubmit)}
+                        style={{
+                            minHeight: 'calc(100vh - 330px)',
+                            height: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'end',
+                            justifyContent: 'space-between',
+                        }}>
                         <Row className="g-3">
                             <Col md={6}>
                                 <Form.Group controlId="tobaccoUser">
                                     <Form.Label className="fw-medium mb-1">Current Tobacco Use</Form.Label>
                                     <Form.Select {...register('tobaccoUse')} required className="form-select-sm">
                                         <option value="">Select an option</option>
-                                        {/* Keep your options here... */}
+                                        <option value="Very heavy cigarette smoker (40+ cigs/day)">
+                                            Very heavy cigarette smoker (40+ cigs/day)
+                                        </option>
+                                        <option value="Cigar smoker">Cigar smoker</option>
+                                        <option value="Pipe smoker">Pipe smoker</option>
+                                        <option value="Chews tobacco">Chews tobacco</option>
+                                        <option value="Chews products containing tobacco">
+                                            Chews products containing tobacco
+                                        </option>
+                                        <option value="Snuff user">Snuff user</option>
+                                        <option value="Electronic cigarette user">Electronic cigarette user</option>
+                                        <option value="Heavy tobacco smoker">Heavy tobacco smoker</option>
+                                        <option value="Light tobacco smoker">Light tobacco smoker</option>
+                                        <option value="Current some day smoker">Current some day smoker</option>
+                                        <option value="Non-Smoker">Non-Smoker</option>
+                                        <option value="Ex-Smoker">Ex-Smoker</option>
+                                        <option value="Ex-user of moist powdered tobacco">
+                                            Ex-user of moist powdered tobacco
+                                        </option>
+                                        <option value="Smoker">Smoker</option>
+                                        <option value="Unknown if ever smoked">Unknown if ever smoked</option>
+                                        <option value="Current non smoker but past smoking history unknown">
+                                            Current non smoker but past smoking history unknown
+                                        </option>
+                                        <option value="Current every day smoker">Current every day smoker</option>
+                                        <option value="Light cigarette smoker (1-9 cigs/day)">
+                                            Light cigarette smoker (1-9 cigs/day)
+                                        </option>
+                                        <option value="Moderate cigarette smoker (10-19 cigs/day)">
+                                            Moderate cigarette smoker (10-19 cigs/day)
+                                        </option>
+                                        <option value="Heavy cigarette smoker (20-39 cigs/day)">
+                                            Heavy cigarette smoker (20-39 cigs/day)
+                                        </option>
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
@@ -159,7 +201,7 @@ const Tobacco = () => {
                                                 }}
                                                 theme="snow"
                                                 placeholder="Enter detailed notes here..."
-                                                style={{ height: '25vh', backgroundColor: 'white' }}
+                                                style={{ height: '35vh', backgroundColor: 'white' }}
                                                 modules={{
                                                     toolbar: [
                                                         [{ header: [1, 2, false] }],
@@ -180,9 +222,13 @@ const Tobacco = () => {
                             </Col>
                         </Row>
 
-                        <div className="d-flex justify-content-end mt-3">
-                            <Button type="submit" variant="primary" disabled={isLoading} className="px-4 py-1">
-                                {toEdit ? 'Update' : 'Add'}
+                        <div className="d-flex justify-content-end mt-0">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                disabled={isLoading}
+                                className="px-2 py-1 custom-buttons">
+                                {toEdit ? 'Update' : 'Add Record'}
                             </Button>
                         </div>
                     </Form>
@@ -190,11 +236,11 @@ const Tobacco = () => {
             </Col>
 
             {/* Right: History Section */}
-            {/* <Col md={6} className="d-flex flex-column px-0">
-                <Card.Body className="p-0">
-                    <Card.Title className="border-bottom">
+            <Col md={6} className="d-flex flex-column px-0 scroll-container">
+                <Card.Body className="ps-2 py-1 p-0">
+                    {/* <Card.Title className="border-bottom">
                         <h5 className="fw-semibold mb-0">Tobacco History</h5>
-                    </Card.Title>
+                    </Card.Title> */}
 
                     {isLoading && !tobaccoHistory?.length ? (
                         <div className="text-center py-4">
@@ -206,63 +252,100 @@ const Tobacco = () => {
                             <p className="mt-2 mb-0">No tobacco use records found</p>
                         </div>
                     ) : (
-                        <ListGroup variant="flush" className="striped-data">
+                        <Accordion alwaysOpen flush>
                             {tobaccoHistory.map((item, index) => (
-                                <ListGroup.Item key={index} className="py-2 px-2 border-bottom">
-                                    <div className="d-flex justify-content-between align-items-start mb-1">
-                                        <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
-                                        <div className="d-flex gap-2">
-                                            <i
-                                                className="bi bi-trash-fill text-danger cursor-pointer"
-                                                onClick={() => {
-                                                    setToDelete(item?._id);
-                                                    setDeleteModal(true);
-                                                }}
-                                            />
-                                            {toEdit && toEdit._id === item._id ? (
-                                                <i
-                                                    className="bi bi-x-circle-fill cursor-pointer text-danger"
-                                                    onClick={handleReset}
-                                                />
-                                            ) : (
-                                                <i
-                                                    className="bi bi-pencil text-info cursor-pointer"
-                                                    onClick={() => setToEdit(item)}
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                    <small className="text-muted">
-                                        {item?.note?.[0]?.time
-                                            ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(
-                                                  item.note[0].time
-                                              ).toLocaleTimeString()})`
-                                            : 'No date'}
-                                    </small>
-                                    {item?.note?.[0]?.text && (
+                                <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
+                                    <Accordion.Header>
                                         <div
-                                            className="mt-2 scroll-container"
-                                            style={{ maxHeight: '6rem', overflowY: 'auto' }}>
+                                            className="d-flex justify-content-between align-items-center w-100"
+                                            style={{ marginRight: '-19px' }}>
+                                            <div className="d-flex align-items-center gap-2 p-2 pe-0">
+                                                <span className="text-black fs-6 tab-font-family fw-semibold">
+                                                    {index + 1}.
+                                                </span>
+                                                <span className="fw-normal fs-6 tab-font-family text-black">
+                                                    {item.tobaccoUse || 'No description'}
+                                                </span>
+                                                <small className="text-black" style={{ fontSize: '12px' }}>
+                                                    (
+                                                    {item?.note?.[0]?.time
+                                                        ? new Date(item.note[0].time).toLocaleDateString('en-US', {
+                                                              month: 'short',
+                                                              day: 'numeric',
+                                                              year: 'numeric',
+                                                          })
+                                                        : 'No date'}
+                                                    -
+                                                    {item?.note?.[0]?.time
+                                                        ? new Date(item.note[0].time).toLocaleTimeString()
+                                                        : 'No time'}
+                                                    )
+                                                </small>
+                                            </div>
+                                            {/* Action Icons */}
                                             <div
-                                                className="ql-editor p-0"
-                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                style={{ fontSize: '0.875rem' }}
-                                            />
+                                                className="d-flex gap-2 px-2"
+                                                onClick={(e) => {
+                                                    // Prevent accordion from toggling
+                                                    e.stopPropagation();
+                                                }}>
+                                                <i
+                                                    className="bi bi-trash text-danger cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}
+                                                    title="Delete"
+                                                />
+                                                {toEdit && toEdit._id === item._id ? (
+                                                    <i
+                                                        className="bi bi-x-lg text-danger cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleReset();
+                                                        }}
+                                                        title="Cancel"
+                                                    />
+                                                ) : (
+                                                    <i
+                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setToEdit(item);
+                                                        }}
+                                                        title="Edit"
+                                                    />
+                                                )}
+                                            </div>
                                         </div>
-                                    )}
-                                    <DeletionModal
-                                        show={deleteModal}
-                                        onHide={closeDeleteModal}
-                                        onConfirm={deleteHistory}
-                                        item="tobacco history"
-                                        isLoading={store?.deleteTobaccooReducer?.loading}
-                                    />
-                                </ListGroup.Item>
+                                    </Accordion.Header>
+
+                                    <Accordion.Body className="pt-0 p-0 ">
+                                        {item?.note?.[0]?.text ? (
+                                            <div
+                                                className="ql-editor p-1 rounded scroll-container notes-scroll" 
+                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                style={{ fontSize: '0.875rem' , overflowY:'scroll', height: '150px' }}
+                                            />
+                                        ) : (
+                                            <div className="text-muted fst-italic p-2">No notes available</div>
+                                        )}
+                                    </Accordion.Body>
+                                </Accordion.Item>
                             ))}
-                        </ListGroup>
+
+                            <DeletionModal
+                                show={deleteModal}
+                                onHide={closeDeleteModal}
+                                onConfirm={deleteHistory}
+                                item="tobacco history"
+                                isLoading={store?.deleteTobaccooReducer?.loading}
+                            />
+                        </Accordion>
                     )}
                 </Card.Body>
-            </Col> */}
+            </Col>
         </Row>
     );
 };

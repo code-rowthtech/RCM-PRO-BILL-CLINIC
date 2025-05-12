@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -18,8 +18,6 @@ import { createSuggestionAction } from '../../../../../redux/suggestions/action'
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
-import { FiEdit } from 'react-icons/fi';
-import { MdDeleteOutline } from 'react-icons/md';
 import DeletionModal from '../../../../../helpers/deletionModal';
 
 const MedicalHistory = () => {
@@ -33,38 +31,33 @@ const MedicalHistory = () => {
     const createSuccess = store?.createMedicalHistoryReducer?.data?.status;
     const medicalHistory = store?.getMedicalHistoryReducer?.data?.medicalHistory;
     const deleteResponse = store?.deleteMedicalHistoryReducer?.data?.status;
-    const isLoading = store?.getTobaccooReducer?.loading;
+    const isLoading = store?.getMedicalHistoryReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-        getValues,
-        control,
-        watch,
-        setValue,
-    } = useForm();
+    
+    const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
 
     useEffect(() => {
         dispatch(getMedicalHistoryAction({ patientId: patientId }));
+        dispatch(getAllCodeAction({ search: '' }));
     }, [dispatch, patientId]);
+
     useEffect(() => {
         if (createSuccess === 201 || updateResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
             setToEdit(null);
-            setSelectedProblem(null); // clear local state
+            setSelectedProblem(null);
             reset();
         }
-    }, [createSuccess, dispatch, patientId, reset, updateResponse]);
+    }, [createSuccess, updateResponse]);
 
     const deleteHistory = () => {
         dispatch(deleteMedicalHistoryAction({ id: toDelete }));
     };
+
     useEffect(() => {
         if (deleteResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
@@ -96,11 +89,12 @@ const MedicalHistory = () => {
                 'endDate',
                 toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end).toISOString().split('T')[0] : ''
             );
-            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>'); // fallback to default if empty
+            setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>');
         } else {
             reset();
         }
     }, [toEdit]);
+
     const onSubmit = (data) => {
         const selected = data.problem;
         const payload = {
@@ -138,314 +132,275 @@ const MedicalHistory = () => {
         dispatch(createSuggestionAction({ module: 'medicalHistory' }));
         setShowSuggestions(true);
     };
+
     const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
-        const current = getValues('note'); // from useFormContext or pass as prop
+        const current = getValues('note');
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
-    // const handleUserTyping = (content) => {};
-    // Fetch dynamic ICD codes
+
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
-        }, 300); // 300ms debounce
+        }, 300);
 
         return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
+
     const formattedOptions = allCodeICDs.map((code) => ({
         value: code.value,
         label: `${code.title} - ${code.codeType}`,
         system: 'http://hl7.org/fhir/condition-code',
         display: code.title,
     }));
-    const startDate = watch('startDate'); // Watch startDate dynamically
+
+    const startDate = watch('startDate');
+    
     const handleReset = () => {
         setToEdit(null);
         setSelectedProblem(null);
         reset();
     };
+
     return (
-        <Row
-            className="mt-0 g-0 pt-0 px-1 h-100 scroll-container"
-            style={{ height: 'calc(100vh - 100px)', overflowY: 'scroll' }}>
-            <Col md={6} className="d-flex flex-column border-end  pt-0 mt-0 pe-1 ">
-                <div className=" h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pb-2 pt-0 mb-1">
-                            <h5 className="fw-semibold mb-0">Add Medical History</h5>
-                        </Card.Title>
+        <Row className="py-0 m-auto">
+            {/* Left: Form Section */}
+            <Col md={6} className="d-flex flex-column border-end px-0 pe-2 scroll-container">
+                <Card.Body className="p-0 pt-2">
+                    <Form
+                        onSubmit={handleSubmit(onSubmit)}
+                        style={{
+                            minHeight: 'calc(100vh - 330px)',
+                            height: 'auto',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'end',
+                            justifyContent: 'space-between',
+                        }}>
+                        <Row className="g-3">
+                            <Col xs={12}>
+                                <Form.Group controlId="problem">
+                                    <Form.Label className="fw-medium mb-1">Medical Problem</Form.Label>
+                                    <Controller
+                                        name="problem"
+                                        control={control}
+                                        rules={{ required: 'Problem is required' }}
+                                        render={({ field }) => (
+                                            <Select
+                                                {...field}
+                                                classNamePrefix="select"
+                                                options={formattedOptions}
+                                                value={selectedProblem || null}
+                                                onChange={(selected) => {
+                                                    field.onChange(selected);
+                                                    setSelectedProblem(selected);
+                                                }}
+                                                onInputChange={(value, { action }) => {
+                                                    if (action === 'input-change') {
+                                                        setSearchQuery(value);
+                                                    }
+                                                }}
+                                                placeholder="Search Problem"
+                                                isClearable
+                                                isSearchable
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        minHeight: '30px',
+                                                    }),
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="startDate">
+                                    <Form.Label className="fw-medium mb-1">Start Date</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        {...register('startDate')}
+                                        required
+                                        max={new Date().toISOString().slice(0, 10)}
+                                        className="form-control-sm"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={6}>
+                                <Form.Group controlId="endDate">
+                                    <Form.Label className="fw-medium mb-1">End Date</Form.Label>
+                                    <Form.Control
+                                        type="date"
+                                        {...register('endDate')}
+                                        required
+                                        className="form-control-sm"
+                                        min={startDate || undefined}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col xs={12}>
+                                <Form.Group controlId="notes">
+                                    <Form.Label className="fw-medium mb-1">
+                                        Notes{' '}
+                                        <span
+                                            style={{ cursor: 'pointer' }}
+                                            title="Notes Suggestions"
+                                            onClick={handleEditorFocus}>
+                                            ✨
+                                        </span>
+                                    </Form.Label>
+                                    <Controller
+                                        name="note"
+                                        control={control}
+                                        defaultValue="<ul><li></li></ul>"
+                                        render={({ field: { onChange, value } }) => (
+                                            <ReactQuill
+                                                value={value}
+                                                onChange={(content, delta, source) => {
+                                                    if (source === 'user') {
+                                                        onChange(content);
+                                                    }
+                                                }}
+                                                theme="snow"
+                                                placeholder="Enter detailed notes here..."
+                                                style={{ height: '25vh', backgroundColor: 'white' }}
+                                                modules={{
+                                                    toolbar: [
+                                                        [{ header: [1, 2, false] }],
+                                                        ['bold', 'italic', 'underline', 'strike'],
+                                                        [{ list: 'ordered' }, { list: 'bullet' }],
+                                                        ['clean'],
+                                                    ],
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                    <SuggestionOffcanvas
+                                        show={showSuggestions}
+                                        onClose={() => setShowSuggestions(false)}
+                                        onSelect={handleSuggestionSelect}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
 
-                        <Form onSubmit={handleSubmit(onSubmit)}>
-                            <div
-                                className="scroll-container mb-3 px-2"
-                                style={{ maxHeight: 'calc(100vh - 56vh)', overflowY: 'auto' }}>
-                                <Row className="g-3">
-                                    <Col sm={6}>
-                                        <Form.Group className="mb-1">
-                                            <Form.Label className="mb-0">Problem</Form.Label>
-                                            <Controller
-                                                name="problem"
-                                                control={control}
-                                                rules={{ required: 'Problem is required' }}
-                                                render={({ field }) => (
-                                                    <Select
-                                                        {...field}
-                                                        classNamePrefix="select"
-                                                        options={formattedOptions}
-                                                        value={selectedProblem || null}
-                                                        onChange={(selected) => {
-                                                            field.onChange(selected);
-                                                            setSelectedProblem(selected); // 🔁 update local state
-                                                        }}
-                                                        onInputChange={(value, { action }) => {
-                                                            if (action === 'input-change') {
-                                                                setSearchQuery(value);
-                                                            }
-                                                        }}
-                                                        placeholder="Search Problem"
-                                                        isClearable
-                                                        isSearchable
-                                                        styles={{
-                                                            control: (provided) => ({
-                                                                ...provided,
-                                                                height: '30px',
-                                                                minHeight: '30px',
-                                                                border: '0px',
-                                                            }),
-                                                            placeholder: (provided) => ({
-                                                                ...provided,
-                                                                fontWeight: 'bold',
-                                                                fontSize: '12px',
-                                                                paddingBottom: '5px',
-                                                            }),
-                                                            valueContainer: (provided) => ({
-                                                                ...provided,
-                                                                padding: '0px 6px',
-                                                            }),
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-                                            {errors.problem && (
-                                                <Form.Text className="text-danger">{errors.problem.message}</Form.Text>
-                                            )}
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6} className="">
-                                        <Form.Group controlId="startDate">
-                                            <Form.Label className="fw-medium mb-0">Start Date</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                {...register('startDate')}
-                                                required
-                                                max={new Date().toISOString().slice(0, 10)}
-                                                className="form-control-sm"
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                    <Col md={6} className="mt-0">
-                                        <Form.Group controlId="endDate">
-                                            <Form.Label className="fw-medium mb-0">End Date</Form.Label>
-                                            <Form.Control
-                                                type="date"
-                                                {...register('endDate')}
-                                                required
-                                                className="form-control-sm"
-                                                min={startDate || undefined} // blocks dates before startDate
-                                            />
-                                        </Form.Group>
-                                    </Col>
-
-                                    <Col xs={12}>
-                                        <Form.Group controlId="notes">
-                                            <Form.Label className="fw-medium mb-0">
-                                                Notes{' '}
-                                                <span
-                                                    style={{ cursor: 'pointer' }}
-                                                    title="Notes Suggestions"
-                                                    onClick={handleEditorFocus}>
-                                                    ✨
-                                                </span>
-                                            </Form.Label>
-
-                                            <Controller
-                                                name="note"
-                                                control={control}
-                                                defaultValue="<ul><li></li></ul>"
-                                                render={({ field: { onChange, value } }) => (
-                                                    <ReactQuill
-                                                        value={value}
-                                                        onChange={(content, delta, source) => {
-                                                            if (source === 'user') {
-                                                                onChange(content);
-                                                            }
-                                                        }}
-                                                        theme="snow"
-                                                        placeholder="Enter detailed notes here..."
-                                                        style={{ height: '200px', backgroundColor: 'white' }}
-                                                        modules={{
-                                                            toolbar: [
-                                                                [{ header: [1, 2, false] }],
-                                                                ['bold', 'italic', 'underline', 'strike'],
-                                                                [{ list: 'ordered' }, { list: 'bullet' }],
-                                                                // ['link', 'image'],
-                                                                ['clean'],
-                                                            ],
-                                                        }}
-                                                    />
-                                                )}
-                                            />
-
-                                            <SuggestionOffcanvas
-                                                show={showSuggestions}
-                                                onClose={() => setShowSuggestions(false)}
-                                                onSelect={handleSuggestionSelect}
-                                            />
-                                        </Form.Group>
-                                    </Col>
-                                </Row>
-                            </div>
-                            <div className="d-flex justify-content-end pe mt-2">
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    disabled={
-                                        store?.createMedicalHistoryReducer?.loading ||
-                                        store?.updateMedicalHistoryAction?.loading
-                                    }
-                                    className="px-4 py-1 custom-buttons">
-                                    {store?.createMedicalHistoryReducer?.loading ||
-                                    store?.updateMedicalHistoryAction?.loading ? (
-                                        <Spinner animation="border" size="sm" className="text-white" />
-                                    ) : toEdit ? (
-                                        'Update'
-                                    ) : (
-                                        'Add'
-                                    )}
-                                </Button>
-                            </div>
-                        </Form>
-                    </Card.Body>
-                </div>
+                        <div className="d-flex justify-content-end mt-0">
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                disabled={isLoading}
+                                className="px-2 py-1 custom-buttons">
+                                {toEdit ? 'Update' : 'Add Record'}
+                            </Button>
+                        </div>
+                    </Form>
+                </Card.Body>
             </Col>
 
-            {/* History Side */}
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
-                <div className=" border-danger  h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
-                            <h5 className="fw-semibold mb-0">Medical History</h5>
-                        </Card.Title>
-
-                        {isLoading && !medicalHistory?.length ? (
-                            <div className="text-center py-4">
-                                <Spinner />
-                            </div>
-                        ) : medicalHistory?.length === 0 ? (
-                            <div className="text-center py-4 text-muted">
-                                <i className="bi bi-journal-x fs-1"></i>
-                                <p className="mt-2 mb-0">No Medical History found</p>
-                            </div>
-                        ) : (
-                            <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush" className="striped-data">
-                                    {medicalHistory?.map((item, index) => (
-                                        <ListGroup.Item
-                                            key={index}
-                                            className="px-3 py-3 border-bottom striped-data-item bg-opacity-50 rounded-2">
-                                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                                <div>
-                                                    <strong className="fw-semibold text-dark">
-                                                        {item?.code?.coding?.[0]?.display || '—'}
-                                                    </strong>
-                                                </div>
-                                                <div>
-                                                    <div className="d-flex justify-content-start text-muted small mb-1">
-                                                        <div className="me-1">
-                                                            <i className="bi bi-calendar-event me-1"></i>
-                                                            <span>
-                                                                Start:{' '}
-                                                                {item?.effectivePeriod?.start
-                                                                    ? new Date(
-                                                                          item?.effectivePeriod.start
-                                                                      ).toLocaleDateString('en-GB')
-                                                                    : '—'}
-                                                            </span>
-                                                        </div>
-                                                        <div>
-                                                            <i className="bi bi-calendar-check me-1"></i>
-                                                            <span>
-                                                                End:{' '}
-                                                                {item?.effectivePeriod?.end
-                                                                    ? new Date(
-                                                                          item?.effectivePeriod.end
-                                                                      ).toLocaleDateString('en-GB')
-                                                                    : '—'}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
+            {/* Right: History Section */}
+            <Col md={6} className="d-flex flex-column px-0 scroll-container">
+                <Card.Body className="ps-2 py-1 p-0">
+                    {isLoading && !medicalHistory?.length ? (
+                        <div className="text-center py-4">
+                            <Spinner />
+                        </div>
+                    ) : medicalHistory?.length === 0 ? (
+                        <div className="text-center py-4 text-muted">
+                            <i className="bi bi-journal-x fs-1"></i>
+                            <p className="mt-2 mb-0">No medical history records found</p>
+                        </div>
+                    ) : (
+                        <Accordion alwaysOpen flush>
+                            {medicalHistory?.map((item, index) => (
+                                <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
+                                    <Accordion.Header>
+                                        <div
+                                            className="d-flex justify-content-between align-items-center w-100"
+                                            style={{ marginRight: '-19px' }}>
+                                            <div className="d-flex align-items-center gap-2 p-2 pe-0">
+                                                <span className="text-black fs-6 tab-font-family fw-semibold">
+                                                    {index + 1}.
+                                                </span>
+                                                <span className="fw-normal fs-6 tab-font-family text-black">
+                                                    {item?.code?.coding?.[0]?.display || 'No description'}
+                                                </span>
+                                                <small className="text-black" style={{ fontSize: '12px' }}>
+                                                    (
+                                                    {item?.note?.[0]?.time
+                                                        ? new Date(item.note[0].time).toLocaleDateString('en-US', {
+                                                              month: 'short',
+                                                              day: 'numeric',
+                                                              year: 'numeric',
+                                                          })
+                                                        : 'No date'}
+                                                    -
+                                                    {item?.note?.[0]?.time
+                                                        ? new Date(item.note[0].time).toLocaleTimeString()
+                                                        : 'No time'}
+                                                    )
+                                                </small>
                                             </div>
-
-                                            {item.note?.[0]?.text && (
-                                                <div className="mt-2 small text-secondary">
-                                                    <div
-                                                        className="ql-editor p-0"
-                                                        dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                        style={{ fontSize: '0.875rem' }}
-                                                    />
-                                                </div>
-                                            )}
-
-                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
+                                            {/* Action Icons */}
+                                            <div
+                                                className="d-flex gap-2 px-2"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                }}>
                                                 <i
-                                                    className="bi bi-trash-fill text-danger cursor-pointer"
-                                                    onClick={() => {
+                                                    className="bi bi-trash text-danger cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         setToDelete(item?._id);
                                                         setDeleteModal(true);
-                                                    }}></i>
+                                                    }}
+                                                    title="Delete"
+                                                />
                                                 {toEdit && toEdit._id === item._id ? (
                                                     <i
-                                                        onClick={() => handleReset()}
-                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                        className="bi bi-x-lg text-danger cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleReset();
+                                                        }}
+                                                        title="Cancel"
+                                                    />
                                                 ) : (
                                                     <i
-                                                        onClick={() => setToEdit(item)}
-                                                        className="bi bi-pencil text-info cursor-pointer"></i>
+                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setToEdit(item);
+                                                        }}
+                                                        title="Edit"
+                                                    />
                                                 )}
                                             </div>
-                                            {/* <div className="d-flex justify-content-end align-items-center ">
-                                                <FiEdit
-                                                    className="fs-4 cursor-pointer text-black"
-                                                    // onClick={() => {
-                                                    //     handleEditClick(data);
-                                                    //     const requestData = {
-                                                    //         id: data?._id,
-                                                    //     };
-                                                    //     dispatch(getAllergyDetailsAction(requestData));
-                                                    // }}
-                                                />
-                                                <MdDeleteOutline
-                                                    className="fs-4 cursor-pointer text-danger"
-                                                    onClick={() => {
-                                                        handleDelete(item);
-                                                    }}
-                                                />
-                                            </div> */}
-                                            <DeletionModal
-                                                show={deleteModal}
-                                                onHide={closeDeleteModal}
-                                                onConfirm={deleteHistory}
-                                                item="medical history"
-                                                isLoading={store?.deleteMedicalHistoryAction?.loading}
+                                        </div>
+                                    </Accordion.Header>
+
+                                    <Accordion.Body className="pt-0 p-0">
+                                        {item?.note?.[0]?.text ? (
+                                            <div
+                                                className="ql-editor p-1 rounded scroll-container notes-scroll" 
+                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                style={{ fontSize: '0.875rem', overflowY: 'scroll', height: '150px' }}
                                             />
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                            </div>
-                        )}
-                    </Card.Body>
-                </div>
+                                        ) : (
+                                            <div className="text-muted fst-italic p-2">No notes available</div>
+                                        )}
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
+
+                            <DeletionModal
+                                show={deleteModal}
+                                onHide={closeDeleteModal}
+                                onConfirm={deleteHistory}
+                                item="medical history"
+                                isLoading={store?.deleteMedicalHistoryReducer?.loading}
+                            />
+                        </Accordion>
+                    )}
+                </Card.Body>
             </Col>
         </Row>
     );

@@ -18,7 +18,7 @@ const tabList = [
     { key: 'Allergy List', label: 'Allergy List' },
     { key: 'Problem List', label: 'Problem List' },
     { key: 'Medication List', label: 'Medication List' },
-    { key: 'Vitals', label: 'Vitals' },
+    { key: 'Vitals List', label: 'Vitals List' },
 ];
 
 const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
@@ -73,7 +73,7 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                 className="d-flex align-items-center justify-content-between border-bottom pe-2"
                 style={{ overflowX: 'auto', whiteSpace: 'nowrap', scrollbarWidth: 'none' }}>
                 <div className="nav nav-underline flex-nowrap">
-                    {tabList.map(({ key, label }) => (
+                    {tabList.map(({ key, label,disabled }) => (
                         <a
                             key={key}
                             className={`nav-link fs-6 fw-bold py-1 px-2 tab-font-family ${activeTab === key
