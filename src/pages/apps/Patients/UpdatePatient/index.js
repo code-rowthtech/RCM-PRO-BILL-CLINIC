@@ -53,6 +53,7 @@ const UpdatePatientIndex = () => {
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [activeSubmenu, setActiveSubmenu] = useState(null);
+    console.log(activeSubmenu, 'activeSubmenu')
     const toggleSubmenu = (label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
     };
@@ -574,7 +575,7 @@ const UpdatePatientIndex = () => {
                                                                         <div className="mb-2">
                                                                             <h6 className="fw-semibold mb-2 text-muted">Select sections to print</h6>
                                                                             <div className="d-flex flex-column gap-2">
-                                                                                {['Vitals', 'Allergies', "Problems", "Medications"].map((data) => (
+                                                                                {['Vitals List', 'Allergies', "Problems", "Medications"].map((data) => (
                                                                                     <div className="form-check form-check-inline  d-flex align-items-center" key={data}>
                                                                                         <input
                                                                                             className="form-check-input me-2"

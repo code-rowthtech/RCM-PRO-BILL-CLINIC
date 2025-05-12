@@ -12,7 +12,7 @@ const Subsocialtabindex = ({ patientId, isAccordionOpen, defaultTab }) => {
     'Surgical': 'Surgical History',
     'Family / Genetic': 'Family/Genetic History',
     'Alcohol': 'Alcohol History',
-    'Vaccination': 'Vaccination History',
+    // 'Vaccination': 'Vaccination History',
   };
 
   const tabs = [
