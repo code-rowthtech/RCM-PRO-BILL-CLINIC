@@ -9,7 +9,6 @@ const SuggestionOffcanvas = ({ show, onClose, onSelect }) => {
     const suggestions = store?.createSuggestionsReducer?.data?.data;
     const loading = store?.createSuggestionsReducer?.loading;
     const [copiedIndex, setCopiedIndex] = useState(null);
-    console.log(suggestions?.length, 'suggestions?.length')
     const handleCopy = (text, index) => {
         // Create a temporary element to strip HTML tags
         const tempDiv = document.createElement("div");
