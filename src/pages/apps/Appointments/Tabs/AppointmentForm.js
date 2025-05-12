@@ -408,7 +408,12 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
     // }, []);
 
     // Get default time helper
-    const getDefaultTime = useCallback(() => '10:00', []);
+    const getDefaultTime = useCallback(() => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        return `${hours}:${minutes}`;
+    }, []);
 
     // Handle disabled field click
     const handleDisabledClick = useCallback(() => {
@@ -435,14 +440,13 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             const date = new Date(calendarView === 'month' ? selectedSlot?.slots?.[0] : selectedSlot?.start);
             const localDateString = date.toLocaleDateString('en-CA');
 
-
             setScheduledDate(localDateString);
 
             if (calendarView !== 'month') {
                 setValue('startTime', formatTime(selectedSlot?.start));
             }
         } else {
-            // setScheduledDate(new Date().toISOString().split('T')[0]);
+            setScheduledDate(new Date().toISOString().split('T')[0]);
             setValue('startTime', getDefaultTime());
             setValue('duration', '30');
         }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Form, Button, Card, ListGroup } from 'react-bootstrap';
+import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
@@ -50,7 +50,7 @@ const Alcohol = () => {
         setToEdit(null);
     }
 
-    const deleteAlcoholHistory = () => {
+    const deleteHistory = () => {
         dispatch(deleteAlcoholHistoryAction({ id: toDelete }))
     }
 
@@ -129,22 +129,29 @@ const Alcohol = () => {
 
     };
 
+    const handleReset = () => {
+        reset();
+        setToEdit(null);
+        setToDelete(null);
+        setDeleteModal(false);
+        setShowSuggestions(false);
+    };
     const heavyFrequency = watch('frequency')
     return (
-        <Row className="mt-2 scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
+        <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
             {/* Left Side - Form */}
-            <Col md={6} className="d-flex  flex-column   pt-0 mt-0 pe-1 ">
-                <div className="h-100">
+            <Col md={6} className="d-flex border-end flex-column pt-0 mt-0 pe-1 ">
+                <div className="h-100 mt-1  ">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pb-2 pt-0 mb-1">
+                        {/* <Card.Title className="border-bottom pb-2 pt-0 mb-1">
                             <h5 className="fw-semibold mb-0">Add Alcohol History</h5>
-                        </Card.Title>
+                        </Card.Title> */}
 
                         <Form onSubmit={handleSubmit(onSubmit)}>
                             <div style={{ maxHeight: '48vh' }} className='d-flex px-2 scroll-container flex-column justify-content-between'>
                                 <Row>
                                     <Col sm={12}>
-                                        <Form.Group className="mb-3 mt-3">
+                                        <Form.Group className="">
                                             <Form.Label className='mb-0'>Alcohol Use Status</Form.Label>
                                             <Form.Select
                                                 {...register('useStatus', { required: true })}
@@ -299,11 +306,11 @@ const Alcohol = () => {
                                 )}
                             </div>
                             <div className="d-flex justify-content-end mt-3 align-items-center">
-                                <Button variant="primary" type="submit" className="custom-buttons">
+                                <Button variant="primary" type="submit" className="custom-buttons px-4 py-1">
                                     {toEdit ?
                                         `Update`
                                         :
-                                        `Add Record`
+                                        `Add`
                                     }
                                 </Button>
                             </div>
@@ -313,89 +320,113 @@ const Alcohol = () => {
                     </Card.Body>
                 </div>
             </Col>
+            <Col md={6} className="d-flex flex-column px-0 scroll-container">
+                <Card.Body className="px-2 py-1 p-0">
+                    {/* <Card.Title className="border-bottom">
+                        <h5 className="fw-semibold mb-0">Tobacco History</h5>
+                    </Card.Title> */}
 
-
-            {/* Right Side - Display Data */}
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
-                <div className=" border-danger  h-100">
-                    <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
-                        <Card.Title className="border-bottom pt-0 pb-2 mb-0">
-                            <h5 className="fw-semibold mb-0">Alcohol History</h5>
-                        </Card.Title>
-
-                        {store?.getAlcoholHistoryReducer?.loading && !alcoholData?.length ? (
-                            <div className="text-center py-4">
-                                <Spinner />
-                            </div>
-                        ) : alcoholData?.length === 0 ? (
-                            <div className="text-center py-4 text-muted">
-                                <i className="bi bi-journal-x fs-1"></i>
-                                <p className="mt-2 mb-0">No alcohol history records found</p>
-                            </div>
-                        ) : (
-                            <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
-                                <ListGroup variant="flush" className='striped-data'>
-                                    {alcoholData?.map((item, index) => (
-                                        <ListGroup.Item key={index} className="pb-3 striped-data-item px-0 border-bottom">
-                                            <div className="d-flex justify-content-between align-items-start px-1">
-                                                <strong className="mb-0 text-right fw-semibold cursor-pointer" title={item?.useStatus}>
-                                                    <p className='mb-0'>
-                                                        {item?.useStatus?.length > 35 ?
-                                                            item?.useStatus?.slice(0, 34) + '...' :
-                                                            item?.useStatus || ''} <span className='fs-6 text-muted fw-semibold'>
-                                                            {item?.alcoholType && `(${item?.alcoholType})`}
-                                                        </span>
-                                                    </p>
-                                                    <p className='mb-0 fs-6 text-muted'>
-
-                                                    </p>
-
-                                                </strong>
-                                                <small className="text-muted">
+                    {store?.getAlcoholHistoryReducer?.loading && !alcoholData?.length ? (
+                        <div className="text-center py-4">
+                            <Spinner />
+                        </div>
+                    ) : alcoholData?.length === 0 ? (
+                        <div className="text-center py-4 text-muted">
+                            <i className="bi bi-journal-x fs-1"></i>
+                            <p className="mt-2 mb-0">No alcohol use records found</p>
+                        </div>
+                    ) : (
+                        <Accordion alwaysOpen flush>
+                            {alcoholData.map((item, index) => (
+                                <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
+                                    <Accordion.Header>
+                                        <div
+                                            className="d-flex justify-content-between align-items-center w-100"
+                                            style={{ marginRight: '-19px' }}>
+                                            <div className="d-flex align-items-center gap-2 p-2 pe-0">
+                                                <span className="text-black fs-6 tab-font-family fw-semibold">
+                                                    {index + 1}.
+                                                </span>
+                                                <span className="fw-normal fs-6 tab-font-family text-black">
+                                                    {item?.useStatus?.length > 35 ?
+                                                        item?.useStatus?.slice(0, 34) + '...' :
+                                                        item?.useStatus || ''} <span className='fs-6 text-muted fw-semibold'>
+                                                        {item?.alcoholType && `(${item?.alcoholType})`}
+                                                    </span>
+                                                </span>
+                                                <small className="text-black" style={{ fontSize: '12px' }}>
                                                     {item?.effectiveDateTime
                                                         ? `${new Date(item?.effectiveDateTime).toLocaleDateString()} (${new Date(item?.effectiveDateTime).toLocaleTimeString()})`
                                                         : 'No date'}
                                                 </small>
                                             </div>
-                                            {item.note?.[0]?.text && (
-                                                <div className="mt-0">
-                                                    <div
-                                                        className="ql-editor p-0"
-                                                        dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                        style={{ fontSize: '0.875rem' }}
-                                                    />
-                                                </div>
-                                            )}
-                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
-                                                <i className="bi bi-trash-fill text-danger cursor-pointer"
-                                                    onClick={() => {
-                                                        setToDelete(item?._id)
-                                                        setDeleteModal(true)
-                                                    }}></i>
+                                            {/* Action Icons */}
+                                            <div
+                                                className="d-flex gap-2 px-2"
+                                                onClick={(e) => {
+                                                    // Prevent accordion from toggling
+                                                    e.stopPropagation();
+                                                }}>
+                                                <i
+                                                    className="bi bi-trash text-danger cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}
+                                                    title="Delete"
+                                                />
                                                 {toEdit && toEdit._id === item._id ? (
                                                     <i
-                                                        onClick={() => {
-                                                            setToEdit(null);
-                                                            reset();
+                                                        className="bi bi-x-lg text-danger cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleReset();
                                                         }}
-                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                        title="Cancel"
+                                                    />
                                                 ) : (
                                                     <i
-                                                        onClick={() => setToEdit(item)}
                                                         className="bi bi-pencil text-info cursor-pointer"
-                                                    ></i>
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setToEdit(item);
+                                                        }}
+                                                        title="Edit"
+                                                    />
                                                 )}
-
                                             </div>
-                                        </ListGroup.Item>
-                                    ))}
-                                </ListGroup>
-                                <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteAlcoholHistory} item='alcohol history' isLoading={store?.deleteTobaccooReducer?.loading} />
-                            </div>
-                        )}
-                    </Card.Body>
-                </div>
+                                        </div>
+                                    </Accordion.Header>
+
+                                    <Accordion.Body className="pt-0 p-0 ">
+                                        {item?.note?.[0]?.text ? (
+                                            <div
+                                                className="ql-editor p-1 rounded scroll-container notes-scroll"
+                                                dangerouslySetInnerHTML={{ __html: item.note[0].text }}
+                                                style={{ fontSize: '0.875rem', overflowY: 'scroll', height: '150px' }}
+                                            />
+                                        ) : (
+                                            <div className="text-muted fst-italic p-2">No notes available</div>
+                                        )}
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
+
+                            <DeletionModal
+                                show={deleteModal}
+                                onHide={closeDeleteModal}
+                                onConfirm={deleteHistory}
+                                item="tobacco history"
+                                isLoading={store?.deleteTobaccooReducer?.loading}
+                            />
+                        </Accordion>
+                    )}
+                </Card.Body>
             </Col>
+
+            {/* Right Side - Display Data */}
+
         </Row>
     );
 };

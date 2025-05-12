@@ -1027,3 +1027,34 @@ tbody tr:hover {
     background-color: #e8f0fe !important;
     border: 0px !important;
 }
+.notes-scroll::-webkit-scrollbar {
+    width: 2px;
+    height: 2px; /* In case of horizontal scroll, too */
+}
+
+.notes-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notes-scroll::-webkit-scrollbar-thumb {
+    background-color: #bbb; /* Slightly lighter for subtle look */
+    border-radius: 10px;
+    border: none;
+}
+
+/* Remove buttons (arrows) for WebKit browsers */
+.notes-scroll::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+/* Firefox */
+.notes-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #bbb transparent;
+}
+
+/* .form-control {
+    text-transform: capitalize;
+} */

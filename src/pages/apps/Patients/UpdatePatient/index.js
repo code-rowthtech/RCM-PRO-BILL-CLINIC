@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Accordion, Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { Accordion, Button, Card, Col, Dropdown, Form, Row, Table } from 'react-bootstrap';
 import profileDummy from '../../../../assets/images/profileDummy.png';
 import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { TbCapture } from 'react-icons/tb';
@@ -30,6 +30,7 @@ import PatientSummary from './PatientSummary';
 import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
 import { getProblemListAction } from '../../../../redux/ProblemList/action';
+import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -44,6 +45,7 @@ const UpdatePatientIndex = () => {
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
+    const [printOptions, setPrintOptions] = useState([]);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
     const videoRef = useRef(null);
@@ -75,23 +77,22 @@ const UpdatePatientIndex = () => {
         };
     }, []);
 
-
     useEffect(() => {
         const fetchData = async () => {
             // First, get the core patient data
             await dispatch(getPatientByIdAction({ id }));
-    
+
             // Then, fetch important lists
             await dispatch(getProblemListAction({ patientId: id }));
             await dispatch(getMedicationAction({ patientId: id }));
-    
+
             // Finally, fetch the remaining data in parallel
             dispatch(getSurgicalHistoryAction({ patientId: id }));
             dispatch(getTobaccooAction({ patientId: id }));
             dispatch(getFamilyGeneticAction({ patientId: id }));
             dispatch(getAlcoholHistoryAction({ patientId: id }));
         };
-    
+
         fetchData();
     }, [dispatch, id]);
     // useEffect(() => {
@@ -545,20 +546,101 @@ const UpdatePatientIndex = () => {
                                                             <Button
                                                                 as={Link}
                                                                 to="#"
-                                                                className="mt-1 shadow-none"
+                                                                className="mt-1 shadow-none opacity-50"
                                                                 style={{
                                                                     fontSize: '10px',
                                                                     borderRadius: '8px',
                                                                     padding: '3px 7px 3px 7px',
                                                                     width: '100px',
                                                                     backgroundColor: ' #6169d0',
-                                                                }}>
+                                                                }}
+                                                                disabled
+                                                            >
                                                                 New Encounter
                                                             </Button>
 
-                                                            <div className="mt-2 d-flex justify-content-center gap-2 ps-2 ">
-                                                                <IoPrintSharp className="fs-4 text-black" />
-                                                                <LiaReceiptSolid className="fs-4 text-black" />
+                                                            <div className="mt-2 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                                                <Dropdown>
+                                                                    <Dropdown.Toggle
+                                                                        variant="light"
+                                                                        className="p-0 border-0 bg-transparent hover-bg-light rounded-circle"
+                                                                        id="print-dropdown"
+                                                                        aria-label="Print options"
+                                                                    >
+                                                                        <IoPrintSharp className="fs-4 text-primary" />
+                                                                    </Dropdown.Toggle>
+
+                                                                    <Dropdown.Menu className="px-3 py-2 shadow-sm" style={{ minWidth: "220px" }}>
+                                                                        <div className="mb-2">
+                                                                            <h6 className="fw-semibold mb-2 text-muted">Select sections to print</h6>
+                                                                            <div className="d-flex flex-column gap-2">
+                                                                                {['Vitals', 'Allergies', "Problems", "Medications"].map((data) => (
+                                                                                    <div className="form-check form-check-inline  d-flex align-items-center" key={data}>
+                                                                                        <input
+                                                                                            className="form-check-input me-2"
+                                                                                            type="checkbox"
+                                                                                            id={`print-${data}`}
+                                                                                            checked={printOptions.includes(data)}
+                                                                                            onChange={(e) => {
+                                                                                                if (e.target.checked) {
+                                                                                                    setPrintOptions((prev) => [...prev, data]);
+                                                                                                } else {
+                                                                                                    setPrintOptions((prev) => prev.filter((item) => item !== data));
+                                                                                                }
+                                                                                            }}
+                                                                                        />
+                                                                                        <label className="form-check-label" htmlFor={`print-${data}`}>
+                                                                                            {data}
+                                                                                        </label>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div className="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                                            <small className="text-muted">
+                                                                                {printOptions.length} selected
+                                                                            </small>
+                                                                            <Button
+                                                                                variant="primary"
+                                                                                size="sm"
+                                                                                className='custom-buttons'
+                                                                                onClick={() =>
+                                                                                    handlePrintPatientSummary({
+                                                                                        toBePrinted: printOptions,
+                                                                                        patientDetails: patientDetails,
+                                                                                        vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                                                                        medicationList: store?.getMedicationReducer?.data?.medicationRequests,
+                                                                                        allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
+                                                                                        problemData: store?.getProblemListReducer?.data?.problems
+                                                                                    })
+                                                                                }
+                                                                                disabled={
+                                                                                    printOptions?.length < 1 ||
+                                                                                    store?.getVitalsByPatientIdReducer?.loading ||
+                                                                                    store?.getMedicationReducer?.loading ||
+                                                                                    store?.getAllergiesOfAPatientReducer?.loading ||
+                                                                                    store?.getProblemListReducer?.loading
+                                                                                }
+                                                                            >
+                                                                                {(
+                                                                                    store?.getVitalsByPatientIdReducer?.loading ||
+                                                                                    store?.getMedicationReducer?.loading ||
+                                                                                    store?.getAllergiesOfAPatientReducer?.loading ||
+                                                                                    store?.getProblemListReducer?.loading
+                                                                                ) ? (
+                                                                                    <>
+                                                                                        Preparing...
+                                                                                    </>
+                                                                                ) : (
+                                                                                    'Print Report'
+                                                                                )}
+                                                                            </Button>
+                                                                        </div>
+                                                                    </Dropdown.Menu>
+                                                                </Dropdown>
+
+                                                                <LiaReceiptSolid className="fs-4  text-primary" />
                                                             </div>
                                                         </div>
                                                     </Col>
@@ -569,10 +651,12 @@ const UpdatePatientIndex = () => {
                                 </Accordion>
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
-                                        <Card className="px-2 scroll-container pt-2" style={{
-                                            height: isAccordionOpen ? 'calc(100vh - 270px)' : 'calc(100vh - 154px)',
-                                            maxHeight: '1000px'
-                                        }}>
+                                        <Card
+                                            className="px-2 scroll-container pt-2"
+                                            style={{
+                                                height: isAccordionOpen ? 'calc(100vh - 270px)' : 'calc(100vh - 154px)',
+                                                maxHeight: '1000px',
+                                            }}>
                                             {selectedMainTab === 'Patient Details' && (
                                                 <PatientSummary
                                                     isAccordionOpen={isAccordionOpen}
@@ -596,14 +680,17 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                             {selectedMainTab === 'Encounter' && <p>In progress...</p>}
                                             {[
-                                                'Tabacco',
+                                                'Tobacco',
                                                 'Medical',
                                                 'Surgical',
                                                 'Family / Genetic',
                                                 'Alcohol',
                                                 'Vaccination',
                                             ].includes(selectedMainTab) && (
-                                                    <Subsocialtabindex isAccordionOpen={isAccordionOpen} />
+                                                    <Subsocialtabindex
+                                                        isAccordionOpen={isAccordionOpen}
+                                                        defaultTab={selectedMainTab}
+                                                    />
                                                 )}
                                             {selectedMainTab === 'Communication' && <p>In progress...</p>}
                                             {selectedMainTab === 'Task' && <p>In progress...</p>}
@@ -619,7 +706,10 @@ const UpdatePatientIndex = () => {
                                                 'Medication List',
                                                 'Vitals List',
                                             ].includes(selectedMainTab) && (
-                                                    <SubAllergytabs isAccordionOpen={isAccordionOpen} />
+                                                    <SubAllergytabs
+                                                        isAccordionOpen={isAccordionOpen}
+                                                        defaultTab={selectedMainTab}
+                                                    />
                                                 )}
                                         </Card>
                                     </div>
