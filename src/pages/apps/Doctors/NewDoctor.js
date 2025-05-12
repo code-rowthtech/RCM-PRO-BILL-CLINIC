@@ -109,15 +109,17 @@ const NewDoctor = () => {
     }, [createResponse]);
 
     useEffect(() => {
-        if (updateResponse === 200 && activeTab === 'personalDetails') {
-            setActiveTab('departmentDetails');
-        } else if (updateResponse === 200 && activeTab === 'departmentDetails') {
-            setActiveTab('qualifications');
-        } else if (updateResponse === 200 && activeTab === 'qualifications') {
-            // setActiveTab('personalDetails')
-            navigate('/apps/doctors/list');
+        if (updateResponse === 200) {
+            if (activeTab === 'personalDetails') {
+                setActiveTab('departmentDetails');
+            } else if (activeTab === 'departmentDetails') {
+                setActiveTab('qualifications');
+            } else if (activeTab === 'qualifications') {
+                navigate('/apps/doctors/list');
+            }
         }
-    }, [updateResponse, activeTab]);
+    }, [updateResponse]);
+
 
     const closeModal = () => {
         setShow(false);
@@ -229,6 +231,7 @@ const NewDoctor = () => {
     );
 
     const [formData, setFormData] = useState({
+        
         role: doctorRoleId,
         email: '',
         name: {
@@ -241,6 +244,7 @@ const NewDoctor = () => {
         password: '',
         confirmPassword: '',
     });
+    console.log(formData,'formdaaaaaaaaaaaas')
 
     // Example of updating the state when data changes
     const handleInputChange = (e) => {
@@ -288,9 +292,9 @@ const NewDoctor = () => {
     }, [passwordValue, doctorRoleId, id]);
 
     useEffect(() => {
-        const isFirstNameValid = formData?.firstName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.firstName);
-        const isLastNameValid = formData?.lastName?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.lastName);
-        const isPhoneValid = formData?.phone?.trim()?.length === 14 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
+        const isFirstNameValid = formData.name.given?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.given);
+        const isLastNameValid = formData.name.family?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.family);
+        const isPhoneValid = formData?.phone?.trim()?.length === 13 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
         const isDOBValid =
             formData?.dateOfBirth &&
             new Date(formData.dateOfBirth) <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
@@ -304,7 +308,7 @@ const NewDoctor = () => {
                 formData?.confirmPassword === formData?.password);
 
         const isFormValid =
-            isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid;
+            isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid && isPhoneValid;
         setIsButtonDisabled(!isFormValid);
     }, [formData, id]);
 
@@ -324,27 +328,24 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'personalDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         Personal Details
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'departmentDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         Professional Information
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'qualifications' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         Qualifications
                                                     </button>
@@ -366,10 +367,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                  pointerEvents: 'none',
-                                                                                  opacity: 0.6, // Visual indication that the button is disabled
-                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                              }
+                                                                                pointerEvents: 'none',
+                                                                                opacity: 0.6, // Visual indication that the button is disabled
+                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                            }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -411,7 +412,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     First Name{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
@@ -426,10 +427,11 @@ const NewDoctor = () => {
                                                                     })}
                                                                     onChange={(e) => {
                                                                         clearErrors('firstName');
-                                                                        setFormData({
-                                                                            ...formData,
-                                                                            firstName: e.target.value,
-                                                                        });
+                                                                        // setFormData({
+                                                                        //     ...formData,
+                                                                        //     firstName: e.target.value,
+                                                                        // });
+                                                                        handleInputChange(e)
                                                                     }}
                                                                     placeholder="Enter first name"
                                                                 />
@@ -444,7 +446,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Last Name{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
@@ -459,10 +461,11 @@ const NewDoctor = () => {
                                                                     })}
                                                                     onChange={(e) => {
                                                                         clearErrors('lastName');
-                                                                        setFormData({
-                                                                            ...formData,
-                                                                            lastName: e.target.value,
-                                                                        });
+                                                                        // setFormData({
+                                                                        //     ...formData,
+                                                                        //     lastName: e.target.value,
+                                                                        // });
+                                                                        handleInputChange(e)
                                                                     }}
                                                                     placeholder="Enter last name"
                                                                 />
@@ -478,7 +481,7 @@ const NewDoctor = () => {
                                                                 <Form.Group className="mb-0 position-relative">
                                                                     <Form.Label className="mb-0">
                                                                         Phone{' '}
-                                                                        {!id && <span className="text-danger">*</span>}
+                                                                        <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Group>
                                                                         <InputGroup>
@@ -492,28 +495,25 @@ const NewDoctor = () => {
                                                                             <Form.Control
                                                                                 type="tel"
                                                                                 {...register(
-                                                                                    'phone',
-                                                                                    !id
-                                                                                        ? {
-                                                                                              required:
-                                                                                                  'This field is required',
-                                                                                              pattern: {
-                                                                                                  value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
-                                                                                                  message:
-                                                                                                      'Contact must be in the format (XXX)XXX-XXXX',
-                                                                                              },
-                                                                                              maxLength: {
-                                                                                                  value: 13,
-                                                                                                  message:
-                                                                                                      'Contact must not exceed 10 digits',
-                                                                                              },
-                                                                                              minLength: {
-                                                                                                  value: 13,
-                                                                                                  message:
-                                                                                                      'Contact must not be less than 10 digits',
-                                                                                              },
-                                                                                          }
-                                                                                        : {}
+                                                                                    'phone', {
+                                                                                    required:
+                                                                                        'This field is required',
+                                                                                    pattern: {
+                                                                                        value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
+                                                                                        message:
+                                                                                            'Contact must be in the format (XXX)XXX-XXXX',
+                                                                                    },
+                                                                                    maxLength: {
+                                                                                        value: 13,
+                                                                                        message:
+                                                                                            'Contact must not exceed 10 digits',
+                                                                                    },
+                                                                                    minLength: {
+                                                                                        value: 13,
+                                                                                        message:
+                                                                                            'Contact must not be less than 10 digits',
+                                                                                    },
+                                                                                }
                                                                                 )}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('phone');
@@ -567,7 +567,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Date of Birth{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
@@ -615,7 +615,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Email{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="email"
@@ -646,7 +646,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Gender{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Select
                                                                     as="select"
@@ -680,7 +680,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
                                                                     Password{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <div className="position-relative">
                                                                     <Form.Control
@@ -709,12 +709,12 @@ const NewDoctor = () => {
                                                                             ...(updateId
                                                                                 ? {} // Don't apply pattern if updating
                                                                                 : {
-                                                                                      pattern: {
-                                                                                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                          message:
-                                                                                              'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                      },
-                                                                                  }),
+                                                                                    pattern: {
+                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                        message:
+                                                                                            'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                    },
+                                                                                }),
                                                                         })}
                                                                     />
 
@@ -736,7 +736,7 @@ const NewDoctor = () => {
                                                             <Form.Group className="mb-1 ">
                                                                 <Form.Label className="mb-0">
                                                                     Confirm Password{' '}
-                                                                    {!id && <span className="text-danger">*</span>}
+                                                                    <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <div className="position-relative">
                                                                     <Form.Control
@@ -783,18 +783,17 @@ const NewDoctor = () => {
                                                                 <Form.Label className="mb-0">Profile Image</Form.Label>
                                                                 <div
                                                                     onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                        logoName || logoUploading
-                                                                            ? ''
-                                                                            : 'custom-form-fields'
-                                                                    }`}>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
+                                                                        ? ''
+                                                                        : 'custom-form-fields'
+                                                                        }`}>
                                                                     {logoUploading
                                                                         ? 'Uploading...'
                                                                         : logoName
-                                                                        ? logoName.length > 30
-                                                                            ? logoName.slice(0, 25) + '...'
-                                                                            : logoName
-                                                                        : 'Upload Profile Image'}
+                                                                            ? logoName.length > 30
+                                                                                ? logoName.slice(0, 25) + '...'
+                                                                                : logoName
+                                                                            : 'Upload Profile Image'}
                                                                     <p className="mb-0">
                                                                         <FiUploadCloud />
                                                                     </p>
@@ -842,7 +841,7 @@ const NewDoctor = () => {
                                                         className="custom-buttons"
                                                         disabled={store?.createtDoctorsReducer?.loading}
                                                         style={{ width: '120px' }}>
-                                                        {store?.createtDoctorsReducer?.loading ? (
+                                                        {store?.createtDoctorsReducer?.loading || store?.createtDoctorsDetailReducer?.loading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />
                                                         ) : id ? (
                                                             'Update & Next'

@@ -123,10 +123,8 @@ const ProblemList = () => {
                                                 />
                                             </td>{' '} */}
                                             <td>
-                                                <IoInformationCircleOutline className="fs-4 cursor-pointer text-black" />
-                                                &nbsp;
-                                                <FiEdit
-                                                    className="fs-4 cursor-pointer text-black"
+                                                <i
+                                                    className=" bi bi-pencil text-info cursor-pointer"
                                                     onClick={() => {
                                                         handleEditClick(data);
                                                         const requestData = {
@@ -136,8 +134,8 @@ const ProblemList = () => {
                                                     }}
                                                 />
                                                 &nbsp;
-                                                <MdDeleteOutline
-                                                    className="fs-4 cursor-pointer text-black"
+                                                <i
+                                                    className="bi bi-trash-fill text-danger cursor-pointer"
                                                     onClick={() => {
                                                         handleDelete(data);
                                                     }}

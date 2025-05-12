@@ -211,7 +211,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
                             value={item.type}
-                            className="text-capitalize"
+                            className="text-capitalize text-danger"
                             data-has-value={!!watch(`address[${index}].type`)}
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>

@@ -22,7 +22,7 @@ const Tobacco = () => {
     const tobaccoHistory = store?.getTobaccooReducer?.data?.tobaccoHistory;
     const isLoading = store?.getTobaccooReducer?.loading;
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const { register, handleSubmit, reset, getValues, control, setValue } = useForm();
+    const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
     const [toEdit, setToEdit] = useState(null);
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
@@ -97,9 +97,9 @@ const Tobacco = () => {
                             <h5 className="fw-semibold mb-0">Add Tobacco Use</h5>
                         </Card.Title>
 
-                        <Form onSubmit={handleSubmit(onSubmit)}>
-                            <div className="scroll-container mb-3 px-2" style={{ maxHeight: '55vh', overflowY: 'auto' }}>
-                                <Row className="g-3">
+                        <Form className="scroll-container  d-flex flex-column justify-content-between" style={{ overflowY: 'auto', height: '50vh' }} onSubmit={handleSubmit(onSubmit)}>
+                            <div className="scroll-container mb-3 px-2" style={{ maxHeight: '57vh', overflowY: 'auto' }}>
+                                <Row className="g-2">
                                     <Col md={6}>
                                         <Form.Group controlId="tobaccoUser">
                                             <Form.Label className="fw-medium mb-0">Current Tobacco Use</Form.Label>
@@ -156,7 +156,7 @@ const Tobacco = () => {
                                                 type="date"
                                                 {...register('effectiveDateTime')}
                                                 required
-                                                className="form-control-sm"
+                                                className={`form-control-sm ${watch('effectiveDateTime') ? 'text-danger' : 'text-muted'}`}
                                                 max={new Date().toISOString().slice(0, 10)}
                                             />
                                         </Form.Group>
@@ -185,7 +185,7 @@ const Tobacco = () => {
                                                         }}
                                                         theme="snow"
                                                         placeholder="Enter detailed notes here..."
-                                                        style={{ height: '200px', backgroundColor: 'white' }}
+                                                        style={{ height: '30vh', backgroundColor: 'white' }}
                                                         modules={{
                                                             toolbar: [
                                                                 [{ header: [1, 2, false] }],
@@ -208,23 +208,24 @@ const Tobacco = () => {
                                     </Col>
                                 </Row>
                             </div>
-                            <div className="d-flex justify-content-end pe mt-2">
+                            <div className="d-flex justify-content-end align-items-end pe-1 py-2">
                                 <Button
                                     type="submit"
                                     variant="primary"
                                     disabled={isLoading}
                                     className="px-4 py-1 custom-buttons">
-                                    Add Record
+                                    {toEdit ?
+                                        `Update`
+                                        :
+                                        `Add Record`
+                                    }
                                 </Button>
                             </div>
                         </Form>
                     </Card.Body>
                 </div>
             </Col>
-
-            {/* History Side */}
-            {/* History Side */}
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
+            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1">
                 <div className=" border-danger  h-100">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
                         <Card.Title className="border-bottom pt-0 pb-2 mb-0">
@@ -241,21 +242,41 @@ const Tobacco = () => {
                                 <p className="mt-2 mb-0">No tobacco use records found</p>
                             </div>
                         ) : (
-                            <div className="scroll-container" style={{ overflowY: 'auto', height: '50vh' }}>
+                            <div className="scroll-container " style={{ overflowY: 'auto', height: '50vh' }}>
                                 <ListGroup variant="flush" className='striped-data'>
                                     {tobaccoHistory?.map((item, index) => (
-                                        <ListGroup.Item key={index} className="pb-3 striped-data-item px-0 border-bottom">
-                                            <div className="d-flex justify-content-between align-items-start px-1 mb-1">
+                                        <ListGroup.Item key={index} className=" striped-data-item py-0 px-0 border-bottom">
+                                            <div className="d-flex pt-2 justify-content-between align-items-start px-1 mb-0">
                                                 <strong className="fw-semibold">{item.tobaccoUse || ''}</strong>
-                                                <small className="text-muted">
-                                                    {item?.note?.[0]?.time
-                                                        ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(item.note[0].time).toLocaleTimeString()})`
-                                                        : 'No date'}
-                                                </small>
+                                                <div className=" d-flex justify-content-end align-items-center pe-2 gap-1">
+                                                    <i className="bi bi-trash-fill text-danger cursor-pointer"
+                                                        onClick={() => {
+                                                            setToDelete(item?._id)
+                                                            setDeleteModal(true)
+                                                        }}></i>
+                                                    {toEdit && toEdit._id === item._id ? (
+                                                        <i
+                                                            onClick={() => {
+                                                                setToEdit(null);
+                                                                setToEdit(item);
+                                                            }}
+                                                            className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
+                                                    ) : (
+                                                        <i
+                                                            onClick={() => setToEdit(item)}
+                                                            className="bi bi-pencil text-info cursor-pointer"
+                                                        ></i>
+                                                    )}
 
+                                                </div>
                                             </div>
+                                            <small className="text-muted px-1 mb-0 mt-0">
+                                                {item?.note?.[0]?.time
+                                                    ? `${new Date(item.note[0].time).toLocaleDateString()} (${new Date(item.note[0].time).toLocaleTimeString()})`
+                                                    : 'No date'}
+                                            </small>
                                             {item?.note?.[0]?.text && (
-                                                <div className="mt-2">
+                                                <div className="mt-2 pb-2 scroll-container" style={{ maxHeight: '7rem ' }}>
                                                     <div
                                                         className="ql-editor p-0"
                                                         dangerouslySetInnerHTML={{ __html: item.note[0].text }}
@@ -263,27 +284,6 @@ const Tobacco = () => {
                                                     />
                                                 </div>
                                             )}
-                                            <div className="mt-0 d-flex justify-content-end pe-2 gap-1">
-                                                <i className="bi bi-trash-fill text-danger cursor-pointer"
-                                                    onClick={() => {
-                                                        setToDelete(item?._id)
-                                                        setDeleteModal(true)
-                                                    }}></i>
-                                                {toEdit && toEdit._id === item._id ? (
-                                                    <i
-                                                        onClick={() => {
-                                                            setToEdit(null);
-                                                            setToEdit(item);
-                                                        }}
-                                                        className="bi bi-x-circle-fill cursor-pointer text-danger"></i>
-                                                ) : (
-                                                    <i
-                                                        onClick={() => setToEdit(item)}
-                                                        className="bi bi-pencil text-info cursor-pointer"
-                                                    ></i>
-                                                )}
-
-                                            </div>
                                             <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={deleteHistory} item='tobaccoo history' isLoading={store?.deleteTobaccooReducer?.loading} />
                                         </ListGroup.Item>
                                     ))}

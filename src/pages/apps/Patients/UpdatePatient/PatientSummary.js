@@ -195,8 +195,8 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     }
 
     return (
-        <div className="patient-summary">
-            <Row className={`scroll-container  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
+        <div className="patient-summary ">
+            <Row className={`mb-2  h-100  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
                 {/* Vitals Card */}
                 <Col sm={4}>
                     <Card className="h-100 shadow-sm">
@@ -526,7 +526,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
 
                 {/* Appointments Card - Full Width */}
                 <Col sm={12}>
-                    <Card className="shadow-sm">
+                    <Card className="shadow-sm mb-0">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
                                 <FaCalendarAlt className="me-2 text-secondary" />

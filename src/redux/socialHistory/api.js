@@ -35,7 +35,8 @@ export function createFamilyGeneticApi(params: any): any {
 }
 export function updateFamilyGeneticApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updateFamily, data);
+    return api.update(`${URL.updateFamily}/${data?.id}`, data);
+
 }
 export function getFamilyGeneticApi(params: any): any {
     const { data } = params;
@@ -44,7 +45,7 @@ export function getFamilyGeneticApi(params: any): any {
 
 export function deleteFamilyGeneticApi(params: any): any {
     const { data } = params;
-    return api.delete(URL.deleteFamily, data);
+    return api.delete(`${URL.deleteFamily}/${data?.id}`);
 }
 
 
@@ -76,7 +77,7 @@ export function createMedicalHistoryApi(params: any): any {
 }
 export function updateMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updateMedicalHistory, data);
+    return api.update(`${URL.updateMedicalHistory}/${data?.id}`, data);
 }
 export function getMedicalHistoryApi(params: any): any {
     const { data } = params;
@@ -84,7 +85,7 @@ export function getMedicalHistoryApi(params: any): any {
 }
 export function deleteMedicalHistoryApi(params: any): any {
     const { data } = params;
-    return api.delete(`${URL.deleteMedicalHistory}?id=${data?.id}`);
+    return api.delete(`${URL.deleteMedicalHistory}/${data?.id}`);
 }
 
 

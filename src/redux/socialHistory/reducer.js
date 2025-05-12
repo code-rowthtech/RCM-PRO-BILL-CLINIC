@@ -19,10 +19,10 @@ const GET_TOBACCOO_INITIAL_STATE = {
     data: [],
     loading: false,
 };
-const GET_MEDICATION_INITIAL_STATE = {
-    data: [],
-    loading: false,
-};
+// const GET_MEDICATION_INITIAL_STATE = {
+//     data: [],
+//     loading: false,
+// };
 
 // Family Genetic
 const CREATE_FAMILY_GENETIC_INITIAL_STATE = {
@@ -40,6 +40,10 @@ const GET_FAMILY_GENETIC_INITIAL_STATE = {
     loading: false,
 };
 
+const DELETE_FAMILY_GENETIC_INITIAL_STATE = {
+    data: [],
+    loading: false,
+}
 // SURGICAL HISTORY
 const CREATE_SURGICAL_HISTORY_INITIAL_STATE = {
     data: [],
@@ -277,6 +281,33 @@ export const getFamilyGeneticReducer = (state = GET_FAMILY_GENETIC_INITIAL_STATE
             };
         default:
             return state;
+    }
+};
+
+export const deleteFamilyGenticReducer = (state = DELETE_FAMILY_GENETIC_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case TobaccooActionTypes.DELETE_FAMILY_GENTIC_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case TobaccooActionTypes.DELETE_FAMILY_GENTIC_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_FAMILY_GENTIC_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case TobaccooActionTypes.DELETE_FAMILY_GENTIC_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
     }
 };
 

@@ -38,7 +38,6 @@ const MedicalHistory = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
-    console.log(toEdit, 'toEditupdate')
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const {
         register,
@@ -58,10 +57,10 @@ const MedicalHistory = () => {
         if (createSuccess === 201 || updateResponse === 200) {
             dispatch(getMedicalHistoryAction({ patientId: patientId }));
             setToEdit(null);
-            setSelectedProblem(null);  // clear local state
+            setSelectedProblem(null); // clear local state
             reset();
         }
-    }, [createSuccess, dispatch, patientId, reset]);
+    }, [createSuccess, dispatch, patientId, reset, updateResponse]);
 
     const deleteHistory = () => {
         dispatch(deleteMedicalHistoryAction({ id: toDelete }));
@@ -81,10 +80,17 @@ const MedicalHistory = () => {
 
     useEffect(() => {
         if (toEdit) {
-            setSelectedProblem(toEdit?.code?.coding?.[0]?.display)
+            const conditionCode = toEdit?.code?.coding?.[0];
+            const matchedProblem = formattedOptions.find(
+                (opt) => opt.value === conditionCode?.code && opt.display === conditionCode?.display
+            );
+            setSelectedProblem(matchedProblem || null);
+            setValue('problem', matchedProblem || null);
             setValue(
                 'startDate',
-                toEdit?.effectivePeriod?.start ? new Date(toEdit?.effectivePeriod?.start).toISOString().split('T')[0] : ''
+                toEdit?.effectivePeriod?.start
+                    ? new Date(toEdit?.effectivePeriod?.start).toISOString().split('T')[0]
+                    : ''
             );
             setValue(
                 'endDate',
@@ -97,7 +103,6 @@ const MedicalHistory = () => {
     }, [toEdit]);
     const onSubmit = (data) => {
         const selected = data.problem;
-
         const payload = {
             clinicId: loggedInUser?._id,
             code: {
@@ -127,7 +132,6 @@ const MedicalHistory = () => {
         } else {
             dispatch(createMedicalHistoryAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload, 'medical data');
     };
 
     const handleEditorFocus = () => {
@@ -183,9 +187,7 @@ const MedicalHistory = () => {
                                                         {...field}
                                                         classNamePrefix="select"
                                                         options={formattedOptions}
-                                                        value={
-                                                            selectedProblem || null
-                                                        }
+                                                        value={selectedProblem || null}
                                                         onChange={(selected) => {
                                                             field.onChange(selected);
                                                             setSelectedProblem(selected); // 🔁 update local state
@@ -231,7 +233,7 @@ const MedicalHistory = () => {
                                                 type="date"
                                                 {...register('startDate')}
                                                 required
-                                                // max={new Date().toISOString().slice(0, 10)}
+                                                max={new Date().toISOString().slice(0, 10)}
                                                 className="form-control-sm"
                                             />
                                         </Form.Group>
@@ -302,9 +304,19 @@ const MedicalHistory = () => {
                                 <Button
                                     type="submit"
                                     variant="primary"
-                                    disabled={isLoading}
+                                    disabled={
+                                        store?.createMedicalHistoryReducer?.loading ||
+                                        store?.updateMedicalHistoryAction?.loading
+                                    }
                                     className="px-4 py-1 custom-buttons">
-                                    Add Record
+                                    {store?.createMedicalHistoryReducer?.loading ||
+                                    store?.updateMedicalHistoryAction?.loading ? (
+                                        <Spinner animation="border" size="sm" className="text-white" />
+                                    ) : toEdit ? (
+                                        'Update'
+                                    ) : (
+                                        'Add'
+                                    )}
                                 </Button>
                             </div>
                         </Form>
@@ -350,8 +362,8 @@ const MedicalHistory = () => {
                                                                 Start:{' '}
                                                                 {item?.effectivePeriod?.start
                                                                     ? new Date(
-                                                                        item?.effectivePeriod.start
-                                                                    ).toLocaleDateString('en-GB')
+                                                                          item?.effectivePeriod.start
+                                                                      ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>
@@ -361,8 +373,8 @@ const MedicalHistory = () => {
                                                                 End:{' '}
                                                                 {item?.effectivePeriod?.end
                                                                     ? new Date(
-                                                                        item?.effectivePeriod.end
-                                                                    ).toLocaleDateString('en-GB')
+                                                                          item?.effectivePeriod.end
+                                                                      ).toLocaleDateString('en-GB')
                                                                     : '—'}
                                                             </span>
                                                         </div>

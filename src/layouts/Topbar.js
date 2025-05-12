@@ -73,7 +73,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
-        '/apps/patients/update-patient': 'Update Patient',
+        '/apps/patients/update-patient': 'Patient Chart',
         '/apps/settings/templates': 'Templates',
         '/apps/settings/notesType': 'Notes Type',
     };
@@ -154,8 +154,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                     onClick={() => navigate('/apps/patients/list')}
                                     className='custom mt-2 text-dark border-0  text-white px-2 bg-light fw-semibold'
                                 >
-                                    <i className="bi bi-microsoft text-dark"></i>
-
+                                    Back
                                 </button>
                             </li>}
                         <li className="dropdown notification-list">

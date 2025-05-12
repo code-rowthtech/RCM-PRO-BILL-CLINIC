@@ -1,6 +1,16 @@
 body {
-    font-family: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Oxygen',
-        'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+        'Charlie Text',
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
+        'Roboto',
+        'Noto Sans',
+        'Oxygen',
+        'Ubuntu',
+        'Droid Sans',
+        'Helvetica Neue',
+        sans-serif;
 }
 
 .cursor-pointer {
@@ -201,22 +211,18 @@ select.form-control:not([size]):not([multiple]) {
     border: 0px !important;
 }
 
-.form-select {
-    color: #0908084f !important;
-    font-weight: 550 !important;
-    padding: 6px !important;
-    font-size: 12px;
-    background-color: #e8f0fe !important;
-    border: 0px !important;
+.select-placeholder {
+    color: gray !important;
+}
+.select-filled {
+    color: red !important;
 }
 
-.form-control:focus,
-.form-select:focus {
+.form-control:focus {
     color: black !important;
 }
 
-.form-control[data-has-value='true'],
-.form-select[data-has-value='true'] {
+.form-control[data-has-value='true'] {
     color: black !important;
 }
 
@@ -659,7 +665,9 @@ table {
     font-weight: 600 !important;
     margin-bottom: 3px !important;
     /* background-color: #313a46 !important; */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23) !important;
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.16),
+        0 3px 6px rgba(0, 0, 0, 0.23) !important;
     width: 95% !important;
 }
 
@@ -768,7 +776,9 @@ table {
     border-color: #80bdff !important;
 }
 .customAccordion {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.16),
+        0 3px 6px rgba(0, 0, 0, 0.23);
 }
 /* 
 .accordion-item {
@@ -854,7 +864,9 @@ table {
     height: 64vh;
 }
 .patient-menu-container {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    box-shadow:
+        0 3px 6px rgba(0, 0, 0, 0.16),
+        0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
 .active-patient-chart-tab,
@@ -975,5 +987,43 @@ tbody tr:hover {
 }
 
 .striped-data .striped-data-item:nth-child(even) {
-    background-color: rgba(212, 211, 211, 0.434) !important;
+    background-color: rgba(228, 224, 224, 0.434) !important;
+}
+.striped-data .striped-data-item:nth-child(odd) {
+    background-color: #e8f0fec1 !important;
+}
+
+/* .form-select:required:invalid {
+    color: #0908084f !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+}
+
+.form-select:required:valid {
+    color: black !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px !important;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+} */
+.form-select {
+    color: #0908084f !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
+}
+
+.form-select[data-has-value='true'] {
+    color: black !important;
+    font-weight: 550 !important;
+    padding: 6px !important;
+    font-size: 12px;
+    background-color: #e8f0fe !important;
+    border: 0px !important;
 }

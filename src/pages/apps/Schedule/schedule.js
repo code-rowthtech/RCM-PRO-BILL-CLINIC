@@ -150,6 +150,9 @@ const Schedule = () => {
                                                         name="doctorName"
                                                         options={doctorOptions}
                                                         placeholder="Select Doctor"
+                                                        getOptionLabel={(e) =>
+                                                            e.label.replace(/\b\w/g, (char) => char.toUpperCase())
+                                                        }
                                                         styles={{
                                                             control: (provided) => ({
                                                                 ...provided,

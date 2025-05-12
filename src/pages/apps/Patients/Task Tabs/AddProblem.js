@@ -117,7 +117,6 @@ const AddProblem = ({ onCancel }) => {
                 },
             ],
         };
-        console.log('Form Data:', payload);
         dispatch(createProblemListAction(payload)); // Uncomment to dispatch the action
     };
 

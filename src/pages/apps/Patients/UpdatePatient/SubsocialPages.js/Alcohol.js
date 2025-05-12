@@ -148,6 +148,7 @@ const Alcohol = () => {
                                             <Form.Label className='mb-0'>Alcohol Use Status</Form.Label>
                                             <Form.Select
                                                 {...register('useStatus', { required: true })}
+                                                required
                                             >
                                                 <option value="">Select status</option>
                                                 <option value="Current User">Current User</option>
@@ -166,7 +167,7 @@ const Alcohol = () => {
                                         <Col sm={6}>
                                             <Form.Group className="mb-1">
                                                 <Form.Label className='mb-0'>Alcohol use frequency</Form.Label>
-                                                <Form.Select {...register('frequency')}>
+                                                <Form.Select {...register('frequency')} required>
                                                     <option key='' value=''>Select</option>
                                                     {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown'].map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
@@ -179,7 +180,7 @@ const Alcohol = () => {
                                         <Col sm={6}>
                                             <Form.Group className="mb-1">
                                                 <Form.Label className='mb-0'>Standard drinks per occasion</Form.Label>
-                                                <Form.Select {...register('quantityPerOccasion')}>
+                                                <Form.Select {...register('quantityPerOccasion')} required>
                                                     <option key='' value=''>Select</option>
                                                     {['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more'].map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
@@ -191,7 +192,7 @@ const Alcohol = () => {
                                             <Col sm={6}>
                                                 <Form.Group className="mb-1">
                                                     <Form.Label className='mb-0'>Heavy intake frequency</Form.Label>
-                                                    <Form.Select {...register('heavyIntakeFrequency')}>
+                                                    <Form.Select {...register('heavyIntakeFrequency')} required>
                                                         <option key='' value=''>Select</option>
                                                         {['Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'].map((data) => {
                                                             return <option value={data} key={data}>{data}</option>;
@@ -204,7 +205,7 @@ const Alcohol = () => {
                                         <Col sm={6}>
                                             <Form.Group className="mb-1">
                                                 <Form.Label className='mb-0'>What types of alcohol do you usually consume?</Form.Label>
-                                                <Form.Select {...register('alcoholType')}>
+                                                <Form.Select {...register('alcoholType')} required>
                                                     <option key='' value=''>Select</option>
                                                     {['Beer', 'Wine', 'Spirits', 'Other', 'All'].map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
@@ -299,7 +300,11 @@ const Alcohol = () => {
                             </div>
                             <div className="d-flex justify-content-end mt-3 align-items-center">
                                 <Button variant="primary" type="submit" className="custom-buttons">
-                                    Add Record
+                                    {toEdit ?
+                                        `Update`
+                                        :
+                                        `Add Record`
+                                    }
                                 </Button>
                             </div>
 
