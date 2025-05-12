@@ -231,6 +231,7 @@ const NewDoctor = () => {
     );
 
     const [formData, setFormData] = useState({
+        
         role: doctorRoleId,
         email: '',
         name: {
@@ -243,6 +244,7 @@ const NewDoctor = () => {
         password: '',
         confirmPassword: '',
     });
+    console.log(formData,'formdaaaaaaaaaaaas')
 
     // Example of updating the state when data changes
     const handleInputChange = (e) => {

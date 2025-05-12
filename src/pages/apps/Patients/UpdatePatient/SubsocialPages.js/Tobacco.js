@@ -225,7 +225,7 @@ const Tobacco = () => {
                     </Card.Body>
                 </div>
             </Col>
-            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1 ">
+            <Col md={6} className="d-flex  flex-column pt-0 mt-0  ps-1">
                 <div className=" border-danger  h-100">
                     <Card.Body className="d-flex flex-column pt-0 px-2 pb-2 mt-0">
                         <Card.Title className="border-bottom pt-0 pb-2 mb-0">
