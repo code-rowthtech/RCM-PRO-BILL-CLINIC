@@ -213,7 +213,7 @@ const MedicalHistory = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
+                            <Col md={6} className='mt-0'>
                                 <Form.Group controlId="startDate">
                                     <Form.Label className="fw-medium mb-1">Start Date</Form.Label>
                                     <Form.Control
@@ -225,7 +225,7 @@ const MedicalHistory = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={6}>
+                            <Col md={6} className='mt-0'>
                                 <Form.Group controlId="endDate">
                                     <Form.Label className="fw-medium mb-1">End Date</Form.Label>
                                     <Form.Control
@@ -237,7 +237,7 @@ const MedicalHistory = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col xs={12}>
+                            <Col xs={12} className='mt-0'>
                                 <Form.Group controlId="notes">
                                     <Form.Label className="fw-medium mb-1">
                                         Notes{' '}
@@ -262,7 +262,7 @@ const MedicalHistory = () => {
                                                 }}
                                                 theme="snow"
                                                 placeholder="Enter detailed notes here..."
-                                                style={{ height: '25vh', backgroundColor: 'white' }}
+                                                style={{ height: '30vh', backgroundColor: 'white' }}
                                                 modules={{
                                                     toolbar: [
                                                         [{ header: [1, 2, false] }],
