@@ -76,7 +76,10 @@ const ConsultationRoom = React.lazy(() => import('../pages/apps/Settings/Consult
 const Office = React.lazy(() => import('../pages/apps/Settings/Office/Office'));
 const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/notesType'))
 const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
-
+// Notes Templates
+const NotesAndTemplates = React.lazy(() => import('../pages/apps/NotesAndTemplates/Index'));
+const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
+const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/NotesTemplates'));
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
 const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
@@ -410,6 +413,32 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
+
+                        {
+                            path: 'notesandtemplates',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element: hasPermission('view notes and templates') ? (
+                                        <LoadComponent component={NotesAndTemplates} />
+                                        ) : (
+                                             <div className="disabled-content">You don't have permission to view this page.</div>
+                                            )
+                                },
+                                {
+                                    path: 'clinicalnotestypes',
+                                    element: hasPermission('view notes') ? (
+                                        <LoadComponent component={ClinicalNotesType}/>
+                                        ) : null,
+                        },
+                        {
+                            path: 'notestemplates',
+                            element: hasPermission('view templates') ? (
+                                <LoadComponent component={NotesTemplates} />
+                                ) : null,
+                                },
+                                ],
+                                },
                         {
                             path: 'settings',
                             children: [

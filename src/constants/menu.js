@@ -65,9 +65,27 @@ const MENU_ITEMS = [
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },
         icon: 'uil-user',
-
     },
-
+    {
+        key: 'notesandtemplates',
+        label: 'Notes and Templates',
+        icon: 'bi bi-journal-plus',
+        url: '/apps/notesandtemplates/list',
+        children: [
+            {
+                key: 'clinicalnotestypes',
+                label: 'Clinical Notes Types',
+                icon: 'uil uil-note',
+                url: '/apps/notesandtemplates/clinicalnotestypes',
+            },
+            {
+                key: 'notestemplates',
+                label: 'Clinical Templates',
+                icon: 'uil uil-note',
+                url: '/apps/notesandtemplates/notestemplates',
+            },
+        ],
+    },
     {
         key: 'setting',
         label: 'Setting',
@@ -122,7 +140,7 @@ const MENU_ITEMS = [
                 url: '/apps/settings/templates',
                 parentKey: 'setting',
             },
-        ]
+        ],
     },
     // {
     //     key: 'logout',
