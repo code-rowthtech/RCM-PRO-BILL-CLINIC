@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { Card, Col, Row, Table, Form, Button } from 'react-bootstrap';
-import { IoSettings } from 'react-icons/io5';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, Table, Form, Button, Modal } from 'react-bootstrap';
+import { IoClose, IoSettings } from 'react-icons/io5';
+import SettingTabs from './SettingTabs';
+import { useForm } from 'react-hook-form';
+import AddModalSetting from './Modals/AddModalSetting';
+import NoteTypeCards from './Modals/Noteshelper';
 
 const noteTypeData = [
     { id: 1, name: 'Case Review', isActive: false, format: 'Simple', isPsychotherapyNote: false, isDefault: false },
@@ -28,7 +32,9 @@ const noteTypeData = [
 const NotesTypes = () => {
     const [noteTypes, setNoteTypes] = useState(noteTypeData);
     const [openTabs, setOpenTabs] = useState([]);
+    console.log(openTabs,'opentabs')
     const [activeTabId, setActiveTabId] = useState('clinical-notes-type'); // Default tab
+    const [addModal, setAddModal] = useState(false);
 
     const handleDefaultChange = (id) => {
         const updated = noteTypes.map((note) => ({
@@ -61,134 +67,88 @@ const NotesTypes = () => {
         <Row className="mt-2">
             <Col xs={12} className="px-0">
                 <Card className="scroll-container" style={{ height: '90vh', overflowY: 'scroll' }}>
-                    <Card.Body className="px-3">
-                        <Row>
-                            <Col>
-                                {openTabs.length > 0 && (
-                                    <div
-                                        className="d-flex gap-3"
-                                        style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}
-                                    >
+                    <Card.Body className="px-2 py-1">
+                        <Row className="">
+                            <Col className="" sm={6}>
+                                <div
+                                    className="d-flex gap-3"
+                                    style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
+                                    <span
+                                        onClick={() => setActiveTabId('clinical-notes-type')}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') setActiveTabId('clinical-notes-type');
+                                        }}
+                                        role="button"
+                                        tabIndex={0}
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${
+                                            activeTabId === 'clinical-notes-type' ? 'active_tabs_link fw-bold' : ''
+                                        }`}>
+                                        Clinical Notes Type
+                                    </span>
+
+                                    {openTabs.map((tab, index) => (
                                         <span
-                                            onClick={() => setActiveTabId('clinical-notes-type')}
+                                            key={tab.id}
+                                            onClick={() => setActiveTabId(tab.id)}
                                             onKeyDown={(e) => {
-                                                if (e.key === 'Enter') setActiveTabId('clinical-notes-type');
+                                                if (e.key === 'Enter') setActiveTabId(tab.id);
                                             }}
                                             role="button"
                                             tabIndex={0}
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === 'clinical-notes-type' ? 'active_tabs_link fw-bold' : ''
-                                            }`}
-                                        >
-                                            Clinical Notes Type
-                                        </span>
-
-                                        {openTabs.map((tab, index) => (
+                                                activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
+                                            {tab?.name} {index + 1}
                                             <span
-                                                key={tab.id}
-                                                onClick={() => setActiveTabId(tab.id)}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') setActiveTabId(tab.id);
+                                                style={{
+                                                    marginLeft: 8,
+                                                    cursor: 'pointer',
+                                                    fontWeight: 'bold',
                                                 }}
-                                                role="button"
-                                                tabIndex={0}
-                                                className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                    activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
-                                                }`}
-                                            >
-                                                Setting {index + 1}
-                                                <span
-                                                    style={{
-                                                        marginLeft: 8,
-                                                        color: '#dc3545',
-                                                        cursor: 'pointer',
-                                                        fontWeight: 'bold',
-                                                    }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleCloseTab(tab.id);
-                                                    }}
-                                                    title="Close tab"
-                                                >
-                                                    ×
-                                                </span>
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleCloseTab(tab.id);
+                                                }}
+                                                title="Close tab">
+                                                <IoClose />
                                             </span>
-                                        ))}
-                                    </div>
-                                )}
+                                        </span>
+                                    ))}
+                                </div>
+                            </Col>
+                            <Col sm={6} className="d-flex justify-content-end">
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    className="custom-buttons"
+                                    onClick={() => setAddModal(true)}>
+                                    + Add Note Type
+                                </Button>
                             </Col>
                         </Row>
-
-                        <hr />
-
                         {activeTabId === 'clinical-notes-type' ? (
-                            <Table responsive className="table-centered table-nowrap mb-0 rounded mt-1">
-                                <thead>
-                                    <tr>
-                                        <th className="text-white">Default</th>
-                                        <th className="text-white">Clinical Note Type</th>
-                                        <th className="text-white">Active</th>
-                                        <th className="text-white">Format</th>
-                                        <th className="text-white">Psychotherapy Note</th>
-                                        <th className="text-white">Customization</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {noteTypes.map((note) => (
-                                        <tr key={note.id}>
-                                            <td className="text-center align-middle">
-                                                <Form.Check
-                                                    type="radio"
-                                                    name="defaultNote"
-                                                    checked={note.isDefault}
-                                                    onChange={() => handleDefaultChange(note.id)}
-                                                />
-                                            </td>
-                                            <td className="align-middle">
-                                                {note.name}
-                                                {note.isDefault && (
-                                                    <strong className="text-muted"> (Default)</strong>
-                                                )}
-                                            </td>
-                                            <td className="text-center align-middle">
-                                                <Form.Check type="checkbox" checked={note.isActive} disabled />
-                                            </td>
-                                            <td className="align-middle">{note.format}</td>
-                                            <td className="align-middle">
-                                                {note.isPsychotherapyNote ? 'Yes' : 'No'}
-                                            </td>
-                                            <td className="align-middle">
-                                                <Button variant="link" size="sm" onClick={() => handleOpenTab(note)}>
-                                                    <IoSettings /> Settings
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
+                            <NoteTypeCards
+                                noteTypes={noteTypes}
+                                handleDefaultChange={handleDefaultChange}
+                                handleOpenTab={handleOpenTab}
+                            />
                         ) : activeNote ? (
-                            <Card className="mt-3">
-                                <Card.Body>
-                                    <h6>Settings for: {activeNote.name}</h6>
-                                    <p>
-                                        <strong>Format:</strong> {activeNote.format}
-                                    </p>
-                                    <p>
-                                        <strong>Active:</strong> {activeNote.isActive ? 'Yes' : 'No'}
-                                    </p>
-                                    <p>
-                                        <strong>Psychotherapy Note:</strong>{' '}
-                                        {activeNote.isPsychotherapyNote ? 'Yes' : 'No'}
-                                    </p>
-                                    {/* Add editable fields here if needed */}
-                                </Card.Body>
-                            </Card>
+                            <SettingTabs />
                         ) : (
                             <p>No settings available.</p>
                         )}
                     </Card.Body>
                 </Card>
             </Col>
+            <AddModalSetting
+                addModal={addModal}
+                setAddModal={setAddModal}
+                onSubmit={(newNote) => {
+                    const id = noteTypes.length + 1;
+                    const noteWithId = { id, isPsychotherapyNote: false, ...newNote };
+                    setNoteTypes((prev) => [...prev, noteWithId]);
+                }}
+            />{' '}
         </Row>
     );
 };
