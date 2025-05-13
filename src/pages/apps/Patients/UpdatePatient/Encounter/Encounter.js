@@ -5,11 +5,12 @@ import { FaCalendarAlt, FaUserMd, FaNotesMedical } from 'react-icons/fa';
 import { MdOutlineMedicalServices } from 'react-icons/md';
 import './Encounter.css';
 import EncounterList from './EncounterList';
+import DateEncounters from './DateEncounters';
+import AppointmentEncounter from './AppointmentEncounter';
+
 const Encounter = ({ encounterTabs, setEncounterTabs }) => {
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
-    console.log(encounterTabs, 'encounterTabsencounterTabs')
     const removeEncounterTab = (idToRemove, e) => {
-        console.log(e, 'asdjasdjasd')
         e.stopPropagation();
         const newTabs = encounterTabs.filter(tab => tab.id !== idToRemove);
         setEncounterTabs(newTabs);
@@ -33,9 +34,8 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
         setActiveTab(newTab.id);
     };
 
-    console.log(activeTab, 'ajhds')
     return (
-        <Card className="border-0 shadow-sm">
+        <Card className="border-0 shadow-sm  h-100">
             <Card.Body className="p-0 border-0">
                 <Tabs
                     activeKey={activeTab}
@@ -71,7 +71,13 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
                             {tab?.type === 'default' ?
                                 <EncounterList tab={tab} />
                                 :
-                                <></>
+                                tab?.type === 'date' ?
+                                    <DateEncounters />
+                                    :
+                                    tab?.type === 'appointment' ?
+                                        <AppointmentEncounter />
+                                        :
+                                        <></>
                             }
 
                         </Tab>
