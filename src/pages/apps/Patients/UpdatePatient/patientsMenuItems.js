@@ -16,7 +16,12 @@ export const patientMenuItems = [
     { label: 'Patient Summary', tab: "Patient Details", icon: <MdMedicalInformation /> },
     { label: 'Demographics', tab: "Demographics", icon: <TbHeartRateMonitor /> },
     { label: 'Documents', tab: "Documents", icon: <IoDocumentsOutline /> },
-    { label: 'Encounters', tab: "Encounter", icon: <FaPersonHarassing /> },
+    {
+        label: 'Encounters', icon: <FaPersonHarassing />, subItems: [
+            { label: 'By Date', tab: "Using Date", icon: <FiPlus /> },
+            { label: 'By Appointment', tab: "Using Appointment", icon: <FiPlus /> },
+        ],
+    },
     {
         label: 'Clinical Review',
         icon: <MdOutlinePreview />,
