@@ -426,7 +426,7 @@ const AllRoutes = () => {
                                             )
                                 },
                                 {
-                                    path: 'clinicalnotestypes',
+                                    path: 'notescategories',
                                     element: hasPermission('view notes') ? (
                                         <LoadComponent component={ClinicalNotesType}/>
                                         ) : null,

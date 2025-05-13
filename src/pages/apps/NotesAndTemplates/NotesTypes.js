@@ -32,8 +32,8 @@ const noteTypeData = [
 const NotesTypes = () => {
     const [noteTypes, setNoteTypes] = useState(noteTypeData);
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs,'opentabs')
-    const [activeTabId, setActiveTabId] = useState('clinical-notes-type'); // Default tab
+    console.log(openTabs, 'opentabs');
+    const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
 
     const handleDefaultChange = (id) => {
@@ -57,7 +57,7 @@ const NotesTypes = () => {
         setOpenTabs(updatedTabs);
 
         if (activeTabId === id) {
-            setActiveTabId(updatedTabs.length > 0 ? updatedTabs[0].id : 'clinical-notes-type');
+            setActiveTabId(updatedTabs.length > 0 ? updatedTabs[0].id : 'note-categories');
         }
     };
 
@@ -74,16 +74,16 @@ const NotesTypes = () => {
                                     className="d-flex gap-3"
                                     style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
                                     <span
-                                        onClick={() => setActiveTabId('clinical-notes-type')}
+                                        onClick={() => setActiveTabId('note-categories')}
                                         onKeyDown={(e) => {
-                                            if (e.key === 'Enter') setActiveTabId('clinical-notes-type');
+                                            if (e.key === 'Enter') setActiveTabId('note-categories');
                                         }}
                                         role="button"
                                         tabIndex={0}
                                         className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'clinical-notes-type' ? 'active_tabs_link fw-bold' : ''
+                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
                                         }`}>
-                                        Clinical Notes Type
+                                        Note Categories
                                     </span>
 
                                     {openTabs.map((tab, index) => (
@@ -122,11 +122,11 @@ const NotesTypes = () => {
                                     size="sm"
                                     className="custom-buttons"
                                     onClick={() => setAddModal(true)}>
-                                    + Add Note Type
+                                    New Note Category
                                 </Button>
                             </Col>
                         </Row>
-                        {activeTabId === 'clinical-notes-type' ? (
+                        {activeTabId === 'note-categories' ? (
                             <NoteTypeCards
                                 noteTypes={noteTypes}
                                 handleDefaultChange={handleDefaultChange}

@@ -73,10 +73,10 @@ const MENU_ITEMS = [
         url: '/apps/notesandtemplates/list',
         children: [
             {
-                key: 'clinicalnotestypes',
-                label: 'Clinical Notes Types',
+                key: 'notescategories',
+                label: 'Notes Categories',
                 icon: 'uil uil-note',
-                url: '/apps/notesandtemplates/clinicalnotestypes',
+                url: '/apps/notesandtemplates/notescategories',
             },
             {
                 key: 'notestemplates',

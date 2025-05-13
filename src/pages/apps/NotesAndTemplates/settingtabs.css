@@ -53,3 +53,14 @@
 .right-panel {
   padding-left: 30px;
 }
+.card-body .text-muted {
+    font-size: 0.85rem;
+}
+
+.card-body .small {
+    font-size: 0.8rem;
+}
+
+.card {
+    transition: transform 0.2s ease;
+}
