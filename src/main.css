@@ -1058,3 +1058,6 @@ tbody tr:hover {
 /* .form-control {
     text-transform: capitalize;
 } */
+.nav-tabs .nav-link {
+    border: none !important;
+}
