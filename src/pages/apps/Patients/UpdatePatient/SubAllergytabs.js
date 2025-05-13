@@ -16,7 +16,6 @@ import { useDispatch } from 'react-redux';
 import { handlePrintVitals } from '../../../../helpers/printVitals';
 import { useSelector } from 'react-redux';
 import { defaultVitals } from '../../../../utils/DataSets/commonData2';
- 
 const convertToImperial = (value, vitalName) => {
     if (vitalName === 'Height') return (value / 2.54).toFixed(2); // cm to in
     if (vitalName === 'Weight') return (value * 2.20462).toFixed(2); // kg to lbs
@@ -24,7 +23,6 @@ const convertToImperial = (value, vitalName) => {
     if (vitalName === 'Head Circumference') return (value / 2.54).toFixed(2)
     return value;
 };
- 
 const convertFromImperial = (value, vitalName) => {
     if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
     if (vitalName === 'Weight') return (value / 2.20462).toFixed(2); // lbs to kg
@@ -55,7 +53,6 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
     const visitTime = new Date().toLocaleString();
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
- 
     useEffect(() => {
         if (defaultTab) {
             setActiveTab(defaultTab)
@@ -66,16 +63,16 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
         setVitals(prevVitals => {
             return prevVitals.map(vital => {
                 if (!vital.unitKey) return vital; // Skip vitals that don't need conversion
- 
+
                 // For BP, we don't convert the values (mmHg is standard)
                 if (vital.type === 'bp') return vital;
- 
+
                 // For BMI, we don't convert (it's unitless)
                 if (vital.name === 'BMI') return vital;
- 
+
                 // Convert the displayed value
                 let newValue = vital.value;
- 
+
                 if (unitSystem === 'imperial' && newSystem === 'metric') {
                     // Convert from imperial to metric
                     newValue = convertFromImperial(parseFloat(vital.value), vital.name);
@@ -83,21 +80,18 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                     // Convert from metric to imperial
                     newValue = convertToImperial(parseFloat(vital.value), vital.name);
                 }
- 
                 return {
                     ...vital,
                     value: newValue.toString()
                 };
             });
         });
- 
         setUnitSystem(newSystem);
     };
     // Dummy state for edit mode and selected data
     const [isEditMode, setIsEditMode] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [selectedMedication, setSelectedMedication] = useState(null);
- 
     const closeMedicationModal = () => {
         setMedicationModal(false);
         setSelectedMedication(null);
@@ -123,27 +117,25 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                 break;
         }
     };
- 
+
     const [currentPage, setCurrentPage] = useState(1);
- 
+
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, page: currentPage }));
     }, [currentPage]);
- 
+
     const paginationData = store?.getVitalsByPatientIdReducer?.data?.pagination;
- 
+
     const handlePreviousPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
         }
     };
- 
     const handleNextPage = () => {
         if (paginationData && currentPage < paginationData?.totalPages) {
             setCurrentPage(currentPage + 1);
         }
     };
- 
     return (
         <div>
             <div
@@ -181,7 +173,6 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                         </a>
                     ))}
                 </div>
- 
                 {/* Add Icon */}
                 {activeTab !== 'Vitals List' &&
                     <MdAddCircleOutline
@@ -204,9 +195,9 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                             className={`bi cursor-pointer  ${currentPage === 1 ? 'text-muted' : 'text-primary'} fw-bold fs-4 bi-skip-forward-circle`}
                             onClick={handlePreviousPage}
                             disabled={currentPage === 1}
- 
+
                         />
- 
+
                         <span
                             title='Print all vitals'
                             onClick={() => handlePrintVitals({ vitals: patientVitals, patientDetails: patientDetails })}
@@ -225,7 +216,6 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                         </div>
                     </div>
                 }
- 
             </div>
  
             <div className="pt-1">
@@ -234,7 +224,6 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                 {activeTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
                 {activeTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
             </div>
- 
             {/* Allergy Modal */}
             <Modal show={allergyModal} onHide={() => setAllergyModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">
@@ -249,7 +238,6 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                     />
                 </Modal.Body>
             </Modal>
- 
             {/* Problem Modal */}
             <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">

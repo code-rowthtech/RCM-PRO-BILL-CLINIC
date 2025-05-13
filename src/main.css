@@ -1037,7 +1037,7 @@ tbody tr:hover {
 }
 
 .notes-scroll::-webkit-scrollbar-thumb {
-    background-color: #bbb;  /* Slightly lighter for subtle look */
+    background-color: #bbb; /* Slightly lighter for subtle look */
     border-radius: 10px;
     border: none;
 }
@@ -1054,3 +1054,7 @@ tbody tr:hover {
     scrollbar-width: thin;
     scrollbar-color: #bbb transparent;
 }
+
+/* .form-control {
+    text-transform: capitalize;
+} */

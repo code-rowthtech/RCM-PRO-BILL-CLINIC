@@ -78,8 +78,7 @@ const Tobacco = () => {
         ];
         data.clinicId = loggedInUser?._id;
         if (toEdit) {
-            // data.id = toEdit?._id;
-            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }));
+            dispatch(updateTobaccooAction({ key: encryptMessage(data), id: toEdit?._id }))
         } else {
             dispatch(createTobaccooAction({ key: encryptMessage(data) }));
         }
@@ -90,7 +89,6 @@ const Tobacco = () => {
         setShowSuggestions(true);
     };
     const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
         const current = getValues('note'); // from useFormContext or pass as prop
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
@@ -270,10 +268,10 @@ const Tobacco = () => {
                                                     (
                                                     {item?.note?.[0]?.time
                                                         ? new Date(item.note[0].time).toLocaleDateString('en-US', {
-                                                              month: 'short',
-                                                              day: 'numeric',
-                                                              year: 'numeric',
-                                                          })
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })
                                                         : 'No date'}
                                                     -
                                                     {item?.note?.[0]?.time
@@ -324,9 +322,9 @@ const Tobacco = () => {
                                     <Accordion.Body className="pt-0 p-0 ">
                                         {item?.note?.[0]?.text ? (
                                             <div
-                                                className="ql-editor p-1 rounded scroll-container notes-scroll" 
+                                                className="ql-editor p-1 rounded scroll-container notes-scroll"
                                                 dangerouslySetInnerHTML={{ __html: item.note[0].text }}
-                                                style={{ fontSize: '0.875rem' , overflowY:'scroll', height: '150px' }}
+                                                style={{ fontSize: '0.875rem', overflowY: 'scroll', height: '150px' }}
                                             />
                                         ) : (
                                             <div className="text-muted fst-italic p-2">No notes available</div>
