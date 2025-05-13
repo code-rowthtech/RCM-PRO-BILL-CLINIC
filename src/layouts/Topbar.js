@@ -77,7 +77,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/settings/templates': 'Templates',
         '/apps/settings/notesType': 'Notes Type',
         '/apps/notesandtemplates/notestemplates' : 'Notes Templates',
-         '/apps/notesandtemplates/clinicalnotestypes': 'Clinical Notes Types',
+         '/apps/notesandtemplates/notescategories': 'Notes Categories',
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {
