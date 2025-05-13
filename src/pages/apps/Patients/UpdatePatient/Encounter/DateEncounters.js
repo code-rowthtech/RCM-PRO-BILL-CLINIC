@@ -51,62 +51,62 @@ const DateEncounters = () => {
             {/* Main Content Column */}
             <Col sm={isCollapsed ? 12 : 8}>
                 {/* Encounter Details */}
-                <div className=" px-2 mb-3 ">
+                <div style={{ height: '59vh' }} className="pt-1 scroll-container">
                     {/* <h5 className='m-0'>Encounter details</h5> */}
                     <Row className="g-2 ">
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Encounter Type *</Form.Label>
+                                <Form.Label className='mb-0'>Encounter Type *</Form.Label>
                                 <Form.Select>
                                     <option>185349003 (SNOMED-CT) - Office Visit</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Note Type *</Form.Label>
+                                <Form.Label className='mb-0'>Note Type *</Form.Label>
                                 <Form.Select>
                                     <option>SOAP Note</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Date *</Form.Label>
+                                <Form.Label className='mb-0'>Date *</Form.Label>
                                 <Form.Control type="date" defaultValue="2025-05-13" />
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Age at Encounter</Form.Label>
+                                <Form.Label className='mb-0'>Age at Encounter</Form.Label>
                                 <Form.Control plaintext readOnly defaultValue="48 yrs" />
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Seen By *</Form.Label>
+                                <Form.Label className='mb-0'>Seen By *</Form.Label>
                                 <Form.Select>
                                     <option>Mohit Rawat</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Facility *</Form.Label>
+                                <Form.Label className='mb-0'>Facility *</Form.Label>
                                 <Form.Select>
                                     <option>Mohit Rawat...</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Status</Form.Label>
+                                <Form.Label className='mb-0'>Status</Form.Label>
                                 <Form.Control plaintext readOnly defaultValue="Unsigned" />
                             </Form.Group>
                         </Col>
-                        <Col sm={6}>
+                        <Col sm={4}>
                             <Form.Group>
-                                <Form.Label>Self-pay Restriction</Form.Label>
+                                <Form.Label className='mb-0'>Self-pay Restriction</Form.Label>
                                 <Form.Select>
                                     <option>No restriction</option>
                                 </Form.Select>
@@ -114,7 +114,7 @@ const DateEncounters = () => {
                         </Col>
                         {/* Chief Complaint */}
 
-                        <Col sm={12} className="mb-3">
+                        <Col sm={4} className="mb-3">
                             <h6>Chief complaint</h6>
                             <Form.Control as="textarea" placeholder="Add any problems or symptoms here" rows={2} />
                         </Col>
@@ -146,7 +146,7 @@ const DateEncounters = () => {
                                 </div>
                             </div>
                             <Form.Group className="my-2">
-                                <Form.Label>Was Medication Reconciliation Completed?</Form.Label>
+                                <Form.Label className='mb-0'>Was Medication Reconciliation Completed?</Form.Label>
                                 <Form.Select>
                                     <option>Select...</option>
                                 </Form.Select>

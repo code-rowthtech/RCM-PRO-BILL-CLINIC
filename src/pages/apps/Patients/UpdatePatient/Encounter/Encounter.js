@@ -35,7 +35,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
     };
 
     return (
-        <Card className="border-0 shadow-sm  h-100">
+        <Card className="border-0 shadow-sm ">
             <Card.Body className="p-0 border-0">
                 <Tabs
                     activeKey={activeTab}

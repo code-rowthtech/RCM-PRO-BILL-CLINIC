@@ -1,12 +1,49 @@
 import React, { useState } from 'react';
-import { Accordion, Button, Col, Dropdown, Form, Offcanvas, Row } from 'react-bootstrap';
+import { Accordion, Button, Col, Dropdown, Form, Offcanvas, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
 import { FiFilter } from 'react-icons/fi';
+import { defaultVitals } from '../../../../../utils/DataSets/commonData2';
+
+const convertFromImperial = (value, vitalName) => {
+    if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
+    if (vitalName === 'Weight') return (value / 2.20462).toFixed(2); // lbs to kg
+    if (vitalName === 'Temperature') return (((value - 32) * 5) / 9).toFixed(2); // F to C
+    if (vitalName === 'Head Circumference') return (value * 2.54).toFixed(2)
+    return value;
+};
+const formatDate = (dateString) => {
+    const options = { day: 'numeric', month: 'short' };
+    return new Date(dateString).toLocaleDateString('en-GB', options);
+};
+
+const imperialUnits = {
+    Temperature: '°F',
+    Height: 'in',
+    Weight: 'lbs',
+    'Head Circumference': 'in',
+};
+
+const metricUnits = {
+    Temperature: '°C',
+    Height: 'cm',
+    Weight: 'kg',
+    'Head Circumference': 'cm',
+};
+
 const EncounterSummary = () => {
+    const now = new Date();
+    const formatTwoDigits = (n) => n.toString().padStart(2, '0');
+
+    const [unitSystem, setUnitSystem] = useState('imperial')
+    const [vitals, setVitals] = useState(defaultVitals);
+
+    const [visitDateTime, setVisitDateTime] = useState({
+        date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
+        time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
+    });
     const store = useSelector((state) => state);
-    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
     const tobaccoHistory = Array.isArray(store?.getTobaccooReducer?.data?.tobaccoHistory)
         ? store.getTobaccooReducer.data.tobaccoHistory
         : [];
@@ -38,6 +75,8 @@ const EncounterSummary = () => {
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
+    const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+
     const statusColorMap = {
         active: 'text-success',
         'on-hold': 'text-warning',
@@ -66,9 +105,110 @@ const EncounterSummary = () => {
 
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
+
+    const isDateDisabled = (dateString) => disabledDates.includes(dateString);
+    const disabledDates = patientVitals?.map(vital => vital.effectiveDateTime) || [];
+    const getDisplayUnit = (vital) => {
+        if (vital.unitKey) {
+            return unitSystem === 'imperial' ? imperialUnits[vital.unitKey] : metricUnits[vital.unitKey];
+        }
+        return vital.unit || '';
+    };
+    const handleDateChange = (e) => {
+        const newDate = e.target.value;
+
+        if (isDateDisabled(newDate)) {
+            alert("This date already has recorded vitals. Please choose another date.");
+            return;
+        }
+
+        setVisitDateTime(prev => ({
+            ...prev,
+            date: newDate,
+        }));
+    };
+
+    // Handle time change (unchanged)
+    const handleTimeChange = (e) => {
+        setVisitDateTime(prev => ({
+            ...prev,
+            time: e.target.value,
+        }));
+    };
+
+    const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
+        const date = vitalGroup.effectiveDateTime;
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(...vitalGroup.vitals);
+        return acc;
+    }, {});
+    const findVitalValue = (vitalName, date) => {
+        if (!groupedVitals[date]) return null;
+
+        const vital = groupedVitals[date].find(v =>
+            v.code?.coding?.[0]?.display === vitalName ||
+            v.code?.text === vitalName
+        );
+
+        if (!vital) return null;
+
+        if (vital.component && vital.component.length > 0) {
+            // Handle blood pressure case (no conversion needed)
+            const systolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8480-6"
+            )?.valueQuantity?.value;
+
+            const diastolic = vital.component.find(c =>
+                c.code?.coding?.[0]?.code === "8462-4"
+            )?.valueQuantity?.value;
+
+            return { systolic: systolic || '', diastolic: diastolic || '' };
+        }
+
+        // Get the stored value (always in imperial units)
+        let value = vital.valueQuantity?.value || vital.valueString || '';
+
+        // Convert to metric if needed for display
+        if (unitSystem === 'metric') {
+            if (vitalName === 'Height') {
+                value = convertFromImperial(value, 'Height');
+            }
+            else if (vitalName === 'Weight') {
+                value = convertFromImperial(value, 'Weight');
+            }
+            else if (vitalName === 'Temperature') {
+                value = convertFromImperial(value, 'Temperature');
+            }
+        }
+
+        return value;
+    };
+
+    // Get sorted dates (newest first)
+    const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
+        new Date(b) - new Date(a)
+    );
+    const renderVitalCell = (vital, date) => {
+        const value = findVitalValue(vital.name, date);
+
+        if (vital.type === 'bp') {
+            const bpValue = value || { systolic: '', diastolic: '' };
+            return (
+                <div className="d-flex">
+                    <span>{bpValue.systolic || '-'}</span>
+                    <span>/</span>
+                    <span>{bpValue.diastolic || '-'}</span>
+                </div>
+            );
+        }
+
+        return value || '-';
+    };
     return (
         <Row className='gy-2 position-relative'>
-            <Col sm={12} className='d-flex justify-content-end '>
+            {/* <Col sm={12} className='d-flex justify-content-end '>
                 <Dropdown className="position-absolute " style={{ top: '-1.5%', left: '86%' }} drop="down" >
                     <Dropdown.Toggle variant="primary" className="text-white px-1 fs-5 p-0 border-0 shadow-none">
                         <FiFilter />
@@ -89,67 +229,65 @@ const EncounterSummary = () => {
                         ))}
                     </Dropdown.Menu>
                 </Dropdown>
-            </Col>
-            <Col sm={12} className='mt-0'>
-                <Accordion flush>
+            </Col> */}
+            <Col sm={12} className='mt-0 scroll-container' style={{ height: '60vh' }}>
+                <Accordion>
                     {visibleSections.vitals && (
                         <Accordion.Item eventKey="0" className='border-0 mb-2'>
                             <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold'>Vitals</span>
+                                <span className='fw-semibold fs-6'>Vitals</span>
                             </Accordion.Header>
-                            <Accordion.Body className='p-2'>
-                                {patientVitals ? (
-                                    <div style={{ height: '20vh' }} className='scroll-container'>
-                                        {store?.getVitalsByPatientIdReducer?.loading ? (
-                                            <div className='d-flex justify-content-center align-items-center w-100 p-5'>
-                                                <Spinner className='spinner-border-sm' />
-                                            </div>
-                                        ) : (
-                                            <div className={`${!patientVitals?.vitals || patientVitals.vitals.length === 0 ? 'h-100 d-flex align-items-center justify-content-center bg-white' : 'vitals-grid'} fs-6`}>
-                                                {(!patientVitals?.vitals || patientVitals.vitals.length === 0) ? (
-                                                    <div className='fw-bold  w-100 h-100 text-nowrap d-flex align-items-center justify-content-center fs-6' style={{ height: '100%', width: '100%' }}>No Vitals Found</div>
-                                                ) : (
-                                                    patientVitals.vitals.map((data) => {
-                                                        const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
+                            <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
+                                <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
+                                    <thead>
+                                        <tr className='border'>
+                                            <th className='text-white'>
+                                                Vital Name
+                                            </th>
+                                            {sortedDates?.map(date => (
+                                                <th className='text-white' key={date}>
+                                                    {formatDate(date)}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {vitals.map((vital, index) => (
+                                            <tr className='' key={vital.name}>
+                                                <td className='p-0 vitalsTableBorder'>
+                                                    {vital.name} {getDisplayUnit(vital) && (
+                                                        <small className="text-muted">({getDisplayUnit(vital)})</small>
+                                                    )}
+                                                </td>
 
-                                                        const value =
-                                                            data?.valueString ??
-                                                            (data?.valueQuantity?.value ? `${data.valueQuantity.value} ${data.valueQuantity.unit || ''}` : null) ??
-                                                            (data?.valueBoolean !== undefined ? (data.valueBoolean ? 'Yes' : 'No') : null);
-
-                                                        let bpReading = null;
-                                                        if (data.component && !value) {
-                                                            const systolic = data.component.find(c => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
-                                                            const diastolic = data.component.find(c => c.code?.coding?.[0]?.code === '8462-4')?.valueQuantity?.value;
-                                                            bpReading = `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
-                                                        }
-
-                                                        return (
-                                                            <div key={data?._id} className="vital-item">
-                                                                <span className="text-muted">{codeDisplay}</span>
-                                                                <div className="fw-bold">{value || bpReading || 'N/A'}</div>
-                                                            </div>
-                                                        );
-                                                    })
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className='text-muted'>No vitals recorded</div>
-                                )}
+                                                {sortedDates.map(date => (
+                                                    <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                                                        {renderVitalCell(vital, date)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    {store?.getVitalsByPatientIdReducer?.loading &&
+                                        <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                                            <Spinner />
+                                        </div>
+                                    }
+                                </Table>
                             </Accordion.Body>
 
                         </Accordion.Item>
                     )}
+                </Accordion>
+                <Accordion>
                     {visibleSections.allergies && (
                         <Accordion.Item eventKey="1" className='border-0 mb-2'>
                             <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold'>Allergies</span>
+                                <span className='fw-semibold fs-6'>Allergies</span>
                             </Accordion.Header>
                             <Accordion.Body className='p-2'>
                                 {allergyData?.length > 0 ? (
-                                    <div style={{ height: '20vh' }} className='scroll-container'>
+                                    <div style={{ height: '30vh' }} className='scroll-container'>
                                         {store?.getAllergiesOfAPatientReducer?.loading ? (
                                             <div
                                                 className="d-flex justify-content-center align-items-center w-100 p-5"
@@ -190,14 +328,16 @@ const EncounterSummary = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                     )}
+                </Accordion>
+                <Accordion>
                     {visibleSections.problems && (
                         <Accordion.Item eventKey="2" className='border-0 mb-2'>
                             <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold'>Problems</span>
+                                <span className='fw-semibold fs-6'>Problems</span>
                             </Accordion.Header>
                             <Accordion.Body className='p-2'>
                                 {problemData?.length > 0 ? (
-                                    <div style={{ height: '20vh' }} className='scroll-container'>
+                                    <div style={{ height: '30vh' }} className='scroll-container'>
                                         {store?.getProblemListReducer?.loading ? (
                                             <div
                                                 className="d-flex justify-content-center align-items-center w-100 p-5"
@@ -246,14 +386,16 @@ const EncounterSummary = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                     )}
+                </Accordion>
+                <Accordion>
                     {visibleSections.medications && (
                         <Accordion.Item eventKey="3" className='border-0 mb-2'>
                             <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold'>Medications</span>
+                                <span className='fw-semibold fs-6'>Medications</span>
                             </Accordion.Header>
                             <Accordion.Body className='p-2'>
                                 {medicationList?.length > 0 ? (
-                                    <div style={{ height: '20vh' }} className='scroll-container'>
+                                    <div style={{ height: '30vh' }} className='scroll-container'>
                                         {store?.getMedicationReducer?.loading ?
                                             <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
                                                 <Spinner className='spinner-border-sm' />
@@ -291,10 +433,12 @@ const EncounterSummary = () => {
                             </Accordion.Body>
                         </Accordion.Item>
                     )}
+                </Accordion>
+                <Accordion>
                     {visibleSections.socialHistory && (
                         <Accordion.Item eventKey="4" className='border-0 mb-2'>
                             <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold'>Social History</span>
+                                <span className='fw-semibold fs-6'>Social History</span>
                             </Accordion.Header>
                             <Accordion.Body className='p-2'>
                                 {socialHistoryData?.length > 0 ? (
