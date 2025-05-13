@@ -69,7 +69,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
                             }
                         >
                             {tab?.type === 'default' ?
-                                <EncounterList tab={tab} />
+                                <EncounterList tab={tab} encounterTabs={encounterTabs} setEncounterTabs={setEncounterTabs} setActiveTab={setActiveTab} />
                                 :
                                 tab?.type === 'date' ?
                                     <DateEncounters />
@@ -79,7 +79,6 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
                                         :
                                         <></>
                             }
-
                         </Tab>
                     ))}
                 </Tabs>

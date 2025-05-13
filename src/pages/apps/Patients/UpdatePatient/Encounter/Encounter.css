@@ -2,3 +2,11 @@
     border: none !important;
     padding: 0 !important;
 }
+.encounterSummary .accordion-button {
+    padding: 10px !important;
+}
+.button:active,
+.button {
+    border: none !important;
+    outline: none !important;
+}
