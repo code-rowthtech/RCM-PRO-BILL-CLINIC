@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Accordion, Button, Card, Col, Dropdown, Form, Row, Table } from 'react-bootstrap';
 import profileDummy from '../../../../assets/images/profileDummy.png';
-import { IoClose, IoPrintSharp } from 'react-icons/io5';
+import { IoCalendar, IoClose, IoPrintSharp } from 'react-icons/io5';
 import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
@@ -31,6 +31,8 @@ import Subsocialtabindex from './Subsocialtabindex';
 import SubAllergytabs from './SubAllergytabs';
 import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
+import Encounter from './Encounter/Encounter';
+import { FaCalendarAlt } from 'react-icons/fa';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -53,10 +55,11 @@ const UpdatePatientIndex = () => {
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [activeSubmenu, setActiveSubmenu] = useState(null);
-    console.log(activeSubmenu, 'activeSubmenu')
+    const [createdTabs, setCreatedTabs] = useState(['Default Encounter']); // Start with default tab
     const toggleSubmenu = (label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
     };
+
 
     useEffect(() => {
         const tab = sessionStorage?.getItem('selectedMainTab');
@@ -169,7 +172,13 @@ const UpdatePatientIndex = () => {
     const [activeKey, setActiveKey] = useState('0');
     const [showMoreMenu, setShowMoreMenu] = useState(false);
     const isAccordionOpen = activeKey === '0'; // true or false
-
+    const [encounterTabs, setEncounterTabs] = useState([
+        {
+            id: 1,
+            title: 'Encounter list',
+            type: 'default',
+        }
+    ]);
     return (
         <div className="mt-1 g-0  px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
@@ -203,9 +212,18 @@ const UpdatePatientIndex = () => {
                                                     toggleSubmenu(item.label);
                                                     // setActiveSubmenu(null);
                                                 } else {
-                                                    setSelectedMainTab(item.tab);
-                                                    sessionStorage.setItem('selectedMainTab', item.tab);
-                                                    setActiveSubmenu(null);
+                                                    if (item.tab === 'Encounter') {
+                                                        setActiveKey('1')
+                                                        setSelectedMainTab(item.tab);
+                                                        sessionStorage.setItem('selectedMainTab', item.tab);
+                                                        setActiveSubmenu(null);
+                                                    } else {
+                                                        setActiveKey('0')
+                                                        setSelectedMainTab(item.tab);
+                                                        sessionStorage.setItem('selectedMainTab', item.tab);
+                                                        setActiveSubmenu(null);
+                                                    }
+
                                                 }
                                             }}>
                                             <div>
@@ -544,22 +562,54 @@ const UpdatePatientIndex = () => {
                                                                 }}>
                                                                 New Appointment
                                                             </Button>
-                                                            <Button
-                                                                as={Link}
-                                                                to="#"
-                                                                className="mt-1 shadow-none opacity-50"
-                                                                style={{
-                                                                    fontSize: '10px',
-                                                                    borderRadius: '8px',
-                                                                    padding: '3px 7px 3px 7px',
-                                                                    width: '100px',
-                                                                    backgroundColor: ' #6169d0',
-                                                                }}
-                                                                disabled
-                                                            >
-                                                                New Encounter
-                                                            </Button>
+                                                            <Dropdown>
+                                                                <Dropdown.Toggle className="mt-1 shadow-none "
+                                                                    style={{
+                                                                        fontSize: '10px',
+                                                                        borderRadius: '8px',
+                                                                        padding: '3px 7px 3px 7px',
+                                                                        width: '100px',
+                                                                        backgroundColor: ' #6169d0',
+                                                                    }} id="dropdown-basic">
+                                                                    New Encounter
+                                                                </Dropdown.Toggle>
 
+
+                                                                <Dropdown.Menu>
+                                                                    <Dropdown.Item
+                                                                        onClick={() => {
+                                                                            const newTab = {
+                                                                                id: encounterTabs?.length + 1,
+                                                                                title: new Date().toISOString().split('T')[0],
+                                                                                type: 'date',
+                                                                            };
+                                                                            setActiveKey('1')
+                                                                            setEncounterTabs([...encounterTabs, newTab]);
+                                                                            setSelectedMainTab('Encounter'); // Add this line
+                                                                        }}
+                                                                        className='mb-0 fs-6 fw-semibold py-1'
+                                                                    >
+                                                                        <IoCalendar className="me-1" /> By Date
+                                                                    </Dropdown.Item>
+                                                                    <Dropdown.Divider className='m-0' />
+                                                                    <Dropdown.Item
+                                                                        onClick={() => {
+                                                                            const newTab = {
+                                                                                id: encounterTabs?.length + 1,
+                                                                                title: 'Clinical Finding',
+                                                                                type: 'appointment',
+                                                                            };
+                                                                            setActiveKey('1')
+                                                                            setEncounterTabs([...encounterTabs, newTab]);
+                                                                            setSelectedMainTab('Encounter'); // Add this line
+                                                                        }}
+                                                                        className='mb-0 fs-6 fw-semibold py-1'
+                                                                    >
+                                                                        <FaCalendarAlt className="me-1" /> By Appointment
+                                                                    </Dropdown.Item>
+                                                                </Dropdown.Menu>
+
+                                                            </Dropdown>
                                                             <div className="mt-2 d-flex justify-content-center align-items-center gap-2 ps-2">
                                                                 <Dropdown>
                                                                     <Dropdown.Toggle
@@ -653,7 +703,7 @@ const UpdatePatientIndex = () => {
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
                                         <Card
-                                            className="px-2 scroll-container pt-2"
+                                            className="px-2 scroll-container border-0 pt-2"
                                             style={{
                                                 height: isAccordionOpen ? 'calc(100vh - 270px)' : 'calc(100vh - 154px)',
                                                 maxHeight: '1000px',
@@ -679,7 +729,13 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Documents' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Encounter' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Encounter' && (
+                                                <Encounter
+                                                    encounterTabs={encounterTabs}
+                                                    setEncounterTabs={setEncounterTabs}
+                                                    setSelectedMainTab={setSelectedMainTab} // Pass this prop
+                                                />
+                                            )}
                                             {[
                                                 'Tobacco',
                                                 'Medical',
@@ -725,4 +781,3 @@ const UpdatePatientIndex = () => {
 };
 
 export default UpdatePatientIndex;
-// dispatch(getStatesByCountryAction());line 129
