@@ -34,10 +34,6 @@ const GET_RESPONSIBLE_PARTY_INITIAL_STATE = {
     loading: false,
 }
 
-const GET_RESPONSIBLE_PARTY_BY_ID_INITIAL_STATE = {
-    data: [],
-    loading: false,
-}
 const UPDATE_PATIENTS_INITIAL_STATE = {
     data: [],
     loading: false

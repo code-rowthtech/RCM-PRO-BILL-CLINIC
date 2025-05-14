@@ -28,3 +28,162 @@ export const medicationStatus = [
     { value: 'unknown', label: 'Unknown' }
 ]
 
+
+export const practiceTypeOptions = [
+    {
+        type: "General Practice",
+        description: "Primary care physicians providing general medical services to all age groups."
+    },
+    {
+        type: "Internal Medicine",
+        description: "Physicians specializing in adult health and complex illnesses."
+    },
+    {
+        type: "Pediatrics",
+        description: "Medical care for infants, children, and adolescents."
+    },
+    {
+        type: "Family Medicine",
+        description: "Comprehensive health care for individuals and families across all ages and genders."
+    },
+    {
+        type: "Obstetrics and Gynecology",
+        description: "Women's reproductive health, including pregnancy and childbirth."
+    },
+    {
+        type: "Psychiatry",
+        description: "Diagnosis and treatment of mental health and emotional disorders."
+    },
+    {
+        type: "Dermatology",
+        description: "Care for skin, hair, and nail conditions."
+    },
+    {
+        type: "Cardiology",
+        description: "Diagnosis and treatment of heart and vascular conditions."
+    },
+    {
+        type: "Orthopedics",
+        description: "Treatment of musculoskeletal system issues, including bones and joints."
+    },
+    {
+        type: "Ophthalmology",
+        description: "Medical and surgical care of the eyes."
+    },
+    {
+        type: "ENT (Otolaryngology)",
+        description: "Ear, nose, and throat care."
+    },
+    {
+        type: "Neurology",
+        description: "Disorders of the nervous system."
+    },
+    {
+        type: "Endocrinology",
+        description: "Hormonal and metabolic disorders, including diabetes and thyroid conditions."
+    },
+    {
+        type: "Gastroenterology",
+        description: "Digestive system diseases, including liver and intestines."
+    },
+    {
+        type: "Nephrology",
+        description: "Kidney care and treatment of renal diseases."
+    },
+    {
+        type: "Pulmonology",
+        description: "Lung and respiratory system diseases."
+    },
+    {
+        type: "Rheumatology",
+        description: "Autoimmune and joint-related diseases."
+    },
+    {
+        type: "Allergy and Immunology",
+        description: "Allergic and immune system disorders."
+    },
+    {
+        type: "Hematology",
+        description: "Diseases of the blood."
+    },
+    {
+        type: "Oncology",
+        description: "Diagnosis and treatment of cancer."
+    },
+    {
+        type: "Infectious Disease",
+        description: "Management of complex infections."
+    },
+    {
+        type: "Anesthesiology",
+        description: "Pain relief and anesthesia management during surgery."
+    },
+    {
+        type: "Radiology",
+        description: "Medical imaging for diagnosis and treatment planning."
+    },
+    {
+        type: "Pathology",
+        description: "Study of disease through lab analysis of body tissues and fluids."
+    },
+    {
+        type: "Surgery",
+        description: "Various types of surgical interventions (general, vascular, plastic, etc.)."
+    },
+    {
+        type: "Urology",
+        description: "Urinary tract and male reproductive system health."
+    },
+    {
+        type: "Geriatrics",
+        description: "Medical care of older adults."
+    },
+    {
+        type: "Emergency Medicine",
+        description: "Immediate medical attention for acute illnesses and injuries."
+    },
+    {
+        type: "Sports Medicine",
+        description: "Injury prevention and treatment in athletic populations."
+    },
+    {
+        type: "Palliative Medicine",
+        description: "Care for patients with serious, chronic, or terminal illnesses."
+    },
+    {
+        type: "Occupational Medicine",
+        description: "Health and safety in the workplace."
+    },
+    {
+        type: "Rehabilitation Medicine (Physiatry)",
+        description: "Recovery and functional improvement after illness or injury."
+    },
+    {
+        type: "Preventive Medicine",
+        description: "Health promotion and disease prevention."
+    },
+    {
+        type: "Pain Management",
+        description: "Specialized care for chronic pain conditions."
+    },
+    {
+        type: "Addiction Medicine",
+        description: "Treatment for substance use disorders."
+    },
+    {
+        type: "Hospitalist",
+        description: "General inpatient care in hospital settings."
+    },
+    {
+        type: "Telemedicine",
+        description: "Remote delivery of healthcare services."
+    },
+    {
+        type: "Integrative Medicine",
+        description: "Combines conventional medicine with alternative therapies."
+    },
+    {
+        type: "Other",
+        description: "Other."
+    }
+]

@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { EncounterActionTypes } from './constants';

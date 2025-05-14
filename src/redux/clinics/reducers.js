@@ -52,11 +52,6 @@ const GET_CLINIC_TYPE_INITIAL_STATE = {
     loading: false
 }
 
-const UPDATE_CLINICS_INITIAL_STATE = {
-    data: [],
-    loading: false
-}
-
 const GET_CLINIC_BY_ID_INITIAL_STATE = {
     data: [],
     loading: false

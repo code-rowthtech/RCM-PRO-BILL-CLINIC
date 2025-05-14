@@ -4,47 +4,30 @@ import { IoClose, IoSettings } from 'react-icons/io5';
 import SettingTabs from './SettingTabs';
 import { useForm } from 'react-hook-form';
 import AddModalSetting from './Modals/AddModalSetting';
-import NoteTypeCards from './Modals/Noteshelper';
-
-const noteTypeData = [
-    { id: 1, name: 'Case Review', isActive: false, format: 'Simple', isPsychotherapyNote: false, isDefault: false },
-    { id: 2, name: 'Nutrition Notes', isActive: false, format: 'Simple', isPsychotherapyNote: false, isDefault: false },
-    { id: 3, name: 'Other', isActive: false, format: 'Simple', isPsychotherapyNote: false, isDefault: false },
-    {
-        id: 4,
-        name: 'Patient Email Message',
-        isActive: false,
-        format: 'Simple',
-        isPsychotherapyNote: false,
-        isDefault: false,
-    },
-    {
-        id: 5,
-        name: 'Patient Phone Message',
-        isActive: true,
-        format: 'Simple',
-        isPsychotherapyNote: false,
-        isDefault: false,
-    },
-    { id: 6, name: 'SOAP Note', isActive: true, format: 'SOAP', isPsychotherapyNote: false, isDefault: true },
-];
+import NoteTypeCards from './Modals/NoteCards';
+import { useDispatch } from 'react-redux';
+import { getNoteCategoriesAction } from '../../../redux/noteCategories/action';
+import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
-    const [noteTypes, setNoteTypes] = useState(noteTypeData);
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs, 'opentabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
-
+    const dispatch = useDispatch();
+    const [noteTypes, setNoteTypes] = useState([]);
     const handleDefaultChange = (id) => {
-        const updated = noteTypes.map((note) => ({
+        const updated = noteTypes?.map((note) => ({
             ...note,
-            isDefault: note.id === id,
+            isDefault: note?.id === id,
         }));
         setNoteTypes(updated);
     };
 
+    useEffect(() => {
+        dispatch(getNoteCategoriesAction());
+    }, [dispatch]);
     const handleOpenTab = (note) => {
+        console.log(note, 'nnnnnnnnnnnnnnnnnnnnn')
         const exists = openTabs.find((tab) => tab.id === note.id);
         if (!exists) {
             setOpenTabs((prev) => [...prev, note]);
@@ -80,13 +63,12 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                        }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                         Note Categories
                                     </span>
 
-                                    {openTabs.map((tab, index) => (
+                                    {openTabs?.map((tab, index) => (
                                         <span
                                             key={tab.id}
                                             onClick={() => setActiveTabId(tab.id)}
@@ -95,10 +77,9 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
-                                            {tab?.name} {index + 1}
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
+                                            {tab?.noteType}
                                             <span
                                                 style={{
                                                     marginLeft: 8,
@@ -128,7 +109,6 @@ const NotesTypes = () => {
                         </Row>
                         {activeTabId === 'note-categories' ? (
                             <NoteTypeCards
-                                noteTypes={noteTypes}
                                 handleDefaultChange={handleDefaultChange}
                                 handleOpenTab={handleOpenTab}
                             />
@@ -143,12 +123,7 @@ const NotesTypes = () => {
             <AddModalSetting
                 addModal={addModal}
                 setAddModal={setAddModal}
-                onSubmit={(newNote) => {
-                    const id = noteTypes.length + 1;
-                    const noteWithId = { id, isPsychotherapyNote: false, ...newNote };
-                    setNoteTypes((prev) => [...prev, noteWithId]);
-                }}
-            />{' '}
+            />
         </Row>
     );
 };

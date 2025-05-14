@@ -83,17 +83,17 @@ const Department = () => {
     }, [updateResponse]);
     useEffect(() => {
         dispatch(getMastersDataAction({ status: status, category: 'Department', limit: 10, skip, search: search }));
-    },[dispatch, status, skip, search]);
+    }, [dispatch, status, skip, search]);
     useEffect(() => {
-         if (createResponse === 200 )
-          dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
-    },[createResponse])
+        if (createResponse === 200)
+            dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
+    }, [createResponse])
     useEffect(() => {
-      if(updateResponse === 200){
-        dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
-      }
-    },[updateResponse])
-  
+        if (updateResponse === 200) {
+            dispatch(getMastersDataAction({ status: status, category: 'Department', search: search, limit: 10, skip: skip }));
+        }
+    }, [updateResponse])
+
     const handleStatusChange = (data) => {
         setStatus(data);
         setSearch('');
@@ -118,18 +118,16 @@ const Department = () => {
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${
-                                        status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Active
                                 </Button>
 
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={` active_inactive_buttons ${
-                                        status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2`}>
+                                    className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -351,7 +349,7 @@ const Department = () => {
                         <Modal.Footer>
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>
