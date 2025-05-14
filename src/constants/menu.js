@@ -74,15 +74,15 @@ const MENU_ITEMS = [
         children: [
             {
                 key: 'notescategories',
-                label: 'Notes Categories',
+                label: 'Note Categories',
                 icon: 'uil uil-note',
-                url: '/apps/notesandtemplates/notescategories',
+                url: '/apps/notesandtemplates/notecategories',
             },
             {
                 key: 'notestemplates',
                 label: 'Clinical Templates',
                 icon: 'uil uil-note',
-                url: '/apps/notesandtemplates/notestemplates',
+                url: '/apps/notesandtemplates/notetemplates',
             },
         ],
     },

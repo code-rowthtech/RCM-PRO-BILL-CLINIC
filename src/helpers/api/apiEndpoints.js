@@ -161,3 +161,8 @@ export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
 // ICD CODES
 export const icdProcedures = `${BaseRoute}/codes/pcs`;
+
+// NoteCategories
+export const createNoteCategories = `${BaseRoute}/notes-type/`;
+export const updateNoteCategories = `${BaseRoute}/notes-type/`;
+export const getNoteCategories = `${BaseRoute}/notes-type/`;
