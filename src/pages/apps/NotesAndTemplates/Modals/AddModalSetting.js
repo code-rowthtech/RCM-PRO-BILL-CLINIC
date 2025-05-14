@@ -1,63 +1,93 @@
 import React, { useEffect } from 'react';
-import { Col, Form, Modal, Row, Button } from 'react-bootstrap';
+import { Col, Form, Modal, Row, Button, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { createNoteCategoriesAction, getNoteCategoriesAction } from '../../../../redux/noteCategories/action';
+import {
+    createNoteCategoriesAction,
+    getNoteCategoriesAction,
+    updateNoteCategoriesAction,
+} from '../../../../redux/noteCategories/action';
 import { useDispatch } from 'react-redux';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useSelector } from 'react-redux';
 
-const AddModalSetting = ({ setAddModal, addModal }) => {
+const AddModalSetting = ({ setAddModal, addModal,
+    //  selectedNote
+}) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
-    const store = useSelector((state)=> state);
-    const createResponse = store?.createNoteCategoriesReducer?.data?.status
-  const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const createResponse = store?.createNoteCategoriesReducer?.data?.status;
+    // const updateResponse = store?.updateNoteCategoriesReducer?.data?.status;
+    const dispatch = useDispatch();
     const {
         register,
         handleSubmit,
         reset,
+        setValue,
         formState: { errors },
     } = useForm();
+    // useEffect(() => {
+    //     if (selectedNote) {
+    //         setValue('noteType', selectedNote?.noteType || '');
+    //         setValue('isActive', selectedNote?.active?.toString() || 'true');
+    //         setValue('format', selectedNote?.format || '');
+    //         setValue('confidential', selectedNote?.confidential || 'false');
+    //         setValue('isDefault', selectedNote?.isDefault || 'false');
+    //     }
+    // }, [selectedNote, setValue]);
 
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinic_id?.clinicId,
-            noteType: data.name,
+            noteType: data.noteType,
             isActive: data.isActive === 'true', // convert to boolean
             format: data.format,
             confidential: data.confidential,
             // isDefault: !!data.isDefault, // convert to boolean
         };
+        // if (selectedNote?._id) {
+        //     dispatch(
+        //         updateNoteCategoriesAction({
+        //             id: selectedNote._id,
+        //             key: encryptMessage(payload),
+        //         })
+        //     );
+        // } else {
         dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
-        console.log(payload,'payload')
-        // setAddModal(false);
-        // reset();
+        // }
     };
-    
-    useEffect(()=>{
-    if(createResponse === 201){
-        dispatch(getNoteCategoriesAction());
-        setAddModal(false);
-        reset();
-    }
-    },[createResponse])
+
+    useEffect(() => {
+        if (createResponse === 201
+            //  || updateResponse === 200
+        ) {
+            dispatch(getNoteCategoriesAction());
+            setAddModal(false);
+            reset();
+        }
+    }, [createResponse,
+        //  updateResponse, reset
+    ]);
 
     return (
         <Modal show={addModal} onHide={() => setAddModal(false)} size="lg" centered>
             <Modal.Header closeButton className="px-2 py-0">
-                <Modal.Title>Add Note Type</Modal.Title>
+                <Modal.Title>
+                    {/* {selectedNote ? 'Edit Note Category' : 'Add Note Category'} */}
+                    Add Note Category
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Row className="mb-3">
                         <Col md={6}>
-                            <Form.Group controlId="name">
+                            <Form.Group controlId="noteType">
                                 <Form.Label>Note Type Name</Form.Label>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter name"
-                                    {...register('name', { required: 'Name is required' })}
+                                    {...register('noteType', { required: 'noteType is required' })}
                                 />
-                                {errors.name && <span className="text-danger">{errors.name.message}</span>}
+                                {errors.noteType && <span className="text-danger">{errors.noteType.message}</span>}
                             </Form.Group>
                         </Col>
                         <Col md={6}>
@@ -84,14 +114,16 @@ const AddModalSetting = ({ setAddModal, addModal }) => {
                                 {errors.format && <span className="text-danger">{errors.format.message}</span>}
                             </Form.Group>
                         </Col>
-                         <Col md={6}>
+                        <Col md={6}>
                             <Form.Group controlId="confidential">
                                 <Form.Label>Is this template Private</Form.Label>
                                 <Form.Select {...register('confidential', { required: 'confidential is required' })}>
                                     <option value="true">True</option>
                                     <option value="false">False</option>
                                 </Form.Select>
-                                {errors.confidential && <span className="text-danger">{errors.confidential.message}</span>}
+                                {errors.confidential && (
+                                    <span className="text-danger">{errors.confidential.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                     </Row>
@@ -104,9 +136,22 @@ const AddModalSetting = ({ setAddModal, addModal }) => {
                         </Col>
                     </Row> */}
 
-                    <div className="d-flex justify-content-end">
-                        <Button variant="primary" type="submit" className="custom-buttons">
-                            Save
+                    <div className="d-flex justify-content-end mt-2">
+                        <Button
+                            variant="primary"
+                            type="submit"
+                            className="custom-buttons"
+                            style={{ width: '65px' }}
+                            disabled={
+                                store?.createNoteCategoriesReducer?.loading ||
+                                store?.updateNoteCategoriesReducer?.loading
+                            }>
+                            {store?.createNoteCategoriesReducer?.loading ||
+                                store?.updateNoteCategoriesReducer?.loading ? (
+                                <Spinner animation="border" size="sm" />
+                            ) : (
+                                'Add'
+                            )}
                         </Button>
                     </div>
                 </Form>

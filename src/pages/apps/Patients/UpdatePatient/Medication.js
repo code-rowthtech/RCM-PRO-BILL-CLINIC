@@ -58,7 +58,7 @@ const Medication = ({ isAccordionOpen }) => {
             <Table responsive className="table-centered table-nowrap mb-0">
               <thead className="text-white bg-dark">
                 <tr>
-                  <th className="text-white">S. No.</th>
+                  <th className="text-white">S.No.</th>
                   <th className="text-white">Medication</th>
                   <th className="text-white">Dosage Instruction</th>
                   <th className="text-white">Start Date</th>
