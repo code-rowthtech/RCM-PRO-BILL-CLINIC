@@ -91,7 +91,7 @@ const AllergyList = () => {
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
                                 <tr key="">
-                                    <th className="text-white">Sr.No.</th>
+                                    <th className="text-white">S.No.</th>
 
                                     {/* <th className="text-white">Verification Status</th> */}
                                     <th className="text-white">Clinical Status</th>

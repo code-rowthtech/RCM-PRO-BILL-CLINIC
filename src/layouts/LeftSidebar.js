@@ -226,7 +226,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                         <div className="p-4" style={{ maxWidth: '500px', width: '100%' }}>
                             <div className="card-body text-center">
                                 <h4 className="card-title">Are you sure you want to logout!</h4>
-                                <div className="d-flex justify-content-center gap-3">
+                                <div className="d-flex justify-content-center gap-3 mt-3">
                                     <Button className="cancel-button" onClick={closeModal}>
                                         Cancel
                                     </Button>

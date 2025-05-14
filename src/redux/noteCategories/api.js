@@ -14,5 +14,5 @@ export function getNoteCategoriesApi(params: any): any {
 
 export function updateNoteCategoriesApi(params: any): any {
     const { data } = params;
-    return api.create(URL.updateNoteCategories, data);
+    return api.update(`${URL.updateNoteCategories}${data?.id}`);
 }
