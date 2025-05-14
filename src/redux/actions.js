@@ -16,3 +16,4 @@ export * from './medication/action';
 export * from './socialHistory/action';
 export * from './icdCodes/action';
 export * from './encounter/action';
+export * from './templates/action';

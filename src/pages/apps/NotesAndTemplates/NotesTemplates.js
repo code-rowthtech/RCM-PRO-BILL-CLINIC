@@ -1,93 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import {
   Button, Card, Col, Row, Table,
-  Badge, Dropdown, Spinner, Alert
+  Badge, Spinner
 } from 'react-bootstrap';
 import {
-  FiFileText, FiFilter, FiEdit2, FiCopy,
-  FiArchive, FiTrash2, FiMoreVertical
+  FiFileText, FiEdit2,
+  FiArchive, FiTrash2
 } from 'react-icons/fi';
 import { IoSearchSharp } from 'react-icons/io5';
 import { FormInput } from '../../../components';
 import TemplateModal from './Modals/TemplateModal';
-import { Plus } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { getTemplateAction } from '../../../redux/actions';
+import Paginations from '../../../helpers/Paginations';
 
 const TemplatesPage = () => {
   // State management
+  const store = useSelector((state) => state);
+  const dispatch = useDispatch();
+  const templatesData = store?.getTemplateReducer?.data?.data;
+  const createResponse = store?.createTemplateReducer?.data?.success;
+  const updateResponse = store?.updateTemplateReducer?.data?.success;
   const [showModal, setShowModal] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [filteredTemplates, setFilteredTemplates] = useState([]);
+  const [skip, setSkip] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeStatus, setActiveStatus] = useState('active');
 
   // Fetch templates from API
   useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        setIsLoading(true);
-        // Replace with actual API call
-        // const response = await api.get('/templates');
-        const mockData = [
-          {
-            uid: '1',
-            title: 'SOAP Note Template',
-            templateType: 'SOAP',
-            category: 'General',
-            status: 'active',
-            sections: 4,
-            usageCount: 42,
-            lastUsed: '2023-05-15',
-            tags: ['general', 'soap']
-          },
-          {
-            uid: '2',
-            title: 'Pediatric Assessment',
-            templateType: 'AssessmentPlan',
-            category: 'Pediatrics',
-            status: 'active',
-            sections: 3,
-            usageCount: 18,
-            lastUsed: '2023-05-10',
-            tags: ['pediatrics']
-          }
-        ];
-        setTemplates(mockData);
-        setFilteredTemplates(mockData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTemplates();
-  }, []);
-
-  // Filter templates based on search and status
+    dispatch(getTemplateAction({ search: searchTerm, skip: skip, limit: 10, status: activeStatus }))
+  }, [dispatch, searchTerm, activeStatus, skip])
   useEffect(() => {
-    let results = templates;
-
-    // Filter by status
-    if (activeStatus !== 'all') {
-      results = results.filter(t => t.status === activeStatus);
+    if (createResponse === true || updateResponse === true) {
+      dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: activeStatus }))
     }
-
-    // Filter by search term
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      results = results.filter(t =>
-        t.title.toLowerCase().includes(term) ||
-        t.category.toLowerCase().includes(term) ||
-        t.tags?.some(tag => tag.toLowerCase().includes(term))
-      ); // <-- this closing parenthesis was missing
-    }
-
-    setFilteredTemplates(results);
-  }, [searchTerm, activeStatus, templates]);
-
+  }, [createResponse, updateResponse])
   // Modal handlers
   const openCreateModal = () => {
     setSelectedTemplate(null);
@@ -103,81 +54,6 @@ const TemplatesPage = () => {
     setShowModal(false);
   };
 
-  // Template CRUD operations
-  const handleSaveTemplate = async (templateData) => {
-    try {
-      setIsLoading(true);
-
-      if (templateData.uid) {
-        // Update existing template
-        // await api.put(`/templates/${templateData.uid}`, templateData);
-        setTemplates(templates.map(t =>
-          t.uid === templateData.uid ? templateData : t));
-      } else {
-        // Create new template
-        // const response = await api.post('/templates', templateData);
-        const newTemplate = {
-          ...templateData,
-          uid: Date.now().toString(),
-          status: 'active',
-          sections: templateData.items?.length || 0,
-          usageCount: 0,
-          lastUsed: null
-        };
-        setTemplates([...templates, newTemplate]);
-      }
-
-      closeModal();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteTemplate = (templateId) => {
-    // confirmAlert({
-    //   title: 'Confirm deletion',
-    //   message: 'Are you sure you want to delete this template?',
-    //   buttons: [
-    //     {
-    //       label: 'Yes',
-    //       onClick: async () => {
-    //         try {
-    //           setIsLoading(true);
-    //           // await api.delete(`/templates/${templateId}`);
-    //           setTemplates(templates.filter(t => t.uid !== templateId));
-    //         } catch (err) {
-    //           setError(err.message);
-    //         } finally {
-    //           setIsLoading(false);
-    //         }
-    //       }
-    //     },
-    //     {
-    //       label: 'No',
-    //       onClick: () => { }
-    //     }
-    //   ]
-    // });
-  };
-
-  const handleDuplicateTemplate = (template) => {
-    const newTemplate = {
-      ...template,
-      uid: Date.now().toString(),
-      title: `${template.title} (Copy)`,
-      usageCount: 0,
-      lastUsed: null
-    };
-    setTemplates([...templates, newTemplate]);
-  };
-
-  const handleStatusChange = (templateId, newStatus) => {
-    setTemplates(templates.map(t =>
-      t.uid === templateId ? { ...t, status: newStatus } : t));
-  };
-
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'Never';
@@ -185,6 +61,9 @@ const TemplatesPage = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const handlePageChange = (pageNumber) => {
+    setSkip(pageNumber);
+  };
   // Status badge component
   const StatusBadge = ({ status }) => {
     const variants = {
@@ -204,48 +83,62 @@ const TemplatesPage = () => {
       <Col xs={12} className="px-0">
         <Card className="scroll-container page-height">
           <Card.Body>
-            <Row className="mb-2 align-items-center">
+            <Row className="mb-3 align-items-center">
               <Col sm={6}>
-                <div className="d-flex flex-wrap gap-2">
+                <div className="d-flex gap-2 flex-wrap">
                   <Button
-                    variant={activeStatus === 'active' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveStatus('active')}
-                    disabled
-                    className="text-nowrap custom-buttons text-white"
-                  >
-                    Active ({templates.filter(t => t.status === 'active').length})
+                    className={` active_inactive_buttons text-nowrap ${activeStatus === 'active' ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                      }`}                  >
+                    Active
                   </Button>
                   <Button
-                    variant={activeStatus === 'inactive' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveStatus('inactive')}
-                    disabled
-                    className="text-nowrap custom-buttons text-white"
-                  >
-                    Inactive ({templates.filter(t => t.status === 'inactive').length})
+                    className={` active_inactive_buttons text-nowrap ${activeStatus === 'inactive' ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                      }`}                  >
+                    Inactive
                   </Button>
                   <Button
-                    variant={activeStatus === 'archive' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveStatus('archive')}
-                    disabled
-                    className="text-nowrap custom-buttons text-white"
-                  >
-                    Archived ({templates.filter(t => t.status === 'archive').length})
+                    className={` active_inactive_buttons text-nowrap ${activeStatus === 'archive' ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                      }`}                  >
+                    Archived
                   </Button>
                 </div>
               </Col>
               <Col sm={6} className="text-end mt-md-0 mt-2 mt-sm-0">
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className="d-flex gap-2">
-                    <div className="input-group" style={{ maxWidth: '300px' }}>
-                      <span className="input-group-text bg-white">
-                        <IoSearchSharp />
-                      </span>
+                    <div
+                      className="input_search_box"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        borderRadius: '4px',
+                        backgroundColor: '#e8f0fe',
+                        padding: '0px 5px',
+                      }}>
+                      <IoSearchSharp
+                        style={{
+                          fontSize: '1.2rem',
+                          color: 'black',
+                          marginRight: '10px',
+                        }}
+                      />
                       <FormInput
                         type="text"
-                        placeholder="Search templates..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border-start-0"
+                        onChange={(e) => {
+                          const currentValue = e.target.value;
+                          setSearchTerm(currentValue);
+                        }}
+                        className="input_search_box"
+                        style={{
+                          border: 'none',
+                          outline: 'none',
+                          flex: 1,
+                          backgroundColor: '#ccc',
+                        }}
                       />
                     </div>
                     <Button
@@ -260,13 +153,7 @@ const TemplatesPage = () => {
               </Col>
             </Row>
 
-            {error && (
-              <Alert variant="danger" className="mt-3">
-                {error}
-              </Alert>
-            )}
-
-            {isLoading ? (
+            {store?.getTemplateReducer?.loading ? (
               <div className="text-center py-5">
                 <Spinner animation="border" variant="primary" />
                 <p className="mt-2">Loading templates...</p>
@@ -275,19 +162,17 @@ const TemplatesPage = () => {
               <Table responsive className="table-centered table-nowrap mb-0 rounded">
                 <thead className="table-light">
                   <tr>
-                    <th>S.No.</th>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                    <th>Sections</th>
-                    <th>Usage</th>
-                    <th>Last Used</th>
-                    <th>Actions</th>
+                    <th className='text-white'>S.No.</th>
+                    <th className='text-white'>Title</th>
+                    <th className='text-white'>Type</th>
+                    <th className='text-white'>Category</th>
+                    <th className='text-white'>Status</th>
+                    <th className='text-white'>Last Used</th>
+                    <th className='text-white'>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTemplates.length === 0 ? (
+                  {templatesData?.length === 0 ? (
                     <tr>
                       <td colSpan={9} className="text-center py-4">
                         <div className="d-flex flex-column align-items-center">
@@ -301,7 +186,7 @@ const TemplatesPage = () => {
                                 : 'Create your first template to get started'}
                           </p>
                           {!searchTerm && (
-                            <Button variant="primary" onClick={openCreateModal}>
+                            <Button className='custom-buttons' onClick={openCreateModal}>
                               Create New Template
                             </Button>
                           )}
@@ -309,65 +194,32 @@ const TemplatesPage = () => {
                       </td>
                     </tr>
                   ) : (
-                    filteredTemplates.map((template, index) => (
-                      <tr key={template.uid}>
+                    templatesData?.map((template, index) => (
+                      <tr key={template?.uid}>
                         <td>{index + 1}</td>
                         <td>
-                          <strong>{template.title}</strong>
+                          <strong className='text-capitalize'>{template?.title || '-'}</strong>
                           <div className="d-flex flex-wrap gap-1 mt-1">
-                            {template.tags?.map((tag, i) => (
+                            {template?.tags?.map((tag, i) => (
                               <Badge key={i} bg="light" text="dark" className="text-capitalize">
                                 {tag}
                               </Badge>
                             ))}
                           </div>
                         </td>
-                        <td className="text-capitalize">{template.templateType}</td>
-                        <td>{template.category || '-'}</td>
+                        <td className="text-capitalize">{template?.templateType}</td>
+                        <td>{template?.category || '-'}</td>
                         <td>
-                          <StatusBadge status={template.status} />
+                          <StatusBadge status={template?.status} />
                         </td>
-                        <td>{template.sections}</td>
-                        <td>{template.usageCount}</td>
-                        <td>{formatDate(template.lastUsed)}</td>
+                        <td>{formatDate(template?.lastUsed)}</td>
                         <td>
                           <FiEdit2 onClick={() => openEditModal(template)} className=" cursor-pointer me-1 fs-5 text-info" />
                           <FiArchive
-                            onClick={() => handleStatusChange(
-                              template.uid,
-                              template.status === 'active' ? 'inactive' : 'active'
-                            )}
-                            className=" cursor-pointer me-1 fs-5 text-warning" />
-                          <FiTrash2 onClick={() => handleDeleteTemplate(template.uid)} className="fs-5 text-danger" />
-                          {/* <Dropdown>
-                            <Dropdown.Toggle variant="light" size="sm" className="px-2">
-                              <FiMoreVertical />
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu>
-                              <Dropdown.Item >
-                                 Edit
-                              </Dropdown.Item>
-                              <Dropdown.Item onClick={() => handleDuplicateTemplate(template)}>
-                                <FiCopy className="me-2" /> Duplicate
-                              </Dropdown.Item>
-                              <Dropdown.Item
-                                onClick={() => handleStatusChange(
-                                  template.uid,
-                                  template.status === 'active' ? 'inactive' : 'active'
-                                )}
-                              >
-                                <FiArchive className="me-2" />
-                                {template.status === 'active' ? 'Deactivate' : 'Activate'}
-                              </Dropdown.Item>
-                              <Dropdown.Divider />
-                              <Dropdown.Item
-                                onClick={() => handleDeleteTemplate(template.uid)}
-                                className="text-danger"
-                              >
-                                <FiTrash2 className="me-2" /> Delete
-                              </Dropdown.Item>
-                            </Dropdown.Menu>
-                          </Dropdown> */}
+                            style={{ cursor: 'not-allowed' }}
+                            className=" me-1 fs-5 text-warning" />
+                          <FiTrash2 style={{ cursor: 'not-allowed' }} className="fs-5 text-danger" />
+
                         </td>
                       </tr>
                     ))
@@ -375,6 +227,15 @@ const TemplatesPage = () => {
                 </tbody>
               </Table>
             )}
+            <div className="row">
+              <div className="col">
+                <Paginations
+                  currentPage={skip}
+                  totalPages={store?.getTemplateReducer?.data?.pagination?.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            </div>
           </Card.Body>
         </Card>
 
@@ -382,7 +243,6 @@ const TemplatesPage = () => {
           show={showModal}
           onHide={closeModal}
           template={selectedTemplate}
-          onSave={handleSaveTemplate}
         />
       </Col>
     </Row>

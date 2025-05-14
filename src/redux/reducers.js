@@ -32,6 +32,7 @@ import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobacco
 import { getIcdProcedureReducer } from './icdCodes/reducer';
 import { createEncounterReducer, getEncounterReducer, updateEncounterReducer } from './encounter/reducer';
 import { createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer } from './noteCategories/reducer';
+import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -66,4 +67,6 @@ export default (combineReducers({
     createEncounterReducer, getEncounterReducer, updateEncounterReducer,
     // note categories
     createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
+    // templates
+    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer
 }): any);
