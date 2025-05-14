@@ -11,40 +11,39 @@ import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
+    console.log(openTabs, 'opentabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
-    const [noteTypes, setNoteTypes] = useState([]);
-    const handleDefaultChange = (id) => {
-        const updated = noteTypes?.map((note) => ({
-            ...note,
-            isDefault: note?.id === id,
-        }));
-        setNoteTypes(updated);
-    };
+    // const [selectedNote, setSelectedNote] = useState(null);
 
     useEffect(() => {
         dispatch(getNoteCategoriesAction());
     }, [dispatch]);
     const handleOpenTab = (note) => {
-        console.log(note,'nnnnnnnnnnnnnnnnnnnnn')
-        const exists = openTabs.find((tab) => tab.id === note.id);
+        console.log(note, 'nnnnnnnnnnnnnnnnnnnnn');
+        const exists = openTabs.find((tab) => tab?._id === note?._id);
         if (!exists) {
             setOpenTabs((prev) => [...prev, note]);
         }
-        setActiveTabId(note.id);
+        setActiveTabId(note?._id);
     };
 
     const handleCloseTab = (id) => {
-        const updatedTabs = openTabs.filter((tab) => tab.id !== id);
+        const updatedTabs = openTabs.filter((tab) => tab?._id !== id);
         setOpenTabs(updatedTabs);
 
         if (activeTabId === id) {
-            setActiveTabId(updatedTabs.length > 0 ? updatedTabs[0].id : 'note-categories');
+            setActiveTabId(updatedTabs?.length > 0 ? updatedTabs[0]?._id : 'note-categories');
         }
     };
 
-    const activeNote = openTabs.find((tab) => tab.id === activeTabId);
+    const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
+  // for edit
+// const handleOpenEditModal = (note) => {
+//     setSelectedNote(note);
+//     setAddModal(true);
+// };
 
     return (
         <Row className="mt-2">
@@ -71,17 +70,17 @@ const NotesTypes = () => {
 
                                     {openTabs?.map((tab, index) => (
                                         <span
-                                            key={tab.id}
-                                            onClick={() => setActiveTabId(tab.id)}
+                                            key={tab?._id}
+                                            onClick={() => setActiveTabId(tab?._id)}
                                             onKeyDown={(e) => {
-                                                if (e.key === 'Enter') setActiveTabId(tab.id);
+                                                if (e.key === 'Enter') setActiveTabId(tab?._id);
                                             }}
                                             role="button"
                                             tabIndex={0}
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
+                                                activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
                                             }`}>
-                                            {tab?.noteType}
+                                            {tab?.noteType} Display Setting
                                             <span
                                                 style={{
                                                     marginLeft: 8,
@@ -90,7 +89,7 @@ const NotesTypes = () => {
                                                 }}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleCloseTab(tab.id);
+                                                    handleCloseTab(tab?._id);
                                                 }}
                                                 title="Close tab">
                                                 <IoClose />
@@ -110,10 +109,9 @@ const NotesTypes = () => {
                             </Col>
                         </Row>
                         {activeTabId === 'note-categories' ? (
-                            <NoteTypeCards
-                                handleDefaultChange={handleDefaultChange}
-                                handleOpenTab={handleOpenTab}
-                            />
+                            <NoteTypeCards handleOpenTab={handleOpenTab}
+                            //  handleOpenEditModal={handleOpenEditModal} 
+                             />
                         ) : activeNote ? (
                             <SettingTabs />
                         ) : (
@@ -122,10 +120,9 @@ const NotesTypes = () => {
                     </Card.Body>
                 </Card>
             </Col>
-            <AddModalSetting
-                addModal={addModal}
-                setAddModal={setAddModal}
-            />
+            <AddModalSetting addModal={addModal} setAddModal={setAddModal}
+            //  selectedNote={selectedNote} 
+             />
         </Row>
     );
 };
