@@ -63,7 +63,7 @@ export default (combineReducers({
     createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
     getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
     createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer,
-    createEncounterReducer, getEncounterReducer, updateEncounterReducer
+    createEncounterReducer, getEncounterReducer, updateEncounterReducer,
     // note categories
     createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
 }): any);

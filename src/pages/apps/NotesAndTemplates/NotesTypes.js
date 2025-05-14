@@ -11,10 +11,7 @@ import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
-<<<<<<< HEAD
-=======
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
->>>>>>> 1320c46db10e68d74e9bb2d830c54844ab34ebdc
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -80,16 +77,9 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-<<<<<<< HEAD
                                             className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
                                                 }`}>
-                                            {tab?.name} {index + 1}
-=======
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
                                             {tab?.name}
->>>>>>> 1320c46db10e68d74e9bb2d830c54844ab34ebdc
                                             <span
                                                 style={{
                                                     marginLeft: 8,
