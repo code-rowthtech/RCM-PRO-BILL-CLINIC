@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 
 const AddModalSetting = ({ setAddModal, addModal,
     //  selectedNote
-     }) => {
+}) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const store = useSelector((state) => state);
     const createResponse = store?.createNoteCategoriesReducer?.data?.status;
@@ -52,29 +52,28 @@ const AddModalSetting = ({ setAddModal, addModal,
         //         })
         //     );
         // } else {
-            dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
+        dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
         // }
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
         if (createResponse === 201
             //  || updateResponse === 200
-            ) {
+        ) {
             dispatch(getNoteCategoriesAction());
             setAddModal(false);
             reset();
         }
-    }, [createResponse ,
+    }, [createResponse,
         //  updateResponse, reset
-        ]);
- 
+    ]);
+
     return (
         <Modal show={addModal} onHide={() => setAddModal(false)} size="lg" centered>
             <Modal.Header closeButton className="px-2 py-0">
                 <Modal.Title>
                     {/* {selectedNote ? 'Edit Note Category' : 'Add Note Category'} */}
-                 Add Note Category
+                    Add Note Category
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -148,7 +147,7 @@ const AddModalSetting = ({ setAddModal, addModal,
                                 store?.updateNoteCategoriesReducer?.loading
                             }>
                             {store?.createNoteCategoriesReducer?.loading ||
-                            store?.updateNoteCategoriesReducer?.loading ? (
+                                store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
                             ) : (
                                 'Add'

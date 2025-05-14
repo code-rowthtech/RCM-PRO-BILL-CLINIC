@@ -11,7 +11,6 @@ import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs, 'opentabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -21,7 +20,6 @@ const NotesTypes = () => {
         dispatch(getNoteCategoriesAction());
     }, [dispatch]);
     const handleOpenTab = (note) => {
-        console.log(note, 'nnnnnnnnnnnnnnnnnnnnn');
         const exists = openTabs.find((tab) => tab?._id === note?._id);
         if (!exists) {
             setOpenTabs((prev) => [...prev, note]);

@@ -17,7 +17,6 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
 const TemplateModal = ({ show, onHide, template }) => {
-    console.log(template, 'template')
     const { control, register, handleSubmit, reset } = useForm();
     const dispatch = useDispatch()
     const store = useSelector((state) => state);

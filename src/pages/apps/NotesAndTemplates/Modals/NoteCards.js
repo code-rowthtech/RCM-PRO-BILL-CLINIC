@@ -8,7 +8,6 @@
 // const NoteTypeCards = ({ handleOpenTab }) => {
 //     const store = useSelector((state) => state);
 //     const [noteTypes, setNoteTypes] = useState([]);
-//     console.log(noteTypes, 'notetypes');
 
 //     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
 //     const loading = store?.getNoteCategoriesReducer?.loading;
@@ -16,7 +15,6 @@
 //         setNoteTypes(notesCategoriesData);
 //     }, [notesCategoriesData]);
 //     const handleDefaultChange = (id) => {
-//         console.log(id, 'idhandlechange');
 //         const updated = noteTypes?.map((note) => ({
 //             ...note,
 //             isDefault: note?._id === id,
@@ -154,7 +152,7 @@ const NoteTypeCards = ({ handleOpenTab }) => {
 
     const handleChange = (id, field, value) => {
         // Update the local state with the changed field
-        const updated = noteTypes.map((note) => 
+        const updated = noteTypes.map((note) =>
             note._id === id ? { ...note, [field]: value } : note
         );
         setNoteTypes(updated);
@@ -163,7 +161,6 @@ const NoteTypeCards = ({ handleOpenTab }) => {
         const current = updated.find((n) => n._id === id);
 
         // Debugging: Log the updated note data to verify
-        console.log('Updated Payload:', current);
 
         // Prepare the payload for the API call
         const payload = {
@@ -176,7 +173,6 @@ const NoteTypeCards = ({ handleOpenTab }) => {
         };
 
         // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload:', payload);
 
         // Call the API to update the note category
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
@@ -189,7 +185,6 @@ const NoteTypeCards = ({ handleOpenTab }) => {
         const current = noteTypes.find((n) => n._id === id);
 
         // Debugging: Log the updated note data to verify
-        console.log('Updated Payload:', current);
 
         // Prepare the payload for the API call
         const payload = {
@@ -202,7 +197,6 @@ const NoteTypeCards = ({ handleOpenTab }) => {
         };
 
         // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload:', payload);
 
         // Call the API to update the note category
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
@@ -228,7 +222,6 @@ const NoteTypeCards = ({ handleOpenTab }) => {
         };
 
         // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload for Default Change:', payload);
 
         // Call the API to update the note category
         dispatch(updateNoteCategoriesAction({ id: note._id, key: encryptMessage(payload) }));
