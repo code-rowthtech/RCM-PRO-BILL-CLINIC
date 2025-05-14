@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col, Form, Modal, Row, Button } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import { createNoteCategoriesAction, getNoteCategoriesAction } from '../../../../redux/noteCategories/action';
+import { useDispatch } from 'react-redux';
+import { encryptMessage } from '../../../../cryptoUtils';
+import { useSelector } from 'react-redux';
 
-const AddModalSetting = ({ setAddModal, addModal, onSubmit }) => {
+const AddModalSetting = ({ setAddModal, addModal }) => {
+    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
+    const store = useSelector((state)=> state);
+    const createResponse = store?.createNoteCategoriesReducer?.data?.status
+  const dispatch = useDispatch();
     const {
         register,
         handleSubmit,
@@ -10,18 +18,28 @@ const AddModalSetting = ({ setAddModal, addModal, onSubmit }) => {
         formState: { errors },
     } = useForm();
 
-    const handleAddNoteSubmit = (data) => {
+    const onSubmit = (data) => {
         const payload = {
-            name: data.name,
+            clinicId: clinic_id?.clinicId,
+            noteType: data.name,
             isActive: data.isActive === 'true', // convert to boolean
             format: data.format,
-            isDefault: !!data.isDefault, // convert to boolean
+            confidential: data.confidential,
+            // isDefault: !!data.isDefault, // convert to boolean
         };
-
-        onSubmit(payload); // pass to parent
+        dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
+        console.log(payload,'payload')
+        // setAddModal(false);
+        // reset();
+    };
+    
+    useEffect(()=>{
+    if(createResponse === 201){
+        dispatch(getNoteCategoriesAction());
         setAddModal(false);
         reset();
-    };
+    }
+    },[createResponse])
 
     return (
         <Modal show={addModal} onHide={() => setAddModal(false)} size="lg" centered>
@@ -29,7 +47,7 @@ const AddModalSetting = ({ setAddModal, addModal, onSubmit }) => {
                 <Modal.Title>Add Note Type</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form onSubmit={handleSubmit(handleAddNoteSubmit)}>
+                <Form onSubmit={handleSubmit(onSubmit)}>
                     <Row className="mb-3">
                         <Col md={6}>
                             <Form.Group controlId="name">
@@ -61,20 +79,30 @@ const AddModalSetting = ({ setAddModal, addModal, onSubmit }) => {
                                     <option value="">Select format</option>
                                     <option value="Simple">Simple</option>
                                     <option value="SOAP">SOAP</option>
-                                    <option value="Narrative">Narrative</option>
+                                    <option value="Narrative">Custom</option>
                                 </Form.Select>
                                 {errors.format && <span className="text-danger">{errors.format.message}</span>}
                             </Form.Group>
                         </Col>
+                         <Col md={6}>
+                            <Form.Group controlId="confidential">
+                                <Form.Label>Is this template Private</Form.Label>
+                                <Form.Select {...register('confidential', { required: 'confidential is required' })}>
+                                    <option value="true">True</option>
+                                    <option value="false">False</option>
+                                </Form.Select>
+                                {errors.confidential && <span className="text-danger">{errors.confidential.message}</span>}
+                            </Form.Group>
+                        </Col>
                     </Row>
 
-                    <Row className="mb-1">
+                    {/* <Row className="mb-1">
                         <Col md={6}>
                             <Form.Group controlId="isDefault">
                                 <Form.Check type="checkbox" label="Make Default" {...register('isDefault')} />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Row> */}
 
                     <div className="d-flex justify-content-end">
                         <Button variant="primary" type="submit" className="custom-buttons">

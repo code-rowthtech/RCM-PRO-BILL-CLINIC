@@ -11,7 +11,6 @@ import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
-    const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -28,6 +27,7 @@ const NotesTypes = () => {
         dispatch(getNoteCategoriesAction());
     }, [dispatch]);
     const handleOpenTab = (note) => {
+        console.log(note,'nnnnnnnnnnnnnnnnnnnnn')
         const exists = openTabs.find((tab) => tab.id === note.id);
         if (!exists) {
             setOpenTabs((prev) => [...prev, note]);
@@ -81,7 +81,7 @@ const NotesTypes = () => {
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
                                                 activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
                                             }`}>
-                                            {tab?.name}
+                                            {tab?.noteType}
                                             <span
                                                 style={{
                                                     marginLeft: 8,
@@ -125,12 +125,7 @@ const NotesTypes = () => {
             <AddModalSetting
                 addModal={addModal}
                 setAddModal={setAddModal}
-                onSubmit={(newNote) => {
-                    const id = noteTypes.length + 1;
-                    const noteWithId = { id, isPsychotherapyNote: false, ...newNote };
-                    setNoteTypes((prev) => [...prev, noteWithId]);
-                }}
-            />{' '}
+            />
         </Row>
     );
 };
