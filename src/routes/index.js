@@ -426,13 +426,13 @@ const AllRoutes = () => {
                                             )
                                 },
                                 {
-                                    path: 'notescategories',
+                                    path: 'notecategories',
                                     element: hasPermission('view notes') ? (
                                         <LoadComponent component={ClinicalNotesType}/>
                                         ) : null,
                         },
                         {
-                            path: 'notestemplates',
+                            path: 'notetemplates',
                             element: hasPermission('view templates') ? (
                                 <LoadComponent component={NotesTemplates} />
                                 ) : null,

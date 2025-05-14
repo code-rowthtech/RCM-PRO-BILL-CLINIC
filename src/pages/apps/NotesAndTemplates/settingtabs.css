@@ -66,6 +66,7 @@
     transition: transform 0.2s ease;
 }
 
+<<<<<<< HEAD
 .templatesAccordion {
     margin-top: 0 !important;
 }
@@ -82,3 +83,6 @@
 .templateModal .modal-dialog .modal-content {
     height: 80vh !important;
 }
+=======
+
+>>>>>>> 1320c46db10e68d74e9bb2d830c54844ab34ebdc

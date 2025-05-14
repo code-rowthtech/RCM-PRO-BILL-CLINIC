@@ -162,5 +162,12 @@ export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
 // ICD CODES
 export const icdProcedures = `${BaseRoute}/codes/pcs`;
 
+<<<<<<< HEAD
 // Encounter
 export const encounter = `${BaseRoute}/encounter`;
+=======
+// NoteCategories
+export const createNoteCategories = `${BaseRoute}/notes-type/`;
+export const updateNoteCategories = `${BaseRoute}/notes-type/`;
+export const getNoteCategories = `${BaseRoute}/notes-type/`;
+>>>>>>> 1320c46db10e68d74e9bb2d830c54844ab34ebdc
