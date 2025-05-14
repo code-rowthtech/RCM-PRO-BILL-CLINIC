@@ -76,15 +76,9 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-<<<<<<< HEAD
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
-                                                }`}>
-                                            {tab?.noteType}
-=======
                                             className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
                                                 }`}>
                                             {tab?.noteType} Display Setting
->>>>>>> 6381f4679ee9dab80e464ffcf6372de750a1074f
                                             <span
                                                 style={{
                                                     marginLeft: 8,
