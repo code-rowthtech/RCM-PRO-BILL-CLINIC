@@ -32,7 +32,6 @@ const noteTypeData = [
 const NotesTypes = () => {
     const [noteTypes, setNoteTypes] = useState(noteTypeData);
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs, 'opentabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
 
@@ -80,9 +79,8 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                        }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                         Note Categories
                                     </span>
 
@@ -95,9 +93,8 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab.id ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
                                             {tab?.name} {index + 1}
                                             <span
                                                 style={{

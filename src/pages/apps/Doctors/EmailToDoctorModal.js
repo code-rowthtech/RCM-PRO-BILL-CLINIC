@@ -18,7 +18,6 @@ const EmailToDoctorModal = ({ show, closeModal, formData, setFormData }) => {
     const dispatch = useDispatch();
     const onSubmit = () => {
         // alert(JSON.stringify(formData))
-        console.log(formData, 'formData')
         dispatch(createDoctorAction({ key: encryptMessage(formData) }));
 
     }
