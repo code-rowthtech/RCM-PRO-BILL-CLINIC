@@ -147,6 +147,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
+    // console.log(, 'store?.getNoteCategoriesReducer?.data')
     const loading = store?.getNoteCategoriesReducer?.loading;
 
     useEffect(() => {
@@ -325,7 +326,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
 
                             <div
                                 className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
-                                // style={{ backgroundColor: '#5582E51A' }}
+                            // style={{ backgroundColor: '#5582E51A' }}
                             >
                                 <div className="d-flex align-items-center">
                                     <Form.Check

@@ -45,9 +45,9 @@ const Paginations = ({ currentPage, totalPages, onPageChange }) => {
                     </li>
                 );
             }
-    
+
             return (
-                <li key={`page-${page}-${index}`} className={`page-item fw-semibold fs-5`}>
+                <li key={`page-${page}-${index}`} className={`page-item fw-semibold ms-1 fs-5`}>
                     <button
                         className={`page-link p-1 py-0 ${currentPage === page ? 'active-pagination px-1' : ''} rounded-2`}
                         onClick={() => onPageChange(page)}
