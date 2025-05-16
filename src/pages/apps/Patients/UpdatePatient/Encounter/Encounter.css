@@ -2,3 +2,26 @@
     border: none !important;
     padding: 0 !important;
 }
+
+.encounterSummary .accordion-button {
+    padding: 10px !important;
+    background-color: white !important;
+    border: 1px solid rgba(128, 128, 128, 0.223) !important;
+}
+
+.accordion > .accordion-item > .accordion-collapse {
+    border: 1px solid rgba(128, 128, 128, 0.223) !important;
+    border-top: none !important;
+}
+
+.button:active,
+.button {
+    border: none !important;
+    outline: none !important;
+}
+
+.encounterHeaderGroup .form-control,
+.encounterHeaderGroup .form-select {
+    background-color: white !important;
+    border: 1px solid rgba(186, 185, 185, 0.762) !important;
+}

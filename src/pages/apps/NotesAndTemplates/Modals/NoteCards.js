@@ -8,7 +8,6 @@
 // const NoteTypeCards = ({ handleOpenTab }) => {
 //     const store = useSelector((state) => state);
 //     const [noteTypes, setNoteTypes] = useState([]);
-//     console.log(noteTypes, 'notetypes');
 
 //     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
 //     const loading = store?.getNoteCategoriesReducer?.loading;
@@ -16,7 +15,6 @@
 //         setNoteTypes(notesCategoriesData);
 //     }, [notesCategoriesData]);
 //     const handleDefaultChange = (id) => {
-//         console.log(id, 'idhandlechange');
 //         const updated = noteTypes?.map((note) => ({
 //             ...note,
 //             isDefault: note?._id === id,

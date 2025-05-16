@@ -30,7 +30,9 @@ import { createSuggestionsReducer } from './suggestions/reducer';
 import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
 import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
+import { createEncounterReducer, getEncounterReducer, updateEncounterReducer } from './encounter/reducer';
 import { createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer } from './noteCategories/reducer';
+import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -62,6 +64,9 @@ export default (combineReducers({
     createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
     getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
     createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer,
+    createEncounterReducer, getEncounterReducer, updateEncounterReducer,
     // note categories
-    createNoteCategoriesReducer,getNoteCategoriesReducer,updateNoteCategoriesReducer,
+    createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
+    // templates
+    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer
 }): any);

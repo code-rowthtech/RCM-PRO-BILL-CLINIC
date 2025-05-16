@@ -161,9 +161,16 @@ export const getMedicalHistory = `${BaseRoute}/medicalHistory`;
 export const deleteMedicalHistory = `${BaseRoute}/medicalHistory`;
 // ICD CODES
 export const icdProcedures = `${BaseRoute}/codes/pcs`;
+
+// Encounter
+export const encounter = `${BaseRoute}/encounter`;
+
 // NoteCategories
 export const createNoteCategories = `${BaseRoute}/notes-type/`;
 export const updateNoteCategories = `${BaseRoute}/notes-type/`;
 export const getNoteCategories = `${BaseRoute}/notes-type/`;
-// Setting Display 
+// SettingsNotes
 export const createnoteTypeSettings = `${BaseRoute}/notes-type-settings/`;
+
+// Template
+export const templates = `${BaseRoute}/notes-templates`;

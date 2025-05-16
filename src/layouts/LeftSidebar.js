@@ -101,7 +101,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
 
     const createPatientsResponse = store?.createPatientsReducer?.data?.status;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    console.log(doctorDetails, 'doctorDetailsdoctorDetailsdoctorDetails')
     const appointmentDetails = [];
     const [activeFilter, setActiveFilter] = useState("Doctors"); // Track active menu
     const [selectedDoctor, setSelectedDoctor] = useState(null); // Store selected doctor ID

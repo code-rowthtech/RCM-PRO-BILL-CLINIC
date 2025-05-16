@@ -212,9 +212,18 @@ const UpdatePatientIndex = () => {
                                                     toggleSubmenu(item.label);
                                                     // setActiveSubmenu(null);
                                                 } else {
-                                                    setSelectedMainTab(item.tab);
-                                                    sessionStorage.setItem('selectedMainTab', item.tab);
-                                                    setActiveSubmenu(null);
+                                                    if (item.tab === 'Encounter') {
+                                                        setActiveKey('1')
+                                                        setSelectedMainTab(item.tab);
+                                                        sessionStorage.setItem('selectedMainTab', item.tab);
+                                                        setActiveSubmenu(null);
+                                                    } else {
+                                                        setActiveKey('0')
+                                                        setSelectedMainTab(item.tab);
+                                                        sessionStorage.setItem('selectedMainTab', item.tab);
+                                                        setActiveSubmenu(null);
+                                                    }
+
                                                 }
                                             }}>
                                             <div>
@@ -571,9 +580,10 @@ const UpdatePatientIndex = () => {
                                                                         onClick={() => {
                                                                             const newTab = {
                                                                                 id: encounterTabs?.length + 1,
-                                                                                title: '12/04/2025',
+                                                                                title: new Date().toISOString().split('T')[0],
                                                                                 type: 'date',
                                                                             };
+                                                                            setActiveKey('1')
                                                                             setEncounterTabs([...encounterTabs, newTab]);
                                                                             setSelectedMainTab('Encounter'); // Add this line
                                                                         }}
@@ -589,6 +599,7 @@ const UpdatePatientIndex = () => {
                                                                                 title: 'Clinical Finding',
                                                                                 type: 'appointment',
                                                                             };
+                                                                            setActiveKey('1')
                                                                             setEncounterTabs([...encounterTabs, newTab]);
                                                                             setSelectedMainTab('Encounter'); // Add this line
                                                                         }}

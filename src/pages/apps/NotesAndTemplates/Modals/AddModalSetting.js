@@ -150,7 +150,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 store?.updateNoteCategoriesReducer?.loading
                             }>
                             {store?.createNoteCategoriesReducer?.loading ||
-                            store?.updateNoteCategoriesReducer?.loading ? (
+                                store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
                             ) : selectedNote ? (
                                 'Update'

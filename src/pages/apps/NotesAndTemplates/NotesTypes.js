@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Table, Form, Button, Modal } from 'react-bootstrap';
-import { IoClose, IoSettings } from 'react-icons/io5';
+import { useEffect, useState } from 'react';
+import { Card, Col, Row, Button, Modal } from 'react-bootstrap';
+import { IoClose } from 'react-icons/io5';
 import SettingTabs from './SettingTabs';
-import { useForm } from 'react-hook-form';
 import AddModalSetting from './Modals/AddModalSetting';
 import NoteTypeCards from './Modals/NoteCards';
 import { useDispatch } from 'react-redux';
@@ -11,7 +10,6 @@ import { useSelector } from 'react-redux';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs, 'opentabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -61,9 +59,8 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                        }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                         Note Categories
                                     </span>
 
@@ -76,9 +73,8 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
                                             {tab?.noteType} Display Setting
                                             <span
                                                 style={{

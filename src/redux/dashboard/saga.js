@@ -1,8 +1,7 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { DashboardActionTypes } from './constants';
 import { getAnalyticsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
-import ToastHandle from '../../helpers/ToastMessage';
 /**
  * Login the user
  * @param {*} payload - username and password

@@ -1,4 +1,4 @@
-import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects';
+import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { MedicationActionTypes } from './constants';
@@ -12,8 +12,6 @@ import {
     // getAllergyDetailsApi,
     // updateAllergyApi,
 } from './api';
-import { GetDrugsAction } from './action';
-import { getMedication } from '../../helpers/api/apiEndpoints';
 /**
  * Login the user
  * @param {*} payload - username and password

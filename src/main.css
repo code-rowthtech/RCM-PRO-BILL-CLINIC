@@ -1011,7 +1011,8 @@ tbody tr:hover {
     border: 0px !important;
 } */
 .form-select {
-    color: #0908084f !important;
+    /* color: #0908084f !important; */
+    color: black !important;
     font-weight: 550 !important;
     padding: 6px !important;
     font-size: 12px;
