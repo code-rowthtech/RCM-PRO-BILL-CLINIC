@@ -52,6 +52,7 @@ const TemplatesPage = () => {
 
   const closeModal = () => {
     setShowModal(false);
+    setSelectedTemplate(null)
   };
 
   // Format date for display
@@ -162,10 +163,11 @@ const TemplatesPage = () => {
               <Table responsive className="table-centered table-nowrap mb-0 rounded">
                 <thead className="table-light">
                   <tr>
-                    <th className='text-white'>S.No.</th>
+                    {/* <th className='text-white'>S.No.</th> */}
                     <th className='text-white'>Title</th>
-                    <th className='text-white'>Type</th>
+                    <th className='text-white'>Note Type</th>
                     <th className='text-white'>Category</th>
+                    <th className='text-white'>Related Practices</th>
                     <th className='text-white'>Status</th>
                     <th className='text-white'>Last Used</th>
                     <th className='text-white'>Actions</th>
@@ -196,30 +198,27 @@ const TemplatesPage = () => {
                   ) : (
                     templatesData?.map((template, index) => (
                       <tr key={template?.uid}>
-                        <td>{index + 1}</td>
+                        {/* <td>{index + 1}</td> */}
                         <td>
-                          <strong className='text-capitalize'>{template?.title || '-'}</strong>
+                          <p className='text-capitalize mb-0'>{template?.title || '-'}</p>
                           <div className="d-flex flex-wrap gap-1 mt-1">
                             {template?.tags?.map((tag, i) => (
-                              <Badge key={i} bg="light" text="dark" className="text-capitalize">
+                              <Badge key={i} variant="secondary" text="white" className="text-capitalize" style={{ fontSize: '11px !important' }}>
                                 {tag}
                               </Badge>
                             ))}
                           </div>
                         </td>
                         <td className="text-capitalize">{template?.templateType}</td>
-                        <td>{template?.category || '-'}</td>
+                        <td className='text-capitalize'>{template?.category || '-'}</td>
+                        <td className='text-capitalize'>{template?.practiceType || '-'}</td>
                         <td>
                           <StatusBadge status={template?.status} />
                         </td>
                         <td>{formatDate(template?.lastUsed)}</td>
                         <td>
-                          <FiEdit2 onClick={() => openEditModal(template)} className=" cursor-pointer me-1 fs-5 text-info" />
-                          <FiArchive
-                            style={{ cursor: 'not-allowed' }}
-                            className=" me-1 fs-5 text-warning" />
-                          <FiTrash2 style={{ cursor: 'not-allowed' }} className="fs-5 text-danger" />
-
+                          <i onClick={() => openEditModal(template)} className="mdi mdi-square-edit-outline me-1 cursor-pointer fs-4"></i>
+                          <i style={{ cursor: 'not-allowed' }} className="bi bi-trash me-1 fs-5"></i>
                         </td>
                       </tr>
                     ))

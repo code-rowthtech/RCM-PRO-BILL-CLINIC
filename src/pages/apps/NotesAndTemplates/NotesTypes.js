@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Table, Form, Button, Modal } from 'react-bootstrap';
-import { IoClose, IoSettings } from 'react-icons/io5';
+import { useEffect, useState } from 'react';
+import { Card, Col, Row, Button, Modal } from 'react-bootstrap';
+import { IoClose } from 'react-icons/io5';
 import SettingTabs from './SettingTabs';
-import { useForm } from 'react-hook-form';
 import AddModalSetting from './Modals/AddModalSetting';
 import NoteTypeCards from './Modals/NoteCards';
 import { useDispatch } from 'react-redux';
@@ -14,7 +13,7 @@ const NotesTypes = () => {
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
-    // const [selectedNote, setSelectedNote] = useState(null);
+    const [selectedNote, setSelectedNote] = useState(null);
 
     useEffect(() => {
         dispatch(getNoteCategoriesAction());
@@ -38,18 +37,18 @@ const NotesTypes = () => {
 
     const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
     // for edit
-    // const handleOpenEditModal = (note) => {
-    //     setSelectedNote(note);
-    //     setAddModal(true);
-    // };
+    const handleOpenEditModal = (note) => {
+        setSelectedNote(note);
+        setAddModal(true);
+    };
 
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
-                <Card className="scroll-container" style={{ height: '90vh', overflowY: 'scroll' }}>
+                <Card className="scroll-container " style={{ height: '90vh', overflowY: 'scroll' }}>
                     <Card.Body className="px-2 py-1">
                         <Row className="">
-                            <Col className="" sm={6}>
+                            <Col className="" sm={10}>
                                 <div
                                     className="d-flex gap-3"
                                     style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 10 }}>
@@ -94,20 +93,23 @@ const NotesTypes = () => {
                                     ))}
                                 </div>
                             </Col>
-                            <Col sm={6} className="d-flex justify-content-end">
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    className="custom-buttons"
-                                    onClick={() => setAddModal(true)}>
-                                    New Note Category
-                                </Button>
-                            </Col>
+                            {(openTabs?.length === 0 || activeTabId === 'note-categories') && (
+                                <Col sm={2} className="d-flex justify-content-end">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        className="custom-buttons"
+                                        onClick={() => {
+                                            setSelectedNote(null);
+                                            setAddModal(true);
+                                        }}>
+                                        Add Category
+                                    </Button>
+                                </Col>
+                            )}
                         </Row>
                         {activeTabId === 'note-categories' ? (
-                            <NoteTypeCards handleOpenTab={handleOpenTab}
-                            //  handleOpenEditModal={handleOpenEditModal} 
-                            />
+                            <NoteTypeCards handleOpenTab={handleOpenTab} handleOpenEditModal={handleOpenEditModal} />
                         ) : activeNote ? (
                             <SettingTabs />
                         ) : (
@@ -116,8 +118,11 @@ const NotesTypes = () => {
                     </Card.Body>
                 </Card>
             </Col>
-            <AddModalSetting addModal={addModal} setAddModal={setAddModal}
-            //  selectedNote={selectedNote} 
+            <AddModalSetting
+                addModal={addModal}
+                setAddModal={setAddModal}
+                selectedNote={selectedNote}
+                setSelectedNote={setSelectedNote} // ✅ Pass setter
             />
         </Row>
     );

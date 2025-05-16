@@ -1,29 +1,14 @@
 import React, { useState } from 'react';
 import { Col, Button, Row, Form, Table } from 'react-bootstrap';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import EncounterSummary from './EncounterSummary';
-import { TbLayoutSidebarLeftCollapseFilled, TbLayoutSidebarRightCollapseFilled } from 'react-icons/tb';
+import { HiMiniBars3BottomLeft } from "react-icons/hi2";
 
-const DateEncounters = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+const DateEncounters = ({ isCollapsed }) => {
     const [leftTab, setLeftTab] = useState('Summary');
-    const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
     return (
-        <div className='px-2 mt-1 row position-relative'>
-            <Button
-                variant='transparent'
-                onClick={toggleCollapse}
-                className="position-absolute text-black fs-4 fw-bold translate-middle-y p-0   "
-                style={{
-                    width: '24px',
-                    height: '24px',
-                    zIndex: 1,
-                    left: '95%', top: '-2%'
-                }}
-            >
-                {isCollapsed ? <TbLayoutSidebarLeftCollapseFilled size={18} /> : <TbLayoutSidebarRightCollapseFilled size={18} />}
-            </Button>
+        <div className='px-2 mt-1 row'>
+
 
             {/* Collapsible Left Column */}
             <Col className={`border-end ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -51,72 +36,92 @@ const DateEncounters = () => {
             {/* Main Content Column */}
             <Col sm={isCollapsed ? 12 : 8}>
                 {/* Encounter Details */}
-                <div style={{ height: '59vh' }} className="pt-1 scroll-container">
-                    {/* <h5 className='m-0'>Encounter details</h5> */}
-                    <Row className="g-2 ">
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Encounter Type *</Form.Label>
-                                <Form.Select>
+                <div style={{ height: '59vh' }} className="px-1 scroll-container">
+                    <Row className="g-2 mt-0 bg-light rounded-top p-1 border">
+                        <Col sm={4} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Encounter Type <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select className='border-primary'>
                                     <option>185349003 (SNOMED-CT) - Office Visit</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Note Type *</Form.Label>
-                                <Form.Select>
+                        <Col sm={4} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Note Type <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select className='border-primary'>
                                     <option>SOAP Note</option>
+                                    <option>Progress Note</option>
+                                    <option>Procedure Note</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Date *</Form.Label>
-                                <Form.Control type="date" defaultValue="2025-05-13" />
+                        <Col sm={4} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Date <span className='text-danger'>*</span></Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    defaultValue="2025-05-13"
+                                    className='border-primary'
+                                />
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Age at Encounter</Form.Label>
-                                <Form.Control plaintext readOnly defaultValue="48 yrs" />
+                    </Row>
+
+                    {/* Secondary Header Row */}
+                    <Row className="g-2 bg-light p-1 border-top-0 border">
+                        <Col sm={2} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Age at Encounter</Form.Label>
+                                <Form.Control readOnly defaultValue="48 yrs" className='bg-white' />
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Seen By *</Form.Label>
-                                <Form.Select>
+                        <Col sm={2} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Seen By <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select className='border-primary'>
                                     <option>Mohit Rawat</option>
+                                    <option>Other Provider</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Facility *</Form.Label>
-                                <Form.Select>
-                                    <option>Mohit Rawat...</option>
+                        <Col sm={2} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Facility <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select className='border-primary'>
+                                    <option>Main Clinic</option>
+                                    <option>Satellite Office</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Status</Form.Label>
-                                <Form.Control plaintext readOnly defaultValue="Unsigned" />
+                        <Col sm={2} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Status</Form.Label>
+                                <Form.Select className='border-primary'>
+                                    <option>Signed</option>
+                                    <option selected>Unsigned</option>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
-                        <Col sm={4}>
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Self-pay Restriction</Form.Label>
+                        <Col sm={4} className='mt-0'>
+                            <Form.Group className='encounterHeaderGroup'>
+                                <Form.Label className='mb-0 fw-bold small'>Self-pay Restriction</Form.Label>
                                 <Form.Select>
                                     <option>No restriction</option>
+                                    <option>Partial restriction</option>
+                                    <option>Full restriction</option>
                                 </Form.Select>
                             </Form.Group>
                         </Col>
+                    </Row>
+                    <Row className='g-2'>
                         {/* Chief Complaint */}
 
-                        <Col sm={4} className="mb-3">
-                            <h6>Chief complaint</h6>
-                            <Form.Control as="textarea" placeholder="Add any problems or symptoms here" rows={2} />
+                        <Col sm={12} className="mb-3  pt-1">
+                            <Form.Group>
+                                <Form.Label className='mb-0'>Chief Complaint</Form.Label>
+                                <Form.Control as={'textarea'} placeholder='Add any problems or symptoms here' />
+                            </Form.Group>
                         </Col>
                         {/* Health Concerns */}
                         <Col sm={12} className="mb-3 border-top pt-2">
