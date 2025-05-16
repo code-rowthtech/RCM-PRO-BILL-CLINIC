@@ -909,7 +909,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label>Issuing Authority</Form.Label>
                                         </Col>
                                         <Col>
-                                            <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
+                                            <Form.Label>Identifier Expiry <span className='text-secondary'>(If Applicable)</span> </Form.Label>
                                         </Col>
                                     </Row>
 

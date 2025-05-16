@@ -459,7 +459,7 @@ const SubUpdateClinic = () => {
     };
     useEffect(() => {
         if (updateSuccess === 200) {
-            navigate('/apps/crm/addclinic');
+            navigate('/apps/crm/addPractice');
         }
     }, [updateSuccess]);
     const [selectedLocation, setSelectedLocation] = useState(null);
@@ -844,7 +844,7 @@ const SubUpdateClinic = () => {
                                 <div className="d-flex gap-2  d-none d-md-block">
                                     {btnShow && (
                                         <>
-                                            <Button as={Link} className="cancel-button" to={'/apps/crm/addclinic'}>
+                                            <Button as={Link} className="cancel-button" to={'/apps/crm/addPractice'}>
                                                 Back
                                             </Button>
                                         </>
@@ -1010,7 +1010,7 @@ const SubUpdateClinic = () => {
                                                             <Form.Label>Issuing Authority</Form.Label>
                                                         </Col>
                                                         <Col>
-                                                            <Form.Label>Identifier Expiry (If Applicable)</Form.Label>
+                                                            <Form.Label>Identifier Expiry <span className='text-secondary'>(If Applicable)</span></Form.Label>
                                                         </Col>
                                                     </Row>
 

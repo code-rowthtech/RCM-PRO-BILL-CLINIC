@@ -102,7 +102,7 @@ const Transaction = ({ patientsData }: { patientsData: Array<OrderListItems> }):
                     </Row>
                   </Col>
                   <Col sm={4} className='text-end'>
-                    {/* <Button as={Link} to="/apps/crm/addclinic" className="custom-buttons">
+                    {/* <Button as={Link} to="/apps/crm/addPractice" className="custom-buttons">
                                         Add Clinics
                                     </Button> */}
                   </Col>
