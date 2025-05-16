@@ -190,9 +190,9 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                 {dataToEdit ? "Update User" : "Add New User"}
                             </h4>
                         </Col>
-                        <Col sm={1}>
+                        {/* <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={close} />
-                        </Col>
+                        </Col> */}
                     </Row>
                     {/* Form with handleSubmit to trigger onSubmit */}
                     <Form onSubmit={handleSubmit(onSubmit)}>

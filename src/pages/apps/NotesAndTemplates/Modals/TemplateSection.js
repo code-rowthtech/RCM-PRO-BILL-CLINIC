@@ -220,7 +220,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
 
                         {activeAccordionKey !== null && (
                             <Col md={4} className='ps-0 border '>
-                                <Card className=" mb-4 rounded-0">
+                                <Card className="h-100 mb-4 rounded-0">
                                     <Card.Header className="" style={{ background: '#ecedee', padding: '0.456rem 0.6rem' }}>
                                         <h6 className="my-0 fw-semibold">Add New Item to {items[activeAccordionKey]?.label}</h6>
                                     </Card.Header>

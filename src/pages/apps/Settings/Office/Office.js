@@ -231,7 +231,7 @@ const Office = () => {
         <Modal.Body>
           <Row className="border-bottom mb-2 pb-2">
             <Col sm={11} className='text-center'><h4>{edit ? 'Edit Office' : 'New Office'}</h4></Col>
-            <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} /></Col>
+            {/* <Col sm={1}><IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} /></Col> */}
           </Row>
           <Form onSubmit={handleSubmit(addOffice)}>
             <Row>
@@ -306,6 +306,7 @@ const Office = () => {
               </Col>
             </Row>
             <Modal.Footer>
+              <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
               <Button type="submit" className="custom-buttons">
                 {store?.createMastersDataReducer?.loading || store?.updateMastersDataReducer?.loading ? (
                   <div class="spinner-border spinner-border-sm" role="status">
