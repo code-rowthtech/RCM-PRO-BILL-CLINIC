@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tab, Tabs, Card } from 'react-bootstrap';
+import { Tab, Tabs, Card, Offcanvas } from 'react-bootstrap';
 import { IoClose } from 'react-icons/io5';
 import { FaCalendarAlt } from 'react-icons/fa';
 import { MdOutlineMedicalServices } from 'react-icons/md';
@@ -8,8 +8,11 @@ import EncounterList from './EncounterList';
 import DateEncounters from './DateEncounters';
 import AppointmentEncounter from './AppointmentEncounter';
 import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
+import { CiSettings } from "react-icons/ci";
+import EncounterSettingsForm from './EncounterSettings';
+import { BiCollapse, BiExpand } from 'react-icons/bi';
 
-const Encounter = ({ encounterTabs, setEncounterTabs }) => {
+const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isAccordionOpen }) => {
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
@@ -24,62 +27,79 @@ const Encounter = ({ encounterTabs, setEncounterTabs }) => {
         }
     };
 
+    const [showSettings, setShowSettings] = useState(false)
+    const closeSettings = () => {
+        setShowSettings(false)
+    }
     return (
-        <Card className="border-0 shadow-sm ">
+        <Card className="border-0 shadow-sm mb-0 h-100">
             <Card.Body className="p-0 border-0">
-                <div className="position-ralative">
-                    {encounterTabs?.length > 1 && (
-                        <HiMiniBars3BottomLeft
-                            onClick={toggleCollapse}
-                            style={{ top: '1.9%', left: '1.3%' }}
-                            className='fw-bold fs-4 mb-1 cursor-pointer text-black position-absolute' />
+                <div className="row">
+                    {/* Tab headers */}
+                    <div className="col-12 d-flex align-items-center justify-content-between px-2 ">
+                        <div className="d-flex align-items-center ">
+                            {encounterTabs?.length > 1 &&
+                                <>
+                                    <HiMiniBars3BottomLeft
+                                        onClick={toggleCollapse}
+                                        className='fw-bold fs-4 mx-1  cursor-pointer text-black' />
+                                    <CiSettings
+                                        onClick={() => setShowSettings(!showSettings)}
+                                        className='fw-bold fs-4 mx-1  cursor-pointer text-black' />
+                                    <EncounterSettingsForm
+                                        showSettings={showSettings}
+                                        closeSettings={closeSettings}
+                                    //   initialData={/* your initial data from API */}
+                                    />
+                                </>}
+                            {encounterTabs?.map((tab) => (
+                                <div
+                                    key={tab.id}
+                                    className={`d-flex fs-6 p-1 align-items-center cursor-pointer fw-semibold
+                                         ${parseInt(activeTab) === tab?.id ? ' text-primary border-bottom border-2  border-primary' : 'text-secondary'}`}
+                                    onClick={() => setActiveTab(tab.id)}
+                                >
 
-                    )}
-
-                    <Tabs
-                        activeKey={activeTab}
-                        onSelect={setActiveTab}
-                        id="encounter-tabs"
-                        className={` ${encounterTabs?.length > 1 ? 'ms-4' : 'px-0 pt-0 '} mb-0 border-0 flex-grow-1`}
-                    >
-                        {encounterTabs?.map((tab) => (
-                            <Tab
-                                key={tab.id}
-                                eventKey={tab.id}
-                                title={
-                                    <div
-                                        className={`d-flex fs-6 align-items-center  ${parseInt(activeTab) === tab?.id ? ' text-primary ' : 'text-secondary'}`}>
-                                        {tab.type === 'date' ? (
-                                            <FaCalendarAlt className="me-1" />
-                                        ) : (
-                                            <MdOutlineMedicalServices className="me-1" />
-                                        )}
-                                        <span className="text-nowrap">{tab.title}</span>
-                                        {tab.type !== 'default' &&
-                                            <span className={`p-0 ms-2 m-0  ${parseInt(activeTab) === tab?.id ? 'fw- text-primary' : 'text-secondary'} `}
-                                                onClick={(e) => removeEncounterTab(tab.id, e)}>
-                                                <IoClose />
-                                            </span>
-                                        }
-                                    </div>
-                                }
-                            >
-                                <div>
-                                    {tab?.type === 'default' ?
-                                        <EncounterList tab={tab} encounterTabs={encounterTabs} setEncounterTabs={setEncounterTabs} setActiveTab={setActiveTab} />
-                                        :
-                                        tab?.type === 'date' ?
-                                            <DateEncounters isCollapsed={isCollapsed} />
-                                            :
-                                            tab?.type === 'appointment' ?
-                                                <AppointmentEncounter />
-                                                :
-                                                <></>
-                                    }
+                                    <span className="text-nowrap">{tab.title}</span>
+                                    {tab.type !== 'default' && (
+                                        <span
+                                            className="p-0 ms-2 m-0"
+                                            onClick={(e) => removeEncounterTab(tab.id, e)}
+                                        >
+                                            <IoClose />
+                                        </span>
+                                    )}
                                 </div>
-                            </Tab>
+                            ))}
+                        </div>
+                        {expanded ?
+                            <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
+                            :
+                            <BiExpand className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
+                        }
+                    </div>
+
+                    {/* Tab content */}
+                    <div className="col-12 ">
+                        {encounterTabs?.map((tab) => (
+                            <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
+                                {tab?.type === 'default' ? (
+                                    <EncounterList
+                                        tab={tab}
+                                        encounterTabs={encounterTabs}
+                                        setEncounterTabs={setEncounterTabs}
+                                        setActiveTab={setActiveTab}
+                                    />
+                                ) : tab?.type === 'date' ? (
+                                    <DateEncounters isCollapsed={isCollapsed} />
+                                ) : tab?.type === 'appointment' ? (
+                                    <AppointmentEncounter />
+                                ) : (
+                                    <></>
+                                )}
+                            </div>
                         ))}
-                    </Tabs>
+                    </div>
                 </div>
             </Card.Body>
         </Card>

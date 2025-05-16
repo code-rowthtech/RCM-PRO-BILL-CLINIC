@@ -251,9 +251,9 @@ const Designation = () => {
                         <Col sm={11} className="text-center">
                             <h4>{edit ? 'Edit Desigination' : 'New Desigination'}</h4>
                         </Col>
-                        <Col sm={1}>
+                        {/* <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} />
-                        </Col>
+                        </Col> */}
                     </Row>
                     <Form onSubmit={handleSubmit(addDesigination)}>
                         <Row>
@@ -311,6 +311,7 @@ const Designation = () => {
                             </Col>
                         </Row>
                         <Modal.Footer>
+                            <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
                                     store?.updateMastersDataReducer?.loading ? (

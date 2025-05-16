@@ -7,24 +7,23 @@ const DateEncounters = ({ isCollapsed }) => {
     const [leftTab, setLeftTab] = useState('Summary');
 
     return (
-        <div className='px-2 mt-1 row'>
-
-
+        <div className='px-0 mt-1 row border  mx-1 h-100' >
             {/* Collapsible Left Column */}
-            <Col className={`border-end ${isCollapsed ? 'd-none' : ''}`} sm={4}>
-                <ul className='d-flex list-unstyled'>
+            <Col className={`px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
+                <ul className='d-flex list-unstyled mt-0'>
                     {['Summary', 'Templates', 'Past Encounters'].map((data) => (
                         <li
                             key={data}
                             onClick={() => setLeftTab(data)}
-                            className={`flex-fill border-bottom fs-6 fw-semibold cursor-pointer text-center 
-                            ${data === leftTab ? 'border-2 fw-bold border-primary text-primary' : ''}`}>
+                            className={`cursor-pointer p-1 fs-6  rounded-0  list-group-item  
+                                    d-flex align-items-center flex-fill justify-content-center fw-bold 
+                                    ${data === leftTab ? 'active-patient-chart-tab fw-medium    ' : 'border border-muted'}`}>
                             {data}
                         </li>
                     ))}
                 </ul>
-                <Row>
-                    <Col sm={12}>
+                <Row className='mx-auto'>
+                    <Col sm={12} className='px-md-1'>
                         {leftTab === 'Summary' && <EncounterSummary />}
                         {leftTab === 'Templates' && <>Templates</>}
                         {leftTab === 'Past Encounters' && <>Past Encounters</>}
@@ -34,10 +33,12 @@ const DateEncounters = ({ isCollapsed }) => {
             </Col>
 
             {/* Main Content Column */}
-            <Col sm={isCollapsed ? 12 : 8}>
+            <Col className='px-0 border-start pb-2 h-100' sm={isCollapsed ? 12 : 8}>
                 {/* Encounter Details */}
-                <div style={{ height: '59vh' }} className="px-1 scroll-container">
-                    <Row className="g-2 mt-0 bg-light rounded-top p-1 border">
+                <div className="px-1 h-100" >
+                    <Row
+                        style={{ height: '16.5vh' }}
+                        className="g-2 mt-0 bg-light rounded-top p-1 ">
                         <Col sm={4} className='mt-0'>
                             <Form.Group className='encounterHeaderGroup'>
                                 <Form.Label className='mb-0 fw-bold small'>Encounter Type <span className='text-danger'>*</span></Form.Label>
@@ -66,10 +67,6 @@ const DateEncounters = ({ isCollapsed }) => {
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
-
-                    {/* Secondary Header Row */}
-                    <Row className="g-2 bg-light p-1 border-top-0 border">
                         <Col sm={2} className='mt-0'>
                             <Form.Group className='encounterHeaderGroup'>
                                 <Form.Label className='mb-0 fw-bold small'>Age at Encounter</Form.Label>
@@ -114,15 +111,20 @@ const DateEncounters = ({ isCollapsed }) => {
                             </Form.Group>
                         </Col>
                     </Row>
-                    <Row className='g-2'>
-                        {/* Chief Complaint */}
 
-                        <Col sm={12} className="mb-3  pt-1">
+                    {/* Secondary Header Row */}
+                    {/* <Row className="g-2 bg-light p-1 " >
+                     
+                    </Row> */}
+                    <Row className='g-2 px-2 mt-1 scroll-container' style={{ height: '59vh' }}>
+                        {/* Chief Complaint */}
+                        <Col sm={12} className="mb-0 mt-0  pt-0">
                             <Form.Group>
                                 <Form.Label className='mb-0'>Chief Complaint</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='Add any problems or symptoms here' />
+                                <Form.Control as={'textarea'} placeholder='' />
                             </Form.Group>
                         </Col>
+
                         {/* Health Concerns */}
                         <Col sm={12} className="mb-3 border-top pt-2">
                             <div className="d-flex justify-content-between align-items-center">
@@ -137,6 +139,31 @@ const DateEncounters = ({ isCollapsed }) => {
                                 <h6 className="mb-0">Flowsheets</h6>
                                 <Button variant="link" size="sm">Expand</Button>
                             </div>
+                        </Col>
+
+                        <Col sm={12} className="mb-3 mt-0  pt-0">
+                            <Form.Group>
+                                <Form.Label className='mb-0'>Subjective</Form.Label>
+                                <Form.Control as={'textarea'} placeholder='' />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={12} className="mb-3 mt-0  pt-0">
+                            <Form.Group>
+                                <Form.Label className='mb-0'>Objective</Form.Label>
+                                <Form.Control as={'textarea'} placeholder='' />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={12} className="mb-3 mt-0  pt-0">
+                            <Form.Group>
+                                <Form.Label className='mb-0'>Assessment</Form.Label>
+                                <Form.Control as={'textarea'} placeholder='' />
+                            </Form.Group>
+                        </Col>
+                        <Col sm={12} className="mb-3 mt-0  pt-0">
+                            <Form.Group>
+                                <Form.Label className='mb-0'>Plan</Form.Label>
+                                <Form.Control as={'textarea'} placeholder='' />
+                            </Form.Group>
                         </Col>
 
                         {/* Medications */}
@@ -171,9 +198,10 @@ const DateEncounters = ({ isCollapsed }) => {
                                     </tr>
                                 </tbody>
                             </Table>
-                            <div className="text-end mt-2 d-flex justify-content-end">
+
+                            {/* <div className="text-end mt-2 d-flex justify-content-end">
                                 <Button className='custom-buttons'>Go to</Button>
-                            </div>
+                            </div> */}
                         </Col>
                     </Row>
                 </div>

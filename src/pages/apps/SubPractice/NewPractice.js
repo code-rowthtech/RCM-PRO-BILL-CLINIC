@@ -899,9 +899,9 @@ const NewPractice = () => {
                                                     Email to Sub Practice
                                                 </Button>
                                            */}
-                                            <Button className="cancel-button" as={Link} to={'/apps/crm/addclinic'}>
+                                            <Button className="cancel-button" as={Link} to={'/apps/crm/addPractice'}>
                                                 Back
-                                            </Button>
+                                            </Button>s
                                         </>
                                     )}
                                 </div>
@@ -1078,7 +1078,7 @@ const NewPractice = () => {
                                                             </Col>
                                                             <Col>
                                                                 <Form.Label>
-                                                                    Identifier Expiry (If Applicable)
+                                                                    Identifier Expiry <span className='text-secondary'>(If Applicable)</span>
                                                                 </Form.Label>
                                                             </Col>
                                                         </Row>

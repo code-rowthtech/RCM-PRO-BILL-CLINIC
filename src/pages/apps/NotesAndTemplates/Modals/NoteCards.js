@@ -61,7 +61,7 @@
 //                                         {/* Labels */}
 //                                         <div className="text-muted small">
 //                                             <div className="fw-semibold">Format</div>
-//                                             <div className="fw-semibold">Confidential</div>
+//                                             <div className="fw-semibold">private</div>
 //                                             <div className="fw-semibold">Enabled</div>
 //                                         </div>
 
@@ -137,15 +137,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import Spinner from '../../../../constants/Spinner';
 import { getNoteCategoriesAction, updateNoteCategoriesAction } from '../../../../redux/noteCategories/action';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { FiFileText } from 'react-icons/fi';
 
 const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [noteTypes, setNoteTypes] = useState([]);
-    console.log(noteTypes,'notes')
+    console.log(noteTypes, 'notes');
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
+    // console.log(, 'store?.getNoteCategoriesReducer?.data')
     const loading = store?.getNoteCategoriesReducer?.loading;
 
     useEffect(() => {
@@ -157,6 +159,9 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
             clinicId: clinic_id,
             noteType: note.noteType,
             format: note.format,
+            noteType: note.noteType,
+            title: note.title,
+            customTitle: note.title === 'Other' ? note.customTitle : '',
             active: note.active,
             private: note.private,
             default: note.isDefault,
@@ -200,6 +205,11 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                 <div className="d-flex justify-content-center align-items-center w-100" style={{ height: '82vh' }}>
                     <Spinner color="white" className="spinner-border-sm" />
                 </div>
+            ) : noteTypes?.length === 0 ? (
+                <div className="d-flex flex-column align-items-center">
+                    <FiFileText size={48} className="text-muted mb-2" />
+                    <h5>No Note found</h5>
+                </div>
             ) : (
                 noteTypes?.map((note) => (
                     <Col key={note._id} md={6} lg={4} xl={3} className="mb-2 px-2">
@@ -235,11 +245,8 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                         )}
                                     </div> */}
                                     <div className="small ms-1">
-                                        <strong
-                                         title={note?.noteType}>
-                                            {note?.noteType?.length > 20
-                                                ? `${note.noteType.slice(0, 20)}...`
-                                                : note?.noteType}
+                                        <strong title={note?.title}>
+                                            {note?.title?.length > 25 ? `${note.title.slice(0, 25)}...` : note?.title}
                                         </strong>{' '}
                                     </div>
                                 </div>
@@ -291,12 +298,16 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
                                 </Form.Select>
                             </div> */}
                             <div className="d-flex align-items-center justify-content-between px-2 py-2 border-bottom small">
+                                <strong>Note Type</strong>
+                                <div>{note?.noteType || note?.customTitle}</div>
+                            </div>
+                            <div className="d-flex align-items-center justify-content-between px-2 py-2 border-bottom small">
                                 <strong>Format</strong>
                                 <div>{note?.format}</div>
                             </div>
 
                             <div className="d-flex justify-content-between align-items-center small border-bottom px-2 py-2">
-                                <strong>Confidential</strong>
+                                <strong>Private</strong>
                                 <Form.Check
                                     type="switch"
                                     checked={note?.private}
@@ -315,7 +326,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
 
                             <div
                                 className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
-                                // style={{ backgroundColor: '#5582E51A' }}
+                            // style={{ backgroundColor: '#5582E51A' }}
                             >
                                 <div className="d-flex align-items-center">
                                     <Form.Check

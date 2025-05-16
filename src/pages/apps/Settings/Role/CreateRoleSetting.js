@@ -61,7 +61,7 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                 closeModal();
             }
             dispatch(createRoleDataAction({ key: `${encryptMessage(payload)}` }));
-            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '',createdById:'', page: 1, status: true }));
+            dispatch(getRoleDataAction({ clinicId: clinicId, limit: 10, search: '', createdById: '', page: 1, status: true }));
         }
     };
 
@@ -93,9 +93,9 @@ const CreateRoleSetting = ({ show, closeModal }) => {
                     <Col sm={10}>
                         <h4 className="mb-0 text-center">Add Role</h4>
                     </Col>
-                    <Col sm={1}>
+                    {/* <Col sm={1}>
                         <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
-                    </Col>
+                    </Col> */}
                 </Row>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Row>
@@ -149,6 +149,7 @@ const CreateRoleSetting = ({ show, closeModal }) => {
 
                     </Row>
                     <Modal.Footer>
+                        <Button onClick={closeModal} className="custom-buttons">Close</Button>
                         <Button type='submit' disabled={store?.createRoleDataReducer?.loading} className='custom-buttons'>
                             {store?.createRoleDataReducer?.loading ?
                                 <Spinner color='white' className="spinner-border-sm" />
