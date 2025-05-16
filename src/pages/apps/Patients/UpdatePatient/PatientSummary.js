@@ -301,9 +301,9 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                             key={index}
                                             className="mb-2 d-flex justify-content-between align-items-start">
                                             <div className="fs-6">
-                                                <strong title={allergy.code?.text}>{allergy.code?.text?.length > 30 ? allergy.code?.text?.slice(0, 29) + '...' : allergy.code?.text || 'Unknown Allergy'}</strong>
+                                                <strong title={allergy?.code?.text}>{allergy?.code?.text?.length > 30 ? allergy?.code?.text?.slice(0, 29) + '...' : allergy?.code?.text || 'Unknown Allergy'}</strong>
                                                 <div className="text-muted  small">
-                                                    {allergy.clinicalStatus?.text || 'Status not available'}
+                                                    {allergy?.clinicalStatus?.text || 'Status not available'}
                                                 </div>
                                             </div>
                                             <span className="fs-6 fw-semibold text-nowrap">

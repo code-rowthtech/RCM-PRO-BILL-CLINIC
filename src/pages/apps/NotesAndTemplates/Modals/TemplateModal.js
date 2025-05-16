@@ -105,21 +105,21 @@ const TemplateModal = ({ show, onHide, template }) => {
             onHide();
             reset();
             setTags([])
-        }} size="xl" centered scrollable backdrop="static">
-            <Modal.Header closeButton className="border-bottom-0 pb-0">
-                <Modal.Title className="fw-bold">
-                    Create New Template
+        }} size="xl" centered backdrop="static">
+            <Modal.Header className="p-0 pb-0 d-flex justify-content-center">
+                <Modal.Title className="fw-semibold ">
+                    {template?._id ? 'Update' : "Create"} Template
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="pt-0">
-                <ul className="nav nav-underline mb-2">
+            <Modal.Body className="pt-0 scroll-container">
+                <ul style={{ height: '6.1%' }} className=" nav nav-underline mb-2">
                     <li className="nav-item">
                         <span
                             className={classNames(
-                                'nav-link fw-bold text-black cursor-pointer fs-6',
+                                'nav-link fw-semibold text-secondary cursor-pointer pb-0 fs-5',
                                 {
                                     active: activeTab === 'details',
-                                    'fw-bold fs-6': activeTab === 'details',
+                                    'fw-bold fs-5': activeTab === 'details',
                                 }
                             )}
                             onClick={() => setActiveTab('details')}>
@@ -129,10 +129,10 @@ const TemplateModal = ({ show, onHide, template }) => {
                     <li className="nav-item">
                         <span
                             className={classNames(
-                                'nav-link fw-bold text-black cursor-pointer fs-6',
+                                'nav-link fw-semibold text-secondary cursor-pointer pb-0 fs-5',
                                 {
                                     active: activeTab === 'sections',
-                                    'fw-bold fs-6': activeTab === 'sections',
+                                    'fw-bold fs-5': activeTab === 'sections',
                                 }
                             )}
                             onClick={() => setActiveTab('sections')}>
@@ -141,8 +141,8 @@ const TemplateModal = ({ show, onHide, template }) => {
                     </li>
                 </ul>
                 {activeTab === 'details' ?
-                    <Form onSubmit={handleSubmit(onSubmit)}>
-                        <div className="row mb-3">
+                    <Form className='d-flex flex-column align-items-between' style={{ height: '93.9%' }} onSubmit={handleSubmit(onSubmit)}>
+                        <div className="row mb-3 scroll-container">
                             <div className="col-md-4">
                                 <Form.Group>
                                     <Form.Label className='mb-0'>Title <span className='text-danger'>*</span></Form.Label>
@@ -266,6 +266,7 @@ const TemplateModal = ({ show, onHide, template }) => {
                                             type="text"
                                             placeholder=" "
                                             onKeyDown={handleAddTag}
+                                            maxLength={15}
                                         />
                                     </Form.Group>
                                 </div>
@@ -274,61 +275,66 @@ const TemplateModal = ({ show, onHide, template }) => {
                                         <Badge key={index}
                                             bg="primary"
                                             text="white"
+                                            // title={tag}
                                             style={{ height: '1.6rem', marginTop: '1.1rem' }}
                                             className="d-flex px-2 align-items-center mb-0">
+                                            {/* {tag?.length > 35 ? tag?.slice(0, 34) + '...' : tag} */}
                                             {tag}
                                             <TiDelete className='text-white fs-4 ms-1' onClick={() => handleRemoveTag(index)} />
                                         </Badge>
                                     ))}
                                 </div>
                             </div>
-                            <div className="row mb-2">
-                                <div className='mt-0 col-md-12'>
-                                    <Form.Group controlId="description">
+                            <div className="row mb-2 pe-0" style={{ height: 'calc(60vh - 120px)', display: 'flex', flexDirection: 'column' }}>
+                                <div className="col-md-12 pe-0  flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
+                                    <Form.Group controlId="description" className="flex-grow-1 d-flex flex-column mb-0">
                                         <Form.Label className="fw-medium mb-1">
-                                            Desription{' '}
+                                            Description
                                         </Form.Label>
-                                        <Controller
-                                            name="description"
-                                            control={control}
-                                            render={({ field: { onChange, value } }) => (
-                                                <ReactQuill
-                                                    value={value}
-                                                    onChange={(content, delta, source) => {
-                                                        if (source === 'user') {
-                                                            onChange(content);
-                                                        }
-                                                    }}
-                                                    theme="snow"
-                                                    placeholder="Enter detailed description here..."
-                                                    style={{ height: '15vh', backgroundColor: 'white' }}
-                                                    modules={{
-                                                        toolbar: [
-                                                            [{ header: [1, 2, false] }],
-                                                            ['bold', 'italic', 'underline', 'strike'],
-                                                            [{ list: 'ordered' }, { list: 'bullet' }],
-                                                            ['clean'],
-                                                        ],
-                                                    }}
-                                                />
-                                            )}
-                                        />
+                                        <div className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0 }}>
+                                            <Controller
+                                                name="description"
+                                                control={control}
+                                                render={({ field: { onChange, value } }) => (
+                                                    <ReactQuill
+                                                        value={value}
+                                                        onChange={(content, delta, source) => {
+                                                            if (source === 'user') {
+                                                                onChange(content);
+                                                            }
+                                                        }}
+                                                        theme="snow"
+                                                        placeholder="Enter detailed description here..."
+                                                        style={{ flex: 1, minHeight: 0 }}
+                                                        modules={{
+                                                            toolbar: [
+                                                                [{ header: [1, 2, false] }],
+                                                                ['bold', 'italic', 'underline', 'strike'],
+                                                                [{ list: 'ordered' }, { list: 'bullet' }],
+                                                                ['clean'],
+                                                            ],
+                                                        }}
+                                                    />
+                                                )}
+                                            />
+                                        </div>
                                     </Form.Group>
                                 </div>
                             </div>
-                            <div className="row pt-5">
-                                <div className="col-12 d-flex justify-content-end gap-1">
-                                    <Button onClick={() => {
-                                        onHide();
-                                        reset();
-                                        setTags([])
-                                    }} className='custom-buttons'>
-                                        Cancel
-                                    </Button>
-                                    <Button type='submit' className='custom-buttons' disabled={store?.createTemplateReducer?.loading || store?.updateTemplateReducer?.loading}>
-                                        Save Template
-                                    </Button>
-                                </div>
+
+                        </div>
+                        <div className="row">
+                            <div className="col-12 d-flex justify-content-end pb-2 gap-1">
+                                <Button onClick={() => {
+                                    onHide();
+                                    reset();
+                                    setTags([])
+                                }} className='custom-buttons'>
+                                    Cancel
+                                </Button>
+                                <Button type='submit' className='custom-buttons' disabled={store?.createTemplateReducer?.loading || store?.updateTemplateReducer?.loading}>
+                                    Save Template
+                                </Button>
                             </div>
                         </div>
                     </Form> :

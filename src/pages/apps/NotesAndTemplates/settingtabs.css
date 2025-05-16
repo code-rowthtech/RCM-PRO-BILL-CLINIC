@@ -71,16 +71,19 @@
 }
 .templatesAccordion .accordion-button {
     padding: 5px 10px !important;
+    background-color: white !important;
+    border: 1px solid rgba(202, 200, 200, 0.641);
 }
 
 .templateAccordionItem .accordion-body {
     padding: 0 !important;
+    border: 1px solid rgba(202, 200, 200, 0.641);
 }
 .templateAccordionItem {
     border: none !important;
 }
 .templateModal .modal-dialog .modal-content {
-    height: 80vh !important;
+    height: 85vh !important;
 }
 
 .note-type-card input:focus,

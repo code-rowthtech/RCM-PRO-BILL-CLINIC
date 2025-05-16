@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Col, Row, Table, Form, Button, Modal } from 'react-bootstrap';
-import { IoClose, IoSettings } from 'react-icons/io5';
+import { useEffect, useState } from 'react';
+import { Card, Col, Row, Button, Modal } from 'react-bootstrap';
+import { IoClose } from 'react-icons/io5';
 import SettingTabs from './SettingTabs';
-import { useForm } from 'react-hook-form';
 import AddModalSetting from './Modals/AddModalSetting';
 import NoteTypeCards from './Modals/NoteCards';
 import { useDispatch } from 'react-redux';
@@ -14,13 +13,12 @@ const NotesTypes = () => {
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
-    // const [selectedNote, setSelectedNote] = useState(null);
 
     useEffect(() => {
         dispatch(getNoteCategoriesAction());
     }, [dispatch]);
     const handleOpenTab = (note) => {
-        const exists = openTabs.find((tab) => tab?._id === note?._id);
+        const exists = openTabs?.find((tab) => tab?._id === note?._id);
         if (!exists) {
             setOpenTabs((prev) => [...prev, note]);
         }
@@ -37,11 +35,6 @@ const NotesTypes = () => {
     };
 
     const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
-    // for edit
-    // const handleOpenEditModal = (note) => {
-    //     setSelectedNote(note);
-    //     setAddModal(true);
-    // };
 
     return (
         <Row className="mt-2">

@@ -43,7 +43,7 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
     ]
 
     return (
-        <div className="p-2 pt-0">
+        <div className="px-2 pt-0 mt-1 row">
             <Row className="mb-1">
                 <Col sm={6}>
                 </Col>
@@ -54,8 +54,10 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
                 </Col>
             </Row>
 
-            <Table responsive className="table-centered table-nowrap mb-0  rounded">
-                <thead className="">
+            {/* <Table
+                responsive
+                className="table-centered table-nowrap mb-0  rounded">
+                <thead className="text-white">
                     <tr>
                         <th className='text-white'>S.no</th>
                         <th className='text-white'>Date</th>
@@ -64,47 +66,74 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
                         <th className='text-white'>Superbill</th>
                         <th className='text-white'>Action</th>
                     </tr>
-                </thead>
-                <tbody>
-                    {encounterData?.map((item, index) => (
-                        <tr key={item?.id}>
-                            <td>{index + 1}</td>
-                            <td>{item?.date}</td>
-                            <td className="d-flex align-items-center gap-2">
-                                <Image
-                                    src={item?.provider?.profilePic}
-                                    roundedCircle
-                                    width={35}
-                                    height={35}
-                                    alt={item?.provider?.name}
-                                />
-                                <div>
-                                    <div>{item?.provider?.name}</div>
-                                    <small className="text-muted">{item?.provider?.email}</small>
-                                </div>
-                            </td>
-                            <td>{item?.appointment}</td>
-                            <td>{item?.superbill || 'N/A'}</td>
-                            <td>
+                </thead> */}
+            <Row>
+                <Col sm={12}>
+                    <Table
+                        responsive
+                        className="table-centered table-nowrap mb-0  rounded">
+                        <thead className="text-white">
+                            <tr>
+                                <th className="text-white">S.no</th>
+                                <th className="text-white">Date</th>
+                                <th className="text-white">Provider</th>
+                                <th className="text-white">Related Appointment</th>
+                                <th className='text-white'>Superbill</th>
+                                <th className="text-white">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {encounterData?.map((item, index) => (
+                                <tr onClick={() => {
+                                    const newTab = {
+                                        id: encounterTabs?.length + 1,
+                                        title: item?.date,
+                                        type: 'date',
+                                    };
+                                    setEncounterTabs([...encounterTabs, newTab]);
+                                    setActiveTab(newTab?.id)
+                                }} key={item?.id}>
+                                    <td>{index + 1}</td>
+                                    <td>{item?.date}</td>
+                                    <td className="d-flex align-items-center gap-2">
+                                        <Image
+                                            src={item?.provider?.profilePic}
+                                            roundedCircle
+                                            width={35}
+                                            height={35}
+                                            alt={item?.provider?.name}
+                                        />
+                                        <div>
+                                            <div>{item?.provider?.name}</div>
+                                            <small className="text-muted">{item?.provider?.email}</small>
+                                        </div>
+                                    </td>
+                                    <td>{item?.appointment}</td>
+                                    <td>{item?.superbill || 'N/A'}</td>
+                                    <td>
 
-                                <i
-                                    className=" bi bi-pencil text-info cursor-pointer"
-                                    onClick={() => {
-                                        const newTab = {
-                                            id: encounterTabs?.length + 1,
-                                            title: item?.date,
-                                            type: 'date',
-                                        };
-                                        setEncounterTabs([...encounterTabs, newTab]);
-                                        setActiveTab(newTab?.id)
-                                    }}
-                                />
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
-        </div>
+                                        <i
+                                            className=" bi bi-pencil text-info cursor-pointer"
+                                            onClick={() => {
+                                                const newTab = {
+                                                    id: encounterTabs?.length + 1,
+                                                    title: item?.date,
+                                                    type: 'date',
+                                                };
+                                                setEncounterTabs([...encounterTabs, newTab]);
+                                                setActiveTab(newTab?.id)
+                                            }}
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </Col>
+            </Row>
+
+
+        </div >
     )
 }
 

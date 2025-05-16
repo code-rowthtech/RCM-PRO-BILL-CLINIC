@@ -1,10 +1,11 @@
 import { Badge, ChevronDown, ChevronUp, Plus, Trash } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
-import { Accordion, Button, Card, Form, ListGroup } from 'react-bootstrap';
+import { Accordion, Button, Card, Form, ListGroup, Row, Col } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { updateTemplateAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
+import { TiTick } from 'react-icons/ti';
 
 const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
     const dispatch = useDispatch();
@@ -17,14 +18,18 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
         shortcut: '',
         archived: false
     });
+    const [activeAccordionKey, setActiveAccordionKey] = useState(null);
+
     useEffect(() => {
         if (template?._id) {
             setItems(template?.items)
         }
     }, [template])
+
     const sectionLabels = [
         'Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', 'Notes'
     ];
+
     useEffect(() => {
         if (updateResponse == true && sectionsId || updateResponse == true && template?._id) {
             onHide();
@@ -33,24 +38,26 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
             setItems([])
         }
     }, [updateResponse, sectionsId, template])
+
     const handleAddSection = (sectionType) => {
         if (!items.some(item => item.label === sectionType)) {
-            setItems(prev => [
-                ...prev,
+            const newItems = [
+                ...items,
                 {
                     label: sectionType,
                     list: [],
-                    order: prev.length
+                    order: items.length
                 }
-            ]);
+            ];
+            setItems(newItems);
+            // Open the newly added section
+            setActiveAccordionKey(newItems.length - 1);
         }
     };
-
 
     const handleRemoveSection = (index) => {
         setItems(prev => prev.filter((_, i) => i !== index));
     };
-
 
     const handleAddItem = (sectionIndex) => {
         if (newItem.text) {
@@ -103,7 +110,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
         [section.list[itemIndex], section.list[newIndex]] =
             [section.list[newIndex], section.list[itemIndex]];
 
-        setItems(updatedItems); // ✅ Correctly update state
+        setItems(updatedItems);
     };
 
     const updateTemplateSection = () => {
@@ -112,24 +119,31 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
         }
         dispatch(updateTemplateAction({ key: encryptMessage(data), templateId: sectionsId }))
     }
+
     return (
         <div className='d-flex flex-column align-items-between'>
             <div>
-                <div className="mb-4">
-                    <h5 className="mb-1 fs-5">Add Section</h5>
-                    <div className="d-flex flex-wrap gap-2">
+                <div className="row mb-2">
+                    {/* <h5 className="mb-1 fs-5">Add Section</h5> */}
+                    <div className="col-8 d-flex flex-wrap ">
                         {sectionLabels.map(label => (
-                            <Button
+                            <button
                                 key={label}
-                                variant="outline-primary"
+                                variant="outlined"
                                 size="sm"
+                                // style={{ width: '' }}
                                 onClick={() => handleAddSection(label)}
-                                disabled={items?.some(item => item.label === label)}
-                                className="d-flex align-items-center gap-1"
+                                className={`cursor-pointer p-1 fs-6  flex-fill  rounded-0  list-group-item  
+                                    d-flex align-items-center justify-content-center fw-bold 
+                                    ${items?.some(item => item.label === label) ? 'active-patient-chart-tab fw-medium border border-white' : 'border border-muted'}`}
                             >
-                                <Plus size={14} />
-                                {label}
-                            </Button>
+                                {label}&nbsp;
+                                {items?.some(item => item.label === label) ?
+                                    <TiTick size={14} />
+                                    :
+                                    <Plus size={14} />
+                                }&nbsp;
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -140,154 +154,136 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                         No sections added to this template yet. Click the buttons above to add sections.
                     </div>
                 ) : (
-                    <Accordion defaultActiveKey="0" className="mb-4">
-                        {items.map((section, sectionIndex) => (
-                            <Accordion.Item className='templateAccordionItem' key={sectionIndex} eventKey={sectionIndex.toString()}>
-                                <Accordion.Header className="d-flex align-items-center templatesAccordion">
-                                    <div className="d-flex justify-content-between align-items-center w-100 me-2">
-                                        <div className="d-flex align-items-center">
-                                            <span className="badge bg-primary me-2">{sectionIndex + 1}</span>
-                                            <strong>{section.label}</strong>
-                                        </div>
-                                        <Trash
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRemoveSection(sectionIndex);
-                                            }}
-                                            className='cursor-pointer text-danger'
-                                            size={14} />
-                                        {/* </Button> */}
-                                    </div>
-                                </Accordion.Header>
-                                <Accordion.Body>
-                                    {!section.list?.length ? (
-                                        <div className="alert alert-warning m-1 p-1">
-                                            No items in this section
-                                        </div>
-                                    ) : (
-                                        <ListGroup className="mb-0">
-                                            {section.list.map((item, itemIndex) => (
-                                                <ListGroup.Item key={itemIndex} className="py-1 px-3">
-                                                    <div className="d-flex justify-content-between align-items-center">
-                                                        <div className="d-flex align-items-center">
-                                                            <span className="text-muted fs-6 me-2" style={{ width: '30px' }}>#{itemIndex + 1}</span>
-                                                            <div>
-                                                                <div className='fs-6 text-black'>{item.text}</div>
-                                                                {/* {item.shortcut && (
-                                                                <Badge bg="light" text="dark" className="mt-1">
-                                                                    Shortcut: {item.shortcut}
-                                                                </Badge>
-                                                            )} */}
-                                                            </div>
-                                                        </div>
-                                                        <div className="d-flex gap-1">
-                                                            {/* <Button
-                                                    variant="outline-secondary"
-                                                    size="sm"
-                                                    className="p-1"
-                                                    disabled={itemIndex === 0}
-                                                > */}
-                                                            <ChevronUp
-                                                                className='cursor-pointer'
-                                                                onClick={() => handleMoveItem(sectionIndex, itemIndex, 'up')}
-                                                                size={16} />
-                                                            {/* </Button> */}
-                                                            {/* <Button
-                                                    variant="outline-secondary"
-                                                    size="sm"
-                                                    className="p-1"
-                                                    disabled={itemIndex === section.list.length - 1}
-                                                > */}
-                                                            <ChevronDown
-                                                                onClick={() => handleMoveItem(sectionIndex, itemIndex, 'down')}
-                                                                className='cursor-pointer'
-                                                                size={16} />
-                                                            {/* <Button
-                                                    variant="outline-danger"
-                                                    size="sm"
-                                                    className="p-1"
-
-                                                > */}
-                                                            <Trash
-                                                                onClick={() => handleRemoveItem(sectionIndex, itemIndex)}
-                                                                className='cursor-pointer text-danger'
-                                                                size={16} />
-                                                            {/* </Button> */}
-                                                        </div>
-                                                    </div>
-                                                </ListGroup.Item>
-                                            ))}
-                                        </ListGroup>
-                                    )}
-
-                                    <Card className="border">
-                                        <Card.Header className="bg-light">
-                                            <h6 className="mb-0">Add New Item to {section.label}</h6>
-                                        </Card.Header>
-                                        <Card.Body>
-                                            <div className="row g-3">
-                                                <div className="col-md-6">
-                                                    <Form.Group>
-                                                        <Form.Label className='mb-0'>Item Text <span className='text-danger'>*</span></Form.Label>
-                                                        <Form.Control
-                                                            as="textarea"
-                                                            style={{ height: '80px' }}
-                                                            name="text"
-                                                            value={newItem.text}
-                                                            onChange={(e) => setNewItem({
-                                                                ...newItem,
-                                                                text: e.target.value
-                                                            })}
-                                                            placeholder=" "
-                                                            required
-                                                        />
-                                                    </Form.Group>
+                    <Row>
+                        <Col md={activeAccordionKey !== null ? 8 : 12}>
+                            <Accordion activeKey={activeAccordionKey?.toString()} onSelect={(key) => setActiveAccordionKey(key ? parseInt(key) : null)} className="mb-4">
+                                {items?.map((section, sectionIndex) => (
+                                    <Accordion.Item className='templateAccordionItem mb-1' key={sectionIndex} eventKey={sectionIndex.toString()}>
+                                        <Accordion.Header className="d-flex align-items-center templatesAccordion">
+                                            <div className="d-flex justify-content-between align-items-center w-100 me-2">
+                                                <div className="d-flex align-items-center">
+                                                    <span className="badge bg-primary me-2">{sectionIndex + 1}</span>
+                                                    <span className='fs-6 fw-semibold'>{section.label}</span>
                                                 </div>
-                                                <div className="col-md-6 d-flex flex-column">
-                                                    <Form.Group>
-                                                        <Form.Label className='mb-0'>Shortcut</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            name="shortcut"
-                                                            value={newItem.shortcut}
-                                                            onChange={(e) => setNewItem({
-                                                                ...newItem,
-                                                                shortcut: e.target.value
-                                                            })}
-                                                            placeholder=" "
-                                                        />
-                                                    </Form.Group>
+                                                <Trash
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveSection(sectionIndex);
+                                                    }}
+                                                    className='cursor-pointer text-danger'
+                                                    size={14} />
+                                            </div>
+                                        </Accordion.Header>
+                                        <Accordion.Body>
+                                            {!section.list?.length ? (
+                                                <div className="alert alert-warning m-1 p-1">
+                                                    No items in this section
+                                                </div>
+                                            ) : (
+                                                <ListGroup className="mb-0">
+                                                    {section.list.map((item, itemIndex) => (
+                                                        <ListGroup.Item key={itemIndex} className="py-2 px-3">
+                                                            <div className="d-flex justify-content-between align-items-center">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="text-muted fw-semibold fs-6 me-1" style={{ width: '30px' }}>{itemIndex + 1}</span>
+                                                                    <div>
+                                                                        <div className='fs-6 text-black'>{item.text}</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="d-flex gap-1">
+                                                                    {/* <ChevronUp
+                                                                        className='cursor-pointer'
+                                                                        onClick={() => handleMoveItem(sectionIndex, itemIndex, 'up')}
+                                                                        size={16} />
+                                                                    <ChevronDown
+                                                                        onClick={() => handleMoveItem(sectionIndex, itemIndex, 'down')}
+                                                                        className='cursor-pointer'
+                                                                        size={16} /> */}
+                                                                    {/* <Trash
+                                                                        onClick={() => handleRemoveItem(sectionIndex, itemIndex)}
+                                                                        className='cursor-pointer text-danger'
+                                                                        size={16} /> */}
+                                                                </div>
+                                                            </div>
+                                                        </ListGroup.Item>
+                                                    ))}
+                                                </ListGroup>
+                                            )}
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                ))}
+                            </Accordion>
+                        </Col>
 
-                                                    <Form.Check
-                                                        type="switch"
-                                                        id="itemArchived"
-                                                        label="Archived"
-                                                        name="archived"
-                                                        checked={newItem.archived}
+                        {activeAccordionKey !== null && (
+                            <Col md={4} className='ps-0'>
+                                <Card className="border-0  mb-4 rounded-0">
+                                    <Card.Header className="" style={{ background: '#ecedee', padding: '0.456rem 0.6rem' }}>
+                                        <h6 className="my-0 fw-semibold">Add New Item to {items[activeAccordionKey]?.label}</h6>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <div className="row g-3">
+                                            <div className="col-12">
+                                                <Form.Group>
+                                                    <Form.Label className='mb-0'>Item Text <span className='text-danger'>*</span></Form.Label>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        style={{ height: '80px' }}
+                                                        name="text"
+                                                        value={newItem.text}
                                                         onChange={(e) => setNewItem({
                                                             ...newItem,
-                                                            archived: e.target.checked
+                                                            text: e.target.value
                                                         })}
-                                                        className="mt-2"
+                                                        placeholder=" "
+                                                        required
                                                     />
-                                                </div>
+                                                </Form.Group>
                                             </div>
-                                            <div className="d-flex justify-content-end mt-1">
-                                                <Button
-                                                    onClick={() => handleAddItem(sectionIndex)}
-                                                    disabled={!newItem.text}
-                                                    className="d-flex align-items-center gap-1 custom-buttons"
-                                                >
-                                                    <Plus size={16} />
-                                                    Add Item
-                                                </Button>
+                                            <div className="col-12">
+                                                <Form.Group>
+                                                    <Form.Label className='mb-0'>Shortcut</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="shortcut"
+                                                        value={newItem.shortcut}
+                                                        onChange={(e) => setNewItem({
+                                                            ...newItem,
+                                                            shortcut: e.target.value
+                                                        })}
+                                                        placeholder=" "
+                                                    />
+                                                </Form.Group>
                                             </div>
-                                        </Card.Body>
-                                    </Card>
-                                </Accordion.Body>
-                            </Accordion.Item>
-                        ))}
-                    </Accordion>
+                                            {/* <div className="col-12">
+                                                <Form.Check
+                                                    type="switch"
+                                                    id="itemArchived"
+                                                    label="Archived"
+                                                    name="archived"
+                                                    checked={newItem.archived}
+                                                    onChange={(e) => setNewItem({
+                                                        ...newItem,
+                                                        archived: e.target.checked
+                                                    })}
+                                                />
+                                            </div> */}
+                                        </div>
+                                        <div className="d-flex justify-content-end mt-3">
+                                            <Button
+                                                onClick={() => handleAddItem(activeAccordionKey)}
+                                                disabled={!newItem.text}
+                                                className="d-flex align-items-center gap-1 custom-buttons"
+                                            >
+                                                <Plus size={16} />
+                                                Add Item
+                                            </Button>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        )}
+                    </Row>
                 )}
             </div>
             <div className='d-flex gap-1 justify-content-end'>
