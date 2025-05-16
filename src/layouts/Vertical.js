@@ -133,12 +133,12 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                         </div>
                     </div>
                 </nav> */}
-                {/* <Suspense fallback={loading()}>
+                <Suspense fallback={loading()}>
                     <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
-                </Suspense> */}
+                </Suspense>
 
                 {/* Add margin to push content below navbar */}
-                {/* <div className="content-page ">
+                <div className="content-page ">
                     <div className="content">
                         <Suspense fallback={loading()}>
                             <Topbar openLeftMenuCallBack={openMenu} hideLogo={true} />
@@ -147,8 +147,8 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                             <Outlet />
                         </Container>
                     </div>
-                </div> */}
-                <div className="row m-0 p-0 " style={{ overflowX: 'hidden !important', overflowY: 'hidden !important' }}>
+                </div>
+                {/* <div className="row m-0 p-0 " style={{ overflowX: 'hidden !important', overflowY: 'hidden !important' }}>
                     <div className="col-2 p-0 m-0">
                         <Suspense fallback={loading()}>
                             <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
@@ -168,7 +168,7 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
 
