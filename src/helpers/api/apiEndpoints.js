@@ -169,6 +169,8 @@ export const encounter = `${BaseRoute}/encounter`;
 export const createNoteCategories = `${BaseRoute}/notes-type/`;
 export const updateNoteCategories = `${BaseRoute}/notes-type/`;
 export const getNoteCategories = `${BaseRoute}/notes-type/`;
+// SettingsNotes
+export const createnoteTypeSettings = `${BaseRoute}/notes-type-settings/`;
 
 // Template
 export const templates = `${BaseRoute}/notes-templates`;

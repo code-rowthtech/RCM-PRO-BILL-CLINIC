@@ -16,7 +16,7 @@ import Spinner from '../../../constants/Spinner';
 import { getDoctorsAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import Select from 'react-select';
-import { FcViewDetails } from "react-icons/fc";
+import { FcViewDetails } from 'react-icons/fc';
 import { useForm } from 'react-hook-form';
 import { appointmentStatus } from '../../../utils/DataSets/commonData';
 import AppointmentCalendar from './AppointmentCalendar';
@@ -111,13 +111,12 @@ const AppointmentsList = ({
             })
         );
     };
-
-
+  const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
     return (
-        <div className='scroll-container mt-2' style={{ height: '69vh', overflowY: 'auto' }}>
-            <Table
-                responsive
-                className="table-centered mb-0  rounded">
+        <div className="scroll-container mt-2" style={{ height: '69vh', overflowY: 'auto' }}>
+            <Table responsive className="table-centered mb-0  rounded">
                 <thead className="text-white">
                     <tr>
                         <th className="text-white">Sr.No.</th>
@@ -276,6 +275,15 @@ const AppointmentsList = ({
                     )}
                 </tbody>
             </Table>
+            <div className="col-12">
+                <div className="mt-2 d-flex justify-content-end">
+                    <Paginations
+                        currentPage={skip}
+                        totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
@@ -339,9 +347,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     };
     const [showTooltip, setShowTooltip] = useState(false);
 
-    const handlePageChange = (pageNumber) => {
-        setSkip(pageNumber);
-    };
+  
     return (
         <>
             <Row className="mt-2">
@@ -382,11 +388,15 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
 
                                 <Col className="text-end mt-2 mt-md-0">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
-                                        <Col xs={1} className="position-relative d-flex align-items-center justify-content-end text-end">
+                                        <Col
+                                            xs={1}
+                                            className="position-relative d-flex align-items-center justify-content-end text-end">
                                             {/* <div
                                                 > */}
-                                            <FcViewDetails onMouseEnter={() => setShowTooltip(true)}
-                                                onMouseLeave={() => setShowTooltip(false)} className='fs-3 text-dark'
+                                            <FcViewDetails
+                                                onMouseEnter={() => setShowTooltip(true)}
+                                                onMouseLeave={() => setShowTooltip(false)}
+                                                className="fs-3 text-dark"
                                                 style={{ cursor: 'help' }}
                                             />
                                             {/* </div> */}
@@ -549,8 +559,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
@@ -558,8 +569,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
@@ -567,8 +579,9 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'
-                                                            }`}
+                                                        className={`nav-link ${
+                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                        }`}
                                                         onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History
@@ -594,15 +607,6 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                     selectedDoctor={selectedDoctor?.value}
                                 />
                             )}
-                            <div className="col-12">
-                                <div className="mt-2 d-flex justify-content-end">
-                                    <Paginations
-                                        currentPage={skip}
-                                        totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
-                                        onPageChange={handlePageChange}
-                                    />
-                                </div>
-                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
