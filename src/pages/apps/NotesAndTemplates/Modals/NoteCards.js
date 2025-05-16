@@ -199,7 +199,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     };
 
     return (
-        <Row className="mt-2">
+        <Row className="mt-3">
             {loading ? (
                 <div className="d-flex justify-content-center align-items-center w-100" style={{ height: '82vh' }}>
                     <Spinner color="white" className="spinner-border-sm" />
