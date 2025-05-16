@@ -7,7 +7,6 @@ const initialLeftSections = [
     { id: 'summary', label: 'Summary' },
     { id: 'templates', label: 'Templates' },
     { id: 'past', label: 'Past encounters' },
-    { id: 'pmh', label: 'PMH' },
 ];
 
 const initialRightSections = [
@@ -59,97 +58,104 @@ const SettingTabs = () => {
 
     return (
         <Row className="mt-0">
-            <Col xs={12} className="px-0">
-                <div className="d-flex px-1">
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        {/* Left Panel */}
-                        <Droppable droppableId="left">
-                            {(provided) => (
-                                <div
-                                    className="left-panel border-end px-2"
-                                    style={{ width: '40%' }}
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}>
-                                    <h5>Left panel display settings</h5>
-                                    <Form.Check type="checkbox" label="Minimize by default" className="mb-2" />
-                                    {leftSections.map((section, index) => (
-                                        <Draggable key={section.id} draggableId={section.id} index={index}>
-                                            {(provided) => (
-                                                <div
-                                                    className="draggable-card"
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}>
-                                                    <span className="drag-icon">☰</span> {section.label}
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
+            <div className="p-3">
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <Row>
+                        {/* Left Column */}
+                        <Col md={12}>
+                            <div className="d-flex align-items-center mb-1">
+                                <h5 className="">Left Panel Display Settings</h5>
+                                <Form.Check type="checkbox" label="Minimize by default" className="ms-4" />
+                            </div>
 
-                        {/* Right Panel */}
-                        <Droppable droppableId="right">
-                            {(provided) => (
-                                <div
-                                    className="right-panel px-2"
-                                    style={{ width: '60%' }}
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}>
-                                    <h5>Test display settings</h5>
-                                    <p>
-                                        Customize your chart note view for all patients by modifying the display
-                                        settings below.
-                                    </p>
-                                    {rightSections.map((section, index) => (
-                                        <Draggable key={section.id} draggableId={section.id} index={index}>
-                                            {(provided) => (
-                                                <div
-                                                    className="draggable-card"
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}>
-                                                    <div className="d-flex justify-content-between align-items-center">
-                                                        <strong className='d-flex align-items-center'>
-                                                            <span className="drag-icon">☰</span>
+                            <Droppable droppableId="left" direction="horizontal">
+                                {(provided) => (
+                                    <Row className="g-3" ref={provided.innerRef} {...provided.droppableProps}>
+                                        {leftSections.map((section, index) => (
+                                            <Draggable key={section.id} draggableId={section.id} index={index}>
+                                                {(provided) => (
+                                                    <Col
+                                                        md={4}
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}>
+                                                        <div className="draggable-card d-flex align-items-center justify-content-between">
                                                             {section.label}
-                                                        </strong>
-                                                        <div className="section-controls">
-                                                            {[
-                                                                'meds',
-                                                                'note',
-                                                                'plan',
-                                                                'labOrders',
-                                                                'imagingOrders',
-                                                            ].includes(section.id) && (
-                                                                <Form.Check
-                                                                    type="checkbox"
-                                                                    label="Minimize by default"
-                                                                    checked={section.minimized || false}
-                                                                    onChange={() => toggleMinimize(section.id)}
-                                                                />
-                                                            )}
-                                                            <Form.Check
-                                                                type="checkbox"
-                                                                label="Show section"
-                                                                checked={section.visible}
-                                                                onChange={() => toggleVisibility(section.id)}
-                                                            />
+                                                            <span className="drag-icon">≡</span>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
-                </div>
-            </Col>
+                                                    </Col>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </Row>
+                                )}
+                            </Droppable>
+                        </Col>
+
+                        {/* Right Column */}
+                        <Col md={12}>
+                            <h5 className="mb-2">Clinical Form & Display Settings</h5>
+                            <p className="text-muted mb-4">
+                                Customize your chart note view for all patients by modifying the display settings below.
+                            </p>
+
+                            <Droppable droppableId="right" direction="horizontal">
+                                {(provided) => (
+                                    <Row className="g-3" ref={provided.innerRef} {...provided.droppableProps}>
+                                        {rightSections.map((section, index) => (
+                                            <Draggable key={section.id} draggableId={section.id} index={index}>
+                                                {(provided) => (
+                                                    <Col
+                                                        md={6}
+                                                        className="mt-0"
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}>
+                                                        <div className="draggable-card">
+                                                            <div className="w-100 d-flex justify-content-between align-items-center">
+                                                                <div className="d-flex align-items-center">
+                                                                    <span className="me-2 fw-bold">{index + 1}</span>
+                                                                    <strong>{section.label}</strong>
+                                                                </div>
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    {[
+                                                                        'meds',
+                                                                        'note',
+                                                                        'plan',
+                                                                        'labOrders',
+                                                                        'imagingOrders',
+                                                                    ].includes(section.id) && (
+                                                                        <Form.Check
+                                                                            type="switch"
+                                                                            id={`minimize-${section.id}`}
+                                                                            checked={section.minimized || false}
+                                                                            onChange={() => toggleMinimize(section.id)}
+                                                                            label="Minimize By Default"
+                                                                        />
+                                                                    )}
+                                                                    <Form.Check
+                                                                        type="switch"
+                                                                        id={`visible-${section.id}`}
+                                                                        checked={section.visible}
+                                                                        onChange={() => toggleVisibility(section.id)}
+                                                                    />
+                                                                    <span className="drag-icon">≡</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </Col>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </Row>
+                                )}
+                            </Droppable>
+                        </Col>
+                    </Row>
+                </DragDropContext>
+            </div>
         </Row>
     );
 };

@@ -10,13 +10,11 @@ import { useDispatch } from 'react-redux';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useSelector } from 'react-redux';
 
-const AddModalSetting = ({ setAddModal, addModal,
-    //  selectedNote
-     }) => {
+const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote }) => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'));
     const store = useSelector((state) => state);
     const createResponse = store?.createNoteCategoriesReducer?.data?.status;
-    // const updateResponse = store?.updateNoteCategoriesReducer?.data?.status;
+    const updateResponse = store?.updateNoteCategoriesReducer?.data?.status;
     const dispatch = useDispatch();
     const {
         register,
@@ -25,15 +23,15 @@ const AddModalSetting = ({ setAddModal, addModal,
         setValue,
         formState: { errors },
     } = useForm();
-    // useEffect(() => {
-    //     if (selectedNote) {
-    //         setValue('noteType', selectedNote?.noteType || '');
-    //         setValue('isActive', selectedNote?.active?.toString() || 'true');
-    //         setValue('format', selectedNote?.format || '');
-    //         setValue('confidential', selectedNote?.confidential || 'false');
-    //         setValue('isDefault', selectedNote?.isDefault || 'false');
-    //     }
-    // }, [selectedNote, setValue]);
+    useEffect(() => {
+        if (selectedNote) {
+            setValue('noteType', selectedNote?.noteType || '');
+            setValue('isActive', selectedNote?.active?.toString() || 'true');
+            setValue('format', selectedNote?.format || '');
+            setValue('confidential', selectedNote?.confidential || 'false');
+            setValue('isDefault', selectedNote?.isDefault || 'false');
+        }
+    }, [selectedNote, setValue]);
 
     const onSubmit = (data) => {
         const payload = {
@@ -44,37 +42,41 @@ const AddModalSetting = ({ setAddModal, addModal,
             confidential: data.confidential,
             // isDefault: !!data.isDefault, // convert to boolean
         };
-        // if (selectedNote?._id) {
-        //     dispatch(
-        //         updateNoteCategoriesAction({
-        //             id: selectedNote._id,
-        //             key: encryptMessage(payload),
-        //         })
-        //     );
-        // } else {
+        if (selectedNote?._id) {
+            dispatch(
+                updateNoteCategoriesAction({
+                    id: selectedNote._id,
+                    key: encryptMessage(payload),
+                })
+            );
+        } else {
             dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
-        // }
+        }
         console.log(payload, 'payload');
     };
 
     useEffect(() => {
-        if (createResponse === 201
-            //  || updateResponse === 200
-            ) {
+        if (createResponse === 201 || updateResponse === 200) {
             dispatch(getNoteCategoriesAction());
             setAddModal(false);
             reset();
         }
-    }, [createResponse ,
-        //  updateResponse, reset
-        ]);
- 
+    }, [createResponse, updateResponse, reset]);
+
     return (
-        <Modal show={addModal} onHide={() => setAddModal(false)} size="lg" centered>
+        <Modal
+            show={addModal}
+            onHide={() => {
+                reset();
+                setAddModal(false);
+                setSelectedNote(null); // ✅ Clean up
+            }}
+            size="lg"
+            centered>
             <Modal.Header closeButton className="px-2 py-0">
                 <Modal.Title>
-                    {/* {selectedNote ? 'Edit Note Category' : 'Add Note Category'} */}
-                 Add Note Category
+                    {selectedNote ? 'Edit Note Category' : 'Add Note Category'}
+                    {/* Add Note Category */}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -150,6 +152,8 @@ const AddModalSetting = ({ setAddModal, addModal,
                             {store?.createNoteCategoriesReducer?.loading ||
                             store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
+                            ) : selectedNote ? (
+                                'Update'
                             ) : (
                                 'Add'
                             )}

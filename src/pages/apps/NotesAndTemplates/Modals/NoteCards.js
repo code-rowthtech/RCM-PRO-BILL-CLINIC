@@ -129,6 +129,8 @@
 // };
 
 // export default NoteTypeCards;
+// Full code: NoteTypeCards.jsx
+
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { IoSettings, IoDocumentTextOutline } from 'react-icons/io5';
@@ -138,199 +140,205 @@ import Spinner from '../../../../constants/Spinner';
 import { getNoteCategoriesAction, updateNoteCategoriesAction } from '../../../../redux/noteCategories/action';
 import { encryptMessage } from '../../../../cryptoUtils';
 
-const NoteTypeCards = ({ handleOpenTab }) => {
+const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [noteTypes, setNoteTypes] = useState([]);
+    console.log(noteTypes,'notes')
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
     const loading = store?.getNoteCategoriesReducer?.loading;
-    const updateResponse = store?.getNoteCategoriesReducer?.data?.status;
 
     useEffect(() => {
-        setNoteTypes(notesCategoriesData || []);
+        if (notesCategoriesData) setNoteTypes(notesCategoriesData);
     }, [notesCategoriesData]);
 
-    const handleChange = (id, field, value) => {
-        // Update the local state with the changed field
-        const updated = noteTypes.map((note) => 
-            note._id === id ? { ...note, [field]: value } : note
-        );
-        setNoteTypes(updated);
-
-        // Find the updated note to create the payload
-        const current = updated.find((n) => n._id === id);
-
-        // Debugging: Log the updated note data to verify
-        console.log('Updated Payload:', current);
-
-        // Prepare the payload for the API call
+    const sendUpdate = (id, note) => {
         const payload = {
             clinicId: clinic_id,
-            noteType: current.noteType,
-            format: current.format,
-            isActive: current.active,
-            confidential: current.confidential,
-            isDefault: current.isDefault,
+            noteType: note.noteType,
+            format: note.format,
+            active: note.active,
+            private: note.private,
+            default: note.isDefault,
         };
-
-        // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload:', payload);
-
-        // Call the API to update the note category
+        console.log('Raw Payload:', payload);
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
+    };
+
+    const handleChange = (id, field, value) => {
+        const updated = noteTypes.map((note) => (note._id === id ? { ...note, [field]: value } : note));
+        setNoteTypes(updated);
+
+        const current = updated.find((n) => n._id === id);
+        sendUpdate(id, current);
     };
 
     const handleNoteTypeBlur = (id, value) => {
-        if (value.trim().length < 10) return;
+        if (!value.trim() || value.trim().length < 2) return;
 
-        // Find the updated note to create the payload
-        const current = noteTypes.find((n) => n._id === id);
+        const updated = noteTypes.map((note) => (note._id === id ? { ...note, noteType: value.trim() } : note));
+        setNoteTypes(updated);
 
-        // Debugging: Log the updated note data to verify
-        console.log('Updated Payload:', current);
-
-        // Prepare the payload for the API call
-        const payload = {
-            clinicId: clinic_id,
-            noteType: value.trim(),
-            format: current.format,
-            isActive: current.active,
-            confidential: current.confidential,
-            isDefault: current.isDefault,
-        };
-
-        // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload:', payload);
-
-        // Call the API to update the note category
-        dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
+        const current = updated.find((n) => n._id === id);
+        sendUpdate(id, current);
     };
 
     const handleDefaultChange = (id) => {
-        // Set the note with the selected ID as default
         const updated = noteTypes.map((note) => ({
             ...note,
             isDefault: note._id === id,
         }));
         setNoteTypes(updated);
 
-        // Find the note marked as default to create the payload
         const note = updated.find((n) => n._id === id);
-        const payload = {
-            clinicId: clinic_id,
-            noteType: note.noteType,
-            format: note.format,
-            isActive: note.active,
-            confidential: note.confidential,
-            isDefault: true,
-        };
-
-        // Debugging: Log the payload before dispatching
-        console.log('Dispatch Payload for Default Change:', payload);
-
-        // Call the API to update the note category
-        dispatch(updateNoteCategoriesAction({ id: note._id, key: encryptMessage(payload) }));
+        sendUpdate(id, note);
     };
 
     return (
-        <Row className="mt-3">
+        <Row className="mt-2">
             {loading ? (
                 <div className="d-flex justify-content-center align-items-center w-100" style={{ height: '82vh' }}>
                     <Spinner color="white" className="spinner-border-sm" />
                 </div>
             ) : (
-                noteTypes.map((note) => (
-                    <Col key={note._id} md={6} lg={4} xl={3} className="mb-4">
-                        <Card
-                            className="border-0 shadow-sm rounded-4 px-3 py-3 h-100"
-                            style={{ backgroundColor: '#fdfdfd' }}>
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <div className="d-flex align-items-center gap-2">
+                noteTypes?.map((note) => (
+                    <Col key={note._id} md={6} lg={4} xl={3} className="mb-2 px-2">
+                        <Card className="border-0 shadow-sm rounded-3 p-0">
+                            <div
+                                className="d-flex align-items-center justify-content-between px-2 py-1 rounded-top"
+                                style={{ backgroundColor: ' #e8f0fe' }}>
+                                <div className="d-flex align-items-center gap-0">
                                     <div
-                                        className="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center"
-                                        style={{ width: 32, height: 32 }}>
+                                        className="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                        style={{ width: 28, height: 28 }}>
                                         <IoDocumentTextOutline size={16} />
                                     </div>
-                                    <Form.Control
-                                        type="text"
-                                        value={note.noteType}
-                                        onChange={(e) => {
-                                            const updated = noteTypes.map((n) =>
-                                                n._id === note._id ? { ...n, noteType: e.target.value } : n
-                                            );
-                                            setNoteTypes(updated);
-                                        }}
-                                        onBlur={(e) => handleNoteTypeBlur(note._id, e.target.value)}
-                                        className="form-control-sm border-0 border-bottom"
-                                        style={{ width: '140px', backgroundColor: 'transparent' }}
-                                        placeholder="Note Type"
-                                    />
+                                    {/* <div className="d-flex align-items-center">
+                                        <Form.Control
+                                            type="text"
+                                            value={note.noteType}
+                                            onChange={(e) => {
+                                                const updated = noteTypes?.map((n) =>
+                                                    n._id === note?._id ? { ...n, noteType: e.target.value } : n
+                                                );
+                                                setNoteTypes(updated);
+                                            }}
+                                            onBlur={(e) => handleNoteTypeBlur(note._id, e.target.value)}
+                                            className="form-control-sm border-0 border-bottom"
+                                            style={{ width: '100px', backgroundColor: 'transparent' }}
+                                            placeholder="Note Type"
+                                        />
+                                        {note?.isDefault && (
+                                            <span className="text-muted" style={{ fontSize: '10px' }}>
+                                                (Default)
+                                            </span>
+                                        )}
+                                    </div> */}
+                                    <div className="small ms-1">
+                                        <strong
+                                         title={note?.noteType}>
+                                            {note?.noteType?.length > 20
+                                                ? `${note.noteType.slice(0, 20)}...`
+                                                : note?.noteType}
+                                        </strong>{' '}
+                                    </div>
                                 </div>
 
-                                <OverlayTrigger placement="left" overlay={<Tooltip>Edit Settings</Tooltip>}>
-                                    <div
-                                        className="text-muted cursor-pointer d-flex align-items-center gap-1"
-                                        role="button"
-                                        onClick={() => handleOpenTab(note)}>
-                                        <IoSettings size={16} />
+                                {/* <div className="text-muted small" style={{ fontSize: '10px' }}>
+                                    Created On:
+                                    <strong className="ms-1">
+                                        {new Date(note?.createdAt).toLocaleDateString('en-US', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: '2-digit',
+                                        })}
+                                    </strong>
+                                    <span className='ms-1'>
+                                        <i
+                                            className=" mdi mdi-square-edit-outline text-info cursor-pointer"
+                                            onClick={() => {
+                                                handleOpenEditModal(note);
+                                            }}
+                                        />
+                                    </span>
+                                </div> */}
+                                {
+                                    <div>
+                                        <i
+                                            className=" mdi mdi-square-edit-outline text-primary fs-4 cursor-pointer"
+                                            title="Edit"
+                                            onClick={() => {
+                                                handleOpenEditModal(note);
+                                            }}
+                                        />
                                     </div>
-                                </OverlayTrigger>
+                                }
                             </div>
 
-                            <hr className="my-2" />
+                            <hr className="my-0" />
 
-                            <div className="mb-2 small d-flex align-items-center justify-content-between">
+                            {/* <div className=" small d-flex align-items-center justify-content-between px-2 py-1 border-bottom">
                                 <strong>Format</strong>
                                 <Form.Select
                                     size="sm"
                                     value={note.format}
-                                    onChange={(e) => handleChange(note._id, 'format', e.target.value)}
-                                    className="mt-1"
-                                    style={{ width: '120px' }}>
+                                    onChange={(e) => handleChange(note?._id, 'format', e.target.value)}
+                                    className=""
+                                    style={{ width: '100px' }}>
                                     <option value="Simple">Simple</option>
                                     <option value="SOAP">SOAP</option>
-                                    <option value="Narrative">Custom</option>
+                                    <option value="Custom">Custom</option>
                                 </Form.Select>
+                            </div> */}
+                            <div className="d-flex align-items-center justify-content-between px-2 py-2 border-bottom small">
+                                <strong>Format</strong>
+                                <div>{note?.format}</div>
                             </div>
 
-                            <div className="d-flex justify-content-between align-items-center small text-muted mt-2">
-                                <span>Confidential</span>
+                            <div className="d-flex justify-content-between align-items-center small border-bottom px-2 py-2">
+                                <strong>Confidential</strong>
                                 <Form.Check
                                     type="switch"
-                                    checked={note.confidential}
-                                    onChange={(e) => handleChange(note._id, 'confidential', e.target.checked)}
+                                    checked={note?.private}
+                                    onChange={(e) => handleChange(note?._id, 'private', e.target.checked)}
                                 />
                             </div>
 
-                            <div className="d-flex justify-content-between align-items-center small text-muted mt-2">
-                                <span>Active</span>
+                            <div className="d-flex justify-content-between align-items-center small border-bottom px-2 py-2">
+                                <strong>Active</strong>
                                 <Form.Check
                                     type="switch"
                                     checked={note.active}
-                                    onChange={(e) => handleChange(note._id, 'active', e.target.checked)}
+                                    onChange={(e) => handleChange(note?._id, 'active', e.target.checked)}
                                 />
                             </div>
 
-                            <div className="d-flex align-items-center mt-3 small">
-                                <Form.Check
-                                    type="radio"
-                                    name="defaultNote"
-                                    className="me-2"
-                                    checked={note.isDefault}
-                                    onChange={() => handleDefaultChange(note._id)}
-                                />
-                                <span>Set as default</span>
-                            </div>
+                            <div
+                                className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
+                                // style={{ backgroundColor: '#5582E51A' }}
+                            >
+                                <div className="d-flex align-items-center">
+                                    <Form.Check
+                                        type="radio"
+                                        name="defaultNote"
+                                        className="me-1"
+                                        checked={note?.default}
+                                        onChange={() => handleDefaultChange(note?._id)}
+                                    />
+                                    <strong>Set as default</strong>
+                                </div>
 
-                            <div className="text-muted small mt-3 text-end" style={{ fontSize: '10px' }}>
-                                Created:{' '}
-                                {new Date(note.createdAt).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                })}
+                                <OverlayTrigger placement="left" overlay={<Tooltip>Edit Settings</Tooltip>}>
+                                    <div
+                                        className=" cursor-pointer text-primary d-flex align-items-center gap-1"
+                                        role="button"
+                                        onClick={() => handleOpenTab(note)}>
+                                        <IoSettings size={16} />
+                                        <strong className="text-primary">Setting</strong>
+                                    </div>
+                                </OverlayTrigger>
                             </div>
                         </Card>
                     </Col>
@@ -341,13 +349,3 @@ const NoteTypeCards = ({ handleOpenTab }) => {
 };
 
 export default NoteTypeCards;
-
-
-// extra code
-
-// <i
-//                                                 className=" bi bi-pencil text-info cursor-pointer"
-//                                                 onClick={() => {
-//                                                     handleOpenEditModal(note);
-//                                                 }}
-//                                             />
