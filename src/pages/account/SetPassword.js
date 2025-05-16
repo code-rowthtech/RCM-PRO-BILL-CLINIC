@@ -52,7 +52,7 @@ const SetPassword = (): React$Element<any> => {
     }, [dispatch]);
 
     const store = useSelector((state) => state);
-    const redirectUrl = location.state?.from?.pathname || '/apps/crm/addclinic';
+    const redirectUrl = location.state?.from?.pathname || '/apps/crm/addPractice';
 
     const { loading, passwordChange, changePasswordSuccess, changeSetPassword, user, userLoggedIn } = useSelector((state) => ({
         loading: state.Auth.loading,

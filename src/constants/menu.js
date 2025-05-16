@@ -61,7 +61,7 @@ const MENU_ITEMS = [
     {
         key: 'apps-crm',
         label: 'Practice',
-        url: '/apps/crm/addclinic',
+        url: '/apps/crm/addPractice',
         isTitle: false,
         // badge: { variant: 'danger', text: 'New' },
         icon: 'uil-user',

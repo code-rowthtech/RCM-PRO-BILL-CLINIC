@@ -279,7 +279,7 @@ const AllRoutes = () => {
                             path: 'crm',
                             children: [
                                 {
-                                    path: 'addclinic',
+                                    path: 'addPractice',
                                     element: hasPermission('view crm')
                                         ? <LoadComponent component={AddClinics} />
                                         : <div className="disabled-content">You don't have permission to view this page.</div>,
