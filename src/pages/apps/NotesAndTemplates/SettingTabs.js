@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, Col, Form, Row, Button, Offcanvas } from 'react-bootstrap';
+import { Card, Col, Form, Row, Button, Offcanvas, Modal } from 'react-bootstrap';
 import { MdAddCircleOutline } from 'react-icons/md';
 import './settingtabs.css';
-
-const initialLeftSections = [
-    { id: 'summary', label: 'Summary' },
-    { id: 'templates', label: 'Templates' },
-    { id: 'past', label: 'Past encounters' },
-];
-
-const initialOffcanvasSections = [
-    { id: 'problems', label: 'Problems' },
-    { id: 'notes', label: 'Notes' },
-    { id: 'medical', label: 'Medical' },
-    { id: 'notes2', label: 'Notes2' },
-    { id: 'custom', label: 'Custom' },
-];
+import { FiInfo } from 'react-icons/fi';
 
 const NOTE_TYPE_OPTIONS = {
     'Encounter-Based': [
@@ -87,37 +74,20 @@ const NOTE_TYPE_OPTIONS = {
         'Alerts/Flags (e.g. abnormal vitals)',
     ],
 };
-
 const SettingTabs = ({ noteType }) => {
-    const noteTypeId = noteType;
-    console.log(noteTypeId, 'noteTypeId');
-    const [leftSections] = useState(initialLeftSections);
-    const [activeSections, setActiveSections] = useState([]); // unified active sections (including custom)
-    const [offcanvasSections, setOffcanvasSections] = useState(
-        NOTE_TYPE_OPTIONS[noteType]?.map((label, index) => ({
-            id: `${noteType}-${index}`,
-            label,
-        })) || []
-    );
+    const [activeSectionsByType, setActiveSectionsByType] = useState({});
+    const [showInfoModal, setShowInfoModal] = useState(false);
+    const [offcanvasSections, setOffcanvasSections] = useState([]);
     const [showCanvas, setShowCanvas] = useState(false);
     const [showCustomFields, setShowCustomFields] = useState(false);
-    const [customFieldData, setCustomFieldData] = useState({
-        fieldName: '',
-        inputType: '',
-    });
+    const [customFieldData, setCustomFieldData] = useState({ fieldName: '', inputType: '' });
 
-    // Drag and drop reorder for activeSections
-    const handleDragEnd = (result) => {
-        const { source, destination } = result;
-        if (!destination) return;
-
-        // Only reorder if dragged within the same droppable
-        if (source.droppableId === destination.droppableId) {
-            const reordered = Array.from(activeSections);
-            const [moved] = reordered.splice(source.index, 1);
-            reordered.splice(destination.index, 0, moved);
-            setActiveSections(reordered);
-        }
+    const getCurrentSections = () => activeSectionsByType[noteType?.noteType] || [];
+    const updateCurrentSections = (newSections) => {
+        setActiveSectionsByType((prev) => ({
+            ...prev,
+            [noteType?.noteType]: newSections,
+        }));
     };
 
     const handleInputChange = (e) => {
@@ -126,62 +96,85 @@ const SettingTabs = ({ noteType }) => {
     };
 
     const handleAddCustomField = () => {
-        if (!customFieldData.fieldName || !customFieldData.inputType) return;
+        const { fieldName, inputType } = customFieldData;
+        if (!fieldName || !inputType) return;
 
         const newSection = {
             id: `custom-${Date.now()}`,
-            label: customFieldData.fieldName,
-            inputType: customFieldData.inputType,
+            label: fieldName,
+            inputType,
             visible: true,
             minimized: false,
         };
-        setActiveSections([...activeSections, newSection]);
+        const updatedSections = [...getCurrentSections(), newSection];
+        updateCurrentSections(updatedSections);
         setCustomFieldData({ fieldName: '', inputType: '' });
         setShowCustomFields(false);
         setShowCanvas(false);
     };
 
-    // When user clicks a card in Offcanvas to move it to activeSections
     const handleOffcanvasCardClick = (section) => {
         if (section.id === 'custom') {
             setShowCustomFields((prev) => !prev);
             return;
         }
 
-        // Add clicked section to activeSections only if not already present
-        if (!activeSections.find((s) => s.id === section.id)) {
-            setActiveSections([...activeSections, { ...section, visible: true, minimized: false }]);
+        const currentSections = getCurrentSections();
+        if (!currentSections.find((s) => s.id === section.id)) {
+            updateCurrentSections([...currentSections, { ...section, visible: true, minimized: false }]);
+            setOffcanvasSections(offcanvasSections.filter((s) => s.id !== section.id));
         }
-
-        // Remove clicked section from offcanvasSections
-        setOffcanvasSections(offcanvasSections.filter((s) => s.id !== section.id));
     };
 
-    // Toggle visible or minimized states of a section
     const toggleSectionProperty = (id, prop) => {
-        setActiveSections((prev) => prev.map((sec) => (sec.id === id ? { ...sec, [prop]: !sec[prop] } : sec)));
+        const updated = getCurrentSections().map((sec) => (sec.id === id ? { ...sec, [prop]: !sec[prop] } : sec));
+        updateCurrentSections(updated);
     };
-useEffect(() => {
-    if (NOTE_TYPE_OPTIONS[noteType]) {
-        const sections = NOTE_TYPE_OPTIONS[noteType].map((label, index) => ({
-            id: `${noteType}-${index}`,
-            label,
-        }));
-        // Always append the "Custom" section at the end
-        sections.push({ id: 'custom', label: 'Custom' });
-        setOffcanvasSections(sections);
-    } else {
-        setOffcanvasSections([{ id: 'custom', label: 'Custom' }]);
-    }
-}, [noteType]);
+
+    const handleDragEnd = (result) => {
+        const { source, destination } = result;
+        if (!destination || source.droppableId !== destination.droppableId) return;
+
+        const reordered = Array.from(getCurrentSections());
+        const [moved] = reordered.splice(source.index, 1);
+        reordered.splice(destination.index, 0, moved);
+        updateCurrentSections(reordered);
+    };
+
+    useEffect(() => {
+        if (noteType?.noteType && NOTE_TYPE_OPTIONS[noteType.noteType]) {
+            const options = NOTE_TYPE_OPTIONS[noteType.noteType].map((label, index) => ({
+                id: `${noteType.noteType}-${index}`,
+                label,
+            }));
+            options.push({ id: 'custom', label: 'Custom' });
+            setOffcanvasSections(options);
+
+            // Optional: initialize current sections for noteType if not already present
+            if (!activeSectionsByType[noteType.noteType]) {
+                setActiveSectionsByType((prev) => ({
+                    ...prev,
+                    [noteType.noteType]: [],
+                }));
+            }
+        } else {
+            setOffcanvasSections([{ id: 'custom', label: 'Custom' }]);
+        }
+    }, [noteType]);
 
     return (
         <Row className="mt-0">
-            <div className="p-1" style={{ width: '100%' }}>
+            <div className="p-2 w-100">
                 <DragDropContext onDragEnd={handleDragEnd}>
                     <Row>
                         <Col md={12} className="d-flex align-items-center">
                             <h5>Clinical Form Sections</h5>
+                            <span
+                                className="text-secondary cursor-pointer ms-2"
+                                title="Info of Drag Section"
+                                onClick={() => setShowInfoModal(true)}>
+                                <FiInfo size={20} />
+                            </span>
                             <MdAddCircleOutline
                                 size={24}
                                 className="text-primary cursor-pointer ms-2"
@@ -192,11 +185,10 @@ useEffect(() => {
 
                     <Row className="mt-1">
                         <Col md={8}>
-                            {/* Droppable area for all active sections (including custom) */}
                             <Droppable droppableId="active-sections">
                                 {(provided) => (
                                     <div {...provided.droppableProps} ref={provided.innerRef}>
-                                        {activeSections.map((section, index) => (
+                                        {getCurrentSections().map((section, index) => (
                                             <Draggable key={section.id} draggableId={section.id} index={index}>
                                                 {(provided) => (
                                                     <div
@@ -216,7 +208,7 @@ useEffect(() => {
                                                                         type="switch"
                                                                         id={`minimize-${section.id}`}
                                                                         checked={section.minimized || false}
-                                                                        label="Minimize By Default"
+                                                                        label="Minimize"
                                                                         onChange={() =>
                                                                             toggleSectionProperty(
                                                                                 section.id,
@@ -233,7 +225,6 @@ useEffect(() => {
                                                                             toggleSectionProperty(section.id, 'visible')
                                                                         }
                                                                     />
-
                                                                     <span
                                                                         className="drag-icon"
                                                                         style={{ cursor: 'grab' }}>
@@ -266,22 +257,20 @@ useEffect(() => {
                     <Offcanvas.Title>Add New Section</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    {offcanvasSections?.map((section) => (
+                    {offcanvasSections.map((section) => (
                         <Card
                             key={section.id}
                             className="draggable-card p-2 mb-2"
                             onClick={() => handleOffcanvasCardClick(section)}
-                            style={section.id === 'custom' ? { cursor: 'pointer' } : {}}>
+                            style={{ cursor: 'pointer' }}>
                             <div className="w-100 d-flex justify-content-between align-items-center">
-                                <div className="d-flex align-items-center">
-                                    <strong>{section.label}</strong>
-                                </div>
+                                <strong>{section.label}</strong>
                             </div>
                         </Card>
                     ))}
 
-                    <Form className="mt-3">
-                        {showCustomFields && (
+                    {showCustomFields && (
+                        <Form className="mt-3">
                             <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-2">
@@ -308,19 +297,29 @@ useEffect(() => {
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
-                                <Col md={12} className="d-flex align-items-center justify-content-end">
-                                    <Button
-                                        variant="primary"
-                                        className="custom-buttons text-white"
-                                        onClick={handleAddCustomField}>
+                                <Col md={12} className="d-flex justify-content-end">
+                                    <Button variant="primary" onClick={handleAddCustomField}>
                                         Add
                                     </Button>
                                 </Col>
                             </Row>
-                        )}
-                    </Form>
+                        </Form>
+                    )}
                 </Offcanvas.Body>
             </Offcanvas>
+
+            <Modal show={showInfoModal} onHide={() => setShowInfoModal(false)} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Info</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>
+                        You can drag and reorder form sections to control the order in which they appear in the clinical
+                        form. Use the toggle switches to set whether a section is visible by default and whether it
+                        should be minimized. Use the "+" icon to add predefined or custom sections to your form.
+                    </p>
+                </Modal.Body>
+            </Modal>
         </Row>
     );
 };
