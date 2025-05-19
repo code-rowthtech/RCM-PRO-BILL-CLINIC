@@ -5,7 +5,7 @@ import { EncounterActionTypes } from './constants';
 import {
     createEncounterApi,
     getEncounterApi,
-    updateEncounterApi,
+    updateEncounterApi, createEncounterSettingsApi
 } from './api';
 /**
  * Login the user
@@ -40,6 +40,39 @@ function* createEncounterFunction(data) {
         ToastHandle(error, 'danger');
         yield put({
             type: EncounterActionTypes.CREATE_ENCOUNTER_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* createEncounterSettingsFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS_LOADING,
+            payload: {},
+        });
+        const response = yield call(createEncounterSettingsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS_ERROR,
             payload: error,
         });
     }
@@ -117,11 +150,16 @@ export function* watchGetEncounter() {
     yield takeEvery(EncounterActionTypes.GET_ENCOUNTER, getEncounterFunction);
 }
 
+export function* watchCreateEncounterSettings() {
+    yield takeEvery(EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS, createEncounterSettingsFunction);
+}
+
 function* encounterSaga() {
     yield all([
         fork(watchCreateEncounter),
         fork(watchUpdateEncounter),
         fork(watchGetEncounter),
+        fork(watchCreateEncounterSettings)
     ]);
 }
 export default encounterSaga;

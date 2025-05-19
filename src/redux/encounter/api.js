@@ -16,3 +16,10 @@ export function getEncounterApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.encounter}/all?patientId=${data?.patientId}`);
 }
+
+// encounter settings
+
+export function createEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.encounterSettings, data);
+}

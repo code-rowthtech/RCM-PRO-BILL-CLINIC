@@ -164,6 +164,8 @@ export const icdProcedures = `${BaseRoute}/codes/pcs`;
 
 // Encounter
 export const encounter = `${BaseRoute}/encounter`;
+export const encounterSettings = `${BaseRoute}/encounterSettings`;
+
 
 // NoteCategories
 export const createNoteCategories = `${BaseRoute}/notes-type/`;

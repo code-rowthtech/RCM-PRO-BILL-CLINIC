@@ -5,6 +5,10 @@ import { useEffect, useState } from 'react';
 import { Button, Offcanvas, Form } from 'react-bootstrap';
 import { Trash, Plus } from 'lucide-react';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
+import { useDispatch } from 'react-redux';
+import { createEncounterSettingsAction } from '../../../../../redux/actions';
+import { encryptMessage } from '../../../../../cryptoUtils';
+import { useSelector } from 'react-redux';
 
 // Schema validation using Yup
 const settingsSchema = yup.object().shape({
@@ -55,7 +59,10 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
             items: initialData?.items || []
         }
     });
-
+    const dispatch = useDispatch()
+    const store = useSelector((state) => state);
+    const createResponse = store?.createEncounterSettingsReducer?.data?.status;
+    console.log(store?.createEncounterSettingsReducer?.data, 'encounter settings create response...')
     const [selectedMenuItem, setSelectedMenuItem] = useState('');
     const items = watch('items');
 
@@ -71,8 +78,8 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
         data.userId = loggedInUser?._id;
         data.clinicId = loggedInUser?.clinicId;
         console.log('Form submitted:', data);
-        // Here you would typically send data to your API
-        closeSettings();
+        dispatch(createEncounterSettingsAction({ key: encryptMessage(data) }))
+        // closeSettings();
     };
 
     const addPredefinedMenuItem = () => {
@@ -147,7 +154,7 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                         <div className="mb-4">
                             <h5 className="mb-0 fw-semibold">Add Menu Items</h5>
 
-                            <div className="card mb-0">
+                            <div className="card mb-0 px-2">
                                 <div className="card-body py-0 px-0">
                                     <div className="row g-2 px-0 align-items-end">
                                         <div className="col-md-10 mt-2">
@@ -189,16 +196,16 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                     <h5 className="my-2 fw-semibold">Current Menu Items</h5> : <></>}
 
                                 {items?.map((item, itemIndex) => (
-                                    <div key={itemIndex} className="card border mb-2">
-                                        <div className="card-header py-1 bg-light d-flex justify-content-between align-items-center">
+                                    <div key={itemIndex} className="card mb-2">
+                                        <div className="card-header py-0 bg-white d-flex justify-content-between align-items-center">
                                             <span className="fw-semibold">{item.name || `Menu Item ${itemIndex + 1}`}</span>
-                                            <Trash
+                                            <i
+                                                className="bi bi-trash-fill text-danger cursor-pointer"
                                                 onClick={() => removeMenuItem(itemIndex)}
-                                                className='cursor-pointer text-danger'
                                                 size={14}
                                             />
                                         </div>
-                                        <div className="card-body px-0">
+                                        <div className="card-body px-0 py-1">
                                             <div className="row g-2 px-0">
                                                 <div className="col-md-6">
                                                     <label className="form-label mb-0">Name</label>
@@ -242,8 +249,8 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                             </div>
 
                                             {item.subMenu?.length > 0 && (
-                                                <div className="mt-3">
-                                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                                <div className="mt-1">
+                                                    <div className="d-flex justify-content-between align-items-center ">
                                                         <h6 className="fw-semibold mb-0">Submenu Items</h6>
                                                         {/* <Button
                                                             className="custom-buttons text-white fs-6"
@@ -254,9 +261,9 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                     </div>
 
                                                     {item.subMenu?.map((subItem, subIndex) => (
-                                                        <div key={subIndex} className="card mb-2">
-                                                            <div className="card-body">
-                                                                <div className="row g-2 py-0">
+                                                        <div key={subIndex} className="card mb-0">
+                                                            <div className="card-body py-1 px-1">
+                                                                <div className="row  py-0">
                                                                     <div className="col-md-6">
                                                                         <label className="form-label mb-0">Name</label>
                                                                         <input
@@ -270,7 +277,7 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <div className="col-md-4">
+                                                                    <div className="col-md-3">
                                                                         <label className="form-label mb-0">Order</label>
                                                                         <input
                                                                             type="number"
@@ -283,8 +290,8 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                                             </div>
                                                                         )}
                                                                     </div>
-                                                                    <div className="col-md-2 d-flex align-items-end">
-                                                                        <div className="form-check form-switch mb-3">
+                                                                    <div className="col-md-3 d-flex align-items-center gap-2 pt-3">
+                                                                        <div className="form-check form-switch ">
                                                                             <input
                                                                                 type="checkbox"
                                                                                 className="form-check-input"
@@ -295,14 +302,15 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                                                 Hide
                                                                             </label>
                                                                         </div>
+                                                                        <i
+                                                                            className="bi bi-trash-fill text-danger cursor-pointer"
+                                                                            onClick={() => removeSubMenuItem(itemIndex, subIndex)}
+                                                                        />
                                                                     </div>
                                                                 </div>
-                                                                <div className="text-end mt-2">
-                                                                    <Trash
-                                                                        className='text-danger cursor-pointer'
-                                                                        onClick={() => removeSubMenuItem(itemIndex, subIndex)}
-                                                                    />
-                                                                </div>
+                                                                {/* <div className="text-end ">
+                                                                  
+                                                                </div> */}
                                                             </div>
                                                         </div>
                                                     ))}
