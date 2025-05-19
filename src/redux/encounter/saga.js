@@ -5,7 +5,9 @@ import { EncounterActionTypes } from './constants';
 import {
     createEncounterApi,
     getEncounterApi,
-    updateEncounterApi, createEncounterSettingsApi
+    updateEncounterApi, createEncounterSettingsApi,
+    getEncounterSettingsApi,
+    updateEncounterSettingsApi
 } from './api';
 /**
  * Login the user
@@ -86,7 +88,7 @@ function* updateEncounterFunction(data) {
         });
         const response = yield call(updateEncounterApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: EncounterActionTypes.UPDATE_ENCOUNTER_SUCCESS,
@@ -105,6 +107,39 @@ function* updateEncounterFunction(data) {
     } catch (error) {
         yield put({
             type: EncounterActionTypes.UPDATE_ENCOUNTER_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateEncounterSettingsFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateEncounterSettingsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_ERROR,
             payload: error,
         });
     }
@@ -137,6 +172,33 @@ function* getEncounterFunction(data) {
     }
 }
 
+function* getEncounterSettingsFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getEncounterSettingsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 export function* watchCreateEncounter() {
     yield takeEvery(EncounterActionTypes.CREATE_ENCOUNTER, createEncounterFunction);
@@ -154,12 +216,22 @@ export function* watchCreateEncounterSettings() {
     yield takeEvery(EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS, createEncounterSettingsFunction);
 }
 
+export function* watchUpdateEncounterSettings() {
+    yield takeEvery(EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS, updateEncounterSettingsFunction);
+}
+
+
+export function* watchGetEncounterSettings() {
+    yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_SETTINGS, getEncounterSettingsFunction);
+}
+
 function* encounterSaga() {
     yield all([
         fork(watchCreateEncounter),
         fork(watchUpdateEncounter),
         fork(watchGetEncounter),
-        fork(watchCreateEncounterSettings)
+        fork(watchCreateEncounterSettings), fork(watchUpdateEncounterSettings),
+        fork(watchGetEncounterSettings)
     ]);
 }
 export default encounterSaga;

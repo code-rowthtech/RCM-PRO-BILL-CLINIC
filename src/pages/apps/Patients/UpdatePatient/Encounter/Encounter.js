@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Tab, Tabs, Card, Offcanvas } from 'react-bootstrap';
 import { IoClose } from 'react-icons/io5';
 import { FaCalendarAlt } from 'react-icons/fa';
@@ -11,12 +11,15 @@ import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
 import { CiSettings } from "react-icons/ci";
 import EncounterSettingsForm from './EncounterSettings';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
+import { useDispatch } from 'react-redux';
+import { getEncounterSettingsAction } from '../../../../../redux/actions';
+import { useSelector } from 'react-redux';
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isAccordionOpen }) => {
+    const dispatch = useDispatch()
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
     const removeEncounterTab = (idToRemove, e) => {
         e.stopPropagation();
         const newTabs = encounterTabs.filter(tab => tab.id !== idToRemove);
@@ -26,7 +29,9 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isA
             setActiveTab(newTabs.length > 0 ? newTabs[0].id : '');
         }
     };
-
+    useEffect(() => {
+        dispatch(getEncounterSettingsAction())
+    }, [dispatch])
     const [showSettings, setShowSettings] = useState(false)
     const closeSettings = () => {
         setShowSettings(false)
@@ -49,14 +54,14 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isA
                                     <EncounterSettingsForm
                                         showSettings={showSettings}
                                         closeSettings={closeSettings}
-                                    //   initialData={/* your initial data from API */}
                                     />
                                 </>}
                             {encounterTabs?.map((tab) => (
                                 <div
                                     key={tab.id}
-                                    className={`d-flex fs-6 p-1 align-items-center cursor-pointer fw-semibold
-                                         ${parseInt(activeTab) === tab?.id ? ' text-primary border-bottom border-2  border-primary' : 'text-secondary'}`}
+                                    className={`cursor-pointer p-1 fs-6  rounded-0  list-group-item  
+                                    d-flex align-items-center flex-fill justify-content-center fw-bold 
+                                     ${parseInt(activeTab) === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
                                     onClick={() => setActiveTab(tab.id)}
                                 >
 

@@ -20,6 +20,16 @@ const CREATE_ENCOUNTER_SETTINGS_INITIAL_STATE = {
     loading: false,
 };
 
+const UPDATE_ENCOUNTER_SETTINGS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+const GET_ENCOUNTER_SETTINGS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
 export const createEncounterReducer = (state = CREATE_ENCOUNTER_INITIAL_STATE, action) => {
     switch (action.type) {
         case EncounterActionTypes.CREATE_ENCOUNTER_LOADING:
@@ -124,5 +134,56 @@ export const createEncounterSettingsReducer = (state = CREATE_ENCOUNTER_SETTINGS
             };
         default:
             return { ...state };
+    }
+};
+
+export const updateEncounterSettingsReducer = (state = UPDATE_ENCOUNTER_SETTINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+
+export const getEncounterSettingsReducer = (state = GET_ENCOUNTER_SETTINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case EncounterActionTypes.GET_ENCOUNTER_SETTINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case EncounterActionTypes.GET_ENCOUNTER_SETTINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case EncounterActionTypes.GET_ENCOUNTER_SETTINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
     }
 };

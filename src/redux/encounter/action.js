@@ -19,3 +19,13 @@ export const createEncounterSettingsAction = (data): AuthAction => ({
     type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS,
     data
 });
+
+export const updateEncounterSettingsAction = (data): AuthAction => ({
+    type: EncounterActionTypes.UPDATE_ENCOUNTER_SETTINGS,
+    data
+});
+
+export const getEncounterSettingsAction = (data): AuthAction => ({
+    type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS,
+    data
+});

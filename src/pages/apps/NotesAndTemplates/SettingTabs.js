@@ -126,14 +126,14 @@ const SettingTabs = () => {
                                                                         'labOrders',
                                                                         'imagingOrders',
                                                                     ].includes(section.id) && (
-                                                                        <Form.Check
-                                                                            type="switch"
-                                                                            id={`minimize-${section.id}`}
-                                                                            checked={section.minimized || false}
-                                                                            onChange={() => toggleMinimize(section.id)}
-                                                                            label="Minimize By Default"
-                                                                        />
-                                                                    )}
+                                                                            <Form.Check
+                                                                                type="switch"
+                                                                                id={`minimize-${section.id}`}
+                                                                                checked={section.minimized || false}
+                                                                                onChange={() => toggleMinimize(section.id)}
+                                                                                label="Minimize By Default"
+                                                                            />
+                                                                        )}
                                                                     <Form.Check
                                                                         type="switch"
                                                                         id={`visible-${section.id}`}

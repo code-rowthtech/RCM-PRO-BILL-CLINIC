@@ -23,3 +23,13 @@ export function createEncounterSettingsApi(params: any): any {
     const { data } = params;
     return api.create(URL.encounterSettings, data);
 }
+
+export function updateEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.encounterSettings, data);
+}
+
+export function getEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.get(URL.encounterSettings, data);
+}

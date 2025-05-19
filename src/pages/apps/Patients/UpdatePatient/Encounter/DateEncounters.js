@@ -2,26 +2,39 @@ import React, { useState } from 'react';
 import { Col, Button, Row, Form, Table } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { HiMiniBars3BottomLeft } from "react-icons/hi2";
+import { useSelector } from 'react-redux';
 
 const DateEncounters = ({ isCollapsed }) => {
     const [leftTab, setLeftTab] = useState('Summary');
+    const store = useSelector((state) => state);
+    const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
+    console.log(settingsDataMainItems, 'settingsDataMainItemssettingsDataMainItems')
 
+    const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
+    const visibleTabs =
+        settingsDataMainItems?.length > 0
+            ? settingsDataMainItems?.filter((item) => item?.show === true)
+            : defaultTabs.map((name, index) => ({
+                _id: index.toString(),
+                name,
+            }));
     return (
         <div className='px-0 mt-1 row border  mx-1 h-100' >
             {/* Collapsible Left Column */}
             <Col className={`px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
                 <ul className='d-flex list-unstyled mt-0'>
-                    {['Summary', 'Templates', 'Past Encounters'].map((data) => (
+                    {visibleTabs.map((item) => (
                         <li
-                            key={data}
-                            onClick={() => setLeftTab(data)}
-                            className={`cursor-pointer p-1 fs-6  rounded-0  list-group-item  
-                                    d-flex align-items-center flex-fill justify-content-center fw-bold 
-                                    ${data === leftTab ? 'active-patient-chart-tab fw-medium    ' : 'border border-muted'}`}>
-                            {data}
+                            key={item._id}
+                            onClick={() => setLeftTab(item.name)}
+                            className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
+                  d-flex align-items-center flex-fill justify-content-center fw-bold 
+                  ${item.name === leftTab ? 'active-patient-chart-tab fw-medium' : 'border border-muted'}`}>
+                            {item.name}
                         </li>
                     ))}
                 </ul>
+
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1'>
                         {leftTab === 'Summary' && <EncounterSummary />}
