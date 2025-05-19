@@ -148,6 +148,28 @@ const VerticalLayout = ({ children }: VerticalLayoutProps, state: VerticalLayout
                         </Container>
                     </div>
                 </div>
+                {/* <div className="row m-0 p-0 " style={{ overflowX: 'hidden !important', overflowY: 'hidden !important' }}>
+                    <div className="col-2 p-0 m-0">
+                        <Suspense fallback={loading()}>
+                            <LeftSidebar isCondensed={isCondensed} isLight={isLight} hideUserProfile={true} />
+                        </Suspense>
+                    </div>
+                    <div className="col-10 p-0 m-0">
+                        <div className="row p-0 m-0">
+                            <div className="col-12 p-0 m-0">
+                                <Suspense fallback={loading()}>
+                                    <Topbar openLeftMenuCallBack={openMenu} hideLogo={true} />
+                                </Suspense>
+                            </div>
+                            <div className="col-12 w-100 p-2 pe-0 mt-4 m-0">
+                                <Container fluid className='px-2'>
+                                    <Outlet />
+                                </Container>
+                            </div>
+                        </div>
+                    </div>
+                </div> */}
+
             </div>
 
             <Suspense fallback={loading()}>

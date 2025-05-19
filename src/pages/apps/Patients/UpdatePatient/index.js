@@ -179,6 +179,20 @@ const UpdatePatientIndex = () => {
             type: 'default',
         }
     ]);
+    const [expanded, setExpanded] = useState(false)
+    useEffect(() => {
+        const elements = document.getElementsByClassName('content-page');
+        for (let el of elements) {
+            if (expanded) {
+                el.style.setProperty('padding-top', '33px', 'important');
+            } else {
+                el.style.setProperty('padding-top', '50px', 'important');
+                // el.style.removeProperty('padding-top');
+            }
+        }
+    }, [expanded]);
+
+
     return (
         <div className="mt-1 g-0  px-0 mx-0">
             <div className="page-height g-0 px-0 mx-0">
@@ -190,523 +204,529 @@ const UpdatePatientIndex = () => {
                             <Spinner />
                         </div>
                     ) : (
-                        <Row className=" align-items-stretch pe-0">
-                            <Col xs={12} className="mb-0 pe-0 ps-0">
-                                <ul
-                                    ref={menuRef}
-                                    className="list-group border border-muted d-flex flex-row patientChartscroll position-relative">
-                                    {patientMenuItems?.slice(0, 9)?.map((item, index) => (
-                                        <li
-                                            key={index}
-                                            className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
+                        <Row className=" align-items-stretch  pe-0">
+                            <Col xs={12} className={`mb-0 ${expanded ? 'd-none' : ''} pe-0 ps-0`}>
+                                <>
+                                    <ul
+                                        ref={menuRef}
+                                        className="list-group border border-muted d-flex flex-row patientChartscroll position-relative">
+                                        {patientMenuItems?.slice(0, 9)?.map((item, index) => (
+                                            <li
+                                                key={index}
+                                                className={`cursor-pointer px-0 p-1 fs-6 text-nowrap list-group-item  
                                                        py-1 flex-fill text-center position-relative fw-bold
                                                        ${item?.subItems ? 'hasSubmenuItems' : ''}
                                                       ${selectedMainTab === item?.tab ||
-                                                    item?.subItems?.some((sub) => sub.tab === selectedMainTab)
-                                                    ? 'active-patient-chart-tab fw-medium'
-                                                    : ''
-                                                }`}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (item.subItems) {
-                                                    toggleSubmenu(item.label);
-                                                    // setActiveSubmenu(null);
-                                                } else {
-                                                    if (item.tab === 'Encounter') {
-                                                        setActiveKey('1')
-                                                        setSelectedMainTab(item.tab);
-                                                        sessionStorage.setItem('selectedMainTab', item.tab);
-                                                        setActiveSubmenu(null);
+                                                        item?.subItems?.some((sub) => sub.tab === selectedMainTab)
+                                                        ? 'active-patient-chart-tab fw-medium'
+                                                        : ''
+                                                    }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (item.subItems) {
+                                                        toggleSubmenu(item.label);
+                                                        // setActiveSubmenu(null);
                                                     } else {
-                                                        setActiveKey('0')
-                                                        setSelectedMainTab(item.tab);
-                                                        sessionStorage.setItem('selectedMainTab', item.tab);
-                                                        setActiveSubmenu(null);
+                                                        if (item.tab === 'Encounter') {
+                                                            setActiveKey('1')
+                                                            setSelectedMainTab(item.tab);
+                                                            sessionStorage.setItem('selectedMainTab', item.tab);
+                                                            setActiveSubmenu(null);
+                                                        } else {
+                                                            setActiveKey('0')
+                                                            setSelectedMainTab(item.tab);
+                                                            sessionStorage.setItem('selectedMainTab', item.tab);
+                                                            setActiveSubmenu(null);
+                                                        }
+
                                                     }
+                                                }}>
+                                                <div>
+                                                    <span className="px-1 d-flex gap-2 align-items-center justify-content-center">
+                                                        {item.label}
+                                                        {item?.subItems && (
+                                                            <span>
+                                                                {activeSubmenu === item.label ? (
+                                                                    <i className="bi bi-chevron-up" />
+                                                                ) : (
+                                                                    <i className="bi bi-chevron-down" />
+                                                                )}
+                                                            </span>
+                                                        )}
+                                                    </span>
+                                                </div>
 
-                                                }
-                                            }}>
-                                            <div>
-                                                <span className="px-1 d-flex gap-2 align-items-center justify-content-center">
-                                                    {item.label}
-                                                    {item?.subItems && (
-                                                        <span>
-                                                            {activeSubmenu === item.label ? (
-                                                                <i className="bi bi-chevron-up" />
-                                                            ) : (
-                                                                <i className="bi bi-chevron-down" />
-                                                            )}
-                                                        </span>
-                                                    )}
-                                                </span>
-                                            </div>
+                                                {activeSubmenu === item.label && item.subItems && (
+                                                    <ul className="list-group position-absolute start-0 top-100 mt-1 bg-white shadow rounded w-100 z-3">
+                                                        {item.subItems.map((subItem, subIndex) => (
+                                                            <li
+                                                                key={subIndex}
+                                                                onClick={() => {
+                                                                    setSelectedMainTab(subItem.tab);
+                                                                    sessionStorage.setItem('selectedMainTab', subItem.tab);
 
-                                            {activeSubmenu === item.label && item.subItems && (
-                                                <ul className="list-group position-absolute start-0 top-100 mt-1 bg-white shadow rounded w-100 z-3">
-                                                    {item.subItems.map((subItem, subIndex) => (
+                                                                    // setActiveSubmenu(null);
+                                                                    // setShowMoreMenu(false);
+                                                                }}
+                                                                className="list-group-item submenuItem py-1 text-start fs-6">
+                                                                {subItem.label}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </li>
+                                        ))}
+
+                                        <li
+                                            className="list-group-item py-1 text-center fs-6 position-relative cursor-pointer"
+                                            onClick={() => setShowMoreMenu((prev) => !prev)}>
+                                            <i className="bi bi-three-dots" />
+                                            {showMoreMenu && (
+                                                <ul className="list-group position-absolute end-50 top-100 mt-1  shadow rounded w-auto z-3">
+                                                    {patientMenuItems?.slice(9)?.map((data, index) => (
                                                         <li
-                                                            key={subIndex}
+                                                            key={index}
                                                             onClick={() => {
-                                                                setSelectedMainTab(subItem.tab);
-                                                                sessionStorage.setItem('selectedMainTab', subItem.tab);
-
-                                                                // setActiveSubmenu(null);
+                                                                setSelectedMainTab(data.tab);
+                                                                sessionStorage.setItem('selectedMainTab', data.tab);
+                                                                setShowMoreMenu(false);
+                                                                // setShowMoreMenu(false);
+                                                                // setShowMoreMenu(false);
                                                                 // setShowMoreMenu(false);
                                                             }}
                                                             className="list-group-item submenuItem py-1 text-start fs-6">
-                                                            {subItem.label}
+                                                            {data.label}
                                                         </li>
                                                     ))}
                                                 </ul>
                                             )}
                                         </li>
-                                    ))}
+                                    </ul>
+                                    <Accordion
+                                        className=""
+                                        activeKey={activeKey}
+                                        onSelect={(eventKey) => setActiveKey(eventKey)}>
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Header className="p-0  m-0">
+                                                <div className="ps-2 py-1">
+                                                    <p className="text-nowrap fs-6 mb-0">
+                                                        <span
+                                                            className="fw-bold text-capitalize pe-1 ps-0"
+                                                            style={{
+                                                                color: 'rgb(249, 139, 55)',
+                                                                borderRight: '1px solid gray',
+                                                            }}>
+                                                            {patientDetails?.name?.[0]?.prefix + ' ' || ''}
+                                                            {patientDetails?.name?.[0]?.given?.join(' ') + ' ' || 'N/A'}
+                                                            {patientDetails?.name?.[0]?.family || ''}
+                                                        </span>{' '}
+                                                        <span
+                                                            style={{ borderRight: '1px solid gray' }}
+                                                            className="fs-6 fw-bold text-capitalize px-1">
+                                                            {patientDetails?.gender || ' '}
+                                                        </span>
+                                                        <span
+                                                            style={{ borderRight: '1px solid gray' }}
+                                                            className="fs-6 fw-bold text-capitalize px-1">
+                                                            {patientDetails?.birthDate
+                                                                ? new Date(patientDetails.birthDate).toLocaleDateString(
+                                                                    'en-GB'
+                                                                )
+                                                                : 'N/A'}{' '}
+                                                            {patientDetails?.approxAge &&
+                                                                (() => {
+                                                                    const years = Math.floor(patientDetails.approxAge);
+                                                                    const months = Math.round(
+                                                                        (patientDetails.approxAge - years) * 12
+                                                                    );
+                                                                    return `(${years} year${years !== 1 ? 's old)' : ''} `;
+                                                                })()}
+                                                        </span>
+                                                        <span className="fs-6 fw-bold text-capitalize px-1">
+                                                            Chart ID: {patientDetails?.chartNumber || ''}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </Accordion.Header>
+                                            <Accordion.Body className="p-0">
+                                                <Card.Body className="py-2 px-0">
+                                                    <Row className="p-0 mx-0">
+                                                        <Col sm={1} className="px-0 pt-1">
+                                                            <Form
+                                                                onSubmit={handleSubmit(onSubmit)}
+                                                                className="d-flex flex-column align-items-center">
+                                                                <div className="position-relative w-75 d-flex align-items-center flex-column justify-content-center">
+                                                                    {isCameraOpen ? (
+                                                                        <video
+                                                                            ref={videoRef}
+                                                                            autoPlay
+                                                                            playsInline
+                                                                            className="rounded"
+                                                                            style={{
+                                                                                width: '120px',
+                                                                                height: '90px',
+                                                                                objectFit: 'cover',
+                                                                            }}
+                                                                        />
+                                                                    ) : uploading ? (
+                                                                        <Spinner />
+                                                                    ) : (
+                                                                        <img
+                                                                            src={
+                                                                                logo?.url
+                                                                                    ? logo.url.split('?')[0]
+                                                                                    : patientDetails?.photo[0]?.url
+                                                                                        ? patientDetails.photo[0]?.url
+                                                                                        : profilePhoto
+                                                                            }
+                                                                            alt="Patient Profile"
+                                                                            className="img-fluid rounded object-fit-cover"
+                                                                            style={{
+                                                                                width: '120px',
+                                                                                height: '90px',
+                                                                            }}
+                                                                        />
+                                                                    )}
 
-                                    <li
-                                        className="list-group-item py-1 text-center fs-6 position-relative cursor-pointer"
-                                        onClick={() => setShowMoreMenu((prev) => !prev)}>
-                                        <i className="bi bi-three-dots" />
-                                        {showMoreMenu && (
-                                            <ul className="list-group position-absolute end-50 top-100 mt-1  shadow rounded w-auto z-3">
-                                                {patientMenuItems?.slice(9)?.map((data, index) => (
-                                                    <li
-                                                        key={index}
-                                                        onClick={() => {
-                                                            setSelectedMainTab(data.tab);
-                                                            sessionStorage.setItem('selectedMainTab', data.tab);
-                                                            setShowMoreMenu(false);
-                                                            // setShowMoreMenu(false);
-                                                            // setShowMoreMenu(false);
-                                                            // setShowMoreMenu(false);
-                                                        }}
-                                                        className="list-group-item submenuItem py-1 text-start fs-6">
-                                                        {data.label}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </li>
-                                </ul>
-                            </Col>
-                            <Col xs={12} className=" pe-0 ps-0">
-                                <Accordion
-                                    className=""
-                                    activeKey={activeKey}
-                                    onSelect={(eventKey) => setActiveKey(eventKey)}>
-                                    <Accordion.Item eventKey="0">
-                                        <Accordion.Header className="p-0  m-0">
-                                            <div className="ps-2 py-1">
-                                                <p className="text-nowrap fs-6 mb-0">
-                                                    <span
-                                                        className="fw-bold text-capitalize pe-1 ps-0"
-                                                        style={{
-                                                            color: 'rgb(249, 139, 55)',
-                                                            borderRight: '1px solid gray',
-                                                        }}>
-                                                        {patientDetails?.name?.[0]?.prefix + ' ' || ''}
-                                                        {patientDetails?.name?.[0]?.given?.join(' ') + ' ' || 'N/A'}
-                                                        {patientDetails?.name?.[0]?.family || ''}
-                                                    </span>{' '}
-                                                    <span
-                                                        style={{ borderRight: '1px solid gray' }}
-                                                        className="fs-6 fw-bold text-capitalize px-1">
-                                                        {patientDetails?.gender || ' '}
-                                                    </span>
-                                                    <span
-                                                        style={{ borderRight: '1px solid gray' }}
-                                                        className="fs-6 fw-bold text-capitalize px-1">
-                                                        {patientDetails?.birthDate
-                                                            ? new Date(patientDetails.birthDate).toLocaleDateString(
-                                                                'en-GB'
-                                                            )
-                                                            : 'N/A'}{' '}
-                                                        {patientDetails?.approxAge &&
-                                                            (() => {
-                                                                const years = Math.floor(patientDetails.approxAge);
-                                                                const months = Math.round(
-                                                                    (patientDetails.approxAge - years) * 12
-                                                                );
-                                                                return `(${years} year${years !== 1 ? 's old)' : ''} `;
-                                                            })()}
-                                                    </span>
-                                                    <span className="fs-6 fw-bold text-capitalize px-1">
-                                                        Chart ID: {patientDetails?.chartNumber || ''}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        </Accordion.Header>
-                                        <Accordion.Body className="p-0">
-                                            <Card.Body className="py-2 px-0">
-                                                <Row className="p-0 mx-0">
-                                                    <Col sm={1} className="px-0 pt-1">
-                                                        <Form
-                                                            onSubmit={handleSubmit(onSubmit)}
-                                                            className="d-flex flex-column align-items-center">
-                                                            <div className="position-relative w-75 d-flex align-items-center flex-column justify-content-center">
-                                                                {isCameraOpen ? (
-                                                                    <video
-                                                                        ref={videoRef}
-                                                                        autoPlay
-                                                                        playsInline
-                                                                        className="rounded"
-                                                                        style={{
-                                                                            width: '120px',
-                                                                            height: '90px',
-                                                                            objectFit: 'cover',
-                                                                        }}
-                                                                    />
-                                                                ) : uploading ? (
-                                                                    <Spinner />
-                                                                ) : (
-                                                                    <img
-                                                                        src={
-                                                                            logo?.url
-                                                                                ? logo.url.split('?')[0]
-                                                                                : patientDetails?.photo[0]?.url
-                                                                                    ? patientDetails.photo[0]?.url
-                                                                                    : profilePhoto
-                                                                        }
-                                                                        alt="Patient Profile"
-                                                                        className="img-fluid rounded object-fit-cover"
-                                                                        style={{
-                                                                            width: '120px',
-                                                                            height: '90px',
-                                                                        }}
-                                                                    />
-                                                                )}
+                                                                    {!isCameraOpen && (
+                                                                        <BiEdit
+                                                                            className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
+                                                                                }`}
+                                                                            style={{
+                                                                                top: '-9%',
+                                                                                right: '-10%',
+                                                                                cursor: 'pointer',
+                                                                            }}
+                                                                            onClick={openCamera}
+                                                                        />
+                                                                    )}
 
-                                                                {!isCameraOpen && (
-                                                                    <BiEdit
-                                                                        className={`position-absolute fs-4 text-primary ${uploading ? 'd-none' : ''
-                                                                            }`}
-                                                                        style={{
-                                                                            top: '-9%',
-                                                                            right: '-10%',
-                                                                            cursor: 'pointer',
-                                                                        }}
-                                                                        onClick={openCamera}
-                                                                    />
-                                                                )}
+                                                                    {isCameraOpen && (
+                                                                        <div className="camera-controls d-flex justify-content-center gap-1">
+                                                                            <Button
+                                                                                onClick={capturePhoto}
+                                                                                type="button"
+                                                                                className="custom-buttons">
+                                                                                <TbCapture className="text-white fs-5" />{' '}
+                                                                            </Button>
+                                                                            <Button
+                                                                                onClick={stopCamera}
+                                                                                className="custom-buttons">
+                                                                                <IoClose className="text-white fs-5" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    )}
 
-                                                                {isCameraOpen && (
-                                                                    <div className="camera-controls d-flex justify-content-center gap-1">
-                                                                        <Button
-                                                                            onClick={capturePhoto}
-                                                                            type="button"
-                                                                            className="custom-buttons">
-                                                                            <TbCapture className="text-white fs-5" />{' '}
-                                                                        </Button>
-                                                                        <Button
-                                                                            onClick={stopCamera}
-                                                                            className="custom-buttons">
-                                                                            <IoClose className="text-white fs-5" />
-                                                                        </Button>
-                                                                    </div>
-                                                                )}
+                                                                    <canvas ref={canvasRef} style={{ display: 'none' }} />
+                                                                </div>
 
-                                                                <canvas ref={canvasRef} style={{ display: 'none' }} />
-                                                            </div>
-
-                                                            {/* Submit button that sends the form after upload */}
-                                                            <Button
-                                                                // onClick={onSubmit}
-                                                                type="submit"
-                                                                className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'
-                                                                    }`}
-                                                                disabled={!logo}>
-                                                                Submit
-                                                            </Button>
-                                                        </Form>
-                                                    </Col>
-                                                    <Col sm={9}>
-                                                        <Row className="pt-1 px-2">
-                                                            <Col className="" sm={6} md={4}>
-                                                                <Table className="h-100 box-shadow-none">
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Phone:
-                                                                        </th>
-                                                                        <td
-                                                                            className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find(
-                                                                                (data) => data?.system === 'phone'
-                                                                            )?.value
-                                                                                ? 'text-black'
-                                                                                : 'text-danger'
-                                                                                }`}>
-                                                                            {'+1-' +
-                                                                                patientDetails?.telecom?.find(
+                                                                {/* Submit button that sends the form after upload */}
+                                                                <Button
+                                                                    // onClick={onSubmit}
+                                                                    type="submit"
+                                                                    className={`${!logo ? 'd-none' : 'mt-1 custom-buttons'
+                                                                        }`}
+                                                                    disabled={!logo}>
+                                                                    Submit
+                                                                </Button>
+                                                            </Form>
+                                                        </Col>
+                                                        <Col sm={9}>
+                                                            <Row className="pt-1 px-2">
+                                                                <Col className="" sm={6} md={4}>
+                                                                    <Table className="h-100 box-shadow-none">
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Phone:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find(
                                                                                     (data) => data?.system === 'phone'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {'+1-' +
+                                                                                    patientDetails?.telecom?.find(
+                                                                                        (data) => data?.system === 'phone'
+                                                                                    )?.value || 'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Email:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find(
+                                                                                    (item) => item?.system === 'email'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.telecom?.find(
+                                                                                    (item) => item?.system === 'email'
                                                                                 )?.value || 'Missing'}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Email:
-                                                                        </th>
-                                                                        <td
-                                                                            className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find(
-                                                                                (item) => item?.system === 'email'
-                                                                            )?.value
-                                                                                ? 'text-black'
-                                                                                : 'text-danger'
-                                                                                }`}>
-                                                                            {patientDetails?.telecom?.find(
-                                                                                (item) => item?.system === 'email'
-                                                                            )?.value || 'Missing'}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Address:
-                                                                        </th>
-                                                                        <td
-                                                                            className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city &&
-                                                                                patientDetails?.address?.[0]?.state
-                                                                                ? 'text-black'
-                                                                                : 'text-danger'
-                                                                                }`}>
-                                                                            {patientDetails?.address?.[0]?.city &&
-                                                                                patientDetails?.address?.[0]?.state
-                                                                                ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
-                                                                                : 'Missing'}
-                                                                        </td>
-                                                                    </tr>
-                                                                </Table>
-                                                            </Col>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Address:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city &&
+                                                                                    patientDetails?.address?.[0]?.state
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.address?.[0]?.city &&
+                                                                                    patientDetails?.address?.[0]?.state
+                                                                                    ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
+                                                                                    : 'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </Table>
+                                                                </Col>
 
-                                                            <Col className="" sm={6} md={4}>
-                                                                <Table className="h-100 box-shadow-none">
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Primary Provider:
-                                                                        </th>
-                                                                        <td
-                                                                            className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]
-                                                                                ?.text
-                                                                                ? 'text-black'
-                                                                                : 'text-danger'
-                                                                                }`}>
-                                                                            {patientDetails?.doctorId?.name?.[0]
-                                                                                ?.text || 'Missing'}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Date Added:
-                                                                        </th>
-                                                                        <td className="fs-6 text-nowrap text-black">
-                                                                            {' '}
-                                                                            {new Date(
-                                                                                patientDetails?.createdAt
-                                                                            )?.toLocaleDateString('en-GB')}
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
-                                                                            Insurance:
-                                                                        </th>
-                                                                        <td className="fs-6  text-nowrap text-danger">
-                                                                            Missing
-                                                                        </td>
-                                                                    </tr>
-                                                                </Table>
-                                                            </Col>
-                                                            <Col sm={4}>
-                                                                <Table className="h-100 box-shadow-none">
-                                                                    <tr className="">
-                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
-                                                                            Last Appointment:
-                                                                        </th>
-                                                                        <td className="fs-6 pe-2 text-nowrap text-black">
-                                                                            16/04/2025
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
-                                                                            Next Appointment:
-                                                                        </th>
-                                                                        <td className="fs-6 pe-2 text-nowrap text-black">
-                                                                            26/05/2025
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr className="">
-                                                                        <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
-                                                                            Follow Up Reason:
-                                                                        </th>
-                                                                        <td
-                                                                            className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason
-                                                                                ? 'text-black'
-                                                                                : 'text-danger'
-                                                                                }`}>
-                                                                            {patientDetails?.followupReason ||
-                                                                                'Missing'}
-                                                                        </td>
-                                                                    </tr>
-                                                                </Table>
-                                                            </Col>
-                                                        </Row>
-                                                    </Col>
+                                                                <Col className="" sm={6} md={4}>
+                                                                    <Table className="h-100 box-shadow-none">
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Primary Provider:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]
+                                                                                    ?.text
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.doctorId?.name?.[0]
+                                                                                    ?.text || 'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Date Added:
+                                                                            </th>
+                                                                            <td className="fs-6 text-nowrap text-black">
+                                                                                {' '}
+                                                                                {new Date(
+                                                                                    patientDetails?.createdAt
+                                                                                )?.toLocaleDateString('en-GB')}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Insurance:
+                                                                            </th>
+                                                                            <td className="fs-6  text-nowrap text-danger">
+                                                                                Missing
+                                                                            </td>
+                                                                        </tr>
+                                                                    </Table>
+                                                                </Col>
+                                                                <Col sm={4}>
+                                                                    <Table className="h-100 box-shadow-none">
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Last Appointment:
+                                                                            </th>
+                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                                16/04/2025
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Next Appointment:
+                                                                            </th>
+                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                                26/05/2025
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Follow Up Reason:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.followupReason ||
+                                                                                    'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                    </Table>
+                                                                </Col>
+                                                            </Row>
+                                                        </Col>
 
-                                                    <Col sm={2} className="d-flex justify-content-end pe-3">
-                                                        <div className="text-center d-flex flex-column">
-                                                            <Button
-                                                                as={Link}
-                                                                to="/apps/appointments/newAppointment"
-                                                                className="shadow-none"
-                                                                style={{
-                                                                    fontSize: '10px',
-                                                                    borderRadius: '8px',
-                                                                    padding: '3px 7px 3px 7px',
-                                                                    width: '100px',
-                                                                    backgroundColor: ' #6169d0',
-                                                                }}>
-                                                                New Appointment
-                                                            </Button>
-                                                            <Dropdown>
-                                                                <Dropdown.Toggle className="mt-1 shadow-none "
+                                                        <Col sm={2} className="d-flex justify-content-end pe-3">
+                                                            <div className="text-center d-flex flex-column">
+                                                                <Button
+                                                                    as={Link}
+                                                                    to="/apps/appointments/newAppointment"
+                                                                    className="shadow-none"
                                                                     style={{
                                                                         fontSize: '10px',
                                                                         borderRadius: '8px',
                                                                         padding: '3px 7px 3px 7px',
                                                                         width: '100px',
                                                                         backgroundColor: ' #6169d0',
-                                                                    }} id="dropdown-basic">
-                                                                    New Encounter
-                                                                </Dropdown.Toggle>
-
-
-                                                                <Dropdown.Menu>
-                                                                    <Dropdown.Item
-                                                                        onClick={() => {
-                                                                            const newTab = {
-                                                                                id: encounterTabs?.length + 1,
-                                                                                title: new Date().toISOString().split('T')[0],
-                                                                                type: 'date',
-                                                                            };
-                                                                            setActiveKey('1')
-                                                                            setEncounterTabs([...encounterTabs, newTab]);
-                                                                            setSelectedMainTab('Encounter'); // Add this line
-                                                                        }}
-                                                                        className='mb-0 fs-6 fw-semibold py-1'
-                                                                    >
-                                                                        <IoCalendar className="me-1" /> By Date
-                                                                    </Dropdown.Item>
-                                                                    <Dropdown.Divider className='m-0' />
-                                                                    <Dropdown.Item
-                                                                        onClick={() => {
-                                                                            const newTab = {
-                                                                                id: encounterTabs?.length + 1,
-                                                                                title: 'Clinical Finding',
-                                                                                type: 'appointment',
-                                                                            };
-                                                                            setActiveKey('1')
-                                                                            setEncounterTabs([...encounterTabs, newTab]);
-                                                                            setSelectedMainTab('Encounter'); // Add this line
-                                                                        }}
-                                                                        className='mb-0 fs-6 fw-semibold py-1'
-                                                                    >
-                                                                        <FaCalendarAlt className="me-1" /> By Appointment
-                                                                    </Dropdown.Item>
-                                                                </Dropdown.Menu>
-
-                                                            </Dropdown>
-                                                            <div className="mt-2 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                                                    }}>
+                                                                    New Appointment
+                                                                </Button>
                                                                 <Dropdown>
-                                                                    <Dropdown.Toggle
-                                                                        variant="light"
-                                                                        className="p-0 border-0 bg-transparent hover-bg-light rounded-circle"
-                                                                        id="print-dropdown"
-                                                                        aria-label="Print options"
-                                                                    >
-                                                                        <IoPrintSharp className="fs-4 text-primary" />
+                                                                    <Dropdown.Toggle className="mt-1 shadow-none "
+                                                                        style={{
+                                                                            fontSize: '10px',
+                                                                            borderRadius: '8px',
+                                                                            padding: '3px 7px 3px 7px',
+                                                                            width: '100px',
+                                                                            backgroundColor: ' #6169d0',
+                                                                        }} id="dropdown-basic">
+                                                                        New Encounter
                                                                     </Dropdown.Toggle>
 
-                                                                    <Dropdown.Menu className="px-3 py-2 shadow-sm" style={{ minWidth: "220px" }}>
-                                                                        <div className="mb-2">
-                                                                            <h6 className="fw-semibold mb-2 text-muted">Select sections to print</h6>
-                                                                            <div className="d-flex flex-column gap-2">
-                                                                                {['Vitals List', 'Allergies', "Problems", "Medications"].map((data) => (
-                                                                                    <div className="form-check form-check-inline  d-flex align-items-center" key={data}>
-                                                                                        <input
-                                                                                            className="form-check-input me-2"
-                                                                                            type="checkbox"
-                                                                                            id={`print-${data}`}
-                                                                                            checked={printOptions.includes(data)}
-                                                                                            onChange={(e) => {
-                                                                                                if (e.target.checked) {
-                                                                                                    setPrintOptions((prev) => [...prev, data]);
-                                                                                                } else {
-                                                                                                    setPrintOptions((prev) => prev.filter((item) => item !== data));
-                                                                                                }
-                                                                                            }}
-                                                                                        />
-                                                                                        <label className="form-check-label" htmlFor={`print-${data}`}>
-                                                                                            {data}
-                                                                                        </label>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
 
-                                                                        <div className="d-flex justify-content-between align-items-center pt-2 border-top">
-                                                                            <small className="text-muted">
-                                                                                {printOptions.length} selected
-                                                                            </small>
-                                                                            <Button
-                                                                                variant="primary"
-                                                                                size="sm"
-                                                                                className='custom-buttons'
-                                                                                onClick={() =>
-                                                                                    handlePrintPatientSummary({
-                                                                                        toBePrinted: printOptions,
-                                                                                        patientDetails: patientDetails,
-                                                                                        vitals: store?.getVitalsByPatientIdReducer?.data?.data,
-                                                                                        medicationList: store?.getMedicationReducer?.data?.medicationRequests,
-                                                                                        allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
-                                                                                        problemData: store?.getProblemListReducer?.data?.problems
-                                                                                    })
-                                                                                }
-                                                                                disabled={
-                                                                                    printOptions?.length < 1 ||
-                                                                                    store?.getVitalsByPatientIdReducer?.loading ||
-                                                                                    store?.getMedicationReducer?.loading ||
-                                                                                    store?.getAllergiesOfAPatientReducer?.loading ||
-                                                                                    store?.getProblemListReducer?.loading
-                                                                                }
-                                                                            >
-                                                                                {(
-                                                                                    store?.getVitalsByPatientIdReducer?.loading ||
-                                                                                    store?.getMedicationReducer?.loading ||
-                                                                                    store?.getAllergiesOfAPatientReducer?.loading ||
-                                                                                    store?.getProblemListReducer?.loading
-                                                                                ) ? (
-                                                                                    <>
-                                                                                        Preparing...
-                                                                                    </>
-                                                                                ) : (
-                                                                                    'Print Report'
-                                                                                )}
-                                                                            </Button>
-                                                                        </div>
+                                                                    <Dropdown.Menu>
+                                                                        <Dropdown.Item
+                                                                            onClick={() => {
+                                                                                const newTab = {
+                                                                                    id: encounterTabs?.length + 1,
+                                                                                    title: new Date().toISOString().split('T')[0],
+                                                                                    type: 'date',
+                                                                                };
+                                                                                setActiveKey('1')
+                                                                                setEncounterTabs([...encounterTabs, newTab]);
+                                                                                setSelectedMainTab('Encounter'); // Add this line
+                                                                            }}
+                                                                            className='mb-0 fs-6 fw-semibold py-1'
+                                                                        >
+                                                                            <IoCalendar className="me-1" /> By Date
+                                                                        </Dropdown.Item>
+                                                                        <Dropdown.Divider className='m-0' />
+                                                                        <Dropdown.Item
+                                                                            onClick={() => {
+                                                                                const newTab = {
+                                                                                    id: encounterTabs?.length + 1,
+                                                                                    title: 'Clinical Finding',
+                                                                                    type: 'appointment',
+                                                                                };
+                                                                                setActiveKey('1')
+                                                                                setEncounterTabs([...encounterTabs, newTab]);
+                                                                                setSelectedMainTab('Encounter'); // Add this line
+                                                                            }}
+                                                                            className='mb-0 fs-6 fw-semibold py-1'
+                                                                        >
+                                                                            <FaCalendarAlt className="me-1" /> By Appointment
+                                                                        </Dropdown.Item>
                                                                     </Dropdown.Menu>
-                                                                </Dropdown>
 
-                                                                <LiaReceiptSolid className="fs-4  text-primary" />
+                                                                </Dropdown>
+                                                                <div className="mt-2 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                                                    <Dropdown>
+                                                                        <Dropdown.Toggle
+                                                                            variant="light"
+                                                                            className="p-0 border-0 bg-transparent hover-bg-light rounded-circle"
+                                                                            id="print-dropdown"
+                                                                            aria-label="Print options"
+                                                                        >
+                                                                            <IoPrintSharp className="fs-4 text-primary" />
+                                                                        </Dropdown.Toggle>
+
+                                                                        <Dropdown.Menu className="px-3 py-2 shadow-sm" style={{ minWidth: "220px" }}>
+                                                                            <div className="mb-2">
+                                                                                <h6 className="fw-semibold mb-2 text-muted">Select sections to print</h6>
+                                                                                <div className="d-flex flex-column gap-2">
+                                                                                    {['Vitals List', 'Allergies', "Problems", "Medications"].map((data) => (
+                                                                                        <div className="form-check form-check-inline  d-flex align-items-center" key={data}>
+                                                                                            <input
+                                                                                                className="form-check-input me-2"
+                                                                                                type="checkbox"
+                                                                                                id={`print-${data}`}
+                                                                                                checked={printOptions.includes(data)}
+                                                                                                onChange={(e) => {
+                                                                                                    if (e.target.checked) {
+                                                                                                        setPrintOptions((prev) => [...prev, data]);
+                                                                                                    } else {
+                                                                                                        setPrintOptions((prev) => prev.filter((item) => item !== data));
+                                                                                                    }
+                                                                                                }}
+                                                                                            />
+                                                                                            <label className="form-check-label" htmlFor={`print-${data}`}>
+                                                                                                {data}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div className="d-flex justify-content-between align-items-center pt-2 border-top">
+                                                                                <small className="text-muted">
+                                                                                    {printOptions.length} selected
+                                                                                </small>
+                                                                                <Button
+                                                                                    variant="primary"
+                                                                                    size="sm"
+                                                                                    className='custom-buttons'
+                                                                                    onClick={() =>
+                                                                                        handlePrintPatientSummary({
+                                                                                            toBePrinted: printOptions,
+                                                                                            patientDetails: patientDetails,
+                                                                                            vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                                                                            medicationList: store?.getMedicationReducer?.data?.medicationRequests,
+                                                                                            allergyData: store?.getAllergiesOfAPatientReducer?.data?.allergies,
+                                                                                            problemData: store?.getProblemListReducer?.data?.problems
+                                                                                        })
+                                                                                    }
+                                                                                    disabled={
+                                                                                        printOptions?.length < 1 ||
+                                                                                        store?.getVitalsByPatientIdReducer?.loading ||
+                                                                                        store?.getMedicationReducer?.loading ||
+                                                                                        store?.getAllergiesOfAPatientReducer?.loading ||
+                                                                                        store?.getProblemListReducer?.loading
+                                                                                    }
+                                                                                >
+                                                                                    {(
+                                                                                        store?.getVitalsByPatientIdReducer?.loading ||
+                                                                                        store?.getMedicationReducer?.loading ||
+                                                                                        store?.getAllergiesOfAPatientReducer?.loading ||
+                                                                                        store?.getProblemListReducer?.loading
+                                                                                    ) ? (
+                                                                                        <>
+                                                                                            Preparing...
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        'Print Report'
+                                                                                    )}
+                                                                                </Button>
+                                                                            </div>
+                                                                        </Dropdown.Menu>
+                                                                    </Dropdown>
+
+                                                                    <LiaReceiptSolid className="fs-4  text-primary" />
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </Card.Body>
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-                                </Accordion>
+                                                        </Col>
+                                                    </Row>
+                                                </Card.Body>
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                </>
+                            </Col>
+                            <Col xs={12} className=" pe-0 ps-0">
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
                                         <Card
                                             className="px-2 scroll-container border-0 pt-2"
                                             style={{
-                                                height: isAccordionOpen ? 'calc(100vh - 270px)' : 'calc(100vh - 154px)',
+                                                height: expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed
+                                                    : expanded ? '90vh'                           // When expanded (accordion state doesn't matter)
+                                                        : isAccordionOpen ? '66.5vh'                    // When accordion open (not expanded)
+                                                            : '81.5vh',                                     // Default case (neither expanded nor accordion open)
                                                 maxHeight: '1000px',
+                                                overflowX: 'hidden'
                                             }}>
                                             {selectedMainTab === 'Patient Details' && (
                                                 <PatientSummary
@@ -731,6 +751,9 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Documents' && <p>In progress...</p>}
                                             {selectedMainTab === 'Encounter' && (
                                                 <Encounter
+                                                    expanded={expanded}
+                                                    setExpanded={setExpanded}
+                                                    isAccordionOpen={isAccordionOpen}
                                                     encounterTabs={encounterTabs}
                                                     setEncounterTabs={setEncounterTabs}
                                                     setSelectedMainTab={setSelectedMainTab} // Pass this prop

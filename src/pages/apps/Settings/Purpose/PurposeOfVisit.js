@@ -121,17 +121,15 @@ const POV = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${
-                                        status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={` active_inactive_buttons ${
-                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={` active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -262,9 +260,9 @@ const POV = () => {
                         <Col sm={11} className="text-center">
                             <h4>{edit ? 'Edit Purpose' : 'New Purpose'}</h4>
                         </Col>
-                        <Col sm={1}>
+                        {/* <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} />
-                        </Col>
+                        </Col> */}
                     </Row>
                     <Form onSubmit={handleSubmit(addDepartment)}>
                         <Row>
@@ -346,10 +344,10 @@ const POV = () => {
                             </Col>
                         </Row>
                         <Modal.Footer>
-                            {/* <Button onClick={closeAddModal} className="custom-buttons">Close</Button> */}
+                            <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

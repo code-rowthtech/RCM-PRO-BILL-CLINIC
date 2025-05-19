@@ -121,8 +121,8 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
     }
 
     return (
-        <div className='d-flex flex-column align-items-between'>
-            <div>
+        <div className='d-flex flex-column' style={{ height: "90%" }}>
+            <div className='scroll-container' style={{ height: '98%' }}>
                 <div className="row mb-2">
                     {/* <h5 className="mb-1 fs-5">Add Section</h5> */}
                     <div className="col-8 d-flex flex-wrap ">
@@ -145,6 +145,9 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                                 }&nbsp;
                             </button>
                         ))}
+                    </div>
+                    <div className="col-4">
+
                     </div>
                 </div>
 
@@ -216,8 +219,8 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                         </Col>
 
                         {activeAccordionKey !== null && (
-                            <Col md={4} className='ps-0'>
-                                <Card className="border-0  mb-4 rounded-0">
+                            <Col md={4} className='ps-0 border '>
+                                <Card className="h-100 mb-4 rounded-0">
                                     <Card.Header className="" style={{ background: '#ecedee', padding: '0.456rem 0.6rem' }}>
                                         <h6 className="my-0 fw-semibold">Add New Item to {items[activeAccordionKey]?.label}</h6>
                                     </Card.Header>
@@ -286,7 +289,7 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                     </Row>
                 )}
             </div>
-            <div className='d-flex gap-1 justify-content-end'>
+            <div className='d-flex gap-1 justify-content-end  align-items-end' style={{ height: '8%' }}>
                 <Button className='custom-buttons'>Cancel</Button>
                 <Button disabled={items?.length < 1} onClick={updateTemplateSection} className='custom-buttons'>Save Template</Button>
             </div>

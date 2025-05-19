@@ -206,8 +206,14 @@ const EncounterSummary = () => {
 
         return value || '-';
     };
+    const [activeKey, setActiveKey] = useState("1");
+
+    const handleToggle = (key) => {
+        setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
+    };
+
     return (
-        <Row className='gy-2 position-relative'>
+        <Row className='gy-2  position-relative'>
             {/* <Col sm={12} className='d-flex justify-content-end '>
                 <Dropdown className="position-absolute " style={{ top: '-1.5%', left: '86%' }} drop="down" >
                     <Dropdown.Toggle variant="primary" className="text-white px-1 fs-5 p-0 border-0 shadow-none">
@@ -230,79 +236,32 @@ const EncounterSummary = () => {
                     </Dropdown.Menu>
                 </Dropdown>
             </Col> */}
-            <Col sm={12} className='mt-0 scroll-container' style={{ height: '60vh' }}>
-                <Accordion>
-                    {visibleSections.vitals && (
-                        <Accordion.Item eventKey="0" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Vitals</span>
-                            </Accordion.Header>
-                            <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
-                                    <thead>
-                                        <tr className='border'>
-                                            <th className='text-white'>
-                                                Vital Name
-                                            </th>
-                                            {sortedDates?.map(date => (
-                                                <th className='text-white' key={date}>
-                                                    {formatDate(date)}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {vitals.map((vital, index) => (
-                                            <tr className='' key={vital.name}>
-                                                <td className='p-0 vitalsTableBorder'>
-                                                    {vital.name} {getDisplayUnit(vital) && (
-                                                        <small className="text-muted">({getDisplayUnit(vital)})</small>
-                                                    )}
-                                                </td>
+            <Col sm={12} className='mt-0 scroll-container mt-0 scroll-container' style={{ height: '69vh' }}>
 
-                                                {sortedDates.map(date => (
-                                                    <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
-                                                        {renderVitalCell(vital, date)}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                    {store?.getVitalsByPatientIdReducer?.loading &&
-                                        <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
-                                            <Spinner />
-                                        </div>
-                                    }
-                                </Table>
-                            </Accordion.Body>
-
-                        </Accordion.Item>
-                    )}
-                </Accordion>
-                <Accordion>
+                <Accordion activeKey={activeKey} onSelect={handleToggle}>
                     {visibleSections.allergies && (
-                        <Accordion.Item eventKey="1" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Allergies</span>
+                        <Accordion.Item eventKey="1" className="border-0 mb-2">
+                            <Accordion.Header className="p-0 bg-light rounded encounterSummary">
+                                <span className="fw-semibold fs-6">Allergies</span>
                             </Accordion.Header>
-                            <Accordion.Body className='p-2'>
+                            <Accordion.Body className="p-2">
                                 {allergyData?.length > 0 ? (
-                                    <div style={{ height: '30vh' }} className='scroll-container'>
+                                    <div style={{ height: '30vh' }} className="scroll-container">
                                         {store?.getAllergiesOfAPatientReducer?.loading ? (
-                                            <div
-                                                className="d-flex justify-content-center align-items-center w-100 p-5"
-                                                style={{ height: '100%' }}>
+                                            <div className="d-flex justify-content-center align-items-center w-100 p-5" style={{ height: '100%' }}>
                                                 <Spinner className="spinner-border-sm" />
                                             </div>
-                                        ) : allergyData && allergyData.length > 0 ? (
+                                        ) : (
                                             <ul className="list-unstyled pb-0 mb-0">
                                                 {allergyData.slice(0, 4).map((allergy, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className="mb-2 d-flex justify-content-between align-items-start">
+                                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
                                                         <div className="fs-6">
-                                                            <strong title={allergy.code?.text}>{allergy.code?.text?.length > 30 ? allergy.code?.text?.slice(0, 29) + '...' : allergy.code?.text || 'Unknown Allergy'}</strong>
-                                                            <div className="text-muted  small">
+                                                            <strong title={allergy.code?.text}>
+                                                                {allergy.code?.text?.length > 30
+                                                                    ? allergy.code?.text.slice(0, 29) + '...'
+                                                                    : allergy.code?.text || 'Unknown Allergy'}
+                                                            </strong>
+                                                            <div className="text-muted small">
                                                                 {allergy.clinicalStatus?.text || 'Status not available'}
                                                             </div>
                                                         </div>
@@ -312,23 +271,16 @@ const EncounterSummary = () => {
                                                     </li>
                                                 ))}
                                             </ul>
-                                        ) : (
-                                            <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
-                                                <li className="mb-2">
-                                                    <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                        <strong>No Allergies Found</strong>
-                                                    </div>
-                                                </li>
-                                            </ul>
                                         )}
                                     </div>
                                 ) : (
-                                    <div className='text-muted'>No allergies recorded</div>
+                                    <div className="text-muted">No allergies recorded</div>
                                 )}
                             </Accordion.Body>
                         </Accordion.Item>
                     )}
                 </Accordion>
+
                 <Accordion>
                     {visibleSections.problems && (
                         <Accordion.Item eventKey="2" className='border-0 mb-2'>
@@ -431,6 +383,54 @@ const EncounterSummary = () => {
                                     <div className='text-muted'>No medications recorded</div>
                                 )}
                             </Accordion.Body>
+                        </Accordion.Item>
+                    )}
+                </Accordion>
+                <Accordion>
+                    {visibleSections.vitals && (
+                        <Accordion.Item eventKey="0" className='border-0 mb-2'>
+                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
+                                <span className='fw-semibold fs-6'>Vitals</span>
+                            </Accordion.Header>
+                            <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
+                                <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
+                                    <thead>
+                                        <tr className='border'>
+                                            <th className='text-white'>
+                                                Vital Name
+                                            </th>
+                                            {sortedDates?.map(date => (
+                                                <th className='text-white' key={date}>
+                                                    {formatDate(date)}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {vitals.map((vital, index) => (
+                                            <tr className='' key={vital.name}>
+                                                <td className='p-0 vitalsTableBorder'>
+                                                    {vital.name} {getDisplayUnit(vital) && (
+                                                        <small className="text-muted">({getDisplayUnit(vital)})</small>
+                                                    )}
+                                                </td>
+
+                                                {sortedDates.map(date => (
+                                                    <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                                                        {renderVitalCell(vital, date)}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    {store?.getVitalsByPatientIdReducer?.loading &&
+                                        <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                                            <Spinner />
+                                        </div>
+                                    }
+                                </Table>
+                            </Accordion.Body>
+
                         </Accordion.Item>
                     )}
                 </Accordion>

@@ -288,11 +288,11 @@ const ConsultationRoom = () => {
                 <Modal.Body>
                     <Row className="border-bottom mb-2 pb-2">
                         <Col sm={11} className="text-center">
-                            <h4>{edit ? 'Edit Department' : 'New Department'}</h4>
+                            <h4>{edit ? 'Edit Consultation Room' : 'New Consultation Room'}</h4>
                         </Col>
-                        <Col sm={1}>
+                        {/* <Col sm={1}>
                             <IoMdClose className="fs-4 cursor-pointer" onClick={closeAddModal} />
-                        </Col>
+                        </Col> */}
                     </Row>
                     <Form onSubmit={handleSubmit(addDepartment)}>
                         <Row>
@@ -373,6 +373,7 @@ const ConsultationRoom = () => {
                             </Col>
                         </Row>
                         <Modal.Footer>
+                            <Button onClick={closeAddModal} className="custom-buttons">Close</Button>
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
                                     store?.updateMastersDataReducer?.loading ? (

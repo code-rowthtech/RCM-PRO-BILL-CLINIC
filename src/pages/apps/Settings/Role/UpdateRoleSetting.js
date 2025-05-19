@@ -104,9 +104,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                     <Col sm={10}>
                         <h4 className="mb-0 text-center">Edit Role</h4>
                     </Col>
-                    <Col sm={1}>
+                    {/* <Col sm={1}>
                         <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
-                    </Col>
+                    </Col> */}
                 </Row>
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <Row>
@@ -151,9 +151,9 @@ const UpdateRoleSetting = ({ show, closeModal, data }) => {
                         </Col>
                     </Row>
                     <Modal.Footer>
-                        {/* <Button type="button" className="custom-buttons" onClick={closeModal}>
+                        <Button type="button" className="custom-buttons" onClick={closeModal}>
                             Cancel
-                        </Button> */}
+                        </Button>
                         <Button type="submit" className="custom-buttons" disabled={store?.updateRoleDataReducer?.loading}>
                             {store?.updateRoleDataReducer?.loading ?
                                 <Spinner className="spinner-border-sm" color="white" /> :

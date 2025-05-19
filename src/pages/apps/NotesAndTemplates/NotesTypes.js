@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { FormInput } from 'lucide-react';
 import { Controller, Form, useForm } from 'react-hook-form';
+import Paginations from '../../../helpers/Paginations';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
@@ -18,7 +19,9 @@ const NotesTypes = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
-    const [noteType, setNoteType] = useState('');
+    const store = useSelector((state) => state)
+    const [noteType, setNoteType] = useState('')
+    console.log(store?.getNoteCategoriesReducer?.data?.pagination?.pages, 'store?.getNoteCategoriesReducer?.data?.pagination?.pages')
     const newDataOftypes = [
         'Encounter-Based',
         'Nursing & Allied Health',
@@ -37,17 +40,8 @@ const NotesTypes = () => {
         formState: { errors },
     } = useForm();
     useEffect(() => {
-        dispatch(
-            getNoteCategoriesAction({
-                search: search,
-                page: skip,
-                limit: 8,
-                clinicId: ClinicId,
-                active: true,
-                noteType: noteType,
-            })
-        );
-    }, [dispatch, search, noteType]);
+        dispatch(getNoteCategoriesAction({ search: search, skip: skip, limit: 8, clinicId: ClinicId, active: true, noteType: noteType }));
+    }, [dispatch, search, noteType, skip]);
     const handleOpenTab = (note) => {
         const exists = openTabs.find((tab) => tab?._id === note?._id);
         if (!exists) {
@@ -75,7 +69,11 @@ const NotesTypes = () => {
         dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8, clinicId: ClinicId }));
     };
 
-    const [status, setStatus] = useState('active');
+    const [status, setStatus] = useState('active')
+
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
@@ -93,9 +91,8 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${
-                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                        }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                         Note Categories
                                     </span>
 
@@ -108,9 +105,8 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${
-                                                activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
+                                                }`}>
                                             {tab?.noteType} Display Setting
                                             <span
                                                 style={{
@@ -134,45 +130,17 @@ const NotesTypes = () => {
                                     <Row>
                                         <Col md={6}>
                                             <Button
-                                                onClick={() => {
-                                                    setStatus('active');
-                                                    dispatch(
-                                                        getNoteCategoriesAction({
-                                                            active: true,
-                                                            search: search,
-                                                            page: skip,
-                                                            limit: 8,
-                                                            clinicId: ClinicId,
-                                                            noteType: noteType,
-                                                        })
-                                                    );
-                                                }}
-                                                className={`me-md-2 active_inactive_buttons ${
-                                                    status === 'active'
-                                                        ? ' text-white py-'
-                                                        : 'bg-white border-primary text-dark py-'
-                                                }`}>
+                                                onClick={() => { setStatus('active'); dispatch(getNoteCategoriesAction({ active: true, search: search, page: skip, limit: 8, clinicId: ClinicId, noteType: noteType })); }}
+                                                className={`me-md-2 active_inactive_buttons ${status === 'active' ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                                    }`}>
                                                 Active
                                             </Button>
                                             <Button
-                                                onClick={() => {
-                                                    setStatus('inactive');
-                                                    dispatch(
-                                                        getNoteCategoriesAction({
-                                                            active: false,
-                                                            search: search,
-                                                            page: skip,
-                                                            limit: 8,
-                                                            clinicId: ClinicId,
-                                                            noteType: noteType,
-                                                        })
-                                                    );
-                                                }}
-                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
-                                                    status === 'inactive'
-                                                        ? ' text-white py-'
-                                                        : 'bg-white border-primary text-dark py-'
-                                                }`}>
+                                                onClick={() => { setStatus('inactive'); dispatch(getNoteCategoriesAction({ active: false, search: search, page: skip, limit: 8, clinicId: ClinicId, noteType: noteType })); }}
+                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${status === 'inactive'
+                                                    ? ' text-white py-'
+                                                    : 'bg-white border-primary text-dark py-'
+                                                    }`}>
                                                 Inactive
                                             </Button>
                                             {/* <Button
@@ -192,7 +160,7 @@ const NotesTypes = () => {
                                                     className="form-select form-select-lg"
                                                     onChange={(e) => setNoteType(e.target.value)}
                                                     aria-label="Large select example">
-                                                    <option value="">All</option>
+                                                    <option value=''>All</option>
                                                     {newDataOftypes?.map((type) => (
                                                         <option key={type} value={type}>
                                                             {type}
@@ -200,13 +168,8 @@ const NotesTypes = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className="ms-2">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    onChange={(e) => setSearch(e.target.value)}
-                                                    placeholder="Search"
-                                                />
+                                            <div className='ms-2'>
+                                                <input type="text" className="form-control" onChange={(e) => setSearch(e.target.value)} placeholder="Search" />
                                             </div>
                                             <Button
                                                 variant="primary"
@@ -230,6 +193,13 @@ const NotesTypes = () => {
                         ) : (
                             <p>No settings available.</p>
                         )}
+                        <Card.Footer>
+                            <Paginations
+                                currentPage={skip}
+                                totalPages={store?.getNoteCategoriesReducer?.data?.pagination?.pages}
+                                onPageChange={handlePageChange}
+                            />
+                        </Card.Footer>
                     </Card.Body>
                 </Card>
             </Col>

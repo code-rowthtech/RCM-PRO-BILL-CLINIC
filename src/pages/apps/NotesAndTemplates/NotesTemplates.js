@@ -80,7 +80,7 @@ const TemplatesPage = () => {
   };
 
   return (
-    <Row className="mt-2">
+    <Row className="mt-2 h-100">
       <Col xs={12} className="px-0">
         <Card className="scroll-container page-height">
           <Card.Body>

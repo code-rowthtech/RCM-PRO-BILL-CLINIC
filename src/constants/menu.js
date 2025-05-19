@@ -128,18 +128,18 @@ const MENU_ITEMS = [
                 url: '/apps/settings/role',
                 parentKey: 'setting',
             },
-            {
-                key: 'notesType',
-                label: 'Notes Type',
-                url: '/apps/settings/notesType',
-                parentKey: 'setting',
-            },
-            {
-                key: 'templates',
-                label: 'Templates',
-                url: '/apps/settings/templates',
-                parentKey: 'setting',
-            },
+            // {
+            //     key: 'notesType',
+            //     label: 'Notes Type',
+            //     url: '/apps/settings/notesType',
+            //     parentKey: 'setting',
+            // },
+            // {
+            //     key: 'templates',
+            //     label: 'Templates',
+            //     url: '/apps/settings/templates',
+            //     parentKey: 'setting',
+            // },
         ],
     },
     // {
