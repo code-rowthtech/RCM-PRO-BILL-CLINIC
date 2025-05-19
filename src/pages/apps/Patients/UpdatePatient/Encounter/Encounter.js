@@ -12,13 +12,14 @@ import { CiSettings } from "react-icons/ci";
 import EncounterSettingsForm from './EncounterSettings';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { useDispatch } from 'react-redux';
-import { getEncounterSettingsAction } from '../../../../../redux/actions';
+import { getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isAccordionOpen }) => {
     const dispatch = useDispatch()
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [searchNoteType, setSearchNoteType] = useState('');
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
     const removeEncounterTab = (idToRemove, e) => {
         e.stopPropagation();
@@ -30,8 +31,11 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isA
         }
     };
     useEffect(() => {
-        dispatch(getEncounterSettingsAction())
+        dispatch(getEncounterSettingsAction());
     }, [dispatch])
+    useEffect(() => {
+        dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType }))
+    }, [dispatch, searchNoteType])
     const [showSettings, setShowSettings] = useState(false)
     const closeSettings = () => {
         setShowSettings(false)
@@ -96,7 +100,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, isA
                                         setActiveTab={setActiveTab}
                                     />
                                 ) : tab?.type === 'date' ? (
-                                    <DateEncounters isCollapsed={isCollapsed} />
+                                    <DateEncounters searchNoteType={searchNoteType} setSearchNoteType={setSearchNoteType} isCollapsed={isCollapsed} />
                                 ) : tab?.type === 'appointment' ? (
                                     <AppointmentEncounter />
                                 ) : (

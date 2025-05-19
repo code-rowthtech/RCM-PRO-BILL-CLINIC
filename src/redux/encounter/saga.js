@@ -7,7 +7,9 @@ import {
     getEncounterApi,
     updateEncounterApi, createEncounterSettingsApi,
     getEncounterSettingsApi,
-    updateEncounterSettingsApi
+    updateEncounterSettingsApi,
+    getEncounterNotesTypeApi,
+    getEncounterNoteFieldsApi
 } from './api';
 /**
  * Login the user
@@ -199,6 +201,60 @@ function* getEncounterSettingsFunction(data) {
     }
 }
 
+function* getEncounterNotesTypeFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_NOTES_LOADING,
+            payload: {},
+        });
+        const response = yield call(getEncounterNotesTypeApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_NOTES_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_NOTES_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_NOTES_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getEncounterNotesFieldsFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getEncounterNoteFieldsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 
 export function* watchCreateEncounter() {
     yield takeEvery(EncounterActionTypes.CREATE_ENCOUNTER, createEncounterFunction);
@@ -224,6 +280,13 @@ export function* watchUpdateEncounterSettings() {
 export function* watchGetEncounterSettings() {
     yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_SETTINGS, getEncounterSettingsFunction);
 }
+export function* watchGetEncounterNotes() {
+    yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_NOTES, getEncounterNotesTypeFunction);
+}
+
+export function* watchGetEncounterNotesFields() {
+    yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS, getEncounterNotesFieldsFunction);
+}
 
 function* encounterSaga() {
     yield all([
@@ -231,7 +294,7 @@ function* encounterSaga() {
         fork(watchUpdateEncounter),
         fork(watchGetEncounter),
         fork(watchCreateEncounterSettings), fork(watchUpdateEncounterSettings),
-        fork(watchGetEncounterSettings)
+        fork(watchGetEncounterSettings), fork(watchGetEncounterNotes), fork(watchGetEncounterNotesFields)
     ]);
 }
 export default encounterSaga;

@@ -14,6 +14,16 @@ export const getEncounterAction = (data): AuthAction => ({
     data
 });
 
+export const getEncounterNotesTypeAction = (data): AuthAction => ({
+    type: EncounterActionTypes.GET_ENCOUNTER_NOTES,
+    data
+});
+
+export const getEncounterNotesFieldsAction = (data): AuthAction => ({
+    type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS,
+    data
+});
+
 // encounter settings
 export const createEncounterSettingsAction = (data): AuthAction => ({
     type: EncounterActionTypes.CREATE_ENCOUNTER_SETTINGS,
