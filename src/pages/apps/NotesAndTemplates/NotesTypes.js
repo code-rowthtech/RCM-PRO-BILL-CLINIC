@@ -19,9 +19,12 @@ const NotesTypes = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const [skip, setSkip] = useState(1);
-    const store = useSelector((state) => state)
-    const [noteType, setNoteType] = useState('')
-    console.log(store?.getNoteCategoriesReducer?.data?.pagination?.pages, 'store?.getNoteCategoriesReducer?.data?.pagination?.pages')
+    const store = useSelector((state) => state);
+    const [noteType, setNoteType] = useState('');
+    console.log(
+        store?.getNoteCategoriesReducer?.data?.pagination?.pages,
+        'store?.getNoteCategoriesReducer?.data?.pagination?.pages'
+    );
     const newDataOftypes = [
         'Encounter-Based',
         'Nursing & Allied Health',
@@ -40,7 +43,16 @@ const NotesTypes = () => {
         formState: { errors },
     } = useForm();
     useEffect(() => {
-        dispatch(getNoteCategoriesAction({ search: search, skip: skip, limit: 8, clinicId: ClinicId, active: true, noteType: noteType }));
+        dispatch(
+            getNoteCategoriesAction({
+                search: search,
+                skip: skip,
+                limit: 8,
+                clinicId: ClinicId,
+                active: true,
+                noteType: noteType,
+            })
+        );
     }, [dispatch, search, noteType, skip]);
     const handleOpenTab = (note) => {
         const exists = openTabs.find((tab) => tab?._id === note?._id);
@@ -60,6 +72,7 @@ const NotesTypes = () => {
     };
 
     const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
+    console.log(activeNote, 'activeNote');
     // for edit
     const handleOpenEditModal = (note) => {
         setSelectedNote(note);
@@ -69,11 +82,31 @@ const NotesTypes = () => {
         dispatch(getNoteCategoriesAction({ search: search, page: skip, limit: 8, clinicId: ClinicId }));
     };
 
-    const [status, setStatus] = useState('active')
+    const [status, setStatus] = useState('active');
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+    useEffect(() => {
+        const storedTabId = localStorage.getItem('note_activeTabId');
+        const storedOpenTabs = localStorage.getItem('note_openTabs');
+
+        if (storedTabId) setActiveTabId(storedTabId);
+
+        if (storedOpenTabs) {
+            try {
+                setOpenTabs(JSON.parse(storedOpenTabs));
+            } catch (e) {
+                console.error('Error parsing openTabs from localStorage');
+            }
+        }
+    }, []);
+
+    // Save to localStorage
+    useEffect(() => {
+        localStorage.setItem('note_activeTabId', activeTabId);
+        localStorage.setItem('note_openTabs', JSON.stringify(openTabs));
+    }, [activeTabId, openTabs]);
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
@@ -91,8 +124,9 @@ const NotesTypes = () => {
                                         }}
                                         role="button"
                                         tabIndex={0}
-                                        className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
-                                            }`}>
+                                        className={`fw-semibold cursor-pointer font_active_tabs ${
+                                            activeTabId === 'note-categories' ? 'active_tabs_link fw-bold' : ''
+                                        }`}>
                                         Note Categories
                                     </span>
 
@@ -105,8 +139,9 @@ const NotesTypes = () => {
                                             }}
                                             role="button"
                                             tabIndex={0}
-                                            className={`fw-semibold cursor-pointer font_active_tabs ${activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
-                                                }`}>
+                                            className={`fw-semibold cursor-pointer font_active_tabs ${
+                                                activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
+                                            }`}>
                                             {tab?.noteType} Display Setting
                                             <span
                                                 style={{
@@ -130,17 +165,45 @@ const NotesTypes = () => {
                                     <Row>
                                         <Col md={6}>
                                             <Button
-                                                onClick={() => { setStatus('active'); dispatch(getNoteCategoriesAction({ active: true, search: search, page: skip, limit: 8, clinicId: ClinicId, noteType: noteType })); }}
-                                                className={`me-md-2 active_inactive_buttons ${status === 'active' ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                                    }`}>
+                                                onClick={() => {
+                                                    setStatus('active');
+                                                    dispatch(
+                                                        getNoteCategoriesAction({
+                                                            active: true,
+                                                            search: search,
+                                                            page: skip,
+                                                            limit: 8,
+                                                            clinicId: ClinicId,
+                                                            noteType: noteType,
+                                                        })
+                                                    );
+                                                }}
+                                                className={`me-md-2 active_inactive_buttons ${
+                                                    status === 'active'
+                                                        ? ' text-white py-'
+                                                        : 'bg-white border-primary text-dark py-'
+                                                }`}>
                                                 Active
                                             </Button>
                                             <Button
-                                                onClick={() => { setStatus('inactive'); dispatch(getNoteCategoriesAction({ active: false, search: search, page: skip, limit: 8, clinicId: ClinicId, noteType: noteType })); }}
-                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${status === 'inactive'
-                                                    ? ' text-white py-'
-                                                    : 'bg-white border-primary text-dark py-'
-                                                    }`}>
+                                                onClick={() => {
+                                                    setStatus('inactive');
+                                                    dispatch(
+                                                        getNoteCategoriesAction({
+                                                            active: false,
+                                                            search: search,
+                                                            page: skip,
+                                                            limit: 8,
+                                                            clinicId: ClinicId,
+                                                            noteType: noteType,
+                                                        })
+                                                    );
+                                                }}
+                                                className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
+                                                    status === 'inactive'
+                                                        ? ' text-white py-'
+                                                        : 'bg-white border-primary text-dark py-'
+                                                }`}>
                                                 Inactive
                                             </Button>
                                             {/* <Button
@@ -160,7 +223,7 @@ const NotesTypes = () => {
                                                     className="form-select form-select-lg"
                                                     onChange={(e) => setNoteType(e.target.value)}
                                                     aria-label="Large select example">
-                                                    <option value=''>All</option>
+                                                    <option value="">All</option>
                                                     {newDataOftypes?.map((type) => (
                                                         <option key={type} value={type}>
                                                             {type}
@@ -168,8 +231,13 @@ const NotesTypes = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className='ms-2'>
-                                                <input type="text" className="form-control" onChange={(e) => setSearch(e.target.value)} placeholder="Search" />
+                                            <div className="ms-2">
+                                                <input
+                                                    type="text"
+                                                    className="form-control"
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    placeholder="Search"
+                                                />
                                             </div>
                                             <Button
                                                 variant="primary"
@@ -189,17 +257,19 @@ const NotesTypes = () => {
                         {activeTabId === 'note-categories' ? (
                             <NoteTypeCards handleOpenTab={handleOpenTab} handleOpenEditModal={handleOpenEditModal} />
                         ) : activeNote ? (
-                            <SettingTabs />
+                            <SettingTabs noteType={activeNote?.noteType} />
                         ) : (
                             <p>No settings available.</p>
                         )}
-                        <Card.Footer>
-                            <Paginations
-                                currentPage={skip}
-                                totalPages={store?.getNoteCategoriesReducer?.data?.pagination?.pages}
-                                onPageChange={handlePageChange}
-                            />
-                        </Card.Footer>
+                        {activeTabId === 'note-categories' && (
+                            <Card.Footer>
+                                <Paginations
+                                    currentPage={skip}
+                                    totalPages={store?.getNoteCategoriesReducer?.data?.pagination?.pages}
+                                    onPageChange={handlePageChange}
+                                />
+                            </Card.Footer>
+                        )}
                     </Card.Body>
                 </Card>
             </Col>
