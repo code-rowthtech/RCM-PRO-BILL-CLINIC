@@ -13,6 +13,7 @@ import {
     getPatientByIdAction,
     getStatesByCountryAction,
     getSurgicalHistoryAction,
+    getTemplateAction,
     getTobaccooAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
@@ -95,6 +96,7 @@ const UpdatePatientIndex = () => {
             dispatch(getTobaccooAction({ patientId: id }));
             dispatch(getFamilyGeneticAction({ patientId: id }));
             dispatch(getAlcoholHistoryAction({ patientId: id }));
+            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
         };
 
         fetchData();

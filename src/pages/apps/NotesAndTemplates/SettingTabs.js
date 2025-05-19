@@ -130,15 +130,33 @@ const SettingTabs = ({ noteType }) => {
         const updated = getCurrentSections().map((sec) => (sec.id === id ? { ...sec, [prop]: !sec[prop] } : sec));
         updateCurrentSections(updated);
     };
+
+    const handleDragEnd = (result) => {
+        const { source, destination } = result;
+        if (!destination || source.droppableId !== destination.droppableId) return;
+
+        const reordered = Array.from(getCurrentSections());
+        const [moved] = reordered.splice(source.index, 1);
+        reordered.splice(destination.index, 0, moved);
+        updateCurrentSections(reordered);
+    };
+
     useEffect(() => {
-        if (NOTE_TYPE_OPTIONS[noteType]) {
-            const sections = NOTE_TYPE_OPTIONS[noteType].map((label, index) => ({
-                id: `${noteType}-${index}`,
+        if (noteType?.noteType && NOTE_TYPE_OPTIONS[noteType.noteType]) {
+            const options = NOTE_TYPE_OPTIONS[noteType.noteType].map((label, index) => ({
+                id: `${noteType.noteType}-${index}`,
                 label,
             }));
-            // Always append the "Custom" section at the end
-            sections.push({ id: 'custom', label: 'Custom' });
-            setOffcanvasSections(sections);
+            options.push({ id: 'custom', label: 'Custom' });
+            setOffcanvasSections(options);
+
+            // Optional: initialize current sections for noteType if not already present
+            if (!activeSectionsByType[noteType.noteType]) {
+                setActiveSectionsByType((prev) => ({
+                    ...prev,
+                    [noteType.noteType]: [],
+                }));
+            }
         } else {
             setOffcanvasSections([{ id: 'custom', label: 'Custom' }]);
         }

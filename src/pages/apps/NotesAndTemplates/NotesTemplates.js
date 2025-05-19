@@ -241,6 +241,7 @@ const TemplatesPage = () => {
         <TemplateModal
           show={showModal}
           onHide={closeModal}
+          setSelectedTemplate={setSelectedTemplate}
           template={selectedTemplate}
         />
       </Col>

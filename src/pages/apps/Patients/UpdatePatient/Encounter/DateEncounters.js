@@ -7,6 +7,7 @@ import Select from 'react-select';
 import { useDispatch } from 'react-redux';
 import { getEncounterNotesFieldsAction } from '../../../../../redux/actions';
 import { NOTE_TYPE_OPTIONS } from '../../../../../utils/DataSets/commonData2';
+import EncounterTemplates from './EncounterTemplates';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
     const [leftTab, setLeftTab] = useState('Summary');
@@ -202,7 +203,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1'>
                         {leftTab === 'Summary' && <EncounterSummary />}
-                        {leftTab === 'Templates' && <>Templates</>}
+                        {leftTab === 'Templates' && <EncounterTemplates />}
                         {leftTab === 'Past Encounters' && <>Past Encounters</>}
                         {leftTab === 'PMH' && <>PMH</>}
                     </Col>
