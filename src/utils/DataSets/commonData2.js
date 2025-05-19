@@ -187,3 +187,37 @@ export const practiceTypeOptions = [
         description: "Other."
     }
 ]
+
+export const NOTE_TYPE_OPTIONS = {
+    'Encounter-Based': [
+        'Reason for Visit',
+        'Health Status',
+        'Monitoring Chart (Vitals)',
+        'Prescriptions (Medications)',
+        'Notes (SOAP)',
+        'Notes (Simple)',
+        'Attached Records',
+        'Outcome Review',
+        'Refer to another Provider',
+        'Patient Education',
+        'Social History',
+        'Lab Results',
+        'Provider Notes',
+        'Consent Forms',
+    ],
+    'Nursing & Allied Health': [
+        'Vital Signs Log',
+        'Intake & Output',
+        'Wound Care Notes',
+        'Mobility Assessment',
+        'Pain Assessment (e.g. scale 1–10)',
+        'Fall Risk Assessment',
+        'ADLs (Activities of Daily Living)',
+        'Skin Integrity',
+        'Nutritional Intake',
+        'Patient Education / Teaching',
+        'Shift Notes / Progress Notes',
+        'IV / Catheter Management',
+        'Care Plan Update',
+    ],
+}

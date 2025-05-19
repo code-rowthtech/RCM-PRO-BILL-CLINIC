@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { useDispatch } from 'react-redux';
 import { getEncounterNotesFieldsAction } from '../../../../../redux/actions';
+import { NOTE_TYPE_OPTIONS } from '../../../../../utils/DataSets/commonData2';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
     const [leftTab, setLeftTab] = useState('Summary');
@@ -32,6 +33,155 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
         setNoteType(selectedOption ? selectedOption.value : '');
 
     };
+
+
+    const NoteFormFields = ({ excludedFields = [], fieldConfig = {} }) => {
+        // Merge all fields from all categories into one array
+        const getAllFields = () => {
+            return Object.values(NOTE_TYPE_OPTIONS).flat();
+        };
+
+        // Get fields to display (filter out excluded)
+        const getFieldsToRender = () => {
+            return getAllFields().filter(field => !excludedFields.includes(field));
+        };
+
+        // Field component mapper
+        const renderField = (fieldName) => {
+            const config = fieldConfig[fieldName] || {};
+            const fieldType = config.type || 'textarea'; // default to textarea
+
+            switch (fieldType) {
+                case 'textarea':
+                    return (
+                        <Form.Group className="mb-3" key={fieldName}>
+                            <Form.Label>{fieldName}</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                rows={config.rows || 3}
+                                placeholder={config.placeholder || ''}
+                            />
+                        </Form.Group>
+                    );
+
+                case 'select':
+                    return (
+                        <Form.Group className="mb-3" key={fieldName}>
+                            <Form.Label>{fieldName}</Form.Label>
+                            <Form.Select>
+                                {config.options?.map(opt => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+                    );
+
+                case 'table':
+                    return (
+                        <div className="mb-3" key={fieldName}>
+                            <div className="d-flex justify-content-between align-items-center mb-2">
+                                <h5>{fieldName}</h5>
+                                {config.actions && (
+                                    <div>
+                                        {config.actions.map(action => (
+                                            <Button
+                                                variant="link"
+                                                size="sm"
+                                                key={action.label}
+                                                onClick={action.handler}
+                                            >
+                                                {action.label}
+                                            </Button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <Table
+                                responsive
+                                className="table-centered table-nowrap mb-0  rounded">
+                                <thead>
+                                    <tr>
+                                        {config.columns?.map(col => (
+                                            <th className='text-white' key={col}>{col}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colSpan={config?.columns?.length} className='text-center'>
+                                            No Data Found
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </div>
+                    );
+
+                case 'complex':
+                    // Handle complex field types like SOAP notes
+                    if (fieldName === 'Notes (SOAP)') {
+                        return (
+                            <div className="mb-3" key={fieldName}>
+                                <h5>{fieldName}</h5>
+                                {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
+                                    <Form.Group className="mb-2" key={section}>
+                                        <Form.Label>{section}</Form.Label>
+                                        <Form.Control as="textarea" rows={2} />
+                                    </Form.Group>
+                                ))}
+                            </div>
+                        );
+                    }
+                    return null;
+
+                default:
+                    return (
+                        <Form.Group className="mb-3" key={fieldName}>
+                            <Form.Label>{fieldName}</Form.Label>
+                            <Form.Control type="text" />
+                        </Form.Group>
+                    );
+            }
+        };
+
+        return (
+            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '59vh' }}>
+                {getFieldsToRender().map(field => renderField(field))}
+            </Row>
+        );
+    };
+
+    // Example usage with configuration:
+    const fieldConfig = {
+        'Reason for Visit': {
+            type: 'textarea',
+            rows: 2,
+            placeholder: 'Enter chief complaint'
+        },
+        'Prescriptions (Medications)': {
+            type: 'table',
+            columns: ['Medication', 'Dosage', 'Frequency', 'Instructions'],
+            actions: [
+                { label: 'Add', handler: () => console.log('Add medication') },
+                { label: 'Print', handler: () => console.log('Print medications') }
+            ]
+        },
+        'Notes (SOAP)': {
+            type: 'complex'
+        },
+        'Pain Assessment (e.g. scale 1–10)': {
+            type: 'select',
+            options: [
+                { value: '0', label: '0 - No pain' },
+                { value: '1-3', label: '1-3 - Mild pain' },
+                // ... more options
+            ]
+        }
+    };
+
+
     return (
         <div className='px-0 mt-1 row border  mx-1 h-100' >
             {/* Collapsible Left Column */}
@@ -169,94 +319,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                     {/* <Row className="g-2 bg-light p-1 " >
                      
                     </Row> */}
-                    <Row className='g-2 px-2 mt-1 scroll-container' style={{ height: '59vh' }}>
-                        {/* Chief Complaint */}
-                        <Col sm={12} className="mb-0 mt-0  pt-0">
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Chief Complaint</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='' />
-                            </Form.Group>
-                        </Col>
-
-                        {/* Health Concerns */}
-                        <Col sm={12} className="mb-3 border-top pt-2">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h6 className="mb-0">Health concerns</h6>
-                                <Button variant="link" size="sm">Expand</Button>
-                            </div>
-                        </Col>
-
-                        {/* Flowsheets */}
-                        <Col sm={12} className="mb-3 border-top pt-2">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h6 className="mb-0">Flowsheets</h6>
-                                <Button variant="link" size="sm">Expand</Button>
-                            </div>
-                        </Col>
-
-                        <Col sm={12} className="mb-3 mt-0  pt-0">
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Subjective</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='' />
-                            </Form.Group>
-                        </Col>
-                        <Col sm={12} className="mb-3 mt-0  pt-0">
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Objective</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='' />
-                            </Form.Group>
-                        </Col>
-                        <Col sm={12} className="mb-3 mt-0  pt-0">
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Assessment</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='' />
-                            </Form.Group>
-                        </Col>
-                        <Col sm={12} className="mb-3 mt-0  pt-0">
-                            <Form.Group>
-                                <Form.Label className='mb-0'>Plan</Form.Label>
-                                <Form.Control as={'textarea'} placeholder='' />
-                            </Form.Group>
-                        </Col>
-
-                        {/* Medications */}
-                        <Col sm={12} className="border-top pt-2">
-                            <div className="d-flex justify-content-between align-items-center">
-                                <h6 className="mb-0">Medications</h6>
-                                <div>
-                                    <Button variant="link" size="sm">Add</Button>
-                                    <Button variant="link" size="sm">Show ▼</Button>
-                                    <Button variant="link" size="sm">Print</Button>
-                                    <Button variant="link" size="sm">Minimize</Button>
-                                </div>
-                            </div>
-                            <Form.Group className="my-2">
-                                <Form.Label className='mb-0'>Was Medication Reconciliation Completed?</Form.Label>
-                                <Form.Select>
-                                    <option>Select...</option>
-                                </Form.Select>
-                            </Form.Group>
-                            <Table responsive className="table-centered table-nowrap mb-0  rounded">
-                                <thead className="">
-                                    <tr>
-                                        <th className='text-white'>Name ▲</th>
-                                        <th className='text-white'>Sig</th>
-                                        <th className='text-white'>Start</th>
-                                        <th className='text-white'>Prescriptions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colSpan={4} className="text-center text-muted">No data</td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-
-                            {/* <div className="text-end mt-2 d-flex justify-content-end">
-                                <Button className='custom-buttons'>Go to</Button>
-                            </div> */}
-                        </Col>
-                    </Row>
+                    <NoteFormFields
+                        excludedFields={['Consent Forms', 'Provider Notes']}
+                        fieldConfig={fieldConfig}
+                    />
                 </div>
             </Col>
         </div>

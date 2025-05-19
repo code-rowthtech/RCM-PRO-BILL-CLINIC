@@ -257,7 +257,7 @@ const NotesTypes = () => {
                         {activeTabId === 'note-categories' ? (
                             <NoteTypeCards handleOpenTab={handleOpenTab} handleOpenEditModal={handleOpenEditModal} />
                         ) : activeNote ? (
-                            <SettingTabs noteType={activeNote?.noteType} />
+                            <SettingTabs noteType={activeNote} />
                         ) : (
                             <p>No settings available.</p>
                         )}
