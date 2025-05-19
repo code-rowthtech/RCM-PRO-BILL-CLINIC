@@ -13,6 +13,7 @@ import {
     getPatientByIdAction,
     getStatesByCountryAction,
     getSurgicalHistoryAction,
+    getTemplateAction,
     getTobaccooAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
@@ -95,6 +96,7 @@ const UpdatePatientIndex = () => {
             dispatch(getTobaccooAction({ patientId: id }));
             dispatch(getFamilyGeneticAction({ patientId: id }));
             dispatch(getAlcoholHistoryAction({ patientId: id }));
+            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
         };
 
         fetchData();
@@ -721,10 +723,10 @@ const UpdatePatientIndex = () => {
                                         <Card
                                             className="px-2 scroll-container border-0 pt-2"
                                             style={{
-                                                height: expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed
-                                                    : expanded ? '90vh'                           // When expanded (accordion state doesn't matter)
-                                                        : isAccordionOpen ? '66.5vh'                    // When accordion open (not expanded)
-                                                            : '81.5vh',                                     // Default case (neither expanded nor accordion open)
+                                                height: expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed...............
+                                                    : expanded ? '90vh'                        // When expanded (accordion state doesn't matter)....
+                                                        : isAccordionOpen ? '66.5vh'          // When accordion open (not expanded).................
+                                                            : '81.5vh',                      // Default case (neither expanded nor accordion open)..
                                                 maxHeight: '1000px',
                                                 overflowX: 'hidden'
                                             }}>

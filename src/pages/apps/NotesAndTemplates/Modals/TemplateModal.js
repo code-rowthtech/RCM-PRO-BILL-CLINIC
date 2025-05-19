@@ -16,7 +16,7 @@ import { createTemplateAction, updateTemplateAction } from '../../../../redux/ac
 import { encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
-const TemplateModal = ({ show, onHide, template }) => {
+const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const { control, register, handleSubmit, reset } = useForm();
     const dispatch = useDispatch()
     const store = useSelector((state) => state);
@@ -40,6 +40,7 @@ const TemplateModal = ({ show, onHide, template }) => {
 
     useEffect(() => {
         if (template?._id) {
+            // Populate form with template data
             reset({
                 title: template.title || '',
                 templateType: template.templateType || '',
@@ -54,6 +55,7 @@ const TemplateModal = ({ show, onHide, template }) => {
             setSectionsId(template._id);
         }
     }, [template, reset]);
+
 
     const handleAddTag = (e) => {
         const inputValue = e.target.value.trim();
@@ -328,6 +330,7 @@ const TemplateModal = ({ show, onHide, template }) => {
                                 <Button onClick={() => {
                                     onHide();
                                     reset();
+                                    setSelectedTemplate(null)
                                     setTags([])
                                 }} className='custom-buttons'>
                                     Cancel
