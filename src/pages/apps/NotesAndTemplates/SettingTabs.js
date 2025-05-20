@@ -117,7 +117,7 @@ const SettingTabs = ({ noteType }) => {
             isMinimized: s.minimized ?? s.isMinimized,
             isRequired: false,
             order: idx + 1,
-            inputType: s.inputType || 'text',
+            ...(s.inputType && { inputType: s.inputType }),
         }));
 
     // Call update API
@@ -177,6 +177,7 @@ const SettingTabs = ({ noteType }) => {
                     visible: s.isShown,
                     minimized: s.isMinimized,
                     name: s.name,
+                    ...(s.inputType && { inputType: s.inputType }),
                 })) || [];
             setActiveSectionsByType((prev) => ({
                 ...prev,
@@ -297,13 +298,24 @@ const SettingTabs = ({ noteType }) => {
                                 <Spinner animation="border" variant="primary" />
                             </div>
                         ) : (
-                            <Col md={8}>
+                            <Col md={getCurrentSections()?.length>0?8:12} >
                                 <Droppable droppableId="active-sections">
                                     {(provided) => (
                                         <div {...provided.droppableProps} ref={provided.innerRef}>
                                             {getCurrentSections().length === 0 && (
-                                                <div className="text-center">
-                                                    <p className="text-secondary">No sections available</p>
+                                                <div className="d-flex flex-column justify-content-center align-items-center" >
+                                                    <span style={{ fontSize: 40, color: '#adb5bd' }} className="">
+                                                        <i className="bi bi-folder-x" />{' '}
+                                                        {/* Bootstrap Icons, or use any icon library */}
+                                                    </span>
+                                                    <p className="text-secondary mt-  mb-0" style={{ fontSize: 18 }}>
+                                                        No sections available
+                                                    </p>
+                                                    <small className="text-muted">
+                                                        Click the{' '}
+                                                        <MdAddCircleOutline style={{ verticalAlign: 'middle' }} />{' '}
+                                                        button to add a section.
+                                                    </small>
                                                 </div>
                                             )}
                                             {getCurrentSections().map((section, index) => (
