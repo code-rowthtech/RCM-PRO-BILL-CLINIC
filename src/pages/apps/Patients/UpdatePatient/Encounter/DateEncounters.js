@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Button, Row, Form, Table } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { HiMiniBars3BottomLeft } from "react-icons/hi2";
@@ -8,17 +8,34 @@ import { useDispatch } from 'react-redux';
 import { getEncounterNotesFieldsAction } from '../../../../../redux/actions';
 import { NOTE_TYPE_OPTIONS } from '../../../../../utils/DataSets/commonData2';
 import EncounterTemplates from './EncounterTemplates';
-
+import { useForm } from 'react-hook-form';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
     const [leftTab, setLeftTab] = useState('Summary');
+    const [selectedFromList, setSelectedFromList] = useState({})
+    console.log(selectedFromList, 'selectedFromListselectedFromList')
     const store = useSelector((state) => state);
+    const { handleSubmit, register, setValue } = useForm();
     const dispatch = useDispatch()
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
-    const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel;
+    const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
+    console.log(notesFields, '345tfiujed')
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
-        label: data?.title, value: data?._id
+        label: data?.title, value: data?._id, isDefault: data?.default
+
     }));
     const [noteType, setNoteType] = useState(null);
+
+    const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
+    useEffect(() => {
+        if (!noteType && defaultNoteTypeOption) {
+            setNoteType(defaultNoteTypeOption.value);
+            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }))
+        }
+    }, [noteType, defaultNoteTypeOption]);
+
+    console.log(defaultNoteTypeOption, 'notesTypeOptions')
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
     const visibleTabs =
         settingsDataMainItems?.length > 0
@@ -35,157 +52,109 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
 
     };
 
+    useEffect(() => {
+        if (!selectedFromList) return;
 
-    const NoteFormFields = ({ excludedFields = [], fieldConfig = {} }) => {
-        // Merge all fields from all categories into one array
-        const getAllFields = () => {
-            return Object.values(NOTE_TYPE_OPTIONS).flat();
-        };
+        setTimeout(() => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
+                if (selectedFromList?.[section]) {
+                    setValue(section, selectedFromList[section]);
+                }
+            });
+        }, 0);
+    }, [selectedFromList, setValue]);
 
-        // Get fields to display (filter out excluded)
+
+
+
+    const NoteFormFields = ({ data = [], excludedFields = [], selectedFromList }) => {
         const getFieldsToRender = () => {
-            return getAllFields().filter(field => !excludedFields.includes(field));
+            return (data || [])
+                .filter(field => field.isShown && !excludedFields.includes(field.name))
+                .sort((a, b) => a.order - b.order);
         };
 
-        // Field component mapper
-        const renderField = (fieldName) => {
-            const config = fieldConfig[fieldName] || {};
-            const fieldType = config.type || 'textarea'; // default to textarea
+        const renderField = (field) => {
+            const { name, inputType = 'textarea' } = field; // Default to textarea if inputType not specified
 
-            switch (fieldType) {
-                case 'textarea':
-                    return (
-                        <Form.Group className="mb-3" key={fieldName}>
-                            <Form.Label>{fieldName}</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={config.rows || 3}
-                                placeholder={config.placeholder || ''}
-                            />
-                        </Form.Group>
-                    );
-
-                case 'select':
-                    return (
-                        <Form.Group className="mb-3" key={fieldName}>
-                            <Form.Label>{fieldName}</Form.Label>
-                            <Form.Select>
-                                {config.options?.map(opt => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    );
-
-                case 'table':
-                    return (
-                        <div className="mb-3" key={fieldName}>
-                            <div className="d-flex justify-content-between align-items-center mb-2">
-                                <h5>{fieldName}</h5>
-                                {config.actions && (
-                                    <div>
-                                        {config.actions.map(action => (
-                                            <Button
-                                                variant="link"
-                                                size="sm"
-                                                key={action.label}
-                                                onClick={action.handler}
-                                            >
-                                                {action.label}
-                                            </Button>
-                                        ))}
-                                    </div>
+            // Special handling for SOAP notes
+            if (name === 'Notes (SOAP)') {
+                return (
+                    <div className="mb-3" key={name}>
+                        <h5>{name}</h5>
+                        {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
+                            <Form.Group className="mb-2" key={section}>
+                                <Form.Label>{section}</Form.Label>
+                                {inputType === 'text-editor' ? (
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={selectedFromList?.[section] || ''}
+                                        onChange={(value) => setValue(section, value)}
+                                        modules={{
+                                            toolbar: [
+                                                ['bold', 'italic', 'underline'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['link'],
+                                                ['clean']
+                                            ]
+                                        }}
+                                    />
+                                ) : (
+                                    <Form.Control
+                                        {...register(section)}
+                                        as={inputType === 'text' ? 'input' : 'textarea'}
+                                        rows={inputType === 'text' ? undefined : 3}
+                                        defaultValue={selectedFromList?.[section] || ''}
+                                    />
                                 )}
-                            </div>
-                            <Table
-                                responsive
-                                className="table-centered table-nowrap mb-0  rounded">
-                                <thead>
-                                    <tr>
-                                        {config.columns?.map(col => (
-                                            <th className='text-white' key={col}>{col}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td colSpan={config?.columns?.length} className='text-center'>
-                                            No Data Found
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </div>
-                    );
-
-                case 'complex':
-                    // Handle complex field types like SOAP notes
-                    if (fieldName === 'Notes (SOAP)') {
-                        return (
-                            <div className="mb-3" key={fieldName}>
-                                <h5>{fieldName}</h5>
-                                {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
-                                    <Form.Group className="mb-2" key={section}>
-                                        <Form.Label>{section}</Form.Label>
-                                        <Form.Control as="textarea" rows={2} />
-                                    </Form.Group>
-                                ))}
-                            </div>
-                        );
-                    }
-                    return null;
-
-                default:
-                    return (
-                        <Form.Group className="mb-3" key={fieldName}>
-                            <Form.Label>{fieldName}</Form.Label>
-                            <Form.Control type="text" />
-                        </Form.Group>
-                    );
+                            </Form.Group>
+                        ))}
+                    </div>
+                );
             }
+
+            // Handle regular fields based on inputType
+            return (
+                <Form.Group className="mb-3" key={name}>
+                    <Form.Label>{name}</Form.Label>
+                    {inputType === 'text-editor' ? (
+                        <ReactQuill
+                            theme="snow"
+                            value={selectedFromList?.[name] || ''}
+                            onChange={(value) => setValue(name, value)}
+                            modules={{
+                                toolbar: [
+                                    ['bold', 'italic', 'underline'],
+                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    ['link'],
+                                    ['clean']
+                                ]
+                            }}
+                        />
+                    ) : (
+                        <Form.Control
+                            {...register(name)}
+                            as={inputType === 'text' ? 'input' : 'textarea'}
+                            rows={inputType === 'text' ? undefined : 3}
+                            defaultValue={selectedFromList?.[name] || ''}
+                        />
+                    )}
+                </Form.Group>
+            );
         };
 
         return (
-            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '57.5vh' }}>
+            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '57.5vh', overflowY: 'auto' }}>
                 {getFieldsToRender().map(field => renderField(field))}
             </Row>
         );
     };
-
-    // Example usage with configuration:
-    const fieldConfig = {
-        'Reason for Visit': {
-            type: 'textarea',
-            rows: 2,
-            placeholder: 'Enter chief complaint'
-        },
-        'Prescriptions (Medications)': {
-            type: 'table',
-            columns: ['Medication', 'Dosage', 'Frequency', 'Instructions'],
-            actions: [
-                { label: 'Add', handler: () => console.log('Add medication') },
-                { label: 'Print', handler: () => console.log('Print medications') }
-            ]
-        },
-        'Notes (SOAP)': {
-            type: 'complex'
-        },
-        'Pain Assessment (e.g. scale 1–10)': {
-            type: 'select',
-            options: [
-                { value: '0', label: '0 - No pain' },
-                { value: '1-3', label: '1-3 - Mild pain' },
-                // ... more options
-            ]
-        }
-    };
-
+    const onSubmit = (data) => {
+        console.log('data12324', data)
+    }
 
     return (
         <div className='px-0 mt-1 row border  mx-1 h-100' >
-            {/* Collapsible Left Column */}
             <Col className={`px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
                 <ul className='d-flex list-unstyled mt-0'>
                     {visibleTabs?.map((item) => (
@@ -203,7 +172,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1'>
                         {leftTab === 'Summary' && <EncounterSummary />}
-                        {leftTab === 'Templates' && <EncounterTemplates />}
+                        {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} />}
                         {leftTab === 'Past Encounters' && <>Past Encounters</>}
                         {leftTab === 'PMH' && <>PMH</>}
                     </Col>
@@ -229,20 +198,19 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                             <Form.Group className='encounterHeaderGroup'>
                                 <Form.Label className='mb-0 fw-bold small'>Note Type <span className='text-danger'>*</span></Form.Label>
                                 <Select
-                                    options={notesTypeOptions} // Use the formatted array
+                                    options={notesTypeOptions}
                                     isSearchable
                                     isLoading={store?.getEncounterNotesTypeReducer?.loading}
                                     className="basic-single"
                                     classNamePrefix="select"
-                                    placeholder="&nbsp; Select "
-                                    value={
-                                        notesTypeOptions?.find(
-                                            (option) => option?.value === noteType
-                                        ) || null
-                                    }
-                                    onChange={handleNotesTypeChange}
+                                    placeholder=" Select"
+                                    value={notesTypeOptions?.find(option => option?.value === noteType) || null}
+                                    onChange={(selected) => {
+                                        setNoteType(selected?.value);
+                                        handleNotesTypeChange?.(selected); // if this is needed
+                                    }}
                                     inputValue={searchNoteType}
-                                    onInputChange={(value) => setSearchNoteType(value)} // Keep it in sync
+                                    onInputChange={(value) => setSearchNoteType(value)}
                                     styles={{
                                         control: (provided) => ({
                                             ...provided,
@@ -259,6 +227,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                                         }),
                                     }}
                                 />
+
                             </Form.Group>
                         </Col>
                         <Col sm={4} className='mt-0'>
@@ -316,14 +285,20 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                         </Col>
                     </Row>
 
-                    {/* Secondary Header Row */}
-                    {/* <Row className="g-2 bg-light p-1 " >
-                     
-                    </Row> */}
-                    <NoteFormFields
-                        excludedFields={['Consent Forms', 'Provider Notes']}
-                        fieldConfig={fieldConfig}
-                    />
+
+                    <Form onSubmit={handleSubmit(onSubmit)}>
+                        <NoteFormFields
+                            selectedFromList={selectedFromList}
+                            // excludedFields={['Consent Forms', 'Provider Notes']}
+                            data={notesFields}
+                        />
+                        <div className="row">
+                            <div className="col-12 text-end">
+                                <Button type='Submit' className='custom-buttons'>Save</Button>
+                            </div>
+                        </div>
+                    </Form>
+
                 </div>
             </Col>
         </div>

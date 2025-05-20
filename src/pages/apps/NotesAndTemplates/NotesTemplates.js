@@ -35,11 +35,11 @@ const TemplatesPage = () => {
   useEffect(() => {
     dispatch(getTemplateAction({ search: searchTerm, skip: skip, limit: 10, status: activeStatus }))
   }, [dispatch, searchTerm, activeStatus, skip])
-  useEffect(() => {
-    if (createResponse === true || updateResponse === true) {
-      dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: activeStatus }))
-    }
-  }, [createResponse, updateResponse])
+  // useEffect(() => {
+  //   if (createResponse === true || updateResponse === true) {
+  //     dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: activeStatus }))
+  //   }
+  // }, [createResponse, updateResponse])
   // Modal handlers
   const openCreateModal = () => {
     setSelectedTemplate(null);
