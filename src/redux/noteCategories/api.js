@@ -31,3 +31,17 @@ export function updateNoteTypeSettingsApi(params: any): any {
     const { data } = params;
     return api.update(`${URL.updateNoteCategories}${data?.id}`,data);
 }
+
+// settings tabs
+export function createSettingsTabsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createnoteTypeSettings, data);
+}
+export function getSettingsTabsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.createnoteTypeSettings}?noteId=${data?.noteId}`);
+}
+export function updateSettingsTabsApi(params: any): any {
+    const { data } = params;
+    return api.update(`${URL.createnoteTypeSettings}`,data);
+}

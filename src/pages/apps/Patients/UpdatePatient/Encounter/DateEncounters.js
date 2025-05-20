@@ -2,26 +2,53 @@ import React, { useState } from 'react';
 import { Col, Button, Row, Form, Table } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { HiMiniBars3BottomLeft } from "react-icons/hi2";
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
+import { useDispatch } from 'react-redux';
+import { getEncounterNotesFieldsAction } from '../../../../../redux/actions';
 
-const DateEncounters = ({ isCollapsed }) => {
+const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
     const [leftTab, setLeftTab] = useState('Summary');
+    const store = useSelector((state) => state);
+    const dispatch = useDispatch()
+    const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
+    const notesFields = store?.getEncounterNotesFieldsReducer?.data;
+    const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
+        label: data?.title, value: data?._id
+    }));
+    const [noteType, setNoteType] = useState(null);
+    const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
+    const visibleTabs =
+        settingsDataMainItems?.length > 0
+            ? settingsDataMainItems?.filter((item) => item?.show === true)
+            : defaultTabs.map((name, index) => ({
+                _id: index.toString(),
+                name,
+            }));
 
+
+    const handleNotesTypeChange = (selectedOption) => {
+        dispatch(getEncounterNotesFieldsAction({ noteId: selectedOption?.value }))
+        setNoteType(selectedOption ? selectedOption.value : '');
+
+    };
     return (
         <div className='px-0 mt-1 row border  mx-1 h-100' >
             {/* Collapsible Left Column */}
             <Col className={`px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
                 <ul className='d-flex list-unstyled mt-0'>
-                    {['Summary', 'Templates', 'Past Encounters'].map((data) => (
+                    {visibleTabs?.map((item) => (
                         <li
-                            key={data}
-                            onClick={() => setLeftTab(data)}
-                            className={`cursor-pointer p-1 fs-6  rounded-0  list-group-item  
-                                    d-flex align-items-center flex-fill justify-content-center fw-bold 
-                                    ${data === leftTab ? 'active-patient-chart-tab fw-medium    ' : 'border border-muted'}`}>
-                            {data}
+                            key={item?._id}
+                            onClick={() => setLeftTab(item?.name)}
+                            className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
+                  d-flex align-items-center flex-fill justify-content-center fw-bold 
+                  ${item.name === leftTab ? 'active-patient-chart-tab fw-medium' : 'border border-muted'}`}>
+                            {item?.name}
                         </li>
                     ))}
                 </ul>
+
                 <Row className='mx-auto'>
                     <Col sm={12} className='px-md-1'>
                         {leftTab === 'Summary' && <EncounterSummary />}
@@ -50,11 +77,37 @@ const DateEncounters = ({ isCollapsed }) => {
                         <Col sm={4} className='mt-0'>
                             <Form.Group className='encounterHeaderGroup'>
                                 <Form.Label className='mb-0 fw-bold small'>Note Type <span className='text-danger'>*</span></Form.Label>
-                                <Form.Select className='border-primary'>
-                                    <option>SOAP Note</option>
-                                    <option>Progress Note</option>
-                                    <option>Procedure Note</option>
-                                </Form.Select>
+                                <Select
+                                    options={notesTypeOptions} // Use the formatted array
+                                    isSearchable
+                                    isLoading={store?.getEncounterNotesTypeReducer?.loading}
+                                    className="basic-single"
+                                    classNamePrefix="select"
+                                    placeholder="&nbsp; Select "
+                                    value={
+                                        notesTypeOptions?.find(
+                                            (option) => option?.value === noteType
+                                        ) || null
+                                    }
+                                    onChange={handleNotesTypeChange}
+                                    inputValue={searchNoteType}
+                                    onInputChange={(value) => setSearchNoteType(value)} // Keep it in sync
+                                    styles={{
+                                        control: (provided) => ({
+                                            ...provided,
+                                            height: '30px',
+                                            minHeight: '30px',
+                                            border: '1px solid rgba(186, 185, 185, 0.762)',
+                                            background: "white !important"
+                                        }),
+                                        placeholder: (provided) => ({
+                                            ...provided,
+                                            fontWeight: 'bold',
+                                            fontSize: '12px',
+                                            paddingBottom: '5px',
+                                        }),
+                                    }}
+                                />
                             </Form.Group>
                         </Col>
                         <Col sm={4} className='mt-0'>

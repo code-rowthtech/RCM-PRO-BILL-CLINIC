@@ -1,5 +1,6 @@
 import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
+import { loggedInUser } from '../../helpers/api/loggedInUser';
 const api = new APICore();
 
 export function createEncounterApi(params: any): any {
@@ -15,4 +16,31 @@ export function updateEncounterApi(params: any): any {
 export function getEncounterApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.encounter}/all?patientId=${data?.patientId}`);
+}
+
+export function getEncounterNotesTypeApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.encounterNotesType}?clinicId=${loggedInUser?.clinicId}&userId=${loggedInUser?._id}&page=${data?.skip}&limit=${10}&search=${data?.search || ''}`);
+}
+
+export function getEncounterNoteFieldsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.encounterNoteFields}?noteId=${data?.noteId}`);
+}
+
+// encounter settings
+
+export function createEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.encounterSettings, data);
+}
+
+export function updateEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.encounterSettings, data);
+}
+
+export function getEncounterSettingsApi(params: any): any {
+    const { data } = params;
+    return api.get(URL.encounterSettings, data);
 }

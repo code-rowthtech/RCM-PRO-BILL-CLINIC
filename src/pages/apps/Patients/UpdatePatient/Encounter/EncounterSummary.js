@@ -44,6 +44,8 @@ const EncounterSummary = () => {
         time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
     });
     const store = useSelector((state) => state);
+    const settingsDataItems = store?.getEncounterSettingsReducer?.data?.data?.items?.find((data) => data?.name === 'Summary');
+    const sortedSubMenuItems = settingsDataItems?.subMenu?.sort((a, b) => a.order - b.order) || [];
     const tobaccoHistory = Array.isArray(store?.getTobaccooReducer?.data?.tobaccoHistory)
         ? store.getTobaccooReducer.data.tobaccoHistory
         : [];
@@ -57,12 +59,19 @@ const EncounterSummary = () => {
         ...familyGeneticHistory.slice(0, 2)
     ];
     const [showFilter, setShowFilter] = useState(false);
+    // const [visibleSections, setVisibleSections] = useState({
+    //     vitals: true,
+    //     allergies: true,
+    //     problems: true,
+    //     medications: true,
+    //     socialHistory: true,
+    // });
     const [visibleSections, setVisibleSections] = useState({
+        allergy: true,
+        socialhistory: true,
         vitals: true,
-        allergies: true,
         problems: true,
         medications: true,
-        socialHistory: true,
     });
 
     const toggleSection = (section) => {
@@ -214,244 +223,228 @@ const EncounterSummary = () => {
 
     return (
         <Row className='gy-2  position-relative'>
-            {/* <Col sm={12} className='d-flex justify-content-end '>
-                <Dropdown className="position-absolute " style={{ top: '-1.5%', left: '86%' }} drop="down" >
-                    <Dropdown.Toggle variant="primary" className="text-white px-1 fs-5 p-0 border-0 shadow-none">
-                        <FiFilter />
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu className="p-3" style={{ minWidth: '250px' }}>
-                        <h6 className="dropdown-header">Filter Summary Sections</h6>
-                        {['vitals', 'allergies', 'problems', 'medications', 'socialHistory'].map((key) => (
-                            <Form.Check
-                                key={key}
-                                type="checkbox"
-                                id={`filter-${key}`}
-                                label={key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                                checked={visibleSections[key]}
-                                onChange={() => toggleSection(key)}
-                                className="mb-2"
-                            />
-                        ))}
-                    </Dropdown.Menu>
-                </Dropdown>
-            </Col> */}
             <Col sm={12} className='mt-0 scroll-container mt-0 scroll-container' style={{ height: '69vh' }}>
 
                 <Accordion activeKey={activeKey} onSelect={handleToggle}>
-                    {visibleSections.allergies && (
-                        <Accordion.Item eventKey="1" className="border-0 mb-2">
-                            <Accordion.Header className="p-0 bg-light rounded encounterSummary">
-                                <span className="fw-semibold fs-6">Allergies</span>
-                            </Accordion.Header>
-                            <Accordion.Body className="p-2">
-                                {allergyData?.length > 0 ? (
-                                    <div style={{ height: '30vh' }} className="scroll-container">
-                                        {store?.getAllergiesOfAPatientReducer?.loading ? (
-                                            <div className="d-flex justify-content-center align-items-center w-100 p-5" style={{ height: '100%' }}>
-                                                <Spinner className="spinner-border-sm" />
-                                            </div>
-                                        ) : (
-                                            <ul className="list-unstyled pb-0 mb-0">
-                                                {allergyData.slice(0, 4).map((allergy, index) => (
-                                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                                        <div className="fs-6">
-                                                            <strong title={allergy.code?.text}>
-                                                                {allergy.code?.text?.length > 30
-                                                                    ? allergy.code?.text.slice(0, 29) + '...'
-                                                                    : allergy.code?.text || 'Unknown Allergy'}
-                                                            </strong>
-                                                            <div className="text-muted small">
-                                                                {allergy.clinicalStatus?.text || 'Status not available'}
-                                                            </div>
-                                                        </div>
-                                                        <span className="fs-6 fw-semibold text-nowrap">
-                                                            {getSeverityBadge(allergy.criticality)}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="text-muted">No allergies recorded</div>
-                                )}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    )}
-                </Accordion>
+                    {sortedSubMenuItems.map((menuItem) => {
+                        if (!menuItem?.hide) return null; // Skip hidden items
+                        const sectionKey = menuItem?.name.toLowerCase().replace(/\s+/g, '');
+                        const isVisible = visibleSections[sectionKey];
+                        if (!isVisible) return null;
 
-                <Accordion>
-                    {visibleSections.problems && (
-                        <Accordion.Item eventKey="2" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Problems</span>
-                            </Accordion.Header>
-                            <Accordion.Body className='p-2'>
-                                {problemData?.length > 0 ? (
-                                    <div style={{ height: '30vh' }} className='scroll-container'>
-                                        {store?.getProblemListReducer?.loading ? (
-                                            <div
-                                                className="d-flex justify-content-center align-items-center w-100 p-5"
-                                                style={{ height: '100%' }}>
-                                                <Spinner className="spinner-border-sm" />
-                                            </div>
-                                        ) : problemData && problemData.length > 0 ? (
-                                            <ul className="list-unstyled pb-0 mb-0">
-                                                {problemData?.slice(0, 4)?.map((problem, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className="mb-2 d-flex justify-content-between align-items-start">
-                                                        <div className="fs-6">
-                                                            <strong title={problem?.code?.text}>
-                                                                {problem?.code?.text?.length > 30
-                                                                    ? problem.code.text.slice(0, 30) + '...'
-                                                                    : problem?.code?.text || 'Unknown Problem'}
-                                                            </strong>
-                                                            <div className="text-muted small">
-                                                                {problem?.clinicalStatus?.text || 'Status not available'}
-                                                            </div>
-                                                        </div>
-                                                        <span className="fs-6 fw-semibold text-success">
-                                                            {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
-                                                                year: 'numeric',
-                                                                month: 'long',
-                                                                day: 'numeric',
-                                                            })}
-                                                        </span>
-                                                    </li>
+                        let content;
+                        switch (menuItem.name) {
+                            case 'Vitals':
+                                content = (
+                                    <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
+                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
+                                            <thead>
+                                                <tr className='border'>
+                                                    <th className='text-white'>
+                                                        Vital Name
+                                                    </th>
+                                                    {sortedDates?.map(date => (
+                                                        <th className='text-white' key={date}>
+                                                            {formatDate(date)}
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {vitals.map((vital, index) => (
+                                                    <tr className='' key={vital.name}>
+                                                        <td className='p-0 vitalsTableBorder'>
+                                                            {vital.name} {getDisplayUnit(vital) && (
+                                                                <small className="text-muted">({getDisplayUnit(vital)})</small>
+                                                            )}
+                                                        </td>
+
+                                                        {sortedDates.map(date => (
+                                                            <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
+                                                                {renderVitalCell(vital, date)}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
                                                 ))}
-                                            </ul>
-                                        ) : (
-                                            <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
-                                                <li className="mb-2">
-                                                    <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                        <strong>No Problems Found</strong>
+                                            </tbody>
+                                            {store?.getVitalsByPatientIdReducer?.loading &&
+                                                <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
+                                                    <Spinner />
+                                                </div>
+                                            }
+                                        </Table>
+                                    </Accordion.Body>
+                                );
+                                break;
+
+                            case 'Allergy':
+                                content = (
+                                    <Accordion.Body className="p-2">
+                                        {allergyData?.length > 0 ? (
+                                            <div style={{ height: '30vh' }} className="scroll-container">
+                                                {store?.getAllergiesOfAPatientReducer?.loading ? (
+                                                    <div className="d-flex justify-content-center align-items-center w-100 p-5" style={{ height: '100%' }}>
+                                                        <Spinner className="spinner-border-sm" />
                                                     </div>
-                                                </li>
-                                            </ul>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className='text-muted'>No problems recorded</div>
-                                )}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    )}
-                </Accordion>
-                <Accordion>
-                    {visibleSections.medications && (
-                        <Accordion.Item eventKey="3" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Medications</span>
-                            </Accordion.Header>
-                            <Accordion.Body className='p-2'>
-                                {medicationList?.length > 0 ? (
-                                    <div style={{ height: '30vh' }} className='scroll-container'>
-                                        {store?.getMedicationReducer?.loading ?
-                                            <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
-                                                <Spinner className='spinner-border-sm' />
+                                                ) : (
+                                                    <ul className="list-unstyled pb-0 mb-0">
+                                                        {allergyData.slice(0, 4).map((allergy, index) => (
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <div className="fs-6">
+                                                                    <strong title={allergy.code?.text}>
+                                                                        {allergy.code?.text?.length > 30
+                                                                            ? allergy.code?.text.slice(0, 29) + '...'
+                                                                            : allergy.code?.text || 'Unknown Allergy'}
+                                                                    </strong>
+                                                                    <div className="text-muted small">
+                                                                        {allergy.clinicalStatus?.text || 'Status not available'}
+                                                                    </div>
+                                                                </div>
+                                                                <span className="fs-6 fw-semibold text-nowrap">
+                                                                    {getSeverityBadge(allergy.criticality)}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
                                             </div>
-                                            :
-                                            <ul className="list-unstyled h-100">
-                                                {medicationList?.length === 0 || !medicationList ? (
-                                                    <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
-                                                        <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                            <strong>No Medications Found</strong>
-                                                        </div>
-                                                    </li>
-                                                ) : medicationList?.slice(0, 4)?.map((medication, index) => (
-                                                    <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
-                                                        <div className="fs-6">
-                                                            <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
-                                                            <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
-                                                                {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
-                                                            </div>
-                                                            <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
-                                                                {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
-                                                            </div>
-                                                        </div>
-                                                        <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                            {medication?.status}
-                                                        </span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        }
-                                    </div>
-                                ) : (
-                                    <div className='text-muted'>No medications recorded</div>
-                                )}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    )}
-                </Accordion>
-                <Accordion>
-                    {visibleSections.vitals && (
-                        <Accordion.Item eventKey="0" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Vitals</span>
-                            </Accordion.Header>
-                            <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
-                                    <thead>
-                                        <tr className='border'>
-                                            <th className='text-white'>
-                                                Vital Name
-                                            </th>
-                                            {sortedDates?.map(date => (
-                                                <th className='text-white' key={date}>
-                                                    {formatDate(date)}
-                                                </th>
-                                            ))}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {vitals.map((vital, index) => (
-                                            <tr className='' key={vital.name}>
-                                                <td className='p-0 vitalsTableBorder'>
-                                                    {vital.name} {getDisplayUnit(vital) && (
-                                                        <small className="text-muted">({getDisplayUnit(vital)})</small>
-                                                    )}
-                                                </td>
+                                        ) : (
+                                            <div className="text-muted">No allergies recorded</div>
+                                        )}
+                                    </Accordion.Body>
+                                );
+                                break;
 
-                                                {sortedDates.map(date => (
-                                                    <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
-                                                        {renderVitalCell(vital, date)}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                    {store?.getVitalsByPatientIdReducer?.loading &&
-                                        <div className='position-absolute' style={{ top: '35%', left: '50%' }}>
-                                            <Spinner />
-                                        </div>
-                                    }
-                                </Table>
-                            </Accordion.Body>
+                            case 'Problems':
+                                content = (
+                                    <Accordion.Body className='p-2'>
+                                        {problemData?.length > 0 ? (
+                                            <div style={{ height: '30vh' }} className='scroll-container'>
+                                                {store?.getProblemListReducer?.loading ? (
+                                                    <div
+                                                        className="d-flex justify-content-center align-items-center w-100 p-5"
+                                                        style={{ height: '100%' }}>
+                                                        <Spinner className="spinner-border-sm" />
+                                                    </div>
+                                                ) : problemData && problemData.length > 0 ? (
+                                                    <ul className="list-unstyled pb-0 mb-0">
+                                                        {problemData?.slice(0, 4)?.map((problem, index) => (
+                                                            <li
+                                                                key={index}
+                                                                className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <div className="fs-6">
+                                                                    <strong title={problem?.code?.text}>
+                                                                        {problem?.code?.text?.length > 30
+                                                                            ? problem.code.text.slice(0, 30) + '...'
+                                                                            : problem?.code?.text || 'Unknown Problem'}
+                                                                    </strong>
+                                                                    <div className="text-muted small">
+                                                                        {problem?.clinicalStatus?.text || 'Status not available'}
+                                                                    </div>
+                                                                </div>
+                                                                <span className="fs-6 fw-semibold text-success">
+                                                                    {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
+                                                                        year: 'numeric',
+                                                                        month: 'long',
+                                                                        day: 'numeric',
+                                                                    })}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <ul className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
+                                                        <li className="mb-2">
+                                                            <div className="fs-6  d-flex justify-content-between align-items-center">
+                                                                <strong>No Problems Found</strong>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className='text-muted'>No problems recorded</div>
+                                        )}
+                                    </Accordion.Body>
+                                );
+                                break;
 
-                        </Accordion.Item>
-                    )}
+                            case 'Medications':
+                                content = (
+                                    <Accordion.Body className='p-2'>
+                                        {medicationList?.length > 0 ? (
+                                            <div style={{ height: '30vh' }} className='scroll-container'>
+                                                {store?.getMedicationReducer?.loading ?
+                                                    <div className='d-flex justify-content-center align-items-center w-100 p-5' style={{ height: '100%' }}>
+                                                        <Spinner className='spinner-border-sm' />
+                                                    </div>
+                                                    :
+                                                    <ul className="list-unstyled h-100">
+                                                        {medicationList?.length === 0 || !medicationList ? (
+                                                            <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
+                                                                <div className="fs-6  d-flex justify-content-between align-items-center">
+                                                                    <strong>No Medications Found</strong>
+                                                                </div>
+                                                            </li>
+                                                        ) : medicationList?.slice(0, 4)?.map((medication, index) => (
+                                                            <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                <div className="fs-6">
+                                                                    <strong className="text-capitalize" title={medication?.drugId?.proprietaryName}>{medication?.drugId?.proprietaryName?.length > 30 ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...' : medication?.drugId?.proprietaryName}</strong>
+                                                                    <div className="text-muted" title={medication?.drugId?.nonProprietaryName}>
+                                                                        {medication?.drugId?.nonProprietaryName?.length > 40 ? medication?.drugId?.nonProprietaryName?.slice(0, 39) + '...' : medication?.drugId?.nonProprietaryName}
+                                                                    </div>
+                                                                    <div className="text-muted " title={medication?.dosageInstruction?.[0]?.text}>
+                                                                        {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
+                                                                    </div>
+                                                                </div>
+                                                                <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                                    {medication?.status}
+                                                                </span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                }
+                                            </div>
+                                        ) : (
+                                            <div className='text-muted'>No medications recorded</div>
+                                        )}
+                                    </Accordion.Body>
+                                );
+                                break;
+
+                            case 'Social History':
+                                content = (
+                                    <Accordion.Body className='p-2'>
+                                        {socialHistoryData?.length > 0 ? (
+                                            <div>
+                                                {/* Render social history data here */}
+                                            </div>
+                                        ) : (
+                                            <div className='text-muted'>No social history recorded</div>
+                                        )}
+                                    </Accordion.Body>
+                                );
+                                break;
+
+                            default:
+                                return null;
+                        }
+
+                        return (
+                            <Accordion.Item
+                                key={menuItem._id}
+                                eventKey={menuItem.order.toString()}
+                                className="border-0 mb-2"
+                            >
+                                <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
+                                    <span className='fw-semibold fs-6'>{menuItem.name}</span>
+                                </Accordion.Header>
+                                {content}
+                            </Accordion.Item>
+                        );
+                    })}
                 </Accordion>
-                <Accordion>
-                    {visibleSections.socialHistory && (
-                        <Accordion.Item eventKey="4" className='border-0 mb-2'>
-                            <Accordion.Header className='p-0 bg-light rounded encounterSummary'>
-                                <span className='fw-semibold fs-6'>Social History</span>
-                            </Accordion.Header>
-                            <Accordion.Body className='p-2'>
-                                {socialHistoryData?.length > 0 ? (
-                                    <div>
-                                        {/* Render social history data here */}
-                                    </div>
-                                ) : (
-                                    <div className='text-muted'>No social history recorded</div>
-                                )}
-                            </Accordion.Body>
-                        </Accordion.Item>
-                    )}
-                </Accordion>
+
             </Col>
         </Row>
     );

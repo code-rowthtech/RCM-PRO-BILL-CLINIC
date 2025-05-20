@@ -30,8 +30,8 @@ import { createSuggestionsReducer } from './suggestions/reducer';
 import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateMedicationReducer } from './medication/reducer';
 import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
-import { createEncounterReducer, getEncounterReducer, updateEncounterReducer } from './encounter/reducer';
-import { createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer } from './noteCategories/reducer';
+import { createEncounterReducer, createEncounterSettingsReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
+import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 export default (combineReducers({
     Auth,
@@ -64,9 +64,11 @@ export default (combineReducers({
     createTobaccooReducer, deleteTobaccooReducer, updateTobaccooReducer, getTobaccooReducer, createFamilyGeneticReducer, getFamilyGeneticReducer, updateFamilyGeneticReducer,
     getIcdProcedureReducer, createSurgicalHistoryReducer, getSurgicalHistoryReducer, deleteSurgicalHistoryReducer, updateSurgicalHistoryReducer, getMedicalHistoryReducer, createMedicalHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer,
     createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer,
-    createEncounterReducer, getEncounterReducer, updateEncounterReducer,
+    createEncounterReducer, getEncounterReducer, updateEncounterReducer, createEncounterSettingsReducer, getEncounterSettingsReducer, updateEncounterSettingsReducer, getEncounterNotesTypeReducer, getEncounterNotesFieldsReducer,
     // note categories
     createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
     // templates
-    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer
+    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer,
+    // settings tabs
+    getSettingsTabsReducer, createSettingsTabsReducer,updateSettingsTabsReducer,
 }): any);

@@ -30,3 +30,10 @@ export const updateNoteSettingAction = (data): AuthAction => ({
     data
 });
 
+//  SETTINGS TABS
+export const createSettingsTabAction = (data): AuthAction =>
+    ({ type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS, data });
+export const getSettingsTabAction = (data): AuthAction =>
+    ({ type: NotesCategoriesActionTypes.GET_SETTINGS_TABS, data });
+export const updateSettingsTabAction = (data): AuthAction =>
+    ({ type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS, data });
