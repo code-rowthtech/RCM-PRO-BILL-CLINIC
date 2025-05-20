@@ -12,7 +12,7 @@ import ReactQuill from 'react-quill';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { createTemplateAction, updateTemplateAction } from '../../../../redux/actions';
+import { createTemplateAction, getTemplateAction, updateTemplateAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
@@ -21,6 +21,7 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const dispatch = useDispatch()
     const store = useSelector((state) => state);
     const createResponse = store?.createTemplateReducer?.data?.success;
+    const updateResponse = store?.updateTemplateReducer?.data?.success;
 
     const [tags, setTags] = useState([]);
     const practiceOptions = practiceTypeOptions?.map((data) => ({
@@ -37,6 +38,11 @@ const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
             setActiveTab('sections')
         }
     }, [createResponse])
+    useEffect(() => {
+        if (createResponse === true || updateResponse === true) {
+            dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: 'active' }))
+        }
+    }, [createResponse, updateResponse])
 
     useEffect(() => {
         if (template?._id) {

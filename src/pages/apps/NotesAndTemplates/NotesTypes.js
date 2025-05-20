@@ -21,10 +21,6 @@ const NotesTypes = () => {
     const [skip, setSkip] = useState(1);
     const store = useSelector((state) => state);
     const [noteType, setNoteType] = useState('');
-    console.log(
-        store?.getNoteCategoriesReducer?.data?.pagination?.pages,
-        'store?.getNoteCategoriesReducer?.data?.pagination?.pages'
-    );
     const newDataOftypes = [
         'Encounter-Based',
         'Nursing & Allied Health',
@@ -49,7 +45,7 @@ const NotesTypes = () => {
                 skip: skip,
                 limit: 8,
                 clinicId: ClinicId,
-                active: true,
+                active: status === 'active' ? true : false,
                 noteType: noteType,
             })
         );
@@ -72,7 +68,6 @@ const NotesTypes = () => {
     };
 
     const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
-    console.log(activeNote, 'activeNote');
     // for edit
     const handleOpenEditModal = (note) => {
         setSelectedNote(note);
@@ -110,7 +105,7 @@ const NotesTypes = () => {
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
-                <Card className="scroll-container " style={{ height: '90vh', overflowY: 'scroll' }}>
+                <Card className="" style={{ height: '90vh' }}>
                     <Card.Body className="px-2 py-1">
                         <Row className="">
                             <Col className="border-bottom" sm={12}>
@@ -142,7 +137,7 @@ const NotesTypes = () => {
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
                                                 activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
                                             }`}>
-                                            {tab?.noteType} Display Setting
+                                            {tab?.title} Display Setting
                                             <span
                                                 style={{
                                                     marginLeft: 8,
@@ -167,11 +162,12 @@ const NotesTypes = () => {
                                             <Button
                                                 onClick={() => {
                                                     setStatus('active');
+                                                    setSkip(1); // Reset to first page
                                                     dispatch(
                                                         getNoteCategoriesAction({
                                                             active: true,
                                                             search: search,
-                                                            page: skip,
+                                                            page: 1,
                                                             limit: 8,
                                                             clinicId: ClinicId,
                                                             noteType: noteType,
@@ -188,11 +184,12 @@ const NotesTypes = () => {
                                             <Button
                                                 onClick={() => {
                                                     setStatus('inactive');
+                                                    setSkip(1); // Reset to first page
                                                     dispatch(
                                                         getNoteCategoriesAction({
                                                             active: false,
                                                             search: search,
-                                                            page: skip,
+                                                            page: 1,
                                                             limit: 8,
                                                             clinicId: ClinicId,
                                                             noteType: noteType,

@@ -183,11 +183,7 @@ const Patients = () => {
                                                                     height={35}
                                                                     width={35}
                                                                     className="rounded-circle me-2 object-fit-cover"
-                                                                    src={
-                                                                        data?.photo?.[0]?.url
-                                                                            ? data?.photo?.[0]?.url
-                                                                            : dummyProfile
-                                                                    }
+                                                                    src={data?.photo?.[0]?.url || dummyProfile}
                                                                     alt=""
                                                                 />
                                                                 <div>

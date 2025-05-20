@@ -31,7 +31,7 @@ import { createMedicationReducer, getDrugsReducer, getMedicationReducer, updateM
 import { createFamilyGeneticReducer, createSurgicalHistoryReducer, createTobaccooReducer, deleteSurgicalHistoryReducer, getFamilyGeneticReducer, getSurgicalHistoryReducer, getTobaccooReducer, updateFamilyGeneticReducer, updateSurgicalHistoryReducer, updateTobaccooReducer, createMedicalHistoryReducer, getMedicalHistoryReducer, deleteTobaccooReducer, createAlcoholHistoryReducer, getAlcoholHistoryReducer, updateAlcoholHistoryReducer, deleteAlcoholHistoryReducer, updateMedicalHistoryReducer, deleteMedicalHistoryReducer, deleteFamilyGenticReducer } from './socialHistory/reducer';
 import { getIcdProcedureReducer } from './icdCodes/reducer';
 import { createEncounterReducer, createEncounterSettingsReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
-import { createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer } from './noteCategories/reducer';
+import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 export default (combineReducers({
     Auth,
@@ -68,5 +68,7 @@ export default (combineReducers({
     // note categories
     createNoteCategoriesReducer, getNoteCategoriesReducer, updateNoteCategoriesReducer,
     // templates
-    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer
+    createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer,
+    // settings tabs
+    getSettingsTabsReducer, createSettingsTabsReducer,updateSettingsTabsReducer,
 }): any);

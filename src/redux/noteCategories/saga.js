@@ -2,7 +2,14 @@ import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects'
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { NotesCategoriesActionTypes } from './constants';
-import { createNoteCategoriesApi, getNoteCategoriesApi, updateNoteCategoriesApi } from './api';
+import {
+    createNoteCategoriesApi,
+    createSettingsTabsApi,
+    getNoteCategoriesApi,
+    getSettingsTabsApi,
+    updateNoteCategoriesApi,
+    updateSettingsTabsApi,
+} from './api';
 
 /**
  * Login the user
@@ -108,6 +115,101 @@ function* updateNoteCategoriesFunction(data) {
     }
 }
 
+// setting tabs saga
+function* createSettingsTabsFunction(data) {
+    try {
+        yield put({
+            type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_LOADING,
+            payload: {},
+        });
+        const response = yield call(createSettingsTabsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getSettingsTabsFunction(data) {
+    try {
+        yield put({
+            type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getSettingsTabsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        // ToastHandle(error, 'danger');
+        yield put({
+            type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* updateSettingsTabsFunction(data) {
+    try {
+        yield put({
+            type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateSettingsTabsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callResetUpdate() {
     put({
         type: NotesCategoriesActionTypes.RESET_UPDATE_STATUS,
@@ -127,11 +229,24 @@ export function* watchUpdateNoteCategories() {
     yield takeEvery(NotesCategoriesActionTypes.UPDATE_NOTE_CATEGORIES, updateNoteCategoriesFunction);
 }
 
+export function* watchCreateSettingsTabs() {
+    yield takeEvery(NotesCategoriesActionTypes.CREATE_SETTINGS_TABS, createSettingsTabsFunction);
+}
+export function* watchGetSettingsTabs() {
+    yield takeEvery(NotesCategoriesActionTypes.GET_SETTINGS_TABS, getSettingsTabsFunction);
+}
+export function* watchUpdateSettingsTabs() {
+    yield takeEvery(NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS, updateSettingsTabsFunction);
+}
+
 function* noteCategoriesSaga() {
     yield all([
         fork(watchCreateNoteCategories),
         fork(watchGetNoteCategories),
         fork(watchUpdateNoteCategories),
+        fork(watchCreateSettingsTabs),
+        fork(watchGetSettingsTabs),
+        fork(watchUpdateSettingsTabs),
     ]);
 }
 export default noteCategoriesSaga;
