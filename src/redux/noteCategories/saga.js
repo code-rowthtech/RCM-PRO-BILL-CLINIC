@@ -169,7 +169,7 @@ function* getSettingsTabsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
+        // ToastHandle(error, 'danger');
         yield put({
             type: NotesCategoriesActionTypes.GET_SETTINGS_TABS_ERROR,
             payload: error,

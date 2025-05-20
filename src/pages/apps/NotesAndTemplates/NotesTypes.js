@@ -14,7 +14,6 @@ import Paginations from '../../../helpers/Paginations';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
-    console.log(openTabs, 'openTabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -22,10 +21,6 @@ const NotesTypes = () => {
     const [skip, setSkip] = useState(1);
     const store = useSelector((state) => state);
     const [noteType, setNoteType] = useState('');
-    console.log(
-        store?.getNoteCategoriesReducer?.data?.pagination?.pages,
-        'store?.getNoteCategoriesReducer?.data?.pagination?.pages'
-    );
     const newDataOftypes = [
         'Encounter-Based',
         'Nursing & Allied Health',
@@ -50,7 +45,7 @@ const NotesTypes = () => {
                 skip: skip,
                 limit: 8,
                 clinicId: ClinicId,
-                active: true,
+                active: status === 'active' ? true : false,
                 noteType: noteType,
             })
         );
@@ -73,7 +68,6 @@ const NotesTypes = () => {
     };
 
     const activeNote = openTabs.find((tab) => tab?._id === activeTabId);
-    console.log(activeNote, 'activeNote');
     // for edit
     const handleOpenEditModal = (note) => {
         setSelectedNote(note);
