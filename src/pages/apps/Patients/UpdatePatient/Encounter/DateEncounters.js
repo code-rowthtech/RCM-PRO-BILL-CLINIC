@@ -14,7 +14,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch()
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
-    const notesFields = store?.getEncounterNotesFieldsReducer?.data;
+    const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
         label: data?.title, value: data?._id
     }));
@@ -148,7 +148,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
         };
 
         return (
-            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '59vh' }}>
+            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '57.5vh' }}>
                 {getFieldsToRender().map(field => renderField(field))}
             </Row>
         );

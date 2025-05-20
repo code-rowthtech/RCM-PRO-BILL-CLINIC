@@ -45,7 +45,14 @@ const EncounterSummary = () => {
     });
     const store = useSelector((state) => state);
     const settingsDataItems = store?.getEncounterSettingsReducer?.data?.data?.items?.find((data) => data?.name === 'Summary');
-    const sortedSubMenuItems = settingsDataItems?.subMenu?.sort((a, b) => a.order - b.order) || [];
+    const defaultMenuItems = [
+        { _id: '1', name: 'Vitals', order: 0, hide: true },
+        { _id: '2', name: 'Allergy', order: 1, hide: true },
+        { _id: '3', name: 'Problems', order: 2, hide: true },
+        { _id: '4', name: 'Medications', order: 3, hide: true },
+        { _id: '5', name: 'Social History', order: 4, hide: true }
+    ];
+    const sortedSubMenuItems = settingsDataItems?.subMenu?.length > 0 ? settingsDataItems?.subMenu?.sort((a, b) => a.order - b.order) : defaultMenuItems;
     const tobaccoHistory = Array.isArray(store?.getTobaccooReducer?.data?.tobaccoHistory)
         ? store.getTobaccooReducer.data.tobaccoHistory
         : [];

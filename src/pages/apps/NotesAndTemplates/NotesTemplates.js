@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Button, Card, Col, Row, Table,
-  Badge, Spinner
+  Badge
 } from 'react-bootstrap';
 import {
   FiFileText, FiEdit2,
@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { getTemplateAction } from '../../../redux/actions';
 import Paginations from '../../../helpers/Paginations';
+import Spinner from '../../../constants/Spinner';
 
 const TemplatesPage = () => {
   // State management
@@ -147,7 +148,7 @@ const TemplatesPage = () => {
                       onClick={openCreateModal}
                       className="d-flex custom-buttons align-items-center"
                     >
-                      New
+                      New Template
                     </Button>
                   </Col>
                 </Row>
@@ -156,14 +157,12 @@ const TemplatesPage = () => {
 
             {store?.getTemplateReducer?.loading ? (
               <div className="text-center py-5">
-                <Spinner animation="border" variant="primary" />
-                <p className="mt-2">Loading templates...</p>
+                <Spinner />
               </div>
             ) : (
               <Table responsive className="table-centered table-nowrap mb-0 rounded">
                 <thead className="table-light">
                   <tr>
-                    {/* <th className='text-white'>S.No.</th> */}
                     <th className='text-white'>Title</th>
                     <th className='text-white'>Note Type</th>
                     <th className='text-white'>Category</th>
@@ -198,7 +197,6 @@ const TemplatesPage = () => {
                   ) : (
                     templatesData?.map((template, index) => (
                       <tr key={template?.uid}>
-                        {/* <td>{index + 1}</td> */}
                         <td>
                           <p className='text-capitalize mb-0'>{template?.title || '-'}</p>
                           <div className="d-flex flex-wrap gap-1 mt-1">
