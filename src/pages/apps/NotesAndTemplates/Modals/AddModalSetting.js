@@ -118,7 +118,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
         }
     }, [selectedNote, setValue]);
 
-
     const onSubmit = (data) => {
         const payload = {
             clinicId: clinic_id?.clinicId,
@@ -140,7 +139,16 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
 
     useEffect(() => {
         if (createResponse === 201 || updateResponse === 200) {
-            dispatch(getNoteCategoriesAction({ search: '', skip: 1, limit: 8, clinicId: clinic_id?.clinicId, active: true, noteType: '' }));
+            dispatch(
+                getNoteCategoriesAction({
+                    search: '',
+                    skip: 1,
+                    limit: 8,
+                    clinicId: clinic_id?.clinicId,
+                    active: true,
+                    noteType: '',
+                })
+            );
             setAddModal(false);
             reset();
             setSelectedNote(null);
@@ -181,17 +189,24 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                             }}>
                                             <option value="">Select Note Type</option>
                                             {Object.keys(NOTE_TYPE_OPTIONS).map((type) => (
-                                                <option key={type} value={type}>
+                                                <option
+                                                    key={type}
+                                                    value={type}
+                                                    disabled={type !== 'Encounter-Based'}
+                                                    title={type !== 'Encounter-Based' ? 'In Progress' : ''}>
                                                     {type}
                                                 </option>
                                             ))}
-                                            <option value="Other">Other</option>
+                                            <option value="Other" disabled title="In Progress">
+                                                Other
+                                            </option>
                                         </Form.Select>
                                     )}
                                 />
                                 {errors.noteType && <span className="text-danger">{errors.noteType.message}</span>}
                             </Form.Group>
                         </Col>
+
                         {noteType && (
                             <Col md={6}>
                                 <Form.Group className="mb-1">
@@ -264,9 +279,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                     <option value="false">False</option>
                                     <option value="true">True</option>
                                 </Form.Select>
-                                {errors.private && (
-                                    <span className="text-danger">{errors.private.message}</span>
-                                )}
+                                {errors.private && <span className="text-danger">{errors.private.message}</span>}
                             </Form.Group>
                         </Col>
                     </Row>
@@ -282,7 +295,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 store?.updateNoteCategoriesReducer?.loading
                             }>
                             {store?.createNoteCategoriesReducer?.loading ||
-                                store?.updateNoteCategoriesReducer?.loading ? (
+                            store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
                             ) : selectedNote ? (
                                 'Update'
