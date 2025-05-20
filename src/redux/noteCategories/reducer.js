@@ -15,6 +15,19 @@ export const UPDATE_NOTE_CATEGORIES_INITIAL_STATE = {
     loading: false,
 };
 
+// settings tabs
+export const CREATE_SETTINGS_TABS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+export const GET_SETTINGS_TABS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+export const UPDATE_SETTINGS_TABS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
 export const createNoteCategoriesReducer = (state = CREATE_NOTE_CATEGORIES_INITIAL_STATE, action) => {
     switch (action.type) {
         case NotesCategoriesActionTypes.CREATE_NOTE_CATEGORIES_LOADING:
@@ -82,6 +95,87 @@ export const updateNoteCategoriesReducer = (state = UPDATE_NOTE_CATEGORIES_INITI
                 loading: false,
             };
         case NotesCategoriesActionTypes.UPDATE_NOTE_CATEGORIES_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+// settings tabs
+export const getSettingsTabsReducer = (state = GET_SETTINGS_TABS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case NotesCategoriesActionTypes.GET_SETTINGS_TABS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case NotesCategoriesActionTypes.GET_SETTINGS_TABS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.GET_SETTINGS_TABS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.GET_SETTINGS_TABS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const createSettingsTabsReducer = (state = CREATE_SETTINGS_TABS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.CREATE_SETTINGS_TABS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const updateSettingsTabsReducer = (state = UPDATE_SETTINGS_TABS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_ERROR:
             return {
                 data: action.payload,
                 loading: false,

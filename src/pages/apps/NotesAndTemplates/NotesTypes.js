@@ -14,6 +14,7 @@ import Paginations from '../../../helpers/Paginations';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
+    console.log(openTabs, 'openTabs');
     const [activeTabId, setActiveTabId] = useState('note-categories'); // Default tab
     const [addModal, setAddModal] = useState(false);
     const dispatch = useDispatch();
@@ -142,7 +143,7 @@ const NotesTypes = () => {
                                             className={`fw-semibold cursor-pointer font_active_tabs ${
                                                 activeTabId === tab?._id ? 'active_tabs_link fw-bold' : ''
                                             }`}>
-                                            {tab?.noteType} Display Setting
+                                            {tab?.title} Display Setting
                                             <span
                                                 style={{
                                                     marginLeft: 8,

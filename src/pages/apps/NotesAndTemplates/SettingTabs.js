@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Card, Col, Form, Row, Button, Offcanvas, Modal } from 'react-bootstrap';
+import { Card, Col, Form, Row, Button, Offcanvas, Modal, Spinner } from 'react-bootstrap';
 import { MdAddCircleOutline } from 'react-icons/md';
 import './settingtabs.css';
 import { FiInfo } from 'react-icons/fi';
+import { useDispatch } from 'react-redux';
+import {
+    createSettingsTabAction,
+    getSettingsTabAction,
+    updateSettingsTabAction,
+} from '../../../redux/noteCategories/action';
+import { useSelector } from 'react-redux';
+import { loggedInUser } from '../../../helpers/api/loggedInUser';
+import { encryptMessage } from '../../../cryptoUtils';
 
 const NOTE_TYPE_OPTIONS = {
     'Encounter-Based': [
@@ -75,14 +84,25 @@ const NOTE_TYPE_OPTIONS = {
     ],
 };
 const SettingTabs = ({ noteType }) => {
+    console.log(noteType, 'noteType');
+    const dispatch = useDispatch();
+    const store = useSelector((state) => state);
+    const ClinicId = loggedInUser?.clinicId;
+    const settingData = store?.getSettingsTabsReducer?.data?.data?.displaySettings?.mainPanel;
+    const createResponse = store?.createSettingsTabsReducer?.data?.status;
+    console.log(store?.getSettingsTabsReducer?.data?.data, 'settingData');
     const [activeSectionsByType, setActiveSectionsByType] = useState({});
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [offcanvasSections, setOffcanvasSections] = useState([]);
+    console.log(offcanvasSections, 'offcanvasSections');
     const [showCanvas, setShowCanvas] = useState(false);
     const [showCustomFields, setShowCustomFields] = useState(false);
     const [customFieldData, setCustomFieldData] = useState({ fieldName: '', inputType: '' });
+    const updateSettingsStatus = store?.updateSettingsTabsReducer?.data?.status;
+    console.log(updateSettingsStatus, 'updateSettingsStatus');
 
     const getCurrentSections = () => activeSectionsByType[noteType?.noteType] || [];
+    console.log(getCurrentSections(), 'getCurrentSections');
     const updateCurrentSections = (newSections) => {
         setActiveSectionsByType((prev) => ({
             ...prev,
@@ -112,6 +132,10 @@ const SettingTabs = ({ noteType }) => {
         setShowCustomFields(false);
         setShowCanvas(false);
     };
+    const toggleSectionProperty = (id, prop) => {
+        const updated = getCurrentSections().map((sec) => (sec.id === id ? { ...sec, [prop]: !sec[prop] } : sec));
+        updateCurrentSections(updated);
+    };
 
     const handleOffcanvasCardClick = (section) => {
         if (section.id === 'custom') {
@@ -120,15 +144,64 @@ const SettingTabs = ({ noteType }) => {
         }
 
         const currentSections = getCurrentSections();
-        if (!currentSections.find((s) => s.id === section.id)) {
-            updateCurrentSections([...currentSections, { ...section, visible: true, minimized: false }]);
-            setOffcanvasSections(offcanvasSections.filter((s) => s.id !== section.id));
-        }
-    };
 
-    const toggleSectionProperty = (id, prop) => {
-        const updated = getCurrentSections().map((sec) => (sec.id === id ? { ...sec, [prop]: !sec[prop] } : sec));
-        updateCurrentSections(updated);
+        // Avoid duplicates
+        if (!currentSections.find((s) => s.id === section.id)) {
+            const newSection = {
+                id: section.id,
+                label: section.label,
+                visible: true,
+                minimized: false,
+            };
+
+            const updatedSections = [...currentSections, newSection];
+            updateCurrentSections(updatedSections);
+            setOffcanvasSections(offcanvasSections.filter((s) => s.id !== section.id));
+
+            const transformedSections = updatedSections.map((s, index) => ({
+                name: s.label || s.name,
+                isShown: s.visible !== undefined ? s.visible : s.isShown,
+                isMinimized: s.minimized !== undefined ? s.minimized : s.isMinimized,
+                isRequired: false,
+                order: index + 1,
+            }));
+            const isFirstTimeSetup = !Array.isArray(settingData) || settingData.length === 0;
+
+            if (isFirstTimeSetup) {
+                // 🟢 CREATE
+                const payload = {
+                    userId: loggedInUser?._id,
+                    noteTypeId: noteType._id,
+                    displaySettings: {
+                        mainPanel: [
+                            {
+                                categoryName: 'Default',
+                                sections: transformedSections,
+                            },
+                        ],
+                    },
+                };
+                dispatch(createSettingsTabAction(payload));
+                console.log('Create payload:', payload);
+            } else {
+                // 🔵 UPDATE
+                const payload = {
+                    id: store?.getSettingsTabsReducer?.data?.data?._id,
+                    userId: loggedInUser?._id,
+                    noteTypeId: noteType._id,
+                    displaySettings: {
+                        mainPanel: [
+                            {
+                                categoryName: 'Default',
+                                sections: transformedSections,
+                            },
+                        ],
+                    },
+                };
+                dispatch(updateSettingsTabAction({ key: encryptMessage(payload) }));
+                console.log('Update payload:', payload);
+            }
+        }
     };
 
     const handleDragEnd = (result) => {
@@ -162,6 +235,15 @@ const SettingTabs = ({ noteType }) => {
         }
     }, [noteType]);
 
+    useEffect(() => {
+        dispatch(getSettingsTabAction({ noteId: noteType?._id }));
+    }, [dispatch, noteType]);
+
+    useEffect(() => {
+        if (createResponse === 201 || updateSettingsStatus === 200) {
+            dispatch(getSettingsTabAction({ noteId: noteType?._id }));
+        }
+    }, [createResponse]);
     return (
         <Row className="mt-0">
             <div className="p-2 w-100">
@@ -184,64 +266,94 @@ const SettingTabs = ({ noteType }) => {
                     </Row>
 
                     <Row className="mt-1">
-                        <Col md={8}>
-                            <Droppable droppableId="active-sections">
-                                {(provided) => (
-                                    <div {...provided.droppableProps} ref={provided.innerRef}>
-                                        {getCurrentSections().map((section, index) => (
-                                            <Draggable key={section.id} draggableId={section.id} index={index}>
-                                                {(provided) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className="mb-2">
-                                                        <Card className="draggable-card p-2">
-                                                            <div className="w-100 d-flex justify-content-between align-items-center">
-                                                                <div className="d-flex align-items-center">
-                                                                    <span className="me-2 fw-bold">{index + 1}</span>
-                                                                    <strong>{section.label}</strong>
-                                                                </div>
-
-                                                                <div className="d-flex align-items-center gap-2">
-                                                                    <Form.Check
-                                                                        type="switch"
-                                                                        id={`minimize-${section.id}`}
-                                                                        checked={section.minimized || false}
-                                                                        label="Minimize"
-                                                                        onChange={() =>
-                                                                            toggleSectionProperty(
-                                                                                section.id,
-                                                                                'minimized'
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                    <Form.Check
-                                                                        type="switch"
-                                                                        id={`visible-${section.id}`}
-                                                                        checked={section.visible ?? true}
-                                                                        label="Visible"
-                                                                        onChange={() =>
-                                                                            toggleSectionProperty(section.id, 'visible')
-                                                                        }
-                                                                    />
-                                                                    <span
-                                                                        className="drag-icon"
-                                                                        style={{ cursor: 'grab' }}>
-                                                                        ≡
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </Card>
+                        {store?.getSettingsTabsReducer?.loading ? (
+                            <div
+                                className="text-center my-4 d-flex justify-content-center align-items-center"
+                                style={{ height: '200px' }}>
+                                <Spinner animation="border" variant="primary" />
+                            </div>
+                        ) : (
+                            <Col md={8}>
+                                <Droppable droppableId="active-sections">
+                                    {(provided) => (
+                                        <div {...provided.droppableProps} ref={provided.innerRef}>
+                                            {store?.getSettingsTabsReducer?.data?.data?.displaySettings?.mainPanel
+                                                ?.length === 0 && (
+                                                    <div className="text-center">
+                                                        <p className="text-secondary">No sections available</p>
                                                     </div>
                                                 )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
-                        </Col>
+
+                                            {settingData?.map((group, groupIndex) =>
+                                                group.sections.map((section, index) => (
+                                                    <Draggable
+                                                        key={section._id}
+                                                        draggableId={section._id}
+                                                        index={index}>
+                                                        {(provided) => (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                className="mb-2">
+                                                                <Card className="draggable-card p-2">
+                                                                    <div className="w-100 d-flex justify-content-between align-items-center">
+                                                                        <div className="d-flex align-items-center">
+                                                                            <span className="me-2 fw-bold">
+                                                                                {index + 1}
+                                                                            </span>
+                                                                            <strong>{section?.name}</strong>
+                                                                        </div>
+
+                                                                        <div className="d-flex align-items-center gap-2">
+                                                                            <Form.Check
+                                                                                type="switch"
+                                                                                id={`minimize-${section._id}`}
+                                                                                checked={section?.isMinimized}
+                                                                                label="Minimize"
+                                                                                onChange={() =>
+                                                                                    toggleSectionProperty(
+                                                                                        section._id,
+                                                                                        'minimized'
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            <Form.Check
+                                                                                type="switch"
+                                                                                id={`visible-${section._id}`}
+                                                                                checked={
+                                                                                    section?.isShown !== undefined
+                                                                                        ? section.isShown
+                                                                                        : true
+                                                                                }
+                                                                                label="Visible"
+                                                                                onChange={() =>
+                                                                                    toggleSectionProperty(
+                                                                                        section._id,
+                                                                                        'visible'
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                            <span
+                                                                                className="drag-icon"
+                                                                                style={{ cursor: 'grab' }}>
+                                                                                ≡
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                </Card>
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                ))
+                                            )}
+
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+                            </Col>
+                        )}
                     </Row>
                 </DragDropContext>
             </div>
@@ -257,7 +369,7 @@ const SettingTabs = ({ noteType }) => {
                     <Offcanvas.Title>Add New Section</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
-                    {offcanvasSections.map((section) => (
+                    {offcanvasSections?.map((section) => (
                         <Card
                             key={section.id}
                             className="draggable-card p-2 mb-2"
@@ -298,7 +410,7 @@ const SettingTabs = ({ noteType }) => {
                                     </Form.Group>
                                 </Col>
                                 <Col md={12} className="d-flex justify-content-end">
-                                    <Button variant="primary" onClick={handleAddCustomField}>
+                                    <Button variant="primary" className="custom-buttons" onClick={handleAddCustomField}>
                                         Add
                                     </Button>
                                 </Col>
@@ -309,7 +421,7 @@ const SettingTabs = ({ noteType }) => {
             </Offcanvas>
 
             <Modal show={showInfoModal} onHide={() => setShowInfoModal(false)} centered>
-                <Modal.Header closeButton>
+                <Modal.Header className="px-2 py-0" closeButton>
                     <Modal.Title>Info</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
