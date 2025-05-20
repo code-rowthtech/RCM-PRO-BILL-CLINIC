@@ -2,7 +2,14 @@ import { all, fork, put, takeEvery, call, takeLatest } from 'redux-saga/effects'
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { NotesCategoriesActionTypes } from './constants';
-import { createNoteCategoriesApi, createSettingsTabsApi, getNoteCategoriesApi, getSettingsTabsApi, updateNoteCategoriesApi, updateSettingsTabsApi } from './api';
+import {
+    createNoteCategoriesApi,
+    createSettingsTabsApi,
+    getNoteCategoriesApi,
+    getSettingsTabsApi,
+    updateNoteCategoriesApi,
+    updateSettingsTabsApi,
+} from './api';
 
 /**
  * Login the user
@@ -179,6 +186,7 @@ function* updateSettingsTabsFunction(data) {
         const response = yield call(updateSettingsTabsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS_SUCCESS,
                 payload: { ...decryptedData },
@@ -231,10 +239,14 @@ export function* watchUpdateSettingsTabs() {
     yield takeEvery(NotesCategoriesActionTypes.UPDATE_SETTINGS_TABS, updateSettingsTabsFunction);
 }
 
-
 function* noteCategoriesSaga() {
     yield all([
-        fork(watchCreateNoteCategories), fork(watchGetNoteCategories), fork(watchUpdateNoteCategories)
-        , fork(watchCreateSettingsTabs), fork(watchGetSettingsTabs), fork(watchUpdateSettingsTabs),]);
+        fork(watchCreateNoteCategories),
+        fork(watchGetNoteCategories),
+        fork(watchUpdateNoteCategories),
+        fork(watchCreateSettingsTabs),
+        fork(watchGetSettingsTabs),
+        fork(watchUpdateSettingsTabs),
+    ]);
 }
 export default noteCategoriesSaga;

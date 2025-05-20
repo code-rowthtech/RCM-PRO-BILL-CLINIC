@@ -111,7 +111,7 @@ const NotesTypes = () => {
     return (
         <Row className="mt-2">
             <Col xs={12} className="px-0">
-                <Card className="scroll-container " style={{ height: '90vh', overflowY: 'scroll' }}>
+                <Card className="" style={{ height: '90vh' }}>
                     <Card.Body className="px-2 py-1">
                         <Row className="">
                             <Col className="border-bottom" sm={12}>
@@ -168,11 +168,12 @@ const NotesTypes = () => {
                                             <Button
                                                 onClick={() => {
                                                     setStatus('active');
+                                                    setSkip(1); // Reset to first page
                                                     dispatch(
                                                         getNoteCategoriesAction({
                                                             active: true,
                                                             search: search,
-                                                            page: skip,
+                                                            page: 1,
                                                             limit: 8,
                                                             clinicId: ClinicId,
                                                             noteType: noteType,
@@ -189,11 +190,12 @@ const NotesTypes = () => {
                                             <Button
                                                 onClick={() => {
                                                     setStatus('inactive');
+                                                    setSkip(1); // Reset to first page
                                                     dispatch(
                                                         getNoteCategoriesAction({
                                                             active: false,
                                                             search: search,
-                                                            page: skip,
+                                                            page: 1,
                                                             limit: 8,
                                                             clinicId: ClinicId,
                                                             noteType: noteType,
