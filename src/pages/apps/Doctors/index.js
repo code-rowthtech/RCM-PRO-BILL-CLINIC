@@ -48,7 +48,7 @@ const Doctors = () => {
         }
     }, [updateStatus]);
     const handleNewDoctor = () => {
-        navigate('/apps/doctors/new-doctor');
+        navigate('/apps/providers/new-doctor');
     };
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
@@ -203,7 +203,7 @@ const Doctors = () => {
                                                                 <div
                                                                     onClick={() => {
                                                                         navigate(
-                                                                            `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                            `/apps/providers/new-doctor?id=${data?._id}`
                                                                         );
                                                                     }}>
                                                                     <div className="d-flex align-items-center gap-2">
@@ -236,7 +236,7 @@ const Doctors = () => {
                                                                 <div
                                                                     onClick={() => {
                                                                         navigate(
-                                                                            `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                            `/apps/providers/new-doctor?id=${data?._id}`
                                                                         );
                                                                     }}>
                                                                     <div className="d-flex flex-column justify-content-center">
@@ -286,7 +286,7 @@ const Doctors = () => {
                                                                 className="py-1"
                                                                 onClick={() => {
                                                                     navigate(
-                                                                        `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                        `/apps/providers/new-doctor?id=${data?._id}`
                                                                     );
                                                                 }}
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -297,7 +297,7 @@ const Doctors = () => {
                                                                 className="py-1"
                                                                 onClick={() => {
                                                                     navigate(
-                                                                        `/apps/doctors/new-doctor?id=${data?._id}`
+                                                                        `/apps/providers/new-doctor?id=${data?._id}`
                                                                     );
                                                                 }}
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
@@ -347,7 +347,7 @@ const Doctors = () => {
                                                                 style={{ fontSize: '13px', fontWeight: '400' }}>
                                                                 <div className="d-flex gap-2">
                                                                     <Link
-                                                                        to={`/apps/doctors/new-doctor?id=${data?._id}`}
+                                                                        to={`/apps/providers/new-doctor?id=${data?._id}`}
                                                                         className="text-black cursor-pointer ps-2">
                                                                         <FiEdit className="fs-4 cursor-pointer" />
                                                                     </Link>

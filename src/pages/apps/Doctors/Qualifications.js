@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createDoctorDetailAction } from '../../../redux/actions';
 import { encryptMessage } from '../../../cryptoUtils';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { FiUploadCloud } from 'react-icons/fi';
+import { FiEye, FiInfo, FiUploadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import Select from 'react-select';
@@ -18,7 +18,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     const id = doctorDetails?._id;
     const { register, handleSubmit, setValue, clearErrors } = useForm();
     const [searchParams] = useSearchParams();
-
+    const [showDocPreview, setShowDocPreview] = useState(false);
+    const [docPreviewUrl, setDocPreviewUrl] = useState('');
     const updateId = searchParams.get('id');
     const [qualifications, setQualifications] = useState([
         { degreeName: '', degreeFile: null, issuerOrganisation: '' },
@@ -62,10 +63,19 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     // Handle file upload for degree
     const handleFileChangeDegree = async (index, event) => {
         const file = event.target.files[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') {
+            alert('Only PDF files are allowed for degree upload.');
+            return;
+        }
+        const fileName = file.name;
+        const localPreviewUrl = URL.createObjectURL(file);
+        handleQualificationChange(index, 'degreeFile', { url: localPreviewUrl, fileName, localPreviewUrl });
         try {
             const url = await handleUpload(file, setDegreeUploading);
-            const fileName = file.name;
-            handleQualificationChange(index, 'degreeFile', { url: url?.url, fileName });
+            if (url?.url) {
+                handleQualificationChange(index, 'degreeFile', { url: url.url, fileName, localPreviewUrl });
+            }
         } catch (error) {}
     };
     const [degreeUploading, setDegreeUploading] = useState(false);
@@ -134,20 +144,50 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         );
         setDocuments(updatedDocuments);
     };
-
     const handleFileChangeDocuments = async (index, event) => {
         const file = event.target.files[0];
+        if (!file) return;
+        const fileName = file.name;
+        const localPreviewUrl = URL.createObjectURL(file);
+        handleDocumentsChange(index, 'document', { url: localPreviewUrl, fileName, localPreviewUrl });
         try {
             const url = await handleUpload(file, setDocumentUploading);
-            const fileName = file.name;
-            handleDocumentsChange(index, 'document', { url: url?.url, fileName });
+            if (url?.url) {
+                // Save both backend and local preview URL
+                handleDocumentsChange(index, 'document', { url: url.url, fileName, localPreviewUrl });
+            }
         } catch (error) {}
     };
-
     const removeDocument = (index) => {
         setDocuments((prev) => prev.filter((_, i) => i !== index));
     };
+    useEffect(() => {
+        return () => {
+            if (docPreviewUrl && docPreviewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(docPreviewUrl);
+            }
+        };
+    }, [docPreviewUrl]);
 
+    const handlePreview = (file) => {
+        if (file?.localPreviewUrl && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
+            setDocPreviewUrl(file.localPreviewUrl);
+            setShowDocPreview(true);
+        } else if (file?.url && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
+            setDocPreviewUrl(file.url);
+            setShowDocPreview(true);
+        }
+    };
+
+    const handlePreviewDegree = (file) => {
+        if (file?.localPreviewUrl && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
+            setDocPreviewUrl(file.localPreviewUrl);
+            setShowDocPreview(true);
+        } else if (file?.url && /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(file.fileName)) {
+            setDocPreviewUrl(file.url);
+            setShowDocPreview(true);
+        }
+    };
     return (
         <>
             <div className="container-fluid">
@@ -208,36 +248,70 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                 </div>
                                                 <div className="col-md-4 col-12">
                                                     <div className="mb-1 d-flex flex-column position-relative">
-                                                        <Form.Label className="mb-0">Degree</Form.Label>
+                                                        <Form.Label className="mb-0 d-flex align-items-center gap-1">
+                                                            Degree{' '}
+                                                            <OverlayTrigger
+                                                                placement="top"
+                                                                overlay={
+                                                                    <Tooltip id="tooltip-degree">
+                                                                        Only PDF files are supported for degree uploads.
+                                                                    </Tooltip>
+                                                                }>
+                                                                <span className="text-secondary cursor-pointer">
+                                                                    <FiInfo size={15} />
+                                                                </span>
+                                                            </OverlayTrigger>
+                                                        </Form.Label>{' '}
                                                         <div
                                                             onClick={() =>
                                                                 document
                                                                     .getElementById(`degree-file-input-${index}`)
                                                                     .click()
                                                             }
-                                                            // onClick={() => degreeFileInputRef.current.click()}
                                                             className={`custom-file-upload justify-content-between cursor-pointer form-control ${
                                                                 qualification.degreeName || qualification.degreeFile
                                                                     ? ''
                                                                     : 'custom-form-fields'
                                                             }`}>
-                                                            {degreeUploading
-                                                                ? 'Uploading...'
-                                                                : qualification.degreeFile?.fileName
-                                                                ? qualification.degreeFile.fileName.length > 30
-                                                                    ? qualification.degreeFile.fileName.slice(0, 35) +
-                                                                      '...'
-                                                                    : qualification.degreeFile.fileName
-                                                                : 'Upload Degree'}{' '}
-                                                            <p className="mb-0">
-                                                                <FiUploadCloud />
-                                                            </p>
+                                                            <span>
+                                                                {degreeUploading
+                                                                    ? 'Uploading...'
+                                                                    : qualification.degreeFile?.fileName
+                                                                      ? qualification.degreeFile.fileName.length > 30
+                                                                          ? qualification.degreeFile.fileName.slice(
+                                                                                0,
+                                                                                30
+                                                                            ) + '...'
+                                                                          : qualification.degreeFile.fileName
+                                                                      : 'Upload Degree'}
+                                                            </span>
+                                                            <div className="d-flex align-items-center gap-2">
+                                                                {qualification.degreeFile?.url &&
+                                                                    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
+                                                                        qualification.degreeFile.fileName
+                                                                    ) && (
+                                                                        <FiEye
+                                                                            className="text-secondary"
+                                                                            style={{ cursor: 'pointer' }}
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handlePreviewDegree(
+                                                                                    qualification.degreeFile
+                                                                                );
+                                                                            }}
+                                                                            title="Preview"
+                                                                        />
+                                                                    )}
+                                                                <span className="mb-0 d-inline-flex align-items-center">
+                                                                    <FiUploadCloud />
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                         <Form.Control
                                                             type="file"
                                                             className="d-none"
                                                             id={`degree-file-input-${index}`}
-                                                            // ref={degreeFileInputRef}
+                                                            accept="application/pdf"
                                                             onChange={(event) => handleFileChangeDegree(index, event)}
                                                         />
                                                     </div>
@@ -350,20 +424,40 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         .getElementById(`documents-file-input-${index}`)
                                                                         .click()
                                                                 }
-                                                                // onClick={() => documentsFileInputRef.current.click()}
                                                                 className={`custom-file-upload justify-content-between cursor-pointer form-control ${
                                                                     data?.document?.fileName || data.degreeFile
                                                                         ? ''
                                                                         : 'custom-form-fields'
                                                                 }`}>
-                                                                {documentUploading
-                                                                    ? 'Uploading...'
-                                                                    : data?.document?.fileName
-                                                                    ? data?.document.fileName
-                                                                    : 'Upload Degree'}
-                                                                <p className="mb-0">
-                                                                    <FiUploadCloud />
-                                                                </p>
+                                                                <span>
+                                                                    {documentUploading
+                                                                        ? 'Uploading...'
+                                                                        : data?.document?.fileName
+                                                                          ? data.document.fileName.length > 25
+                                                                              ? data.document.fileName.slice(0, 25) +
+                                                                                '...'
+                                                                              : data.document.fileName
+                                                                          : 'Upload Degree'}
+                                                                </span>
+                                                                <div className="d-flex align-items-center gap-2">
+                                                                    {data?.document?.url &&
+                                                                        /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
+                                                                            data.document.fileName
+                                                                        ) && (
+                                                                            <FiEye
+                                                                                className="text-secondary"
+                                                                                style={{ cursor: 'pointer' }}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    handlePreview(data.document);
+                                                                                }}
+                                                                                title="Preview"
+                                                                            />
+                                                                        )}
+                                                                    <span className="mb-0 d-inline-flex align-items-center">
+                                                                        <FiUploadCloud />
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                             <Form.Control
                                                                 type="file"
@@ -430,6 +524,37 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                         </>
                     )}
                 </Form>
+                <Modal show={showDocPreview} onHide={() => setShowDocPreview(false)} centered>
+                    <Modal.Body>
+                        <div className="d-flex justify-content-center">
+                            <p className="fw-bold" style={{ color: '#6169D0' }}>
+                                Document Preview
+                            </p>
+                        </div>
+                        <div
+                            style={{
+                                overflow: 'hidden',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                            {docPreviewUrl ? (
+                                <img
+                                    src={docPreviewUrl}
+                                    alt="Document Preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '70vh',
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                    }}
+                                />
+                            ) : (
+                                <div>No preview available</div>
+                            )}
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </div>
         </>
     );

@@ -355,7 +355,7 @@ const AllRoutes = () => {
 
                         },
                         {
-                            path: 'doctors',
+                            path: 'providers',
                             children: [
                                 {
                                     path: 'list',

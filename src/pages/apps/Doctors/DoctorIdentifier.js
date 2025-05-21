@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { FiDownloadCloud, FiInfo } from 'react-icons/fi';
+import { Row, Col, Form, OverlayTrigger, Tooltip, Modal } from 'react-bootstrap';
+import { FiDownloadCloud, FiEye, FiInfo } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
 import { handleUpload } from '../../../helpers/HandleUpload';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
-import { identifierOptions, licensureOptions } from '../../../utils/DataSets/commonData'
+import { identifierOptions, licensureOptions } from '../../../utils/DataSets/commonData';
 import { useSearchParams } from 'react-router-dom';
 
-const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], onChange, setIdentifiers, identifiers, licensure, setLicensure }) => {
+const DoctorIdentifierForm = ({
+    defaultIdentifiers = [],
+    defaultLicensure = [],
+    onChange,
+    setIdentifiers,
+    identifiers,
+    licensure,
+    setLicensure,
+}) => {
     const {
         formState: { errors },
         setValue,
@@ -21,6 +29,8 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     const statesData = store?.getStatesReducer?.data?.states;
     const id = searchParams.get('id');
     const updateId = id?.replace(/^check/, '');
+    const [showPreview, setShowPreview] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState('');
 
     const defaultIssuingAuthority = [
         'NPPES',
@@ -35,7 +45,14 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (identifiers.length === 0) {
             setIdentifiers(
                 defaultIdentifiers.map((type) => ({
-                    type, number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
+                    type,
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                    system: '',
+                    ennumerationDate: '',
+                    status: '',
                 }))
             );
         }
@@ -44,7 +61,15 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         if (licensure.length === 0) {
             setLicensure(
                 defaultLicensure.map((type) => ({
-                    type: '', state: '', number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', status: '',
+                    type: '',
+                    state: '',
+                    number: '',
+                    file: null,
+                    expiry: '',
+                    issuingAuthority: '',
+                    system: '',
+                    ennumerationDate: '',
+                    status: '',
                 }))
             );
         }
@@ -53,7 +78,16 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     const addIdentifier = () => {
         setIdentifiers([
             ...identifiers,
-            { type: null, number: '', file: null, expiry: '', issuingAuthority: '', system: '', status: '', ennumerationDate: '' },
+            {
+                type: null,
+                number: '',
+                file: null,
+                expiry: '',
+                issuingAuthority: '',
+                system: '',
+                status: '',
+                ennumerationDate: '',
+            },
         ]);
     };
 
@@ -90,13 +124,21 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         }
     };
 
-
-
     // Licensure
     const addLicensure = () => {
         setLicensure([
             ...licensure,
-            { type: null, number: '', file: null, expiry: '', issuingAuthority: '', system: '', ennumerationDate: '', licenseState: '', status: '' },
+            {
+                type: null,
+                number: '',
+                file: null,
+                expiry: '',
+                issuingAuthority: '',
+                system: '',
+                ennumerationDate: '',
+                licenseState: '',
+                status: '',
+            },
         ]);
     };
 
@@ -111,7 +153,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
         setLicensure(updatedLicensure);
     };
 
-    const [licensureDocument, setLicensureDocument] = useState(false)
+    const [licensureDocument, setLicensureDocument] = useState(false);
     const handleLicensureFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
@@ -135,8 +177,10 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
     };
     useEffect(() => {
         if (doctorDetails && updateId) {
-            const identifiersWithState = doctorDetails?.identifier?.filter(item => item?.hasOwnProperty('licenseState')) || [];
-            const identifiersWithoutState = doctorDetails?.identifier?.filter(item => !item?.hasOwnProperty('licenseState')) || [];
+            const identifiersWithState =
+                doctorDetails?.identifier?.filter((item) => item?.hasOwnProperty('licenseState')) || [];
+            const identifiersWithoutState =
+                doctorDetails?.identifier?.filter((item) => !item?.hasOwnProperty('licenseState')) || [];
             // Set qualifications data
             const updatedIdentifiers = identifiersWithoutState?.map((item, index) => ({
                 expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
@@ -151,7 +195,9 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                 },
                 file: item?.file?.[0],
                 status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate ? new Date(item?.ennumerationDate).toISOString().split('T')[0] : '',
+                ennumerationDate: item?.ennumerationDate
+                    ? new Date(item?.ennumerationDate).toISOString().split('T')[0]
+                    : '',
             }));
             const updatedLicensure = identifiersWithState?.map((item, index) => ({
                 expiry: item?.expiry ? new Date(item?.expiry).toISOString().split('T')[0] : '',
@@ -167,12 +213,21 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                 file: item?.file?.[0],
                 licenseState: item?.licenseState || '',
                 status: item?.status || '',
-                ennumerationDate: item?.ennumerationDate ? new Date(item?.ennumerationDate).toISOString().split('T')[0] : '',
+                ennumerationDate: item?.ennumerationDate
+                    ? new Date(item?.ennumerationDate).toISOString().split('T')[0]
+                    : '',
             }));
             setIdentifiers(updatedIdentifiers);
             setLicensure(updatedLicensure);
         }
     }, [doctorDetails, statesData]);
+    const handlePreview = (file) => {
+        if (file?.url && /\.(jpg|jpeg|png|svg)$/i.test(file.name)) {
+            setPreviewUrl(file.url);
+            setShowPreview(true);
+        }
+    };
+
     return (
         <>
             <Row>
@@ -189,26 +244,41 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             {identifiers.map((item, index) => (
                 <Row key={index} className="mb-0">
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Identifier Type</Form.Label>
-                        <Form.Select
-                            value={item?.system || item?.type?.value || ''}
-                            onChange={(e) => {
-                                const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
-                                handleChange(index, 'type', selectedType);
-                            }}
-                            disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}
-                        >
-                            <option value="" disabled>Select Identifier Type</option>
-                            {identifierOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
+                        <Form.Label className="mb-0 mt-2">Identifier Type</Form.Label>
+                        {index === 0 && defaultIdentifiers.length > 0 ? (
+                            <Form.Control
+                                type="text"
+                                value={item?.type?.label || defaultIdentifiers[0].label}
+                                readOnly
+                                style={{
+                                    background: '#e9ecef', // Bootstrap's disabled bg
+                                    color: '#212529', // Bootstrap's default text color
+                                    cursor: 'not-allowed',
+                                }}
+                                className="fw-semibold"
+                                tabIndex={-1}
+                            />
+                        ) : (
+                            <Form.Select
+                                value={item?.system || item?.type?.value || ''}
+                                onChange={(e) => {
+                                    const selectedType = identifierOptions.find((opt) => opt.value === e.target.value);
+                                    handleChange(index, 'type', selectedType);
+                                }}
+                                disabled={defaultIdentifiers.some((d) => d.value === item.type?.value)}>
+                                <option value="" disabled>
+                                    Select Identifier Type
                                 </option>
-                            ))}
-                        </Form.Select>
-
+                                {identifierOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        )}
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Identifier Number</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Identifier Number</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
@@ -218,7 +288,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         />
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Issuing Authority</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Issuing Authority</Form.Label>
                         <Form.Select
                             value={item?.issuingAuthority || ''}
                             onChange={(e) => handleChange(index, 'issuingAuthority', e.target.value)}>
@@ -233,32 +303,33 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         </Form.Select>
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Start Date (Ennumeration Date)</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Start Date (Ennumeration Date)</Form.Label>
                         <Form.Control
                             type="date"
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleChange(index, 'ennumerationDate', e.target.value)}
+                            max={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : undefined}
                         />
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Expiry Date</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Expiry Date</Form.Label>
                         <Form.Control
                             type="date"
                             value={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : ''}
-                            min={new Date().toISOString().split('T')[0]}
+                            min={
+                                item?.ennumerationDate
+                                    ? (() => {
+                                          const start = new Date(item.ennumerationDate);
+                                          start.setDate(start.getDate() + 1);
+                                          return start.toISOString().split('T')[0];
+                                      })()
+                                    : new Date().toISOString().split('T')[0]
+                            }
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                         />
-                        {index >= defaultIdentifiers?.length && (
-                            <span
-                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '9px' }}
-                                onClick={() => removeIdentifier(index)}>
-                                <CiCircleMinus />
-                            </span>
-                        )}
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Status</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Status</Form.Label>
                         <Form.Select
                             value={item?.status || 'active'}
                             onChange={(e) => handleChange(index, 'status', e.target.value)}>
@@ -270,32 +341,52 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         </Form.Select>
                     </Col>
                     <Col sm={3} className="mb-2 position-relative">
-                        <Form.Label className='mb-0 mt-2'>Identifier Document  <OverlayTrigger
-                            placement="top"
-                            overlay={
-                                <Tooltip id="tooltip-identifier">
-                                    File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
-                                </Tooltip>
-                            }>
-                            <span className="text-secondary cursor-pointer mb-2">
-                                <FiInfo size={15} />
-                            </span>
-                        </OverlayTrigger></Form.Label>
+                        <Form.Label className="mb-0 mt-2">
+                            Identifier Document{' '}
+                            <OverlayTrigger
+                                placement="top"
+                                overlay={
+                                    <Tooltip id="tooltip-identifier">
+                                        File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
+                                    </Tooltip>
+                                }>
+                                <span className="text-secondary cursor-pointer mb-2">
+                                    <FiInfo size={15} />
+                                </span>
+                            </OverlayTrigger>
+                        </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
-                            {identifierDocument
-                                ? 'Uploading...'
-                                : item.file?.name
-                                    ? item.file.name.length > 30
-                                        ? item.file.name.slice(0, 25) + '...'
-                                        : item.file.name
-                                    : 'Upload Document'}
-                            <p className="mb-0">
-                                <FiDownloadCloud />
-                            </p>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
+                            <span>
+                                {identifierDocument
+                                    ? 'Uploading...'
+                                    : item.file?.name
+                                      ? item.file.name.length > 30
+                                          ? item.file.name.slice(0, 25) + '...'
+                                          : item.file.name
+                                      : 'Upload Document'}
+                            </span>
+                            <div className="d-flex align-items-center gap-2">
+                                {item.file?.url && (
+                                    <FiEye
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePreview(item.file);
+                                        }}
+                                        title="Preview"
+                                    />
+                                )}
+                                <span className="mb-0 d-inline-flex align-items-center">
+                                    <FiDownloadCloud />
+                                </span>
+                            </div>
                         </div>
+
                         <Form.Control
                             type="file"
                             id={`fileInput-identifier-${index}`}
@@ -303,10 +394,24 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                             accept=".png, .jpg, .jpeg, .pdf"
                             onChange={(e) => handleIdentifierFileChange(e, index)}
                         />
+                        {/* <Form.Control
+                            type="file"
+                            id={`fileInput-identifier-${index}`}
+                            style={{ display: 'none' }}
+                            accept=".png, .jpg, .jpeg, .pdf"
+                            onChange={(e) => handleIdentifierFileChange(e, index)}
+                        /> */}
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
+                        {index >= defaultIdentifiers?.length && (
+                            <span
+                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                                style={{ marginTop: '-29px', right: '-5px' }}
+                                onClick={() => removeIdentifier(index)}>
+                                <CiCircleMinus />
+                            </span>
+                        )}
                     </Col>
                     {identifiers?.length > 1 && index < identifiers.length - 1 && <hr className="mt-2" />}
-
                 </Row>
             ))}
             <hr />
@@ -324,30 +429,29 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
             {licensure?.map((item, index) => (
                 <Row key={index} className="mb-0">
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>License Type</Form.Label>
+                        <Form.Label className="mb-0 mt-2">License Type</Form.Label>
                         <Form.Select
                             value={item?.system || item?.type?.value || ''}
                             onChange={(e) => {
                                 const selectedType = licensureOptions.find((opt) => opt.value === e.target.value);
                                 handleLicensureChange(index, 'type', selectedType);
                             }}
-                            disabled={defaultLicensure.some((d) => d.value === item.type?.value)}
-                        >
-                            <option value="" disabled>Select License Type</option>
+                            disabled={defaultLicensure.some((d) => d.value === item.type?.value)}>
+                            <option value="" disabled>
+                                Select License Type
+                            </option>
                             {licensureOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
                         </Form.Select>
-
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>State</Form.Label>
+                        <Form.Label className="mb-0 mt-2">State</Form.Label>
                         <Form.Select
                             value={item?.licenseState || ''}
-                            onChange={(e) => handleLicensureChange(index, 'licenseState', e.target.value)}
-                        >
+                            onChange={(e) => handleLicensureChange(index, 'licenseState', e.target.value)}>
                             <option value="">Select state</option>
                             {statesData?.map((data) => (
                                 <option key={data?._id} value={data?.name}>
@@ -357,7 +461,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         </Form.Select>
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Number</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Number</Form.Label>
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
@@ -367,7 +471,7 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         />
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Issuing Authority</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Issuing Authority</Form.Label>
                         <Form.Select
                             value={item?.issuingAuthority || ''}
                             onChange={(e) => handleLicensureChange(index, 'issuingAuthority', e.target.value)}>
@@ -382,34 +486,26 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         </Form.Select>
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Start Date (Ennumeration Date)</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Start Date (Ennumeration Date)</Form.Label>
                         <Form.Control
                             type="date"
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleLicensureChange(index, 'ennumerationDate', e.target.value)}
                             maxLength={10}
-                        // onChange={(e) => handleChange(index, 'number', e.target.value)}
+                            // onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Expiry Date</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Expiry Date</Form.Label>
                         <Form.Control
                             type="date"
                             value={item?.expiry ? new Date(item.expiry).toISOString().split('T')[0] : ''}
                             min={new Date().toISOString().split('T')[0]}
                             onChange={(e) => handleLicensureChange(index, 'expiry', e.target.value)}
                         />
-                        {index >= defaultIdentifiers?.length && (
-                            <span
-                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                style={{ marginTop: '-29px', right: '9px' }}
-                                onClick={() => removeLicensure(index)}>
-                                <CiCircleMinus />
-                            </span>
-                        )}
                     </Col>
                     <Col sm={3}>
-                        <Form.Label className='mb-0 mt-2'>Status</Form.Label>
+                        <Form.Label className="mb-0 mt-2">Status</Form.Label>
                         <Form.Select
                             value={item?.status || 'active'}
                             onChange={(e) => handleLicensureChange(index, 'status', e.target.value)}>
@@ -421,31 +517,51 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                         </Form.Select>
                     </Col>
                     <Col sm={3} className=" position-relative">
-                        <Form.Label className='mb-0 mt-2'>Document  <OverlayTrigger
-                            placement="top"
-                            overlay={
-                                <Tooltip id="tooltip-identifier">
-                                    File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
-                                </Tooltip>
-                            }>
-                            <span className="text-secondary cursor-pointer mb-2">
-                                <FiInfo size={15} />
-                            </span>
-                        </OverlayTrigger></Form.Label>
+                        <Form.Label className="mb-0 mt-2">
+                            Document{' '}
+                            <OverlayTrigger
+                                placement="top"
+                                overlay={
+                                    <Tooltip id="tooltip-identifier">
+                                        File size should be less than 2MB. Supported formats: JPG, PNG, JPEG, PDF.
+                                    </Tooltip>
+                                }>
+                                <span className="text-secondary cursor-pointer mb-2">
+                                    <FiInfo size={15} />
+                                </span>
+                            </OverlayTrigger>
+                        </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-licensure-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
-                            {licensureDocument
-                                ? 'Uploading...'
-                                : item.file?.name
-                                    ? item.file.name.length > 30
-                                        ? item.file.name.slice(0, 25) + '...'
-                                        : item.file.name
-                                    : 'Upload Document'}
-                            <p className="mb-0">
-                                <FiDownloadCloud />
-                            </p>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
+                            <span>
+                                {licensureDocument
+                                    ? 'Uploading...'
+                                    : item.file?.name
+                                      ? item.file.name.length > 30
+                                          ? item.file.name.slice(0, 25) + '...'
+                                          : item.file.name
+                                      : 'Upload Document'}
+                            </span>
+                            <div className="d-flex align-items-center gap-2">
+                                  {item.file?.url && (
+                                    <FiEye
+                                        className="text-secondary"
+                                        style={{ cursor: 'pointer' }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePreview(item.file);
+                                        }}
+                                        title="Preview"
+                                    />
+                                )}
+                                <span className="mb-0 d-inline-flex align-items-center">
+                                    <FiDownloadCloud />
+                                </span>
+                              
+                            </div>
                         </div>
                         <Form.Control
                             type="file"
@@ -455,11 +571,46 @@ const DoctorIdentifierForm = ({ defaultIdentifiers = [], defaultLicensure = [], 
                             onChange={(e) => handleLicensureFileChange(e, index)}
                         />
                         {errors?.[index]?.file && <span className="text-danger">Please upload a document</span>}
+                        {index >= defaultIdentifiers?.length && (
+                            <span
+                                className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
+                                style={{ marginTop: '-29px', right: '-5px' }}
+                                onClick={() => removeLicensure(index)}>
+                                <CiCircleMinus />
+                            </span>
+                        )}
                     </Col>
                     {licensure?.length > 1 && index < licensure.length - 1 && <hr className="mt-2" />}
+                    <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
+                        <Modal.Body>
+                            <div className="d-flex justify-content-center">
+                                <p className="fw-bold" style={{ color: '#6169D0' }}>
+                                    {' '}
+                                    File Preview
+                                </p>
+                            </div>
+                            <div
+                                style={{
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}>
+                                <img
+                                    src={previewUrl} // Set the source of the image
+                                    alt="File Preview"
+                                    style={{
+                                        maxWidth: '100%', // Ensures the image fits within the modal width
+                                        maxHeight: '100vh', // Prevents the image from exceeding the viewport height
+                                        objectFit: 'contain', // Ensures the image maintains its aspect ratio
+                                        display: 'block',
+                                    }}
+                                />
+                            </div>
+                        </Modal.Body>
+                    </Modal>
                 </Row>
             ))}
-
         </>
     );
 };

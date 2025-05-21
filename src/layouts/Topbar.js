@@ -54,10 +54,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/dashboard/project': 'Dashboard',
         '/apps/appointments/list': 'Appointments',
         '/apps/appointments/newAppointment': 'New Appointments',
-        '/apps/doctors/list': 'Provider List',
+        '/apps/providers/list': 'Provider List',
         '/apps/Practice/list': 'Sub Practice',
         '/apps/Practice/new-practice': 'Add New Practice Location',
-        '/apps/doctors/new-doctor': 'New Provider',
+        '/apps/providers/new-doctor': 'New Provider',
         '/apps/patients/list': 'Patients',
         '/apps/patients/new-patient': 'New Patient',
         '/apps/role-management/list': 'User Management',
@@ -83,8 +83,8 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
     const getPageTitle = (pathToTitleMap, pathname, search) => {
         const queryParams = new URLSearchParams(search);
 
-        if (pathname === '/apps/doctors/new-doctor' && queryParams.has('id')) {
-            return 'Update Doctors';
+        if (pathname === '/apps/providers/new-doctor' && queryParams.has('id')) {
+            return 'Update Provider';
         }
         if (pathname === '/apps/Practice/updateSubClinic' && queryParams.has('id')) {
             return 'Update Sub Practice';
