@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Card, Col, Form, InputGroup, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
+import { Button, Card, Col, Form, InputGroup, Modal, OverlayTrigger, Row, Spinner, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -51,6 +51,8 @@ const NewDoctor = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const password = watch('password');
+    const [showProfilePreview, setShowProfilePreview] = useState(false);
+    const [profilePreviewUrl, setProfilePreviewUrl] = useState('');
     const [demographicAddresses, setDemographicAddresses] = useState([
         {
             type: 'primary',
@@ -115,11 +117,10 @@ const NewDoctor = () => {
             } else if (activeTab === 'departmentDetails') {
                 setActiveTab('qualifications');
             } else if (activeTab === 'qualifications') {
-                navigate('/apps/doctors/list');
+                navigate('/apps/providers/list');
             }
         }
     }, [updateResponse]);
-
 
     const closeModal = () => {
         setShow(false);
@@ -132,6 +133,7 @@ const NewDoctor = () => {
             const url = await handleUpload(selectedFile, setLogoUploading);
             setLogo(url);
             setLogoName(selectedFile?.name);
+            setProfilePreviewUrl(url?.url?.split('?')[0] || url?.url || url);
         } catch (error) {
             // console.error('Error during file upload:', error);
         }
@@ -170,7 +172,7 @@ const NewDoctor = () => {
     }, [statesData, doctorDetails]);
 
     const handleNewDoctor = () => {
-        navigate('/apps/doctors/list');
+        navigate('/apps/providers/list');
         reset();
     };
 
@@ -231,7 +233,6 @@ const NewDoctor = () => {
     );
 
     const [formData, setFormData] = useState({
-
         role: doctorRoleId,
         email: '',
         name: {
@@ -292,7 +293,8 @@ const NewDoctor = () => {
 
     useEffect(() => {
         const isFirstNameValid = formData.name.given?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.given);
-        const isLastNameValid = formData.name.family?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.family);
+        const isLastNameValid =
+            formData.name.family?.trim()?.length >= 3 && /^[a-zA-Z]{3,}$/.test(formData.name.family);
         const isPhoneValid = formData?.phone?.trim()?.length === 13 && /^\(\d{3}\)\d{3}-\d{4}$/.test(formData.phone);
         const isDOBValid =
             formData?.dateOfBirth &&
@@ -307,7 +309,13 @@ const NewDoctor = () => {
                 formData?.confirmPassword === formData?.password);
 
         const isFormValid =
-            isFirstNameValid && isLastNameValid && isDOBValid && isEmailValid && isGenderValid && isPasswordValid && isPhoneValid;
+            isFirstNameValid &&
+            isLastNameValid &&
+            isDOBValid &&
+            isEmailValid &&
+            isGenderValid &&
+            isPasswordValid &&
+            isPhoneValid;
         setIsButtonDisabled(!isFormValid);
     }, [formData, id]);
 
@@ -327,24 +335,27 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'personalDetails' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         Personal Details
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'departmentDetails' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         Professional Information
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
-                                                            }`}
+                                                        className={` font_active_tabs text-black nav-link ${
+                                                            activeTab === 'qualifications' ? 'active' : ''
+                                                        }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         Qualifications
                                                     </button>
@@ -366,10 +377,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                pointerEvents: 'none',
-                                                                                opacity: 0.6, // Visual indication that the button is disabled
-                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                            }
+                                                                                  pointerEvents: 'none',
+                                                                                  opacity: 0.6, // Visual indication that the button is disabled
+                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                              }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -385,7 +396,7 @@ const NewDoctor = () => {
                                                     className="cancel-button"
                                                     // onClick={handleNewDoctor}
                                                     onClick={() => {
-                                                        navigate('/apps/doctors/list');
+                                                        navigate('/apps/providers/list');
                                                         reset();
                                                     }}>
                                                     Back
@@ -410,8 +421,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6  col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    First Name{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    First Name <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
@@ -424,13 +434,19 @@ const NewDoctor = () => {
                                                                                 'First name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
+                                                                    onInput={(e) => {
+                                                                        e.target.value = e.target.value.replace(
+                                                                            /[^a-zA-Z]/g,
+                                                                            ''
+                                                                        );
+                                                                    }}
                                                                     onChange={(e) => {
                                                                         clearErrors('firstName');
                                                                         // setFormData({
                                                                         //     ...formData,
                                                                         //     firstName: e.target.value,
                                                                         // });
-                                                                        handleInputChange(e)
+                                                                        handleInputChange(e);
                                                                     }}
                                                                     placeholder="Enter first name"
                                                                 />
@@ -444,8 +460,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Last Name{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    Last Name <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="text"
@@ -458,13 +473,19 @@ const NewDoctor = () => {
                                                                                 'Last name must contain only letters and be at least 3 characters long',
                                                                         },
                                                                     })}
+                                                                    onInput={(e) => {
+                                                                        e.target.value = e.target.value.replace(
+                                                                            /[^a-zA-Z]/g,
+                                                                            ''
+                                                                        );
+                                                                    }}
                                                                     onChange={(e) => {
                                                                         clearErrors('lastName');
                                                                         // setFormData({
                                                                         //     ...formData,
                                                                         //     lastName: e.target.value,
                                                                         // });
-                                                                        handleInputChange(e)
+                                                                        handleInputChange(e);
                                                                     }}
                                                                     placeholder="Enter last name"
                                                                 />
@@ -479,8 +500,7 @@ const NewDoctor = () => {
                                                             <div className="mb-1">
                                                                 <Form.Group className="mb-0 position-relative">
                                                                     <Form.Label className="mb-0">
-                                                                        Phone{' '}
-                                                                        <span className="text-danger">*</span>
+                                                                        Phone <span className="text-danger">*</span>
                                                                     </Form.Label>
                                                                     <Form.Group>
                                                                         <InputGroup>
@@ -493,10 +513,9 @@ const NewDoctor = () => {
                                                                             </InputGroup.Text>
                                                                             <Form.Control
                                                                                 type="tel"
-                                                                                {...register(
-                                                                                    'phone', {
+                                                                                {...register('phone', {
                                                                                     required:
-                                                                                        'This field is required',
+                                                                                        'Phone number is required',
                                                                                     pattern: {
                                                                                         value: /^\(\d{3}\)\d{3}-\d{4}$/, // Matches (XXX)XXX-XXXX format
                                                                                         message:
@@ -512,8 +531,7 @@ const NewDoctor = () => {
                                                                                         message:
                                                                                             'Contact must not be less than 10 digits',
                                                                                     },
-                                                                                }
-                                                                                )}
+                                                                                })}
                                                                                 onChange={(e) => {
                                                                                     clearErrors('phone');
                                                                                     let rawValue =
@@ -565,8 +583,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Date of Birth{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    Date of Birth <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="date"
@@ -613,8 +630,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12 ">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Email{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    Email <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Control
                                                                     type="email"
@@ -644,8 +660,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Gender{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    Gender <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <Form.Select
                                                                     as="select"
@@ -678,8 +693,7 @@ const NewDoctor = () => {
                                                         <div className="col-md-6 col-lg-3 col-sm-6 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">
-                                                                    Password{' '}
-                                                                    <span className="text-danger">*</span>
+                                                                    Password <span className="text-danger">*</span>
                                                                 </Form.Label>
                                                                 <div className="position-relative">
                                                                     <Form.Control
@@ -708,12 +722,12 @@ const NewDoctor = () => {
                                                                             ...(updateId
                                                                                 ? {} // Don't apply pattern if updating
                                                                                 : {
-                                                                                    pattern: {
-                                                                                        value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                        message:
-                                                                                            'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                    },
-                                                                                }),
+                                                                                      pattern: {
+                                                                                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                          message:
+                                                                                              'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                      },
+                                                                                  }),
                                                                         })}
                                                                     />
 
@@ -782,20 +796,41 @@ const NewDoctor = () => {
                                                                 <Form.Label className="mb-0">Profile Image</Form.Label>
                                                                 <div
                                                                     onClick={() => logoFileInputRef.current.click()}
-                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
-                                                                        ? ''
-                                                                        : 'custom-form-fields'
-                                                                        }`}>
-                                                                    {logoUploading
-                                                                        ? 'Uploading...'
-                                                                        : logoName
-                                                                            ? logoName.length > 30
-                                                                                ? logoName.slice(0, 25) + '...'
-                                                                                : logoName
-                                                                            : 'Upload Profile Image'}
-                                                                    <p className="mb-0">
-                                                                        <FiUploadCloud />
-                                                                    </p>
+                                                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
+                                                                        logoName || logoUploading
+                                                                            ? ''
+                                                                            : 'custom-form-fields'
+                                                                    }`}>
+                                                                    <span>
+                                                                        {logoUploading
+                                                                            ? 'Uploading...'
+                                                                            : logoName
+                                                                              ? logoName.length > 30
+                                                                                  ? logoName.slice(0, 25) + '...'
+                                                                                  : logoName
+                                                                              : 'Upload Profile Image'}
+                                                                    </span>
+                                                                    <div className="d-flex align-items-center gap-2">
+                                                                        {logo && (
+                                                                            <FaEye
+                                                                                className="text-secondary"
+                                                                                style={{ cursor: 'pointer' }}
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setProfilePreviewUrl(
+                                                                                        logo?.url?.split('?')[0] ||
+                                                                                            logo?.url ||
+                                                                                            logo
+                                                                                    );
+                                                                                    setShowProfilePreview(true);
+                                                                                }}
+                                                                                title="Preview"
+                                                                            />
+                                                                        )}
+                                                                        <span className="mb-0 d-inline-flex align-items-center">
+                                                                            <FiUploadCloud />
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
                                                                 <Form.Control
                                                                     type="file"
@@ -840,7 +875,8 @@ const NewDoctor = () => {
                                                         className="custom-buttons"
                                                         disabled={store?.createtDoctorsReducer?.loading}
                                                         style={{ width: '120px' }}>
-                                                        {store?.createtDoctorsReducer?.loading || store?.createtDoctorsDetailReducer?.loading ? (
+                                                        {store?.createtDoctorsReducer?.loading ||
+                                                        store?.createtDoctorsDetailReducer?.loading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />
                                                         ) : id ? (
                                                             'Update & Next'
@@ -865,6 +901,37 @@ const NewDoctor = () => {
                     </Card>
                 </div>
                 <EmailToDoctorModal closeModal={closeModal} show={show} formData={formData} setFormData={setFormData} />
+                <Modal show={showProfilePreview} onHide={() => setShowProfilePreview(false)} centered>
+                    <Modal.Body>
+                        <div className="d-flex justify-content-center">
+                            <p className="fw-bold" style={{ color: '#6169D0' }}>
+                                Profile Image Preview
+                            </p>
+                        </div>
+                        <div
+                            style={{
+                                overflow: 'hidden',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                            {profilePreviewUrl ? (
+                                <img
+                                    src={profilePreviewUrl}
+                                    alt="Profile Preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '70vh',
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                    }}
+                                />
+                            ) : (
+                                <div>No preview available</div>
+                            )}
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </div>
         </>
     );
