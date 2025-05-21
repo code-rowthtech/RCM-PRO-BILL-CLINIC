@@ -775,8 +775,8 @@ const Demographicdetails = ({
                                                         borderTop: 'none',
                                                     }}
                                                     className={`scroll-container hover-bg-change ${searchedEmployerLocations?.length === 0 || !employerFocused
-                                                            ? 'd-none'
-                                                            : ''
+                                                        ? 'd-none'
+                                                        : ''
                                                         }`}>
                                                     {searchedEmployerLocations?.map((data, index) => (
                                                         <p

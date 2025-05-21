@@ -15,7 +15,7 @@ export function updateEncounterApi(params: any): any {
 
 export function getEncounterApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.encounter}/all?patientId=${data?.patientId}`);
+    return api.get(`${URL.encounter}/patient/${data?.patientId}`);
 }
 
 export function getEncounterNotesTypeApi(params: any): any {

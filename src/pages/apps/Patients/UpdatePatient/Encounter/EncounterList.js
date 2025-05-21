@@ -1,46 +1,22 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Badge, Button, Col, Row, Table, Image } from 'react-bootstrap'
 import { FaUserMd } from 'react-icons/fa'
-
+import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { getEncounterAction } from '../../../../../redux/actions'
+import { useSearchParams } from 'react-router-dom'
+import dummyProfile from '../../../../../assets/images/dummyProfile.png'
+import Spinner from '../../../../../constants/Spinner'
 const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) => {
-    const encounterData = [
-        {
-            id: 1,
-            date: '12/04/2025',
-            provider: {
-                name: 'Emily Johnson',
-                profilePic: 'https://randomuser.me/api/portraits/women/44.jpg',
-                contact: '555-1234',
-                email: 'emily.j@example.com',
-            },
-            appointment: 'Annual Checkup',
-            superbill: 'SB123456',
-        },
-        {
-            id: 2,
-            date: '18/04/2025',
-            provider: {
-                name: 'Dr. Mark Lee',
-                profilePic: 'https://randomuser.me/api/portraits/men/32.jpg',
-                contact: '555-5678',
-                email: 'mark.lee@example.com',
-            },
-            appointment: 'Dermatology Follow-up',
-            superbill: 'SB987654',
-        },
-        {
-            id: 3,
-            date: '25/04/2025',
-            provider: {
-                name: 'Dr. Sarah Connor',
-                profilePic: 'https://randomuser.me/api/portraits/women/68.jpg',
-                contact: '555-9012',
-                email: 'sarah.connor@example.com',
-            },
-            appointment: 'Cardiology Consultation',
-            superbill: '',
-        },
-    ]
+    const dispatch = useDispatch()
+    const [searchParams] = useSearchParams()
+    const id = searchParams.get('id')
+    const store = useSelector((state) => state)
+    const encounters = store?.getEncounterReducer?.data?.encounters;
+    console.log(encounters, 'encounters')
+    useEffect(() => {
+        dispatch(getEncounterAction({ patientId: id }))
+    }, [dispatch])
 
     return (
         <div className="px-2 pt-0 mt-1 row">
@@ -53,20 +29,6 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
                     </Badge>
                 </Col>
             </Row>
-
-            {/* <Table
-                responsive
-                className="table-centered table-nowrap mb-0  rounded">
-                <thead className="text-white">
-                    <tr>
-                        <th className='text-white'>S.no</th>
-                        <th className='text-white'>Date</th>
-                        <th className='text-white'>Provider</th>
-                        <th className='text-white'>Related Appointment</th>
-                        <th className='text-white'>Superbill</th>
-                        <th className='text-white'>Action</th>
-                    </tr>
-                </thead> */}
             <Row>
                 <Col sm={12}>
                     <Table
@@ -75,58 +37,67 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
                         <thead className="text-white">
                             <tr>
                                 <th className="text-white">S.no</th>
-                                <th className="text-white">Date</th>
                                 <th className="text-white">Provider</th>
-                                <th className="text-white">Related Appointment</th>
-                                <th className='text-white'>Superbill</th>
+                                <th className="text-white">Encounter Type</th>
+                                <th className="text-white">Status</th>
+                                <th className='text-white'>Start Date</th>
                                 <th className="text-white">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {encounterData?.map((item, index) => (
-                                <tr onClick={() => {
-                                    const newTab = {
-                                        id: encounterTabs?.length + 1,
-                                        title: item?.date,
-                                        type: 'date',
-                                    };
-                                    setEncounterTabs([...encounterTabs, newTab]);
-                                    setActiveTab(newTab?.id)
-                                }} key={item?.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item?.date}</td>
-                                    <td className="d-flex align-items-center gap-2">
-                                        <Image
-                                            src={item?.provider?.profilePic}
-                                            roundedCircle
-                                            width={35}
-                                            height={35}
-                                            alt={item?.provider?.name}
-                                        />
-                                        <div>
-                                            <div>{item?.provider?.name}</div>
-                                            <small className="text-muted">{item?.provider?.email}</small>
-                                        </div>
-                                    </td>
-                                    <td>{item?.appointment}</td>
-                                    <td>{item?.superbill || 'N/A'}</td>
-                                    <td>
-
-                                        <i
-                                            className=" bi bi-pencil text-info cursor-pointer"
-                                            onClick={() => {
-                                                const newTab = {
-                                                    id: encounterTabs?.length + 1,
-                                                    title: item?.date,
-                                                    type: 'date',
-                                                };
-                                                setEncounterTabs([...encounterTabs, newTab]);
-                                                setActiveTab(newTab?.id)
-                                            }}
-                                        />
+                            {store?.getEncounterReducer?.loading ?
+                                <tr>
+                                    <td colSpan={6} className='text-center py-5'>
+                                        <Spinner />
                                     </td>
                                 </tr>
-                            ))}
+                                :
+                                encounters?.map((item, index) => (
+                                    <tr onClick={() => {
+                                        const newTab = {
+                                            id: item?._id,
+                                            title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
+                                            type: 'date',
+                                        };
+                                        setEncounterTabs([...encounterTabs, newTab]);
+                                        setActiveTab(newTab?.id)
+                                    }} key={item?.id}>
+                                        <td>{index + 1}</td>
+                                        <td className="d-flex align-items-center gap-2">
+                                            <Image
+                                                src={item?.providerId?.photo?.[0]?.url || dummyProfile}
+                                                roundedCircle
+                                                width={35}
+                                                height={35}
+                                                alt={item?.providerId?.name?.[0]?.text}
+                                            />
+                                            <div>
+                                                <div>{item?.providerId?.name?.[0]?.text}</div>
+                                                <small className="text-muted">{item?.providerId?.telecom?.find((data) => data?.system === 'email')?.value}</small>
+                                            </div>
+                                        </td>
+                                        <td>{item?.type?.[0]?.coding?.[0]?.display}</td>
+                                        <td className='text-capitalize'>{item?.status}</td>
+                                        <td className='text-capitalize'>{item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : ''}</td>
+                                        <td>
+
+                                            <i
+                                                className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
+                                                onClick={() => {
+                                                    const newTab = {
+                                                        id: item?._id,
+                                                        title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
+                                                        type: 'date',
+                                                    };
+                                                    setEncounterTabs([...encounterTabs, newTab]);
+                                                    setActiveTab(newTab?.id)
+                                                }}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+
                         </tbody>
                     </Table>
                 </Col>
