@@ -284,15 +284,12 @@ const EncounterSettingsForm = ({ showSettings, closeSettings, initialData }) => 
                                                                                                                                     <Col md={4}>
                                                                                                                                         <Form.Check
                                                                                                                                             type="switch"
+                                                                                                                                            defaultChecked={settingsData?._id ? subItem?.hide : true}
                                                                                                                                             id={`hide-${itemIndex}-${subIndex}`}
                                                                                                                                             label={watch(`items.${itemIndex}.subMenu.${subIndex}.hide`) ? 'Hide' : 'Show'}
                                                                                                                                             {...register(`items.${itemIndex}.subMenu.${subIndex}.hide`)}
                                                                                                                                         />
                                                                                                                                     </Col>
-                                                                                                                                    {/* <Col md={1}>
-                                                                                                                                        <i onClick={() => removeSubMenuItem(itemIndex, subIndex)}
-                                                                                                                                            className="bi bi-trash-fill text-danger cursor-pointer" />
-                                                                                                                                    </Col> */}
                                                                                                                                 </Row>
                                                                                                                             </Card.Body>
                                                                                                                         </Card>

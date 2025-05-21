@@ -1062,3 +1062,8 @@ tbody tr:hover {
 .nav-tabs .nav-link {
     border: none !important;
 }
+
+.list-hover:hover {
+    background-color: #e8f0fe !important;
+    transition-duration: 0.6s;
+}

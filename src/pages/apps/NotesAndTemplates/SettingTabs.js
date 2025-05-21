@@ -421,7 +421,7 @@ const handleOffcanvasCardClick = (section) => {
                                         <Form.Control
                                             type="text"
                                             name="fieldName"
-                                            value={customFieldData.fieldName}
+                                            value={customFieldData?.fieldName}
                                             onChange={handleInputChange}
                                         />
                                     </Form.Group>
@@ -431,7 +431,7 @@ const handleOffcanvasCardClick = (section) => {
                                         <Form.Label>Input Type</Form.Label>
                                         <Form.Select
                                             name="inputType"
-                                            value={customFieldData.inputType}
+                                            value={customFieldData?.inputType}
                                             onChange={handleInputChange}>
                                             <option value="">Select Type</option>
                                             <option value="text">Text</option>

@@ -12,15 +12,16 @@ import ReactQuill from 'react-quill';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import { createTemplateAction, updateTemplateAction } from '../../../../redux/actions';
+import { createTemplateAction, getTemplateAction, updateTemplateAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import TemplateSection from './TemplateSection';
-const TemplateModal = ({ show, onHide, template }) => {
+const TemplateModal = ({ show, onHide, template, setSelectedTemplate }) => {
     const { control, register, handleSubmit, reset } = useForm();
     const dispatch = useDispatch()
     const store = useSelector((state) => state);
     const createResponse = store?.createTemplateReducer?.data?.success;
+    const updateResponse = store?.updateTemplateReducer?.data?.success;
 
     const [tags, setTags] = useState([]);
     const practiceOptions = practiceTypeOptions?.map((data) => ({
@@ -37,9 +38,15 @@ const TemplateModal = ({ show, onHide, template }) => {
             setActiveTab('sections')
         }
     }, [createResponse])
+    useEffect(() => {
+        if (createResponse === true || updateResponse === true) {
+            dispatch(getTemplateAction({ search: '', page: 1, limit: 10, status: 'active' }))
+        }
+    }, [createResponse, updateResponse])
 
     useEffect(() => {
         if (template?._id) {
+            // Populate form with template data
             reset({
                 title: template.title || '',
                 templateType: template.templateType || '',
@@ -54,6 +61,7 @@ const TemplateModal = ({ show, onHide, template }) => {
             setSectionsId(template._id);
         }
     }, [template, reset]);
+
 
     const handleAddTag = (e) => {
         const inputValue = e.target.value.trim();
@@ -328,6 +336,7 @@ const TemplateModal = ({ show, onHide, template }) => {
                                 <Button onClick={() => {
                                     onHide();
                                     reset();
+                                    setSelectedTemplate(null)
                                     setTags([])
                                 }} className='custom-buttons'>
                                     Cancel

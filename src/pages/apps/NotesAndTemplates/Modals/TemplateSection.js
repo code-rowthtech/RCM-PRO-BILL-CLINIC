@@ -290,7 +290,9 @@ const TemplateSection = ({ sectionsId, template, onHide, reset, setTags }) => {
                 )}
             </div>
             <div className='d-flex gap-1 justify-content-end  align-items-end' style={{ height: '8%' }}>
-                <Button className='custom-buttons'>Cancel</Button>
+                <Button onClick={() => {
+                    onHide(); reset(); setItems([])
+                }} className='custom-buttons'>Cancel</Button>
                 <Button disabled={items?.length < 1} onClick={updateTemplateSection} className='custom-buttons'>Save Template</Button>
             </div>
         </div>

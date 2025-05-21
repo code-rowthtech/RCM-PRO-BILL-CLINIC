@@ -13,6 +13,7 @@ import {
     getPatientByIdAction,
     getStatesByCountryAction,
     getSurgicalHistoryAction,
+    getTemplateAction,
     getTobaccooAction,
     updatePatientsAction,
 } from '../../../../redux/actions';
@@ -95,6 +96,7 @@ const UpdatePatientIndex = () => {
             dispatch(getTobaccooAction({ patientId: id }));
             dispatch(getFamilyGeneticAction({ patientId: id }));
             dispatch(getAlcoholHistoryAction({ patientId: id }));
+            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
         };
 
         fetchData();
@@ -561,7 +563,7 @@ const UpdatePatientIndex = () => {
                                                         </Col>
 
                                                         <Col sm={2} className="d-flex justify-content-end pe-3">
-                                                            <div className="text-center d-flex flex-column">
+                                                            <div className="text-center d-flex flex-column gap-1">
                                                                 <Button
                                                                     as={Link}
                                                                     to="/apps/appointments/newAppointment"
@@ -575,7 +577,19 @@ const UpdatePatientIndex = () => {
                                                                     }}>
                                                                     New Appointment
                                                                 </Button>
-                                                                <Dropdown>
+                                                                <Button
+                                                                    onClick={() => setSelectedMainTab('Encounter')}
+                                                                    className="shadow-none"
+                                                                    style={{
+                                                                        fontSize: '10px',
+                                                                        borderRadius: '8px',
+                                                                        padding: '3px 7px 3px 7px',
+                                                                        width: '100px',
+                                                                        backgroundColor: ' #6169d0',
+                                                                    }}>
+                                                                    New Encounter
+                                                                </Button>
+                                                                {/* <Dropdown>
                                                                     <Dropdown.Toggle className="mt-1 shadow-none "
                                                                         style={{
                                                                             fontSize: '10px',
@@ -622,8 +636,8 @@ const UpdatePatientIndex = () => {
                                                                         </Dropdown.Item>
                                                                     </Dropdown.Menu>
 
-                                                                </Dropdown>
-                                                                <div className="mt-2 d-flex justify-content-center align-items-center gap-2 ps-2">
+                                                                </Dropdown> */}
+                                                                <div className="mt-1 d-flex justify-content-center align-items-center gap-2 ps-2">
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle
                                                                             variant="light"
@@ -663,7 +677,7 @@ const UpdatePatientIndex = () => {
 
                                                                             <div className="d-flex justify-content-between align-items-center pt-2 border-top">
                                                                                 <small className="text-muted">
-                                                                                    {printOptions.length} selected
+                                                                                    {printOptions?.length} selected
                                                                                 </small>
                                                                                 <Button
                                                                                     variant="primary"
@@ -719,9 +733,9 @@ const UpdatePatientIndex = () => {
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
                                         <Card
-                                            className="px-2 scroll-container border-0 pt-2"
+                                            className="px-2 scroll-container   border-0 pt-2"
                                             style={{
-                                                height: expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed...............
+                                                height: selectedMainTab !== 'Encounter' && expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed...............
                                                     : expanded ? '90vh'                        // When expanded (accordion state doesn't matter)....
                                                         : isAccordionOpen ? '66.5vh'          // When accordion open (not expanded).................
                                                             : '81.5vh',                      // Default case (neither expanded nor accordion open)..
@@ -799,7 +813,7 @@ const UpdatePatientIndex = () => {
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
