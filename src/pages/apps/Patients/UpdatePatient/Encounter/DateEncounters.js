@@ -75,9 +75,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
         };
 
         const renderField = (field) => {
-            const { name, inputType = 'textarea' } = field; // Default to textarea if inputType not specified
-
-            // Special handling for SOAP notes
+            const { name, inputType = 'textarea' } = field;
             if (name === 'Notes (SOAP)') {
                 return (
                     <div className="mb-3" key={name}>
@@ -95,8 +93,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                                                 ['bold', 'italic', 'underline'],
                                                 [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                 ['link'],
-                                                ['clean']
+                                                ['clean'],
                                             ]
+
                                         }}
                                     />
                                 ) : (
@@ -127,7 +126,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType }) => {
                                     ['bold', 'italic', 'underline'],
                                     [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                     ['link'],
-                                    ['clean']
+                                    ['clean'],
+                                    ['undo', 'redo']
+
                                 ]
                             }}
                         />

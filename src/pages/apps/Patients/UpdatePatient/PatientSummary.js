@@ -198,7 +198,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
         <div className="patient-summary ">
             <Row className={`mb-2  h-100  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
                 {/* Vitals Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -268,7 +268,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Allergies Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -331,7 +331,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Problems Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -401,7 +401,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Medications Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -455,7 +455,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Social History Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -494,7 +494,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Encounters Card */}
-                <Col sm={4}>
+                <Col sm={4} className='patient-summary-card'>
                     <Card className="h-100 shadow-sm">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
@@ -525,7 +525,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                 </Col>
 
                 {/* Appointments Card - Full Width */}
-                <Col sm={12}>
+                <Col sm={12} className='patient-summary-card'>
                     <Card className="shadow-sm mb-0">
                         <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                             <div className="d-flex align-items-center">
