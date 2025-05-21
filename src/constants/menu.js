@@ -67,22 +67,22 @@ const MENU_ITEMS = [
         icon: 'uil-user',
     },
     {
-        key: 'notesandtemplates',
+        key: 'notes-and-templates',
         label: 'Notes and Templates',
         icon: 'bi bi-journal-plus',
-        url: '/apps/notesandtemplates/list',
+        url: '/apps/notes-and-templates/list',
         children: [
             {
-                key: 'notescategories',
+                key: 'notes-categories',
                 label: 'Note Categories',
                 icon: 'uil uil-note',
-                url: '/apps/notesandtemplates/notecategories',
+                url: '/apps/notes-and-templates/note-categories',
             },
             {
-                key: 'notestemplates',
+                key: 'notes-templates',
                 label: 'Clinical Templates',
                 icon: 'uil uil-note',
-                url: '/apps/notesandtemplates/notetemplates',
+                url: '/apps/notes-and-templates/note-templates',
             },
         ],
     },
