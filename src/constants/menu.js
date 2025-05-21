@@ -28,10 +28,10 @@ const MENU_ITEMS = [
     //     url: '/apps/Practice/list',
     // },
     {
-        key: 'doctors',
+        key: 'providers',
         label: 'Provider',
         icon: 'dripicons-medical',
-        url: '/apps/doctors/list',
+        url: '/apps/providers/list',
     },
     {
         key: 'schedule',
