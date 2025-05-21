@@ -415,7 +415,7 @@ const AllRoutes = () => {
                         },
 
                         {
-                            path: 'notesandtemplates',
+                            path: 'notes-and-templates',
                             children: [
                                 {
                                     path: 'list',
@@ -426,13 +426,13 @@ const AllRoutes = () => {
                                             )
                                 },
                                 {
-                                    path: 'notecategories',
+                                    path: 'note-categories',
                                     element: hasPermission('view notes') ? (
                                         <LoadComponent component={ClinicalNotesType}/>
                                         ) : null,
                         },
                         {
-                            path: 'notetemplates',
+                            path: 'note-templates',
                             element: hasPermission('view templates') ? (
                                 <LoadComponent component={NotesTemplates} />
                                 ) : null,

@@ -60,7 +60,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     };
 
     return (
-        <Row className="mt-2">
+        <Row className="mt-2 scroll-container" style={{ maxHeight: '82vh', overflowY: 'auto' }}>
             {loading ? (
                 <div className="d-flex justify-content-center align-items-center w-100" style={{ height: '82vh' }}>
                     <Spinner color="white" className="spinner-border-sm" />
@@ -73,7 +73,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
             ) : (
                 noteTypes?.map((note) => (
                     <Col key={note._id} md={6} lg={4} xl={3} className="mb-1 px-2">
-                        <Card className="border-0 shadow-sm rounded-3 p-0">
+                        <Card className=" shadow-sm rounded-3 p-0">
                             <div
                                 className="d-flex align-items-center justify-content-between px-2 py-1 rounded-top"
                                 style={{ backgroundColor: ' #e8f0fe' }}>

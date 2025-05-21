@@ -226,49 +226,45 @@ const SettingTabs = ({ noteType }) => {
     };
 
     // Add custom field
-    const handleAddCustomField = () => {
-        const { fieldName, inputType } = customFieldData;
-        if (!fieldName || !inputType) return;
+const handleAddCustomField = () => {
+    const { fieldName, inputType } = customFieldData;
+    if (!fieldName || !inputType) return;
 
+    const newSection = {
+        id: `custom-${Date.now()}`,
+        label: fieldName,
+        inputType,
+        visible: true,
+        minimized: false,
+    };
+    // Do NOT updateCurrentSections here!
+    saveSectionsAPI([...getCurrentSections(), newSection]);
+    setCustomFieldData({ fieldName: '', inputType: '' });
+    setShowCustomFields(false);
+    setShowCanvas(false);
+};
+
+  // Add section from offcanvas
+const handleOffcanvasCardClick = (section) => {
+    if (section.id === 'custom') {
+        setShowCustomFields((prev) => !prev);
+        return;
+    }
+    const currentSections = getCurrentSections();
+    const isAlreadyAdded = currentSections.some((s) => s.id === section.id);
+    if (!isAlreadyAdded) {
         const newSection = {
-            id: `custom-${Date.now()}`,
-            label: fieldName,
-            inputType,
+            id: section.id,
+            label: section.label,
             visible: true,
             minimized: false,
         };
-        const updatedSections = [...getCurrentSections(), newSection];
-        updateCurrentSections(updatedSections);
-        saveSectionsAPI(updatedSections);
-        setCustomFieldData({ fieldName: '', inputType: '' });
-        setShowCustomFields(false);
-        setShowCanvas(false);
-    };
-
-    // Add section from offcanvas
-    const handleOffcanvasCardClick = (section) => {
-        if (section.id === 'custom') {
-            setShowCustomFields((prev) => !prev);
-            return;
-        }
-
-        const currentSections = getCurrentSections();
-        const isAlreadyAdded = currentSections.some((s) => s.id === section.id);
-
-        if (!isAlreadyAdded) {
-            const newSection = {
-                id: section.id,
-                label: section.label,
-                visible: true,
-                minimized: false,
-            };
-
-            const updatedSections = [...currentSections, newSection];
-            updateCurrentSections(updatedSections);
-            setOffcanvasSections((prev) => prev.filter((s) => s.id !== section.id));
-            saveSectionsAPI(updatedSections);
-        }
-    };
+        // Do NOT updateCurrentSections here!
+        // Just call the API, then wait for GET API to update state
+        saveSectionsAPI([...currentSections, newSection]);
+        setOffcanvasSections((prev) => prev.filter((s) => s.id !== section.id));
+    }
+};
 
     return (
         <Row className="scroll-container mt-0 " style={{ height: '85vh', overflowY: 'scroll' }}>
