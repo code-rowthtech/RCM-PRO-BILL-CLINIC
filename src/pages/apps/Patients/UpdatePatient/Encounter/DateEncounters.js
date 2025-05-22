@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { useDispatch } from 'react-redux';
 import { createEncounterAction, getDoctorsAction, getEncounterAction, getEncounterByIdAction, getEncounterNotesFieldsAction, updateEncounterAction } from '../../../../../redux/actions';
-// Make sure your updateEncounterAction in redux accepts fieldUpdating parameter
 import EncounterTemplates from './EncounterTemplates';
 import { useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -41,7 +40,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
         label: data?.title, value: data?._id, isDefault: data?.default
     }));
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
-    console.log(encounterData, 'encounterDataencounterData')
     const [noteType, setNoteType] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
@@ -215,7 +213,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                 </Form.Group>
             );
         };
-
         return (
             <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '57.5vh', overflowY: 'auto' }}>
                 {getFieldsToRender().map(field => renderField(field))}
@@ -226,7 +223,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
     const onSubmit = (data) => {
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class)
-
         const type = {
             coding: [{
                 system: encounterTypeSelected.system,
@@ -381,7 +377,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('class', { required: 'This field is required.' })}
-                                                className='border-primary'
+                                                className='border-primary text-danger'
                                                 onChange={(e) => {
                                                     if (encounterAction === 'updateEncounter') {
                                                         const encounterClassSelected = encounterClassCodes?.find((data) => data?.code === e.target.value)
@@ -425,14 +421,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                             onChange={(selected) => {
                                                 setNoteType(selected?.value);
                                                 handleNotesTypeChange?.(selected);
-
-                                                // if (encounterAction === 'updateEncounter') {
-                                                //     const payload = {
-                                                //         id: encounterId,
-                                                //         noteType: selected?.value
-                                                //     }
-                                                //     dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'noteType' }));
-                                                // }
                                             }}
                                             inputValue={searchNoteType}
                                             onInputChange={(value) => setSearchNoteType(value)}
@@ -523,10 +511,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                             options={providerOptions}
                                             isSearchable
                                             isClearable
-                                            isLoading={store?.getDoctorsReducer?.loading || (store?.updateEncounterReducer?.loading && store?.updateEncounterReducer?.fieldUpdating === 'provider')}
+                                            isLoading={store?.getDoctorsReducer?.loading}
                                             className="basic-single"
                                             classNamePrefix="select"
-                                            placeholder="Select"
+                                            placeholder="Select Provider"
                                             value={providerOptions?.find(option => option?.value === selectedProvider) || null}
                                             onChange={(selectedValue) => {
                                                 setSelectedProvider(selectedValue?.value);
@@ -578,13 +566,13 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                     >
                                         {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
-                                    <Button
+                                    {/* <Button
                                         type='Submit'
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >
                                         {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
-                                    </Button>
+                                    </Button> */}
                                 </div>
                             </div>
                         </Form>

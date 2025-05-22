@@ -1058,9 +1058,6 @@ tbody tr:hover {
     scrollbar-color: #bbb transparent;
 }
 
-/* .form-control {
-    text-transform: capitalize;
-} */
 .nav-tabs .nav-link {
     border: none !important;
 }
@@ -1071,4 +1068,8 @@ tbody tr:hover {
 }
 .css-1dimb5e-singleValue {
     margin-left: 5 px !important;
+}
+
+.select__input {
+    background-color: white !important;
 }
