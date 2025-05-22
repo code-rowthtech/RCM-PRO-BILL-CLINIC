@@ -293,8 +293,8 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                             ))}
                           </Form.Select>
                         </Col>
-                        <Col sm={3}>
-                          <Form.Label className='mb-0'>Status</Form.Label>
+                        <Col sm={3} className="position-relative">
+                          <Form.Label className='mb-0'>Statdfghgfdsus</Form.Label>
                           <Form.Select
                             value={data.status}
                             onChange={(e) => {
@@ -307,7 +307,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                           </Form.Select>
-                          {index > 0 && (
+                          {/* {index > 0 && (
                             <span
                               className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                               style={{ right: '-2%', top: '12%' }}
@@ -317,17 +317,17 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                               }}>
                               <CiCircleMinus />
                             </span>
-                          )}
-                        </Col>
-                        {index > 0 && (
-                          <div className="col-3 d-flex align-items-center">
+                          )} */}
+                            {index > 0 && (
                             <span
-                              className="text-danger cursor-pointer fs-5 fw-bold"
+                              className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
+                              style={{ right: '-2%', top: '49%' }}
                               onClick={() => removeTaxonomyItem(index)}>
                               <CiCircleMinus />
                             </span>
-                          </div>
                         )}
+                        </Col>
+                      
                         {taxonomyCodesList?.length >= 1 && index < taxonomyCodesList?.length - 1 && <hr className="mt-2" />}
                       </Row>
                     ))}

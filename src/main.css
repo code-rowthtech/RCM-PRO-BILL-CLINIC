@@ -77,12 +77,13 @@ hr {
 .cancel-button {
     background-color: #5c636b !important;
     border: none !important;
+    border-radius: 10px;
+    line-height: 10px;
     font-size: 13px;
     height: 30px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .active_inactive_buttons {
@@ -614,7 +615,7 @@ table {
 
 .css-c1flly-control {
     font-size: 12px !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
 }
 
 .css-1xc3v61-indicatorContainer {
@@ -630,7 +631,7 @@ table {
 
 .css-hlgwow {
     font-size: 12px !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
 }
 
 .css-1k8uk7m-control {
@@ -641,7 +642,7 @@ table {
     font-size: 12px !important;
 }
 .css-19bb58m {
-    padding-top: 2px !important;
+    padding-top: 5px !important;
     padding-bottom: 8px !important;
     margin: 0px !important;
 }
@@ -1069,5 +1070,5 @@ tbody tr:hover {
     transition-duration: 0.6s;
 }
 .css-1dimb5e-singleValue {
-    margin-left: 5  px !important;
+    margin-left: 5 px !important;
 }
