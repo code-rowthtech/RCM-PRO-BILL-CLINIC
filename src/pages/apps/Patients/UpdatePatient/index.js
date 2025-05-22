@@ -193,7 +193,7 @@ const UpdatePatientIndex = () => {
             }
         }
     }, [expanded]);
-
+    const [createEncounter, setCreateEncounter] = useState(false)
 
     return (
         <div className="mt-1 g-0  px-0 mx-0">
@@ -224,7 +224,7 @@ const UpdatePatientIndex = () => {
                                                         : ''
                                                     }`}
                                                 onClick={(e) => {
-                                                    e.stopPropagation();
+                                                    e?.stopPropagation();
                                                     if (item.subItems) {
                                                         toggleSubmenu(item.label);
                                                         // setActiveSubmenu(null);
@@ -578,7 +578,10 @@ const UpdatePatientIndex = () => {
                                                                     New Appointment
                                                                 </Button>
                                                                 <Button
-                                                                    onClick={() => setSelectedMainTab('Encounter')}
+                                                                    onClick={() => {
+                                                                        setSelectedMainTab('Encounter');
+                                                                        setCreateEncounter(true)
+                                                                    }}
                                                                     className="shadow-none"
                                                                     style={{
                                                                         fontSize: '10px',
@@ -769,6 +772,8 @@ const UpdatePatientIndex = () => {
                                                     setExpanded={setExpanded}
                                                     isAccordionOpen={isAccordionOpen}
                                                     encounterTabs={encounterTabs}
+                                                    createEncounter={createEncounter}
+                                                    setCreateEncounter={setCreateEncounter}
                                                     setEncounterTabs={setEncounterTabs}
                                                     setSelectedMainTab={setSelectedMainTab} // Pass this prop
                                                 />
