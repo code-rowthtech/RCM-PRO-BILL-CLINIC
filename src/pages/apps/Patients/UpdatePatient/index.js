@@ -7,15 +7,8 @@ import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    getAlcoholHistoryAction,
-    getFamilyGeneticAction,
-    getMedicationAction,
-    getPatientByIdAction,
-    getStatesByCountryAction,
-    getSurgicalHistoryAction,
-    getTemplateAction,
-    getTobaccooAction,
-    updatePatientsAction,
+    getAlcoholHistoryAction, getFamilyGeneticAction, getMedicationAction, getPatientByIdAction,
+    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
@@ -33,7 +26,6 @@ import SubAllergytabs from './SubAllergytabs';
 import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 import Encounter from './Encounter/Encounter';
-import { FaCalendarAlt } from 'react-icons/fa';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();

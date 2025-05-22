@@ -9,7 +9,8 @@ import {
     getEncounterSettingsApi,
     updateEncounterSettingsApi,
     getEncounterNotesTypeApi,
-    getEncounterNoteFieldsApi
+    getEncounterNoteFieldsApi,
+    getEncounterByIdApi
 } from './api';
 /**
  * Login the user
@@ -200,6 +201,32 @@ function* getEncounterSettingsFunction(data) {
         });
     }
 }
+function* getEncounterByIdFunction(data) {
+    try {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_LOADING,
+            payload: {},
+        });
+        const response = yield call(getEncounterByIdApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_ERROR,
+            payload: error,
+        });
+    }
+}
 
 function* getEncounterNotesTypeFunction(data) {
     try {
@@ -280,6 +307,10 @@ export function* watchUpdateEncounterSettings() {
 export function* watchGetEncounterSettings() {
     yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_SETTINGS, getEncounterSettingsFunction);
 }
+
+export function* watchGetEncounterById() {
+    yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_BY_ID, getEncounterByIdFunction);
+}
 export function* watchGetEncounterNotes() {
     yield takeEvery(EncounterActionTypes.GET_ENCOUNTER_NOTES, getEncounterNotesTypeFunction);
 }
@@ -292,7 +323,7 @@ function* encounterSaga() {
     yield all([
         fork(watchCreateEncounter),
         fork(watchUpdateEncounter),
-        fork(watchGetEncounter),
+        fork(watchGetEncounter), fork(watchGetEncounterById),
         fork(watchCreateEncounterSettings), fork(watchUpdateEncounterSettings),
         fork(watchGetEncounterSettings), fork(watchGetEncounterNotes), fork(watchGetEncounterNotesFields)
     ]);
