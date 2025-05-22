@@ -222,6 +222,7 @@ const NewDoctor = () => {
         } else {
             dispatch(createDoctorAction({ key: encryptMessage(payload) }));
         }
+        console.log(payload,'payload');
     };
 
     const handleTabChange = (tab) => {
@@ -394,11 +395,8 @@ const NewDoctor = () => {
                                             <div className="d-none d-md-block me-2">
                                                 <Button
                                                     className="cancel-button"
-                                                    // onClick={handleNewDoctor}
-                                                    onClick={() => {
-                                                        navigate('/apps/providers/list');
-                                                        reset();
-                                                    }}>
+                                                    onClick={handleNewDoctor}
+                                                   >
                                                     Back
                                                 </Button>
                                             </div>
