@@ -27,7 +27,9 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
     const [documents, setDocuments] = useState([
         { name: '', number: '', issuingAuthority: '', document: null, note: '' },
     ]);
-    const [documentUploading, setDocumentUploading] = useState(false);
+    const [documentUploading, setDocumentUploading] = useState({});
+    const [degreeUploading, setDegreeUploading] = useState({});
+
     const addQualification = () => {
         const newQualification = { degreeName: '', degreeFile: null, issuerOrganisation: '' };
         setQualifications([...qualifications, newQualification]);
@@ -70,6 +72,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         }
         const fileName = file.name;
         const localPreviewUrl = URL.createObjectURL(file);
+        setDegreeUploading((prev) => ({ ...prev, [index]: true }));
         handleQualificationChange(index, 'degreeFile', { url: localPreviewUrl, fileName, localPreviewUrl });
         try {
             const url = await handleUpload(file, setDegreeUploading);
@@ -77,8 +80,8 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                 handleQualificationChange(index, 'degreeFile', { url: url.url, fileName, localPreviewUrl });
             }
         } catch (error) {}
+        setDegreeUploading((prev) => ({ ...prev, [index]: false }));
     };
-    const [degreeUploading, setDegreeUploading] = useState(false);
     const QualificationOptions = qualificationsData.map((qualification) => ({
         value: qualification.code,
         label: qualification.display,
@@ -149,6 +152,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
         if (!file) return;
         const fileName = file.name;
         const localPreviewUrl = URL.createObjectURL(file);
+        setDocumentUploading((prev) => ({ ...prev, [index]: true }));
         handleDocumentsChange(index, 'document', { url: localPreviewUrl, fileName, localPreviewUrl });
         try {
             const url = await handleUpload(file, setDocumentUploading);
@@ -157,6 +161,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                 handleDocumentsChange(index, 'document', { url: url.url, fileName, localPreviewUrl });
             }
         } catch (error) {}
+        setDocumentUploading((prev) => ({ ...prev, [index]: false }));
     };
     const removeDocument = (index) => {
         setDocuments((prev) => prev.filter((_, i) => i !== index));
@@ -200,155 +205,135 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                         <>
                             <Row>
                                 <Col sm={12}>
-                                    <Row>
-                                        <h5>
-                                            Qualifications
-                                            <span
-                                                className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
-                                                onClick={addQualification}></span>
-                                        </h5>
-                                        {qualifications?.map((qualification, index) => (
-                                            <React.Fragment key={index}>
-                                                <div className="col-md-4 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Select Degree Name</Form.Label>
-                                                        <Select
-                                                            options={QualificationOptions}
-                                                            isSearchable
-                                                            className="basic-single"
-                                                            classNamePrefix="select"
-                                                            placeholder="&nbsp; Select "
-                                                            value={QualificationOptions.find(
-                                                                (option) =>
-                                                                    option.value === qualification?.degreeName?.code
-                                                            )}
-                                                            onChange={(selectedOption) =>
-                                                                handleQualificationChange(
-                                                                    index,
-                                                                    'degreeName',
-                                                                    selectedOption
-                                                                )
-                                                            }
-                                                            styles={{
-                                                                control: (provided) => ({
-                                                                    ...provided,
-                                                                    height: '30px',
-                                                                    minHeight: '30px',
-                                                                    border: '0px',
-                                                                }),
-                                                                placeholder: (provided) => ({
-                                                                    ...provided,
-                                                                    fontWeight: 'bold',
-                                                                    fontSize: '12px',
-                                                                    paddingBottom: '5px',
-                                                                }),
-                                                            }}
-                                                        />
-                                                    </Form.Group>
-                                                </div>
-                                                <div className="col-md-4 col-12">
-                                                    <div className="mb-1 d-flex flex-column position-relative">
-                                                        <Form.Label className="mb-0 d-flex align-items-center gap-1">
-                                                            Degree{' '}
-                                                            <OverlayTrigger
-                                                                placement="top"
-                                                                overlay={
-                                                                    <Tooltip id="tooltip-degree">
-                                                                        Only PDF files are supported for degree uploads.
-                                                                    </Tooltip>
-                                                                }>
-                                                                <span className="text-secondary cursor-pointer">
-                                                                    <FiInfo size={15} />
-                                                                </span>
-                                                            </OverlayTrigger>
-                                                        </Form.Label>{' '}
-                                                        <div
-                                                            onClick={() =>
-                                                                document
-                                                                    .getElementById(`degree-file-input-${index}`)
-                                                                    .click()
-                                                            }
-                                                            className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                qualification.degreeName || qualification.degreeFile
-                                                                    ? ''
-                                                                    : 'custom-form-fields'
-                                                            }`}>
-                                                            <span>
-                                                                {degreeUploading
-                                                                    ? 'Uploading...'
-                                                                    : qualification.degreeFile?.fileName
-                                                                      ? qualification.degreeFile.fileName.length > 30
-                                                                          ? qualification.degreeFile.fileName.slice(
-                                                                                0,
-                                                                                30
-                                                                            ) + '...'
-                                                                          : qualification.degreeFile.fileName
-                                                                      : 'Upload Degree'}
+                                    <h5>
+                                        Qualifications
+                                        <span
+                                            className="fs-5 uil-plus-circle plusicon ms-1 fw-bold cursor-pointer"
+                                            onClick={addQualification}></span>
+                                    </h5>
+                                    {qualifications?.map((qualification, index) => (
+                                        <Row key={index} className="align-items-end g-3 mb-2">
+                                            <Col md={4} xs={12}>
+                                                <Form.Group>
+                                                    <Form.Label>Select Degree Name</Form.Label>
+                                                    <Select
+                                                        options={QualificationOptions}
+                                                        isSearchable
+                                                        classNamePrefix="select"
+                                                        placeholder="Select"
+                                                        value={QualificationOptions.find(
+                                                            (option) => option.value === qualification?.degreeName?.code
+                                                        )}
+                                                        onChange={(selectedOption) =>
+                                                            handleQualificationChange(
+                                                                index,
+                                                                'degreeName',
+                                                                selectedOption
+                                                            )
+                                                        }
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={4} xs={12}>
+                                                <Form.Group>
+                                                    <Form.Label className="d-flex align-items-center gap-1">
+                                                        Degree
+                                                        <OverlayTrigger
+                                                            placement="top"
+                                                            overlay={
+                                                                <Tooltip id="tooltip-degree">
+                                                                    Only PDF files are supported for degree uploads.
+                                                                </Tooltip>
+                                                            }>
+                                                            <span className="text-secondary cursor-pointer">
+                                                                <FiInfo size={15} />
                                                             </span>
-                                                            <div className="d-flex align-items-center gap-2">
-                                                                {qualification.degreeFile?.url &&
-                                                                    /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
-                                                                        qualification.degreeFile.fileName
-                                                                    ) && (
-                                                                        <FiEye
-                                                                            className="text-secondary"
-                                                                            style={{ cursor: 'pointer' }}
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handlePreviewDegree(
-                                                                                    qualification.degreeFile
-                                                                                );
-                                                                            }}
-                                                                            title="Preview"
-                                                                        />
-                                                                    )}
-                                                                <span className="mb-0 d-inline-flex align-items-center">
-                                                                    <FiUploadCloud />
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <Form.Control
-                                                            type="file"
-                                                            className="d-none"
-                                                            id={`degree-file-input-${index}`}
-                                                            accept="application/pdf"
-                                                            onChange={(event) => handleFileChangeDegree(index, event)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-4 col-12">
-                                                    <Form.Group className="mb-1">
-                                                        <Form.Label className="mb-0">Issuer Organisation</Form.Label>
-                                                        <Form.Control
-                                                            type="text"
-                                                            value={qualification.issuerOrganisation}
-                                                            onChange={(e) =>
-                                                                handleQualificationChange(
-                                                                    index,
-                                                                    'issuerOrganisation',
-                                                                    e.target.value
-                                                                )
-                                                            }
-                                                            placeholder="Enter Issuer Organisation"
-                                                        />
-                                                    </Form.Group>
-                                                </div>
-                                                {index > 0 && (
-                                                    <div className="col-md-12 text-end">
-                                                        <span
-                                                            className="text-danger position-absolute cursor-pointer fs-5 fw-bold"
-                                                            style={{ marginTop: '-35px' }}
-                                                            onClick={() => removeQualification(index)}>
-                                                            <CiCircleMinus />
+                                                        </OverlayTrigger>
+                                                    </Form.Label>
+                                                    <div
+                                                        onClick={() =>
+                                                            document
+                                                                .getElementById(`degree-file-input-${index}`)
+                                                                .click()
+                                                        }
+                                                        className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${
+                                                            qualification.degreeName || qualification.degreeFile
+                                                                ? ''
+                                                                : 'custom-form-fields'
+                                                        }`}
+                                                        style={{ minHeight: '30px' }}>
+                                                        <span>
+                                                            {degreeUploading[index]
+                                                                ? 'Uploading...'
+                                                                : qualification.degreeFile?.fileName
+                                                                  ? qualification.degreeFile.fileName.length > 30
+                                                                      ? qualification.degreeFile.fileName.slice(0, 30) +
+                                                                        '...'
+                                                                      : qualification.degreeFile.fileName
+                                                                  : 'Upload Degree'}
                                                         </span>
+                                                        <div className="d-flex align-items-center gap-2">
+                                                            {qualification.degreeFile?.url &&
+                                                                /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(
+                                                                    qualification.degreeFile.fileName
+                                                                ) && (
+                                                                    <FiEye
+                                                                        className="text-secondary"
+                                                                        style={{ cursor: 'pointer' }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            handlePreviewDegree(
+                                                                                qualification.degreeFile
+                                                                            );
+                                                                        }}
+                                                                        title="Preview"
+                                                                    />
+                                                                )}
+                                                            <span className="mb-0 d-inline-flex align-items-center">
+                                                                <FiUploadCloud />
+                                                            </span>
+                                                        </div>
                                                     </div>
+                                                    <Form.Control
+                                                        type="file"
+                                                        className="d-none"
+                                                        id={`degree-file-input-${index}`}
+                                                        accept="application/pdf"
+                                                        onChange={(event) => handleFileChangeDegree(index, event)}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md={4} xs={12} className="position-relative">
+                                                <Form.Group>
+                                                    <Form.Label>Issuer Organisation</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        value={qualification.issuerOrganisation}
+                                                        onChange={(e) =>
+                                                            handleQualificationChange(
+                                                                index,
+                                                                'issuerOrganisation',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Enter Issuer Organisation"
+                                                    />
+                                                </Form.Group>
+                                                {index > 0 && (
+                                                    <span
+                                                        className="text-danger cursor-pointer position-absolute fs-4 fw-bold"
+                                                        onClick={() => removeQualification(index)}
+                                                        style={{ right: '-5px', top: '50%' }}
+                                                        title="Remove">
+                                                        <CiCircleMinus />
+                                                    </span>
                                                 )}
-                                                {qualifications?.length > 1 && index < qualifications.length - 1 && (
-                                                    <hr className="mt-2" />
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                    </Row>
+                                            </Col>
+                                            {/* {qualifications?.length > 1 && index < qualifications.length - 1 && (
+                                                    <hr className="" />
+                                            )} */}
+                                        </Row>
+                                    ))}
                                 </Col>
                             </Row>
                             <hr />
@@ -363,7 +348,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                         </h5>
                                         {documents?.map((data, index) => (
                                             <>
-                                                <Row key={data.id}>
+                                                <Row key={data.id} >
                                                     <div className="col-md-3 col-12">
                                                         <Form.Group className="mb-1">
                                                             <Form.Label className="mb-0">Document Name</Form.Label>
@@ -430,7 +415,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                         : 'custom-form-fields'
                                                                 }`}>
                                                                 <span>
-                                                                    {documentUploading
+                                                                    {documentUploading[index]
                                                                         ? 'Uploading...'
                                                                         : data?.document?.fileName
                                                                           ? data.document.fileName.length > 25
