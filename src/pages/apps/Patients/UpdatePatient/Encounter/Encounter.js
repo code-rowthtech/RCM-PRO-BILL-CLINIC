@@ -15,7 +15,7 @@ import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 
-const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter }) => {
+const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter }) => {
     const dispatch = useDispatch()
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -23,21 +23,37 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     const toggleCollapse = () => setIsCollapsed(!isCollapsed);
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    
+
     // Handle new encounter creation
     useEffect(() => {
         if (createEncounter) {
             const newTab = {
                 id: Date.now(), // Use timestamp for unique ID
-                title: createEncounter === 'appointment' ? 'Clinical Finding' : new Date().toISOString().split('T')[0],
-                type: createEncounter === 'appointment' ? 'appointment' : 'date',
+                title: 'New Encounter',
+                type: 'createEncounter',
             };
             setEncounterTabs([...encounterTabs, newTab]);
-            setActiveTab(newTab.id); // Automatically switch to new tab
+            setActiveTab(newTab?.id); // Automatically switch to new tab
             setCreateEncounter(false); // Reset the flag
         }
     }, [createEncounter]);
-    
+
+    // Handle encounter update
+    useEffect(() => {
+        if (updateEncounter) {
+            const newTab = {
+                id: Date.now(), // Use timestamp for unique ID
+                title: 'Update Encounter',
+                type: 'updateEncounter',
+                encounterId: updateEncounter?.id,
+                encounterData: updateEncounter?.data
+            };
+            setEncounterTabs([...encounterTabs, newTab]);
+            setActiveTab(newTab.id); // Automatically switch to new tab
+            setUpdateEncounter(null); // Reset the flag
+        }
+    }, [updateEncounter]);
+
     const removeEncounterTab = (idToRemove, e) => {
         if (e) e.stopPropagation();
         const newTabs = encounterTabs.filter(tab => tab.id !== idToRemove);
@@ -47,26 +63,26 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
             setActiveTab(newTabs.length > 0 ? newTabs[0].id : '');
         }
     };
-    
+
     useEffect(() => {
         dispatch(getEncounterSettingsAction());
     }, [dispatch])
-    
+
     useEffect(() => {
         if (doctorDetails === undefined) {
             dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 10 }));
         }
     }, [dispatch])
-    
+
     useEffect(() => {
         dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType }))
     }, [dispatch, searchNoteType])
-    
+
     const [showSettings, setShowSettings] = useState(false)
     const closeSettings = () => {
         setShowSettings(false)
     }
-    
+
     return (
         <div className="border-0 mb-0 h-100">
             <div className="p-0 border-0">
@@ -124,19 +140,18 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                         encounterTabs={encounterTabs}
                                         setEncounterTabs={setEncounterTabs}
                                         setActiveTab={setActiveTab}
+                                        setCreateEncounter={setCreateEncounter}
                                     />
-                                ) : tab?.type === 'date' ? (
-                                    <DateEncounters 
-                                        removeEncounterTab={removeEncounterTab} 
-                                        searchNoteType={searchNoteType} 
-                                        setSearchNoteType={setSearchNoteType} 
-                                        isCollapsed={isCollapsed}
-                                        setCreateEncounter={setCreateEncounter} 
-                                    />
-                                ) : tab?.type === 'appointment' ? (
-                                    <AppointmentEncounter />
                                 ) : (
-                                    <></>
+                                    <DateEncounters
+                                        encounterAction={tab?.type}
+                                        encounterId={tab?.id}
+                                        removeEncounterTab={removeEncounterTab}
+                                        searchNoteType={searchNoteType}
+                                        setSearchNoteType={setSearchNoteType}
+                                        isCollapsed={isCollapsed}
+                                        setCreateEncounter={setCreateEncounter}
+                                    />
                                 )}
                             </div>
                         ))}

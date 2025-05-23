@@ -20,7 +20,6 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
     const [templateToEdit, setTemplateToEdit] = useState(null);
     const [editIcon, setEditIcon] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    console.log(selectedTemplate, 'selected template')
     const closeModal = () => {
         setShowModal(false);
         setTemplateToEdit(null);
@@ -63,7 +62,6 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                                         }));
 
                                                     }}
-
                                                     className='border-bottom py-1 cursor-pointer list-hover' key={index}>{itemList?.text}</li>
                                             ))}
                                         </ul>

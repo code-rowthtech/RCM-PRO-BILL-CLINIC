@@ -133,8 +133,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
         } else {
             dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
         }
-
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
@@ -258,7 +256,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 </Form.Select>
                             </Form.Group>
                         </Col> */}
-                           <Col md={6}>
+                        <Col md={6}>
                             <Form.Group controlId="format">
                                 <Form.Label>Format</Form.Label>
                                 <Form.Select {...register('format', { required: 'Format is required' })}>
@@ -269,7 +267,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 {errors.format && <span className="text-danger">{errors.format.message}</span>}
                             </Form.Group>
                         </Col>
-                          <Col md={6}>
+                        <Col md={6}>
                             <Form.Group controlId="private">
                                 <Form.Label>Keep This Clinical Note Private?.</Form.Label>
                                 <Form.Select {...register('private', { required: 'private is required' })}>
@@ -291,7 +289,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 store?.updateNoteCategoriesReducer?.loading
                             }>
                             {store?.createNoteCategoriesReducer?.loading ||
-                            store?.updateNoteCategoriesReducer?.loading ? (
+                                store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
                             ) : selectedNote ? (
                                 'Update'
