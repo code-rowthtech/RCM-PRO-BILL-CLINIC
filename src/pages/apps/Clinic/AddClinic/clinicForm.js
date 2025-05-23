@@ -726,7 +726,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         const date = new Date(dateString);
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
-    
+
 
     return (
         <>
@@ -748,7 +748,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Label>
                                     <Form.Control
                                         type="text"
-                                        data-has-value={!!watch('clinicname')}
+                                        // data-has-value={!!watch('clinicname')}
                                         {...register('clinicname', {
                                             required: 'This field is required',
                                             validate: (value) =>
@@ -772,7 +772,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Label>
                                     <Form.Select
                                         className="form-control"
-                                        data-has-value={!!watch('clinicType')}
+                                        // data-has-value={!!watch('clinicType')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}>
                                         <option value="" hidden>
@@ -797,7 +797,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Control
                                         disabled={true}
                                         type="text"
-                                        data-has-value={!!watch('email')}
+                                        // data-has-value={!!watch('email')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.email : ''}
                                         {...register('email', {
                                             required: 'This field is required',
@@ -826,7 +826,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     onClick={handleLogoClick}
                                     className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
                                         }`}
-                                    data-has-value={!!logoName}>
+                                    data-has-value={!!logoName}
+                                >
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
                                     {/* {typeof logoName === 'string' && logoName
                                         ? logoName.split('/').pop()
@@ -1525,7 +1526,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     type="submit"
                                     disabled={store?.createClinicsReducer?.loading}
                                     onClick={() => setNextClicked(true)}
-                                    style ={{ width: '55px' }}
+                                    style={{ width: '55px' }}
                                     className="custom-buttons">
                                     {store?.createClinicsReducer?.loading ? (
                                         <Spinner color="white" className="spinner-border-sm" />

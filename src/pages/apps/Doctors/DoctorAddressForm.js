@@ -210,11 +210,11 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
                             value={item.type}
-                            className="text-capitalize text-danger"
+                            className="text-capitalize"
                             data-has-value={!!watch(`address[${index}].type`)}
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
-                            <option value="" hidden>
+                            <option value="" key='' hidden>
                                 Select
                             </option>
                             {addressTypes?.map((type) => (
@@ -380,7 +380,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">City</Form.Label>
                         <Form.Select
                             value={item?.city}
-                            data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
                             onChange={(e) => {

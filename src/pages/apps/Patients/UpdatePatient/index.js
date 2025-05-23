@@ -221,18 +221,10 @@ const UpdatePatientIndex = () => {
                                                         toggleSubmenu(item.label);
                                                         // setActiveSubmenu(null);
                                                     } else {
-                                                        if (item.tab === 'Encounter') {
-                                                            setActiveKey('1')
-                                                            setSelectedMainTab(item.tab);
-                                                            sessionStorage.setItem('selectedMainTab', item.tab);
-                                                            setActiveSubmenu(null);
-                                                        } else {
-                                                            setActiveKey('0')
-                                                            setSelectedMainTab(item.tab);
-                                                            sessionStorage.setItem('selectedMainTab', item.tab);
-                                                            setActiveSubmenu(null);
-                                                        }
-
+                                                        setActiveKey('0')
+                                                        setSelectedMainTab(item.tab);
+                                                        sessionStorage.setItem('selectedMainTab', item.tab);
+                                                        setActiveSubmenu(null);
                                                     }
                                                 }}>
                                                 <div>

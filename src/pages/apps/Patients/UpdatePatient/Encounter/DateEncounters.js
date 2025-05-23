@@ -219,6 +219,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
             </Row>
         );
     };
+    const [providerError, setProviderError] = useState(false);
 
     const onSubmit = (data) => {
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
@@ -275,27 +276,32 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                 });
             }
         });
-
-        const payload = {
-            type,
-            class: encounterClass,
-            subject: id,
-            status: data?.status,
-            providerId: selectedProvider,
-            data: fieldsData,
-            period: {
-                start: data?.startDate,
-            }
-        }
-        if (encounterAction === 'updateEncounter') {
-            const updateData = {
-                id: encounterId,
-                data: fieldsData
-            }
-            dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
+        if (!selectedProvider) {
+            setProviderError(true)
+            return;
         } else {
-            dispatch(createEncounterAction({ key: encryptMessage(payload) }));
+            const payload = {
+                type,
+                class: encounterClass,
+                subject: id,
+                status: data?.status,
+                providerId: selectedProvider,
+                data: fieldsData,
+                period: {
+                    start: data?.startDate,
+                }
+            }
+            if (encounterAction === 'updateEncounter') {
+                const updateData = {
+                    id: encounterId,
+                    data: fieldsData
+                }
+                dispatch(updateEncounterAction({ key: encryptMessage(updateData) }));
+            } else {
+                dispatch(createEncounterAction({ key: encryptMessage(payload) }));
+            }
         }
+
     }
 
     return (
@@ -377,7 +383,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                         <div className="position-relative">
                                             <Form.Select
                                                 {...register('class', { required: 'This field is required.' })}
-                                                className='border-primary text-danger'
+                                                className='border-primary'
                                                 onChange={(e) => {
                                                     if (encounterAction === 'updateEncounter') {
                                                         const encounterClassSelected = encounterClassCodes?.find((data) => data?.code === e.target.value)
@@ -459,7 +465,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                                             period: {
                                                                 start: e.target.value,
                                                                 ...(encounterData?.period?.end && { end: encounterData.period.end })
-                                                            }
+                                                            },
                                                         }
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload), fieldUpdating: 'startDate' }));
                                                     }
@@ -518,7 +524,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                             value={providerOptions?.find(option => option?.value === selectedProvider) || null}
                                             onChange={(selectedValue) => {
                                                 setSelectedProvider(selectedValue?.value);
-
+                                                setProviderError(false)
                                                 if (encounterAction === 'updateEncounter') {
                                                     const payload = {
                                                         id: encounterId,
@@ -550,6 +556,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                                 }),
                                             }}
                                         />
+                                        {providerError && (
+                                            <div className="text-danger small mt-0">This field is required</div>
+                                        )}
                                     </Form.Group>
                                 </Col>
                             </Row>
@@ -566,13 +575,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                     >
                                         {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
-                                    {/* <Button
-                                        type='Submit'
-                                        className='custom-buttons'
-                                        disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
-                                    >
-                                        {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
-                                    </Button> */}
                                 </div>
                             </div>
                         </Form>
