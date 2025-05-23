@@ -287,13 +287,13 @@ const handleOffcanvasCardClick = (section) => {
                         </Col>
                     </Row>
                     <Row className="mt-1">
-                        {store?.getSettingsTabsReducer?.loading ? (
+                        {/* {store?.getSettingsTabsReducer?.loading ? (
                             <div
                                 className="text-center my-4 d-flex justify-content-center align-items-center"
                                 style={{ height: '200px' }}>
                                 <Spinner animation="border" variant="primary" />
                             </div>
-                        ) : (
+                        ) : ( */}
                             <Col md={getCurrentSections()?.length>0?8:12} >
                                 <Droppable droppableId="active-sections">
                                     {(provided) => (
@@ -376,7 +376,7 @@ const handleOffcanvasCardClick = (section) => {
                                     )}
                                 </Droppable>
                             </Col>
-                        )}
+                        {/* )} */}
                     </Row>
                 </DragDropContext>
             </div>

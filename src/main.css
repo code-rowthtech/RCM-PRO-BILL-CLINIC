@@ -643,8 +643,11 @@ table {
 }
 .css-19bb58m {
     padding-top: 5px !important;
-    padding-bottom: 8px !important;
+    padding-bottom: 5px !important;
     margin: 0px !important;
+}
+.css-1dimb5e-singleValue {
+    margin-right:8px !important;
 }
 
 .css-1wy0on6 {
