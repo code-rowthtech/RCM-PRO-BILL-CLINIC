@@ -437,7 +437,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                                                     height: '30px',
                                                     minHeight: '30px',
                                                     border: '1px solid rgba(186, 185, 185, 0.762)',
-                                                    background: "white !important"
+                                                    background: "white !important",
                                                 }),
                                                 placeholder: (provided) => ({
                                                     ...provided,
