@@ -14,8 +14,10 @@ import { useSearchParams } from 'react-router-dom';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
+import { string } from 'prop-types';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, removeEncounterTab, encounterAction, encounterId }) => {
+
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
@@ -23,8 +25,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
-    const [submitSuccess, setSubmitSuccess] = useState(false);
-    const [submitError, setSubmitError] = useState(false);
     const [initialLoading, setInitialLoading] = useState(true);
 
     // Get data from store
@@ -220,7 +220,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
         );
     };
     const [providerError, setProviderError] = useState(false);
-
     const onSubmit = (data) => {
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class)
