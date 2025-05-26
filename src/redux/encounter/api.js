@@ -10,7 +10,7 @@ export function createEncounterApi(params: any): any {
 
 export function updateEncounterApi(params: any): any {
     const { data } = params;
-    return api.update(`${URL.encounter}/${data?.medicationId}`, data);
+    return api.update(`${URL.encounter}`, data);
 }
 
 export function getEncounterApi(params: any): any {
@@ -43,4 +43,9 @@ export function updateEncounterSettingsApi(params: any): any {
 export function getEncounterSettingsApi(params: any): any {
     const { data } = params;
     return api.get(URL.encounterSettings, data);
+}
+
+export function getEncounterByIdApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.encounter}/${data?.encounterId}`);
 }

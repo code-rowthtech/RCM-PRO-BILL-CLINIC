@@ -8,6 +8,7 @@ import { findAllParent, findMenuItem } from '../helpers/menu';
 import { logoutUser } from '../redux/actions';
 import { useDispatch } from 'react-redux';
 import logo from '../assets/images/logo.png';
+import logo_sm from '../assets/images/logo_sm.png';
 
 const MenuItemWithChildren = ({ item, linkClassName, subMenuClassNames, activeMenuItems, toggleMenu }) => {
     const [open, setOpen] = useState(activeMenuItems.includes(item.key));
@@ -127,9 +128,7 @@ const MenuItemLink = ({ item, className }) => {
                 </span>
             )}
             <span> {item.label} </span>
-
         </Link>
-
     );
 };
 
@@ -189,12 +188,12 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
     return (
         <>
             <ul className="side-nav " ref={menuRef} id="main-side-menu">
-                <li className='text-center py-3' >
-                    {isCondensed ?
-                        <></>
-                        :
-                        <img src={logo} alt="" height="25" />
-                    }
+                <li className="text-center py-3">
+                    {!isCondensed ? (
+                        <img src={logo} alt="" height="25" className="logo-condensed" />
+                    ) : (
+                        <img src={logo_sm} alt="" height="25" className="logo-full" />
+                    )}
                 </li>
                 {(menuItems || []).map((item, idx) => {
                     return (

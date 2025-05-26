@@ -24,7 +24,9 @@ const DoctorIdentifierForm = ({
     } = useForm();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
-    const [identifierDocument, setIdentifierDocument] = useState(false); // Fixed typo
+    const [identifierDocument, setIdentifierDocument] = useState({}); // Fixed typo
+    const [licensureDocument, setLicensureDocument] = useState({});
+
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data?.states;
     const id = searchParams.get('id');
@@ -105,7 +107,7 @@ const DoctorIdentifierForm = ({
     const handleIdentifierFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
-
+        setIdentifierDocument((prev) => ({ ...prev, [index]: true })); // Set loading state
         try {
             const url = await handleUpload(selectedFile, setIdentifierDocument); // Upload file
             setIdentifiers((prevDetails) => {
@@ -153,10 +155,10 @@ const DoctorIdentifierForm = ({
         setLicensure(updatedLicensure);
     };
 
-    const [licensureDocument, setLicensureDocument] = useState(false);
     const handleLicensureFileChange = async (e, index) => {
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
+        setLicensureDocument((prev) => ({ ...prev, [index]: true })); // Set loading state
 
         try {
             const url = await handleUpload(selectedFile, setLicensureDocument); // Upload file
@@ -361,7 +363,7 @@ const DoctorIdentifierForm = ({
                                 item?.file?.name ? 'form-control' : 'custom-form-fields'
                             }`}>
                             <span>
-                                {identifierDocument
+                                {identifierDocument[index]
                                     ? 'Uploading...'
                                     : item.file?.name
                                       ? item.file.name.length > 30
@@ -537,7 +539,7 @@ const DoctorIdentifierForm = ({
                                 item?.file?.name ? 'form-control' : 'custom-form-fields'
                             }`}>
                             <span>
-                                {licensureDocument
+                                {licensureDocument[index]
                                     ? 'Uploading...'
                                     : item.file?.name
                                       ? item.file.name.length > 30
@@ -546,7 +548,7 @@ const DoctorIdentifierForm = ({
                                       : 'Upload Document'}
                             </span>
                             <div className="d-flex align-items-center gap-2">
-                                  {item.file?.url && (
+                                {item.file?.url && (
                                     <FiEye
                                         className="text-secondary"
                                         style={{ cursor: 'pointer' }}
@@ -560,7 +562,6 @@ const DoctorIdentifierForm = ({
                                 <span className="mb-0 d-inline-flex align-items-center">
                                     <FiDownloadCloud />
                                 </span>
-                              
                             </div>
                         </div>
                         <Form.Control

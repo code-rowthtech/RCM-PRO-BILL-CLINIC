@@ -51,9 +51,9 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
                         'Insurances',
                         'Eligibility',
                         'Authorizations',
-                        'Vital Status',
-                        'Balance',
-                        'Payment',
+                        // 'Vital Status',
+                        // 'Balance',
+                        // 'Payment',
                     ].map((tab) => (
                         <li className="nav-item" key={tab}>
                             <a
@@ -76,9 +76,9 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
                     {activeTab === 'Insurances' && <Insurance isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Eligibility' && <>In-progress...</>}
                     {activeTab === 'Authorizations' && <>In-progress...</>}
-                    {activeTab === 'Vital Status' && <>In-progress...</>}
-                    {activeTab === 'Balance' && <>In-progress...</>}
-                    {activeTab === 'Payment' && <>In-progress...</>}
+                    {/* {activeTab === 'Vital Status' && <>In-progress...</>} */}
+                    {/* {activeTab === 'Balance' && <>In-progress...</>} */}
+                    {/* {activeTab === 'Payment' && <>In-progress...</>} */}
                 </div>
             </div>
 

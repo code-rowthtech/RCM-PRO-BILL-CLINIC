@@ -59,7 +59,6 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                                         }));
 
                                                     }}
-
                                                     className='border-bottom py-1 cursor-pointer list-hover' key={index}>{itemList?.text}</li>
                                             ))}
                                         </ul>
