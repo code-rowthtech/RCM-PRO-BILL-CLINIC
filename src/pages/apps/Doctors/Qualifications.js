@@ -219,11 +219,26 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                     <Select
                                                         options={QualificationOptions}
                                                         isSearchable
+                                                        className="basic-single"
                                                         classNamePrefix="select"
                                                         placeholder="Select"
                                                         value={QualificationOptions.find(
                                                             (option) => option.value === qualification?.degreeName?.code
                                                         )}
+                                                        styles={{
+                                                            control: (provided) => ({
+                                                                ...provided,
+                                                                height: '30px',
+                                                                minHeight: '30px',
+                                                                border: '0px',
+                                                            }),
+                                                            placeholder: (provided) => ({
+                                                                ...provided,
+                                                                fontWeight: 'bold',
+                                                                fontSize: '12px',
+                                                                paddingBottom: '5px',
+                                                            }),
+                                                        }}
                                                         onChange={(selectedOption) =>
                                                             handleQualificationChange(
                                                                 index,
@@ -348,7 +363,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                         </h5>
                                         {documents?.map((data, index) => (
                                             <>
-                                                <Row key={data.id} >
+                                                <Row key={data.id}>
                                                     <div className="col-md-3 col-12">
                                                         <Form.Group className="mb-1">
                                                             <Form.Label className="mb-0">Document Name</Form.Label>

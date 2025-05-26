@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { updateRolesReducer } from '../../../redux/roles/reducers';
 
 const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => {
+    console.log(setAddDepartmentModal, 'setdepartment')
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
@@ -282,7 +283,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                 </Form.Group>
                             </Col>
 
-                            <Row className={`${dataToEdit ? 'd-none' : ''}`}>
+                            <Row className={`mx-auto px-0${dataToEdit ? 'd-none ' : ''}`}>
                                 <Col sm={6}>
                                     <Form.Group className="mb-2 position-relative">
                                         <Form.Label className="mb-0">
@@ -328,7 +329,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         />
                                         <span
                                             className="position-absolute fs-4"
-                                            style={{ top: '26px', right: '10px', cursor: 'pointer' }}
+                                            style={{ top: '23px', right: '10px', cursor: 'pointer' }}
                                             onClick={() => togglePasswordVisibility('password')}>
                                             {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
                                         </span>
@@ -355,12 +356,12 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                               value === watch('password') || 'Passwords do not match',
                                                       },
                                             })}
-                                            onInput={() => trigger('confirmPassword')}
+                                            onChange={() => trigger('confirmPassword')}
                                             maxLength={16}
                                         />
                                         <span
                                             className="position-absolute d-flex align-items-center fs-4 justify-content-center"
-                                            style={{ top: '32px', right: '10px', cursor: 'pointer' }}
+                                            style={{ top: '27px', right: '10px', cursor: 'pointer' }}
                                             onClick={() => togglePasswordVisibility('confirmPassword')}
                                             onMouseEnter={(e) => (e.target.style.color = '#000')}
                                             onMouseLeave={(e) => (e.target.style.color = '#666')}>
@@ -757,6 +758,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                     type="submit"
                                     variant="primary"
                                     className="ms-2 custom-buttons btn-height"
+                                    style={{width: '80px'}}
                                     disabled={createLoading}>
                                     {createLoading ? (
                                         <>
@@ -766,7 +768,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 size="sm"
                                                 role="status"
                                                 aria-hidden="true"
-                                                className="me-2"
                                             />
                                         </>
                                     ) : (
