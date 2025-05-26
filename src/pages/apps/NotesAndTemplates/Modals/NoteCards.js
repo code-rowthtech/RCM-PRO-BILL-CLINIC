@@ -12,7 +12,6 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [noteTypes, setNoteTypes] = useState([]);
-    console.log(noteTypes, 'notes');
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const notesCategoriesData = store?.getNoteCategoriesReducer?.data?.data;
     const loading = store?.getNoteCategoriesReducer?.loading;
@@ -33,7 +32,6 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
             private: note.private,
             default: note.isDefault,
         };
-        console.log('Raw Payload:', payload);
         dispatch(updateNoteCategoriesAction({ id, key: encryptMessage(payload) }));
     };
     const handleChange = (id, field, value) => {
@@ -131,7 +129,7 @@ const NoteTypeCards = ({ handleOpenTab, handleOpenEditModal }) => {
 
                             <div
                                 className="d-flex align-items-center justify-content-between rounded-bottom  small px-2 py-2"
-                                // style={{ backgroundColor: '#5582E51A' }}
+                            // style={{ backgroundColor: '#5582E51A' }}
                             >
                                 <div className="d-flex align-items-center">
                                     <Form.Check

@@ -133,8 +133,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
         } else {
             dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
         }
-
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
@@ -258,9 +256,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 </Form.Select>
                             </Form.Group>
                         </Col> */}
-                    </Row>
-
-                    <Row className="mb-1">
                         <Col md={6}>
                             <Form.Group controlId="format">
                                 <Form.Label>Format</Form.Label>
@@ -283,7 +278,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                             </Form.Group>
                         </Col>
                     </Row>
-
                     <div className="d-flex justify-content-end mt-2">
                         <Button
                             variant="primary"
@@ -295,7 +289,7 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
                                 store?.updateNoteCategoriesReducer?.loading
                             }>
                             {store?.createNoteCategoriesReducer?.loading ||
-                            store?.updateNoteCategoriesReducer?.loading ? (
+                                store?.updateNoteCategoriesReducer?.loading ? (
                                 <Spinner animation="border" size="sm" />
                             ) : selectedNote ? (
                                 'Update'

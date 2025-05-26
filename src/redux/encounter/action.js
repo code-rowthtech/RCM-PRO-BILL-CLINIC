@@ -39,3 +39,8 @@ export const getEncounterSettingsAction = (data): AuthAction => ({
     type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS,
     data
 });
+
+export const getEncounterByIdAction = (data): AuthAction => ({
+    type: EncounterActionTypes.GET_ENCOUNTER_BY_ID,
+    data
+});

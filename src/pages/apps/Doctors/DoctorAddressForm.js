@@ -210,11 +210,11 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
                             value={item.type}
-                            className="text-capitalize text-danger"
+                            className="text-capitalize"
                             data-has-value={!!watch(`address[${index}].type`)}
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
-                            <option value="" hidden>
+                            <option value="" key='' hidden>
                                 Select
                             </option>
                             {addressTypes?.map((type) => (
@@ -380,7 +380,6 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                         <Form.Label className="mb-0">City</Form.Label>
                         <Form.Select
                             value={item?.city}
-                            data-has-value={!!getValues(`address[${index}].city`)}
                             {...register(`address[${index}].city`)}
                             // disabled={!selectedState || store?.getCitiesReducer?.loading}
                             onChange={(e) => {
@@ -474,24 +473,23 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                     required: false,
                                     validate: (value) => {
                                         if (!value) return true; // allow empty
-                                        // Acceptable formats:
-                                        // (123) 456-7890, 123-456-7890, 1234567890, +1 (123) 456-7890
-                                        // Reject: less than 10 digits, wrong country code, leading zero area code, letters
+                                        // Remove all non-digit characters
                                         const cleaned = value.replace(/\D/g, '');
                                         if (cleaned.length !== 10) return 'Fax must be a 10-digit US number';
                                         if (/^0/.test(cleaned)) return 'Area code cannot start with 0';
+                                        // Acceptable formats: (123) 456-7890, 123-456-7890, 1234567890, +1 (123) 456-7890
+                                        // Reject: less than 10 digits, wrong country code, leading zero area code, letters
                                         if (
-                                            !/^\(?[2-9][0-9]{2}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/.test(
-                                                value.replace(/^\+1\s?/, '')
+                                            !/^(\+1\s?)?(\(?[2-9][0-9]{2}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4})$/.test(
+                                                value
                                             )
                                         )
                                             return 'Enter a valid US fax number';
                                         return true;
                                     },
                                 })}
-                                maxLength={20}
+                                maxLength={17}
                                 onChange={(e) => {
-                                    // Optionally, auto-format here if you want
                                     handleAddressChange(index, 'fax', e.target.value);
                                 }}
                             />
@@ -500,6 +498,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             )}
                         </Form.Group>
                     </Col>
+
                     {addresses.length > 1 && (
                         <Col sm={3} className="d-flex justify-content-start align-items-center">
                             <span
