@@ -1062,7 +1062,7 @@ tbody tr:hover {
 }
 
 .select__input {
-    background-color: white !important;
+    background-color: transparent !important;
 }
 
 .form-select {
@@ -1095,3 +1095,6 @@ option {
 .form-control[type='date'].filled {
     color: purple !important;
 } */
+.css-19bb58m {
+    padding-top: 6px !important;
+}

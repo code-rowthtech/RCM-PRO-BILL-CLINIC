@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Row, Col, Modal } from 'react-bootstrap';
 import AppointmentForm from './Tabs/AppointmentForm';
-import Vitals from './Tabs/Vitals';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAppointmentByIdAction, resetUpdateActionAppiontment } from '../../../redux/actions';
 import Spinner from '../../../constants/Spinner';
 import { RxPlusCircled } from 'react-icons/rx';
 import { IoMdClose } from 'react-icons/io';
+import VitalStatus from '../Patients/UpdatePatient/VitalStatus';
 
 const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
     const navigate = useNavigate();
@@ -88,7 +88,7 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
                                         <IoMdClose className="fs-4 cursor-pointer" onClick={closeVitalsModal} />
                                     </Col>
                                 </Row>
-                                <Vitals />
+                                <VitalStatus />
                             </Modal.Body>
                         </Modal>
                         <Button className="cancel-button" onClick={handleAppointment}>
