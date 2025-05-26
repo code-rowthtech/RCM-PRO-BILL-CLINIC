@@ -24,10 +24,7 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
         setShowModal(false);
         setTemplateToEdit(null);
     }
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    };
+   
     return (
         <Row className='gy-2 position-relative'>
             {selectedTemplate ?

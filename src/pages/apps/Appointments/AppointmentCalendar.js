@@ -1,41 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Col, Modal, Row } from 'react-bootstrap';
 import { Calendar, momentLocalizer, Views, Toolbar } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { getAppointmentsAction } from '../../../redux/appointments/action';
 import { useDispatch, useSelector } from 'react-redux';
 import { IoMdClose } from 'react-icons/io';
-import Spinner from '../../../constants/Spinner'; // Assuming Spinner is a loading component
+import Spinner from '../../../constants/Spinner';
 import AppointmentForm from './Tabs/AppointmentForm';
 import ToastHandle from '../../../helpers/ToastMessage';
+import {
+    transformAppointments,
+    formatMonthYear,
+    debouncedFetchAppointments,
+    getEventStyle
+} from '../../../utils/calendarUtils';
+import { getAppointmentsAction } from '../../../redux/actions';
 
 const localizer = momentLocalizer(moment);
 const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
 
 const AppointmentCalendar = ({ selectedDoctor }) => {
     const dispatch = useDispatch();
-    const [events, setEvents] = useState([]);
     const store = useSelector((state) => state);
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
+    const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
+
+    // State management
+    const [events, setEvents] = useState([]);
+    const [show, setShow] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedSlot, setSelectedSlot] = useState(null);
+    const [calendarView, setCalendarView] = useState('month');
+    const [loading, setLoading] = useState(true);
     const [monthYearFilter, setMonthYearFilter] = useState(() => {
         const today = new Date();
         return today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     });
-    const [show, setShow] = useState(false); // This will manage modal visibility
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [selectedSlot, setSelectedSlot] = useState(null);
-    const [calendarView, setCalendarView] = useState('month');
-    const [loading, setLoading] = useState(true); // loading state to track calendar data fetching
-    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
-    const updateSuccess = store?.rescheduleAppointmentReducer?.data?.status;
-    const [appModal, setAppModal] = useState(false);
-    const closeAppModal = () => {
-        setShow(false);
-        setSelectedEvent(null);
-    };
+
+    // Initial data fetch
     useEffect(() => {
-        setLoading(true); // Set loading to true when data fetching begins
+        setLoading(true);
         dispatch(
             getAppointmentsAction({
                 clinicId: clinicId,
@@ -46,7 +51,22 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                 monthYear: monthYearFilter,
             })
         );
-    }, [dispatch, selectedDoctor, monthYearFilter]);
+    }, [dispatch, clinicId, selectedDoctor, monthYearFilter]);
+
+    // Memoized event style getter
+    const memoizedEventStyle = useCallback((event) => getEventStyle(event?.status), []);
+
+    // Custom Event Component
+    const CustomEvent = useMemo(() => {
+        return ({ event }) => (
+            <>
+                <p className="text-capitalize mb-0 ps-1" style={{ fontSize: '10px' }}>
+                    {new Date(event?.slotStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} |{' '}
+                    {event?.patientName}
+                </p>
+            </>
+        );
+    }, []);
 
     useEffect(() => {
         if (createAppointmentResponse === 201) {
@@ -107,17 +127,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         }
     }, [appointmentsList]);
 
-    const CustomEvent = ({ event }) => (
-        <>
-            <p className="text-capitalize mb-0 ps-1" style={{ fontSize: '10px' }}>
-                {new Date(event?.slotStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} |{' '}
-                {event?.patientName}
-            </p>
-            {/* <p className="text-capitalize mb-0 ps-1" style={{ fontSize: '10px' }}>
-                {event?.title}
-            </p> */}
-        </>
-    );
+
 
     const handleEventClick = (event) => {
         setShow(true); // Open modal for event details
@@ -134,6 +144,7 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             const prevMonth = new Date(toolbar?.date);
             prevMonth.setMonth(prevMonth.getMonth() - 1);
             formatMonthYear(prevMonth);
+            setLoading(true);
             toolbar.onNavigate('PREV');
         };
 
@@ -141,12 +152,14 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             const nextMonth = new Date(toolbar?.date);
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             formatMonthYear(nextMonth);
+            setLoading(true);
             toolbar.onNavigate('NEXT');
         };
 
         const goToToday = () => {
             const today = new Date();
             formatMonthYear(today);
+            setLoading(true);
             toolbar.onNavigate('TODAY');
         };
 
@@ -200,6 +213,24 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         setMonthYearFilter(date.toLocaleDateString('en-US', options));
     };
 
+    const handleSlotSelect = useCallback((slotInfo) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const slotDate = new Date(slotInfo.start);
+        slotDate.setHours(0, 0, 0, 0);
+
+        if (slotDate < today) {
+            ToastHandle('Appointments cannot be created for past dates', 'danger');
+        } else {
+            setSelectedSlot(slotInfo);
+            setShow(true);
+        }
+    }, []);
+
+    const handleViewChange = useCallback((view) => {
+        setCalendarView(view);
+    }, []);
+
     return (
         <div className="background_Color">
             <div className="container-fluid px-2 mx-0">
@@ -214,54 +245,16 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                                 style={{ height: '82vh' }}
                                 selectable
                                 onSelectEvent={handleEventClick}
-                                onSelectSlot={(slotInfo) => {
-                                    const today = new Date();
-                                    today.setHours(0, 0, 0, 0); // set today's time to 00:00:00
-
-                                    const slotDate = new Date(slotInfo.start);
-                                    slotDate.setHours(0, 0, 0, 0); // set slot time to 00:00:00
-
-                                    if (slotDate < today) {
-                                        ToastHandle('Appointments cannot be created for past dates', 'danger');
-                                    } else {
-                                        setSelectedSlot(slotInfo);
-                                        setShow(true);
-                                    }
-                                }}
+                                onSelectSlot={handleSlotSelect}
                                 components={{
                                     event: CustomEvent,
                                     toolbar: CustomToolbar,
                                 }}
-                                eventPropGetter={(event) => {
-                                    const statusColors = {
-                                        pending: '#f1c40f',         // Yellow
-                                        proposed: '#3498db',        // Blue
-                                        booked: '#2ecc71',          // Light Green
-                                        arrived: '#27ae60',         // Green
-                                        fulfilled: '#9b59b6',       // Purple
-                                        cancelled: '#e74c3c',       // Red
-                                        noshow: '#e67e22',          // Orange
-                                        enteredinerror: '#95a5a6',  // Gray
-                                        checkedin: '#1abc9c',       // Teal
-                                        waitlist: '#8e44ad',        // Dark Purple
-                                    };
-                                
-                                    const bgColor = statusColors[event?.status?.toLowerCase()] || '#ccc'; // default color if status not found
-                                
-                                    return {
-                                        style: {
-                                            backgroundColor: bgColor,
-                                            color: 'white',
-                                            borderRadius: '0px',
-                                            padding: '2px 4px',
-                                        },
-                                    };
-                                }}
-                                onView={(view) => setCalendarView(view)}
+                                eventPropGetter={memoizedEventStyle}
+                                onView={handleViewChange}
                                 view={calendarView}
                             />
-                            {/* Add the loader inside the calendar when loading */}
-                            {store?.getAppointmentsReducer?.loading && (
+                            {loading && (
                                 <div className="loading-overlay">
                                     <Spinner />
                                 </div>
@@ -270,17 +263,16 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                     </div>
                 </div>
             </div>
-            <Modal centered show={show} size="xl" onHide={closeAppModal}>
+            <Modal centered show={show} size="xl" onHide={closeModal}>
                 <Modal.Body>
                     <Row className="border-bottom mb-1 pb-2">
                         <Col sm={11} className="text-center">
                             <h4>{selectedEvent ? 'Appointment Details' : 'Create New Appointment'}</h4>
                         </Col>
                         <Col sm={1}>
-                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppModal} />
+                            <IoMdClose className="fs-4 cursor-pointer" onClick={closeModal} />
                         </Col>
                     </Row>
-
                     <AppointmentForm
                         selectedSlot={selectedSlot}
                         appointmentId={selectedEvent?.event_id}
@@ -292,4 +284,4 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
     );
 };
 
-export default AppointmentCalendar;
+export default React.memo(AppointmentCalendar);
