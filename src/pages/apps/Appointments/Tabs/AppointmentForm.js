@@ -59,7 +59,9 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
     }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate, DateUtils]);
 
     const todayString = DateUtils.formatDate(new Date());
-    const oneYearLaterString = DateUtils.formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+    const oneMonthLaterString = DateUtils.formatDate(new Date(new Date().setMonth(new Date().getMonth() + 1)));
+
+    // const oneYearLaterString = DateUtils.formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
     const isReadOnly = appointmentDetails?.repeat && id;
 
     return (
@@ -84,7 +86,7 @@ const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appoin
                             {...register('dailyOccurrenceDate')}
                             type='date'
                             min={todayString}
-                            max={oneYearLaterString}
+                            max={oneMonthLaterString}
                             readOnly={isReadOnly}
                             style={{ cursor: isReadOnly ? 'not-allowed' : '' }}
                         />
