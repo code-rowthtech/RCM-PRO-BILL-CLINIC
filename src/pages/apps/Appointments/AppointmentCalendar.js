@@ -40,7 +40,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
 
     // Initial data fetch
     useEffect(() => {
-        setLoading(true);
         dispatch(
             getAppointmentsAction({
                 clinicId: clinicId,
@@ -53,6 +52,13 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         );
     }, [dispatch, clinicId, selectedDoctor, monthYearFilter]);
 
+    useEffect(()=>{
+if(store?.getAppointmentsReducer?.loading){
+    setLoading(true)
+}else{
+    setLoading(false)
+}
+    },[store?.getAppointmentsReducer])
     // Memoized event style getter
     const memoizedEventStyle = useCallback((event) => getEventStyle(event?.status), []);
 
@@ -123,7 +129,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
                 .filter(Boolean);
 
             setEvents(transformedEvents);
-            setLoading(false); // Set loading to false once the data has been processed
         }
     }, [appointmentsList]);
 
@@ -144,7 +149,6 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             const prevMonth = new Date(toolbar?.date);
             prevMonth.setMonth(prevMonth.getMonth() - 1);
             formatMonthYear(prevMonth);
-            setLoading(true);
             toolbar.onNavigate('PREV');
         };
 
@@ -152,14 +156,12 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
             const nextMonth = new Date(toolbar?.date);
             nextMonth.setMonth(nextMonth.getMonth() + 1);
             formatMonthYear(nextMonth);
-            setLoading(true);
             toolbar.onNavigate('NEXT');
         };
 
         const goToToday = () => {
             const today = new Date();
             formatMonthYear(today);
-            setLoading(true);
             toolbar.onNavigate('TODAY');
         };
 
