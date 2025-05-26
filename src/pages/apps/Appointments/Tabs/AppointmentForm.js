@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { Button, Col, Form, Modal, Row, Toast, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 import { AiOutlinePlus } from 'react-icons/ai';
@@ -25,56 +25,41 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmenttype.data';
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
+import DateUtils from '../../../../utils/dateUtils'; // Import DateUtils
 
 // Memoized components
 const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id }) => {
     const daysNumberDaily = watch('daysNumberDaily') || 1;
     const dailyOccurrenceDate = watch('dailyOccurrenceDate');
+    const startDate = watch('scheduled');
 
     // Calculate dates whenever dependencies change
     useEffect(() => {
-        if (!daysNumberDaily) {
+        if (!daysNumberDaily || daysNumberDaily < 1) {
             onDatesCalculated?.([]);
             setValue('dailyOccurenceCount', 0);
             return;
         }
 
-        if (!scheduledDate) return; // ⛔️ if no scheduledDate, don't proceed
+        if (!startDate || !scheduledDate || !dailyOccurrenceDate) return;
 
-        const startDate = new Date(scheduledDate);
-        const dates = [];
-
-        if (dailyOccurrenceDate) {
-            const endDate = new Date(dailyOccurrenceDate);
-            let currentDate = new Date(startDate);
-
-            // Ensure we don't get stuck in infinite loop with invalid dates
-            let safetyCounter = 0;
-            const MAX_ITERATIONS = 365 * 5; // 5 years max
-
-            while (currentDate <= endDate && safetyCounter < MAX_ITERATIONS) {
-                dates.push(currentDate.toISOString());
-                const nextDate = new Date(currentDate);
-                nextDate.setDate(currentDate.getDate() + daysNumberDaily);
-                currentDate = nextDate;
-                safetyCounter++;
-            }
+        try {
+            const dates = DateUtils.calculateDailyAppointments({
+                daysNumber: daysNumberDaily,
+                startDate: scheduledDate,
+                endDate: dailyOccurrenceDate
+            });
+            setValue('dailyOccurenceCount', dates.length);
+            onDatesCalculated?.(dates);
+        } catch (error) {
+            console.error('Error calculating daily appointments:', error);
+            onDatesCalculated?.([]);
+            setValue('dailyOccurenceCount', 0);
         }
+    }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate, DateUtils]);
 
-        // // Only update if necessary
-        // setValue(prev => {
-        //     if (prev.dailyOccurenceCount !== dates.length) {
-        //         return { ...prev, dailyOccurenceCount: dates.length };
-        //     }
-        //     return prev;
-        // });
-        setValue("dailyOccurrenceCount", dates.length);
-
-        onDatesCalculated?.(dates);
-    }, [daysNumberDaily, dailyOccurrenceDate, scheduledDate]);
-
-    const todayString = new Date().toISOString().split('T')[0];
-    const oneYearLaterString = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
+    const todayString = DateUtils.formatDate(new Date());
+    const oneYearLaterString = DateUtils.formatDate(new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
     const isReadOnly = appointmentDetails?.repeat && id;
 
     return (
@@ -262,85 +247,8 @@ const Weekly = React.memo(({ register, watch, setValue, onDatesCalculated, appoi
     );
 });
 
-
-const Monthly = React.memo(({ register }) => (
-    <>
-        <Col sm={6}>
-            <Form.Group className="mb-1" controlId="dayOfMonth">
-                <Form.Label className="mb-0">Day of Month</Form.Label>
-                <Form.Control
-                    placeholder="Enter day of month (1-31)"
-                    {...register('dayOfMonth', { valueAsNumber: true, min: 1, max: 31 })}
-                    type="number"
-                    min={1}
-                    max={31}
-                />
-            </Form.Group>
-        </Col>
-
-        <Col sm={6}>
-            <Form.Group className="mb-1" controlId="nthWeekOfMonth">
-                <Form.Label className="mb-0">Nth Week of Month</Form.Label>
-                <Form.Control
-                    placeholder="Select week (e.g., First, Second)"
-                    {...register('nthWeekOfMonth')}
-                    type="text"
-                />
-            </Form.Group>
-        </Col>
-
-        <Col sm={6}>
-            <Form.Group className="mb-1" controlId="dayOfWeek">
-                <Form.Label className="mb-0">Day of Week</Form.Label>
-                <Form.Select {...register('dayOfWeek')}>
-                    <option value="">Select day</option>
-                    {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((day) => (
-                        <option key={day} value={day}>
-                            {day}
-                        </option>
-                    ))}
-                </Form.Select>
-            </Form.Group>
-        </Col>
-
-        <Col sm={6}>
-            <Form.Group className="mb-1" controlId="monthInterval">
-                <Form.Label className="mb-0">Every</Form.Label>
-                <span className='d-flex'>
-                    <Form.Control
-                        placeholder='Enter number of months'
-                        {...register('monthInterval', { valueAsNumber: true, min: 1, required: true })}
-                        type='number'
-                        min={1}
-                    />
-                    <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;month(s)</Form.Text>
-                </span>
-            </Form.Group>
-        </Col>
-
-        <Col sm={4}>
-            <Form.Group className="mb-1">
-                <Form.Label className="mb-0">Ends On</Form.Label>
-                <span className='d-flex'>
-                    <Form.Control {...register('monthlyOccurrenceDate')} type='date' />
-                    <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;after</Form.Text>
-                </span>
-            </Form.Group>
-        </Col>
-
-        <Col sm={2}>
-            <Form.Group className="mb-1">
-                <Form.Label className="mb-0"></Form.Label>
-                <span className='d-flex'>
-                    <Form.Control {...register('monthlyOccurenceCount')} placeholder='Enter number of appointments' type='number' min={1} />
-                    <Form.Text className="text-black fs-6 fw-semibold">&nbsp;&nbsp;appointments</Form.Text>
-                </span>
-            </Form.Group>
-        </Col>
-    </>
-));
-
 const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
+    const location = useLocation();
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -402,12 +310,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         return `${hours}:${minutes}`;
     }, []);
 
-    // Get today's date helper
-    // const getTodayDate = useCallback(() => {
-    //     return ;
-    // }, []);
-
-    // Get default time helper
     const getDefaultTime = useCallback(() => {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -907,7 +809,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                                 >
                                                     {data?.display === 'day' && 'Daily'}
                                                     {data?.display === 'week' && 'Weekly'}
-                                                    {data?.display === 'month' && 'Monthly'}
+                                                    {/* {data?.display === 'month' && 'Monthly'} */}
                                                 </span>
                                             </li>
                                         ))}
@@ -939,7 +841,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     scheduledDate={scheduledDate}
                                     onDatesCalculated={(dates) => setAppointmentDates(dates)}
                                 />}
-                            {repeatType === 'month' && <Monthly register={register} />}
+                            {/* {repeatType === 'month' && <Monthly register={register} />} */}
                         </Row>
                     )}
                     <Row>
@@ -949,7 +851,9 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                                 onClick={() => {
                                     reset();
-                                    navigate(-1);
+                                    if(location?.pathname!=='/apps/appointments/list'){
+                                        navigate(-1);
+                                    }
                                 }}>
                                 Cancel
                             </Button>

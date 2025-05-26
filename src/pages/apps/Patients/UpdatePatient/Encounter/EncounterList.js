@@ -13,7 +13,6 @@ const EncounterList = ({ tab, encounterTabs, setEncounterTabs, setActiveTab }) =
     const id = searchParams.get('id')
     const store = useSelector((state) => state)
     const encounters = store?.getEncounterReducer?.data?.encounters;
-    console.log(encounters, 'encounters')
     useEffect(() => {
         dispatch(getEncounterAction({ patientId: id }))
     }, [dispatch])

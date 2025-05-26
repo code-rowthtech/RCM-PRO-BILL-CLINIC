@@ -20,15 +20,11 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
     const [templateToEdit, setTemplateToEdit] = useState(null);
     const [editIcon, setEditIcon] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    console.log(selectedTemplate, 'selected template')
     const closeModal = () => {
         setShowModal(false);
         setTemplateToEdit(null);
     }
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    };
+   
     return (
         <Row className='gy-2 position-relative'>
             {selectedTemplate ?

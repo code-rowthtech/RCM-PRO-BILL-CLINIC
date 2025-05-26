@@ -133,8 +133,6 @@ const AddModalSetting = ({ setAddModal, addModal, selectedNote, setSelectedNote 
         } else {
             dispatch(createNoteCategoriesAction({ key: encryptMessage(payload) }));
         }
-
-        console.log(payload, 'payload');
     };
 
     useEffect(() => {
