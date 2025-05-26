@@ -59,7 +59,7 @@ export const patientChartTabs = [
     'Insurances',
     'Eligibility',
     'Authorizations',
-    'Vital Status',
-    'Balance',
-    'Payment',
+    // 'Vital Status',
+    // 'Balance',
+    // 'Payment',
 ]
