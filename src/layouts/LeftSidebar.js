@@ -55,6 +55,7 @@ type LeftSidebarProps = {
 };
 
 const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
+    console.log({isCondensed})
     const menuNodeRef: any = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
@@ -569,7 +570,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     </div>
                                     :
                                     appointmentsData?.length === 0 ?
-                                        <li className='text-white text-center py-5'>
+                                        <li className='text-white text-center fs-6'>
                                             No Appointments Found
                                         </li>
                                         :
@@ -689,6 +690,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                 <SideBarContent
                                     isLight={isLight}
                                     hideUserProfile={hideUserProfile}
+                                    isCondensed={isCondensed}
                                 />
                             )}
                         </div>
@@ -703,13 +705,13 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                         hideUserProfile={hideUserProfile}
                                     />
                                     {/* <span style={{ marginLeft: "33px", fontFamily: "Nunito", fontWeight: 700 }}>
-                                        {!isCondensed && (
-                                            <div className="sf-footer ms-3">
-                                                &copy; {currentYear} - {metadata.buildMajor}.{metadata.buildMinor}
-                                                .{metadata.buildRevision} {metadata.buildTag}asdkmasd
-                                            </div>
-                                        )}
-                                    </span> */}
+                                        {!isCondensed && (                              
+                                            <div className="sf-footer ms-3">                                           
+                                                &copy; {currentYear} - {metadata.buildMajor}.{metadata.buildMinor}    
+                                                .{metadata.buildRevision} {metadata.buildTag}asdkmasd                  
+                                            </div>                                                                    
+                                        )}                                                         
+                                    </span> */}                                                                                                                                                                                
                                 </SimpleBar>
                             )}
                             {isCondensed && (
