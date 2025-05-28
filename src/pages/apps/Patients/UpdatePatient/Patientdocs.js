@@ -36,7 +36,7 @@ import { set } from 'react-hook-form';
 
 const MAX_FILE_SIZE_MB = 2;
 
-const PatientDocs = () => {
+const PatientDocs = ({ isAccordionOpen }) => {
     const [searchParams] = useSearchParams();
     const subjectId = searchParams.get('id');
     const dispatch = useDispatch();
@@ -186,8 +186,6 @@ const PatientDocs = () => {
         return <BsFileEarmark size={size} color="#757575" />;
     }
 
-
-
     // function getFileTypeColor(contentType, fileName) {
     //     const extension = fileName?.split('.').pop().toLowerCase();
 
@@ -208,65 +206,63 @@ const PatientDocs = () => {
     //     }
     // }
     return (
-        <Container fluid className="p-0">
-            <div>
-                <div className="d-flex justify-content-between">
-                    <h5>Patient Documents</h5>
-                    <Button className='custom-buttons' onClick={() => setShowUploadModal(true)}>
-                        <PlusIcon className="me-1" /> Upload New
-                    </Button>
-                </div>
-                <div className="row">
-                    {store?.getDocumentsReducer?.loading ?
-                        <div className="col-12 h-100 py-5 d-flex justify-content-center align-items-center">
-                            <Spinner />
-                        </div>
-                        :
-                        patientDocuments?.map((doc) =>
-                            doc?.content?.map((content, index) => (
-                                <div className="col-3 ">
-                                    <Card
-                                        title={content?.attachment?.fileName}
-                                        key={`${doc?._id}-${index}`}
-                                        className="mb-3 p-2  rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
-                                        style={{
-                                            // borderLeft: '4px solid ' + getFileTypeColor(content?.attachment?.contentType, content?.attachment?.fileName),
-                                            borderLeft: '4px solid #e8f0fe',
-                                            transition: 'all 0.2s ease',
-                                        }}
-                                    >
-                                        <div className="d-flex align-items-center w-100 gap-3">
-                                            {/* File Icon */}
-                                            <div className="flex-shrink-0">
-                                                {getFileIcon(content?.attachment?.contentType, content?.attachment?.fileName)}
-                                            </div>
+        <div>
+            <div className="d-flex justify-content-between align-items-center">
+                <h5>Patient Documents</h5>
+                <Button className='custom-buttons' onClick={() => setShowUploadModal(true)}>
+                    <PlusIcon className="me-1" /> Upload New
+                </Button>
+            </div>
+            <div className='scroll-container row mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '1vh' : '73vh' }}>
+                {store?.getDocumentsReducer?.loading ?
+                    <div className="col-12 h-100 py-5 d-flex justify-content-center align-items-center">
+                        <Spinner />
+                    </div>
+                    :
+                    patientDocuments?.map((doc) =>
+                        doc?.content?.map((content, index) => (
+                            <div className="col-3 ">
+                                <Card
+                                    title={content?.attachment?.fileName}
+                                    key={`${doc?._id}-${index}`}
+                                    className="mb-3 p-2  rounded-1 cursor-pointer d-flex align-items-center justify-content-between"
+                                    style={{
+                                        // borderLeft: '4px solid ' + getFileTypeColor(content?.attachment?.contentType, content?.attachment?.fileName),
+                                        borderLeft: '4px solid #e8f0fe',
+                                        transition: 'all 0.2s ease',
+                                    }}
+                                >
+                                    <div className="d-flex align-items-center w-100 gap-3">
+                                        {/* File Icon */}
+                                        <div className="flex-shrink-0">
+                                            {getFileIcon(content?.attachment?.contentType, content?.attachment?.fileName)}
+                                        </div>
 
-                                            {/* File Info */}
-                                            <div className="flex-grow-1" style={{ minWidth: 0 }}>
-                                                <div className="text-truncate fw-medium">
-                                                    {content?.attachment?.fileName}
-                                                </div>
-                                                <div className="text-muted small">
-                                                    {formatFileSize(content?.attachment?.size)}
-                                                </div>
+                                        {/* File Info */}
+                                        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                                            <div className="text-truncate fw-medium">
+                                                {content?.attachment?.fileName}
                                             </div>
-
-                                            {/* Action Buttons */}
-                                            <div className="d-flex gap-1 flex-shrink-0">
-                                                {/* <FiDownload title="Download" size={18} /> */}
-                                                <i title='Preview' onClick={() => {
-                                                    setPreviewModal(true);
-                                                    setPreviewLink(content?.attachment?.url);
-                                                }} className='bi bi-eye fs-4 text-info cursor-pointer' />
-                                                <i title='Edit Status' className='mdi mdi-square-edit-outline cursor-pointer fs-4' />
-                                                <i title='Delete' className='bi bi-trash text-danger fs-4 cursor-pointer' />
+                                            <div className="text-muted small">
+                                                {formatFileSize(content?.attachment?.size)}
                                             </div>
                                         </div>
-                                    </Card>
-                                </div>
-                            ))
-                        )}
-                </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="d-flex gap-1 flex-shrink-0">
+                                            {/* <FiDownload title="Download" size={18} /> */}
+                                            <i title='Preview' onClick={() => {
+                                                setPreviewModal(true);
+                                                setPreviewLink(content?.attachment?.url);
+                                            }} className='bi bi-eye fs-4 text-info cursor-pointer' />
+                                            <i title='Edit Status' className='mdi mdi-square-edit-outline cursor-pointer fs-4' />
+                                            <i title='Delete' className='bi bi-trash text-danger fs-4 cursor-pointer' />
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+                        ))
+                    )}
             </div>
 
             <Modal show={showUploadModal} onHide={() => setShowUploadModal(false)} size="xl" centered>
@@ -397,7 +393,7 @@ const PatientDocs = () => {
                 </Modal.Body>
             </Modal>
             <PreviewModal show={previewModal} closePreviewModal={closePreviewModal} previewLink={previewLink} />
-        </Container>
+        </div>
     );
 };
 

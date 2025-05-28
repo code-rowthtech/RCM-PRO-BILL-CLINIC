@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TemplateModal from '../../../NotesAndTemplates/Modals/TemplateModal';
 
-const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
+const EncounterTemplates = ({ selectedFromList, setSelectedFromList, isAccordionOpen }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch()
     const templatesData = store?.getTemplateReducer?.data?.data;
@@ -24,11 +24,11 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
         setShowModal(false);
         setTemplateToEdit(null);
     }
-   
+
     return (
-        <Row className='gy-2 position-relative'>
+        <Row className=' position-relative'>
             {selectedTemplate ?
-                <Col sm={12} className='scroll-container ' style={{ height: '57vh' }}>
+                <Col sm={12} className='mt-1' >
                     <Row className="align-items-center  position-relative">
                         <Col className="text-center">
                             <h5 className="my-0 fw-bold">{selectedTemplate?.title}</h5>
@@ -70,8 +70,8 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                     </Row>
                 </Col>
                 :
-                <Col sm={12} className='mt-0 scroll-container ' style={{ height: '57vh' }}>
-                    <div className='scroll-container' style={{ height: '90%' }}>
+                <Col sm={12} className='mt-1'>
+                    <div>
                         <div
                             className="input_search_box"
                             style={{
@@ -118,7 +118,6 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
                                     <div className="no-templates-placeholder text-center py-4">
                                         <FiFileText size={48} className="text-muted mb-2" />
                                         <h5>No templates found</h5>
-                                        <p className="text-muted">Create your first template to get started</p>
                                     </div>
                                 ) : (
                                     <div className='template-grid d-flex flex-column py-1 gap-1 px-0'>

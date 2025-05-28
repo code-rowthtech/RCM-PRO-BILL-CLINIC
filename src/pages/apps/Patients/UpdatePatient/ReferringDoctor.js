@@ -110,9 +110,8 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
     };
 
     return (
-        <Form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '46.5vh' : '70vh' }}>
-
+        <Form onSubmit={handleSubmit(onSubmit)}>
+            <div className='scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <Row className="pb-2">
                     <Col sm={12}>
                         <span className="text-black fw-semibold form-label">Personal Details</span>
@@ -211,37 +210,33 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                 <hr />
                 <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             </div>
-            <Row className="mt-2">
-                <div className="d-flex gap-2 justify-content-end mb-1">
-                    <div className="d-flex gap-2 justify-content-end ">
-                        <Button className="cancel-button" onClick={() => reset()}>
-                            Clear
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setSubmissionType('saveAndReset');
-                            }}
-                            className="custom-buttons"
-                            type="submit">
-                            Save & Add Another
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                setSubmissionType('saveAndNext');
-                            }}
-                            disabled={store?.addReferringDoctorReducer?.loading}
-                            className="custom-buttons"
-                            style={{ width: '200px' }}
-                            type="submit">
-                            {store?.addReferringDoctorReducer?.loading ? (
-                                <Spinner color="white" className="spinner-border-sm" />
-                            ) : (
-                                'Save & Continue Editing'
-                            )}
-                        </Button>
-                    </div>
-                </div>
-            </Row>
+            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
+                <Button className="cancel-button" onClick={() => reset()}>
+                    Clear
+                </Button>
+                <Button
+                    onClick={() => {
+                        setSubmissionType('saveAndReset');
+                    }}
+                    className="custom-buttons"
+                    type="submit">
+                    Save & Add Another
+                </Button>
+                <Button
+                    onClick={() => {
+                        setSubmissionType('saveAndNext');
+                    }}
+                    disabled={store?.addReferringDoctorReducer?.loading}
+                    className="custom-buttons"
+                    style={{ width: '200px' }}
+                    type="submit">
+                    {store?.addReferringDoctorReducer?.loading ? (
+                        <Spinner color="white" className="spinner-border-sm" />
+                    ) : (
+                        'Save & Continue Editing'
+                    )}
+                </Button>
+            </div>
         </Form>
     );
 };

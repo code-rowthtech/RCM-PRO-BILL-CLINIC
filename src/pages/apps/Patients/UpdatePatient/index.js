@@ -534,7 +534,7 @@ const UpdatePatientIndex = () => {
                                                                                 Follow Up Reason:
                                                                             </th>
                                                                             <td
-                                                                                className={`fs-6 pe-2 text-nowrap ${patientDetails?.followupReason
+                                                                                className={`fs-6 pe-2 text-capitalize text-nowrap ${patientDetails?.followupReason
                                                                                     ? 'text-black'
                                                                                     : 'text-danger'
                                                                                     }`}>
@@ -721,15 +721,16 @@ const UpdatePatientIndex = () => {
                                 {visibleSection === 'patient' && (
                                     <div className="mt-2">
                                         <Card
-                                            className="px-2 scroll-container   border-0 pt-2"
+                                            className="p-2 border-0"
                                             style={{
                                                 height: selectedMainTab !== 'Encounter' && expanded && !isAccordionOpen ? '100vh'  // When expanded AND accordion closed...............
                                                     : expanded ? '90vh'                        // When expanded (accordion state doesn't matter)....
                                                         : isAccordionOpen ? '66.5vh'          // When accordion open (not expanded).................
                                                             : '81.5vh',                      // Default case (neither expanded nor accordion open)..
-                                                maxHeight: '1000px',
-                                                overflowX: 'hidden'
-                                            }}>
+                                                maxHeight: '100%',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
                                             {selectedMainTab === 'Patient Details' && (
                                                 <PatientSummary
                                                     isAccordionOpen={isAccordionOpen}
@@ -750,7 +751,7 @@ const UpdatePatientIndex = () => {
                                             )}
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
-                                            {selectedMainTab === 'Documents' && <PatientDocs />}
+                                            {selectedMainTab === 'Documents' && <PatientDocs isAccordionOpen={isAccordionOpen} />}
                                             {selectedMainTab === 'Encounter' && (
                                                 <Encounter
                                                     expanded={expanded}

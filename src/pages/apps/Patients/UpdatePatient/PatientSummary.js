@@ -139,518 +139,516 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     };
 
     return (
-        <div className="patient-summary ">
-            <Row className={`mb-2  h-100  g-2   ${isAccordionOpen ? 'summary-expanded' : 'summary-collapsed'}`}>
-                {/* Vitals Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaHeartbeat className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Vitals</span>
-                            </div>
-                            <div className="d-flex align-items-center">
-                                <input
-                                    className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
-                                    type="date"
-                                    value={effectiveDateTime}
-                                    onChange={(e) => setEffectiveDateTime(e.target.value)}
-                                />
-                                <MdAddCircleOutline
-                                    onClick={() => setVitalsModal(true)}
-                                    className="text-primary me-2 cursor-pointer"
-                                />
-                                <MdOutlinePrint
-                                    onClick={() =>
-                                        handlePrintVitals({
-                                            vitals: store?.getVitalsByPatientIdReducer?.data?.data,
-                                            patientDetails: patientDetails,
-                                        })
-                                    }
-                                    className="text-secondary cursor-pointer"
-                                />
-                            </div>
-                        </Card.Header>
-                        <Card.Body className="p-2 scroll-container" style={{ height: '22vh' }}>
-                            {store?.getVitalsByPatientIdReducer?.loading ? (
-                                <div
-                                    className="d-flex justify-content-center align-items-center w-100 p-5"
-                                    style={{ height: '100%' }}>
-                                    <Spinner className="spinner-border-sm" />
-                                </div>
-                            ) : (
-                                <div
-                                    className={`${!patientVitals?.vitals || patientVitals.vitals.length === 0 ? 'h-100 d-flex align-items-center justify-content-center bg-white' : 'vitals-grid'} fs-6`}>
-                                    {!patientVitals?.vitals || patientVitals.vitals.length === 0 ? (
-                                        <div
-                                            className="fw-bold  w-100 h-100 text-nowrap d-flex align-items-center justify-content-center fs-6"
-                                            style={{ height: '100%', width: '100%' }}>
-                                            No Vitals Found
-                                        </div>
-                                    ) : (
-                                        patientVitals.vitals.map((data) => {
-                                            const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
-
-                                            const value =
-                                                data?.valueString ??
-                                                (data?.valueQuantity?.value
-                                                    ? `${data.valueQuantity.value} ${data.valueQuantity.unit || ''}`
-                                                    : null) ??
-                                                (data?.valueBoolean !== undefined
-                                                    ? data.valueBoolean
-                                                        ? 'Yes'
-                                                        : 'No'
-                                                    : null);
-
-                                            let bpReading = null;
-                                            if (data.component && !value) {
-                                                const systolic = data.component.find(
-                                                    (c) => c.code?.coding?.[0]?.code === '8480-6'
-                                                )?.valueQuantity?.value;
-                                                const diastolic = data.component.find(
-                                                    (c) => c.code?.coding?.[0]?.code === '8462-4'
-                                                )?.valueQuantity?.value;
-                                                bpReading = `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
-                                            }
-
-                                            return (
-                                                <div key={data?._id} className="vital-item">
-                                                    <span className="text-muted">{codeDisplay}</span>
-                                                    <div className="fw-bold">{value || bpReading || 'N/A'}</div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-
-                {/* Allergies Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaAllergies className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Allergies</span>
-                            </div>
-                            <div>
-                                <MdAddCircleOutline
-                                    className="text-primary me-2 cursor-pointer"
-                                    onClick={handleAddAllergyOpen}
-                                />
-                                <MdOutlinePrint
-                                    className="text-secondary cursor-pointer"
-                                    title="Print all Allergies"
-                                    onClick={() => handlePrintAllergies({ patientDetails, allergyData })}
-                                />
-                            </div>
-                        </Card.Header>
-                        <Card.Body className="p-2 pb-0">
-                            {store?.getAllergiesOfAPatientReducer?.loading ? (
-                                <div
-                                    className="d-flex justify-content-center align-items-center w-100 p-5"
-                                    style={{ height: '100%' }}>
-                                    <Spinner className="spinner-border-sm" />
-                                </div>
-                            ) : allergyData && allergyData.length > 0 ? (
-                                <ul className="list-unstyled pb-0 mb-0">
-                                    {allergyData.slice(0, 4).map((allergy, index) => (
-                                        <li
-                                            key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-start">
-                                            <div className="fs-6">
-                                                <strong title={allergy?.code?.text}>
-                                                    {allergy?.code?.text?.length > 30
-                                                        ? allergy?.code?.text?.slice(0, 29) + '...'
-                                                        : allergy?.code?.text || 'Unknown Allergy'}
-                                                </strong>
-                                                <div className="text-muted  small">
-                                                    {allergy?.clinicalStatus?.text || 'Status not available'}
-                                                </div>
-                                            </div>
-                                            <span className="fs-6 fw-semibold text-nowrap">
-                                                {getSeverityBadge(allergy.criticality)}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <ul
-                                    className="list-unstyled d-flex align-items-center justify-content-center"
-                                    style={{ height: '100%', width: '100%' }}>
-                                    <li className="mb-2">
-                                        <div className="fs-6  d-flex justify-content-between align-items-center">
-                                            <strong>No Allergies Found</strong>
-                                        </div>
-                                    </li>
-                                </ul>
-                            )}
-                        </Card.Body>
-                        <div
-                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Allergy List')}>
-                            Go To Allergies List
+        <Row className={`mb-2 h-100 scroll-container g-2`}>
+            {/* Vitals Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaHeartbeat className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Vitals</span>
                         </div>
-                    </Card>
-                </Col>
-
-                {/* Problems Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaProcedures className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Problems</span>
-                            </div>
-                            <div>
-                                <MdAddCircleOutline
-                                    className="text-primary me-2 cursor-pointer"
-                                    onClick={handleAddProblemOpen}
-                                />
-                                <MdOutlinePrint
-                                    className="text-secondary cursor-pointer"
-                                    onClick={() => handlePrintProblems({ patientDetails, problemData })}
-                                />
-                            </div>
-                        </Card.Header>
-                        <Card.Body className="p-2">
-                            {store?.getProblemListReducer?.loading ? (
-                                <div
-                                    className="d-flex justify-content-center align-items-center w-100 p-5"
-                                    style={{ height: '100%' }}>
-                                    <Spinner className="spinner-border-sm" />
-                                </div>
-                            ) : problemData && problemData.length > 0 ? (
-                                <ul className="list-unstyled pb-0 mb-0">
-                                    {problemData?.slice(0, 4)?.map((problem, index) => (
-                                        <li
-                                            key={index}
-                                            className="mb-2 d-flex justify-content-between align-items-start">
-                                            <div className="fs-6">
-                                                <strong title={problem?.code?.text}>
-                                                    {problem?.code?.text?.length > 30
-                                                        ? problem.code.text.slice(0, 30) + '...'
-                                                        : problem?.code?.text || 'Unknown Problem'}
-                                                </strong>
-                                                <div className="text-muted small">
-                                                    {problem?.clinicalStatus?.text || 'Status not available'}
-                                                </div>
-                                            </div>
-                                            <span className="fs-6 fw-semibold text-success">
-                                                {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                })}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <ul
-                                    className="list-unstyled d-flex align-items-center justify-content-center"
-                                    style={{ height: '100%', width: '100%' }}>
-                                    <li className="mb-2">
-                                        <div className="fs-6  d-flex justify-content-between align-items-center">
-                                            <strong>No Problems Found</strong>
-                                        </div>
-                                    </li>
-                                </ul>
-                            )}
-                        </Card.Body>
-                        <div
-                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Problem List')}>
-                            Go To Problem List
+                        <div className="d-flex align-items-center">
+                            <input
+                                className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
+                                type="date"
+                                value={effectiveDateTime}
+                                onChange={(e) => setEffectiveDateTime(e.target.value)}
+                            />
+                            <MdAddCircleOutline
+                                onClick={() => setVitalsModal(true)}
+                                className="text-primary me-2 cursor-pointer"
+                            />
+                            <MdOutlinePrint
+                                onClick={() =>
+                                    handlePrintVitals({
+                                        vitals: store?.getVitalsByPatientIdReducer?.data?.data,
+                                        patientDetails: patientDetails,
+                                    })
+                                }
+                                className="text-secondary cursor-pointer"
+                            />
                         </div>
-                    </Card>
-                </Col>
-
-                {/* Medications Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaPills className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Medications</span>
+                    </Card.Header>
+                    <Card.Body className="  p-2 scroll-container" style={{ height: '22vh' }}>
+                        {store?.getVitalsByPatientIdReducer?.loading ? (
+                            <div
+                                className="d-flex justify-content-center align-items-center w-100 p-5"
+                                style={{ height: '100%' }}>
+                                <Spinner className="spinner-border-sm" />
                             </div>
-                            <div>
-                                <MdAddCircleOutline
-                                    onClick={() => setMedicationModal(true)}
-                                    className="text-primary me-2 cursor-pointer"
-                                />
-                                <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
-                                <MdOutlinePrint
-                                    onClick={() =>
-                                        handlePrintMedication({
-                                            medicationList: medicationList,
-                                            patientDetails: patientDetails,
-                                        })
-                                    }
-                                    className="text-secondary cursor-pointer"
-                                />
-                            </div>
-                        </Card.Header>
-                        <Card.Body className="p-2 scroll-container" style={{ height: '22vh' }}>
-                            {store?.getMedicationReducer?.loading ? (
-                                <div
-                                    className="d-flex justify-content-center align-items-center w-100 p-5"
-                                    style={{ height: '100%' }}>
-                                    <Spinner className="spinner-border-sm" />
-                                </div>
-                            ) : (
-                                <ul className="list-unstyled h-100">
-                                    {medicationList?.length === 0 || !medicationList ? (
-                                        <li
-                                            className="list-unstyled d-flex align-items-center justify-content-center"
-                                            style={{ height: '100%', width: '100%' }}>
-                                            <div className="fs-6  d-flex justify-content-between align-items-center">
-                                                <strong>No Medications Found</strong>
-                                            </div>
-                                        </li>
-                                    ) : (
-                                        medicationList?.slice(0, 4)?.map((medication, index) => (
-                                            <li
-                                                key={index}
-                                                className="mb-2 d-flex justify-content-between align-items-start">
-                                                <div className="fs-6">
-                                                    <strong
-                                                        className="text-capitalize"
-                                                        title={medication?.drugId?.proprietaryName}>
-                                                        {medication?.drugId?.proprietaryName?.length > 30
-                                                            ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...'
-                                                            : medication?.drugId?.proprietaryName}
-                                                    </strong>
-                                                    <div
-                                                        className="text-muted"
-                                                        title={medication?.drugId?.nonProprietaryName}>
-                                                        {medication?.drugId?.nonProprietaryName?.length > 40
-                                                            ? medication?.drugId?.nonProprietaryName?.slice(0, 39) +
-                                                              '...'
-                                                            : medication?.drugId?.nonProprietaryName}
-                                                    </div>
-                                                    <div
-                                                        className="text-muted "
-                                                        title={medication?.dosageInstruction?.[0]?.text}>
-                                                        {medication?.dosageInstruction?.[0]?.text?.length > 40
-                                                            ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) +
-                                                              '...'
-                                                            : medication?.dosageInstruction?.[0]?.text || ''}
-                                                    </div>
-                                                </div>
-                                                <span
-                                                    className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                    {medication?.status}
-                                                </span>
-                                            </li>
-                                        ))
-                                    )}
-                                </ul>
-                            )}
-                        </Card.Body>
-                        <div
-                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Medication List')}>
-                            Go To Medication List
-                        </div>
-                    </Card>
-                </Col>
-
-                {/* Social History Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaUserMd className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Social History</span>
-                            </div>
-                            <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
-                            </div>
-                        </Card.Header>
-                        <Card.Body className="p-2">
-                            {store?.getFamilyGeneticReducer?.loading && store?.getTobaccooReducer?.loading ? (
-                                <div className="d-flex align-items-center justify-content-center w-100 h-100">
-                                    <Spinner className="spinner-border-sm" />
-                                </div>
-                            ) : socialHistoryData?.length > 0 ? (
-                                socialHistoryData?.map((data, index) => (
+                        ) : (
+                            <div
+                                className={`${!patientVitals?.vitals || patientVitals.vitals.length === 0 ? 'h-100 d-flex align-items-center justify-content-center bg-white' : 'vitals-grid'} fs-6`}>
+                                {!patientVitals?.vitals || patientVitals.vitals.length === 0 ? (
                                     <div
-                                        className="social-history-item  py-2 d-flex align-items-center justify-content-between"
-                                        key={index}>
-                                        <span className="text-muted fs-6">
-                                            {data?.tobaccoUse || data?.condition?.[0]?.code?.coding?.[0]?.display}
-                                        </span>
-                                        <div className="fs-6 fw-semibold">
-                                            {data?.effectiveDateTime
-                                                ? new Date(data?.effectiveDateTime)?.toLocaleDateString('en-GB')
-                                                : '' || data?.deceasedDate
-                                                  ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB')
-                                                  : '' || 'N/A'}
-                                        </div>
+                                        className="fw-bold  w-100 h-100 text-nowrap d-flex align-items-center justify-content-center fs-6"
+                                        style={{ height: '100%', width: '100%' }}>
+                                        No Vitals Found
                                     </div>
-                                ))
-                            ) : (
-                                <div className="d-flex align-items-center justify-content-center w-100 h-100">
-                                    No Social Histoy Found
-                                </div>
-                            )}
-                        </Card.Body>
-                        <div
-                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Tobacco')}>
-                            Go To Social History
-                        </div>
-                    </Card>
-                </Col>
+                                ) : (
+                                    patientVitals.vitals.map((data) => {
+                                        const codeDisplay = data?.code?.coding?.[0]?.display || 'Unknown Vital';
 
-                {/* Encounters Card */}
-                <Col sm={4} className="patient-summary-card">
-                    <Card className="h-100 shadow-sm">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaCalendarAlt className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Recent Encounters</span>
+                                        const value =
+                                            data?.valueString ??
+                                            (data?.valueQuantity?.value
+                                                ? `${data.valueQuantity.value} ${data.valueQuantity.unit || ''}`
+                                                : null) ??
+                                            (data?.valueBoolean !== undefined
+                                                ? data.valueBoolean
+                                                    ? 'Yes'
+                                                    : 'No'
+                                                : null);
+
+                                        let bpReading = null;
+                                        if (data.component && !value) {
+                                            const systolic = data.component.find(
+                                                (c) => c.code?.coding?.[0]?.code === '8480-6'
+                                            )?.valueQuantity?.value;
+                                            const diastolic = data.component.find(
+                                                (c) => c.code?.coding?.[0]?.code === '8462-4'
+                                            )?.valueQuantity?.value;
+                                            bpReading = `${systolic || 'N/A'} / ${diastolic || 'N/A'}`;
+                                        }
+
+                                        return (
+                                            <div key={data?._id} className="vital-item">
+                                                <span className="text-muted">{codeDisplay}</span>
+                                                <div className="fw-bold">{value || bpReading || 'N/A'}</div>
+                                            </div>
+                                        );
+                                    })
+                                )}
                             </div>
-                            <div>
-                                <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                        )}
+                    </Card.Body>
+                </Card>
+            </Col>
+
+            {/* Allergies Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaAllergies className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Allergies</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline
+                                className="text-primary me-2 cursor-pointer"
+                                onClick={handleAddAllergyOpen}
+                            />
+                            <MdOutlinePrint
+                                className="text-secondary cursor-pointer"
+                                title="Print all Allergies"
+                                onClick={() => handlePrintAllergies({ patientDetails, allergyData })}
+                            />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2 pb-0">
+                        {store?.getAllergiesOfAPatientReducer?.loading ? (
+                            <div
+                                className="d-flex justify-content-center align-items-center w-100 p-5"
+                                style={{ height: '100%' }}>
+                                <Spinner className="spinner-border-sm" />
                             </div>
-                        </Card.Header>
-                        <Card.Body className="p-2">
-                            <ul className="list-unstyled h-100">
-                                {store?.getEncounterReducer?.loading ? (
-                                    <li className="d-flex align-items-center justify-content-center w-100 h-100">
-                                        <Spinner className="spinner-border-sm" />
+                        ) : allergyData && allergyData.length > 0 ? (
+                            <ul className="list-unstyled pb-0 mb-0">
+                                {allergyData.slice(0, 4).map((allergy, index) => (
+                                    <li
+                                        key={index}
+                                        className="mb-2 d-flex justify-content-between align-items-start">
+                                        <div className="fs-6">
+                                            <strong title={allergy?.code?.text}>
+                                                {allergy?.code?.text?.length > 30
+                                                    ? allergy?.code?.text?.slice(0, 29) + '...'
+                                                    : allergy?.code?.text || 'Unknown Allergy'}
+                                            </strong>
+                                            <div className="text-muted  small">
+                                                {allergy?.clinicalStatus?.text || 'Status not available'}
+                                            </div>
+                                        </div>
+                                        <span className="fs-6 fw-semibold text-nowrap">
+                                            {getSeverityBadge(allergy.criticality)}
+                                        </span>
                                     </li>
-                                ) : encounters?.length > 0 ? (
-                                    encounters.map((data, index) => (
+                                ))}
+                            </ul>
+                        ) : (
+                            <ul
+                                className="list-unstyled d-flex align-items-center justify-content-center"
+                                style={{ height: '100%', width: '100%' }}>
+                                <li className="mb-2">
+                                    <div className="fs-6  d-flex justify-content-between align-items-center">
+                                        <strong>No Allergies Found</strong>
+                                    </div>
+                                </li>
+                            </ul>
+                        )}
+                    </Card.Body>
+                    <div
+                        className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                        onClick={() => setSelectedMainTab('Allergy List')}>
+                        Go To Allergies List
+                    </div>
+                </Card>
+            </Col>
+
+            {/* Problems Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaProcedures className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Problems</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline
+                                className="text-primary me-2 cursor-pointer"
+                                onClick={handleAddProblemOpen}
+                            />
+                            <MdOutlinePrint
+                                className="text-secondary cursor-pointer"
+                                onClick={() => handlePrintProblems({ patientDetails, problemData })}
+                            />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2">
+                        {store?.getProblemListReducer?.loading ? (
+                            <div
+                                className="d-flex justify-content-center align-items-center w-100 p-5"
+                                style={{ height: '100%' }}>
+                                <Spinner className="spinner-border-sm" />
+                            </div>
+                        ) : problemData && problemData.length > 0 ? (
+                            <ul className="list-unstyled pb-0 mb-0">
+                                {problemData?.slice(0, 4)?.map((problem, index) => (
+                                    <li
+                                        key={index}
+                                        className="mb-2 d-flex justify-content-between align-items-start">
+                                        <div className="fs-6">
+                                            <strong title={problem?.code?.text}>
+                                                {problem?.code?.text?.length > 30
+                                                    ? problem.code.text.slice(0, 30) + '...'
+                                                    : problem?.code?.text || 'Unknown Problem'}
+                                            </strong>
+                                            <div className="text-muted small">
+                                                {problem?.clinicalStatus?.text || 'Status not available'}
+                                            </div>
+                                        </div>
+                                        <span className="fs-6 fw-semibold text-success">
+                                            {new Date(problem?.onsetDateTime).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                            })}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <ul
+                                className="list-unstyled d-flex align-items-center justify-content-center"
+                                style={{ height: '100%', width: '100%' }}>
+                                <li className="mb-2">
+                                    <div className="fs-6  d-flex justify-content-between align-items-center">
+                                        <strong>No Problems Found</strong>
+                                    </div>
+                                </li>
+                            </ul>
+                        )}
+                    </Card.Body>
+                    <div
+                        className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                        onClick={() => setSelectedMainTab('Problem List')}>
+                        Go To Problem List
+                    </div>
+                </Card>
+            </Col>
+
+            {/* Medications Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaPills className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Medications</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline
+                                onClick={() => setMedicationModal(true)}
+                                className="text-primary me-2 cursor-pointer"
+                            />
+                            <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
+                            <MdOutlinePrint
+                                onClick={() =>
+                                    handlePrintMedication({
+                                        medicationList: medicationList,
+                                        patientDetails: patientDetails,
+                                    })
+                                }
+                                className="text-secondary cursor-pointer"
+                            />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2 scroll-container" style={{ height: '22vh' }}>
+                        {store?.getMedicationReducer?.loading ? (
+                            <div
+                                className="d-flex justify-content-center align-items-center w-100 p-5"
+                                style={{ height: '100%' }}>
+                                <Spinner className="spinner-border-sm" />
+                            </div>
+                        ) : (
+                            <ul className="list-unstyled h-100">
+                                {medicationList?.length === 0 || !medicationList ? (
+                                    <li
+                                        className="list-unstyled d-flex align-items-center justify-content-center"
+                                        style={{ height: '100%', width: '100%' }}>
+                                        <div className="fs-6  d-flex justify-content-between align-items-center">
+                                            <strong>No Medications Found</strong>
+                                        </div>
+                                    </li>
+                                ) : (
+                                    medicationList?.slice(0, 4)?.map((medication, index) => (
                                         <li
                                             key={index}
-                                            className="mb-2 d-flex fs-6 justify-content-between align-items-center">
-                                            <div className="d-flex flex-column">
-                                                <strong className="text-capitalize">
-                                                    {data?.type?.[0]?.coding?.[0]?.display || 'Unknown Type'}
+                                            className="mb-2 d-flex justify-content-between align-items-start">
+                                            <div className="fs-6">
+                                                <strong
+                                                    className="text-capitalize"
+                                                    title={medication?.drugId?.proprietaryName}>
+                                                    {medication?.drugId?.proprietaryName?.length > 30
+                                                        ? medication?.drugId?.proprietaryName?.slice(0, 29) + '...'
+                                                        : medication?.drugId?.proprietaryName}
                                                 </strong>
-                                                <small className="text-muted fs-6">
-                                                    {data?.period?.start
-                                                        ? new Date(data.period.start).toISOString().split('T')[0]
-                                                        : 'No Date'}
-                                                </small>
+                                                <div
+                                                    className="text-muted"
+                                                    title={medication?.drugId?.nonProprietaryName}>
+                                                    {medication?.drugId?.nonProprietaryName?.length > 40
+                                                        ? medication?.drugId?.nonProprietaryName?.slice(0, 39) +
+                                                        '...'
+                                                        : medication?.drugId?.nonProprietaryName}
+                                                </div>
+                                                <div
+                                                    className="text-muted "
+                                                    title={medication?.dosageInstruction?.[0]?.text}>
+                                                    {medication?.dosageInstruction?.[0]?.text?.length > 40
+                                                        ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) +
+                                                        '...'
+                                                        : medication?.dosageInstruction?.[0]?.text || ''}
+                                                </div>
                                             </div>
-                                            <p className="text-muted fw-semibold text-capitalize">
-                                                {data?.status || 'Unknown Status'}
-                                            </p>
+                                            <span
+                                                className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                {medication?.status}
+                                            </span>
                                         </li>
                                     ))
-                                ) : (
-                                    <li className="d-flex align-items-center justify-content-center w-100 h-100 text-muted">
-                                        No Encounters Found
-                                    </li>
                                 )}
                             </ul>
-                        </Card.Body>
-                        <div
-                            className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
-                            onClick={() => setSelectedMainTab('Encounter')}>
-                            Go To Encounter List
-                        </div>
-                    </Card>
-                </Col>
+                        )}
+                    </Card.Body>
+                    <div
+                        className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                        onClick={() => setSelectedMainTab('Medication List')}>
+                        Go To Medication List
+                    </div>
+                </Card>
+            </Col>
 
-                {/* Appointments Card - Full Width */}
-                <Col sm={12} className="patient-summary-card">
-                    <Card className="shadow-sm mb-0">
-                        <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
-                            <div className="d-flex align-items-center">
-                                <FaCalendarAlt className="me-2 text-secondary" />
-                                <span className="fw-bold fs-6">Upcoming Appointments</span>
+            {/* Social History Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaUserMd className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Social History</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                            <MdOutlinePrint className="text-secondary cursor-pointer" />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2">
+                        {store?.getFamilyGeneticReducer?.loading && store?.getTobaccooReducer?.loading ? (
+                            <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                <Spinner className="spinner-border-sm" />
                             </div>
-                            <div>
-                                <MdAddCircleOutline
-                                    className="text-primary me-2 cursor-pointer"
-                                    onClick={handleAddAppointmentOpen}
-                                />
-                                <MdOutlinePrint className="text-secondary cursor-pointer" />
+                        ) : socialHistoryData?.length > 0 ? (
+                            socialHistoryData?.map((data, index) => (
+                                <div
+                                    className="social-history-item  py-2 d-flex align-items-center justify-content-between"
+                                    key={index}>
+                                    <span className="text-muted fs-6">
+                                        {data?.tobaccoUse || data?.condition?.[0]?.code?.coding?.[0]?.display}
+                                    </span>
+                                    <div className="fs-6 fw-semibold">
+                                        {data?.effectiveDateTime
+                                            ? new Date(data?.effectiveDateTime)?.toLocaleDateString('en-GB')
+                                            : '' || data?.deceasedDate
+                                                ? new Date(data?.deceasedDate)?.toLocaleDateString('en-GB')
+                                                : '' || 'N/A'}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="d-flex align-items-center justify-content-center w-100 h-100">
+                                No Social Histoy Found
                             </div>
-                        </Card.Header>
-                        <Card.Body className="p-2">
-                            <div className="table-responsive">
-                                <Table responsive className="table-centered fs-6 table-nowrap mb-0  rounded">
-                                    <thead>
+                        )}
+                    </Card.Body>
+                    <div
+                        className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                        onClick={() => setSelectedMainTab('Tobacco')}>
+                        Go To Social History
+                    </div>
+                </Card>
+            </Col>
+
+            {/* Encounters Card */}
+            <Col sm={4} className="patient-summary-card">
+                <Card className="h-100 shadow-sm">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaCalendarAlt className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Recent Encounters</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline className="text-primary me-2 cursor-pointer" />
+                            <MdOutlinePrint className="text-secondary cursor-pointer" />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2">
+                        <ul className="list-unstyled h-100">
+                            {store?.getEncounterReducer?.loading ? (
+                                <li className="d-flex align-items-center justify-content-center w-100 h-100">
+                                    <Spinner className="spinner-border-sm" />
+                                </li>
+                            ) : encounters?.length > 0 ? (
+                                encounters.map((data, index) => (
+                                    <li
+                                        key={index}
+                                        className="mb-2 d-flex fs-6 justify-content-between align-items-center">
+                                        <div className="d-flex flex-column">
+                                            <strong className="text-capitalize">
+                                                {data?.type?.[0]?.coding?.[0]?.display || 'Unknown Type'}
+                                            </strong>
+                                            <small className="text-muted fs-6">
+                                                {data?.period?.start
+                                                    ? new Date(data.period.start).toISOString().split('T')[0]
+                                                    : 'No Date'}
+                                            </small>
+                                        </div>
+                                        <p className="text-muted fw-semibold text-capitalize">
+                                            {data?.status || 'Unknown Status'}
+                                        </p>
+                                    </li>
+                                ))
+                            ) : (
+                                <li className="d-flex align-items-center justify-content-center w-100 h-100 text-muted">
+                                    No Encounters Found
+                                </li>
+                            )}
+                        </ul>
+                    </Card.Body>
+                    <div
+                        className="fs-6 text-end text-info d-flex align-items-end justify-content-end px-2 pb-1 cursor-pointer text-decoration-underline"
+                        onClick={() => setSelectedMainTab('Encounter')}>
+                        Go To Encounter List
+                    </div>
+                </Card>
+            </Col>
+
+            {/* Appointments Card - Full Width */}
+            <Col sm={12} className="patient-summary-card">
+                <Card className="shadow-sm mb-0">
+                    <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
+                        <div className="d-flex align-items-center">
+                            <FaCalendarAlt className="me-2 text-secondary" />
+                            <span className="fw-bold fs-6">Upcoming Appointments</span>
+                        </div>
+                        <div>
+                            <MdAddCircleOutline
+                                className="text-primary me-2 cursor-pointer"
+                                onClick={handleAddAppointmentOpen}
+                            />
+                            <MdOutlinePrint className="text-secondary cursor-pointer" />
+                        </div>
+                    </Card.Header>
+                    <Card.Body className="p-2">
+                        <div className="table-responsive">
+                            <Table responsive className="table-centered fs-6 table-nowrap mb-0  rounded">
+                                <thead>
+                                    <tr>
+                                        <th className="fs-6 text-white">Date</th>
+                                        <th className="fs-6 text-white">Time</th>
+                                        <th className="fs-6 text-white">Provider</th>
+                                        <th className="fs-6 text-white">Reason</th>
+                                        <th className="fs-6 text-white">Type</th>
+                                        {/* <th className="fs-6 text-white">Location</th> */}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {store?.getAppointmentsReducer?.loading ? (
                                         <tr>
-                                            <th className="fs-6 text-white">Date</th>
-                                            <th className="fs-6 text-white">Time</th>
-                                            <th className="fs-6 text-white">Provider</th>
-                                            <th className="fs-6 text-white">Reason</th>
-                                            <th className="fs-6 text-white">Type</th>
-                                            {/* <th className="fs-6 text-white">Location</th> */}
+                                            <td colSpan="6" className="text-center py-5">
+                                                <Spinner className="spinner-border-sm" />
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {store?.getAppointmentsReducer?.loading ? (
-                                            <tr>
-                                                <td colSpan="6" className="text-center py-5">
-                                                    <Spinner className="spinner-border-sm" />
+                                    ) : appointmentsList && appointmentsList.length > 0 ? (
+                                        appointmentsList.map((appointment, index) => (
+                                            <tr key={index}>
+                                                <td className="fs-6">
+                                                    {appointment?.date
+                                                        ? new Date(appointment.date).toLocaleDateString('en-GB', {
+                                                            day: '2-digit',
+                                                            month: 'short',
+                                                            year: 'numeric',
+                                                        })
+                                                        : ''}
+                                                </td>
+                                                <td className="fs-6">
+                                                    {appointment?.start
+                                                        ? new Date(appointment.start).toLocaleTimeString('en-US', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                            hour12: true,
+                                                        })
+                                                        : ''}
+                                                </td>
+                                                <td className="fs-6">
+                                                    {appointment?.doctorId?.name?.[0]?.text || 'Unknown'}
+                                                </td>
+                                                <td className="fs-6">
+                                                    {appointment?.reason?.[0]?.coding?.[0]?.display}
+                                                </td>
+                                                <td className="fs-6">
+                                                    {appointment?.appointmentType?.coding?.[0]?.display ||
+                                                        'Not Specified'}
                                                 </td>
                                             </tr>
-                                        ) : appointmentsList && appointmentsList.length > 0 ? (
-                                            appointmentsList.map((appointment, index) => (
-                                                <tr key={index}>
-                                                    <td className="fs-6">
-                                                        {appointment?.date
-                                                            ? new Date(appointment.date).toLocaleDateString('en-GB', {
-                                                                  day: '2-digit',
-                                                                  month: 'short',
-                                                                  year: 'numeric',
-                                                              })
-                                                            : ''}
-                                                    </td>
-                                                    <td className="fs-6">
-                                                        {appointment?.start
-                                                            ? new Date(appointment.start).toLocaleTimeString('en-US', {
-                                                                  hour: '2-digit',
-                                                                  minute: '2-digit',
-                                                                  hour12: true,
-                                                              })
-                                                            : ''}
-                                                    </td>
-                                                    <td className="fs-6">
-                                                        {appointment?.doctorId?.name?.[0]?.text || 'Unknown'}
-                                                    </td>
-                                                    <td className="fs-6">
-                                                        {appointment?.reason?.[0]?.coding?.[0]?.display}
-                                                    </td>
-                                                    <td className="fs-6">
-                                                        {appointment?.appointmentType?.coding?.[0]?.display ||
-                                                            'Not Specified'}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4" className="text-center py-5 text-muted">
-                                                    No upcoming appointments found
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </Table>
-                                <Col className="mt-2 d-flex justify-content-end">
-                                    <Paginations
-                                        currentPage={skip}
-                                        totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
-                                        onPageChange={handlePageChange}
-                                    />
-                                </Col>
-                            </div>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="text-center py-5 text-muted">
+                                                No upcoming appointments found
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </Table>
+                            <Col className="mt-2 d-flex justify-content-end">
+                                <Paginations
+                                    currentPage={skip}
+                                    totalPages={store?.getAppointmentsReducer?.data?.pagination?.totalPages}
+                                    onPageChange={handlePageChange}
+                                />
+                            </Col>
+                        </div>
+                    </Card.Body>
+                </Card>
+            </Col>
             <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">
                     <Modal.Title className="">Add Allergy</Modal.Title>
@@ -683,7 +681,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                     <NewAppointment isModal={true} onCancel={handleAppointmentClose} />
                 </Modal.Body>
             </Modal>
-        </div>
+        </Row>
     );
 };
 

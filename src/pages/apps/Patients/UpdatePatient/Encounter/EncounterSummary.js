@@ -229,8 +229,8 @@ const EncounterSummary = () => {
     };
 
     return (
-        <Row className='gy-2  position-relative'>
-            <Col sm={12} className='mt-0 scroll-container mt-0 scroll-container' style={{ height: '69vh' }}>
+        <Row className='position-relative'>
+            <Col sm={12} className='mt-0 mt-0' >
 
                 <Accordion activeKey={activeKey} onSelect={handleToggle}>
                     {sortedSubMenuItems.map((menuItem) => {
