@@ -592,7 +592,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <tbody>
                                     {store?.getAppointmentsReducer?.loading ? (
                                         <tr>
-                                            <td colSpan="6" className="text-center py-5">
+                                            <td colSpan="5" className="text-center py-5">
                                                 <Spinner className="spinner-border-sm" />
                                             </td>
                                         </tr>
