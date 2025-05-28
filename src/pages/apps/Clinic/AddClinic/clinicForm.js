@@ -6,9 +6,19 @@ import { useSelector, useDispatch } from 'react-redux';
 import profileDummy from '../../../../assets/images/profileDummy.png';
 import us from '../../../../assets/images/flags/us.jpg';
 import {
-    createClinicAction, getCities2Action, getCities3Action, getCities4Action, getCities5Action,
-    getCities6Action, getCitiesAction, getClinicAction, getClinicById, getClinicByParentAction, getClinicTypeAction,
-    getStatesByCountryAction, updateClinicAction,
+    createClinicAction,
+    getCities2Action,
+    getCities3Action,
+    getCities4Action,
+    getCities5Action,
+    getCities6Action,
+    getCitiesAction,
+    getClinicAction,
+    getClinicById,
+    getClinicByParentAction,
+    getClinicTypeAction,
+    getStatesByCountryAction,
+    updateClinicAction,
 } from '../../../../redux/clinics/actions';
 import { VscLoading } from 'react-icons/vsc';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -122,7 +132,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
     };
     const [citiesByType, setCitiesByType] = useState({});
-    const cachedCities = citiesByType
+    const cachedCities = citiesByType;
     useEffect(() => {
         dispatch(getClinicAction({ key: encryptMessage({ clinicId: clinic_id?.clinicId }) }));
         dispatch(getSubClinicAction());
@@ -147,9 +157,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                            url: data?.documents?.[0]?.url, // Store URL
-                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                        }
+                              url: data?.documents?.[0]?.url, // Store URL
+                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                          }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -189,7 +199,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
 
             // ✅ Set Addresses
             const newAddresses = clinicsDataGet?.address?.map((addr) => ({
-                type: addr.type || '',  // Make sure type is included
+                type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
                 city: addr.city || '',
@@ -200,30 +210,36 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             setAddresses(newAddresses);
             if (statesData?.states) {
                 newAddresses.forEach((address) => {
-                    const state = statesData.states.find(s => s.name === address.state);
+                    const state = statesData.states.find((s) => s.name === address.state);
                     if (!state) return;
 
                     if (address.type === 'physical') {
-                        dispatch(getCitiesAction({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCitiesAction({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     } else if (address.type === 'postal') {
-                        dispatch(getCities2Action({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCities2Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     } else {
-                        dispatch(getCities3Action({
-                            state_code: state.id,
-                            name: address.city,
-                            limit: 25,
-                            skip: ''
-                        }));
+                        dispatch(
+                            getCities3Action({
+                                state_code: state.id,
+                                name: address.city,
+                                limit: 25,
+                                skip: '',
+                            })
+                        );
                     }
                 });
             }
@@ -727,7 +743,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
 
-
     return (
         <>
             {store.getClinicsReducer?.loading ? (
@@ -810,10 +825,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     />
                                     <span
                                         style={{ right: '2%', top: '43%' }}
-                                        className={`${clinicsDataGet?.userId?.verified_email
-                                            ? 'text-success position-absolute fs-4'
-                                            : 'd-none'
-                                            }`}>
+                                        className={`${
+                                            clinicsDataGet?.userId?.verified_email
+                                                ? 'text-success position-absolute fs-4'
+                                                : 'd-none'
+                                        }`}>
                                         <MdVerified />
                                     </span>
 
@@ -824,10 +840,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
-                                        }`}
-                                    data-has-value={!!logoName}
-                                >
+                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
+                                        logoName ? '' : 'custom-form-fields'
+                                    }`}
+                                    data-has-value={!!logoName}>
                                     {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
                                     {/* {typeof logoName === 'string' && logoName
                                         ? logoName.split('/').pop()
@@ -835,8 +851,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {logoUploading
                                         ? 'Uploading...'
                                         : typeof logoName === 'string' && logoName
-                                            ? logoName.split('/').pop().slice(0, 30) + '...'
-                                            : 'Upload Logo'}
+                                          ? logoName.split('/').pop().slice(0, 30) + '...'
+                                          : 'Upload Logo'}
                                     {/* {logoName} */}
 
                                     <div className="d-flex align-items-center gap-2">
@@ -910,7 +926,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Form.Label>Issuing Authority</Form.Label>
                                         </Col>
                                         <Col>
-                                            <Form.Label>Identifier Expiry <span className='text-secondary'>(If Applicable)</span> </Form.Label>
+                                            <Form.Label>
+                                                Identifier Expiry{' '}
+                                                <span className="text-secondary">(If Applicable)</span>{' '}
+                                            </Form.Label>
                                         </Col>
                                     </Row>
 
@@ -952,29 +971,91 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         item.type === 'NPI' || item.type === 'CLIA'
                                                             ? 10
                                                             : item.type === 'NAIC'
-                                                                ? 5
-                                                                : 10
+                                                              ? 10
+                                                              : item.type === 'Medicare'
+                                                                ? 11
+                                                                : item.type === 'Medicaid'
+                                                                  ? 12
+                                                                  : item.type === 'State License'
+                                                                    ? 15
+                                                                    : item.type === 'Accreditation'
+                                                                      ? 10
+                                                                      : item.type === 'CCN'
+                                                                        ? 6
+                                                                        : item.type === 'Taxonomy Code'
+                                                                          ? 10
+                                                                          : item.type === 'DUNS'
+                                                                            ? 9
+                                                                            : item.type === 'Facility ID'
+                                                                              ? 12
+                                                                              : 20
                                                     }
                                                     {...register(`identifiers[${index}].number`, {
                                                         // required: defaultIdentifiers.includes(item.type)
                                                         //     ? 'Document Number is required'
                                                         //     : false,
                                                         validate: (value) => {
-                                                            if (!value) return true; // Skip validation if field is empty (for dynamic fields)
+                                                            if (!value) return true;
 
-                                                            if (item.type === 'NPI' && !/^[0-9]{10}$/.test(value)) {
-                                                                return 'NPI number must be exactly 10 digits long';
+                                                            switch (item.type) {
+                                                                case 'NPI':
+                                                                    return (
+                                                                        /^\d{10}$/.test(value) ||
+                                                                        'NPI must be exactly 10 digits'
+                                                                    );
+                                                                case 'CLIA':
+                                                                    return (
+                                                                        /^[A-Z0-9]{2}D\d{7}$/.test(value) ||
+                                                                        'CLIA must be in format XXDXXXXXXX'
+                                                                    );
+                                                                case 'NAIC':
+                                                                    return (
+                                                                        /^\d{5,10}$/.test(value) ||
+                                                                        'NAIC must be 5 to 10 digits'
+                                                                    );
+                                                                case 'Medicare':
+                                                                    return (
+                                                                        /^[A-Z0-9]{11}$/.test(value) ||
+                                                                        'Medicare ID must be 11 alphanumeric characters'
+                                                                    );
+                                                                case 'Medicaid':
+                                                                    return (
+                                                                        /^[A-Z0-9]{9,12}$/.test(value) ||
+                                                                        'Medicaid ID must be 9–12 alphanumeric characters'
+                                                                    );
+                                                                case 'State License':
+                                                                    return (
+                                                                        /^[A-Z0-9]{5,15}$/.test(value) ||
+                                                                        'State License must be 5–15 alphanumeric characters'
+                                                                    );
+                                                                case 'Accreditation':
+                                                                    return (
+                                                                        /^[A-Z0-9]{6,10}$/.test(value) ||
+                                                                        'Accreditation ID must be 6–10 alphanumeric characters'
+                                                                    );
+                                                                case 'CCN':
+                                                                    return (
+                                                                        /^\d{6}$/.test(value) ||
+                                                                        'CCN must be exactly 6 digits'
+                                                                    );
+                                                                case 'Taxonomy Code':
+                                                                    return (
+                                                                        /^\d{9}[A-Z]$/.test(value) ||
+                                                                        'Taxonomy Code must be 9 digits + 1 uppercase letter'
+                                                                    );
+                                                                case 'DUNS':
+                                                                    return (
+                                                                        /^\d{9}$/.test(value) ||
+                                                                        'DUNS must be exactly 9 digits'
+                                                                    );
+                                                                case 'Facility ID':
+                                                                    return (
+                                                                        /^[A-Z0-9]{6,12}$/.test(value) ||
+                                                                        'Facility ID must be 6–12 alphanumeric characters'
+                                                                    );
+                                                                default:
+                                                                    return true;
                                                             }
-                                                            if (
-                                                                item.type === 'CLIA' &&
-                                                                !/^[A-Z0-9]{2}D[0-9]{7}$/.test(value)
-                                                            ) {
-                                                                return 'CLIA number must be in the format XXDXXXXXXX, where X is alphanumeric and the rest are digits';
-                                                            }
-                                                            if (item.type === 'NAIC' && !/^[0-9]{5}$/.test(value)) {
-                                                                return 'NAIC number must be exactly 5 digits long';
-                                                            }
-                                                            return true; // No validation for other types (like DUNS, etc.)
                                                         },
                                                     })}
                                                     onChange={(e) => {
@@ -1003,8 +1084,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onClick={() =>
                                                         document.getElementById(`fileInput-identifier-${index}`).click()
                                                     }
-                                                    className={`custom-file-upload justify-content-between cursor-pointer ${item.file ? 'form-control' : 'custom-form-fields'
-                                                        }`}>
+                                                    className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                        item.file ? 'form-control' : 'custom-form-fields'
+                                                    }`}>
                                                     {item.file?.name
                                                         ? item.file.name.length > 30
                                                             ? item.file.name.slice(0, 25) + '...'
@@ -1054,7 +1136,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Control
                                                     type="date"
                                                     value={item?.expiry ? formatDateForInput(item.expiry) : ''}
-                                                    min={new Date().toISOString().split("T")[0]} // Sets min date to today
+                                                    min={new Date().toISOString().split('T')[0]} // Sets min date to today
                                                     onChange={(e) => handleChange(index, 'expiry', e.target.value)}
                                                 />
                                                 {index >= defaultIdentifiers?.length && (
@@ -1280,24 +1362,51 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <p
                                                             key={suggestionIndex}
                                                             onClick={() => {
-                                                                const state = statesData?.states?.find(s => s.name === data.components?.state);
+                                                                const state = statesData?.states?.find(
+                                                                    (s) => s.name === data.components?.state
+                                                                );
                                                                 const stateCode = state?.id;
-                                                                const cityName = data.components?.city || data.components?.town || data.components?.village || '';
+                                                                const cityName =
+                                                                    data.components?.city ||
+                                                                    data.components?.town ||
+                                                                    data.components?.village ||
+                                                                    '';
 
                                                                 // Dispatch city load based on address type
                                                                 if (item?.type === 'physical') {
-                                                                    dispatch(getCitiesAction({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                    dispatch(
+                                                                        getCitiesAction({
+                                                                            state_code: stateCode,
+                                                                            name: cityName,
+                                                                            limit: 25,
+                                                                            skip: '',
+                                                                        })
+                                                                    );
                                                                 } else if (item?.type === 'postal') {
-                                                                    dispatch(getCities2Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                    dispatch(
+                                                                        getCities2Action({
+                                                                            state_code: stateCode,
+                                                                            name: cityName,
+                                                                            limit: 25,
+                                                                            skip: '',
+                                                                        })
+                                                                    );
                                                                 } else {
-                                                                    dispatch(getCities3Action({ state_code: stateCode, name: cityName, limit: 25, skip: '' }));
+                                                                    dispatch(
+                                                                        getCities3Action({
+                                                                            state_code: stateCode,
+                                                                            name: cityName,
+                                                                            limit: 25,
+                                                                            skip: '',
+                                                                        })
+                                                                    );
                                                                 }
                                                                 // Update address
                                                                 const newAddress = {
                                                                     ...item,
                                                                     line: [data.formatted || ''],
                                                                     state: data.components?.state || '',
-                                                                    city: cityName,  // Set the city name
+                                                                    city: cityName, // Set the city name
                                                                     postalCode: data.components?.postcode || '',
                                                                     country: data.components?.country || '',
                                                                 };
@@ -1364,9 +1473,11 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             </option>
                                             {(() => {
                                                 const cities =
-                                                    item?.type === 'physical' ? cities1 :
-                                                        item?.type === 'postal' ? cities2 :
-                                                            cities3;
+                                                    item?.type === 'physical'
+                                                        ? cities1
+                                                        : item?.type === 'postal'
+                                                          ? cities2
+                                                          : cities3;
 
                                                 return cities?.map((data) => (
                                                     <option key={data?._id} value={data?.name}>
@@ -1393,7 +1504,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         message: 'Postal code must contain numbers only',
                                                     },
                                                 })}
-                                                onChange={(e) => handleAddressChange(index, 'postalCode', e.target.value)}
+                                                onChange={(e) =>
+                                                    handleAddressChange(index, 'postalCode', e.target.value)
+                                                }
                                                 maxLength={5}
                                                 onKeyPress={handleFirstSpace}
                                             />
@@ -1565,8 +1678,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     <tr key={patient?.id || `patient-${index}`}>
                                                         <td>{index + 1}</td>
                                                         <td>{patient?.name}</td>
-                                                        <td className='cursor-pointer' data-toggle="tooltip" data-placement="top" title={patient?.address?.[0]?.line?.[0]}>
-                                                            {patient?.address?.[0]?.line?.[0]?.length > 27 ? patient?.address?.[0]?.line?.[0]?.slice(0, 26) + '...' : patient?.address?.[0]?.line?.[0] || 'N/A'}
+                                                        <td
+                                                            className="cursor-pointer"
+                                                            data-toggle="tooltip"
+                                                            data-placement="top"
+                                                            title={patient?.address?.[0]?.line?.[0]}>
+                                                            {patient?.address?.[0]?.line?.[0]?.length > 27
+                                                                ? patient?.address?.[0]?.line?.[0]?.slice(0, 26) + '...'
+                                                                : patient?.address?.[0]?.line?.[0] || 'N/A'}
                                                         </td>
                                                         <td>{patient.orgType}</td>
                                                         {/* <td>{patient.practiceSpecialty || 'N/A'}</td> */}
