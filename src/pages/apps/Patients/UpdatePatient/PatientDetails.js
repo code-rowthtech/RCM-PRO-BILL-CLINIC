@@ -349,7 +349,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                     </InputGroup>
                                 </Form.Group>
 
-                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                <div className="position-absolute " style={{ top: '44%', left: '1%' }}>
                                     <img src={us} alt="country code flag" width={20} />
                                 </div>
                             </Form.Group>
@@ -412,7 +412,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                     </InputGroup>
                                 </Form.Group>
 
-                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                <div className="position-absolute " style={{ top: '44%', left: '1%' }}>
                                     <img src={us} alt="country code flag" width={20} />
                                 </div>
                             </Form.Group>
@@ -474,7 +474,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
                                         />
                                     </InputGroup>
                                 </Form.Group>
-                                <div className="position-absolute " style={{ top: '48%', left: '1%' }}>
+                                <div className="position-absolute " style={{ top: '44%', left: '1%' }}>
                                     <img src={us} alt="country code flag" width={20} />
                                 </div>
                             </Form.Group>

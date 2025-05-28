@@ -141,6 +141,7 @@ type AppMenuProps = {
 };
 
 const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$FragmentType> => {
+    console.log(isCondensed,'isCondensed');
     let location = useLocation();
     const menuRef = useRef(null);
 
@@ -189,10 +190,10 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
         <>
             <ul className="side-nav " ref={menuRef} id="main-side-menu">
                 <li className="text-center py-3">
-                    {!isCondensed ? (
-                        <img src={logo} alt="" height="25" className="logo-condensed" />
+                    {isCondensed === true  ? (
+                        <img src={logo_sm} alt="" height="25" className="logo-condensed" />
                     ) : (
-                        <img src={logo_sm} alt="" height="25" className="logo-full" />
+                        <img src={logo} alt="" height="25" className="logo-full" />
                     )}
                 </li>
                 {(menuItems || []).map((item, idx) => {

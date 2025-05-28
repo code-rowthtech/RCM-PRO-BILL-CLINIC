@@ -1400,7 +1400,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             {addresses.length > 1 && index !== 0 && (
                                                 <span
                                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                    style={{ right: '-2%', top: '50%' }}
+                                                    style={{ right: '-2%', top: '42%' }}
                                                     onClick={() => removeAddress(index)}>
                                                     <CiCircleMinus />
                                                 </span>
