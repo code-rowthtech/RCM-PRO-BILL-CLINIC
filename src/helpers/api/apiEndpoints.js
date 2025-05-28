@@ -178,3 +178,5 @@ export const createnoteTypeSettings = `${BaseRoute}/notes-type-settings/`;
 
 // Template
 export const templates = `${BaseRoute}/notes-templates`;
+// Documents
+export const documents = `${BaseRoute}/documents`;

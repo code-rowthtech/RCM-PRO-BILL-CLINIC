@@ -747,7 +747,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                     as="select"
                                     data-has-value={!!watch('consultationRoom')}
                                     className="form-select"
-                                    {...register('consultationRoom', { required: 'Consultation room is required' })}>
+                                    {...register('consultationRoom')}>
                                     <option value="" hidden>
                                         Select Consultation Room
                                     </option>
@@ -757,7 +757,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                         </option>
                                     ))}
                                 </Form.Control>
-                                {errors.consultationRoom && <p className="text-danger">{errors.consultationRoom.message}</p>}
+                                {/* {errors.consultationRoom && <p className="text-danger">{errors.consultationRoom.message}</p>} */}
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
@@ -853,7 +853,7 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 disabled={store?.createAppointmentReducer?.loading || store?.rescheduleAppointmentReducer?.loading}
                                 onClick={() => {
                                     reset();
-                                    if(location?.pathname!=='/apps/appointments/list'){
+                                    if (location?.pathname !== '/apps/appointments/list') {
                                         navigate(-1);
                                     }
                                 }}>

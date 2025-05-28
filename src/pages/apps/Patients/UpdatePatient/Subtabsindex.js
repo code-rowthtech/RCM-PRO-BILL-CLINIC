@@ -41,8 +41,8 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
     };
     return (
         <>
-            <div className='' style={{ overflowX: 'auto', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
-                <ul className="border-bottom border-secondary  nav nav-underline" style={{ minWidth: 'max-content' }}>
+            <div className='h-100' style={{ overflowX: 'hidden', whiteSpace: 'nowrap', width: '100%', scrollbarWidth: 'none' }}>
+                <ul className="border-bottom ps-1 border-secondary  nav nav-underline" style={{ minWidth: 'max-content', height: 'fit-content' }}>
                     {[
                         'Patient Details',
                         'Demographics',
@@ -68,7 +68,7 @@ const Subtabs = ({ patientId, isAccordionOpen }) => {
                         </li>
                     ))}
                 </ul>
-                <div>
+                <div className=''>
                     {activeTab === 'Patient Details' && <PatientDetails isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Demographics' && <Demographicdetails isAccordionOpen={isAccordionOpen} />}
                     {activeTab === 'Responsible Party' && <ResponsiblleParty isAccordionOpen={isAccordionOpen} />}

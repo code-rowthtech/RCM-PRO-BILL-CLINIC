@@ -1,13 +1,19 @@
 import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { ClinicsActionTypes } from './constants';
 import {
-    createClinicApi, getClinicApi, getClinicByIdApi,
-    updateClinicApi, getStateByCountry, getCityByStateApi,
-    addSubscriptionPlanApi, getClinicsByParentIdApi, deleteClinicOnboardingApi,
+    createClinicApi,
+    getClinicApi,
+    getClinicByIdApi,
+    updateClinicApi,
+    getStateByCountry,
+    getCityByStateApi,
+    addSubscriptionPlanApi,
+    getClinicsByParentIdApi,
+    deleteClinicOnboardingApi,
     createContract,
     getClinicTypeApi,
     standardContract,
-    changeEmailApi
+    changeEmailApi,
 } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
@@ -26,7 +32,7 @@ function* createClinicsFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData.message, 'success')
+            ToastHandle(decryptedData.message, 'success');
             yield put({
                 type: ClinicsActionTypes.CREATE_CLINIC_SUCCESS,
                 payload: { ...decryptedData },
@@ -38,7 +44,7 @@ function* createClinicsFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger')
+        ToastHandle(error, 'danger');
         yield put({
             type: ClinicsActionTypes.CREATE_CLINIC_ERROR,
             payload: error,
@@ -56,7 +62,7 @@ function* changeEmailFunction(data) {
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
 
         if (response.status === 200) {
-            ToastHandle(decryptedData.message, 'success')
+            ToastHandle(decryptedData.message, 'success');
             yield put({
                 type: ClinicsActionTypes.CHANGE_EMAIL_SUCCESS,
                 payload: { ...decryptedData },
@@ -68,7 +74,7 @@ function* changeEmailFunction(data) {
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger')
+        ToastHandle(error, 'danger');
         yield put({
             type: ClinicsActionTypes.CHANGE_EMAIL_ERROR,
             payload: error,
@@ -103,7 +109,6 @@ function* getClinicTypeFunction() {
         });
     }
 }
-
 
 // function* updateClinicsFunction(data) {
 //     try {
@@ -142,7 +147,6 @@ function* getClinicByIdFunction(data) {
         });
         const response = yield call(getClinicByIdApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
 
         if (response.status === 200) {
             yield put({
@@ -324,7 +328,6 @@ function* getCities3Function(data) {
     }
 }
 
-
 function* createSubscriptionPlanFunction(data) {
     try {
         yield put({
@@ -333,11 +336,15 @@ function* createSubscriptionPlanFunction(data) {
         });
         const response = yield call(addSubscriptionPlanApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
-            ToastHandle(decryptedData.message, 'success')
+        if (response.status === 200) {
+            ToastHandle(decryptedData.message, 'success');
             yield put({
                 type: ClinicsActionTypes.CREATE_SUBSCRIPTION_SUCCESS,
                 payload: { ...decryptedData },
+            });
+            yield put({
+                type: ClinicsActionTypes.CREATE_SUBSCRIPTION_RESET,
+                payload: {},
             });
         } else {
             yield put({
@@ -382,7 +389,6 @@ function* createContractFunction(data) {
         });
     }
 }
-
 
 function* standardContractFunction(data) {
     try {
@@ -445,7 +451,6 @@ export function* callStateEmpty() {
         type: ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE,
         payload: {},
     });
-
 }
 
 export function* watchCreateClinics() {
@@ -491,7 +496,6 @@ export function* watchCreateSubscriptions() {
     yield takeEvery(ClinicsActionTypes.CREATE_SUBSCRIPTION, createSubscriptionPlanFunction);
 }
 
-
 export function* watchCreateContract() {
     yield takeEvery(ClinicsActionTypes.CREATE_CONTRACT, createContractFunction);
 }
@@ -508,12 +512,23 @@ export function* watchresetState() {
     yield takeEvery(ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE, callStateEmpty);
 }
 
-
 function* clinicsSaga() {
     yield all([
-        fork(watchCreateClinics), fork(watchGetClinicById), fork(watchGetClinics),
-        fork(watchresetState), fork(watchGetStates), fork(watchGetCities), fork(watchGetCities2), fork(watchCreateSubscriptions), fork(watchDeleteClinicOnboarding), fork(watchCreateContract),
-        fork(watchGetClinicByParent), fork(watchgetClinicsTypeState), fork(watchStandardContract), fork(watchChangeEmail), fork(watchGetCities3)
+        fork(watchCreateClinics),
+        fork(watchGetClinicById),
+        fork(watchGetClinics),
+        fork(watchresetState),
+        fork(watchGetStates),
+        fork(watchGetCities),
+        fork(watchGetCities2),
+        fork(watchCreateSubscriptions),
+        fork(watchDeleteClinicOnboarding),
+        fork(watchCreateContract),
+        fork(watchGetClinicByParent),
+        fork(watchgetClinicsTypeState),
+        fork(watchStandardContract),
+        fork(watchChangeEmail),
+        fork(watchGetCities3),
     ]);
 }
 export default clinicsSaga;

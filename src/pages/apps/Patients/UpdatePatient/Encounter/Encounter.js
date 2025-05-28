@@ -15,7 +15,7 @@ import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 
-const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter }) => {
+const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter, isAccordionOpen }) => {
     const dispatch = useDispatch()
     const [activeTab, setActiveTab] = useState(encounterTabs[0]?.id || '');
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -84,79 +84,78 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     }
 
     return (
-        <div className="border-0 mb-0 h-100">
-            <div className="p-0 border-0">
-                <div className="row">
-                    {/* Tab headers */}
-                    <div className="col-12 d-flex align-items-center justify-content-between px-2 ">
-                        <div className="d-flex align-items-center ">
-                            {encounterTabs?.length > 1 &&
-                                <>
-                                    <HiMiniBars3BottomLeft
-                                        onClick={toggleCollapse}
-                                        className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
-                                    <CiSettings
-                                        onClick={() => setShowSettings(!showSettings)}
-                                        className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
-                                    <EncounterSettingsForm
-                                        showSettings={showSettings}
-                                        closeSettings={closeSettings}
-                                    />
-                                </>}
-                            {encounterTabs?.map((tab) => (
-                                <div
-                                    key={tab.id}
-                                    className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
+        <div className="row">
+            {/* Tab headers */}
+            <div className="col-12 d-flex align-items-center justify-content-between px-2 " style={{ height: 'fit-content' }}>
+                <div className="d-flex align-items-center ">
+                    {encounterTabs?.length > 1 &&
+                        <>
+                            <HiMiniBars3BottomLeft
+                                onClick={toggleCollapse}
+                                className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
+                            <CiSettings
+                                onClick={() => setShowSettings(!showSettings)}
+                                className='fw-bold fs-4 mx-1 cursor-pointer text-black' />
+                            <EncounterSettingsForm
+                                showSettings={showSettings}
+                                closeSettings={closeSettings}
+                            />
+                        </>}
+                    {encounterTabs?.map((tab) => (
+                        <div
+                            key={tab.id}
+                            className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
                                     d-flex align-items-center flex-fill justify-content-center fw-bold 
                                      ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
-                                    onClick={() => setActiveTab(tab.id)}
+                            onClick={() => setActiveTab(tab.id)}
+                        >
+                            <span className="text-nowrap">{tab.title}</span>
+                            {tab.type !== 'default' && (
+                                <span
+                                    className="p-0 ms-2 m-0"
+                                    onClick={(e) => removeEncounterTab(tab.id, e)}
                                 >
-                                    <span className="text-nowrap">{tab.title}</span>
-                                    {tab.type !== 'default' && (
-                                        <span
-                                            className="p-0 ms-2 m-0"
-                                            onClick={(e) => removeEncounterTab(tab.id, e)}
-                                        >
-                                            <IoClose />
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
+                                    <IoClose />
+                                </span>
+                            )}
                         </div>
-                        {expanded ?
-                            <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                            :
-                            <BiExpand className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
-                        }
-                    </div>
-
-                    {/* Tab content */}
-                    <div className="col-12 ">
-                        {encounterTabs?.map((tab) => (
-                            <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
-                                {tab?.type === 'default' ? (
-                                    <EncounterList
-                                        tab={tab}
-                                        encounterTabs={encounterTabs}
-                                        setEncounterTabs={setEncounterTabs}
-                                        setActiveTab={setActiveTab}
-                                        setCreateEncounter={setCreateEncounter}
-                                    />
-                                ) : (
-                                    <DateEncounters
-                                        encounterAction={tab?.type}
-                                        encounterId={tab?.id}
-                                        removeEncounterTab={removeEncounterTab}
-                                        searchNoteType={searchNoteType}
-                                        setSearchNoteType={setSearchNoteType}
-                                        isCollapsed={isCollapsed}
-                                        setCreateEncounter={setCreateEncounter}
-                                    />
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                    ))}
                 </div>
+                {expanded ?
+                    <BiCollapse className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
+                    :
+                    <BiExpand className='text-primary fw-bold fs-4 cursor-pointer me-2' onClick={() => setExpanded(!expanded)} />
+                }
+            </div>
+
+            {/* Tab content */}
+            <div className="col-12">
+                {encounterTabs?.map((tab) => (
+                    <div key={tab.id} style={{ display: activeTab === tab.id ? 'block' : 'none' }}>
+                        {tab?.type === 'default' ? (
+                            <EncounterList
+                                tab={tab}
+                                isAccordionOpen={isAccordionOpen}
+                                encounterTabs={encounterTabs}
+                                setEncounterTabs={setEncounterTabs}
+                                setActiveTab={setActiveTab}
+                                setCreateEncounter={setCreateEncounter}
+                            />
+                        ) : (
+                            <DateEncounters
+                                encounterAction={tab?.type}
+                                encounterId={tab?.id}
+                                expanded={expanded}
+                                isAccordionOpen={isAccordionOpen}
+                                removeEncounterTab={removeEncounterTab}
+                                searchNoteType={searchNoteType}
+                                setSearchNoteType={setSearchNoteType}
+                                isCollapsed={isCollapsed}
+                                setCreateEncounter={setCreateEncounter}
+                            />
+                        )}
+                    </div>
+                ))}
             </div>
         </div>
     );

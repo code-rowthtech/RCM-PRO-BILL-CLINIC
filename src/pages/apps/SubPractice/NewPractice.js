@@ -901,7 +901,7 @@ const NewPractice = () => {
                                            */}
                                             <Button className="cancel-button" as={Link} to={'/apps/crm/addPractice'}>
                                                 Back
-                                            </Button>s
+                                            </Button>
                                         </>
                                     )}
                                 </div>
@@ -1606,7 +1606,7 @@ const NewPractice = () => {
                                                                 {addresses.length > 1 && index !== 0 && (
                                                                     <span
                                                                         className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                        style={{ right: '-2%', top: '50%' }}
+                                                                        style={{ right: '-2%', top: '42%' }}
                                                                         onClick={() => removeAddress(index)}>
                                                                         <CiCircleMinus />
                                                                     </span>

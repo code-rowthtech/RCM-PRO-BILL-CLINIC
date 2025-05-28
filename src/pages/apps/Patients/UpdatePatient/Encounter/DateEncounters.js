@@ -16,7 +16,7 @@ import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 
-const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, removeEncounterTab, encounterAction, encounterId }) => {
+const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
 
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
@@ -150,11 +150,11 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
             const { name, inputType = 'textarea' } = field;
             if (name === 'Notes (SOAP)') {
                 return (
-                    <div className="mb-3" key={name}>
+                    <div className="" key={name}>
                         <h5>{name}</h5>
                         {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
                             <Form.Group className="mb-2" key={section}>
-                                <Form.Label>{section}</Form.Label>
+                                <Form.Label className='mb-0'>{section}</Form.Label>
                                 {inputType === 'text-editor' ? (
                                     <ReactQuill
                                         theme="snow"
@@ -185,8 +185,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
 
             // Handle regular fields based on inputType
             return (
-                <Form.Group className="mb-3" key={name}>
-                    <Form.Label>{name}</Form.Label>
+                <Form.Group key={name}>
+                    <Form.Label className='mb-0'>{name}</Form.Label>
                     {inputType === 'text-editor' ? (
                         <ReactQuill
                             theme="snow"
@@ -214,7 +214,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
             );
         };
         return (
-            <Row className="g-2 px-2 mt-1 scroll-container" style={{ height: '57.5vh', overflowY: 'auto' }}>
+            <Row className="g-2 px-1 mt-1 scroll-container" style={{ height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh', overflowY: 'auto' }}>
                 {getFieldsToRender().map(field => renderField(field))}
             </Row>
         );
@@ -304,9 +304,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
     }
 
     return (
-        <div className='px-0 mt-1 row border mx-1 h-100'>
-            <Col className={`px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
-                <ul className='d-flex list-unstyled mt-0'>
+        <div className='px-0 mt-1  row border h-100  mx-1'>
+            <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
+                <ul className='d-flex list-unstyled mt-0 mb-0' style={{ height: 'fit-content' }}>
                     {visibleTabs?.map((item) => (
                         <li
                             key={item?._id}
@@ -320,17 +320,17 @@ const DateEncounters = ({ isCollapsed, searchNoteType, setSearchNoteType, remove
                 </ul>
 
                 <Row className='mx-auto'>
-                    <Col sm={12} className='px-md-1'>
+                    <Col sm={12} className='px-md-1 scroll-container ' style={{ height: !expanded ? (isAccordionOpen ? '55vh' : '70vh') : '78vh', overflowX: 'hidden' }}>
                         {leftTab === 'Summary' && <EncounterSummary />}
                         {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} />}
                         {leftTab === 'Past Encounters' && <PastEncounters />}
-                        {leftTab === 'PMH' && <>PMH</>}
+                        {/* {leftTab === 'PMH' && <>PMH</>} */}
                     </Col>
                 </Row>
             </Col>
 
             {/* Main Content Column */}
-            <Col className='px-0 border-start pb-2 h-100' sm={isCollapsed ? 12 : 8}>
+            <Col className='px-0 border-start pb-2' sm={isCollapsed ? 12 : 8}>
                 {/* Encounter Details */}
                 <div className={`px-1 h-100 ${store?.getEncounterByIdReducer?.loading && initialLoading ? 'd-flex align-items-center justify-content-center p-5' : ''}`}>
                     {store?.getEncounterByIdReducer?.loading && initialLoading ?

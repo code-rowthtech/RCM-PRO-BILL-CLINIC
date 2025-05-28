@@ -117,7 +117,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     };
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container' style={{ overflowY: 'scroll', overflowX: 'hidden', height: isAccordionOpen ? '48.5vh' : '70vh' }}>
+            <div className='scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <div className="row  pb-2 pt-1 pe-0">
                     <div className="col-md-3 col-12 pe-1">
                         <Form.Label className="mb-0">
@@ -209,7 +209,7 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 <hr />
                 <TelecomFrom constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
             </div>
-            <div className="d-flex gap-2 justify-content-end mb-1 mt-2">
+            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
                 <Button className="cancel-button" onClick={() => reset()}>
                     Clear
                 </Button>

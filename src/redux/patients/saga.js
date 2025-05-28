@@ -1,6 +1,6 @@
 import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi } from './api';
+import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getDocumentsApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi, uploadDocumentsApi } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -319,6 +319,67 @@ function* getInsuranceByPatientIdFunction(data) {
         });
     }
 }
+
+function* uploadDocumentsFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.UPLOAD_DOCUMENTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(uploadDocumentsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 201) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.UPLOAD_DOCUMENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.UPLOAD_DOCUMENTS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.UPLOAD_DOCUMENTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.UPLOAD_DOCUMENTS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* getDocumentsFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_DOCUMENTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(getDocumentsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_DOCUMENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_DOCUMENTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_DOCUMENTS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callResetUpdate() {
     put({
         type: PatientsActionTypes.RESET_UPDATE_STATUS,
@@ -370,6 +431,14 @@ export function* watchUpdateInsurance() {
     yield takeEvery(PatientsActionTypes.UPDATE_INSURANCE, updateInsuranceFunction);
 }
 
+export function* watchUploadDocuments() {
+    yield takeEvery(PatientsActionTypes.UPLOAD_DOCUMENTS, uploadDocumentsFunction);
+}
+
+export function* watchGetDocuments() {
+    yield takeEvery(PatientsActionTypes.GET_DOCUMENTS, getDocumentsFunction);
+}
+
 export function* watchresetState() {
     yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
 }
@@ -384,7 +453,7 @@ function* patientsSaga() {
         fork(watchUpdateResponsibleParty),
         fork(watchGetResponsibleParty),
         fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
-        fork(watchGetInsuranceByPatientId),
+        fork(watchGetInsuranceByPatientId), fork(watchUploadDocuments), fork(watchGetDocuments),
         fork(watchresetState),
     ]);
 }
