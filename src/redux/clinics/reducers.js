@@ -449,16 +449,17 @@ export const createSubscriptionPlanReducer = (state = CREATE_SUBSCRIPTION_PLAN_I
                 data: action.payload,
                 loading: false
             }
+        case ClinicsActionTypes.CREATE_SUBSCRIPTION_RESET:
+            return {
+                data: [],
+                loading: false
+            }                
         case ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-        case ClinicsActionTypes.STATE_EMPTY_INTIAL_STATE:
-            return {
-                data: [],
-                loading: false
-            }
+      
         default: return state
     }
 }
