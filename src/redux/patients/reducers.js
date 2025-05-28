@@ -53,7 +53,15 @@ const GET_INSURANCE_BY_PATIENT_ID_INITIAL_STATE = {
     loading: false
 }
 
+const UPLOAD_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 
+const GET_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case PatientsActionTypes.GET_PATIENTS_LOADING:
@@ -375,3 +383,52 @@ export const updateInsuranceReducer = (state = UPDATE_INSURANCE_INITIAL_STATE, a
 
 
 
+export const uploadDocumentsReducer = (state = UPLOAD_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.UPLOAD_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const getDocumentsReducer = (state = GET_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.GET_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case PatientsActionTypes.GET_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};

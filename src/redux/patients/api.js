@@ -6,7 +6,7 @@ const api = new APICore();
 export function getPatientsApi(params: any): any {
     const { data } = params;
     return api.get(URL.getPatients, data);
-    
+
 }
 
 export function getPatientsByAppointmentApi(params: any): any {
@@ -63,3 +63,12 @@ export function updateInsuranceApi(params: any): any {
     return api.create(URL.updateInsurance, data);
 }
 
+export function uploadDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.documents, data);
+}
+
+export function getDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.documents}`, data);
+}

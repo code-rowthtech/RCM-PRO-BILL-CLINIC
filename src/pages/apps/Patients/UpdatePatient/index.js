@@ -26,6 +26,7 @@ import SubAllergytabs from './SubAllergytabs';
 import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 import Encounter from './Encounter/Encounter';
+import PatientDocs from './Patientdocs';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -749,7 +750,7 @@ const UpdatePatientIndex = () => {
                                             )}
                                             {selectedMainTab === 'Eligibility' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Authorizations' && <p>In Progress...</p>}
-                                            {selectedMainTab === 'Documents' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Documents' && <PatientDocs />}
                                             {selectedMainTab === 'Encounter' && (
                                                 <Encounter
                                                     expanded={expanded}
