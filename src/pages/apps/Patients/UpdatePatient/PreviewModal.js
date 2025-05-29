@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
+
 const getFileExtension = (url) => {
     return url?.split('.').pop().toLowerCase();
 };
