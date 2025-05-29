@@ -47,7 +47,7 @@ const NewPractice = () => {
     const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
 
     const [modalFileUrl, setModalFileUrl] = useState(''); // State to store file URL for modal
-
+    console.log(modalFileUrl, 'modaleye');
     const handleShowModal = (url) => {
         setModalFileUrl(url); // Set the URL of the file to display in modal
         setShowModalPic(true); // Open the modal
@@ -90,6 +90,7 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(clinicsDataGet, 'clinicsDataGet');
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
@@ -108,11 +109,17 @@ const NewPractice = () => {
     const [selectedState, setSelectedState] = useState(null);
     const [selectedCity, setSelectedCity] = useState('');
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
+    const [imageLoading, setImageLoading] = useState(true);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
-
+    useEffect(() => {
+        if (showModalPic && modalFileUrl) {
+            setImageLoading(true);
+        }
+    }, [showModalPic, modalFileUrl]);
     useEffect(() => {
         if (latitude && longitude) {
             setFocused(false);
@@ -177,7 +184,6 @@ const NewPractice = () => {
             dispatch(getCitiesAction({ state_code: stateToSelect, name: '', limit: 25, skip: '' }));
         }
     }, [stateToSelect]);
-
 
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
@@ -255,7 +261,7 @@ const NewPractice = () => {
                 };
                 return updatedDetails;
             });
-        } catch (error) { }
+        } catch (error) {}
     };
     const [formData, setFormData] = useState({
         clinicname: '',
@@ -281,9 +287,9 @@ const NewPractice = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                            url: data?.documents?.[0], // Store URL
-                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                        }
+                              url: data?.documents?.[0], // Store URL
+                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                          }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -498,11 +504,12 @@ const NewPractice = () => {
         };
 
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
+        console.log(newPayload, 'newPayload');
     };
 
     useEffect(() => {
         if (createResponseOfSubClinics === 200 && !isModalRequest) {
-            navigate('/apps/crm/addclinic');
+            navigate('/apps/crm/addPractice');
         } else if (createResponseOfSubClinics === 400) {
             console.error('Error creating / updating the sub-clinic');
         }
@@ -664,6 +671,8 @@ const NewPractice = () => {
         'Medicaid',
         'State License',
         'Accreditation',
+        'CCN',
+        'Taxonomy',
         'CLIA',
         'DUNS',
         'Facility ID',
@@ -756,8 +765,6 @@ const NewPractice = () => {
         }
         setAddresses(updatedAddresses);
     };
-    // Default telecom contact options
-
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
@@ -872,6 +879,16 @@ const NewPractice = () => {
         return date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     };
 
+    const formatDisplayValue = (value) => {
+        if (!value) return '';
+        const rawValue = value.replace(/\D/g, '');
+        return rawValue.replace(/(\d{1,3})(\d{0,3})(\d{0,4})/, (match, p1, p2, p3) => {
+            if (p3) return `(${p1})${p2}-${p3}`;
+            if (p2) return `(${p1})${p2}`;
+            return `(${p1}`;
+        });
+    };
+
     return (
         <>
             <div className="pt-1 pb-2">
@@ -883,8 +900,9 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
-                                                    }`}
+                                                className={`text-black nav-link font_active_tabs ${
+                                                    activeTab === 'personalDetails' ? 'active' : ''
+                                                }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
                                                 Practice Sub Information
                                             </button>
@@ -992,33 +1010,32 @@ const NewPractice = () => {
                                                     </Form.Group>
                                                 </Col>
 
-                                                <Col sm={3} className="mb-1 d-flex flex-column position-relative">
+                                                <Col sm={3}>
                                                     <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName ? '' : 'custom-form-fields'
-                                                            }`}
-                                                        data-has-value={!!logoName}>
-                                                        {logoUploading
-                                                            ? 'Uploading...'
-                                                            : typeof logoName === 'string' && logoName
-                                                                ? logoName.split('/').pop().slice(0, 30) + '...'
-                                                                : 'Upload Logo'}
-
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                            logoName || logoUploading
+                                                                ? 'form-control'
+                                                                : 'custom-form-fields'
+                                                        }`}>
+                                                        {logoName
+                                                            ? logoName.split('/').pop().slice(0, 30) + '...'
+                                                            : logoUploading
+                                                              ? 'Uploading...'
+                                                              : 'Upload Logo'}
                                                         <div className="d-flex align-items-center gap-2">
-                                                            {/* Eye Icon for Preview */}
-                                                            {logo && (
-                                                                <FiEye
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation(); // Prevent file input trigger
-                                                                        handleShowModal(logo); // Open modal with logo URL
-                                                                    }}
-                                                                    className="text-dark cursor-pointer"
-                                                                    style={{ zIndex: 1 }}
-                                                                />
-                                                            )}
-
-                                                            {/* Download Icon */}
+                                                            <FiEye
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation(); // Prevent file input trigger
+                                                                    handleShowModal(
+                                                                        logo ? logo : clinicsDataGet?.orgLogo?.url
+                                                                    );
+                                                                    // Show the logo preview
+                                                                }}
+                                                                className="text-dark cursor-pointer"
+                                                                style={{ zIndex: 1 }}
+                                                            />
                                                             <p className="mb-0">
                                                                 <FiDownloadCloud />
                                                             </p>
@@ -1026,9 +1043,8 @@ const NewPractice = () => {
                                                     </div>
                                                     <Form.Control
                                                         type="file"
-                                                        className="rounded-circle"
-                                                        style={{ display: 'none' }}
                                                         ref={logoFileInputRef}
+                                                        style={{ display: 'none' }}
                                                         accept=".png, .jpg, .jpeg, .svg"
                                                         onChange={handleFileChange}
                                                     />
@@ -1072,13 +1088,15 @@ const NewPractice = () => {
                                                                     </span>
                                                                 </OverlayTrigger>
                                                             </Col>
-
                                                             <Col>
                                                                 <Form.Label>Issuing Authority</Form.Label>
                                                             </Col>
                                                             <Col>
                                                                 <Form.Label>
-                                                                    Identifier Expiry <span className='text-secondary'>(If Applicable)</span>
+                                                                    Identifier Expiry{' '}
+                                                                    <span className="text-secondary">
+                                                                        (If Applicable)
+                                                                    </span>
                                                                 </Form.Label>
                                                             </Col>
                                                         </Row>
@@ -1132,8 +1150,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                    ? 5
-                                                                                    : 10
+                                                                                  ? 5
+                                                                                  : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -1198,18 +1216,36 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
-                                                                            ? 'form-control'
-                                                                            : 'custom-form-fields'
-                                                                            }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
+                                                                            item.file
+                                                                                ? 'form-control'
+                                                                                : 'custom-form-fields'
+                                                                        }`}>
                                                                         {item.file?.name
                                                                             ? item.file.name.length > 30
                                                                                 ? item.file.name.slice(0, 25) + '...'
                                                                                 : item.file.name
                                                                             : 'Upload Document'}
-                                                                        <p className="mb-0">
-                                                                            <FiDownloadCloud />
-                                                                        </p>
+                                                                        <div className="d-flex align-items-center gap-2">
+                                                                            {(item?.file?.url ||
+                                                                                clinicsDataGet?.orgLogo?.url) && (
+                                                                                <FiEye
+                                                                                    className="cursor-pointer"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        e.stopPropagation();
+                                                                                        handleShowModal(
+                                                                                            item?.file?.url ||
+                                                                                                clinicsDataGet?.orgLogo
+                                                                                                    ?.url
+                                                                                        );
+                                                                                    }}
+                                                                                />
+                                                                            )}
+                                                                            <p className="mb-0">
+                                                                                <FiDownloadCloud />
+                                                                            </p>
+                                                                        </div>
                                                                     </div>
                                                                     <Form.Control
                                                                         type="file"
@@ -1270,7 +1306,7 @@ const NewPractice = () => {
                                                                                 ? formatDateForInput(item.expiry)
                                                                                 : ''
                                                                         }
-                                                                        min={new Date().toISOString().split("T")[0]} // Sets min date to today
+                                                                        min={new Date().toISOString().split('T')[0]} // Sets min date to today
                                                                         onChange={(e) =>
                                                                             handleChange(
                                                                                 index,
@@ -1351,19 +1387,66 @@ const NewPractice = () => {
                                                                         ))}
                                                                     </Form.Select>
                                                                 </Col>
+
                                                                 <Col sm={4}>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        placeholder="value"
-                                                                        value={item.value}
-                                                                        onChange={(e) =>
-                                                                            handleContactChange(
-                                                                                index,
-                                                                                'value',
-                                                                                e.target.value
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                    {item.system === 'phone' ? (
+                                                                        <InputGroup className="position-relative">
+                                                                            {/* Country Code Prefix */}
+                                                                            <InputGroup.Text className="ps-4 p-0 pe-1 fw-bold text-black">
+                                                                                +1
+                                                                            </InputGroup.Text>
+                                                                            {/* Phone Input */}
+                                                                            <Form.Control
+                                                                                type="tel"
+                                                                                placeholder="(123)456-7890"
+                                                                                value={formatDisplayValue(item.value)}
+                                                                                onChange={(e) =>
+                                                                                    handleContactChange(
+                                                                                        index,
+                                                                                        'value',
+                                                                                        e.target.value
+                                                                                    )
+                                                                                }
+                                                                                maxLength={14}
+                                                                                onKeyPress={(event) => {
+                                                                                    if (!/[0-9]/.test(event.key))
+                                                                                        event.preventDefault();
+                                                                                }}
+                                                                                style={{ paddingLeft: '40px' }}
+                                                                            />
+                                                                            {/* Flag Icon */}
+                                                                            <div
+                                                                                className="position-absolute"
+                                                                                style={{
+                                                                                    left: '10px',
+                                                                                    top: '50%',
+                                                                                    transform: 'translateY(-50%)',
+                                                                                }}>
+                                                                                <img src={us} alt="flag" width={20} />
+                                                                            </div>
+                                                                        </InputGroup>
+                                                                    ) : (
+                                                                        <Form.Control
+                                                                            type={
+                                                                                item.system === 'email'
+                                                                                    ? 'email'
+                                                                                    : 'text'
+                                                                            }
+                                                                            placeholder={
+                                                                                item.system === 'email'
+                                                                                    ? 'Enter email'
+                                                                                    : 'Enter value'
+                                                                            }
+                                                                            value={item.value || ''}
+                                                                            onChange={(e) =>
+                                                                                handleContactChange(
+                                                                                    index,
+                                                                                    'value',
+                                                                                    e.target.value
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    )}
                                                                 </Col>
 
                                                                 <Col sm={4} className="position-relative">
@@ -1481,6 +1564,11 @@ const NewPractice = () => {
                                                                             (data, suggestionIndex) => (
                                                                                 <p
                                                                                     key={suggestionIndex}
+                                                                                    onMouseEnter={() =>
+                                                                                        setActiveSuggestionIndex(
+                                                                                            suggestionIndex
+                                                                                        )
+                                                                                    }
                                                                                     onClick={() => {
                                                                                         // Extract the necessary fields from the API response
                                                                                         const formatted =
@@ -1492,7 +1580,7 @@ const NewPractice = () => {
                                                                                             use: item.use, // preserve existing use
                                                                                             line: [
                                                                                                 components.road ||
-                                                                                                formatted,
+                                                                                                    formatted,
                                                                                             ],
                                                                                             city:
                                                                                                 components.city ||
@@ -1527,6 +1615,11 @@ const NewPractice = () => {
                                                                                         margin: 0,
                                                                                         padding: '8px 12px',
                                                                                         cursor: 'pointer',
+                                                                                        backgroundColor:
+                                                                                            suggestionIndex ===
+                                                                                            activeSuggestionIndex
+                                                                                                ? '#f0f0f0'
+                                                                                                : '#fff',
                                                                                     }}
                                                                                     className="hover-bg-change text-black">
                                                                                     {data.formatted}
@@ -1567,8 +1660,7 @@ const NewPractice = () => {
                                                             <Form.Label className="mb-1">City</Form.Label>
                                                             <Form.Select
                                                                 data-has-value={!!getValues(`address[${index}].city`)}
-                                                                {...register(`address[${index}].city`)}
-                                                            >
+                                                                {...register(`address[${index}].city`)}>
                                                                 <option value="">
                                                                     {store?.getCitiesReducer?.loading
                                                                         ? 'Loading...'
@@ -1713,20 +1805,51 @@ const NewPractice = () => {
                                                             </Col>
                                                             {poc.telecom.map((telecom, telecomIndex) => (
                                                                 <Col sm={6} key={telecomIndex}>
-                                                                    <Form.Label>Phone Number</Form.Label>
-                                                                    <Form.Control
-                                                                        type="text"
-                                                                        placeholder="Enter Value"
-                                                                        value={telecom.value}
-                                                                        onChange={(e) =>
-                                                                            handleTelecomChange(
-                                                                                pocIndex,
-                                                                                telecomIndex,
-                                                                                'value',
-                                                                                e.target.value
-                                                                            )
-                                                                        }
-                                                                    />
+                                                                    <Form.Group className="mb-2 position-relative">
+                                                                        <Form.Label className="mb-1">
+                                                                            Phone Number
+                                                                        </Form.Label>
+                                                                        <InputGroup>
+                                                                            {/* Country Code Prefix */}
+                                                                            <InputGroup.Text className="ps-3 pe-1 p-0 fw-bold text-black">
+                                                                                &nbsp;&nbsp;+1
+                                                                            </InputGroup.Text>
+
+                                                                            {/* Phone Input Field */}
+                                                                            <Form.Control
+                                                                                type="text"
+                                                                                placeholder="Phone Number"
+                                                                                value={formatDisplayValue(
+                                                                                    telecom.value
+                                                                                )} // Apply formatting
+                                                                                onChange={(e) =>
+                                                                                    handleTelecomChange(
+                                                                                        pocIndex,
+                                                                                        telecomIndex,
+                                                                                        'value',
+                                                                                        e.target.value
+                                                                                    )
+                                                                                }
+                                                                                maxLength={14} // To accommodate formatted (XXX)XXXXXXX
+                                                                                onKeyPress={(event) => {
+                                                                                    if (!/[0-9]/.test(event.key)) {
+                                                                                        event.preventDefault(); // Prevent non-numeric input
+                                                                                    }
+                                                                                }}
+                                                                            />
+                                                                        </InputGroup>
+
+                                                                        {/* Flag Icon */}
+                                                                        <div
+                                                                            className="position-absolute"
+                                                                            style={{ top: '52%', left: '1%' }}>
+                                                                            <img
+                                                                                src={us}
+                                                                                alt="country code flag"
+                                                                                width={20}
+                                                                            />
+                                                                        </div>
+                                                                    </Form.Group>
                                                                 </Col>
                                                             ))}
                                                         </Row>
@@ -1739,7 +1862,7 @@ const NewPractice = () => {
                                                         variant="primary"
                                                         type="submit"
                                                         className="custom-buttons"
-                                                        style={{width:'55px'}}
+                                                        style={{ width: '55px' }}
                                                         disabled={createLoading}>
                                                         {createLoading ? (
                                                             <Spinner color="white" className="spinner-border-sm" />
@@ -1763,20 +1886,32 @@ const NewPractice = () => {
                 <Modal.Body>
                     <div className="d-flex justify-content-center">
                         <p className="fw-bold" style={{ color: '#6169D0' }}>
-                            {' '}
                             File Preview
                         </p>
                     </div>
                     <div
-                        style={{ overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        style={{
+                            overflow: 'hidden',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            minHeight: '300px', // minimum height to keep space for loader
+                        }}>
+                        {imageLoading && (
+                            <div className="d-flex justify-content-center align-items-center">
+                                <Spinner />
+                            </div>
+                        )}
                         <img
-                            src={modalFileUrl} // Set the source of the image
+                            src={modalFileUrl?.url || modalFileUrl}
                             alt="File Preview"
+                            onLoad={() => setImageLoading(false)}
+                            onError={() => setImageLoading(false)} // hide spinner on error too
                             style={{
-                                maxWidth: '100%', // Ensures the image fits within the modal width
-                                maxHeight: '100vh', // Prevents the image from exceeding the viewport height
-                                objectFit: 'contain', // Ensures the image maintains its aspect ratio
-                                display: 'block',
+                                maxWidth: '100%',
+                                maxHeight: '100vh',
+                                objectFit: 'contain',
+                                display: imageLoading ? 'none' : 'block', // hide while loading
                             }}
                         />
                     </div>

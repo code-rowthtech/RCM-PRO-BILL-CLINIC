@@ -73,16 +73,21 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [showModal, setShowModal] = useState(false);
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
+    const [imageLoading, setImageLoading] = useState(true);
 
     const handleShowModal = (url) => {
         setModalFileUrl(url);
         setShowModalPic(true);
     };
-
     const handleCloseModal = () => {
         setShowModalPic(false); // Close the modal
         setModalFileUrl(''); // Reset file URL
     };
+    useEffect(() => {
+        if (showModalPic && modalFileUrl) {
+            setImageLoading(true);
+        }
+    }, [showModalPic, modalFileUrl]);
     const closeModal = () => setShowModal(false);
     const [posDetails, setPosDetails] = useState([{ name: '', email: '', role: '', contact: '', fileName: '' }]);
     const [stateDetails, setStateDetails] = useState([{ name: '', number: '', url: null, fileName: '' }]);
@@ -101,6 +106,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
+    const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+
 
     // const handleAddTaxonomy = () => {
     //     const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
@@ -478,6 +485,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         'CMS',
         'The Joint Commission',
         'Dun & Bradstreet',
+
         'Other',
     ];
     const contactDetails = ['phone', 'email'];
@@ -494,6 +502,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         'Accreditation',
         'CLIA',
         'DUNS',
+        'CCN',
+        'Taxonomy',
         'Facility ID',
     ];
 
@@ -618,7 +628,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         }
         setAddresses(updatedAddresses);
     };
-    // Default telecom contact options
     // State for POCs (at least one default POC)
     const [pocs, setPocs] = useState([
         {
@@ -763,7 +772,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Label>
                                     <Form.Control
                                         type="text"
-                                        // data-has-value={!!watch('clinicname')}
                                         {...register('clinicname', {
                                             required: 'This field is required',
                                             validate: (value) =>
@@ -787,7 +795,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     </Form.Label>
                                     <Form.Select
                                         className="form-control"
-                                        // data-has-value={!!watch('clinicType')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.clinicType : ''}
                                         {...register('clinicType', { required: 'This field is required' })}>
                                         <option value="" hidden>
@@ -812,7 +819,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Form.Control
                                         disabled={true}
                                         type="text"
-                                        // data-has-value={!!watch('email')}
                                         // defaultValue={updatePage ? clinicDataToUpdate?.email : ''}
                                         {...register('email', {
                                             required: 'This field is required',
@@ -836,38 +842,27 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                            <Col sm={3} className="mb-1 d-flex flex-column position-relative">
+
+                            <Col sm={3}>
                                 <Form.Label className="mb-0">Upload Logo</Form.Label>
                                 <div
                                     onClick={handleLogoClick}
-                                    className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                        logoName ? '' : 'custom-form-fields'
-                                    }`}
-                                    data-has-value={!!logoName}>
-                                    {/* Ensure logoName is a string or fallback to 'Upload Logo' */}
-                                    {/* {typeof logoName === 'string' && logoName
-                                        ? logoName.split('/').pop()
-                                        : 'Upload Logo'} */}
-                                    {logoUploading
-                                        ? 'Uploading...'
-                                        : typeof logoName === 'string' && logoName
-                                          ? logoName.split('/').pop().slice(0, 30) + '...'
+                                    className={`custom-file-upload justify-content-between cursor-pointer ${
+                                        logoName || logoUploading ? 'form-control' : 'custom-form-fields'
+                                    }`}>
+                                    {logoName
+                                        ? logoName.split('/').pop().slice(0, 30) + '...'
+                                        : logoUploading
+                                          ? 'Uploading...'
                                           : 'Upload Logo'}
-                                    {/* {logoName} */}
-
                                     <div className="d-flex align-items-center gap-2">
-                                        {logo && (
-                                            <FiEye
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleShowModal(logo);
-                                                }}
-                                                className="text-dark cursor-pointer"
-                                                style={{ zIndex: 1 }}
-                                            />
-                                        )}
-
-                                        {/* Download Icon */}
+                                        <FiEye
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleShowModal(logo || clinicsDataGet?.orgLogo?.url);
+                                            }}
+                                            className="text-dark cursor-pointer"
+                                        />
                                         <p className="mb-0">
                                             <FiDownloadCloud />
                                         </p>
@@ -875,9 +870,8 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                 </div>
                                 <Form.Control
                                     type="file"
-                                    className="rounded-circle"
-                                    style={{ display: 'none' }}
                                     ref={logoFileInputRef}
+                                    style={{ display: 'none' }}
                                     accept=".png, .jpg, .jpeg, .svg"
                                     onChange={handleFileChange}
                                 />
@@ -940,7 +934,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col>
                                                 <Form.Select
                                                     value={item.type}
-                                                    data-has-value={!!watch(`identifiers[${index}].type`)}
                                                     {...register(
                                                         `identifiers[${index}].type`
                                                         //  { required: 'Identifier Type is required' }
@@ -1092,10 +1085,23 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                             ? item.file.name.slice(0, 25) + '...'
                                                             : item.file.name
                                                         : 'Upload Document'}
-
-                                                    <p className="mb-0">
-                                                        <FiDownloadCloud />
-                                                    </p>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        {(item?.file?.url || clinicsDataGet?.orgLogo?.url) && (
+                                                            <FiEye
+                                                                className="cursor-pointer"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    handleShowModal(
+                                                                        item?.file?.url || clinicsDataGet?.orgLogo?.url
+                                                                    );
+                                                                }}
+                                                            />
+                                                        )}
+                                                        <p className="mb-0">
+                                                            <FiDownloadCloud />
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <Form.Control
                                                     type="file"
@@ -1113,7 +1119,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col>
                                                 <Form.Select
                                                     value={item.issuingAuthority}
-                                                    data-has-value={!!watch(`identifiers[${index}].issuingAuthority`)}
                                                     {...register(`identifiers[${index}].issuingAuthority`)}
                                                     onChange={(e) =>
                                                         handleChange(index, 'issuingAuthority', e.target.value)
@@ -1183,7 +1188,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                 <Form.Select
                                                     className="text-capitalize"
                                                     value={item.system}
-                                                    data-has-value={!!watch(`constantContact[${index}].system`)}
                                                     {...register(`constantContact[${index}].system`)}
                                                     onChange={(e) =>
                                                         handleContactChange(index, 'system', e.target.value)
@@ -1248,7 +1252,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                             <Col sm={4} className="position-relative">
                                                 <Form.Select
                                                     value={item.use}
-                                                    data-has-value={!!watch(`constantContact[${index}].use`)}
                                                     {...register(`constantContact[${index}].use`)}
                                                     onChange={(e) => handleContactChange(index, 'use', e.target.value)}>
                                                     <option value="">Select Option</option> {/* Placeholder option */}
@@ -1288,7 +1291,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Select
                                             value={item?.type}
                                             className="text-capitalize"
-                                            data-has-value={!!watch(`address[${index}].type`)}
                                             {...register(`address[${index}].type`)}
                                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
                                             <option value="">Select</option>
@@ -1304,7 +1306,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Select
                                             value={item.use}
                                             className="text-capitalize"
-                                            data-has-value={!!watch(`address[${index}].use`)}
                                             {...register(`address[${index}].use`)}
                                             onChange={(e) => handleAddressChange(index, 'use', e.target.value)}>
                                             <option value="">Select</option>
@@ -1356,11 +1357,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         zIndex: 111,
                                                         backgroundColor: '#fff',
                                                         border: '1px solid #ced4da',
+                                                    
                                                         borderTop: 'none',
                                                     }}>
                                                     {searchedLocations?.map((data, suggestionIndex) => (
                                                         <p
                                                             key={suggestionIndex}
+                                                                    onMouseEnter={() => setActiveSuggestionIndex(suggestionIndex)}
+
                                                             onClick={() => {
                                                                 const state = statesData?.states?.find(
                                                                     (s) => s.name === data.components?.state
@@ -1423,6 +1427,9 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 margin: 0,
                                                                 padding: '8px 12px',
                                                                 cursor: 'pointer',
+                                                                 backgroundColor:
+                suggestionIndex === activeSuggestionIndex ? '#f0f0f0' : '#fff',
+
                                                             }}
                                                             className="hover-bg-change text-black">
                                                             {data.formatted}
@@ -1435,7 +1442,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                         <Form.Label className="mb-1">State</Form.Label>
                                         <Form.Select
                                             {...register(`address[${index}].state`)}
-                                            data-has-value={!!getValues(`address[${index}].state`)}
                                             value={item?.state}
                                             onChange={(e) => {
                                                 handleStateSelection(e, item?.type, index);
@@ -1457,7 +1463,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     <Col sm={4} className="mb-2">
                                         <Form.Label className="mb-1">City</Form.Label>
                                         <Form.Select
-                                            data-has-value={!!getValues(`address[${index}].city`)}
                                             {...register(`address[${index}].city`)}
                                             value={item?.city}
                                             onChange={(e) => {
@@ -1717,7 +1722,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                         <Modal.Body>
                             <div className="d-flex justify-content-center">
                                 <p className="fw-bold" style={{ color: '#6169D0' }}>
-                                    {' '}
                                     File Preview
                                 </p>
                             </div>
@@ -1727,20 +1731,29 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
+                                    minHeight: '300px', // minimum height to keep space for loader
                                 }}>
+                                {imageLoading && (
+                                    <div className="d-flex justify-content-center align-items-center">
+                                        <Spinner />
+                                    </div>
+                                )}
                                 <img
-                                    src={modalFileUrl} // Set the source of the image
+                                    src={modalFileUrl?.url || modalFileUrl}
                                     alt="File Preview"
+                                    onLoad={() => setImageLoading(false)}
+                                    onError={() => setImageLoading(false)} // hide spinner on error too
                                     style={{
-                                        maxWidth: '100%', // Ensures the image fits within the modal width
-                                        maxHeight: '100vh', // Prevents the image from exceeding the viewport height
-                                        objectFit: 'contain', // Ensures the image maintains its aspect ratio
-                                        display: 'block',
+                                        maxWidth: '100%',
+                                        maxHeight: '100vh',
+                                        objectFit: 'contain',
+                                        display: imageLoading ? 'none' : 'block', // hide while loading
                                     }}
                                 />
                             </div>
                         </Modal.Body>
                     </Modal>
+
                     <ChangePasswordModal show={showModal} closeModal={closeModal} />
                 </>
             )}
