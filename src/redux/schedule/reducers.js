@@ -1,0 +1,230 @@
+import { ScheduleActionTypes } from './constants';
+
+const CREATE_SCHEDULE_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+const CREATE_TIMINGS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+const UPDATE_TIMINGS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+const GET_DOCTORS_LIST_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+const GET_SCHEDULE_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+
+const GET_PRACTITIONER_TIMINGS_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+const DELETE_SCHEDULE_INITIAL_STATE = {
+    data: [],
+    loading: false,
+};
+export const createScheduleReducer = (state = CREATE_SCHEDULE_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.CREATE_SCHEDULE_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.CREATE_SCHEDULE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.CREATE_SCHEDULE_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case ScheduleActionTypes.CREATE_SCHEDULE_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const createTimingsReducer = (state = CREATE_TIMINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.CREATE_TIMINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.CREATE_TIMINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.CREATE_TIMINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case ScheduleActionTypes.CREATE_TIMINGS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+
+        default:
+            return state;
+    }
+};
+
+export const updateTimingsReducer = (state = UPDATE_TIMINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.UPDATE_TIMINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.UPDATE_TIMINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.UPDATE_TIMINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case ScheduleActionTypes.UPDATE_TIMINGS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const getDoctorsListReducer = (state = GET_DOCTORS_LIST_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.GET_DOCTORS_LIST_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.GET_DOCTORS_LIST_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.GET_DOCTORS_LIST_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        // case ScheduleActionTypes.GET_DOCTORS_LIST_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
+        default:
+            return state;
+    }
+};
+
+export const getScheduleReducer = (state = GET_SCHEDULE_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.GET_SCHEDULE_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.GET_SCHEDULE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.GET_SCHEDULE_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        // case ScheduleActionTypes.GET_SCHEDULE_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
+        default:
+            return state;
+    }
+};
+
+export const getPractitionerTimingsReducer = (state = GET_PRACTITIONER_TIMINGS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        // case ScheduleActionTypes.GET_PRACTITIONER_TIMINGS_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
+        default:
+            return state;
+    }
+};
+
+export const deleteScheduleReducer = (state = DELETE_SCHEDULE_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ScheduleActionTypes.DELETE_SCHEDULE_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case ScheduleActionTypes.DELETE_SCHEDULE_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case ScheduleActionTypes.DELETE_SCHEDULE_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case ScheduleActionTypes.DELETE_SCHEDULE_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};

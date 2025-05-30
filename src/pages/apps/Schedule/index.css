@@ -1,0 +1,60 @@
+.date-range-picker {
+    position: relative;
+    width: 250px;
+    border: none;
+}
+
+.input-container {
+    border: 1px solid #827f7f;
+    padding: 6.5px;
+    cursor: pointer;
+    text-align: center;
+    background-color: white;
+    border-radius: 5px;
+}
+
+.input-container input {
+    border: none;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+.input-container input::before {
+    border: 1px solid white !important;
+}
+
+.dropdownn {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 100%;
+    z-index: 10;
+    margin-top: 5px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dropdownn div {
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.dropdownn div:hover {
+    background-color: #f0f0f0;
+}
+
+.custom-date-picker {
+    justify-content: center;
+    width: 250px;
+    border: 1px solid #827f7f !important;
+}
+.custom-date-input {
+    border: none !important;
+    outline: none;
+    width: 90px;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0px; /* Optional for spacing */
+    font-size: 14px; /* Optional for consistency */
+}

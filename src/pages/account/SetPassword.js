@@ -1,0 +1,209 @@
+// @flow
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Row, Col, Modal } from 'react-bootstrap';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useTranslation } from 'react-i18next';
+import { useSelector, useDispatch } from 'react-redux';
+import ToastHandle from '../../helpers/ToastMessage';
+// Actions
+import { resetAuth, forgotPasswordChange, verifyToken, setPassword, loginUser } from '../../redux/actions';
+
+// Components
+import { VerticalForm, FormInput } from '../../components/';
+import AccountLayout from './AccountLayout';
+import { decryptMessage } from '../../cryptoUtils';
+
+/* Bottom Link */
+const BottomLink = () => {
+    const { t } = useTranslation();
+
+    return (
+        <Row className="mt-3">
+            <Col className="text-center">
+                <p className="text-muted">
+                    {t('Back to')}{' '}
+                    <Link to={'/account/login'} className="text-muted ms-1">
+                        <b>{t('Log In')}</b>
+                    </Link>
+                </p>
+            </Col>
+        </Row>
+    );
+};
+
+const SetPassword = (): React$Element<any> => {
+    const dispatch = useDispatch();
+    const { t } = useTranslation();
+    const [token, setToken] = useState('');
+    const location = useLocation();
+
+    useEffect(() => {
+        const url = window.location.href;
+        const tokenFromUrl = url.split('/').pop();
+        setToken(tokenFromUrl);
+        dispatch(verifyToken({ token: tokenFromUrl }));
+    }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(resetAuth());
+    }, [dispatch]);
+
+    const store = useSelector((state) => state);
+    const redirectUrl = location.state?.from?.pathname || '/apps/crm/addPractice';
+
+    const { loading, passwordChange, changePasswordSuccess, changeSetPassword, user, userLoggedIn } = useSelector((state) => ({
+        loading: state.Auth.loading,
+        passwordChange: state.Auth.passwordChange,
+        changePasswordSuccess: state.Auth.changePasswordSuccess,
+        changeSetPassword: state.Auth.changeSetPassword,
+        userLoggedIn: state.Auth.userLoggedIn,
+        user: state.Auth.user,
+    }));
+
+    const [popup, setPopup] = useState(false);
+    const error = useSelector((state) => state.Auth.error);
+    const errorLoading = useSelector((state) => state.Auth.loading);
+
+
+    useEffect(() => {
+        setPopup(!!error || errorLoading); // Show popup when there is an error or loading
+    }, [error, errorLoading]);
+
+    const handleClose = () => setPopup(false);
+
+    const tokenResponse = store?.Auth?.verifyTokenSuccess?.data;
+    let verifyResponse;
+    if (tokenResponse) {
+        verifyResponse = JSON.parse(decryptMessage(tokenResponse));
+    }
+
+    const schemaResolver = yupResolver(
+        yup.object().shape({
+            password: yup
+                .string()
+                .required(t('Password is required.'))
+                .min(8, t('Password must be at least 8 characters long.'))
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                    t('At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character but spaces are not allowed.')
+                )
+                .matches(/^(?!.*\s).*$/, t('Spaces are not allowed in the password.')),
+
+            confirmPassword: yup
+                .string()
+                .oneOf([yup.ref('password'), null], t('Passwords must match'))
+                .required(t('Confirm Password is required.')),
+        })
+    );
+
+    const [loginPassword, setLoginPassword] = useState(null);
+
+    const onSubmit = (formData) => {
+        setLoginPassword(formData.password);
+        dispatch(setPassword({ token, newPassword: formData.password }));
+    };
+
+    const navigate = useNavigate();
+    const hasDispatched = useRef(false);
+
+    useEffect(() => {
+        if (changeSetPassword && !hasDispatched.current) {
+            ToastHandle('Password generated successfully', 'success');
+            dispatch(loginUser({ email: verifyResponse?.data?.email, password: loginPassword }));
+            hasDispatched.current = true;
+        }
+
+        if (verifyResponse?.status !== 200 && verifyResponse) {
+            ToastHandle('The token is not valid, please request a new token.', 'danger');
+            navigate('/account/login');
+        }
+    }, [changeSetPassword, navigate, verifyResponse, loginPassword]);
+
+    return (
+        <>
+            {(userLoggedIn || user) && <Navigate to={redirectUrl} replace />}
+            {popup ? (
+                <AccountLayout>
+                    <div className="text-center">
+                        <h4 className="text-muted fw-medium">
+                            {errorLoading
+                                ? "Loading... Please wait."
+                                : "Your account is already set up. Please log in or reset your password if needed."}
+                        </h4>
+                        <Button
+                            className="mt-2"
+                            variant="secondary"
+                            onClick={() => {
+                                setPopup(false);
+                                navigate('/account/login');
+                            }}
+                        >
+                            Log In
+                        </Button>
+                    </div>
+                </AccountLayout>
+            ) : (
+                <>
+                    <AccountLayout bottomLinks={<BottomLink />}>
+                        <div className="text-center m-auto">
+                            <h4 className="text-dark-50 text-center mt-0 font-weight-bold">
+                                {t('Set Password')}
+                            </h4>
+                            <p className="text-muted mb-4">
+                                Hey enter your new password, and we'll update your password and log you in.
+                            </p>
+                        </div>
+                        {!passwordChange && (
+                            <VerticalForm onSubmit={onSubmit} resolver={schemaResolver}>
+                                <FormInput
+                                    label={t('Email')}
+                                    type="email"
+                                    name="email"
+                                    value={verifyResponse?.data?.email || ''}
+                                    disabled
+                                    placeholder={t('Your Email')}
+                                    containerClass={'mb-3'}
+                                />
+                                <FormInput
+                                    label="New Password"
+                                    type="password"
+                                    name="password"
+                                    onCopy={(e) => e.preventDefault()}
+                                    onCut={(e) => e.preventDefault()}
+                                    onPaste={(e) => e.preventDefault()}
+                                    placeholder={t('Enter your Password')}
+                                    containerClass={'mb-3'}
+                                />
+                                <FormInput
+                                    label="Confirm Password"
+                                    type="password"
+                                    name="confirmPassword"
+                                    placeholder={t('Confirm your Password')}
+                                    containerClass={'mb-3'}
+                                    onCopy={(e) => e.preventDefault()}
+                                    onCut={(e) => e.preventDefault()}
+                                    onPaste={(e) => e.preventDefault()}
+                                />
+                                <div className="mb-3 mb-0 d-flex justify-content-center">
+                                    <Button
+                                        variant="primary"
+                                        className="custom-buttons"
+                                        type="submit"
+                                        disabled={loading}
+                                    >
+                                        {t('Submit')}
+                                    </Button>
+                                </div>
+                            </VerticalForm>
+                        )}
+                    </AccountLayout>
+                </>
+            )}
+        </>
+    );
+};
+
+export default SetPassword;

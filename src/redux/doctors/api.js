@@ -1,0 +1,36 @@
+import { APICore } from '../../helpers/api/apiCore';
+import * as URL from '../../helpers/api/apiEndpoints';
+
+const api = new APICore();
+
+export function getDoctorsApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getDoctor}?status=${data?.status}&search=${data?.search}&page=${data?.page}&limit=${data?.limit}`);
+    // &page=${data?.page}&limit=${data?.limit}
+}
+
+export function getDoctorsRolesApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.getDoctorRoles}?search=${data?.search}&clinicId=${data?.clinicId}`);
+}
+
+export function getDoctorsDetailApi(params: any): any {
+    const { data } = params;
+    return api.get(URL.getDoctorDetails, data);
+}
+
+export function createDoctorApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.createDoctor, data);
+}
+
+export function createDoctorDetailApi(params: any): any {
+    const { data } = params;
+    return api.update(URL.createDoctorDetail, data);
+}
+
+export function addReferringDoctorApi(params: any): any {
+    const { data } = params;
+    return api.create(URL.addReferringDoctor, data);
+}
+
