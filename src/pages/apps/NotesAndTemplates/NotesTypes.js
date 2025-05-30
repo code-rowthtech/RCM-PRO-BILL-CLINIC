@@ -11,6 +11,7 @@ import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { FormInput } from 'lucide-react';
 import { Controller, Form, useForm } from 'react-hook-form';
 import Paginations from '../../../helpers/Paginations';
+import { IoMdClose } from 'react-icons/io';
 
 const NotesTypes = () => {
     const [openTabs, setOpenTabs] = useState([]);
@@ -228,14 +229,66 @@ const NotesTypes = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className="ms-2">
+                                            {/* <div className="ms-2">
                                                 <input
                                                     type="text"
                                                     className="form-control"
                                                     onChange={(e) => setSearch(e.target.value)}
                                                     placeholder="Search"
+                                                /> */}
+                                            <div
+                                                className="input_search_box position-relative ms-2"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: '#e8f0fe',
+                                                    padding: '0px 5px',
+                                                    minWidth: 180,
+                                                }}>
+                                                <input
+                                                    type="text"
+                                                    value={search}
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                    className="pe-4 form-control"
+                                                    style={{
+                                                        border: 'none',
+                                                        outline: 'none',
+                                                        flex: 1,
+                                                        backgroundColor: '#ccc',
+                                                        paddingRight: 30,
+                                                    }}
                                                 />
+                                                {search ? (
+                                                    <IoMdClose
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onClick={() => {
+                                                            setSearch('');
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <IoSearchSharp
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                        }}
+                                                    />
+                                                )}
                                             </div>
+                                            {/* </div> */}
+
                                             <Button
                                                 variant="primary"
                                                 size="sm"

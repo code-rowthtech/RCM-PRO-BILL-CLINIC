@@ -413,12 +413,11 @@ const DoctorIdentifierForm = ({
                             </span>
                         )}
                     </Col>
-                    {identifiers?.length > 1 && index < identifiers.length - 1 && <hr className="mt-2" />}
+                    {identifiers?.length > 1 && index < identifiers.length - 1 }
                 </Row>
             ))}
-            <hr />
             <Row>
-                <Col sm={12}>
+                <Col sm={12} className="">
                     <h5>
                         Licensure & Certification
                         <span
@@ -581,7 +580,7 @@ const DoctorIdentifierForm = ({
                             </span>
                         )}
                     </Col>
-                    {licensure?.length > 1 && index < licensure.length - 1 && <hr className="mt-2" />}
+                    {licensure?.length > 1 && index < licensure.length - 1 }
                     <Modal show={showPreview} onHide={() => setShowPreview(false)} centered>
                         <Modal.Body>
                             <div className="d-flex justify-content-center">

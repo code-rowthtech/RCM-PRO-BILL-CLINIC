@@ -70,5 +70,5 @@ export function uploadDocumentsApi(params: any): any {
 
 export function getDocumentsApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.documents}`, data);
+    return api.get(`${URL.documents}?subject=${data?.subject}`);
 }

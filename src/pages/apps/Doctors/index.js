@@ -12,6 +12,7 @@ import { IoSearchSharp } from 'react-icons/io5';
 import { Info } from 'lucide-react';
 import profileDummy from '../../../assets/images/profileDummy.png';
 import Paginations from '../../../helpers/Paginations';
+import { IoMdClose } from 'react-icons/io';
 
 const Doctors = () => {
     const [statusModal, setStatusModal] = useState(false); // Modal to confirm status change
@@ -67,14 +68,16 @@ const Doctors = () => {
                                 <Col sm={6} xs={6}>
                                     <Button
                                         onClick={() => handleActiveTab(true)}
-                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
+                                        className={`me-md-2 active_inactive_buttons ${
+                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                        }`}>
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => handleActiveTab(false)}
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
+                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                        }`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -83,21 +86,15 @@ const Doctors = () => {
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end ">
                                         <Col xs="auto" className="d-flex gap-2">
                                             <div
-                                                className="input_search_box"
+                                                className="input_search_box position-relative"
                                                 style={{
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     borderRadius: '4px',
                                                     backgroundColor: '#e8f0fe',
                                                     padding: '0px 5px',
+                                                    minWidth: 180,
                                                 }}>
-                                                <IoSearchSharp
-                                                    style={{
-                                                        fontSize: '1.2rem',
-                                                        color: 'black',
-                                                        marginRight: '10px',
-                                                    }}
-                                                />
                                                 <FormInput
                                                     type="text"
                                                     value={search}
@@ -113,14 +110,50 @@ const Doctors = () => {
                                                             })
                                                         );
                                                     }}
-                                                    className="input_search_box"
+                                                    className="pe-4"
                                                     style={{
                                                         border: 'none',
                                                         outline: 'none',
                                                         flex: 1,
                                                         backgroundColor: '#ccc',
+                                                        paddingRight: 30,
                                                     }}
                                                 />
+                                                {search ? (
+                                                    <IoMdClose
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onClick={() => {
+                                                            setSearch('');
+                                                            dispatch(
+                                                                getDoctorsAction({
+                                                                    search: '',
+                                                                    page: 1,
+                                                                    limit: 10,
+                                                                    status: true,
+                                                                })
+                                                            );
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <IoSearchSharp
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                        }}
+                                                    />
+                                                )}
                                             </div>
                                             <Button
                                                 onClick={handleNewDoctor}
@@ -183,10 +216,10 @@ const Doctors = () => {
                                                 {filteredDoctors?.length === 0 ? (
                                                     <tr>
                                                         <td colSpan={7} className="text-center">
-                                                            <h3 className="my-3">
+                                                            <h5 className="my-3 fw-bolder">
                                                                 No Data Found for{' '}
                                                                 {status === true ? 'Active' : 'Inactive'}
-                                                            </h3>
+                                                            </h5>
                                                         </td>
                                                     </tr>
                                                 ) : (
@@ -223,7 +256,9 @@ const Doctors = () => {
                                                                                 {data?.name?.[0]?.family || ''}
                                                                             </div>
                                                                             <div className="fs-6 fw-semibold">
-                                                                                {data?.telecom?.[0]?.value ? '+1-' + data?.telecom?.[0]?.value : 'N/A'}
+                                                                                {data?.telecom?.[0]?.value
+                                                                                    ? '+1-' + data?.telecom?.[0]?.value
+                                                                                    : 'N/A'}
                                                                             </div>
                                                                         </span>
                                                                     </div>
@@ -242,8 +277,8 @@ const Doctors = () => {
                                                                     <div className="d-flex flex-column justify-content-center">
                                                                         <p className="mb-0">
                                                                             {data?.address?.[0]?.line &&
-                                                                                data?.address?.[0]?.line.length > 0 &&
-                                                                                data?.address?.[0]?.line[0] !== '' ? (
+                                                                            data?.address?.[0]?.line.length > 0 &&
+                                                                            data?.address?.[0]?.line[0] !== '' ? (
                                                                                 <span
                                                                                     title={data?.address?.[0]?.line.join(
                                                                                         ''
