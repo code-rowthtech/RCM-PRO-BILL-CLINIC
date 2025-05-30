@@ -108,7 +108,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [identifierDocument, setIdentifierDocumnent] = useState(false);
     const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
 
-
     // const handleAddTaxonomy = () => {
     //     const lastCode = taxonomyCodes[taxonomyCodes.length - 1];
 
@@ -1357,14 +1356,15 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         zIndex: 111,
                                                         backgroundColor: '#fff',
                                                         border: '1px solid #ced4da',
-                                                    
+
                                                         borderTop: 'none',
                                                     }}>
                                                     {searchedLocations?.map((data, suggestionIndex) => (
                                                         <p
                                                             key={suggestionIndex}
-                                                                    onMouseEnter={() => setActiveSuggestionIndex(suggestionIndex)}
-
+                                                            onMouseEnter={() =>
+                                                                setActiveSuggestionIndex(suggestionIndex)
+                                                            }
                                                             onClick={() => {
                                                                 const state = statesData?.states?.find(
                                                                     (s) => s.name === data.components?.state
@@ -1427,9 +1427,10 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                                 margin: 0,
                                                                 padding: '8px 12px',
                                                                 cursor: 'pointer',
-                                                                 backgroundColor:
-                suggestionIndex === activeSuggestionIndex ? '#f0f0f0' : '#fff',
-
+                                                                backgroundColor:
+                                                                    suggestionIndex === activeSuggestionIndex
+                                                                        ? '#f0f0f0'
+                                                                        : '#fff',
                                                             }}
                                                             className="hover-bg-change text-black">
                                                             {data.formatted}
@@ -1569,6 +1570,14 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                     onChange={(e) => handlePocChange(pocIndex, 'role', e.target.value)}
                                                 />
                                             </Form.Group>
+                                               {pocs.length > 1 && (
+                                                    <span
+                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
+                                                        style={{ right: '-1%', top: '45%' }}
+                                                        onClick={() => removePoc(pocIndex)}>
+                                                        <CiCircleMinus />
+                                                    </span>
+                                                )}
                                         </Col>
 
                                         <Col sm={6}>
@@ -1621,6 +1630,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         <img src={us} alt="country code flag" width={20} />
                                                     </div>
                                                 </Form.Group>
+                                             
                                             </Col>
                                         ))}
                                     </Row>

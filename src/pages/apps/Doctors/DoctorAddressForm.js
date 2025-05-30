@@ -214,7 +214,7 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                             data-has-value={!!watch(`address[${index}].type`)}
                             {...register(`address[${index}].type`)}
                             onChange={(e) => handleAddressChange(index, 'type', e.target.value)}>
-                            <option value="" key='' hidden>
+                            <option value="" key="" hidden>
                                 Select
                             </option>
                             {addressTypes?.map((type) => (
@@ -421,14 +421,14 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                                     handleAddressChange(index, 'postalCode', e.target.value);
                                 }}
                             />
-                            {addresses.length > 1 && index !== 0 && (
+                            {/* {addresses.length > 1 && index !== 0 && (
                                 <span
                                     className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
                                     style={{ right: '-2%', top: '50%' }}
                                     onClick={() => removeAddress(index)}>
                                     <CiCircleMinus />
                                 </span>
-                            )}
+                            )} */}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>
@@ -500,9 +500,9 @@ const DoctorAddress = ({ addresses, setAddresses }) => {
                     </Col>
 
                     {addresses.length > 1 && (
-                        <Col sm={3} className="d-flex justify-content-start align-items-center">
+                        <Col sm={3} className="d-flex justify-content-start align-items-center mt-2">
                             <span
-                                className="text-danger cursor-pointer fs-5 fw-bold"
+                                className="text-danger cursor-pointer  fs-5 fw-bold"
                                 onClick={() => removeAddress(index)}>
                                 <CiCircleMinus />
                             </span>

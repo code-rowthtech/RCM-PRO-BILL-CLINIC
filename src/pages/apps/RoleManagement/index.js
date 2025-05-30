@@ -10,18 +10,19 @@ import { getRoleDataAction, getRolesAction, updateRolesAction } from '../../../r
 import Paginations from '../../../helpers/Paginations';
 import { getDepartmentDataAction, getMastersDataAction } from '../../../redux/settings/action';
 import { IoSearchSharp } from 'react-icons/io5';
+import { IoMdClose } from 'react-icons/io';
 
 const RoleManagement = () => {
     const dispatch = useDispatch();
-    const store = useSelector((state) => state)
-    const roleData = store?.getRolesDataReducer?.data
-    const roleDataLoading = store?.getRolesDataReducer?.loading
+    const store = useSelector((state) => state);
+    const roleData = store?.getRolesDataReducer?.data;
+    const roleDataLoading = store?.getRolesDataReducer?.loading;
     const createSuccess = store?.createRolesReducer?.data?.status;
     const updateSuccess = store?.updateRolesReducer?.data?.status;
     const [addDepartmentModal, setAddDepartmentModal] = useState(false);
-    const [status, setStatus] = useState(true)
-    const [skip, setSkip] = useState(1)
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId
+    const [status, setStatus] = useState(true);
+    const [skip, setSkip] = useState(1);
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const [searchQuery, setSearchQuery] = useState('');
     const [dataToEdit, setDataToEdit] = useState(null);
 
@@ -39,15 +40,17 @@ const RoleManagement = () => {
     useEffect(() => {
         dispatch(getDepartmentDataAction({ status: true, category: 'Department', limit: 10, skip: '', search: '' }));
         dispatch(getMastersDataAction({ status: true, category: 'Desigination', limit: 10, skip: '', search: '' }));
-        dispatch(getRoleDataAction({
-            clinicId: clinicId,
-            limit: 10,
-            search: '',
-            createdById: '',
-            page: '',
-            status: true
-        }));
-    }, [dispatch])
+        dispatch(
+            getRoleDataAction({
+                clinicId: clinicId,
+                limit: 10,
+                search: '',
+                createdById: '',
+                page: '',
+                status: true,
+            })
+        );
+    }, [dispatch]);
 
     const handleSearchChange = (e) => {
         setSearchQuery(e.target.value);
@@ -88,68 +91,92 @@ const RoleManagement = () => {
     };
 
     return (
-        <Row className='mt-2'>
-            <Col xs={12} className='px-0'>
+        <Row className="mt-2">
+            <Col xs={12} className="px-0">
                 <Card className="scroll-container page-height">
-                    <Card.Body className='' >
+                    <Card.Body className="">
                         <Row className="mb-2">
                             <Col md={6} sm={6} xs={6}>
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}
-                                >
+                                    className={`active_inactive_buttons ${
+                                        status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}
-                                >
+                                    className={`active_inactive_buttons ${
+                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
 
-                            <Col md={6} sm={6} xs={6} className='text-end'>
+                            <Col md={6} sm={6} xs={6} className="text-end">
                                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-end">
-                                    <Col xs="auto" className='d-flex gap-2'>
-
+                                    <Col xs="auto" className="d-flex gap-2">
                                         <div
-                                            className="input_search_box"
+                                            className="input_search_box position-relative"
                                             style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                borderRadius: "4px",
-                                                backgroundColor: "#e8f0fe",
-                                                padding: "0px 5px",
-                                            }}
-                                        >
-                                            <IoSearchSharp
-                                                style={{
-                                                    fontSize: "1.2rem",
-                                                    color: "black",
-                                                    marginRight: "10px",
-                                                }}
-                                            />
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                borderRadius: '4px',
+                                                backgroundColor: '#e8f0fe',
+                                                padding: '0px 5px',
+                                                minWidth: 180,
+                                            }}>
                                             <FormInput
                                                 type="text"
-                                                onChange={handleSearchChange}
                                                 value={searchQuery}
-                                                className="input_search_box"
+                                                onChange={handleSearchChange}
+                                                className="pe-4"
                                                 style={{
-                                                    border: "none",
-                                                    outline: "none",
+                                                    border: 'none',
+                                                    outline: 'none',
                                                     flex: 1,
-                                                    backgroundColor: "#ccc",
+                                                    backgroundColor: '#ccc',
+                                                    paddingRight: 30,
                                                 }}
                                             />
+                                            {searchQuery ? (
+                                                <IoMdClose
+                                                    style={{
+                                                        fontSize: '1.2rem',
+                                                        color: 'lightgray',
+                                                        position: 'absolute',
+                                                        right: 10,
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                        cursor: 'pointer',
+                                                    }}
+                                                    onClick={() => {
+                                                        setSearchQuery('');
+                                                    }}
+                                                />
+                                            ) : (
+                                                <IoSearchSharp
+                                                    style={{
+                                                        fontSize: '1.2rem',
+                                                        color: 'lightgray',
+                                                        position: 'absolute',
+                                                        right: 10,
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                    }}
+                                                />
+                                            )}
                                         </div>
-                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons d-none d-md-block py-1" >
+                                        <Button
+                                            onClick={() => setAddDepartmentModal(true)}
+                                            className="custom-buttons d-none d-md-block py-1">
                                             Add User
                                         </Button>
-                                        <Button onClick={() => setAddDepartmentModal(true)} className="custom-buttons d-md-none py-1">
+                                        <Button
+                                            onClick={() => setAddDepartmentModal(true)}
+                                            className="custom-buttons d-md-none py-1">
                                             +
                                         </Button>
                                     </Col>
@@ -158,18 +185,34 @@ const RoleManagement = () => {
                         </Row>
                         <Row>
                             <Col>
-                                <Table responsive className="table-centered table-nowrap mb-0  rounded"
+                                <Table
+                                    responsive
+                                    className="table-centered table-nowrap mb-0  rounded"
                                     style={{ height: roleData?.length === 0 ? '100vh' : 'auto' }}>
                                     <thead className="text-white">
                                         <tr>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Sr. No.</th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Name</th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Phone</th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Username</th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Joining Date</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Sr. No.
+                                            </th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Name
+                                            </th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Phone
+                                            </th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Username
+                                            </th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Joining Date
+                                            </th>
 
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Status</th>
-                                            <th className="text-white" style={{ fontSize: '13px' }}>Action</th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Status
+                                            </th>
+                                            <th className="text-white" style={{ fontSize: '13px' }}>
+                                                Action
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -183,31 +226,42 @@ const RoleManagement = () => {
                                             roleData?.users.map((data, index) => (
                                                 <tr key={index} className="border-bottom">
                                                     <td style={{ fontSize: '13px', fontWeight: '400' }}>{index + 1}</td>
-                                                    <td className='text-capitalize' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td
+                                                        className="text-capitalize"
+                                                        style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {data?.name?.text || 'N/A'}
                                                     </td>
-                                                    <td className='' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         {(() => {
-                                                            const workPhone = data?.telecom?.find((item) => item?.system === 'phone' && item?.use === 'work')?.value;
+                                                            const workPhone = data?.telecom?.find(
+                                                                (item) =>
+                                                                    item?.system === 'phone' && item?.use === 'work'
+                                                            )?.value;
                                                             return workPhone ? `+1${workPhone}` : 'N/A';
                                                         })()}
                                                     </td>
-                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>{data?.email}</td>
-                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
-                                                        {data?.joiningDate ? new Date(data.joiningDate).toLocaleDateString('en-GB') : ''}
+                                                    <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        {data?.email}
                                                     </td>
-                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                        {data?.joiningDate
+                                                            ? new Date(data.joiningDate).toLocaleDateString('en-GB')
+                                                            : ''}
+                                                    </td>
+                                                    <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <Form.Switch
-                                                            className={data?.status === true ? "custom-active" : ""}
-                                                            onClick={() => handleUpdateDoctorStatus(data)} checked={data?.status === true} />
+                                                            className={data?.status === true ? 'custom-active' : ''}
+                                                            onClick={() => handleUpdateDoctorStatus(data)}
+                                                            checked={data?.status === true}
+                                                        />
                                                     </td>
-                                                    <td className=' ' style={{ fontSize: '13px', fontWeight: '400' }}>
+                                                    <td className=" " style={{ fontSize: '13px', fontWeight: '400' }}>
                                                         <div className="d-flex gap-2">
                                                             <FiEdit
                                                                 className="fs-4 cursor-pointer"
                                                                 onClick={() => {
-                                                                    setDataToEdit(data)
-                                                                    setAddDepartmentModal(true)
+                                                                    setDataToEdit(data);
+                                                                    setAddDepartmentModal(true);
                                                                 }}
                                                             />
                                                         </div>
@@ -226,7 +280,7 @@ const RoleManagement = () => {
                             </Col>
                         </Row>
                         <Row>
-                            <Col className='mt-2 d-flex justify-content-end'>
+                            <Col className="mt-2 d-flex justify-content-end">
                                 <Paginations
                                     currentPage={skip}
                                     totalPages={roleData?.pagination?.totalPages || 1}
@@ -237,7 +291,12 @@ const RoleManagement = () => {
                     </Card.Body>
                 </Card>
             </Col>
-            <AddRole dataToEdit={dataToEdit} setDataToEdit={setDataToEdit} show={addDepartmentModal} setAddDepartmentModal={setAddDepartmentModal} />
+            <AddRole
+                dataToEdit={dataToEdit}
+                setDataToEdit={setDataToEdit}
+                show={addDepartmentModal}
+                setAddDepartmentModal={setAddDepartmentModal}
+            />
         </Row>
     );
 };

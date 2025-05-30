@@ -1778,8 +1778,8 @@ const NewPractice = () => {
                                                                 </Form.Group>
                                                                 {pocs.length > 1 && (
                                                                     <span
-                                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                                                        style={{ right: '-1%', top: '50%' }}
+                                                                        className="text-danger cursor-pointer position-absolute fs-5 fw-bolder"
+                                                                        style={{ right: '-1%', top: '45%' }}
                                                                         onClick={() => removePoc(pocIndex)}>
                                                                         <CiCircleMinus />
                                                                     </span>

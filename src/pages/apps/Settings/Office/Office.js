@@ -130,34 +130,60 @@ const Office = () => {
                 <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                   <Col xs="auto" className='d-flex gap-2'>
                     <div
-                      className="input_search_box"
+                      className="input_search_box position-relative"
                       style={{
                         display: "flex",
                         alignItems: "center",
                         borderRadius: "4px",
                         backgroundColor: "#e8f0fe",
                         padding: "0px 5px",
+                        minWidth: 180,
                       }}
                     >
-                      <IoSearchSharp
-                        style={{
-                          fontSize: "1.2rem",
-                          color: "black",
-                          marginRight: "10px",
-                        }}
-                      />
                       <FormInput
                         type="text"
-                        onChange={(e) => { setSearch(e.target.value); setSkip(1); }}
-                        className=""
+                        value={search}
+                        onChange={(e) => {
+                          setSearch(e.target.value);
+                          setSkip(1);
+                        }}
+                        className="pe-4"
                         style={{
                           border: "none",
                           outline: "none",
                           flex: 1,
                           backgroundColor: "#ccc",
-
+                          paddingRight: 30,
                         }}
                       />
+                      {search ? (
+                        <IoMdClose
+                          style={{
+                            fontSize: "1.2rem",
+                            color: "lightgray",
+                            position: "absolute",
+                            right: 10,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            setSearch("");
+                            setSkip(1);
+                          }}
+                        />
+                      ) : (
+                        <IoSearchSharp
+                          style={{
+                            fontSize: "1.2rem",
+                            color: "lightgray",
+                            position: "absolute",
+                            right: 10,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                          }}
+                        />
+                      )}
                     </div>
                     <Button className="custom-buttons py-0"  ><FiFilter className='fs-5' /></Button>
                     <Button className="custom-buttons py-0"><FiFileText className='fs-5' /></Button>
