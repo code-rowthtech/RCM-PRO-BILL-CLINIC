@@ -290,13 +290,13 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                             setPreviewModal(true);
                                                                             setPreviewLink(content?.attachment?.url);
                                                                         }} className='bi bi-eye fs-5 text-info cursor-pointer' />
-                                                                        <i
+                                                                        {/* <i
                                                                             title='Edit Status'
                                                                             onClick={() => {
                                                                                 setDocumentData(doc)
                                                                                 setShowUploadModal(true);
                                                                             }}
-                                                                            className='mdi mdi-square-edit-outline cursor-pointer fs-5' />
+                                                                            className='mdi mdi-square-edit-outline cursor-pointer fs-5' /> */}
                                                                         <i title='Delete' onClick={handleDeleteAttachment(doc, content?._id)} className='bi bi-trash text-danger fs-5 cursor-pointer' />
                                                                     </div>
                                                                 </div>
