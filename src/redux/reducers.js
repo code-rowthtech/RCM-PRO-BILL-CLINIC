@@ -17,7 +17,9 @@ import {
     updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getInsuranceByIdReducer,
     getPatientsByAppointmentReducer,
     uploadDocumentsReducer,
-    getDocumentsReducer
+    getDocumentsReducer,
+    updateDocumentsReducer,
+    deleteDocumentsReducer
 } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
@@ -46,7 +48,7 @@ export default (combineReducers({
     createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,
-    getPatientsReducer, uploadDocumentsReducer, getDocumentsReducer,
+    getPatientsReducer, uploadDocumentsReducer, getDocumentsReducer, updateDocumentsReducer, deleteDocumentsReducer,
     getSubscriptionReducer, getSubSubscriptionReducer,
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,

@@ -68,6 +68,16 @@ export function uploadDocumentsApi(params: any): any {
     return api.create(URL.documents, data);
 }
 
+export function updateDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.update(`${URL.documents}/${data?.patientDocId}`, data);
+}
+
+export function deleteDocumentsApi(params: any): any {
+    const { data } = params;
+    return api.delete(`${URL.documents}/${data?.patientDocId}`, data);
+}
+
 export function getDocumentsApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.documents}?subject=${data?.subject}`);

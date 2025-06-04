@@ -23,7 +23,6 @@ export const handleUpload = async (file, setLoading) => {
             },
             body: file,
         });
-        console.log(uploadResponse, 'Error uploading file: Success')
         return url;
 
     } catch (error) {

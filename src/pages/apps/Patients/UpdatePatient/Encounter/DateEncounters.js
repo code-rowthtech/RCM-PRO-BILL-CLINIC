@@ -15,13 +15,14 @@ import { encryptMessage } from '../../../../../cryptoUtils';
 import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
+import { Controller } from 'react-hook-form';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
 
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
-    const { handleSubmit, register, setValue, formState: { errors }, getValues, reset } = useForm();
+    const { handleSubmit, register, setValue, formState: { errors }, getValues, reset, control } = useForm();
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
@@ -74,11 +75,11 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
-            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }))
+            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
         }
 
-        // If this is an update operation, populate the form with existing data
-        if (encounterAction === 'updateEncounter' && encounterData) {
+        // Populate form for update operation
+        if (encounterAction === 'updateEncounter' && encounterData && notesFields) {
             // Set provider
             if (encounterData?.providerId) {
                 setSelectedProvider(encounterData.providerId);
@@ -110,7 +111,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 });
             }
         }
-    }, [noteType, defaultNoteTypeOption, encounterAction, encounterData, setValue]);
+    }, [noteType, defaultNoteTypeOption, encounterAction, encounterData, setValue, notesFields]);
 
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
     const visibleTabs =
@@ -139,7 +140,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }, 0);
     }, [selectedFromList, setValue]);
 
-    const NoteFormFields = ({ data = [], excludedFields = [], selectedFromList }) => {
+
+    const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
         const getFieldsToRender = () => {
             return (data || [])
                 .filter(field => field.isShown && !excludedFields.includes(field.name))
@@ -154,67 +156,76 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                         <h5>{name}</h5>
                         {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
                             <Form.Group className="mb-2" key={section}>
-                                <Form.Label className='mb-0'>{section}</Form.Label>
-                                {inputType === 'text-editor' ? (
-                                    <ReactQuill
-                                        theme="snow"
-                                        value={selectedFromList?.[section] || ''}
-                                        onChange={(value) => setValue(section, value)}
-                                        modules={{
-                                            toolbar: [
-                                                ['bold', 'italic', 'underline'],
-                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                ['link'],
-                                                ['clean'],
-                                            ]
-                                        }}
-                                    />
-                                ) : (
-                                    <Form.Control
-                                        {...register(section)}
-                                        as={inputType === 'text' ? 'input' : 'textarea'}
-                                        rows={inputType === 'text' ? undefined : 3}
-                                        defaultValue={selectedFromList?.[section] || ''}
-                                    />
-                                )}
+                                <Form.Label className="mb-0">{section}</Form.Label>
+                                <Controller
+                                    name={section}
+                                    control={control}
+                                    render={({ field: { onChange, value } }) => (
+                                        <ReactQuill
+                                            theme="snow"
+                                            value={value || ''} // Use form state value
+                                            onChange={onChange} // Update form state on change
+                                            modules={{
+                                                toolbar: [
+                                                    ['bold', 'italic', 'underline'],
+                                                    [{ list: 'ordered' }, { list: 'bullet' }],
+                                                    ['link'],
+                                                    ['clean'],
+                                                ],
+                                            }}
+                                        />
+                                    )}
+                                />
                             </Form.Group>
                         ))}
                     </div>
                 );
             }
 
-            // Handle regular fields based on inputType
+            // Handle regular fields
             return (
                 <Form.Group key={name}>
-                    <Form.Label className='mb-0'>{name}</Form.Label>
+                    <Form.Label className="mb-0">{name}</Form.Label>
                     {inputType === 'text-editor' ? (
-                        <ReactQuill
-                            theme="snow"
-                            value={selectedFromList?.[name] || ''}
-                            onChange={(value) => setValue(name, value)}
-                            modules={{
-                                toolbar: [
-                                    ['bold', 'italic', 'underline'],
-                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                    ['link'],
-                                    ['clean'],
-                                    ['undo', 'redo']
-                                ]
-                            }}
+                        <Controller
+                            name={name}
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <ReactQuill
+                                    theme="snow"
+                                    value={value || ''} // Use form state value
+                                    onChange={onChange} // Update form state on change
+                                    modules={{
+                                        toolbar: [
+                                            ['bold', 'italic', 'underline'],
+                                            [{ list: 'ordered' }, { list: 'bullet' }],
+                                            ['link'],
+                                            ['clean'],
+                                            ['undo', 'redo'],
+                                        ],
+                                    }}
+                                />
+                            )}
                         />
                     ) : (
                         <Form.Control
                             {...register(name)}
                             as={inputType === 'text' ? 'input' : 'textarea'}
                             rows={inputType === 'text' ? undefined : 3}
-                            defaultValue={selectedFromList?.[name] || ''}
                         />
                     )}
                 </Form.Group>
             );
         };
+
         return (
-            <Row className="g-2 px-1 mt-1 scroll-container" style={{ height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh', overflowY: 'auto' }}>
+            <Row
+                className="g-2 px-1 mt-1 scroll-container"
+                style={{
+                    height: !expanded ? (isAccordionOpen ? '36vh' : '50vh') : '59.5vh',
+                    overflowY: 'auto',
+                }}
+            >
                 {getFieldsToRender().map(field => renderField(field))}
             </Row>
         );
@@ -564,6 +575,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                             <NoteFormFields
                                 selectedFromList={selectedFromList}
                                 data={notesFields}
+                                control={control}
                             />
                             <div className="row">
                                 <div className="col-12 d-flex justify-content-end py-2">

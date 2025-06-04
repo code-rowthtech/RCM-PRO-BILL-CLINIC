@@ -25,7 +25,6 @@ import { doc } from 'prettier';
 const MAX_FILE_SIZE_MB = 2;
 
 const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => {
-    console.log('documentData', documentData);
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -63,7 +62,6 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
 
     // DOCUMENT TYPE HANDLING
     const [documentType, setDocumentType] = useState(null);
-    console.log(documentType, 'documentType');
     const formattedDocumentTypes = useMemo(() =>
         documentTypes.map((type) => ({
             value: type,
@@ -94,7 +92,6 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
 
     // DOCUMENT Category HANDLING
     const [documentCategory, setDocumentCategory] = useState(null);
-    console.log(documentCategory, 'documentCategory');
 
     // const formattedDocumentCategory = useMemo(() =>
     //     documentCategories.map((type) => ({
@@ -197,19 +194,19 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
 
         const documentTypePayload = {
             coding: [{
-                system: documentType.system,
-                code: documentType.code,
-                display: documentType.display,
+                system: documentType?.system,
+                code: documentType?.code,
+                display: documentType?.display,
             }],
-            text: documentType.display,
+            text: documentType?.display,
         };
         const documentCategoryPayload = {
             coding: [{
-                system: documentCategory.system,
-                code: documentCategory.code,
-                display: documentCategory.display,
+                system: documentCategory?.system,
+                code: documentCategory?.code,
+                display: documentCategory?.display,
             }],
-            text: documentCategory.display,
+            text: documentCategory?.display,
         };
         dispatch(uploadPatientDocumentsAction({
             key: encryptMessage({
@@ -221,9 +218,11 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
                 content,
                 type: documentTypePayload,
                 category: [documentCategoryPayload],
-                context: {
-                    encounter: [encounter]
-                }
+                ...(encounter && {
+                    context: {
+                        encounter: [encounter]
+                    }
+                })
             })
         }));
     };

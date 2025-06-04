@@ -775,7 +775,6 @@ const NewPatient = () => {
                                     </div>
                                 </div>
                                 <hr className="mt-0" />
-
                                 <div className="row">
                                     <div className="col-md-3 col-12">
                                         <Form.Group>

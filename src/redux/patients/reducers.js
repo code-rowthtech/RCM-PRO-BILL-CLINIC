@@ -58,6 +58,16 @@ const UPLOAD_DOCUMENTS_INITIAL_STATE = {
     loading: false
 }
 
+const UPDATE_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
+const DELETE_DOCUMENTS_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
+
 const GET_DOCUMENTS_INITIAL_STATE = {
     data: [],
     loading: false
@@ -401,6 +411,60 @@ export const uploadDocumentsReducer = (state = UPLOAD_DOCUMENTS_INITIAL_STATE, a
                 loading: false,
             };
         case PatientsActionTypes.UPLOAD_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const updateDocumentsReducer = (state = UPDATE_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.UPDATE_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.UPDATE_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return { ...state };
+    }
+};
+
+export const deleteDocumentsReducer = (state = DELETE_DOCUMENTS_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.DELETE_DOCUMENTS_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_RESET:
+            return {
+                data: [],
+                loading: false,
+            };
+        case PatientsActionTypes.DELETE_DOCUMENTS_ERROR:
             return {
                 data: action.payload,
                 loading: false,
