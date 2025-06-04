@@ -1356,7 +1356,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                                                         zIndex: 111,
                                                         backgroundColor: '#fff',
                                                         border: '1px solid #ced4da',
-
                                                         borderTop: 'none',
                                                     }}>
                                                     {searchedLocations?.map((data, suggestionIndex) => (

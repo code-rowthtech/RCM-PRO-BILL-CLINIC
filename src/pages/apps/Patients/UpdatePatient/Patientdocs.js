@@ -23,7 +23,7 @@ import AsyncSelect from 'react-select/async';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
-import { getDocumentsAction, getEncounterAction, uploadPatientDocumentsAction } from '../../../../redux/actions';
+import { deletePatientDocumentsAction, getDocumentsAction, getEncounterAction, updatePatientDocumentsAction, uploadPatientDocumentsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
 import PreviewModal from './PreviewModal';
@@ -38,7 +38,16 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const uploadDocumentsResponse = store?.uploadDocumentsReducer;
-    const patientDocuments = store?.getDocumentsReducer?.data?.patientDocuments;
+    const deleteDocumentsResponse = store?.deleteDocumentsReducer;
+    const patientDocuments = store?.getDocumentsReducer?.data?.patientDocuments || [];
+
+    const updateDocumentsResponse = store?.updateDocumentsReducer;
+    useEffect(() => {
+        if (updateDocumentsResponse?.data?.status === 200 || deleteDocumentsResponse?.data?.status === 200) {
+            dispatch(getDocumentsAction({ subject: subjectId }));
+        }
+    }, [updateDocumentsResponse, deleteDocumentsResponse]);
+
     const [previewLink, setPreviewLink] = useState(null);
     const [previewModal, setPreviewModal] = useState(false);
     const [showUploadModal, setShowUploadModal] = useState(false);
@@ -50,11 +59,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
             value: type,
             label: type?.display,
         })), []);
-    // const selectedDocumentTypeOption = useMemo(() =>
-    //     formattedDocumentTypes.find((option) => option?.value?.display === documentType?.text) ||
-    //     formattedDocumentTypes.find((option) => option?.display === documentType),
-    //     [formattedDocumentTypes, documentType]
-    // );
+
     const loadDocumentTypeOptions = useCallback((inputValue, callback) => {
         if (!inputValue) {
             callback(formattedDocumentTypes.slice(0, 10));
@@ -62,18 +67,21 @@ const PatientDocs = ({ isAccordionOpen }) => {
         }
 
         const filteredOptions = formattedDocumentTypes.filter((option) =>
-            option.label.toLowerCase().includes(inputValue.toLowerCase())
+            option?.label?.toLowerCase()?.includes(inputValue?.toLowerCase())
         );
 
         callback(filteredOptions.slice(0, 20));
     }, [formattedDocumentTypes]);
     const handleDocumentTypeChange = useCallback((docId, selectedOption) => {
-        setDocumentTypesMap((prev) => ({
-            ...prev,
-            [docId]: selectedOption ? selectedOption.value : null,
-        }));
-
-        // You can trigger API or dispatch here if needed
+        const documentTypePayload = {
+            coding: [{
+                system: selectedOption?.value?.system,
+                code: selectedOption?.value?.code,
+                display: selectedOption?.value?.display,
+            }],
+            text: selectedOption?.value?.display,
+        };
+        dispatch(updatePatientDocumentsAction({ key: encryptMessage({ type: documentTypePayload }), patientDocId: docId }));
     }, []);
     useEffect(() => {
         const initialTypes = {};
@@ -114,10 +122,10 @@ const PatientDocs = ({ isAccordionOpen }) => {
         if (contentType === 'application/pdf' || extension === 'pdf') {
             return <BsFileEarmarkPdf size={size} color="red" />;
         }
-        if (['doc', 'docx'].includes(extension) || contentType.includes('word')) {
+        if (['doc', 'docx']?.includes(extension) || contentType?.includes('word')) {
             return <BsFileWord size={size} color="#6169d0" />;
         }
-        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension) || contentType.includes('image')) {
+        if (['jpg', 'jpeg', 'png', 'gif']?.includes(extension) || contentType?.includes('image')) {
             return <BsFileImage size={size} color="rgb(255 124 7 / 84%)" />;
         }
         return <BsFileEarmark size={size} color="#757575" />;
@@ -127,7 +135,29 @@ const PatientDocs = ({ isAccordionOpen }) => {
         setDocumentData(null);
         setShowUploadModal(false);
     }
+    const handleDeleteAttachment = (document, attachmentId) => () => {
+        console.log(document, attachmentId, 'adksfdjs');
+        const content = document?.content
+            ?.filter(doc => doc._id !== attachmentId) // Remove the matching attachment
+            ?.map(doc => ({
+                attachment: {
+                    contentType: doc?.attachment?.contentType,
+                    url: doc?.attachment?.url?.split('?')[0] || '',
+                    size: doc?.attachment?.size,
+                    title: doc?.attachment?.title,
+                    creation: new Date(doc?.attachment?.creation),
+                    fileName: doc?.attachment?.fileName,
+                    name: doc?.attachment?.name,
+                },
+                _id: doc?._id,
+            }));
+        dispatch(updatePatientDocumentsAction({ key: encryptMessage({ content: content }), patientDocId: document?._id }));
+    };
 
+    const [deleteModal, setDeleteModal] = useState(false);
+    const closeDeleteModal = () => {
+        setDeleteModal(false);
+    }
     return (
         <div>
             <div className="d-flex justify-content-between align-items-center">
@@ -151,12 +181,15 @@ const PatientDocs = ({ isAccordionOpen }) => {
                         </div>
                         :
                         patientDocuments?.map((doc) => (
-                            <div className="col-12 border mb-2 p-0" key={doc?._id}>
+                            <div className="col-12 border mb-2 p-0 position-relative" key={doc?._id}>
+                                <i title='Delete' onClick={() => {
+                                    dispatch(deletePatientDocumentsAction({ patientDocId: doc?._id }))
+                                }} className='bi bi-trash text-danger fs-5 cursor-pointer  position-absolute' style={{ zIndex: '111', left: '98.5%' }} />
                                 <Card className='p-1 mb-0'>
                                     <Card.Body className='p-0'>
                                         <div className="row">
                                             <div className="col-8">
-                                                <div className="row"  >
+                                                <div className="row">
                                                     <div className="col-4 fs-6 d-flex  align-items-center gap-2">
                                                         <h6>Date:</h6>
                                                         <Form.Control
@@ -167,9 +200,22 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                     </div>
                                                     <div className="col-4 fs-6 d-flex gap-2 align-items-center">
                                                         <h6>Category:</h6>
-                                                        <Form.Select defaultValue={doc?.category?.[0]?.coding?.[0]?.code || ''}>
+                                                        <Form.Select
+                                                            onChange={(e) => {
+                                                                const selectedCategory = documentCategories.find(category => category.code === e.target.value);
+                                                                const categoryPayload = {
+                                                                    coding: [{
+                                                                        system: selectedCategory?.system,
+                                                                        code: selectedCategory?.code,
+                                                                        display: selectedCategory?.display,
+                                                                    }],
+                                                                    text: selectedCategory?.display,
+                                                                };
+                                                                dispatch(updatePatientDocumentsAction({ key: encryptMessage({ category: categoryPayload }), patientDocId: doc?._id }));
+                                                            }}
+                                                            defaultValue={doc?.category?.[0]?.coding?.[0]?.code || ''}>
                                                             <option value="" hidden>Select</option>
-                                                            {documentCategories.map((category, index) => (
+                                                            {documentCategories?.map((category, index) => (
                                                                 <option key={index} value={category.code}>{category.display}</option>
                                                             ))}
                                                         </Form.Select>
@@ -182,7 +228,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                             isSearchable
                                                             className="basic-single flex-fill"
                                                             classNamePrefix="select"
-                                                            placeholder="&nbsp; Select"
+                                                            placeholder=" Select"
                                                             value={
                                                                 formattedDocumentTypes.find(
                                                                     (option) => option?.value?.display === documentTypesMap[doc?._id]?.text
@@ -207,7 +253,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                 }),
                                                             }}
                                                         />
-
                                                     </div>
                                                 </div>
                                                 <div className="row g-2 mt-1 scroll-container" style={{ height: patientDocuments?.length === 1 ? '45vh' : "25vh" }} >
@@ -252,7 +297,7 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                                                 setShowUploadModal(true);
                                                                             }}
                                                                             className='mdi mdi-square-edit-outline cursor-pointer fs-5' />
-                                                                        <i title='Delete' className='bi bi-trash text-danger fs-5 cursor-pointer' />
+                                                                        <i title='Delete' onClick={handleDeleteAttachment(doc, content?._id)} className='bi bi-trash text-danger fs-5 cursor-pointer' />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -266,12 +311,16 @@ const PatientDocs = ({ isAccordionOpen }) => {
                                                         <h6>Notes</h6>
                                                     </div>
                                                     <div className="col-12 scroll-container" style={{ height: patientDocuments?.length === 1 ? '45vh' : "25vh" }}>
-                                                        <div
-                                                            dangerouslySetInnerHTML={{
-                                                                __html:
-                                                                    doc?.notes,
-                                                            }}
-                                                        />
+                                                        {!doc?.notes || doc?.notes === '' ?
+                                                            <h5 className='d-flex fs-6 align-items-center justify-content-center py-5'>No Notes Found</h5>
+                                                            :
+                                                            <div
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html:
+                                                                        doc?.notes,
+                                                                }}
+                                                            />
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>

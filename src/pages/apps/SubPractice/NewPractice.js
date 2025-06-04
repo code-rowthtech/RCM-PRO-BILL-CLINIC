@@ -47,7 +47,6 @@ const NewPractice = () => {
     const [showModalPic, setShowModalPic] = useState(false); // State to control modal visibility
 
     const [modalFileUrl, setModalFileUrl] = useState(''); // State to store file URL for modal
-    console.log(modalFileUrl, 'modaleye');
     const handleShowModal = (url) => {
         setModalFileUrl(url); // Set the URL of the file to display in modal
         setShowModalPic(true); // Open the modal
@@ -90,7 +89,6 @@ const NewPractice = () => {
     const clinic_id = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const clinic_MainId = JSON.parse(sessionStorage.getItem('hyper_user'));
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet, 'clinicsDataGet');
     const cities = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const statecode = statesData?.states?.state_code;
@@ -504,7 +502,6 @@ const NewPractice = () => {
         };
 
         dispatch(createSubClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload, 'newPayload');
     };
 
     useEffect(() => {

@@ -27,7 +27,6 @@ const BillingForm = ({ activeTab, setActiveTab, clinicId, billingId, multiple })
     const subscriptionsData = store?.getSubscriptionReducer?.data?.result;
     const createResponse = store?.createSubscriptionPlanReducer?.data?.status;
     const billingData = store?.getClinicsReducer?.data?.clinic?.userId?.subscriptionId;
-    console.log(store?.getClinicsReducer?.data, 'billingData');
     const billingDone = store?.getClinicsReducer?.data?.clinic?.userId?.subscriptionId?.isActive;
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Store the selected date
     const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);

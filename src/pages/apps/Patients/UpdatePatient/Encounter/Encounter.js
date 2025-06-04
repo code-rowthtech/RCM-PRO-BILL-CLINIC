@@ -103,17 +103,17 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                         </>}
                     {encounterTabs?.map((tab) => (
                         <div
-                            key={tab.id}
+                            key={tab?.id}
                             className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
                                     d-flex align-items-center flex-fill justify-content-center fw-bold 
                                      ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
-                            onClick={() => setActiveTab(tab.id)}
+                            onClick={() => setActiveTab(tab?.id)}
                         >
-                            <span className="text-nowrap">{tab.title}</span>
+                            <span className="text-nowrap">{tab?.title}</span>
                             {tab.type !== 'default' && (
                                 <span
                                     className="p-0 ms-2 m-0"
-                                    onClick={(e) => removeEncounterTab(tab.id, e)}
+                                    onClick={(e) => removeEncounterTab(tab?.id, e)}
                                 >
                                     <IoClose />
                                 </span>

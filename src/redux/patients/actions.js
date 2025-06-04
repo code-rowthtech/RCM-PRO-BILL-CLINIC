@@ -71,6 +71,16 @@ export const uploadPatientDocumentsAction = (data): AuthAction => ({
     data
 });
 
+export const updatePatientDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.UPDATE_DOCUMENTS,
+    data
+});
+
+export const deletePatientDocumentsAction = (data): AuthAction => ({
+    type: PatientsActionTypes.DELETE_DOCUMENTS,
+    data
+});
+
 export const getDocumentsAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_DOCUMENTS,
     data

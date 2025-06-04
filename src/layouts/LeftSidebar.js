@@ -21,6 +21,7 @@ import logo_sm from '../assets/images/logo_sm.png';
 import { FaUserCircle } from 'react-icons/fa';
 import { FaChevronDown } from 'react-icons/fa6';
 import classNames from 'classnames';
+import metadata from '../metadata.json'
 
 type SideBarContentProps = {
     hideUserProfile: boolean,
@@ -28,6 +29,7 @@ type SideBarContentProps = {
 
 /* sidebar content */
 const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) => {
+    console.log('metadata', metadata);
     return (
         <>
             {!hideUserProfile && (
@@ -55,7 +57,6 @@ type LeftSidebarProps = {
 };
 
 const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
-    console.log({isCondensed})
     const menuNodeRef: any = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
@@ -169,6 +170,10 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                 icon: 'mdi-logout',
                 // url: '/apps/logout/logout-model',
             },
+            {
+                key: 'build',
+                label: `${currentYear}-${metadata?.buildMajor || '0'}.${metadata?.buildMinor || '0'}.${metadata?.buildRevision || '0'}${metadata?.buildTag ? ' ' + metadata.buildTag : ''}`,
+            }
         ];
         const navigate = useNavigate();
         const dispatch = useDispatch();
@@ -339,6 +344,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
         });
         return Object.values(grouped);
     };
+    const currentYear = new Date().getFullYear();
 
     return (
         <>
@@ -711,7 +717,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                                 .{metadata.buildRevision} {metadata.buildTag}asdkmasd                  
                                             </div>                                                                    
                                         )}                                                         
-                                    </span> */}                                                                                                                                                                                
+                                    </span> */}
                                 </SimpleBar>
                             )}
                             {isCondensed && (
@@ -724,7 +730,20 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                     </div>
 
                 }
-
+                <span
+                    style={{
+                        marginLeft: "33px",
+                        fontFamily: "Nunito",
+                        fontWeight: 700,
+                        color: "white",
+                    }}
+                >
+                    {/* {!isCondensed && (
+                        <div className="sf-footer ms-3">
+                          
+                        </div>
+                    )} */}
+                </span>
             </div>
         </>
     );

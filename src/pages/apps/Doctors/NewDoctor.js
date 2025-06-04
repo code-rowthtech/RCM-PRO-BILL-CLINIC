@@ -54,7 +54,6 @@ const NewDoctor = () => {
 
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
-    console.log(modalFileUrl, 'modalFileUrl');
     const [imageLoading, setImageLoading] = useState(true);
 
     const handleShowModal = (url) => {
@@ -112,7 +111,6 @@ const NewDoctor = () => {
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
-    console.log(doctorDetails, 'doctorDetails');
 
     const createResponse = store?.createtDoctorsReducer?.data?.status;
     const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
@@ -160,7 +158,6 @@ const NewDoctor = () => {
             // console.error('Error during file upload:', error);
         }
     };
-    console.log(logo, 'logo');
 
     useEffect(() => {
         if (doctorDetails && updateId) {

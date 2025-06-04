@@ -1,6 +1,12 @@
 import { all, fork, put, takeEvery, call } from 'redux-saga/effects';
 import { PatientsActionTypes } from './constants';
-import { createInsuranceApi, createPatientsApi, createResponsiblePartyApi, getDocumentsApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi, getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi, updatePatientsApi, updateResponsiblePartyApi, uploadDocumentsApi } from './api';
+import {
+    createInsuranceApi, createPatientsApi, createResponsiblePartyApi,
+    getDocumentsApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi,
+    getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi,
+    updatePatientsApi, updateResponsiblePartyApi, uploadDocumentsApi, updateDocumentsApi,
+    deleteDocumentsApi
+} from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 /**
@@ -353,6 +359,72 @@ function* uploadDocumentsFunction(data) {
     }
 }
 
+function* updateDocumentsFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.UPDATE_DOCUMENTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(updateDocumentsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.UPDATE_DOCUMENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.UPDATE_DOCUMENTS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.UPDATE_DOCUMENTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.UPDATE_DOCUMENTS_ERROR,
+            payload: error,
+        });
+    }
+}
+
+function* deleteDocumentsFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.DELETE_DOCUMENTS_LOADING,
+            payload: {},
+        });
+        const response = yield call(deleteDocumentsApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            ToastHandle(decryptedData?.message, 'success');
+            yield put({
+                type: PatientsActionTypes.DELETE_DOCUMENTS_SUCCESS,
+                payload: { ...decryptedData },
+            });
+            yield put({
+                type: PatientsActionTypes.DELETE_DOCUMENTS_RESET,
+                payload: {},
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.DELETE_DOCUMENTS_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        ToastHandle(error, 'danger');
+        yield put({
+            type: PatientsActionTypes.DELETE_DOCUMENTS_ERROR,
+            payload: error,
+        });
+    }
+}
+
 function* getDocumentsFunction(data) {
     try {
         yield put({
@@ -435,6 +507,14 @@ export function* watchUploadDocuments() {
     yield takeEvery(PatientsActionTypes.UPLOAD_DOCUMENTS, uploadDocumentsFunction);
 }
 
+export function* watchUpdateDocuments() {
+    yield takeEvery(PatientsActionTypes.UPDATE_DOCUMENTS, updateDocumentsFunction);
+}
+
+export function* watchDeleteDocuments() {
+    yield takeEvery(PatientsActionTypes.DELETE_DOCUMENTS, deleteDocumentsFunction);
+}
+
 export function* watchGetDocuments() {
     yield takeEvery(PatientsActionTypes.GET_DOCUMENTS, getDocumentsFunction);
 }
@@ -453,7 +533,8 @@ function* patientsSaga() {
         fork(watchUpdateResponsibleParty),
         fork(watchGetResponsibleParty),
         fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
-        fork(watchGetInsuranceByPatientId), fork(watchUploadDocuments), fork(watchGetDocuments),
+        fork(watchGetInsuranceByPatientId), fork(watchUploadDocuments), fork(watchUpdateDocuments),
+        fork(watchGetDocuments), fork(watchDeleteDocuments),
         fork(watchresetState),
     ]);
 }
