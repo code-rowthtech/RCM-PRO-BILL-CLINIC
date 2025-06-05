@@ -26,11 +26,12 @@ import icdCodesSaga from './icdCodes/saga';
 import encounterSaga from './encounter/saga';
 import noteCategoriesSaga from './noteCategories/saga';
 import templateSaga from './templates/saga';
+import tasksSaga from './Tasks/saga';
 
 export default function* rootSaga(): any {
     yield all([authSaga(), layoutSaga(), settingsRoleSaga(), permissionsSaga(), rolesSaga(), subclinicsSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), medicationSaga(), clinicalHistorySaga(),
     dashboardSaga(), subscriptionsSaga(), settingsSaga(), scheduleSaga(), appointentsSaga(), vitalsSaga(), clinicNotesSaga(), ProblemListSaga(), alleryListSaga(), suggestionsListSaga(),
-    icdCodesSaga(), encounterSaga(), noteCategoriesSaga(), templateSaga()]);
+    icdCodesSaga(), encounterSaga(), noteCategoriesSaga(), templateSaga(), tasksSaga()]);
 }
 // export default function* rootSaga(): any {
 //     yield all([authSaga(), layoutSaga(), permissionsSaga(), rolesSaga(), clinicsSaga(), doctorsSaga(), patientsSaga(), dashboardSaga(), subscriptionsSaga(),settingsSaga(),scheduleSaga() ]);

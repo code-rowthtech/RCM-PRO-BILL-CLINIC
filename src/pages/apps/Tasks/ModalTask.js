@@ -13,26 +13,17 @@ import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getPatientsAction, getRolesAction } from '../../../redux/actions';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
+import { encryptMessage } from '../../../cryptoUtils';
+import { createTasksAction } from '../../../redux/Tasks/action';
 
 const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
-    console.log(CategoryData, 'cat');
     const roleData = store?.getRolesDataReducer?.data;
-    console.log(roleData, 'roleData');
     const clinicId = loggedInUser?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const patientsData = store?.getPatientsReducer?.data?.data;
-    console.log(patientsData, 'patient');
-
-    // Dummy patient options for select
-    const patientOptions = [
-        { value: '1', label: 'John Doe' },
-        { value: '2', label: 'Jane Smith' },
-        { value: '3', label: 'Alice Johnson' },
-    ];
-
     const {
         register,
         handleSubmit,
@@ -63,6 +54,7 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     const secondData = roleData?.users?.map((data) => ({
         _id: data?._id,
         name: data?.name?.text,
+        department: data?.department,
     }));
 
     const finalData = dataToMap?.concat(secondData);
@@ -97,10 +89,8 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     }, [show, reset]);
 
     const onSubmit = (data) => {
-        console.log(data,'dataa')
         if (parentOnSubmit) parentOnSubmit(data);
-        reset();
-        handleClose();
+        dispatch(createTasksAction({ key: `${encryptMessage(data)}` }));
     };
 
     const handleReset = () => {
@@ -153,18 +143,76 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
                                                 isClearable={true}
                                                 isSearchable={true}
                                                 name="assignTo"
-                                                options={finalData?.map((t) => ({
-                                                    value: t._id,
-                                                    label: t.name,
-                                                }))}
+                                                options={[
+                                                    ...(doctorDetails?.map((t) => ({
+                                                        value: t._id,
+                                                        label: (
+                                                            <span>
+                                                                {t?.name?.[0]?.text || t?.name?.text || 'Unnamed'}
+                                                                <span
+                                                                    style={{
+                                                                        fontSize: 10,
+                                                                        marginLeft: 4,
+                                                                        color: '#888',
+                                                                    }}>
+                                                                    (Doctor)
+                                                                </span>
+                                                            </span>
+                                                        ),
+                                                    })) || []),
+                                                    ...(roleData?.users?.map((t) => ({
+                                                        value: t._id,
+                                                        label: (
+                                                            <span>
+                                                                {t?.name?.text || 'Unnamed'}
+                                                                <span
+                                                                    style={{
+                                                                        fontSize: 10,
+                                                                        marginLeft: 4,
+                                                                        color: '#888',
+                                                                    }}>
+                                                                    (User)
+                                                                </span>
+                                                            </span>
+                                                        ),
+                                                    })) || []),
+                                                ]}
                                                 placeholder=" Select"
                                                 value={
-                                                    finalData
-                                                        ?.map((t) => ({
+                                                    [
+                                                        ...(doctorDetails?.map((t) => ({
                                                             value: t._id,
-                                                            label: t.name,
-                                                        }))
-                                                        .find((option) => option.value === field.value) || null
+                                                            label: (
+                                                                <span>
+                                                                    {t?.name?.[0]?.text || t?.name?.text || 'Unnamed'}
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: 10,
+                                                                            marginLeft: 4,
+                                                                            color: '#888',
+                                                                        }}>
+                                                                        (Doctor)
+                                                                    </span>
+                                                                </span>
+                                                            ),
+                                                        })) || []),
+                                                        ...(roleData?.users?.map((t) => ({
+                                                            value: t._id,
+                                                            label: (
+                                                                <span>
+                                                                    {t?.name?.text || 'Unnamed'}
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: 10,
+                                                                            marginLeft: 4,
+                                                                            color: '#888',
+                                                                        }}>
+                                                                        (User)
+                                                                    </span>
+                                                                </span>
+                                                            ),
+                                                        })) || []),
+                                                    ].find((option) => option.value === field.value) || null
                                                 }
                                                 onChange={(option) => field.onChange(option ? option.value : '')}
                                                 styles={{
