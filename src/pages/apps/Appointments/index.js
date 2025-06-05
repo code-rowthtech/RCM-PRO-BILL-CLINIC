@@ -52,7 +52,6 @@ const AppointmentsList = ({
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    console.log(appointmentsList, 'appointmentsListappointmentsListappointmentsList')
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
@@ -72,11 +71,7 @@ const AppointmentsList = ({
     const formatTimeWithAmPm = (isoString) => {
         if (!isoString) return '';
         const date = new Date(isoString);
-        return date.toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        });
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     };
 
     useEffect(() => {
@@ -246,9 +241,7 @@ const AppointmentsList = ({
                                     </div>
                                 </td>
                                 <td>
-                                    {data?.start?.split("T")[1].split(":").slice(0, 2).join(":") + ' - ' +
-                                        data?.end?.split("T")[1].split(":").slice(0, 2).join(":")}
-                                    {/* {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)} */}
+                                    {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
                                 </td>
                                 <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
                                 <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>

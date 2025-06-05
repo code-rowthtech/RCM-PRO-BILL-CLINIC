@@ -26,7 +26,6 @@ import { appointmentTypeOptions } from '../../../../utils/DataSets/apppointmentt
 import { appointmentReasonOptions } from '../../../../utils/DataSets/appointmentreason.data';
 import { appointmentRecurrence, appointmentStatus } from '../../../../utils/DataSets/commonData';
 import DateUtils from '../../../../utils/dateUtils'; // Import DateUtils
-import { getLocalDateTimeString } from '../../../../utils/formatDates';
 
 // Memoized components
 const Daily = React.memo(({ register, watch, setValue, onDatesCalculated, appointmentDetails, scheduledDate, id }) => {
@@ -432,10 +431,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
 
         const startDateTime = new Date(`${formatDateToYYYYMMDD(scheduledDate)}T${data.startTime}:00`);
         const endDateTime = new Date(startDateTime.getTime() + data.duration * 60000);
-
-        // Get local date-time strings
-        const startDateTimeStr = getLocalDateTimeString(startDateTime);
-        const endDateTimeStr = getLocalDateTimeString(endDateTime);
         let recurrenceTemplate = {};
 
         if (!(appointmentDetails && id) && repeat && repeatType !== '') {
@@ -479,8 +474,8 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
             clinicId,
             appointmentType: appointmentTypePayload,
             doctorId: data?.doctorName,
-            start: startDateTimeStr,
-            end: endDateTimeStr,
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
             created: new Date().toISOString(),
             minutesDuration: data.duration,
             examRoom: data?.consultationRoom,
@@ -498,7 +493,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
         if (id && appointmentDetails) {
             dispatch(rescheduleAppointmentAction({ id, key: encryptMessage(payload) }));
         } else {
-            console.log(payload, 'payloadsakjdkjaskd')
             dispatch(createAppointmentAction({ key: encryptMessage(payload) }));
         }
     }
