@@ -48,10 +48,6 @@ const NewAppointment = React.lazy(() => import('../pages/apps/Appointments/NewAp
 const AppointmentCalendar = React.lazy(() => import('../pages/apps/Appointments/AppointmentCalendar'));
 const Transaction = React.lazy(() => import('../pages/apps/Transaction/Transaction'));
 
-
-
-
-
 const Subscriptions = React.lazy(() => import('../pages/apps/Subscriptions/index'));
 // const AddSubscriptions = React.lazy(() => import('../pages/apps/Subscriptions/Addsubscriptions/index'));
 const Doctors = React.lazy(() => import('../pages/apps/Doctors/index'));
@@ -66,8 +62,9 @@ const UpdatePatient = React.lazy(() => import('../pages/apps/Patients/UpdatePati
 
 const NewPractice = React.lazy(() => import('../pages/apps/SubPractice/NewPractice'));
 const UpdateSubClinic = React.lazy(() => import('../pages/apps/SubPractice/updateSubClinic'));
-
-
+// tasks
+const Tasks = React.lazy(() => import('../pages/apps/Tasks/Task'));
+// settings
 const Setting = React.lazy(() => import('../pages/apps/Settings/index'));
 const Department = React.lazy(() => import('../pages/apps/Settings/Department/Department'));
 const Desigination = React.lazy(() => import('../pages/apps/Settings/Designation/Desigination'));
@@ -76,6 +73,7 @@ const ConsultationRoom = React.lazy(() => import('../pages/apps/Settings/Consult
 const Office = React.lazy(() => import('../pages/apps/Settings/Office/Office'));
 const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/notesType'))
 const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
+const TaskCategory = React.lazy(() => import('../pages/apps/Settings/Task Category/TaskCategory'));
 // Notes Templates
 const NotesAndTemplates = React.lazy(() => import('../pages/apps/NotesAndTemplates/Index'));
 const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
@@ -413,6 +411,12 @@ const AllRoutes = () => {
                                 },
                             ],
                         },
+                                {
+                                    path: 'tasks',
+                                    element: hasPermission('view Tasks') ? (
+                                        <LoadComponent component={Tasks} />
+                                    ) : null,
+                                },
 
                         {
                             path: 'notes-and-templates',
@@ -514,6 +518,14 @@ const AllRoutes = () => {
                                         <div className="disabled-content">You don't have permission to view this page.</div>
                                     ),
                                 },
+                                  {
+                                    path: 'taskcategory',
+                                    element: hasPermission('view taskcategory settings') ? (
+                                        <LoadComponent component={TaskCategory} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                }
                             ],
 
                         },

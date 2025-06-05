@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { Accordion, Button, Col, Dropdown, Form, Offcanvas, Row, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
 import { FiFilter } from 'react-icons/fi';
 import { defaultVitals } from '../../../../../utils/DataSets/commonData2';
+import AddAllergy from '../../Task Tabs/AddAllergy';
+import AddProblem from '../../Task Tabs/AddProblem';
+import AddMedication from '../AddMedication';
+import { AiOutlineSortDescending } from 'react-icons/ai';
+import { getVitalsByPatientIdAction } from '../../../../../redux/actions';
+import { useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import VitalStatus from '../VitalStatus';
 
 const convertFromImperial = (value, vitalName) => {
     if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
@@ -34,16 +42,50 @@ const metricUnits = {
 
 const EncounterSummary = () => {
     const now = new Date();
+    const store = useSelector((state) => state);
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
+    const [searchParams] = useSearchParams();
+    const dispatch = useDispatch()
 
     const [unitSystem, setUnitSystem] = useState('imperial')
     const [vitals, setVitals] = useState(defaultVitals);
+
+    const [effectiveDateTime, setEffectiveDateTime] = useState('');
+
+    const patienteffectiveVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
+    useEffect(() => {
+        if (patienteffectiveVitals) {
+            setEffectiveDateTime(
+                patienteffectiveVitals?.effectiveDateTime
+                    ? new Date(patienteffectiveVitals?.effectiveDateTime)?.toISOString().split('T')[0]
+                    : ''
+            );
+        }
+    }, [patienteffectiveVitals]);
+    const patientId = searchParams.get('id');
+
+    // MODAL FUNCTIONALITIES
+    const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
+    const [showAddProblemModal, setShowAddProblemModal] = useState(false);
+    const [medicationModal, setMedicationModal] = useState(false);
+    const [vitalsModal, setVitalsModal] = useState(false);
+
+    const closeVitalsModal = () => {
+        setVitalsModal(false);
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+    };
+
+
+    const handleAddProblemClose = () => setShowAddProblemModal(false);
+    const handleAddAllergyClose = () => setShowAddAllergyModal(false);
+    const closeMedicationModal = () => {
+        setMedicationModal(false);
+    };
 
     const [visitDateTime, setVisitDateTime] = useState({
         date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
         time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
     });
-    const store = useSelector((state) => state);
     const settingsDataItems = store?.getEncounterSettingsReducer?.data?.data?.items?.find((data) => data?.name === 'Summary');
     const defaultMenuItems = [
         { _id: '1', name: 'Vitals', order: 0, hide: true },
@@ -61,18 +103,16 @@ const EncounterSummary = () => {
         ? store.getFamilyGeneticReducer.data.familyMedicalHistory
         : [];
 
-    const socialHistoryData = [
-        ...tobaccoHistory.slice(0, 2),
-        ...familyGeneticHistory.slice(0, 2)
-    ];
+    // const socialHistoryData = [
+    //     ...tobaccoHistory.slice(0, 2),
+    //     ...familyGeneticHistory.slice(0, 2)
+    // ];
+    const socialHistoryData = {
+        tobaccoHistory: tobaccoHistory.slice(0, 2),
+        familyGeneticHistory: familyGeneticHistory.slice(0, 2)
+    }
     const [showFilter, setShowFilter] = useState(false);
-    // const [visibleSections, setVisibleSections] = useState({
-    //     vitals: true,
-    //     allergies: true,
-    //     problems: true,
-    //     medications: true,
-    //     socialHistory: true,
-    // });
+
     const [visibleSections, setVisibleSections] = useState({
         allergy: true,
         socialhistory: true,
@@ -92,6 +132,7 @@ const EncounterSummary = () => {
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+
 
     const statusColorMap = {
         active: 'text-success',
@@ -280,6 +321,19 @@ const EncounterSummary = () => {
                                                 </div>
                                             }
                                         </Table>
+                                        <div className="row">
+                                            <div className="col-12 text-end">
+                                                <small onClick={() => setVitalsModal(true)} className='text-info cursor-pointer'>Add vitals</small>
+                                            </div>
+                                        </div>
+                                        <Modal show={vitalsModal} onHide={closeVitalsModal} size="lg" centered>
+                                            <Modal.Header closeButton className="px-2 py-0">
+                                                <Modal.Title className="">Add Vitals</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <VitalStatus />
+                                            </Modal.Body>
+                                        </Modal>
                                     </Accordion.Body>
                                 );
                                 break;
@@ -294,6 +348,7 @@ const EncounterSummary = () => {
                                                         <Spinner className="spinner-border-sm" />
                                                     </div>
                                                 ) : (
+
                                                     <ul className="list-unstyled pb-0 mb-0">
                                                         {allergyData.slice(0, 4).map((allergy, index) => (
                                                             <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
@@ -313,12 +368,27 @@ const EncounterSummary = () => {
                                                             </li>
                                                         ))}
                                                     </ul>
+
                                                 )}
                                             </div>
                                         ) : (
                                             <div className="text-muted">No allergies recorded</div>
                                         )}
+                                        <div className="row">
+                                            <div className="col-12 text-end">
+                                                <small onClick={() => setShowAddAllergyModal(true)} className='text-info cursor-pointer'>Add new allergy</small>
+                                            </div>
+                                        </div>
+                                        <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
+                                            <Modal.Header closeButton className="px-2 py-0">
+                                                <Modal.Title className="">Add Allergy</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <AddAllergy onCancel={handleAddAllergyClose} />
+                                            </Modal.Body>
+                                        </Modal>
                                     </Accordion.Body>
+
                                 );
                                 break;
 
@@ -372,6 +442,19 @@ const EncounterSummary = () => {
                                         ) : (
                                             <div className='text-muted'>No problems recorded</div>
                                         )}
+                                        <div className="row">
+                                            <div className="col-12 text-end">
+                                                <small onClick={() => setShowAddProblemModal(true)} className='text-info cursor-pointer'>Add new problem</small>
+                                            </div>
+                                        </div>
+                                        <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>
+                                            <Modal.Header closeButton className="px-2 py-0">
+                                                <Modal.Title className="">Add Problem</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <AddProblem onCancel={handleAddProblemClose} />
+                                            </Modal.Body>
+                                        </Modal>
                                     </Accordion.Body>
                                 );
                                 break;
@@ -415,6 +498,12 @@ const EncounterSummary = () => {
                                         ) : (
                                             <div className='text-muted'>No medications recorded</div>
                                         )}
+                                        <div className="row">
+                                            <div className="col-12 text-end">
+                                                <small onClick={() => setMedicationModal(true)} className='text-info cursor-pointer'>Add new medication</small>
+                                            </div>
+                                        </div>
+                                        <AddMedication show={medicationModal} onCancel={closeMedicationModal} />
                                     </Accordion.Body>
                                 );
                                 break;
@@ -422,13 +511,51 @@ const EncounterSummary = () => {
                             case 'Social History':
                                 content = (
                                     <Accordion.Body className='p-2'>
-                                        {socialHistoryData?.length > 0 ? (
-                                            <div>
-                                                {/* Render social history data here */}
-                                            </div>
-                                        ) : (
-                                            <div className='text-muted'>No social history recorded</div>
-                                        )}
+                                        <div>
+                                            <ul className="list-unstyled h-100">
+                                                {socialHistoryData?.tobaccoHistory?.length === 0 && socialHistoryData?.familyGeneticHistory?.length === 0 ? (
+                                                    <li className="list-unstyled d-flex align-items-center justify-content-center" style={{ height: '100%', width: '100%' }}>
+                                                        <div className="fs-6  d-flex justify-content-between align-items-center">
+                                                            <strong>No Social History Found</strong>
+                                                        </div>
+                                                    </li>
+                                                ) : (
+                                                    <>
+                                                        {socialHistoryData?.tobaccoHistory?.length > 0 && (
+                                                            socialHistoryData?.tobaccoHistory?.map((data, index) => (
+                                                                <li key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                    <div className="fs-6">
+                                                                        <strong className="text-capitalize" title={data?.tobaccoUse}>{data?.tobaccoUse?.length > 40 ? data?.tobaccoUse?.slice(0, 39) + '...' : data?.tobaccoUse}</strong>
+                                                                        <div className="text-muted fs-6" >
+                                                                            {data?.effectiveDateTime ? new Date(data?.effectiveDateTime)?.toISOString().split('T')[0] : ''}
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            ))
+                                                        )}
+                                                        {socialHistoryData?.familyGeneticHistory?.length > 0 && (
+                                                            socialHistoryData?.familyGeneticHistory?.map((data, index) => (
+                                                                <li title='Family Genetics' key={index} className="mb-2 d-flex justify-content-between align-items-start">
+                                                                    <div className="fs-6">
+                                                                        <strong className="text-capitalize" title={data?.name}>{data?.name?.length > 40 ? data?.name?.slice(0, 39) + '...' : data?.name}
+                                                                            <span className='ms-1'>
+                                                                                {data?.relationship?.coding?.[0]?.display && '(' + data?.relationship?.coding?.[0]?.display + ')'}
+                                                                            </span>
+                                                                        </strong>
+                                                                        <div className="text-muted fs-6" title={data?.condition?.[0]?.code?.text} >
+                                                                            {data?.condition?.[0]?.code?.text?.length > 30 ? data?.condition?.[0]?.code?.text?.slice(0, 29) + '...' : data?.condition?.[0]?.code?.text}
+                                                                        </div>
+                                                                    </div>
+                                                                    <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[data.status] || 'text-body'}`}>
+                                                                        {data?.status}
+                                                                    </span>
+                                                                </li>
+                                                            ))
+                                                        )}
+                                                    </>
+                                                )}
+                                            </ul>
+                                        </div>
                                     </Accordion.Body>
                                 );
                                 break;

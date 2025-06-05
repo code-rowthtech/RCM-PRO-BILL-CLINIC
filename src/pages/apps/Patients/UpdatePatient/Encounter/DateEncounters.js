@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Col, Button, Row, Form } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { useSelector } from 'react-redux';
@@ -17,6 +17,7 @@ import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
 
+
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
 
     const [leftTab, setLeftTab] = useState('Summary');
@@ -27,14 +28,18 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     const [searchParams] = useSearchParams();
     const id = searchParams.get('id');
     const [initialLoading, setInitialLoading] = useState(true);
-
+    const [isSessionRunning, setIsSessionRunning] = useState(false);
+    const [stopwatchTime, setStopwatchTime] = useState(0);
+    const intervalRef = useRef(null);
     // Get data from store
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const providerOptions = doctorDetails?.map((data) => ({
         label: data?.name?.[0]?.text, value: data?._id
-    }))
+    }));
+
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const createEncounterData = store?.createEncounterReducer;
+
     // const encounterData=
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
@@ -52,6 +57,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     useEffect(() => {
         if (createEncounterData?.data?.status === 201) {
             dispatch(getEncounterAction({ patientId: id }));
+            clearInterval(intervalRef.current); // Stop the stopwatch interval
+            setStopwatchTime(0);
+            setIsSessionRunning(false);
             reset();
         }
         else if (updateEncounterData?.data?.status === 200) {
@@ -97,7 +105,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             if (encounterData?.status) {
                 setValue('status', encounterData?.status);
             }
-
             if (encounterData?.period?.start) {
                 setValue('startDate', encounterData?.period?.start?.split('T')[0]);
             }
@@ -107,12 +114,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
                         setValue(field?.type, field?.content?.value);
+                        console.log('Setting field:', field?.type, 'with valuse:', field?.content?.value);
                     }
                 });
             }
         }
     }, [noteType, defaultNoteTypeOption, encounterAction, encounterData, setValue, notesFields]);
-
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
     const visibleTabs =
         settingsDataMainItems?.length > 0
@@ -163,8 +170,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                     render={({ field: { onChange, value } }) => (
                                         <ReactQuill
                                             theme="snow"
-                                            value={value || ''} // Use form state value
-                                            onChange={onChange} // Update form state on change
+                                            value={value || ''}
+                                            onChange={onChange}
                                             modules={{
                                                 toolbar: [
                                                     ['bold', 'italic', 'underline'],
@@ -232,8 +239,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     };
     const [providerError, setProviderError] = useState(false);
     const onSubmit = (data) => {
-        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type)
-        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class)
+        const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
+        const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
         const type = {
             coding: [{
                 system: encounterTypeSelected.system,
@@ -297,6 +304,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 status: data?.status,
                 providerId: selectedProvider,
                 data: fieldsData,
+                sessionTime: formatTime(stopwatchTime),
                 period: {
                     start: data?.startDate,
                 }
@@ -314,6 +322,45 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
     }
 
+
+    const formatTime = (timeInSeconds) => {
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+
+        return [
+            hours.toString().padStart(2, '0'),
+            minutes.toString().padStart(2, '0'),
+            seconds.toString().padStart(2, '0')
+        ].join(':');
+    };
+
+    const Stopwatch = React.memo(({ isRunning, time, onToggle }) => {
+
+        return (
+            <div className="d-flex align-items-center gap-1">
+                <span onClick={onToggle} className={`cursor-pointer fs-5 ${isRunning ? "text-danger" : "text-success"}`}>
+                    {isRunning ? <i className="bi bi-pause-fill" title='Stop Session'></i> : <i title='Start Session' className="bi bi-play-fill"></i>}
+                </span>
+                <div className="fw-bold">
+                    {formatTime(time)}
+                </div>
+            </div>
+        );
+    });
+
+
+    const toggleSession = useCallback(() => {
+        if (isSessionRunning) {
+            clearInterval(intervalRef.current);
+        } else {
+            const startTime = Date.now() - stopwatchTime * 1000;
+            intervalRef.current = setInterval(() => {
+                setStopwatchTime(Math.floor((Date.now() - startTime) / 1000));
+            }, 1000);
+        }
+        setIsSessionRunning(!isSessionRunning);
+    }, [isSessionRunning, stopwatchTime]);
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -548,7 +595,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                     dispatch(getDoctorsAction({ status: true, search: value, page: 1, limit: 10 }));
                                                 }
                                             }}
-                                            filterOption={null} // Important for server-side search
+                                            filterOption={null}
                                             styles={{
                                                 control: (provided) => ({
                                                     ...provided,
@@ -577,10 +624,20 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 data={notesFields}
                                 control={control}
                             />
-                            <div className="row">
-                                <div className="col-12 d-flex justify-content-end py-2">
+                            <div className="row position-relative ">
+                                <div
+                                    style={{ top: '8%' }}
+                                    className="position-absolute d-flex align-items-center gap-2 py-2">
+                                    <Stopwatch
+                                        isRunning={isSessionRunning}
+                                        time={stopwatchTime}
+                                        onToggle={toggleSession}
+                                    />
+                                </div>
+                                <div className=" d-flex justify-content-end gap-2 py-2">
                                     <Button
                                         type='Submit'
+                                        style={{ zIndex: 1111 }}
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >

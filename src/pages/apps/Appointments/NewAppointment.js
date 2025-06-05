@@ -62,9 +62,8 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
                             {tabs.map((tab) => (
                                 <li className="nav-item" key={tab}>
                                     <a
-                                        className={`nav-link text-black me-2 ${
-                                            activeTab === tab ? 'active fw-bold' : ''
-                                        }`}
+                                        className={`nav-link text-black me-2 ${activeTab === tab ? 'active fw-bold' : ''
+                                            }`}
                                         onClick={() => handleTabClick(tab)}
                                         style={{ cursor: 'pointer' }}>
                                         {tab}
@@ -74,10 +73,10 @@ const NewAppointment = ({ appointmentId, onCancel, isModal = false }) => {
                         </ul>
                     </Col>
                     <Col sm={4} className="d-flex gap-2 justify-content-end">
-                        <Button className="custom-buttons" onClick={() => setVitalsModal(true)}>
+                        {/* <Button className="custom-buttons" onClick={() => setVitalsModal(true)}>
                             <RxPlusCircled className="fs-5" />
                             &nbsp;Vitals
-                        </Button>
+                        </Button> */}
                         <Modal centered show={vitalsModal} size="xl" onHide={closeVitalsModal}>
                             <Modal.Body>
                                 <Row className="border-bottom mb-1 pb-2">

@@ -9,6 +9,7 @@ import {
     getCities2Action,
     getCitiesAction,
     getDoctorDetailsAction,
+    getDoctorsAction,
     getRoleDataAction,
     getStatesByCountryAction,
 } from '../../../redux/actions';
@@ -134,7 +135,9 @@ const NewDoctor = () => {
             };
             dispatch(getDoctorDetailsAction(payload));
             if (activeTab === 'personalDetails') {
+
                 setActiveTab('departmentDetails');
+                dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 10 }));
             } else if (activeTab === 'departmentDetails') {
                 setActiveTab('qualifications');
             } else if (activeTab === 'qualifications') {
@@ -355,27 +358,24 @@ const NewDoctor = () => {
                                             <ul className="nav nav-underline">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'personalDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'personalDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('personalDetails')}>
                                                         Personal Details
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'departmentDetails' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'departmentDetails' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('departmentDetails')}>
                                                         Professional Information
                                                     </button>
                                                 </li>
                                                 <li className="nav-item">
                                                     <button
-                                                        className={` font_active_tabs text-black nav-link ${
-                                                            activeTab === 'qualifications' ? 'active' : ''
-                                                        }`}
+                                                        className={` font_active_tabs text-black nav-link ${activeTab === 'qualifications' ? 'active' : ''
+                                                            }`}
                                                         onClick={() => handleTabChange('qualifications')}>
                                                         Qualifications
                                                     </button>
@@ -397,10 +397,10 @@ const NewDoctor = () => {
                                                                     style={
                                                                         isButtonDisabled
                                                                             ? {
-                                                                                  pointerEvents: 'none',
-                                                                                  opacity: 0.6, // Visual indication that the button is disabled
-                                                                                  cursor: 'not-allowed', // Shows the "not allowed" cursor
-                                                                              }
+                                                                                pointerEvents: 'none',
+                                                                                opacity: 0.6, // Visual indication that the button is disabled
+                                                                                cursor: 'not-allowed', // Shows the "not allowed" cursor
+                                                                            }
                                                                             : {}
                                                                     }
                                                                     className="custom-buttons text-nowrap">
@@ -748,12 +748,12 @@ const NewDoctor = () => {
                                                                                 ...(updateId
                                                                                     ? {} // Don't apply pattern if updating
                                                                                     : {
-                                                                                          pattern: {
-                                                                                              value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
-                                                                                              message:
-                                                                                                  'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
-                                                                                          },
-                                                                                      }),
+                                                                                        pattern: {
+                                                                                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                                                                                            message:
+                                                                                                'At least 8 characters required, including 1 uppercase letter, 1 number, and 1 special character. Spaces are not allowed.',
+                                                                                        },
+                                                                                    }),
                                                                             })}
                                                                         />
 
@@ -832,36 +832,35 @@ const NewDoctor = () => {
                                                                     </Form.Label>
                                                                     <div
                                                                         onClick={() => logoFileInputRef.current.click()}
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                            logoName || logoUploading
-                                                                                ? ''
-                                                                                : 'custom-form-fields'
-                                                                        }`}>
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${logoName || logoUploading
+                                                                            ? ''
+                                                                            : 'custom-form-fields'
+                                                                            }`}>
                                                                         <span>
                                                                             {logoUploading
                                                                                 ? 'Uploading...'
                                                                                 : logoName
-                                                                                  ? logoName.length > 30
-                                                                                      ? logoName.slice(0, 25) + '...'
-                                                                                      : logoName
-                                                                                  : 'Upload Profile Image'}
+                                                                                    ? logoName.length > 30
+                                                                                        ? logoName.slice(0, 25) + '...'
+                                                                                        : logoName
+                                                                                    : 'Upload Profile Image'}
                                                                         </span>
 
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(logo ||
                                                                                 doctorDetails?.photo?.[0]?.url) && (
-                                                                                <FaEye
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            logo ||
+                                                                                    <FaEye
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleShowModal(
+                                                                                                logo ||
                                                                                                 doctorDetails
                                                                                                     ?.photo?.[0]?.url
-                                                                                        );
-                                                                                    }}
-                                                                                    className="text-dark cursor-pointer"
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                        className="text-dark cursor-pointer"
+                                                                                    />
+                                                                                )}
 
                                                                             <p className="mb-0">
                                                                                 <FiUploadCloud />
@@ -916,7 +915,7 @@ const NewDoctor = () => {
                                                             disabled={store?.createtDoctorsReducer?.loading}
                                                             style={{ width: '120px' }}>
                                                             {store?.createtDoctorsReducer?.loading ||
-                                                            store?.createtDoctorsDetailReducer?.loading ? (
+                                                                store?.createtDoctorsDetailReducer?.loading ? (
                                                                 <Spinner color="white" className="spinner-border-sm" />
                                                             ) : id ? (
                                                                 'Update & Next'

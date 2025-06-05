@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
+import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -14,6 +14,10 @@ import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatu
 import SuggestionOffcanvas from '../UpdatePatient/SuggestionOffcanvas';
 import { createSuggestionAction } from '../../../../redux/suggestions/action';
 import ReactQuill from 'react-quill';
+import AppointmentForm from '../../Appointments/Tabs/AppointmentForm';
+import { IoMdClose } from 'react-icons/io';
+import { getAppointmentsAction } from '../../../../redux/actions';
+import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 
 const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();
@@ -26,6 +30,26 @@ const AddProblem = ({ onCancel }) => {
     const [submissionType, setSubmissionType] = useState(null);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
+    const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+    const closeAppointmentModal = () => {
+        setShowAppointmentModal(false);
+    }
+    useEffect(() => {
+        if (createAppointmentResponse === 201) {
+            dispatch(
+                getAppointmentsAction({
+                    clinicId: loggedInUser?.clinicId,
+                    status: '',
+                    doctorId: '',
+                    limit: '',
+                    skip: '',
+                    monthYear: '',
+                })
+            );
+            setShowAppointmentModal(false); // Closing the modal after creating appointment
+        }
+    }, [createAppointmentResponse]);
 
     const addProblemStatus = store?.createProblemListReducer?.data?.status;
 
@@ -84,12 +108,7 @@ const AddProblem = ({ onCancel }) => {
                 ],
                 text: selected?.display,
             },
-            // recorder: '',
-            // asserter: '',
-            // encounter: '',
             subject: patientId,
-            // problem: data.problem,
-            // icdVersion: data.icdVersion,
             icdCode: data.icdCode,
             clinicalStatus: {
                 coding: [
@@ -101,8 +120,8 @@ const AddProblem = ({ onCancel }) => {
                 ],
                 text: selectedStatus?.display,
             },
-            appointment: data.appointment,
-            onsetDateTime: data.diagnosisDate,
+            ...(data.appointment && { appointment: data.appointment }),
+            ...(data.diagnosisDate && { onsetDateTime: data.diagnosisDate }),
             // onsetDate: data.onsetDate,
             note: [
                 {
@@ -149,6 +168,8 @@ const AddProblem = ({ onCancel }) => {
         const current = getValues('note'); // from useFormContext or pass as prop
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
+
+
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
@@ -243,13 +264,18 @@ const AddProblem = ({ onCancel }) => {
                                 </option>
                             ))}
                         </Form.Select>
+                        {errors.status && (
+                            <Form.Text className="text-danger">{errors.status.message}</Form.Text>
+                        )}
                     </Form.Group>
                 </Col>
 
                 {/* Appointment - dynamically loaded */}
                 <Col sm={6}>
                     <Form.Group>
-                        <Form.Label className="mb-0">Appointment</Form.Label>
+                        <Form.Label className="mb-0">Appointment <i
+                            onClick={() => setShowAppointmentModal(true)}
+                            className="bi bi-plus-circle text-black cursor-pointer"></i></Form.Label>
                         <Form.Select {...register('appointment')}>
                             <option value="">Select Appointment</option>
                             {appointments?.map((item) => (
@@ -259,6 +285,23 @@ const AddProblem = ({ onCancel }) => {
                             ))}
                         </Form.Select>
                     </Form.Group>
+                    <Modal centered show={showAppointmentModal} size="xl" onHide={closeAppointmentModal}>
+                        <Modal.Body>
+                            <Row className="border-bottom mb-1 pb-2">
+                                <Col sm={11} className="text-center">
+                                    <h4>Create New Appointment</h4>
+                                </Col>
+                                <Col sm={1}>
+                                    <IoMdClose className="fs-4 cursor-pointer" onClick={closeAppointmentModal} />
+                                </Col>
+                            </Row>
+                            <AppointmentForm
+                            // selectedSlot={selectedSlot}
+                            // appointmentId={selectedEvent?.event_id}
+                            // calendarView={calendarView}
+                            />
+                        </Modal.Body>
+                    </Modal>
                 </Col>
 
                 {/* Diagnosis Date */}

@@ -1,14 +1,9 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-    Container, Button, Card, Table, Modal, Row, Col,
-    Form, OverlayTrigger, Tooltip,
-    CardHeader
+    Button, Card, Table, Modal, Row, Col,
+    Form
 } from 'react-bootstrap';
 import {
-    FiUpload as UploadIcon,
-    FiTrash2 as DeleteIcon,
-    FiX as CloseIcon,
-    FiFile as FileIcon,
     FiPlus as PlusIcon,
     FiFileText
 } from 'react-icons/fi';
