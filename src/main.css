@@ -67,6 +67,14 @@ hr {
     justify-content: center;
 }
 
+.timer-button {
+    border: none !important;
+    border-radius: 10px;
+    line-height: 10px;
+    font-size: 13px;
+    height: 30px !important;
+}
+
 .btn-height {
     height: 30px !important;
     display: flex;
@@ -1100,4 +1108,8 @@ option {
 }
 .upload-documents .modal-dialog .modal-content {
     height: 85vh !important;
+}
+
+.scroll-will-change {
+    will-change: transform;
 }

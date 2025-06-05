@@ -382,7 +382,7 @@ const AddAllergy = ({ onCancel }) => {
                                 ))}
                             </Form.Select>
                             {errors.category && (
-                                <Form.Text className="text-danger">{errors.category.message}</Form.Text>
+                                <Form.Text className="text-danger fs-6 fs-6">{errors.category.message}</Form.Text>
                             )}
                         </Form.Group>
                     </Col>
@@ -452,7 +452,7 @@ const AddAllergy = ({ onCancel }) => {
                                 ))}
                             </Form.Select>
                             {errors.criticality && (
-                                <Form.Text className="text-danger">{errors.criticality.message}</Form.Text>
+                                <Form.Text className="text-danger fs-6">{errors.criticality.message}</Form.Text>
                             )}
                         </Form.Group>
                     </Col>
@@ -791,7 +791,7 @@ export default AddAllergy;
                                 ))}
                             </Form.Select>
                             {errors.allergyType && (
-                                <Form.Text className="text-danger">{errors.allergyType.message}</Form.Text>
+                                <Form.Text className="text-danger fs-6">{errors.allergyType.message}</Form.Text>
                             )}
                         </Form.Group>
                     </Col> */

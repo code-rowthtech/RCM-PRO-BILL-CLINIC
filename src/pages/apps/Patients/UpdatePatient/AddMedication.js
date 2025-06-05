@@ -20,9 +20,11 @@ import { useSearchParams } from 'react-router-dom';
 import SuggestionOffcanvas from './SuggestionOffcanvas';
 import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../redux/suggestions/action';
+import { error } from 'jquery';
+import AddProblem from '../Task Tabs/AddProblem';
 
 export default function AddMedication({ show, onCancel, selectedMedication }) {
-    const { register, handleSubmit, setValue, control, getValues, reset } = useForm();
+    const { register, handleSubmit, setValue, control, getValues, reset, formState: { errors } } = useForm();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
@@ -33,6 +35,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     const [showDropdown, setShowDropdown] = useState(false);
     const [additionalInstruction, setAdditionalInstruction] = useState();
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [showAddProblemModal, setShowAddProblemModal] = useState(false);
+    const handleAddProblemClose = () => setShowAddProblemModal(false);
+
     const createSuccess = store?.createMedicationReducer?.data?.status;
     const updateSuccess = store?.updateMedicationReducer?.data?.status;
     useEffect(() => {
@@ -105,13 +110,14 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
 
     const onSubmit = (data) => {
         const medicationData = {
-            status: data.status,
-            note: [
-                {
-                    text: data.note,
-                    time: new Date().toISOString(),
-                },
-            ],
+            ...(data.note && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ]
+            }),
             dosageInstruction: {
                 sequence: parseInt(data?.sequence),
                 text: additionalInstruction?.display,
@@ -133,9 +139,10 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                     },
                 },
             },
-            ...(!selectedMedication && { drugId: selectedDrug?._id }),
-            ...(!selectedMedication && { startDate: data?.medicationStart }),
-            ...(!selectedMedication && { problemId: data?.relatedProblem }),
+            ...(data?.status && { status: data?.status }),
+            ...(selectedDrug?._id && !selectedMedication && { drugId: selectedDrug?._id }),
+            ...(data?.medicationStart && !selectedMedication && { startDate: data?.medicationStart }),
+            ...(data?.relatedProblem && !selectedMedication && { problemId: data?.relatedProblem }),
             endDate: data?.medicationEnd,
             subject: patientId,
         };
@@ -145,6 +152,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                 updateMedicationAction({ key: encryptMessage(medicationData), medicationId: selectedMedication?._id })
             );
         } else {
+            console.log(medicationData, 'medicationDatamedicationData')
             dispatch(createMedicationAction({ key: encryptMessage(medicationData) }));
         }
     };
@@ -193,6 +201,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                 reset();
             }}
             size="lg"
+            className={`${showAddProblemModal ? 'd-none' : ''}`}
             centered>
             <Modal.Header closeButton className="px-2 py-0">
                 <Modal.Title className="mb-0">{selectedMedication ? 'Update' : 'Add'} Medication</Modal.Title>
@@ -202,16 +211,19 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                     <Row>
                         <Col sm={12}>
                             <Form.Group className="position-relative" ref={dropdownRef}>
-                                <Form.Label className="mb-0">Drug</Form.Label>
+                                <Form.Label className="mb-0">Drug <span className='text-danger'>*</span></Form.Label>
                                 <Form.Control
                                     type="text"
-                                    {...register('drugInfo')}
+                                    {...register('drugInfo', { required: 'This field is required.' })}
                                     onChange={handleInputChange}
                                     onFocus={() => drugsData.length > 0 && setShowDropdown(true)}
                                     placeholder="Enter drug name"
                                     autoComplete="off"
                                     disabled={selectedMedication}
                                 />
+                                {errors.drugInfo && (
+                                    <span className="text-danger fs-6">{errors.drugInfo.message}</span>
+                                )}
                                 {drugsData.length > 0 && showDropdown && (
                                     <div
                                         className="bg-white border position-absolute w-100 shadow-sm list-group"
@@ -240,26 +252,35 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         </Col>
                         <Col sm={4}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Frequency</Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency')} />
+                                <Form.Label className="mb-0">Frequency <span className='text-danger'>*</span></Form.Label>
+                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: 'This field is required.' })} />
+                                {errors.frequency && (
+                                    <span className="text-danger fs-6">{errors.frequency.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Period</Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 1" {...register('period')} />
+                                <Form.Label className="mb-0">Period <span className='text-danger'>*</span></Form.Label>
+                                <Form.Control type="number" placeholder="e.g. 1" {...register('period', { required: 'This field is required.' })} />
+                                {errors.period && (
+                                    <span className="text-danger fs-6">{errors.period.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                         <Col sm={4}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Period Unit</Form.Label>
-                                <Form.Select {...register('periodUnit')}>
+                                <Form.Label className="mb-0">Period Unit <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select {...register('periodUnit', { required: 'This field is required.' })}>
                                     <option value="">Select unit</option>
                                     <option value="hours">Hour(s)</option>
                                     <option value="days">Day(s)</option>
                                     <option value="weeks">Week(s)</option>
                                     <option value="months">Month(s)</option>
                                 </Form.Select>
+                                {errors.periodUnit && (
+                                    <span className="text-danger fs-6">{errors.periodUnit.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
@@ -289,7 +310,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
 
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Related Problem</Form.Label>
+                                <Form.Label className="mb-0">Related Problem  <i onClick={() => setShowAddProblemModal(true)} className="bi bi-plus-circle text-black cursor-pointer"></i></Form.Label>
                                 <Form.Select {...register('relatedProblem')} disabled={selectedMedication}>
                                     <option value="">Select Related Problem</option>
                                     {problemList?.map((option) => (
@@ -299,11 +320,19 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                     ))}
                                 </Form.Select>
                             </Form.Group>
+                            <Modal show={showAddProblemModal} onHide={handleAddProblemClose} size="lg" centered>
+                                <Modal.Header closeButton className="px-2 py-0">
+                                    <Modal.Title className="">Add Problem</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <AddProblem onCancel={handleAddProblemClose} />
+                                </Modal.Body>
+                            </Modal>
                         </Col>
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Status</Form.Label>
-                                <Form.Select {...register('status')} disabled={selectedMedication}>
+                                <Form.Label className="mb-0">Status <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select {...register('status', { required: 'This field is required.' })} disabled={selectedMedication}>
                                     <option value="">Select status</option>
                                     {medicationStatus.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -311,23 +340,32 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                         </option>
                                     ))}
                                 </Form.Select>
+                                {errors.status && (
+                                    <span className="text-danger fs-6">{errors.status.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
 
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Start Date</Form.Label>
+                                <Form.Label className="mb-0">Start Date <span className='text-danger'>*</span></Form.Label>
                                 <Form.Control
                                     type="date"
-                                    {...register('medicationStart')}
+                                    {...register('medicationStart', { required: 'This field is required.' })}
                                     disabled={selectedMedication}
                                 />
+                                {errors.medicationStart && (
+                                    <span className="text-danger fs-6">{errors.medicationStart.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">End Date</Form.Label>
-                                <Form.Control type="date" {...register('medicationEnd')} />
+                                <Form.Label className="mb-0">End Date <span className='text-danger'>*</span></Form.Label>
+                                <Form.Control type="date" {...register('medicationEnd', { required: 'This field is required' })} />
+                                {errors.medicationEnd && (
+                                    <span className="text-danger fs-6">{errors.medicationEnd.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
                         <Col xs={12}>
@@ -341,7 +379,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                         ✨
                                     </span>
                                 </Form.Label>
-
                                 <Controller
                                     name="note"
                                     control={control}
@@ -369,7 +406,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                         />
                                     )}
                                 />
-
                                 <SuggestionOffcanvas
                                     show={showSuggestions}
                                     onClose={() => setShowSuggestions(false)}
