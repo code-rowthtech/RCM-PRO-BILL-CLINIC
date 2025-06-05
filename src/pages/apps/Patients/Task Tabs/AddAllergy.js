@@ -50,7 +50,11 @@ const AddAllergy = ({ onCancel }) => {
         clearErrors,
         watch,
         getValues,
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            category: 'medication',
+        },
+    });
 
     // Fetch dynamic appointments
     useEffect(() => {
@@ -368,10 +372,9 @@ const AddAllergy = ({ onCancel }) => {
                             </Form.Label>
                             <Form.Select
                                 {...register('category', { required: 'Allergy Category is required' })}
-                                data-has-value={!!watch('category')}>
-                                <option value="" hidden>
-                                    Select Allergy Category
-                                </option>
+                                value={watch('category') || 'medication'}
+                                onChange={(e) => setValue('category', e.target.value)}
+                            >
                                 {category?.map((item) => (
                                     <option key={item?.code} value={item?.code}>
                                         {item?.display}
@@ -385,31 +388,48 @@ const AddAllergy = ({ onCancel }) => {
                     </Col>
                     <Col sm={6}>
                         <Form.Group>
-                            <Form.Label className="mb-0">Select Allergy </Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadCodeOptions}
-                                defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedCodeOption}
-                                onChange={handleCodeChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
+                            <Form.Label className="mb-0">Select Allergy <span className="text-danger">*</span></Form.Label>
+                            <Controller
+                                name="allergyCode"
+                                control={control}
+                                rules={{ required: 'Allergy selection is required' }}
+                                render={({ field, fieldState }) => (
+                                    <>
+                                        <AsyncSelect
+                                            // ref={selectRef}
+                                            loadOptions={loadCodeOptions}
+                                            defaultOptions={formattedCodeOption.slice(0, 10)}
+                                            isSearchable
+                                            className="basic-single"
+                                            classNamePrefix="select"
+                                            placeholder="Select"
+                                            value={
+                                                formattedCodeOption.find(option => option.value.code === field.value?.code) || null
+                                            }
+                                            onChange={option => {
+                                                field.onChange(option ? option.value : null);
+                                                setCode(option ? option.value : null);
+                                            }}
+                                            styles={{
+                                                control: (provided) => ({
+                                                    ...provided,
+                                                    height: '30px',
+                                                    minHeight: '30px',
+                                                    border: '0px',
+                                                }),
+                                                placeholder: (provided) => ({
+                                                    ...provided,
+                                                    fontWeight: 'bold',
+                                                    fontSize: '12px',
+                                                    paddingBottom: '5px',
+                                                }),
+                                            }}
+                                        />
+                                        {fieldState.error && (
+                                            <Form.Text className="text-danger">{fieldState.error.message}</Form.Text>
+                                        )}
+                                    </>
+                                )}
                             />
                         </Form.Group>
                     </Col>
@@ -445,17 +465,14 @@ const AddAllergy = ({ onCancel }) => {
                             <Form.Select
                                 {...register('status', { required: 'Clinical Status is required' })}
                                 data-has-value={!!watch('status')}>
-                                <option value="" hidden>
-                                    Select Clinical Status
-                                </option>
                                 {clinicalStatus?.map((status) => (
                                     <option key={status?.code} value={status?.code}>
                                         {status?.display}
                                     </option>
                                 ))}
                             </Form.Select>
-                            {errors.status && (
-                                <Form.Text className="text-danger fs-6">{errors.status.message}</Form.Text>
+                              {errors.status && (
+                                <Form.Text className="text-danger">{errors.status.message}</Form.Text>
                             )}
                         </Form.Group>
                     </Col>

@@ -20,6 +20,8 @@ import logo from '../assets/images/logo-light.png';
 //constants
 import * as layoutConstants from '../constants/layout';
 import { Button } from 'react-bootstrap';
+import ModalTask from '../pages/apps/Tasks/ModalTask';
+import { MdAddCircleOutline } from 'react-icons/md';
 
 const ProfileMenus = [
     // {
@@ -44,7 +46,7 @@ type TopbarProps = {
 const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: TopbarProps): React$Element<any> => {
     const dispatch = useDispatch();
     const [isopen, setIsopen] = useState(false);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const location = useLocation(); // Get the current location object
     const { pathname, search } = location;
@@ -67,17 +69,19 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/settings/consultationroom': 'Consultation Room',
         '/apps/settings/office': 'Office',
         '/apps/settings/role': 'Role',
+        '/apps/settings/taskcategory': 'Task Category',
         '/apps/schedule/list': 'Schedule',
         '/apps/schedule/addHoliday': 'Schedule',
         '/apps/schedule/addBreak': 'Schedule',
+        '/apps/tasks': 'Tasks',
         '/apps/appointments/appointmentCalendar': 'Appointment Calendar',
         '/apps/appointments/newAppointment?updateid': 'Reschedule Appointment',
         '/apps/settings/purposeofvisit': 'Purpose Of Visit',
         '/apps/patients/update-patient': 'Patient Chart',
         '/apps/settings/templates': 'Templates',
         '/apps/settings/notesType': 'Notes Type',
-        '/apps/notes-and-templates/note-templates' : 'Note Templates',
-         '/apps/notes-and-templates/note-categories': 'Note Categories',
+        '/apps/notes-and-templates/note-templates': 'Note Templates',
+        '/apps/notes-and-templates/note-categories': 'Note Categories',
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {
@@ -132,6 +136,10 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                 break;
         }
     };
+    const [taskModal, setTaskModal] = useState(false);
+    const handleCloseTaskModal = () => {
+        setTaskModal(false);
+    };
     return (
         <>
             <div className={classNames('navbar-custom', navbarCssClasses)}>
@@ -150,15 +158,22 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                     )}
 
                     <ul className="list-unstyled topbar-menu float-end mb-0">
-                        {location.pathname === '/apps/patients/update-patient' &&
-                            <li className='notification-list'>
+                        {location.pathname === '/apps/patients/update-patient' && (
+                            <li className="notification-list">
                                 <button
                                     onClick={() => navigate('/apps/patients/list')}
-                                    className='custom mt-2 text-muted border-0  px-2 bg-light fw-semibold'
-                                >
+                                    className="custom mt-2 text-muted border-0  px-2 bg-light fw-semibold">
                                     Back
                                 </button>
-                            </li>}
+                            </li>
+                        )}
+                        <li
+                            onClick={() => setTaskModal(true)}
+                            className="ms-2 text-primary fw-bolder fs-3 cursor-pointer"
+                            title="Add New Task">
+                            <MdAddCircleOutline />
+                        </li>
+                        <ModalTask show={taskModal} handleClose={handleCloseTaskModal} />
                         <li className="dropdown notification-list">
                             <ProfileDropdown
                                 profilePic={profilePic}
@@ -174,10 +189,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
                                 <i className="mdi mdi-menu fs-3 " />
                             </button>
                             {/* Display the user-friendly page title */}
-                            <h5 className="">
-
-                                {pageTitle}
-                            </h5>
+                            <h5 className="">{pageTitle}</h5>
                         </div>
                     )}
 

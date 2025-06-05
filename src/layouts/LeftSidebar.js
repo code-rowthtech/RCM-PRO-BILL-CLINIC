@@ -149,12 +149,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const SideBarContentDown = ({ hideUserProfile }: SideBarContentProps) => {
 
         const MENU_ITEMS_END = [
-            {
-                label: 'Tasks',
-                icon: "mdi-sticker-plus-outline",
-                redirectTo: "#",
-                url: "/dashboard/account",
-            },
+            // {
+            //     label: 'Tasks',
+            //     icon: "mdi-sticker-plus-outline",
+            //     redirectTo: "#",
+            //     url: "/dashboard/account",
+            // },
             {
                 label: 'Help & Support',
                 icon: "mdi-help-circle-outline",
@@ -213,7 +213,11 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                             ) : (
                                 <div className="info-color px-2 py-1 align-items-center">
                                     <button
-                                        data-toggle={ele.label === 'Tasks' || ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={ele.label === 'Tasks' || ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
+                                        data-toggle={
+                                            // ele.label === 'Tasks' ||
+                                             ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
+                                                // ele.label === 'Tasks' ||
+                                                 ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
                                         onClick={() => isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)}
                                         className="px-2 textLeftSidebar bg-transparent border-0"
                                     >

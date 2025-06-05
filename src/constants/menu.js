@@ -67,6 +67,12 @@ const MENU_ITEMS = [
         icon: 'uil-user',
     },
     {
+        key: 'tasks',
+        label: 'Tasks',
+        icon: 'bi bi-clipboard2-plus-fill',
+        url: '/apps/tasks',
+    },
+    {
         key: 'notes-and-templates',
         label: 'Notes and Templates',
         icon: 'bi bi-journal-plus',
@@ -126,6 +132,12 @@ const MENU_ITEMS = [
                 key: 'rolesetting',
                 label: 'Role',
                 url: '/apps/settings/role',
+                parentKey: 'setting',
+            },
+            {
+                key: 'taskcategory',
+                label: 'Task Category',
+                url: '/apps/settings/taskcategory',
                 parentKey: 'setting',
             },
             // {
