@@ -1502,7 +1502,9 @@ const SubUpdateClinic = () => {
                                                                                         components.state_code ||
                                                                                         '',
                                                                                     postalCode:
-                                                                                        components.postcode || '',
+                                                                                        data?.components.postcode ||
+                                                                                        item.postalCode ||
+                                                                                        '', // Auto-fill or keep user input
                                                                                     country: components.country || '',
                                                                                 };
                                                                                 // Update the specific address entry
