@@ -251,7 +251,6 @@ const UpdatePatientIndex = () => {
                                                                 onClick={() => {
                                                                     setSelectedMainTab(subItem.tab);
                                                                     sessionStorage.setItem('selectedMainTab', subItem.tab);
-
                                                                     // setActiveSubmenu(null);
                                                                     // setShowMoreMenu(false);
                                                                 }}

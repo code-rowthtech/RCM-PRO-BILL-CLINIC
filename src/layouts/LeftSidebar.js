@@ -63,6 +63,7 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    console.log(appointmentsData, 'appointmentsDataappointmentsData')
     const statusColors = {
         pending: '#f1c40f', // Yellow
         proposed: '#3498db', // Blue

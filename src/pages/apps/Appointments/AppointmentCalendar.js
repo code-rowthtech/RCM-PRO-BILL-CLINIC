@@ -52,13 +52,13 @@ const AppointmentCalendar = ({ selectedDoctor }) => {
         );
     }, [dispatch, clinicId, selectedDoctor, monthYearFilter]);
 
-    useEffect(()=>{
-if(store?.getAppointmentsReducer?.loading){
-    setLoading(true)
-}else{
-    setLoading(false)
-}
-    },[store?.getAppointmentsReducer])
+    useEffect(() => {
+        if (store?.getAppointmentsReducer?.loading) {
+            setLoading(true)
+        } else {
+            setLoading(false)
+        }
+    }, [store?.getAppointmentsReducer])
     // Memoized event style getter
     const memoizedEventStyle = useCallback((event) => getEventStyle(event?.status), []);
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, createRef } from 'react';
 import { Col, Button, Row, Form } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { useSelector } from 'react-redux';
@@ -147,8 +147,16 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }, 0);
     }, [selectedFromList, setValue]);
 
-
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
+        // For SOAP sections, keep refs for each ReactQuill
+        const quillRefs = useRef({
+            Subjective: createRef(),
+            Objective: createRef(),
+            Assessment: createRef(),
+            Plan: createRef(),
+        });
+
         const getFieldsToRender = () => {
             return (data || [])
                 .filter(field => field.isShown && !excludedFields.includes(field.name))
@@ -163,12 +171,56 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                         <h5>{name}</h5>
                         {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
                             <Form.Group className="mb-2" key={section}>
-                                <Form.Label className="mb-0">{section}</Form.Label>
+                                <Form.Label className="mb-1 d-flex align-items-center gap-2">
+                                    <span>{section}</span>
+                                    <Form.Select className="w-25 text-black"
+                                        onChange={e => {
+                                            const value = e.target.value;
+                                            if (value && quillRefs.current[section]?.current) {
+                                                const editor = quillRefs.current[section].current.getEditor();
+                                                const range = editor.getSelection(true);
+                                                editor.insertText(range ? range.index : 0, value);
+                                                e.target.value = '';
+                                            }
+                                        }}
+                                    >
+                                        <option value="">Add Patient Info</option>
+                                        {['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'].map((label, index) => {
+                                            const getValue = () => {
+                                                switch (label) {
+                                                    case 'Address':
+                                                        return patientDetails?.address?.[0]?.line?.[0] || '';
+                                                    case 'Age':
+                                                        return patientDetails?.approxAge ? `${patientDetails.approxAge} years old` : '';
+                                                    case 'Date of Birth':
+                                                        return patientDetails?.birthDate
+                                                            ? new Date(patientDetails.birthDate).toISOString().split('T')[0]
+                                                            : '';
+                                                    case 'Email':
+                                                        return patientDetails?.telecom?.find(t => t.system === 'email')?.value || '';
+                                                    case 'Patient Name':
+                                                        return patientDetails?.name?.find(n => n.use === 'official')?.text || '';
+                                                    case 'Phone':
+                                                        return patientDetails?.telecom?.find(t => t.system === 'phone')?.value || '';
+                                                    default:
+                                                        return '';
+                                                }
+                                            };
+
+                                            return (
+                                                <option key={index} value={getValue()}>
+                                                    {label}
+                                                </option>
+                                            );
+                                        })}
+                                    </Form.Select>
+                                </Form.Label>
                                 <Controller
                                     name={section}
                                     control={control}
                                     render={({ field: { onChange, value } }) => (
                                         <ReactQuill
+                                            ref={quillRefs.current[section]}
                                             theme="snow"
                                             value={value || ''}
                                             onChange={onChange}

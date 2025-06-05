@@ -86,7 +86,6 @@ const NewPatient = () => {
     const [responsibleParty, setResponsibleParty] = useState('true');
     const [referringPhysician, setReferringPhysician] = useState('true');
 
-
     const options = responsibleParties?.map((party) => ({
         value: party._id,
         label: party.fullName,
@@ -340,6 +339,7 @@ const NewPatient = () => {
             followupReason: data?.followupReason || '',
             medicationHistoryConsent: true,
             patientCopayAmount: data?.patientCopayAmount || '0',
+            ...(selectedDoctor?.value && { doctorId: selectedDoctor.value }),
             // Responsible Party & Referring Doctor
             responsibleParty: showResponsibleTab, // Convert string to boolean
             refferingDoctor: showReferringTab, // Convert string to boolean

@@ -52,6 +52,7 @@ const AppointmentsList = ({
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    console.log(appointmentsList, 'appointmentsListappointmentsListappointmentsList')
     const [cancelationPopupRow, setCancelationPopupRow] = useState(null);
     const [cancelationReason, setCancelationReason] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
@@ -71,7 +72,11 @@ const AppointmentsList = ({
     const formatTimeWithAmPm = (isoString) => {
         if (!isoString) return '';
         const date = new Date(isoString);
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        return date.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
     };
 
     useEffect(() => {
@@ -111,7 +116,7 @@ const AppointmentsList = ({
             })
         );
     };
-  const handlePageChange = (pageNumber) => {
+    const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
     return (
@@ -241,7 +246,9 @@ const AppointmentsList = ({
                                     </div>
                                 </td>
                                 <td>
-                                    {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)}
+                                    {data?.start?.split("T")[1].split(":").slice(0, 2).join(":") + ' - ' +
+                                        data?.end?.split("T")[1].split(":").slice(0, 2).join(":")}
+                                    {/* {formatTimeWithAmPm(data?.start)} - {formatTimeWithAmPm(data?.end)} */}
                                 </td>
                                 <td>{new Date(data?.date).toLocaleDateString('en-GB')}</td>
                                 <td className="text-capitalize">{data?.doctorId?.name?.[0]?.text + ' '}</td>
@@ -347,7 +354,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     };
     const [showTooltip, setShowTooltip] = useState(false);
 
-  
+
     return (
         <>
             <Row className="mt-2">
@@ -559,9 +566,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
@@ -569,9 +575,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
@@ -579,9 +584,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History
