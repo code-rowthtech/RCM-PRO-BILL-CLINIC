@@ -11,15 +11,20 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
-import { getDoctorsAction } from '../../../redux/actions';
+import { getDoctorsAction, getPatientsAction, getRolesAction } from '../../../redux/actions';
+import { loggedInUser } from '../../../helpers/api/loggedInUser';
 
 const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
+    console.log(CategoryData, 'cat');
+    const roleData = store?.getRolesDataReducer?.data;
+    console.log(roleData, 'roleData');
+    const clinicId = loggedInUser?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
-    const [doctorSearch, setDoctorSearch] = useState('');
-    const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const patientsData = store?.getPatientsReducer?.data?.data;
+    console.log(patientsData, 'patient');
 
     // Dummy patient options for select
     const patientOptions = [
@@ -44,14 +49,46 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
             category: '',
             status: 'open',
             dueDate: '',
-            priority: '',
+            priority: 'medium',
             patient: '',
             note: '<ul><li></li></ul>',
         },
     });
 
+    const dataToMap = doctorDetails?.map((data) => ({
+        _id: data?._id,
+        name: data?.name?.[0]?.text,
+    }));
+
+    const secondData = roleData?.users?.map((data) => ({
+        _id: data?._id,
+        name: data?.name?.text,
+    }));
+
+    const finalData = dataToMap?.concat(secondData);
+    console.log(finalData, 'finalDatafinalData');
     useEffect(() => {
         dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
+    }, [dispatch]);
+    useEffect(() => {
+        dispatch(
+            getRolesAction({
+                clinicId: clinicId,
+                limit: 10,
+                search: '',
+                page: 1,
+                status: true,
+            })
+        );
+    }, [dispatch]);
+    useEffect(() => {
+        const data = {
+            clinicId: clinicId,
+            page: 1,
+            limit: 10,
+            search: '',
+        };
+        dispatch(getPatientsAction(data));
     }, [dispatch]);
 
     // Reset form when modal closes
@@ -60,6 +97,7 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     }, [show, reset]);
 
     const onSubmit = (data) => {
+        console.log(data,'dataa')
         if (parentOnSubmit) parentOnSubmit(data);
         reset();
         handleClose();
@@ -73,16 +111,6 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
         const doctorPayload = { status: '', search: '' };
         dispatch(getDoctorsAction(doctorPayload));
     }, [dispatch]);
-    const handleInputChange = (data) => {
-        setDoctorSearch(data);
-    };
-    const doctorOptions = doctorDetails?.map((data) => ({
-        value: data?._id,
-        label: data?.name?.[0]?.text,
-    }));
-    const handleChange = (selectedOption) => {
-        setSelectedDoctor(selectedOption);
-    };
 
     return (
         <>
@@ -93,7 +121,8 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
 
                 <Modal.Body>
                     <Form onSubmit={handleSubmit(onSubmit)}>
-                            <Col md={12}>
+                        <Row>
+                            <Col md={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label>
                                         Task Title<span className="text-danger">*</span>
@@ -113,78 +142,60 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
                                     <Form.Label>
                                         Assign To<span className="text-danger">*</span>
                                     </Form.Label>
-                                    <Select
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        isClearable={true}
-                                        isSearchable={true}
-                                        {...register('assignTo', { required: 'Assign to is required.' })}
-                                        onChange={(data) => {
-                                            setValue('assignTo', data);
-                                            clearErrors('assignTo');
-                                        }}
+                                    <Controller
                                         name="assignTo"
-                                        options={patientOptions}
-                                        placeholder="&nbsp; Select "
+                                        control={control}
+                                        rules={{ required: 'Assign to is required.' }}
+                                        render={({ field }) => (
+                                            <Select
+                                                className="basic-single"
+                                                classNamePrefix="select"
+                                                isClearable={true}
+                                                isSearchable={true}
+                                                name="assignTo"
+                                                options={finalData?.map((t) => ({
+                                                    value: t._id,
+                                                    label: t.name,
+                                                }))}
+                                                placeholder=" Select"
+                                                value={
+                                                    finalData
+                                                        ?.map((t) => ({
+                                                            value: t._id,
+                                                            label: t.name,
+                                                        }))
+                                                        .find((option) => option.value === field.value) || null
+                                                }
+                                                onChange={(option) => field.onChange(option ? option.value : '')}
+                                                styles={{
+                                                    control: (provided) => ({
+                                                        ...provided,
+                                                        height: '30px',
+                                                        minHeight: '30px',
+                                                        border: '0px',
+                                                    }),
+                                                    placeholder: (provided) => ({
+                                                        ...provided,
+                                                        fontWeight: 'bold',
+                                                        fontSize: '12px',
+                                                        paddingBottom: '5px',
+                                                    }),
+                                                }}
+                                            />
+                                        )}
                                     />
                                     {errors.assignTo && (
                                         <Form.Text className="text-danger">{errors.assignTo.message}</Form.Text>
                                     )}
                                 </Form.Group>
                             </Col>
-
+                        </Row>
                         <Row className="mb-1">
-                            <Col md={6}>
-                                <Form.Group className="responnsible-party-select">
-                                    <Form.Label>
-                                        Provider
-                                        <span className="text-secondary" style={{ fontSize: '10px' }}>
-                                            (Doctor Name)
-                                        </span>
-                                        <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Select
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        isLoading={store?.getDoctorsReducer?.loading}
-                                        isClearable={true}
-                                        value={selectedDoctor}
-                                        isSearchable={true}
-                                        {...register('selectedDoctor')}
-                                        onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
-                                        onChange={(data) => {
-                                            setValue('selectedDoctor', data);
-                                            handleChange(data);
-                                            clearErrors('selectedDoctor');
-                                        }}
-                                        name="doctorName"
-                                        options={doctorOptions}
-                                        placeholder="&nbsp; Select "
-                                        styles={{
-                                            control: (provided) => ({
-                                                ...provided,
-                                                height: '30px',
-                                                minHeight: '30px',
-                                                border: '0px',
-                                            }),
-                                            placeholder: (provided) => ({
-                                                ...provided,
-                                                fontWeight: 'bold',
-                                                fontSize: '12px',
-                                                paddingBottom: '5px',
-                                            }),
-                                        }}
-                                    />
-                                    {errors.selectedDoctor && (
-                                        <Form.Text className="text-danger">{errors.selectedDoctor.message}</Form.Text>
-                                    )}
-                                </Form.Group>
-                            </Col>
                             <Col md={6}>
                                 <Form.Group>
                                     <Form.Label>Category</Form.Label>
                                     <Form.Select {...register('category')}>
-                                        <option value="">Select one</option>
+                                        <option value="">Select</option>
                                         {CategoryData?.map((category) => (
                                             <option key={category?._id} value={category?._id}>
                                                 {category?.name}
@@ -193,9 +204,6 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                        </Row>
-
-                        <Row className="mb-1">
                             <Col md={6}>
                                 <Form.Group>
                                     <Form.Label>
@@ -248,14 +256,29 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
                                         render={({ field }) => (
                                             <Select
                                                 {...field}
-                                                options={patientOptions}
-                                                placeholder="Select patient..."
+                                                options={
+                                                    patientsData?.map((patient) => ({
+                                                        value: patient._id,
+                                                        label:
+                                                            patient?.name?.[0]?.text ||
+                                                            patient?.name?.text ||
+                                                            'Unnamed',
+                                                    })) || []
+                                                }
+                                                placeholder="Select"
                                                 className="basic-single w-100"
                                                 classNamePrefix="select"
                                                 isClearable
                                                 value={
-                                                    patientOptions.find((option) => option.value === field.value) ||
-                                                    null
+                                                    patientsData
+                                                        ?.map((patient) => ({
+                                                            value: patient._id,
+                                                            label:
+                                                                patient?.name?.[0]?.text ||
+                                                                patient?.name?.text ||
+                                                                'Unnamed',
+                                                        }))
+                                                        .find((option) => option.value === field.value) || null
                                                 }
                                                 onChange={(val) => field.onChange(val ? val.value : '')}
                                                 styles={{

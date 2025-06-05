@@ -429,10 +429,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                                 </Form.Label>
                                 <Form.Select
                                     {...register('criticality', { required: 'Criticality is required' })}
-                                    data-has-value={!!watch('criticality')}>
-                                    <option value="" hidden>
-                                        Select Criticality
-                                    </option>
+                                    >
                                     {criticality?.map((item) => (
                                         <option key={item?.code} value={item?.code}>
                                             {item?.display}
@@ -560,10 +557,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                                         'status'
                                         //  { required: 'Clinical Status is required' }
                                     )}
-                                    data-has-value={!!watch('status')}>
-                                    <option value="" hidden>
-                                        Select Clinical Status
-                                    </option>
+                                   >
                                     {clinicalStatus?.map((status) => (
                                         <option key={status?.code} value={status?.code}>
                                             {status?.display}
@@ -685,7 +679,7 @@ const UpdateAllergy = ({ onCancel, allergy }) => {
                         <Col xs={12}>
                             <Form.Group controlId="note">
                                 <Form.Label className="fw-medium mb-0">
-                                    Notes{' '}
+                                    Notes
                                     <span
                                         style={{ cursor: 'pointer' }}
                                         title="Notes Suggestions"
