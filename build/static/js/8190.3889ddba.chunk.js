@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkhyper_react=self.webpackChunkhyper_react||[]).push([[8190],{18190:(e,r,s)=>{s.r(r),s.d(r,{default:()=>a});s(65043);var t=s(70579);const a=()=>(0,t.jsx)("div",{children:"templates"})}}]);
+//# sourceMappingURL=8190.3889ddba.chunk.js.map
