@@ -110,12 +110,14 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
 
     const onSubmit = (data) => {
         const medicationData = {
-            note: [
-                {
-                    text: data.note,
-                    time: new Date().toISOString(),
-                },
-            ],
+            ...(data.note && {
+                note: [
+                    {
+                        text: data.note,
+                        time: new Date().toISOString(),
+                    },
+                ]
+            }),
             dosageInstruction: {
                 sequence: parseInt(data?.sequence),
                 text: additionalInstruction?.display,
@@ -251,7 +253,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Frequency <span className='text-danger'>*</span></Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: "This field is required." })} />
+                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: 'This field is required.' })} />
                                 {errors.frequency && (
                                     <span className="text-danger fs-6">{errors.frequency.message}</span>
                                 )}
@@ -260,7 +262,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Period <span className='text-danger'>*</span></Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 1" {...register('period', { required: "This field is required." })} />
+                                <Form.Control type="number" placeholder="e.g. 1" {...register('period', { required: 'This field is required.' })} />
                                 {errors.period && (
                                     <span className="text-danger fs-6">{errors.period.message}</span>
                                 )}
@@ -269,7 +271,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         <Col sm={4}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Period Unit <span className='text-danger'>*</span></Form.Label>
-                                <Form.Select {...register('periodUnit', { required: "This field is required." })}>
+                                <Form.Select {...register('periodUnit', { required: 'This field is required.' })}>
                                     <option value="">Select unit</option>
                                     <option value="hours">Hour(s)</option>
                                     <option value="days">Day(s)</option>
@@ -329,8 +331,8 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         </Col>
                         <Col sm={6}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Status</Form.Label>
-                                <Form.Select {...register('status')} disabled={selectedMedication}>
+                                <Form.Label className="mb-0">Status <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select {...register('status', { required: 'This field is required.' })} disabled={selectedMedication}>
                                     <option value="">Select status</option>
                                     {medicationStatus.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -338,6 +340,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                         </option>
                                     ))}
                                 </Form.Select>
+                                {errors.status && (
+                                    <span className="text-danger fs-6">{errors.status.message}</span>
+                                )}
                             </Form.Group>
                         </Col>
 

@@ -108,12 +108,7 @@ const AddProblem = ({ onCancel }) => {
                 ],
                 text: selected?.display,
             },
-            // recorder: '',
-            // asserter: '',
-            // encounter: '',
             subject: patientId,
-            // problem: data.problem,
-            // icdVersion: data.icdVersion,
             icdCode: data.icdCode,
             clinicalStatus: {
                 coding: [
@@ -125,8 +120,8 @@ const AddProblem = ({ onCancel }) => {
                 ],
                 text: selectedStatus?.display,
             },
-            appointment: data.appointment,
-            onsetDateTime: data.diagnosisDate,
+            ...(data.appointment && { appointment: data.appointment }),
+            ...(data.diagnosisDate && { onsetDateTime: data.diagnosisDate }),
             // onsetDate: data.onsetDate,
             note: [
                 {
@@ -269,6 +264,9 @@ const AddProblem = ({ onCancel }) => {
                                 </option>
                             ))}
                         </Form.Select>
+                        {errors.status && (
+                            <Form.Text className="text-danger">{errors.status.message}</Form.Text>
+                        )}
                     </Form.Group>
                 </Col>
 
