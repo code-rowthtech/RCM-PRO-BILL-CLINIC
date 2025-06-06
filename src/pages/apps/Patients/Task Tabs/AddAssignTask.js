@@ -39,7 +39,7 @@ const AddAsignTask = () => {
     const [logoName, setLogoName] = useState('');
     const [profileUploading, setProfileUploading] = useState(false);
     const logoFileInputRef = useRef(null);
-    
+
     useEffect(() => {
         dispatch(getClinicEmployeesAction());
     }, [dispatch]);
@@ -78,9 +78,9 @@ const AddAsignTask = () => {
             ...(logo?.url === null
                 ? {}
                 : {
-                      associatedItemUrl: logo?.url?.split('?')[0],
-                      associatedItemName: logoName,
-                  }),
+                    associatedItemUrl: logo?.url?.split('?')[0],
+                    associatedItemName: logoName,
+                }),
         };
 
         dispatch(createTaskAction({ key: encryptMessage(payload) }));
@@ -244,9 +244,8 @@ const AddAsignTask = () => {
                             <Form.Label className="mb-0">Add Associated Item</Form.Label>
                             <div
                                 onClick={() => logoFileInputRef.current.click()}
-                                className={`custom-file-upload justify-content-between cursor-pointer ${
-                                    logoName || profileUploading ? '' : 'custom-form-fields'
-                                }`}
+                                className={`custom-file-upload justify-content-between cursor-pointer ${logoName || profileUploading ? '' : 'custom-form-fields'
+                                    }`}
                                 // className="custom-file-upload d-flex justify-content-between cursor-pointer"
                                 style={{ backgroundColor: '#e8f0fe', fontSize: '12px', fontWeight: 600 }}>
                                 {logoName ? logoName : profileUploading ? 'Uploading...' : 'Upload Patient Photo'}

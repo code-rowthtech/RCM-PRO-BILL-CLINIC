@@ -14,9 +14,9 @@ import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getPatientsAction, getRolesAction } from '../../../redux/actions';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../cryptoUtils';
-import { createTasksAction } from '../../../redux/Tasks/action';
+import { createUserTasksAction } from '../../../redux/Tasks/action';
 
-const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
+const ModalTask = ({ show, handleClose }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
@@ -46,19 +46,18 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
         },
     });
 
-    const dataToMap = doctorDetails?.map((data) => ({
-        _id: data?._id,
-        name: data?.name?.[0]?.text,
-    }));
+    // const doctorsData = doctorDetails?.map((data) => ({
+    //     _id: data?._id,
+    //     name: data?.name?.[0]?.text,
+    // }));
 
-    const secondData = roleData?.users?.map((data) => ({
-        _id: data?._id,
-        name: data?.name?.text,
-        department: data?.department,
-    }));
+    // const rolesData = roleData?.users?.map((data) => ({
+    //     _id: data?._id,
+    //     name: data?.name?.text,
+    //     department: data?.department,
+    // }));
 
-    const finalData = dataToMap?.concat(secondData);
-    console.log(finalData, 'finalDatafinalData');
+    // const finalData = doctorsData?.concat(rolesData);
     useEffect(() => {
         dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
     }, [dispatch]);
@@ -89,8 +88,8 @@ const ModalTask = ({ show, handleClose, onSubmit: parentOnSubmit }) => {
     }, [show, reset]);
 
     const onSubmit = (data) => {
-        if (parentOnSubmit) parentOnSubmit(data);
-        dispatch(createTasksAction({ key: `${encryptMessage(data)}` }));
+        console.log(data, 'Task Modal Data:')
+        dispatch(createUserTasksAction({ key: `${encryptMessage(data)}` }));
     };
 
     const handleReset = () => {
