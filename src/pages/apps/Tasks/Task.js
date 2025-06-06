@@ -1,13 +1,8 @@
-import { FormInput } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
-import { FiFileText, FiFilter, FiUploadCloud } from 'react-icons/fi';
-import { IoMdClose, IoMdRefresh } from 'react-icons/io';
-import { IoSearchSharp } from 'react-icons/io5';
-import { MdFileDownload } from 'react-icons/md';
-import ReactQuill from 'react-quill';
+import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { FiUploadCloud } from 'react-icons/fi';
+import { IoMdRefresh } from 'react-icons/io';
 import { useSelector } from 'react-redux';
-import Select from 'react-select';
 import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
 import ModalTask from './ModalTask';
@@ -15,16 +10,9 @@ import ModalTask from './ModalTask';
 const Task = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
-
-    // Dummy patient options for select
-    const patientOptions = [
-        { value: '1', label: 'John Doe' },
-        { value: '2', label: 'Jane Smith' },
-        { value: '3', label: 'Alice Johnson' },
-    ];
+    const [status, setStatus] = useState(true);
 
     const handleClose = () => {
         setShow(false);
@@ -41,7 +29,9 @@ const Task = () => {
         // Here you can add logic to update the task list, call API, etc.
         setShow(false);
     };
-
+    const handleActiveTab = (isActive) => {
+        setStatus(isActive);
+    };
     return (
         <>
             <Row className="mt-2">
@@ -79,24 +69,34 @@ const Task = () => {
                                 </Col>
                                 <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end">
                                     <Button
-                                        variant=""
                                         className="d-flex align-items-center custom-buttons text-white gap-1">
                                         <IoMdRefresh className="fs-5" /> Reset Filter
                                     </Button>
                                 </Col>
-                                <Col sm={6} className="d-flex align-items-center gap-2 mt-2">
-                                    <Button className="custom-buttons text-white">Active</Button>
-                                    <Button className="custom-buttons text-white">Inactive</Button>
+                                <Col sm={6} className="d-flex align-items-center mt-2">
+                                    {/* <Button className="custom-buttons text-white">Active</Button>
+                                    <Button className="custom-buttons text-white">Inactive</Button> */}
+                                    <Button
+                                        onClick={() => handleActiveTab(true)}
+                                        className={`me-md-1 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        Active
+                                    </Button>
+                                    <Button
+                                        onClick={() => handleActiveTab(false)}
+                                        className={`me-md-1 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                            }`}>
+                                        Inactive
+                                    </Button>
                                 </Col>
                                 <Col sm={6} className="text-end mt-md-0 mt-sm-0 ">
                                     <Row className="mt-2 align-items-center justify-content-end">
                                         <Col xs="auto" className="d-flex gap-2">
-                                            <input type="text" className="border-0 rounded-3" />
+                                            <Form.Control placeholder='Search Task' onChange={(e) => setSearch(e.target.value)} type="text" />
                                             <Button className="custom-buttons py-0">
                                                 <FiUploadCloud className="fs-5" title='Export All' />
                                             </Button>
-
-                                            <Button className="custom-buttons py-1" onClick={handleShow}>
+                                            <Button className="custom-buttons text-nowrap py-1" onClick={handleShow}>
                                                 New Task
                                             </Button>
                                         </Col>
@@ -106,71 +106,43 @@ const Task = () => {
                             <Table responsive className="table-centered table-nowrap mb-0 rounded mt-3">
                                 <thead className="text-white">
                                     <tr>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Associated Patient
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Title
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Assigned By
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Assigned To
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Status
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Category
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Priority
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Start Date
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Due Date
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Action
-                                        </th>
+                                        {['#', 'Title', 'Assigned By', 'Assigned To', 'Status', 'Category', 'Priority', 'Due Date', 'Action'].map((header, index) => (
+
+                                            <th className="text-white" key={index}>
+                                                {header}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr className="border-bottom">
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            John Doe
+                                        <td>
+                                            1
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             Follow-up Call
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             Dr. Smith
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             Nurse Joy
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             Pending
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             Communication
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             High
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            2025-06-04
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             2025-06-10
                                         </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                        <td>
                                             <i
                                                 className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
-                                                // onClick={() => handleEdit(data)}
                                             ></i>
                                         </td>
                                     </tr>
@@ -179,7 +151,7 @@ const Task = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <ModalTask show={show} handleClose={handleClose} onSubmit={handleTaskSubmit} />
+                <ModalTask show={show} handleClose={handleClose} />
             </Row>
         </>
     );

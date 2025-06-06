@@ -1,21 +1,7 @@
 import { TaskConstantTypes } from "./constants";
 
-export const createTasksAction = (data): AuthAction => ({
-    type: TaskConstantTypes.CREATE_TASKS,
+export const createUserTasksAction = (data): AuthAction => ({
+    type: TaskConstantTypes.CREATE_USER_TASKS,
     data
 });
 
-export const getTasksAction = (data): AuthAction => ({
-    type: TaskConstantTypes.GET_TASKS_DETAILS,
-    data
-});
-
-export const updateTasksAction = (data): AuthAction => ({
-    type: TaskConstantTypes.UPDATE_TASKS,
-    data
-});
-
-export const deleteTasksAction = (data): AuthAction => ({
-    type: TaskConstantTypes.DELETE_TASKS,
-    data
-});
