@@ -6,6 +6,9 @@ import { useSelector } from 'react-redux';
 import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
 import ModalTask from './ModalTask';
+import { getUserTasksAction } from '../../../redux/actions';
+import Spinner from '../../../constants/Spinner';
+import Paginations from '../../../helpers/Paginations';
 
 const Task = () => {
     const store = useSelector((state) => state);
@@ -13,6 +16,17 @@ const Task = () => {
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
     const [status, setStatus] = useState(true);
+    const [skip, setSkip] = useState(1)
+    const createTaskResponse = store?.createUserTasksReducer?.data?.status;
+    const userTasks = store?.getUserTasksReducer?.data;
+    console.log('User Tasks:', userTasks);
+
+    useEffect(() => {
+        if (createTaskResponse === 201) {
+            handleClose();
+            dispatch(getUserTasksAction({ status: '', skip: skip }))
+        }
+    }, [createTaskResponse])
 
     const handleClose = () => {
         setShow(false);
@@ -20,17 +34,14 @@ const Task = () => {
     const handleShow = () => setShow(true);
 
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
-    }, [dispatch]);
+        dispatch(getUserTasksAction({ status: '', skip: skip }))
+    }, [dispatch, skip]);
 
-    // Form submit handler for ModalTask
-    const handleTaskSubmit = (data) => {
-        console.log('Task Modal Data:', data);
-        // Here you can add logic to update the task list, call API, etc.
-        setShow(false);
-    };
     const handleActiveTab = (isActive) => {
         setStatus(isActive);
+    };
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
     };
     return (
         <>
@@ -67,87 +78,91 @@ const Task = () => {
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
-                                <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end">
-                                    <Button
-                                        className="d-flex align-items-center custom-buttons text-white gap-1">
-                                        <IoMdRefresh className="fs-5" /> Reset Filter
+                                <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end gap-2">
+                                    <Form.Control placeholder='Search Task' className='w-25' onChange={(e) => setSearch(e.target.value)} type="text" />
+                                    <Button className="custom-buttons py-0">
+                                        <FiUploadCloud className="fs-5" title='Export All' />
                                     </Button>
-                                </Col>
-                                <Col sm={6} className="d-flex align-items-center mt-2">
-                                    {/* <Button className="custom-buttons text-white">Active</Button>
-                                    <Button className="custom-buttons text-white">Inactive</Button> */}
-                                    <Button
-                                        onClick={() => handleActiveTab(true)}
-                                        className={`me-md-1 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
-                                        Active
+                                    <Button className="custom-buttons text-nowrap py-1" onClick={handleShow}>
+                                        New Task
                                     </Button>
-                                    <Button
-                                        onClick={() => handleActiveTab(false)}
-                                        className={`me-md-1 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
-                                        Inactive
-                                    </Button>
-                                </Col>
-                                <Col sm={6} className="text-end mt-md-0 mt-sm-0 ">
-                                    <Row className="mt-2 align-items-center justify-content-end">
-                                        <Col xs="auto" className="d-flex gap-2">
-                                            <Form.Control placeholder='Search Task' onChange={(e) => setSearch(e.target.value)} type="text" />
-                                            <Button className="custom-buttons py-0">
-                                                <FiUploadCloud className="fs-5" title='Export All' />
-                                            </Button>
-                                            <Button className="custom-buttons text-nowrap py-1" onClick={handleShow}>
-                                                New Task
-                                            </Button>
-                                        </Col>
-                                    </Row>
                                 </Col>
                             </Row>
-                            <Table responsive className="table-centered table-nowrap mb-0 rounded mt-3">
-                                <thead className="text-white">
-                                    <tr>
-                                        {['#', 'Title', 'Assigned By', 'Assigned To', 'Status', 'Category', 'Priority', 'Due Date', 'Action'].map((header, index) => (
+                            <div className="scroll-container mt-2" style={{ height: '69vh', overflowY: 'auto' }}>
+                                <Table responsive className="table-centered table-nowrap mb-0 rounded mt-2">
+                                    <thead className="text-white">
+                                        <tr>
+                                            {['#', 'Title', 'Assigned By', 'Assigned To', 'Status', 'Category', 'Priority', 'Due Date', 'Action'].map((header, index) => (
 
-                                            <th className="text-white" key={index}>
-                                                {header}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="border-bottom">
-                                        <td>
-                                            1
-                                        </td>
-                                        <td>
-                                            Follow-up Call
-                                        </td>
-                                        <td>
-                                            Dr. Smith
-                                        </td>
-                                        <td>
-                                            Nurse Joy
-                                        </td>
-                                        <td>
-                                            Pending
-                                        </td>
-                                        <td>
-                                            Communication
-                                        </td>
-                                        <td>
-                                            High
-                                        </td>
-                                        <td>
-                                            2025-06-10
-                                        </td>
-                                        <td>
-                                            <i
-                                                className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
-                                            ></i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </Table>
+                                                <th className="text-white" key={index}>
+                                                    {header}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {store?.getUserTasksReducer?.loading ?
+                                            <tr>
+                                                <td colSpan={9} className='text-center py-5'>
+                                                    <Spinner />
+                                                </td>
+                                            </tr>
+                                            :
+                                            userTasks?.tasks?.length === 0 ?
+                                                <tr>
+                                                    <td colSpan={9} className='text-center py-5'>
+                                                        No tasks found.
+                                                    </td>
+                                                </tr>
+                                                :
+                                                userTasks?.tasks?.map((task, index) => (
+                                                    <tr className="border-bottom">
+                                                        <td>
+                                                            {index + 1}
+                                                        </td>
+                                                        <td>
+                                                            {task?.description}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.assignedById?.name?.text}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.assignedToId?.name?.text || '-'}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.status}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.category || '-'}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.priority || '-'}
+                                                        </td>
+                                                        <td>
+                                                            {task?.dueDate ? new Date(task?.dueDate).toISOString()?.split('T')?.[0] : '-'}
+                                                        </td>
+                                                        <td>
+                                                            <i
+                                                                className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
+                                                            ></i>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                        }
+
+                                    </tbody>
+                                </Table>
+                            </div>
+
+                            <div className="col-12">
+                                <div className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={userTasks?.pagination?.pages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </div>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
