@@ -931,6 +931,7 @@ tbody tr:hover {
 .vitalsTableBorder {
     border-bottom: 1px solid rgba(128, 128, 128, 0.281) !important;
 }
+
 .vitalsTable tr td {
     font-size: 12px !important;
     padding-top: 3px !important;
@@ -942,6 +943,7 @@ tbody tr:hover {
     font-size: 13px !important;
     font-weight: 600 !important;
 }
+
 .vitalsFormControl .form-control {
     font-size: 13px !important;
     padding: 0 10px !important;
@@ -1039,7 +1041,7 @@ tbody tr:hover {
 }
 
 .notes-scroll::-webkit-scrollbar-thumb {
-    background-color: #bbb; /* Slightly lighter for subtle look */
+    background-color: #bbb;
     border-radius: 10px;
     border: none;
 }
@@ -1066,7 +1068,7 @@ tbody tr:hover {
     transition-duration: 0.6s;
 }
 .css-1dimb5e-singleValue {
-    margin-left: 5 px !important;
+    margin-left: 5px !important;
 }
 
 .select__input {
@@ -1112,4 +1114,8 @@ option {
 
 .scroll-will-change {
     will-change: transform;
+}
+
+.select__indicator-separator {
+    background-color: transparent !important;
 }
