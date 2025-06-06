@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import Select from 'react-select';
 import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
-import { getDoctorsAction, getPatientsAction, getRolesAction } from '../../../redux/actions';
+import { getDoctorsAction, getEncounterAction, getPatientsAction, getRolesAction } from '../../../redux/actions';
 import { loggedInUser } from '../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../cryptoUtils';
 import { createUserTasksAction } from '../../../redux/Tasks/action';
@@ -24,63 +24,60 @@ const ModalTask = ({ show, handleClose }) => {
     const clinicId = loggedInUser?.clinicId;
     const doctorDetails = store?.getDoctorsReducer?.data?.result;
     const patientsData = store?.getPatientsReducer?.data?.data;
+    const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const {
         register,
         handleSubmit,
         control,
         reset,
-        setValue,
-        clearErrors,
-
+        watch,
         formState: { errors },
-    } = useForm({
-        defaultValues: {
-            title: '',
-            assignTo: '',
-            category: '',
-            status: 'open',
-            dueDate: '',
-            priority: 'medium',
-            patient: '',
-            note: '<ul><li></li></ul>',
-        },
-    });
+    } = useForm(
+            //     {
+            //     defaultValues: {
+            //         title: '',
+            //         assignTo: '',
+            //         category: '',
+            //         status: 'open',
+            //         dueDate: '',
+            //         priority: 'medium',
+            //         patient: '',
+            //         note: '<ul><li></li></ul>',
+            //     },
+            // }
+        );
 
-    // const doctorsData = doctorDetails?.map((data) => ({
-    //     _id: data?._id,
-    //     name: data?.name?.[0]?.text,
-    // }));
+    const encounters = store?.getEncounterReducer?.data?.encounters;
 
-    // const rolesData = roleData?.users?.map((data) => ({
-    //     _id: data?._id,
-    //     name: data?.name?.text,
-    //     department: data?.department,
-    // }));
-
-    // const finalData = doctorsData?.concat(rolesData);
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
-    }, [dispatch]);
+        if (createTaskResponse === 201) {
+            reset();
+        }
+    }, [createTaskResponse])
+
     useEffect(() => {
-        dispatch(
-            getRolesAction({
+        if (show) {
+            const data = {
+                clinicId: clinicId,
+                page: 1,
+                limit: 10,
+                search: '',
+            };
+            const doctorPayload = { status: '', search: '' };
+            dispatch(getDoctorsAction(doctorPayload));
+            dispatch(getPatientsAction(data));
+            dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
+            dispatch(getRolesAction({
                 clinicId: clinicId,
                 limit: 10,
                 search: '',
                 page: 1,
                 status: true,
             })
-        );
-    }, [dispatch]);
-    useEffect(() => {
-        const data = {
-            clinicId: clinicId,
-            page: 1,
-            limit: 10,
-            search: '',
-        };
-        dispatch(getPatientsAction(data));
-    }, [dispatch]);
+            );
+        }
+    }, [show]);
+
 
     // Reset form when modal closes
     useEffect(() => {
@@ -88,18 +85,37 @@ const ModalTask = ({ show, handleClose }) => {
     }, [show, reset]);
 
     const onSubmit = (data) => {
-        console.log(data, 'Task Modal Data:')
-        dispatch(createUserTasksAction({ key: `${encryptMessage(data)}` }));
+        // Clean the data by removing empty string, undefined, or null values
+        const cleanedData = Object.fromEntries(
+            Object.entries(data).filter(
+                ([_, value]) => value !== '' && value !== undefined && value !== null
+            )
+        );
+
+        // Overwrite note with formatted object if note exists
+        if (cleanedData.note) {
+            cleanedData.note = [
+                {
+                    text: cleanedData.note,
+                    time: new Date().toISOString(),
+                },
+            ];
+        }
+
+        // Add assignedById
+        cleanedData.clinicId = loggedInUser?.clinicId;
+        cleanedData.assignedById = loggedInUser?._id;
+        console.log('Task Data:', cleanedData);
+        dispatch(createUserTasksAction({ key: `${encryptMessage(cleanedData)}` }));
     };
+
 
     const handleReset = () => {
         reset();
         handleClose();
     };
-    useEffect(() => {
-        const doctorPayload = { status: '', search: '' };
-        dispatch(getDoctorsAction(doctorPayload));
-    }, [dispatch]);
+
+    const selectedPatientId = watch('associatedPatientId'); // from react-hook-form
 
     return (
         <>
@@ -118,11 +134,11 @@ const ModalTask = ({ show, handleClose }) => {
                                     </Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Task Title (required)"
-                                        {...register('title', { required: 'Task title is required.' })}
+                                        placeholder="Task Title"
+                                        {...register('description', { required: 'Task title is required.' })}
                                     />
-                                    {errors.title && (
-                                        <Form.Text className="text-danger">{errors.title.message}</Form.Text>
+                                    {errors.description && (
+                                        <Form.Text className="text-danger">{errors.description.message}</Form.Text>
                                     )}
                                 </Form.Group>
                             </Col>
@@ -132,7 +148,7 @@ const ModalTask = ({ show, handleClose }) => {
                                         Assign To<span className="text-danger">*</span>
                                     </Form.Label>
                                     <Controller
-                                        name="assignTo"
+                                        name="assignedToId"
                                         control={control}
                                         rules={{ required: 'Assign to is required.' }}
                                         render={({ field }) => (
@@ -141,10 +157,10 @@ const ModalTask = ({ show, handleClose }) => {
                                                 classNamePrefix="select"
                                                 isClearable={true}
                                                 isSearchable={true}
-                                                name="assignTo"
+                                                name="assignedToId"
                                                 options={[
                                                     ...(doctorDetails?.map((t) => ({
-                                                        value: t._id,
+                                                        value: t?.userId?._id,
                                                         label: (
                                                             <span>
                                                                 {t?.name?.[0]?.text || t?.name?.text || 'Unnamed'}
@@ -180,7 +196,7 @@ const ModalTask = ({ show, handleClose }) => {
                                                 value={
                                                     [
                                                         ...(doctorDetails?.map((t) => ({
-                                                            value: t._id,
+                                                            value: t?.userId?._id,
                                                             label: (
                                                                 <span>
                                                                     {t?.name?.[0]?.text || t?.name?.text || 'Unnamed'}
@@ -231,8 +247,8 @@ const ModalTask = ({ show, handleClose }) => {
                                             />
                                         )}
                                     />
-                                    {errors.assignTo && (
-                                        <Form.Text className="text-danger">{errors.assignTo.message}</Form.Text>
+                                    {errors.assignedToId && (
+                                        <Form.Text className="text-danger">{errors.assignedToId.message}</Form.Text>
                                     )}
                                 </Form.Group>
                             </Col>
@@ -244,7 +260,7 @@ const ModalTask = ({ show, handleClose }) => {
                                     <Form.Select {...register('category')}>
                                         <option value="">Select</option>
                                         {CategoryData?.map((category) => (
-                                            <option key={category?._id} value={category?._id}>
+                                            <option key={category?._id} value={category?.name}>
                                                 {category?.name}
                                             </option>
                                         ))}
@@ -256,10 +272,13 @@ const ModalTask = ({ show, handleClose }) => {
                                     <Form.Label>
                                         Status<span className="text-danger">*</span>
                                     </Form.Label>
-                                    <Form.Select {...register('status', { required: 'Status is required.' })}>
-                                        <option value="open">Open</option>
-                                        <option value="in_progress">In Progress</option>
-                                        <option value="completed">Completed</option>
+                                    <Form.Select className='text-capitalize' {...register('status', { required: 'Status is required.' })}>
+                                        <option value="">Select Status</option>
+                                        {['draft', 'requested', 'received', 'accepted', 'rejected',
+                                            'ready', 'cancelled', 'in-progress', 'on-hold',
+                                            'failed', 'completed', 'entered-in-error']?.map((status, index) => (
+                                                <option selected={status === 'requested'} className='text-capitalize' value={status} key={index}>{status}</option>
+                                            ))}
                                     </Form.Select>
                                     {errors.status && (
                                         <Form.Text className="text-danger">{errors.status.message}</Form.Text>
@@ -270,26 +289,8 @@ const ModalTask = ({ show, handleClose }) => {
                                 <Form.Group>
                                     <Form.Label>Due Date</Form.Label>
                                     <div className="d-flex align-items-center">
-                                        <Form.Control type="date" {...register('dueDate')} />
+                                        <Form.Control min={new Date()?.toISOString()?.split('T')?.[0]} defaultValue={new Date()?.toISOString()?.split('T')?.[0]} type="date" {...register('dueDate')} />
                                     </div>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-
-                        <Row className="mb-1">
-                            <Col md={6}>
-                                <Form.Group>
-                                    <Form.Label>
-                                        Priority<span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <Form.Select {...register('priority', { required: 'Priority is required.' })}>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="low">Low</option>
-                                    </Form.Select>
-                                    {errors.priority && (
-                                        <Form.Text className="text-danger">{errors.priority.message}</Form.Text>
-                                    )}
                                 </Form.Group>
                             </Col>
                             <Col md={6}>
@@ -298,7 +299,7 @@ const ModalTask = ({ show, handleClose }) => {
                                         Associated Patient <span className="text-secondary">(If any)</span>
                                     </Form.Label>
                                     <Controller
-                                        name="patient"
+                                        name="associatedPatientId"
                                         control={control}
                                         render={({ field }) => (
                                             <Select
@@ -327,7 +328,10 @@ const ModalTask = ({ show, handleClose }) => {
                                                         }))
                                                         .find((option) => option.value === field.value) || null
                                                 }
-                                                onChange={(val) => field.onChange(val ? val.value : '')}
+                                                onChange={(val) => {
+                                                    field.onChange(val ? val.value : '');
+                                                    dispatch(getEncounterAction({ patientId: val.value }))
+                                                }}
                                                 styles={{
                                                     control: (provided) => ({
                                                         ...provided,
@@ -345,6 +349,42 @@ const ModalTask = ({ show, handleClose }) => {
                                             />
                                         )}
                                     />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Row className="mb-1">
+                            {selectedPatientId && encounters?.length > 0 && (
+                                <Col md={6}>
+                                    <Form.Group>
+                                        <Form.Label>Associated Encounter</Form.Label>
+                                        <div className="d-flex align-items-center">
+                                            <Form.Select {...register('encounter')} >
+                                                <option value="">Select Encounter</option>
+                                                {encounters?.map((encounter) => (
+                                                    <option key={encounter?._id} value={encounter?._id}>
+                                                        {encounter?.type?.[0]?.coding?.[0]?.display || ''} ({encounter?.period?.start ? new Date(encounter?.period?.start)?.toISOString()?.split('T')?.[0] : ''})
+                                                    </option>
+                                                ))}
+                                            </Form.Select>
+                                        </div>
+                                    </Form.Group>
+                                </Col>
+                            )}
+                            <Col md={6}>
+                                <Form.Group>
+                                    <Form.Label>
+                                        Priority<span className="text-danger">*</span>
+                                    </Form.Label>
+                                    <Form.Select className='text-capitalize' {...register('priority', { required: 'Priority is required.' })}>
+                                        <option value="">Select Priority</option>
+                                        {['routine', 'urgent', 'asap', 'stat']?.map((priority, index) => (
+                                            <option selected={priority === 'routine'} className='text-capitalize' value={priority} key={index}>{priority === 'stat' ? 'Stat (Immediate action required)' : priority}</option>
+                                        ))}
+                                    </Form.Select>
+                                    {errors.priority && (
+                                        <Form.Text className="text-danger">{errors.priority.message}</Form.Text>
+                                    )}
                                 </Form.Group>
                             </Col>
                         </Row>

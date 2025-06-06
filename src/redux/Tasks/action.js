@@ -5,3 +5,8 @@ export const createUserTasksAction = (data): AuthAction => ({
     data
 });
 
+export const getUserTasksAction = (data): AuthAction => ({
+    type: TaskConstantTypes.GET_USER_TASKS,
+    data
+});
+
