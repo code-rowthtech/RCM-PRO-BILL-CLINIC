@@ -784,7 +784,6 @@ const AppointmentForm = ({ selectedSlot, appointmentId, calendarView }) => {
                                 {errors.status && <p className="text-danger mt-1 text-sm">{errors.status.message}</p>}
                             </Form.Group>
                         </Col>
-
                     </Row>
                     <Row>
                         {repeat && (

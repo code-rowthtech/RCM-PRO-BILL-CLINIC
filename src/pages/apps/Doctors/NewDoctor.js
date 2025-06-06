@@ -112,7 +112,6 @@ const NewDoctor = () => {
     }, [dispatch]);
 
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
-
     const createResponse = store?.createtDoctorsReducer?.data?.status;
     const updateResponse = store?.createtDoctorsDetailReducer?.data?.status;
     const newDoctorId = store?.createtDoctorsReducer?.data?.doctor?._id;
@@ -135,7 +134,6 @@ const NewDoctor = () => {
             };
             dispatch(getDoctorDetailsAction(payload));
             if (activeTab === 'personalDetails') {
-
                 setActiveTab('departmentDetails');
                 dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 10 }));
             } else if (activeTab === 'departmentDetails') {
@@ -185,6 +183,7 @@ const NewDoctor = () => {
             setValue('dateOfBirth', formattedDateOfBirth);
         }
     }, [doctorDetails, setValue]);
+
     useEffect(() => {
         if (doctorDetails && updateId && statesData) {
             const state = statesData?.states?.find((data) => data?.name === doctorDetails?.address?.[0]?.state)?.id;
@@ -240,6 +239,7 @@ const NewDoctor = () => {
             address: demographicAddresses,
             specialties: [data?.specialist],
         };
+
         if (updateId) {
             dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
         } else {
@@ -461,10 +461,6 @@ const NewDoctor = () => {
                                                                         }}
                                                                         onChange={(e) => {
                                                                             clearErrors('firstName');
-                                                                            // setFormData({
-                                                                            //     ...formData,
-                                                                            //     firstName: e.target.value,
-                                                                            // });
                                                                             handleInputChange(e);
                                                                         }}
                                                                         placeholder="Enter first name"
@@ -502,10 +498,6 @@ const NewDoctor = () => {
                                                                         }}
                                                                         onChange={(e) => {
                                                                             clearErrors('lastName');
-                                                                            // setFormData({
-                                                                            //     ...formData,
-                                                                            //     lastName: e.target.value,
-                                                                            // });
                                                                             handleInputChange(e);
                                                                         }}
                                                                         placeholder="Enter last name"
@@ -525,9 +517,6 @@ const NewDoctor = () => {
                                                                         </Form.Label>
                                                                         <Form.Group>
                                                                             <InputGroup>
-                                                                                {/* <InputGroup.Text className="ps-3 pe-1 fw-bold text-black">
-                                                                                &nbsp;&nbsp;+1
-                                                                            </InputGroup.Text> */}
                                                                                 <InputGroup.Text className="px-1 p-0 d-flex justify-content-center align-items-center fs-5 fw-semibold text-black">
                                                                                     <img
                                                                                         src={us}
