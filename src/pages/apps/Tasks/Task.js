@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
-import { FiUploadCloud } from 'react-icons/fi';
+import { FiFileText, FiUploadCloud } from 'react-icons/fi';
 import { IoMdRefresh } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 import { getMastersDataAction } from '../../../redux/settings/action';
@@ -15,34 +15,52 @@ const Task = () => {
     const dispatch = useDispatch();
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
-    const [status, setStatus] = useState(true);
+    const [priority, setPriority] = useState('')
+    const [status, setStatus] = useState('');
+    const [dueDate, setDueDate] = useState('')
     const [skip, setSkip] = useState(1)
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
+    const updateTaskResponse = store?.updateUserTasksReducer?.data?.status;
     const userTasks = store?.getUserTasksReducer?.data;
-    console.log('User Tasks:', userTasks);
+    const [taskData, setTaskData] = useState(null)
 
     useEffect(() => {
-        if (createTaskResponse === 201) {
+        if (createTaskResponse === 201 || updateTaskResponse === 200) {
             handleClose();
             dispatch(getUserTasksAction({ status: '', skip: skip }))
         }
-    }, [createTaskResponse])
+    }, [createTaskResponse, updateTaskResponse])
+
 
     const handleClose = () => {
         setShow(false);
+        setTaskData(null);
     };
     const handleShow = () => setShow(true);
 
     useEffect(() => {
-        dispatch(getUserTasksAction({ status: '', skip: skip }))
-    }, [dispatch, skip]);
+        dispatch(getUserTasksAction({ status: status, skip: skip, priority: priority, dueDate: dueDate }))
+    }, [dispatch, skip, priority, status]);
 
-    const handleActiveTab = (isActive) => {
-        setStatus(isActive);
-    };
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
+
+    const getPriorityClass = (priority) => {
+        switch ((priority || '').toLowerCase()) {
+            case 'routine':
+                return 'text-secondary'; // Gray
+            case 'urgent':
+                return 'text-warning';   // Orange/Yellow
+            case 'asap':
+                return 'text-primary';   // Blue
+            case 'stat':
+                return 'text-danger';    // Red
+            default:
+                return 'text-muted';     // Default muted/gray
+        }
+    };
+
     return (
         <>
             <Row className="mt-2">
@@ -52,31 +70,26 @@ const Task = () => {
                             <Row>
                                 <Col xs={12} md={6} lg={6} className="mb-1 d-flex gap-2">
                                     <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Assigned</option>
-                                            <option value="all">All</option>
-                                            <option value="me">Me</option>
-                                            <option value="others">Others</option>
+                                        <Form.Select className='text-capitalize' onChange={(e) => setStatus(e.target.value)}>
+                                            <option value="">All Statuses</option>
+                                            {['draft', 'requested', 'received', 'accepted', 'rejected',
+                                                'ready', 'cancelled', 'in-progress', 'on-hold',
+                                                'failed', 'completed', 'entered-in-error']?.map((status, index) => (
+                                                    <option className='text-capitalize' value={status} key={index}>{status}</option>
+                                                ))}
                                         </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Priority</option>
-                                            <option value="all">All</option>
-                                            <option value="high">High</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="low">Low</option>
+                                        <Form.Select onChange={(e) => setPriority(e.target.value)} className='text-capitalize'>
+                                            <option value="">All Priorities</option>
+                                            {['routine', 'urgent', 'asap', 'stat']?.map((priority, index) => (
+                                                <option className='text-capitalize' value={priority} key={index}>{priority === 'stat' ? 'Stat (Immediate action required)' : priority}</option>
+                                            ))}
                                         </Form.Select>
                                     </Form.Group>
-                                    <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Due Date</option>
-                                            <option value="all">All</option>
-                                            <option value="today">Today</option>
-                                            <option value="this_week">This Week</option>
-                                            <option value="overdue">Overdue</option>
-                                        </Form.Select>
-                                    </Form.Group>
+                                    {/* <Form.Group className="me-2" style={{ minWidth: 140 }}>
+                                            <Form.Control type='date' onChange={(e) => setDueDate(e.target.value)} />
+                                        </Form.Group> */}
                                 </Col>
                                 <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end gap-2">
                                     <Form.Control placeholder='Search Task' className='w-25' onChange={(e) => setSearch(e.target.value)} type="text" />
@@ -93,7 +106,6 @@ const Task = () => {
                                     <thead className="text-white">
                                         <tr>
                                             {['#', 'Title', 'Assigned By', 'Assigned To', 'Status', 'Category', 'Priority', 'Due Date', 'Action'].map((header, index) => (
-
                                                 <th className="text-white" key={index}>
                                                     {header}
                                                 </th>
@@ -111,7 +123,10 @@ const Task = () => {
                                             userTasks?.tasks?.length === 0 ?
                                                 <tr>
                                                     <td colSpan={9} className='text-center py-5'>
-                                                        No tasks found.
+                                                        <div className="d-flex flex-column align-items-center">
+                                                            <FiFileText size={44} className="text-muted mb-0 mt-2" />
+                                                            <h5>No tasks found</h5>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                                 :
@@ -135,7 +150,7 @@ const Task = () => {
                                                         <td className='text-capitalize'>
                                                             {task?.category || '-'}
                                                         </td>
-                                                        <td className='text-capitalize'>
+                                                        <td className={`text-capitalize fw-semibold ${getPriorityClass(task?.priority)}`}>
                                                             {task?.priority || '-'}
                                                         </td>
                                                         <td>
@@ -143,13 +158,16 @@ const Task = () => {
                                                         </td>
                                                         <td>
                                                             <i
+                                                                onClick={() => {
+                                                                    setShow(true);
+                                                                    setTaskData(task);
+                                                                }}
                                                                 className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
                                                             ></i>
                                                         </td>
                                                     </tr>
                                                 ))
                                         }
-
                                     </tbody>
                                 </Table>
                             </div>
@@ -166,7 +184,7 @@ const Task = () => {
                         </Card.Body>
                     </Card>
                 </Col>
-                <ModalTask show={show} handleClose={handleClose} />
+                <ModalTask taskId={taskData?._id} show={show} handleClose={handleClose} />
             </Row>
         </>
     );

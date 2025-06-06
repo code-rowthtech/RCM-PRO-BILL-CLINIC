@@ -37,7 +37,7 @@ import { getIcdProcedureReducer } from './icdCodes/reducer';
 import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
 import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
-import { createUserTasksReducer, getUserTasksReducer } from './Tasks/reducer';
+import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
 export default (combineReducers({
     Auth,
     Layout,
@@ -77,5 +77,5 @@ export default (combineReducers({
     // settings tabs
     getSettingsTabsReducer, createSettingsTabsReducer, updateSettingsTabsReducer,
     // TASKS
-    createUserTasksReducer, getUserTasksReducer
+    createUserTasksReducer, getUserTasksReducer, updateUserTasksReducer, getTaskByIdReducer
 }): any);
