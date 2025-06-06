@@ -35,7 +35,6 @@ const PatientDocs = ({ isAccordionOpen }) => {
     const uploadDocumentsResponse = store?.uploadDocumentsReducer;
     const deleteDocumentsResponse = store?.deleteDocumentsReducer;
     const patientDocuments = store?.getDocumentsReducer?.data?.patientDocuments || [];
-
     const updateDocumentsResponse = store?.updateDocumentsReducer;
     useEffect(() => {
         if (updateDocumentsResponse?.data?.status === 200 || deleteDocumentsResponse?.data?.status === 200) {
