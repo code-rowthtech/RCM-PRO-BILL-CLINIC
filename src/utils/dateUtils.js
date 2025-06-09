@@ -114,7 +114,7 @@ const DateUtils = {
                 const firstDayOfWeek = firstDayOfMonth.getDay();
                 const daysOffset = (dayOfWeek - firstDayOfWeek + 7) % 7;
                 const weekNumber = nthWeekOfMonth;
-                
+
                 appointmentDate = new Date(firstDayOfMonth);
                 appointmentDate.setDate(1 + daysOffset + ((weekNumber - 1) * 7));
             }

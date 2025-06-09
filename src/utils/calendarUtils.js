@@ -1,5 +1,4 @@
 import { debounce } from 'lodash';
-import moment from 'moment';
 import { getAppointmentsAction } from '../redux/actions';
 
 // Constants for status colors

@@ -82,3 +82,7 @@ export function getDocumentsApi(params: any): any {
     const { data } = params;
     return api.get(`${URL.documents}?subject=${data?.subject}`);
 }
+export function getDocumentsByIdApi(params: any): any {
+    const { data } = params;
+    return api.get(`${URL.documents}/${data?.docId}`);
+}

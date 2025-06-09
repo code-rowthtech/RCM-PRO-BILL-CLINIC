@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
 import { FiFileText, FiUploadCloud } from 'react-icons/fi';
-import { IoMdRefresh } from 'react-icons/io';
 import { useSelector } from 'react-redux';
-import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
 import ModalTask from './ModalTask';
 import { getUserTasksAction } from '../../../redux/actions';
@@ -19,10 +17,10 @@ const Task = () => {
     const [status, setStatus] = useState('');
     const [dueDate, setDueDate] = useState('')
     const [skip, setSkip] = useState(1)
+    const [taskData, setTaskData] = useState(null)
     const createTaskResponse = store?.createUserTasksReducer?.data?.status;
     const updateTaskResponse = store?.updateUserTasksReducer?.data?.status;
     const userTasks = store?.getUserTasksReducer?.data;
-    const [taskData, setTaskData] = useState(null)
 
     useEffect(() => {
         if (createTaskResponse === 201 || updateTaskResponse === 200) {
@@ -31,7 +29,6 @@ const Task = () => {
         }
     }, [createTaskResponse, updateTaskResponse])
 
-
     const handleClose = () => {
         setShow(false);
         setTaskData(null);
@@ -39,8 +36,8 @@ const Task = () => {
     const handleShow = () => setShow(true);
 
     useEffect(() => {
-        dispatch(getUserTasksAction({ status: status, skip: skip, priority: priority, dueDate: dueDate }))
-    }, [dispatch, skip, priority, status]);
+        dispatch(getUserTasksAction({ status: status, skip: skip, priority: priority, dueDate: dueDate, search: search }))
+    }, [dispatch, skip, priority, status, search]);
 
     const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);

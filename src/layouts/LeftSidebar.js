@@ -29,7 +29,6 @@ type SideBarContentProps = {
 
 /* sidebar content */
 const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) => {
-    console.log('metadata', metadata);
     return (
         <>
             {!hideUserProfile && (
@@ -63,7 +62,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
-    console.log(appointmentsData, 'appointmentsDataappointmentsData')
     const statusColors = {
         pending: '#f1c40f', // Yellow
         proposed: '#3498db', // Blue
@@ -215,9 +213,9 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     <button
                                         data-toggle={
                                             // ele.label === 'Tasks' ||
-                                             ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
+                                            ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
                                                 // ele.label === 'Tasks' ||
-                                                 ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
+                                                ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
                                         onClick={() => isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)}
                                         className="px-2 textLeftSidebar bg-transparent border-0"
                                     >

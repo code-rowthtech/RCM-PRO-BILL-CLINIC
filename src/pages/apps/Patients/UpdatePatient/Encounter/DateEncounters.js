@@ -18,8 +18,7 @@ import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
 
 
-const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
-
+const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId, encounterData, encounterDataArr, setEncounterDataArr }) => {
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
@@ -45,13 +44,31 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
         label: data?.title, value: data?._id, isDefault: data?.default
     }));
-    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+    // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
     const [noteType, setNoteType] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
 
     // Get update encounter data from store
     const updateEncounterData = store?.updateEncounterReducer;
+    const encounterDataGet = store?.getEncounterByIdReducer?.data?.encounter;
+    useEffect(() => {
+        if (!encounterDataGet || !encounterDataGet._id) return;
+
+        setEncounterDataArr((prev) => {
+            const exists = prev.some((data) => data._id === encounterDataGet._id);
+
+            if (exists) {
+                // Replace the existing item
+                return prev.map((data) =>
+                    data._id === encounterDataGet._id ? encounterDataGet : data
+                );
+            } else {
+                // Add as new item
+                return [...prev, encounterDataGet];
+            }
+        });
+    }, [encounterDataGet]);
 
     // Handle successful encounter creation or update
     useEffect(() => {
@@ -74,11 +91,11 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         updateEncounterData?.data?.status,
     ]);
 
-    useEffect(() => {
-        if (encounterAction === 'updateEncounter') {
-            dispatch(getEncounterByIdAction({ encounterId: encounterId }))
-        }
-    }, [encounterAction])
+    // useEffect(() => {
+    //     if (encounterAction === 'updateEncounter') {
+    //         dispatch(getEncounterByIdAction({ encounterId: encounterId }))
+    //     }
+    // }, [encounterAction])
     // Set default note type and populate form for update
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
@@ -114,7 +131,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
                         setValue(field?.type, field?.content?.value);
-                        console.log('Setting field:', field?.type, 'with valuse:', field?.content?.value);
                     }
                 });
             }
@@ -693,7 +709,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >
-                                        {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
+                                        {store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading ?
+                                            <Spinner className='spinner-border-sm' color='white' />
+                                            :
+                                            encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
                                 </div>
                             </div>
