@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Card, Col, Form, Modal, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import {
     FiUpload as UploadIcon,
@@ -21,10 +21,13 @@ import { useSearchParams } from 'react-router-dom';
 import { handleUpload as handleS3Upload } from '../../../../helpers/HandleUpload';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import { doc } from 'prettier';
+import Spinner from '../../../../constants/Spinner';
+import ToastHandle from '../../../../helpers/ToastMessage';
 
 const MAX_FILE_SIZE_MB = 2;
+const MAX_FILES = 10;
 
-const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => {
+const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -36,7 +39,22 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
     const [notes, setNotes] = useState(null);
     const [error, setError] = useState(null);
     const [loadingUpload, setLoadingUpload] = useState(false);
+    const quillRef = useRef(null);
+    const MAX_LENGTH = 10000;
+    useEffect(() => {
+        if (quillRef) {
+            const editor = quillRef?.current?.getEditor();
 
+            editor?.on('text-change', (delta, oldDelta, source) => {
+                if (source === 'user') {
+                    const text = editor?.getText(); // includes trailing '\n'
+                    if (text.length > MAX_LENGTH + 1) {
+                        editor?.deleteText(MAX_LENGTH, text.length);
+                    }
+                }
+            });
+        }
+    }, []);
     const uploadDocumentsResponse = store?.uploadDocumentsReducer;
     const encounterOptions = store?.getEncounterReducer?.data?.encounters?.map((data) => ({
         label: data?.period?.start ? new Date(data?.period?.start)?.toISOString().split('T')?.[0] : '', value: data?._id
@@ -122,17 +140,58 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
     // }, []);
 
 
-    const handleDrop = useCallback((e) => {
-        e.preventDefault();
-        const dropped = Array.from(e.dataTransfer.files).filter(validateFile);
-        setFiles((prev) => [...prev, ...dropped]);
-    }, []);
+    // const handleDrop = useCallback((e) => {
+    //     e.preventDefault();
+    //     const dropped = Array.from(e.dataTransfer.files).filter(validateFile);
+    //     setFiles((prev) => [...prev, ...dropped]);
+    // }, []);
 
+    // const handleFileInput = (e) => {
+    //     const selected = Array.from(e.target.files).filter(validateFile);
+    //     setFiles((prev) => [...prev, ...selected]);
+    //     e.target.value = '';
+    // };
+    // const handleFileInput = (e) => {
+    //     const selected = Array.from(e.target.files).filter(validateFile);
+
+    //     setFiles((prev) => {
+    //         const totalFiles = prev.length + selected.length;
+    //         if (totalFiles > MAX_FILES) {
+    //             const availableSlots = MAX_FILES - prev.length;
+    //             const acceptedFiles = selected.slice(0, availableSlots);
+    //             if (availableSlots > 0) {
+    //                 return [...prev, ...acceptedFiles];
+    //             }
+    //             // Optionally show a warning to the user here
+    //             alert(`You can only upload up to ${MAX_FILES} files.`);
+    //             return prev;
+    //         }
+    //         return [...prev, ...selected];
+    //     });
+
+    //     e.target.value = '';
+    // };
+    const addFiles = (incomingFiles) => {
+        const validFiles = incomingFiles.filter(validateFile);
+        setFiles((prev) => {
+            const totalFiles = prev.length + validFiles.length;
+            if (totalFiles > MAX_FILES) {
+                ToastHandle(`You can only upload up to ${MAX_FILES} files.`, 'danger')
+                return prev; // Return previous files without adding new ones
+            }
+            return [...prev, ...validFiles]; // Only add if total is within limit
+        });
+    };
     const handleFileInput = (e) => {
-        const selected = Array.from(e.target.files).filter(validateFile);
-        setFiles((prev) => [...prev, ...selected]);
+        addFiles(Array.from(e.target.files));
         e.target.value = '';
     };
+
+    const handleDrop = useCallback((e) => {
+        e.preventDefault();
+        addFiles(Array.from(e.dataTransfer.files));
+    }, []);
+
 
     const handleRemoveFile = (index) => {
         setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -228,7 +287,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
     };
 
     const formatFileSize = (bytes) => {
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const sizes = ['B', 'KB', 'MB', 'GB'];
         if (!bytes) return '0 Byte';
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
@@ -262,57 +321,118 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
         if (selectedFiles.some(idx => files[idx] === previewFile)) setPreviewFile(null);
     };
 
-    useEffect(() => {
-        if (documentData) {
-            setEncounter(documentData?.context?.encounter?.[0] || '');
-            setDocumentType(documentData?.type?.[0]?.coding?.[0] || null);
-            setDocumentCategory(documentData?.category?.[0]?.coding?.[0] || null);
-            setNotes(documentData?.notes || '');
-        }
-    }, [documentData])
+    // useEffect(() => {
+    //     if (documentData) {
+    //         setEncounter(documentData?.context?.encounter?.[0] || '');
+    //         setDocumentType(documentData?.type?.[0]?.coding?.[0] || null);
+    //         setDocumentCategory(documentData?.category?.[0]?.coding?.[0] || null);
+    //         setNotes(documentData?.notes || '');
+    //     }
+    // }, [documentData])
     return (
-        <Modal className={`${documentData ? '' : 'upload-documents'}`} show={showUploadModal} onHide={closeModal} size="lg" centered>
-            <Modal.Header className="p-0 pb-0 d-flex justify-content-center">
+        <Modal className={`upload-documents`} show={showUploadModal} onHide={closeModal} size="lg" centered>
+            <Modal.Header className="p-0 border-0 pb-0 d-flex justify-content-center">
                 <Modal.Title className="fw-semibold ">
                     Upload Documents
                 </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className='pt-0'>
                 <Row>
-                    {!documentData && (
-                        <Col xs={6}>
-                            <div
-                                className="border rounded p-2 text-center"
-                                onDrop={handleDrop}
-                                onDragOver={(e) => e.preventDefault()}
-                                style={{ borderStyle: 'dashed', backgroundColor: '#f8f9fa' }}
+                    <Col xs={6}>
+                        <div
+                            className="border rounded p-2 text-center"
+                            onDrop={handleDrop}
+                            onDragOver={(e) => e.preventDefault()}
+                            style={{ borderStyle: 'dashed', backgroundColor: '#f8f9fa' }}
+                        >
+                            <UploadIcon size={24} className="mb-1" />
+                            <p>Drag and drop files or</p>
+                            <input
+                                type="file"
+                                multiple
+                                accept={validMimeTypes.join(',')}
+                                onChange={handleFileInput}
+                                hidden
+                                id="file-upload"
+                            />
+                            <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => document.getElementById('file-upload').click()}
                             >
-                                <UploadIcon size={24} className="mb-1" />
-                                <p>Drag and drop files or</p>
-                                <input
-                                    type="file"
-                                    multiple
-                                    accept={validMimeTypes.join(',')}
-                                    onChange={handleFileInput}
-                                    hidden
-                                    id="file-upload"
-                                />
-                                <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    onClick={() => document.getElementById('file-upload').click()}
-                                >
-                                    Browse Files
-                                </Button>
-                                <p className="small text-muted mt-2">
-                                    Allowed: PDF, DOC, DOCX, JPG, PNG, GIF. Max size: {MAX_FILE_SIZE_MB}MB
-                                </p>
-                            </div>
-                        </Col>
-                    )}
-                    <Col xs={documentData ? 12 : 6}>
+                                Browse Files
+                            </Button>
+                            <p className="small text-muted mt-2">
+                                Allowed: PDF, DOC, DOCX, JPG, PNG, GIF. Max size: {MAX_FILE_SIZE_MB}MB
+                            </p>
+                        </div>
+                    </Col>
+                    <Col xs={6}>
                         <Row>
-                            <Col xs={documentData ? 4 : 12}>
+                            <Col xs={12} className="mt-0 "
+                            // style={{ height: '21.7vh' }}
+                            >
+                                <Table
+                                    responsive
+                                    className="table-centered table-nowrap mb-0  rounded table-scroll small-first-col ">
+                                    <thead className="text-white">
+                                        <tr>
+                                            <th style={{ width: '10%' }} className='text-white' >
+                                                <Form.Check
+                                                    type="checkbox"
+                                                    checked={selectedFiles.length === files.length && files.length > 0}
+                                                    onChange={handleSelectAll}
+                                                    aria-label="Select all files"
+                                                />
+                                            </th>
+                                            <th style={{ width: '26.6%' }} className='text-white'>File</th>
+                                            <th style={{ width: '26.6%' }} className='text-white'>Type</th>
+                                            <th style={{ width: '26.6%' }} className='text-white'>Size</th>
+                                            <OverlayTrigger overlay={<Tooltip>Delete Selected</Tooltip>}>
+                                                <th style={{ width: '10%' }} className='text-white'>
+                                                    <DeleteIcon className={`${selectedFiles.length > 0 ? "" : "d-none"}`} onClick={handleDeleteSelected} />
+                                                </th>
+                                            </OverlayTrigger>
+                                        </tr>
+                                    </thead>
+                                    <tbody className='body-half-screen thin-scrollbar'>
+                                        {files?.length ?
+                                            files?.map((file, index) => (
+                                                <tr key={index} onClick={() => setPreviewFile(file)} style={{ cursor: 'pointer' }}>
+                                                    <td style={{ width: '10%' }}>
+                                                        <Form.Check
+                                                            type="checkbox"
+                                                            checked={selectedFiles.includes(index)}
+                                                            onChange={e => {
+                                                                e.stopPropagation();
+                                                                handleCheckboxChange(index);
+                                                            }}
+                                                            aria-label={`Select file ${file.name}`}
+                                                        />
+                                                    </td>
+                                                    <td style={{ width: '26.6%' }} title={file.name}>{file.name?.length > 8 ? file.name?.slice(0, 7) + '...' : file.name}</td>
+                                                    <td style={{ width: '26.6%' }} title={file.type.split('/').pop().toUpperCase()}>{file.type.split('/').pop().toUpperCase()?.length > 5
+                                                        ? file.type.split('/').pop().toUpperCase()?.slice(0, 4) + '...' :
+                                                        file.type.split('/').pop().toUpperCase()}
+                                                    </td>
+                                                    <td style={{ width: '26.6%' }}>{formatFileSize(file.size)}</td>
+                                                    <td style={{ width: '10%' }}></td>
+                                                </tr>
+                                            )) :
+                                            <tr>
+                                                <td colSpan={5} className='text-center py-2'>
+                                                    <h6>No files selected</h6>
+                                                </td>
+                                            </tr>}
+                                    </tbody>
+                                </Table>
+                            </Col>
+                        </Row>
+
+                    </Col>
+                    <Col xs={12} className='mt-1'>
+                        <Row>
+                            <Col xs={4}>
                                 <Form.Group>
                                     <Form.Label className='mb-0 mt-1'>Document Type</Form.Label>
                                     <AsyncSelect
@@ -341,7 +461,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col xs={documentData ? 4 : 12}>
+                            <Col xs={4}>
                                 <Form.Group>
                                     <Form.Label className='mb-0 mt-1'>Document Category</Form.Label>
                                     <Form.Select onChange={(e) => {
@@ -352,33 +472,9 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
                                             <option key={index} value={category.code}>{category.display}</option>
                                         ))}
                                     </Form.Select>
-                                    {/* <AsyncSelect
-                                        loadOptions={loadDocumentCategoryOptions}
-                                        defaultOptions={formattedDocumentCategory.slice(0, 10)}
-                                        isSearchable
-                                        className="basic-single"
-                                        classNamePrefix="select"
-                                        placeholder="&nbsp; Select"
-                                        value={selectedDocumentCategoryOption}
-                                        onChange={handleDocumentCategoryChange}
-                                        styles={{
-                                            control: (provided) => ({
-                                                ...provided,
-                                                height: '30px',
-                                                minHeight: '30px',
-                                                border: '0px',
-                                            }),
-                                            placeholder: (provided) => ({
-                                                ...provided,
-                                                fontWeight: 'bold',
-                                                fontSize: '12px',
-                                                paddingBottom: '5px',
-                                            }),
-                                        }}
-                                    /> */}
                                 </Form.Group>
                             </Col>
-                            <Col xs={documentData ? 4 : 12}>
+                            <Col xs={4}>
                                 <Form.Group>
                                     <Form.Label className='mb-0 mt-1'>Encounter</Form.Label>
                                     <Select
@@ -416,88 +512,26 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
                             </Col>
                         </Row>
                     </Col>
-                    <Col xs={12} className="mt-1 scroll-container" style={{ height: '15vh' }}>
-                        <Form.Label className='mb-0'>Notes & Comments</Form.Label>
+                    <Col xs={12} className="mt-1">
+                        <Form.Label className='mb-0'>Notes & Comments <small className='text-muted'>(Max length: {MAX_LENGTH})</small></Form.Label>
                         <ReactQuill
+                            ref={quillRef}
                             theme="snow"
-                            value={notes || ''}
+                            value={notes}
                             onChange={setNotes}
+                            style={{ height: '30vh' }}
                             modules={{
                                 toolbar: [
                                     ['bold', 'italic', 'underline'],
-                                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                    [{ list: 'ordered' }, { list: 'bullet' }],
                                     ['link'],
                                     ['clean']
                                 ]
                             }}
                         />
+
                     </Col>
-                    {files.length > 0 && (
-                        <Col xs={12} className='mt-2'>
-                            <Row>
-                                <Col style={{ height: '28vh' }} xs={12} className="mt-0 scroll-container ">
-                                    <Table
-                                        responsive
-                                        className="table-centered table-nowrap mb-0  rounded">
-                                        <thead className="text-white">
-                                            <tr>
-                                                <th className='text-white' >
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        checked={selectedFiles.length === files.length && files.length > 0}
-                                                        onChange={handleSelectAll}
-                                                        aria-label="Select all files"
-                                                        style={{ marginLeft: 4 }}
-                                                    />
-                                                </th>
-                                                <th className='text-white'>File</th>
-                                                <th className='text-white'>Type</th>
-                                                <th className='text-white'>Size</th>
-                                                {selectedFiles.length > 0 && (
-                                                    <OverlayTrigger overlay={<Tooltip>Delete Selected</Tooltip>}>
-                                                        <th className='text-white'>
-                                                            <DeleteIcon onClick={handleDeleteSelected} />
-                                                        </th>
-                                                    </OverlayTrigger>
 
-                                                )}
-
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {files?.map((file, index) => (
-                                                <tr key={index} onClick={() => setPreviewFile(file)} style={{ cursor: 'pointer' }}>
-                                                    <td>
-                                                        <Form.Check
-                                                            type="checkbox"
-                                                            checked={selectedFiles.includes(index)}
-                                                            onChange={e => {
-                                                                e.stopPropagation();
-                                                                handleCheckboxChange(index);
-                                                            }}
-                                                            aria-label={`Select file ${file.name}`}
-                                                        />
-                                                    </td>
-                                                    <td title={file.name}>{file.name?.length > 25 ? file.name?.slice(0, 24) + '...' : file.name}</td>
-                                                    <td title={file.type.split('/').pop().toUpperCase()}>{file.type.split('/').pop().toUpperCase()?.length > 20
-                                                        ? file.type.split('/').pop().toUpperCase()?.slice(0, 19) + '...' :
-                                                        file.type.split('/').pop().toUpperCase()}
-                                                    </td>
-                                                    <td>{formatFileSize(file.size)}</td>
-                                                    {selectedFiles.length > 0 && (
-                                                        <td></td>
-                                                    )}
-
-
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </Col>
-                            </Row>
-
-                        </Col>
-                    )}
                 </Row>
             </Modal.Body>
             <Modal.Footer>
@@ -512,7 +546,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal, documentData }) => 
                             setEncounter('');
                         }} disabled={isLoading}>Cancel</Button>
                         <Button className='custom-buttons' onClick={handleUpload} disabled={isLoading}>
-                            {isLoading ? 'Uploading...' : documentData ? 'Update' : 'Upload'}
+                            {isLoading ? <Spinner className='spinner-border-sm' color='white' /> : 'Upload'}
                         </Button>
                     </Col>
                 </Row>

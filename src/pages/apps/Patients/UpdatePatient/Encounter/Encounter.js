@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Tab, Tabs, Card, Offcanvas, Dropdown, Button, Modal } from 'react-bootstrap';
 import { IoClose } from 'react-icons/io5';
@@ -116,21 +117,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
         setShowSettings(false)
     }
 
-    // `The story of hiroshima and nagasaki goes like :
-    // Once there was a time during the World War II when 
-    // the United States dropped atomic bombs on the Japanese
-    // cities of Hiroshima and Nagasaki in August 1945. This
-    // event marked a significant moment in history, leading
-    // to Japan's surrender and the end of the war. The bombings
-    // resulted in immense destruction and loss of life, with long-lasting
-    // effects on the survivors and the environment. The events of Hiroshima
-    // and Nagasaki continue to serve as a powerful reminder of the
-    // devastating consequences of nuclear warfare and the importance
-    // of peace and diplomacy. The story of Hiroshima and Nagasaki is 
-    // a poignant chapter in the history of human conflict, highlighting
-    // the need for global efforts towards disarmament and reconciliation.
-    // The name of the bombs used for the nuclear attacks are as follows:
-    // Fat boy and Little man.`;
+    const [encounterDataArr, setEncounterDataArr] = useState([])
     return (
         <div className="row">
             {/* Tab headers */}
@@ -187,7 +174,9 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 encounterTabs={encounterTabs}
                                 setEncounterTabs={setEncounterTabs}
                                 setActiveTab={setActiveTab}
+                                setEncounterDataArr={setEncounterDataArr}
                                 setCreateEncounter={setCreateEncounter}
+                                encounterDataArr={encounterDataArr}
                             />
                         ) : (
                             <DateEncounters
@@ -199,7 +188,10 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 searchNoteType={searchNoteType}
                                 setSearchNoteType={setSearchNoteType}
                                 isCollapsed={isCollapsed}
+                                encounterDataArr={encounterDataArr}
+                                setEncounterDataArr={setEncounterDataArr}
                                 setCreateEncounter={setCreateEncounter}
+                                encounterData={encounterDataArr?.find((ele) => ele?._id === tab?.id)}
                             />
                         )}
                     </div>

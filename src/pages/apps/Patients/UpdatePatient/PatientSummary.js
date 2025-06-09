@@ -493,8 +493,8 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </div>
                             ))
                         ) : (
-                            <div className="d-flex align-items-center justify-content-center w-100 h-100">
-                                No Social Histoy Found
+                            <div className="fs-6  d-flex justify-content-between align-items-center">
+                                <strong>No Social History Found</strong>
                             </div>
                         )}
                     </Card.Body>

@@ -62,7 +62,6 @@ const TaskCategory = () => {
         } else {
             dispatch(createMastersDataAction({ key: encryptMessage(payload) }));
         }
-        console.log(payload,'payload');
     };
 
     const createResponse = store?.createMastersDataReducer?.data?.status;
@@ -122,18 +121,16 @@ const TaskCategory = () => {
                                     <Button
                                         variant={status === true ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(true)}
-                                        className={`active_inactive_buttons ${
-                                            status === true ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={`active_inactive_buttons ${status === true ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Active
                                     </Button>
 
                                     <Button
                                         variant={status === false ? 'outlined' : ''}
                                         onClick={() => handleStatusChange(false)}
-                                        className={` active_inactive_buttons ${
-                                            status === false ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2`}>
+                                        className={` active_inactive_buttons ${status === false ? 'text-white' : 'bg-white border-primary text-dark'
+                                            } me-2`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -301,7 +298,7 @@ const TaskCategory = () => {
                                 <Col md={6}>
                                     <Form.Group className="mb-2">
                                         <Form.Label>
-                                           Category Name <span className="text-danger">*</span>
+                                            Category Name <span className="text-danger">*</span>
                                         </Form.Label>
                                         <Form.Control
                                             type="text"
@@ -381,7 +378,7 @@ const TaskCategory = () => {
                                 </Button>
                                 <Button type="submit" className="custom-buttons">
                                     {store?.createMastersDataReducer?.loading ||
-                                    store?.updateMastersDataReducer?.loading ? (
+                                        store?.updateMastersDataReducer?.loading ? (
                                         <div class="spinner-border spinner-border-sm" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>

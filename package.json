@@ -67,7 +67,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "node --max_old_space_size=4096 ./node_modules/react-app-rewired/scripts/build.js",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject",
     "flow": "flow",

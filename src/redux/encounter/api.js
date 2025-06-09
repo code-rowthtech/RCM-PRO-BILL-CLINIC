@@ -15,12 +15,12 @@ export function updateEncounterApi(params: any): any {
 
 export function getEncounterApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.encounter}/patient/${data?.patientId}`);
+    return api.get(`${URL.encounter}/patient/${data?.patientId}?limit=10&page=${data?.skip || 1}`);
 }
 
 export function getEncounterNotesTypeApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.encounterNotesType}?clinicId=${loggedInUser?.clinicId}&userId=${loggedInUser?._id}&page=${data?.skip}&limit=${10}&search=${data?.search || ''}`);
+    return api.get(`${URL.encounterNotesType}?clinicId=${loggedInUser?.clinicId}&userId=${loggedInUser?._id}&page=${data?.skip}&search=${data?.search || ''}`);
 }
 
 export function getEncounterNoteFieldsApi(params: any): any {

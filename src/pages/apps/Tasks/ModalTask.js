@@ -125,7 +125,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
         cleanedData.clinicId = loggedInUser?.clinicId;
         cleanedData.assignedById = loggedInUser?._id;
         if (taskId) {
-            console.log(cleanedData, 'cleanedData')
             dispatch(updateUserTasksAction({ key: `${encryptMessage(cleanedData)}`, taskId: taskId }));
         } else {
             dispatch(createUserTasksAction({ key: `${encryptMessage(cleanedData)}` }));
@@ -360,7 +359,7 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                                     }
                                                     onChange={(val) => {
                                                         field.onChange(val ? val.value : '');
-                                                        dispatch(getEncounterAction({ patientId: val.value }))
+                                                        dispatch(getEncounterAction({ patientId: val?.value }))
                                                     }}
                                                     styles={{
                                                         control: (provided) => ({
@@ -469,7 +468,6 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                             </div>
                         </Form>
                     }
-
                 </Modal.Body>
             </Modal>
         </>

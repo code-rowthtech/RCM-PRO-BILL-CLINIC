@@ -269,13 +269,7 @@ const EncounterSummary = () => {
         setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
     };
 
-    const patientDataForFields = {
-        demographics: 'address of the patient',
-        responsibleParty: 'responsible party of the patient',
-        referringDoctor: 'referring doctor of the patient',
-        insurance: 'insurance details of the patient',
-        eligibility: 'eligibility details of the patient',
-    }
+
     return (
         <Row className='position-relative'>
             <Col sm={12} className='mt-0 mt-0' >
