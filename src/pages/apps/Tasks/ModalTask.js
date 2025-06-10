@@ -303,11 +303,23 @@ const ModalTask = ({ show, handleClose, taskId }) => {
                                         </Form.Label>
                                         <Form.Select className='text-capitalize' {...register('status', { required: 'Status is required.' })}>
                                             <option value="">Select Status</option>
-                                            {['draft', 'requested', 'received', 'accepted', 'rejected',
-                                                'ready', 'cancelled', 'in-progress', 'on-hold',
-                                                'failed', 'completed', 'entered-in-error']?.map((status, index) => (
-                                                    <option selected={status === 'requested'} className='text-capitalize' value={status} key={index}>{status}</option>
-                                                ))}
+                                            {(taskId
+                                                ? [
+                                                    'draft', 'requested', 'received', 'accepted', 'rejected',
+                                                    'ready', 'cancelled', 'in-progress', 'on-hold',
+                                                    'failed', 'completed', 'entered-in-error'
+                                                ]
+                                                : ['draft', 'requested']
+                                            ).map((status, index) => (
+                                                <option
+                                                    selected={status === 'requested'}
+                                                    className="text-capitalize"
+                                                    value={status}
+                                                    key={index}
+                                                >
+                                                    {status}
+                                                </option>
+                                            ))}
                                         </Form.Select>
                                         {errors.status && (
                                             <Form.Text className="text-danger">{errors.status.message}</Form.Text>

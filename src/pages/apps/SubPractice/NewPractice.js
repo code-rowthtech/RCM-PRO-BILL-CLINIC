@@ -259,7 +259,7 @@ const NewPractice = () => {
                 };
                 return updatedDetails;
             });
-        } catch (error) {}
+        } catch (error) { }
     };
     const [formData, setFormData] = useState({
         clinicname: '',
@@ -285,9 +285,9 @@ const NewPractice = () => {
                     // file: data?.file|| '',
                     file: data?.documents?.[0]?.fileName
                         ? {
-                              url: data?.documents?.[0], // Store URL
-                              name: data?.documents?.[0]?.fileName, // Extract filename from URL
-                          }
+                            url: data?.documents?.[0], // Store URL
+                            name: data?.documents?.[0]?.fileName, // Extract filename from URL
+                        }
                         : '',
                     expiry: data?.expirationDate || '',
                     issuingAuthority: data.issuingAuthority || '',
@@ -897,9 +897,8 @@ const NewPractice = () => {
                                     <ul className="nav nav-underline">
                                         <li className="nav-item">
                                             <button
-                                                className={`text-black nav-link font_active_tabs ${
-                                                    activeTab === 'personalDetails' ? 'active' : ''
-                                                }`}
+                                                className={`text-black nav-link font_active_tabs ${activeTab === 'personalDetails' ? 'active' : ''
+                                                    }`}
                                                 onClick={() => handleTabChange('personalDetails')}>
                                                 Practice Sub Information
                                             </button>
@@ -1011,16 +1010,15 @@ const NewPractice = () => {
                                                     <Form.Label className="mb-0">Upload Logo</Form.Label>
                                                     <div
                                                         onClick={handleLogoClick}
-                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                            logoName || logoUploading
+                                                        className={`custom-file-upload justify-content-between cursor-pointer ${logoName || logoUploading
                                                                 ? 'form-control'
                                                                 : 'custom-form-fields'
-                                                        }`}>
+                                                            }`}>
                                                         {logoName
                                                             ? logoName.split('/').pop().slice(0, 30) + '...'
                                                             : logoUploading
-                                                              ? 'Uploading...'
-                                                              : 'Upload Logo'}
+                                                                ? 'Uploading...'
+                                                                : 'Upload Logo'}
                                                         <div className="d-flex align-items-center gap-2">
                                                             <FiEye
                                                                 onClick={(e) => {
@@ -1147,8 +1145,8 @@ const NewPractice = () => {
                                                                             item.type === 'NPI' || item.type === 'CLIA'
                                                                                 ? 10
                                                                                 : item.type === 'NAIC'
-                                                                                  ? 5
-                                                                                  : 10
+                                                                                    ? 5
+                                                                                    : 10
                                                                         }
                                                                         {...register(`identifiers[${index}].number`, {
                                                                             // required: defaultIdentifiers.includes(item.type)
@@ -1213,11 +1211,10 @@ const NewPractice = () => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${
-                                                                            item.file
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer ${item.file
                                                                                 ? 'form-control'
                                                                                 : 'custom-form-fields'
-                                                                        }`}>
+                                                                            }`}>
                                                                         {item.file?.name
                                                                             ? item.file.name.length > 30
                                                                                 ? item.file.name.slice(0, 25) + '...'
@@ -1226,19 +1223,19 @@ const NewPractice = () => {
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {(item?.file?.url ||
                                                                                 clinicsDataGet?.orgLogo?.url) && (
-                                                                                <FiEye
-                                                                                    className="cursor-pointer"
-                                                                                    onClick={(e) => {
-                                                                                        e.preventDefault();
-                                                                                        e.stopPropagation();
-                                                                                        handleShowModal(
-                                                                                            item?.file?.url ||
+                                                                                    <FiEye
+                                                                                        className="cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.preventDefault();
+                                                                                            e.stopPropagation();
+                                                                                            handleShowModal(
+                                                                                                item?.file?.url ||
                                                                                                 clinicsDataGet?.orgLogo
                                                                                                     ?.url
-                                                                                        );
-                                                                                    }}
-                                                                                />
-                                                                            )}
+                                                                                            );
+                                                                                        }}
+                                                                                    />
+                                                                                )}
                                                                             <p className="mb-0">
                                                                                 <FiDownloadCloud />
                                                                             </p>
@@ -1577,7 +1574,7 @@ const NewPractice = () => {
                                                                                             use: item.use, // preserve existing use
                                                                                             line: [
                                                                                                 components.road ||
-                                                                                                    formatted,
+                                                                                                formatted,
                                                                                             ],
                                                                                             city:
                                                                                                 components.city ||
@@ -1614,7 +1611,7 @@ const NewPractice = () => {
                                                                                         cursor: 'pointer',
                                                                                         backgroundColor:
                                                                                             suggestionIndex ===
-                                                                                            activeSuggestionIndex
+                                                                                                activeSuggestionIndex
                                                                                                 ? '#f0f0f0'
                                                                                                 : '#fff',
                                                                                     }}

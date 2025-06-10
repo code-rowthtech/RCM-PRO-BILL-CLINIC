@@ -9,6 +9,8 @@ import Spinner from '../../../../../constants/Spinner'
 import ToastHandle from '../../../../../helpers/ToastMessage'
 import { FiFileText } from 'react-icons/fi'
 import Paginations from '../../../../../helpers/Paginations'
+import { handlePrintEncounters } from './handlePrintEncounter'
+import { IoPrintSharp } from 'react-icons/io5'
 const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, setEncounterDataArr, encounterDataArr }) => {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
@@ -16,6 +18,8 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
     const id = searchParams.get('id')
     const store = useSelector((state) => state)
     const encounters = store?.getEncounterReducer?.data?.encounters;
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
     useEffect(() => {
         dispatch(getEncounterAction({ patientId: id, skip: skip }))
     }, [skip])
@@ -75,25 +79,27 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                             :
                             encounters?.length > 0 ?
                                 encounters?.map((item, index) => (
-                                    <tr onClick={() => {
-                                        const newTab = {
-                                            id: item?._id,
-                                            title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
-                                            type: 'updateEncounter',
-                                        };
-                                        dispatch(getEncounterByIdAction({ encounterId: item?._id }))
-                                        // Check if the tab already exists
-                                        const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
+                                    <tr
+                                        //  onClick={() => {
+                                        //     const newTab = {
+                                        //         id: item?._id,
+                                        //         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
+                                        //         type: 'updateEncounter',
+                                        //     };
+                                        //     dispatch(getEncounterByIdAction({ encounterId: item?._id }))
+                                        //     // Check if the tab already exists
+                                        //     const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
 
-                                        if (existingTab) {
-                                            // If tab exists, just switch to it instead of showing error
-                                            setActiveTab(existingTab.id);
-                                        } else {
-                                            // If tab doesn't exist, add it and switch to it
-                                            setEncounterTabs([...encounterTabs, newTab]);
-                                            setActiveTab(newTab.id);
-                                        }
-                                    }} key={item?.id}>
+                                        //     if (existingTab) {
+                                        //         // If tab exists, just switch to it instead of showing error
+                                        //         setActiveTab(existingTab.id);
+                                        //     } else {
+                                        //         // If tab doesn't exist, add it and switch to it
+                                        //         setEncounterTabs([...encounterTabs, newTab]);
+                                        //         setActiveTab(newTab.id);
+                                        //     }
+                                        // }}
+                                        key={item?.id}>
                                         <td>{index + 1}</td>
                                         <td className="d-flex align-items-center gap-2">
                                             <Image
@@ -115,6 +121,10 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                         <td className='text-capitalize'>{item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '-'}</td>
                                         <td className='text-capitalize'>{item?.period?.end ? new Date(item?.period?.end)?.toISOString().split('T')?.[0] : '-'}</td>
                                         <td>
+                                            <IoPrintSharp className="fs-4 mb-1 me-1" onClick={() => handlePrintEncounters(item, patientDetails)} />
+                                            {/* <button onClick={() => handlePrintEncounters(item)}>
+                                                Print Encounter
+                                            </button> */}
                                             <i
                                                 className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
                                                 onClick={() => {
@@ -123,11 +133,17 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                                         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
                                                         type: 'updateEncounter',
                                                     };
-                                                    if (encounterTabs?.some((data) => data?.id === newTab?.id)) {
-                                                        ToastHandle('Encounter is already open in a tab.', 'danger')
+                                                    dispatch(getEncounterByIdAction({ encounterId: item?._id }))
+                                                    // Check if the tab already exists
+                                                    const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
+
+                                                    if (existingTab) {
+                                                        // If tab exists, just switch to it instead of showing error
+                                                        setActiveTab(existingTab.id);
                                                     } else {
+                                                        // If tab doesn't exist, add it and switch to it
                                                         setEncounterTabs([...encounterTabs, newTab]);
-                                                        setActiveTab(newTab?.id)
+                                                        setActiveTab(newTab.id);
                                                     }
                                                 }}
                                             />
