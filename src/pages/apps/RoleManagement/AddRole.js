@@ -280,98 +280,98 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
+                            {!dataToEdit &&
+                                <Row className={`mx-auto px-0${dataToEdit ? 'd-none ' : ''}`}>
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2 position-relative">
+                                            <Form.Label className="mb-0">
+                                                Password <span className="text-danger">*</span>
+                                            </Form.Label>
+                                            <Form.Control
+                                                type={passwordVisibility.password ? 'text' : 'password'}
+                                                placeholder="Password"
+                                                autoComplete="off"
+                                                {...register('password', {
+                                                    required: dataToEdit ? false : 'Password is required',
+                                                    minLength: dataToEdit
+                                                        ? false
+                                                        : {
+                                                            value: 8,
+                                                            message: 'Password must be at least 8 characters',
+                                                        },
+                                                    maxLength: dataToEdit
+                                                        ? false
+                                                        : {
+                                                            value: 16,
+                                                            message: 'Password must not exceed 16 characters',
+                                                        },
+                                                    validate: dataToEdit
+                                                        ? false
+                                                        : {
+                                                            noEmpty: (value) =>
+                                                                value.trim() !== '' ||
+                                                                'Password cannot be empty or only spaces',
+                                                            noSpacesBeforeText: (value) =>
+                                                                !/^\s/.test(value) || 'First character cannot be a space',
+                                                            isStrong: (value) =>
+                                                                strongRegex.test(value) ||
+                                                                'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
+                                                        },
+                                                })}
+                                                onChange={(e) => {
+                                                    handlePasswordChange(e);
+                                                    checkPasswordStrength(e.target.value); // Check strength on change
+                                                    trigger('confirmPassword'); // Revalidate confirmPassword
+                                                }}
+                                                maxLength={16}
+                                            />
+                                            <span
+                                                className="position-absolute fs-4"
+                                                style={{ top: '23px', right: '10px', cursor: 'pointer' }}
+                                                onClick={() => togglePasswordVisibility('password')}>
+                                                {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
+                                            </span>
+                                            {errors.password && (
+                                                <span className="text-danger fs-6">{errors.password.message}</span>
+                                            )}{' '}
+                                        </Form.Group>
+                                    </Col>
 
-                            <Row className={`mx-auto px-0${dataToEdit ? 'd-none ' : ''}`}>
-                                <Col sm={6}>
-                                    <Form.Group className="mb-2 position-relative">
-                                        <Form.Label className="mb-0">
-                                            Password <span className="text-danger">*</span>
-                                        </Form.Label>
-                                        <Form.Control
-                                            type={passwordVisibility.password ? 'text' : 'password'}
-                                            placeholder="Password"
-                                            autoComplete="off"
-                                            {...register('password', {
-                                                required: dataToEdit ? false : 'Password is required',
-                                                minLength: dataToEdit
-                                                    ? false
-                                                    : {
-                                                        value: 8,
-                                                        message: 'Password must be at least 8 characters',
-                                                    },
-                                                maxLength: dataToEdit
-                                                    ? false
-                                                    : {
-                                                        value: 16,
-                                                        message: 'Password must not exceed 16 characters',
-                                                    },
-                                                validate: dataToEdit
-                                                    ? false
-                                                    : {
-                                                        noEmpty: (value) =>
-                                                            value.trim() !== '' ||
-                                                            'Password cannot be empty or only spaces',
-                                                        noSpacesBeforeText: (value) =>
-                                                            !/^\s/.test(value) || 'First character cannot be a space',
-                                                        isStrong: (value) =>
-                                                            strongRegex.test(value) ||
-                                                            'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
-                                                    },
-                                            })}
-                                            onChange={(e) => {
-                                                handlePasswordChange(e);
-                                                checkPasswordStrength(e.target.value); // Check strength on change
-                                                trigger('confirmPassword'); // Revalidate confirmPassword
-                                            }}
-                                            maxLength={16}
-                                        />
-                                        <span
-                                            className="position-absolute fs-4"
-                                            style={{ top: '23px', right: '10px', cursor: 'pointer' }}
-                                            onClick={() => togglePasswordVisibility('password')}>
-                                            {passwordVisibility.password ? <FaEyeSlash /> : <FaEye />}
-                                        </span>
-                                        {errors.password && (
-                                            <span className="text-danger fs-6">{errors.password.message}</span>
-                                        )}{' '}
-                                    </Form.Group>
-                                </Col>
-
-                                <Col sm={6}>
-                                    <Form.Group className="mb-2 position-relative">
-                                        <Form.Label className="mb-0">
-                                            Confirm Password <span className="text-danger">*</span>
-                                        </Form.Label>
-                                        <Form.Control
-                                            type={passwordVisibility.confirmPassword ? 'text' : 'password'}
-                                            placeholder="Confirm password"
-                                            {...register('confirmPassword', {
-                                                required: dataToEdit ? false : 'Confirm password is required',
-                                                validate: dataToEdit
-                                                    ? false
-                                                    : {
-                                                        matchPassword: (value) =>
-                                                            value === watch('password') || 'Passwords do not match',
-                                                    },
-                                            })}
-                                            onChange={() => trigger('confirmPassword')}
-                                            maxLength={16}
-                                        />
-                                        <span
-                                            className="position-absolute d-flex align-items-center fs-4 justify-content-center"
-                                            style={{ top: '27px', right: '10px', cursor: 'pointer' }}
-                                            onClick={() => togglePasswordVisibility('confirmPassword')}
-                                            onMouseEnter={(e) => (e.target.style.color = '#000')}
-                                            onMouseLeave={(e) => (e.target.style.color = '#666')}>
-                                            {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                        </span>
-                                        {errors.confirmPassword?.type === 'matchPassword' && (
-                                            <span className="text-danger fs-6">{errors.confirmPassword.message}</span>
-                                        )}
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
+                                    <Col sm={6}>
+                                        <Form.Group className="mb-2 position-relative">
+                                            <Form.Label className="mb-0">
+                                                Confirm Password <span className="text-danger">*</span>
+                                            </Form.Label>
+                                            <Form.Control
+                                                type={passwordVisibility.confirmPassword ? 'text' : 'password'}
+                                                placeholder="Confirm password"
+                                                {...register('confirmPassword', {
+                                                    required: dataToEdit ? false : 'Confirm password is required',
+                                                    validate: dataToEdit
+                                                        ? false
+                                                        : {
+                                                            matchPassword: (value) =>
+                                                                value === watch('password') || 'Passwords do not match',
+                                                        },
+                                                })}
+                                                onChange={() => trigger('confirmPassword')}
+                                                maxLength={16}
+                                            />
+                                            <span
+                                                className="position-absolute d-flex align-items-center fs-4 justify-content-center"
+                                                style={{ top: '27px', right: '10px', cursor: 'pointer' }}
+                                                onClick={() => togglePasswordVisibility('confirmPassword')}
+                                                onMouseEnter={(e) => (e.target.style.color = '#000')}
+                                                onMouseLeave={(e) => (e.target.style.color = '#666')}>
+                                                {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </span>
+                                            {errors.confirmPassword?.type === 'matchPassword' && (
+                                                <span className="text-danger fs-6">{errors.confirmPassword.message}</span>
+                                            )}
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            }
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">
@@ -583,7 +583,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                 </Form.Group>
                             </Col>
 
-                            <Col sm={6}>
+                            {/* <Col sm={6}>
                                 <Form.Group className="mb-2">
                                     <Form.Label className="mb-0">
                                         Department <span className="text-danger">*</span>
@@ -656,7 +656,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                         <span className="text-danger fs-6">{errors.department.message}</span>
                                     )}
                                 </Form.Group>
-                            </Col>
+                            </Col> */}
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
