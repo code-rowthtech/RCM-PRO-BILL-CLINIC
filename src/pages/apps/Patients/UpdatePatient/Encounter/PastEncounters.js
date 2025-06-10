@@ -17,28 +17,28 @@ const PastEncounters = () => {
         dispatch(getEncounterAction({ patientId: id, status: 'finished' }));
     }, [dispatch, id]);
 
-    const renderEncounterDetails = (encounter) => {
-        return (
-            <div className="row mt-3">
-                {encounter.data.map((item, idx) => {
-                    if (!item.content.value) return null;
+    // const renderEncounterDetails = (encounter) => {
+    //     return (
+    //         <div className="row mt-3">
+    //             {encounter.data.map((item, idx) => {
+    //                 if (!item.content.value) return null;
 
-                    return (
-                        <div key={item._id} className="col-md-6 mb-3">
-                            <div className="p-3 bg-light rounded" style={{ minHeight: '100px' }}>
-                                <h6 className="text-primary text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
-                                    {item.type}
-                                </h6>
-                                <p className="mb-0" style={{ color: '#34495e' }}>
-                                    {item.content.value}
-                                </p>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        );
-    };
+    //                 return (
+    //                     <div key={item._id} className="col-md-6 mb-3">
+    //                         <div className="p-3 bg-light rounded" style={{ minHeight: '100px' }}>
+    //                             <h6 className="text-primary text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+    //                                 {item.type}
+    //                             </h6>
+    //                             <p className="mb-0" style={{ color: '#34495e' }}>
+    //                                 {item.content.value}
+    //                             </p>
+    //                         </div>
+    //                     </div>
+    //                 );
+    //             })}
+    //         </div>
+    //     );
+    // };
 
     return (
         <div className="container py-1">
@@ -77,7 +77,7 @@ const PastEncounters = () => {
                                     </div>
                                 </div>
 
-                                {renderEncounterDetails(encounter)}
+                                {/* {renderEncounterDetails(encounter)} */}
                             </Card.Body>
                         </Card>
                     ))}
