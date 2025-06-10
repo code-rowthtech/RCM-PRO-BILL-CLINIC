@@ -544,9 +544,14 @@ const NewPatient = () => {
                                                 type="text"
                                                 placeholder="First Name"
                                                 {...register('firstName', { required: 'First name is required' })}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ') {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.firstName && (
-                                                <span className="text-danger">{errors.firstName.message}</span>
+                                                <span className="text-danger fs-6">{errors.firstName.message}</span>
                                             )}
                                         </Form.Group>
                                     </div>
@@ -560,6 +565,11 @@ const NewPatient = () => {
                                                 type="text"
                                                 placeholder="Middle Name"
                                                 {...register('middleName')}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ') {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.middleName && (
                                                 <span className="text-danger">{errors.middleName.message}</span>
@@ -576,9 +586,14 @@ const NewPatient = () => {
                                                 type="text"
                                                 placeholder="Last Name"
                                                 {...register('lastName', { required: 'Last Name is required' })}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ') {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                             {errors.lastName && (
-                                                <span className="text-danger">{errors.lastName.message}</span>
+                                                <span className="text-danger fs-6">{errors.lastName.message}</span>
                                             )}
                                         </Form.Group>
                                     </div>
@@ -697,6 +712,11 @@ const NewPatient = () => {
                                                         message: 'Invalid email address',
                                                     },
                                                 })}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === ' ') {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
                                             />
                                         </Form.Group>
                                     </div>
@@ -719,6 +739,11 @@ const NewPatient = () => {
                                                             message: 'Invalid email address',
                                                         },
                                                     })}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === ' ') {
+                                                            e.preventDefault();
+                                                        }
+                                                    }}
                                                 />
                                             </Form.Group>
                                         </div>

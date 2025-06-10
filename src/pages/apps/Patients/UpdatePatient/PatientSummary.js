@@ -493,7 +493,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 </div>
                             ))
                         ) : (
-                            <div className="fs-6  d-flex justify-content-between align-items-center">
+                            <div className="fs-6  d-flex h-100 justify-content-center align-items-center">
                                 <strong>No Social History Found</strong>
                             </div>
                         )}
@@ -546,9 +546,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                     </li>
                                 ))
                             ) : (
-                                <li className="d-flex align-items-center justify-content-center w-100 h-100 text-muted">
-                                    No Encounters Found
-                                </li>
+                                <div className="fs-6  d-flex h-100 justify-content-center align-items-center">
+                                    <strong>No Encounters Found</strong>
+                                </div>
+                                // <li className="d-flex align-items-center justify-content-center w-100 h-100 text-muted">
+                                //     No Encounters Found
+                                // </li>
                             )}
                         </ul>
                     </Card.Body>
@@ -592,7 +595,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                 <tbody>
                                     {store?.getAppointmentsReducer?.loading ? (
                                         <tr>
-                                            <td colSpan="5" className="text-center py-5">
+                                            <td colSpan={5} className="text-center py-5">
                                                 <Spinner className="spinner-border-sm" />
                                             </td>
                                         </tr>
@@ -631,7 +634,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="4" className="text-center py-5 text-muted">
+                                            <td colSpan={5} className="text-center fw-semibold py-5 text-muted">
                                                 No upcoming appointments found
                                             </td>
                                         </tr>

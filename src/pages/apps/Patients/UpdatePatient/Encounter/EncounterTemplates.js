@@ -48,7 +48,7 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList, isAccordion
                                     </Col>
                                     <Col sm={12}>
                                         <ul className='list-unstyled fs-6 px-2'>
-                                            {item?.list?.map((itemList, index) => (
+                                            {/* {item?.list?.map((itemList, index) => (
                                                 <li
                                                     onClick={() => {
                                                         setSelectedFromList(prev => ({
@@ -59,8 +59,32 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList, isAccordion
                                                         }));
 
                                                     }}
-                                                    className='border-bottom py-1 cursor-pointer list-hover' key={index}>{itemList?.text}</li>
-                                            ))}
+                                                    className='border-bottom py-1 cursor-pointer list-hover' key={index}>{itemList?.text}{selectedFromList?.[item?.label]?.includes(itemList?.text)}
+                                                </li>
+                                            ))} */}
+
+                                            {item?.list?.map((itemList, index) => {
+                                                const alreadySelected = selectedFromList?.[item?.label]?.includes(itemList?.text);
+                                                return (
+                                                    <li
+                                                        style={{ backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : '' }}
+                                                        onClick={() => {
+                                                            if (!alreadySelected) {
+                                                                setSelectedFromList(prev => ({
+                                                                    ...prev,
+                                                                    [item?.label]: prev[item?.label]
+                                                                        ? `${prev[item?.label]}\n${itemList?.text}`
+                                                                        : itemList?.text
+                                                                }));
+                                                            }
+                                                        }}
+                                                        className={`border-bottom py-1 cursor-pointer list-hover ${alreadySelected ? 'text-muted' : ''}`}
+                                                        key={index}
+                                                    >
+                                                        {itemList?.text} {alreadySelected && <Badge bg="success" text="white" className="ms-1">Added</Badge>}
+                                                    </li>
+                                                )
+                                            })}
                                         </ul>
                                     </Col>
                                 </Row>

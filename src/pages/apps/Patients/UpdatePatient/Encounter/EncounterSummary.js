@@ -286,19 +286,18 @@ const EncounterSummary = () => {
                             case 'Vitals':
                                 content = (
                                     <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
-                                            <thead>
-                                                <tr className='border'>
-                                                    <th className='text-white'>
-                                                        Vital Name
+                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
+                                            <tr className='border'>
+                                                <th className='text-white'>
+                                                    Vital Name
+                                                </th>
+                                                {sortedDates?.slice(0, 3)?.map(date => (
+                                                    <th className='text-white' key={date}>
+                                                        {formatDate(date)}
                                                     </th>
-                                                    {sortedDates?.map(date => (
-                                                        <th className='text-white' key={date}>
-                                                            {formatDate(date)}
-                                                        </th>
-                                                    ))}
-                                                </tr>
-                                            </thead>
+                                                ))}
+                                            </tr>
+                                        </thead>
                                             <tbody>
                                                 {vitals.map((vital, index) => (
                                                     <tr className='' key={vital.name}>
@@ -308,7 +307,7 @@ const EncounterSummary = () => {
                                                             )}
                                                         </td>
 
-                                                        {sortedDates.map(date => (
+                                                        {sortedDates.slice(0, 3).map(date => (
                                                             <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
                                                                 {renderVitalCell(vital, date)}
                                                             </td>

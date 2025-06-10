@@ -16,6 +16,8 @@ import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
+import { handlePrintEncounters } from './handlePrintEncounter';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
 
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId, encounterData, encounterDataArr, setEncounterDataArr }) => {
@@ -100,14 +102,14 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
-            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
+            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption?.value }));
         }
 
         // Populate form for update operation
         if (encounterAction === 'updateEncounter' && encounterData && notesFields) {
             // Set provider
             if (encounterData?.providerId) {
-                setSelectedProvider(encounterData.providerId);
+                setSelectedProvider(encounterData?.providerId);
             }
 
             // Set form values
@@ -118,7 +120,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             if (encounterData?.class?.coding?.[0]) {
                 setValue('class', encounterData?.class?.coding?.[0]?.code);
             }
-
             if (encounterData?.status) {
                 setValue('status', encounterData?.status);
             }
@@ -155,9 +156,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         if (!selectedFromList) return;
 
         setTimeout(() => {
-            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', "Notes"].forEach((section) => {
                 if (selectedFromList?.[section]) {
-                    setValue(section, selectedFromList[section]);
+                    setValue(section === 'Care Plan' ? 'CarePlan' : section, selectedFromList[section]);
                 }
             });
         }, 0);
@@ -171,6 +172,8 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             Objective: createRef(),
             Assessment: createRef(),
             Plan: createRef(),
+            CarePlan: createRef(),
+            Notes: createRef(),
         });
 
         const getFieldsToRender = () => {
@@ -184,11 +187,12 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             if (name === 'Notes (SOAP)') {
                 return (
                     <div className="" key={name}>
+
                         <h5>{name}</h5>
-                        {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
+                        {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
                             <Form.Group className="mb-2" key={section}>
                                 <Form.Label className="mb-1 d-flex align-items-center gap-2">
-                                    <span>{section}</span>
+                                    <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
                                     <Form.Select className="w-25 text-black"
                                         onChange={e => {
                                             const value = e.target.value;
@@ -339,7 +343,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
             // Handle SOAP notes specially
             if (name === 'Notes (SOAP)') {
-                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
+                ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].forEach(section => {
                     const value = getValues(section) || '';
                     fieldsData.push({
                         type: section,
@@ -429,6 +433,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }
         setIsSessionRunning(!isSessionRunning);
     }, [isSessionRunning, stopwatchTime]);
+
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -490,7 +495,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload) }));
                                                     }
                                                 }}
-                                                className='border-primary'>
+                                                className='border-primary' >
                                                 <option key='' value='' hidden>Select...</option>
                                                 {encounterTypes?.map((data, index) => (
                                                     <option key={index} value={data?.code}>{data?.code + '-' + data?.display}</option>
@@ -626,7 +631,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 className='text-capitalize'>
                                                 <option key='' value=''>Select Status</option>
                                                 {['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled']?.map((data, index) => (
-                                                    <option value={data} className='text-capitalize' key={index}>{data}</option>
+                                                    <option selected={!encounterData && data === 'arrived'} value={data} className='text-capitalize' key={index}>{data}</option>
                                                 ))}
                                             </Form.Select>
                                         </div>

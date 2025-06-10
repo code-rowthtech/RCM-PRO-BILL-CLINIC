@@ -60,11 +60,11 @@ const Medication = ({ isAccordionOpen }) => {
                 <tr>
                   <th className="text-white">S.No.</th>
                   <th className="text-white">Medication</th>
+                  <th className="text-white">Frequency & Duration</th>
                   <th className="text-white">Dosage Instruction</th>
                   <th className="text-white">Start Date</th>
                   <th className="text-white">End Date</th>
                   <th className="text-white">Status</th>
-                  {/* <th className="text-white">Notes</th> */}
                   <th className="text-white">Action</th>
                 </tr>
               </thead>
@@ -85,7 +85,7 @@ const Medication = ({ isAccordionOpen }) => {
                       </td>
                     </tr>
                     :
-                    medicationList?.length === 0 ? (
+                    medicationList?.length === 0 || !medicationList ? (
                       <tr>
                         <td colSpan={7} className="text-center">
                           <h4 className="my-5">No Medication Found!</h4>
@@ -101,17 +101,11 @@ const Medication = ({ isAccordionOpen }) => {
                               <small className='text-muted' title={data?.drugId?.nonProprietaryName}> {data?.drugId?.nonProprietaryName?.length > 30 ? data?.drugId?.nonProprietaryName?.slice(0, 29) + '...' : data?.drugId?.nonProprietaryName || 'N/A'}</small>
                             </div>
                           </td>
+                          <td>{data?.dosageInstruction?.[0]?.timing?.code?.text}</td>
                           <td title={data?.dosageInstruction?.[0]?.text}>{data?.dosageInstruction?.[0]?.text?.length > 30 ? data?.dosageInstruction?.[0]?.text?.slice(0, 29) + '...' : data?.dosageInstruction?.[0]?.text || 'N/A'}</td>
                           <td>{data?.startDate ? new Date(data?.startDate).toLocaleDateString('en-GB') : '-'}</td>
                           <td>{data?.endDate ? new Date(data?.endDate).toLocaleDateString('en-GB') : '-'}</td>
                           <td className={`${statusColorMap[data?.status] || 'text-body'} text-capitalize`}>{data?.status || 'N/A'}</td>
-                          {/* <td title={data?.note?.[0]?.text}>
-                            {
-                              data?.note?.[0]?.text
-                                ? (data.note[0].text.charAt(0).toUpperCase() + data.note[0].text.slice(1)).slice(0, 29) + (data.note[0].text.length > 30 ? '...' : '')
-                                : 'N/A'
-                            }
-                          </td> */}
                           <td>
                             <i
                               className=" bi bi-pencil text-info cursor-pointer"

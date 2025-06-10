@@ -79,7 +79,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
             if (url?.url) {
                 handleQualificationChange(index, 'degreeFile', { url: url.url, fileName, localPreviewUrl });
             }
-        } catch (error) {}
+        } catch (error) { }
         setDegreeUploading((prev) => ({ ...prev, [index]: false }));
     };
     const QualificationOptions = qualificationsData.map((qualification) => ({
@@ -160,7 +160,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                 // Save both backend and local preview URL
                 handleDocumentsChange(index, 'document', { url: url.url, fileName, localPreviewUrl });
             }
-        } catch (error) {}
+        } catch (error) { }
         setDocumentUploading((prev) => ({ ...prev, [index]: false }));
     };
     const removeDocument = (index) => {
@@ -273,23 +273,22 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                     .getElementById(`degree-file-input-${index}`)
                                                                     .click()
                                                             }
-                                                            className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${
-                                                                qualification.degreeName || qualification.degreeFile
+                                                            className={`custom-file-upload d-flex justify-content-between align-items-center cursor-pointer form-control ${qualification.degreeName || qualification.degreeFile
                                                                     ? ''
                                                                     : 'custom-form-fields'
-                                                            }`}
+                                                                }`}
                                                             style={{ minHeight: '30px' }}>
                                                             <span>
                                                                 {degreeUploading[index]
                                                                     ? 'Uploading...'
                                                                     : qualification.degreeFile?.fileName
-                                                                      ? qualification.degreeFile.fileName.length > 30
-                                                                          ? qualification.degreeFile.fileName.slice(
+                                                                        ? qualification.degreeFile.fileName.length > 30
+                                                                            ? qualification.degreeFile.fileName.slice(
                                                                                 0,
                                                                                 30
                                                                             ) + '...'
-                                                                          : qualification.degreeFile.fileName
-                                                                      : 'Upload Degree'}
+                                                                            : qualification.degreeFile.fileName
+                                                                        : 'Upload Degree'}
                                                             </span>
                                                             <div className="d-flex align-items-center gap-2">
                                                                 {qualification.degreeFile?.url &&
@@ -440,22 +439,21 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                                                 )
                                                                                 .click()
                                                                         }
-                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${
-                                                                            data?.document?.fileName || data.degreeFile
+                                                                        className={`custom-file-upload justify-content-between cursor-pointer form-control ${data?.document?.fileName || data.degreeFile
                                                                                 ? ''
                                                                                 : 'custom-form-fields'
-                                                                        }`}>
+                                                                            }`}>
                                                                         <span>
                                                                             {documentUploading[index]
                                                                                 ? 'Uploading...'
                                                                                 : data?.document?.fileName
-                                                                                  ? data.document.fileName.length > 25
-                                                                                      ? data.document.fileName.slice(
+                                                                                    ? data.document.fileName.length > 25
+                                                                                        ? data.document.fileName.slice(
                                                                                             0,
                                                                                             25
                                                                                         ) + '...'
-                                                                                      : data.document.fileName
-                                                                                  : 'Upload Degree'}
+                                                                                        : data.document.fileName
+                                                                                    : 'Upload Degree'}
                                                                         </span>
                                                                         <div className="d-flex align-items-center gap-2">
                                                                             {data?.document?.url &&
