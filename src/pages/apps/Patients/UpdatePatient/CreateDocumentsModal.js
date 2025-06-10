@@ -329,6 +329,7 @@ const CreateDocumentsModal = ({ showUploadModal, closeModal }) => {
     //         setNotes(documentData?.notes || '');
     //     }
     // }, [documentData])
+
     return (
         <Modal className={`upload-documents`} show={showUploadModal} onHide={closeModal} size="lg" centered>
             <Modal.Header className="p-0 border-0 pb-0 d-flex justify-content-center">
