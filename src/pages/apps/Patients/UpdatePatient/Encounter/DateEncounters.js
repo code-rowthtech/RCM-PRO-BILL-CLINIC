@@ -19,8 +19,7 @@ import { Controller } from 'react-hook-form';
 import { handlePrintEncounters } from './handlePrintEncounter';
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
-
-const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId, encounterData, encounterDataArr, setEncounterDataArr }) => {
+const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
@@ -41,12 +40,11 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const createEncounterData = store?.createEncounterReducer;
 
-    // const encounterData=
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
         label: data?.title, value: data?._id, isDefault: data?.default
     }));
-    // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
     const [noteType, setNoteType] = useState(null);
     const [selectedProvider, setSelectedProvider] = useState(null);
     const defaultNoteTypeOption = notesTypeOptions?.find(opt => opt.isDefault);
@@ -54,23 +52,23 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     // Get update encounter data from store
     const updateEncounterData = store?.updateEncounterReducer;
     const encounterDataGet = store?.getEncounterByIdReducer?.data?.encounter;
-    useEffect(() => {
-        if (!encounterDataGet || !encounterDataGet._id) return;
+    // useEffect(() => {
+    //     if (!encounterDataGet || !encounterDataGet._id) return;
 
-        setEncounterDataArr((prev) => {
-            const exists = prev.some((data) => data._id === encounterDataGet._id);
+    //     setEncounterDataArr((prev) => {
+    //         const exists = prev.some((data) => data._id === encounterDataGet._id);
 
-            if (exists) {
-                // Replace the existing item
-                return prev.map((data) =>
-                    data._id === encounterDataGet._id ? encounterDataGet : data
-                );
-            } else {
-                // Add as new item
-                return [...prev, encounterDataGet];
-            }
-        });
-    }, [encounterDataGet]);
+    //         if (exists) {
+    //             // Replace the existing item
+    //             return prev.map((data) =>
+    //                 data._id === encounterDataGet._id ? encounterDataGet : data
+    //             );
+    //         } else {
+    //             // Add as new item
+    //             return [...prev, encounterDataGet];
+    //         }
+    //     });
+    // }, [encounterDataGet]);
 
     // Handle successful encounter creation or update
     useEffect(() => {
@@ -175,6 +173,26 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             CarePlan: createRef(),
             Notes: createRef(),
         });
+        const MAX_LENGTH = 1000;
+
+        useEffect(() => {
+            const sections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
+
+            sections.forEach(section => {
+                const editor = quillRefs.current[section]?.current?.getEditor?.();
+
+                if (editor) {
+                    editor.on('text-change', (delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            const text = editor.getText(); // includes trailing '\n'
+                            if (text.length > MAX_LENGTH + 1) {
+                                editor.deleteText(MAX_LENGTH, text.length);
+                            }
+                        }
+                    });
+                }
+            });
+        }, []);
 
         const getFieldsToRender = () => {
             return (data || [])
@@ -184,6 +202,18 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
         const renderField = (field) => {
             const { name, inputType = 'textarea' } = field;
+            const countWords = (text) => {
+                return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            };
+
+            // Handler for text change with word limit
+            const handleTextChange = (onChange, value, maxWords) => (content) => {
+                const wordCount = countWords(content.replace(/<[^>]*>/g, ' ')); // Strip HTML tags for counting
+                if (wordCount <= maxWords) {
+                    onChange(content);
+                }
+            };
+
             if (name === 'Notes (SOAP)') {
                 return (
                     <div className="" key={name}>
@@ -243,7 +273,9 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             ref={quillRefs.current[section]}
                                             theme="snow"
                                             value={value || ''}
-                                            onChange={onChange}
+                                            // onChange={onChange}
+                                            onChange={handleTextChange(onChange, value, 100)}
+
                                             modules={{
                                                 toolbar: [
                                                     ['bold', 'italic', 'underline'],
@@ -287,11 +319,69 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                             )}
                         />
                     ) : (
-                        <Form.Control
-                            {...register(name)}
-                            as={inputType === 'text' ? 'input' : 'textarea'}
-                            rows={inputType === 'text' ? undefined : 3}
+                        // <Form.Control
+                        //     {...register(name)}
+                        //     as={inputType === 'text' ? 'input' : 'textarea'}
+                        //     rows={inputType === 'text' ? undefined : 3}
+                        // />
+                        // <Controller
+                        //     name={name}
+                        //     control={control}
+                        //     render={({ field: { value = '', onChange } }) => (
+                        //         <Form.Control
+                        //             as={inputType === 'text' ? 'input' : 'textarea'}
+                        //             rows={inputType === 'text' ? undefined : 10}
+                        //             value={value}
+                        //             onChange={(e) => {
+                        //                 const input = e.target.value;
+                        //                 const words = input.trim().split(/\s+/).filter(Boolean);
+
+                        //                 // Prevent updating if the last word exceeds 45 characters
+                        //                 const lastWord = words[words.length - 1] || '';
+                        //                 if (lastWord.length > 45) return;
+
+                        //                 const limitedWords = words.slice(0, MAX_LENGTH);
+                        //                 const limitedText = limitedWords.join(' ');
+                        //                 onChange(limitedText);
+                        //             }}
+                        //         />
+                        //     )}
+                        // />
+                        <Controller
+                            name={name}
+                            control={control}
+                            render={({ field: { value = '', onChange } }) => (
+                                <Form.Control
+                                    as={inputType === 'text' ? 'input' : 'textarea'}
+                                    rows={inputType === 'text' ? undefined : 10}
+                                    value={value}
+                                    onChange={(e) => {
+                                        const input = e.target.value;
+
+                                        const words = input.match(/\S+/g) || []; // words are non-space sequences
+                                        const wordCount = words.length;
+
+                                        const lastWordMatch = input.match(/(\S+)$/); // match last word
+                                        const lastWord = lastWordMatch ? lastWordMatch[0] : '';
+
+                                        if (wordCount < MAX_LENGTH) {
+                                            onChange(input);
+                                            return;
+                                        }
+
+                                        // Word count == MAX_LENGTH
+                                        if (wordCount === MAX_LENGTH) {
+                                            // Allow updating only if user is typing inside the last word and it's <= 45 characters
+                                            if (lastWord.length <= 45 && /\S$/.test(input)) {
+                                                onChange(input);
+                                            }
+                                            // Else block (including if trying to type space after last word)
+                                        }
+                                    }}
+                                />
+                            )}
                         />
+
                     )}
                 </Form.Group>
             );
