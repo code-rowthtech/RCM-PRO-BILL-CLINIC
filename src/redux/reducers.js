@@ -39,6 +39,8 @@ import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByI
 import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
 import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
+import { getPatientsAccessLogsReducer } from './patientAccessHistory/reducers';
+import { getAuditReportReducer } from './auditReport/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -78,5 +80,10 @@ export default (combineReducers({
     // settings tabs
     getSettingsTabsReducer, createSettingsTabsReducer, updateSettingsTabsReducer,
     // TASKS
-    createUserTasksReducer, getUserTasksReducer, updateUserTasksReducer, getTaskByIdReducer
+    createUserTasksReducer, getUserTasksReducer, updateUserTasksReducer, getTaskByIdReducer,
+    // Patient History Logs
+    getPatientsAccessLogsReducer,
+    // Audit Report
+    getAuditReportReducer,
+    
 }): any);

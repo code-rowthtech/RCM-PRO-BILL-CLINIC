@@ -14,11 +14,11 @@ import avatar6 from '../../../assets/images/users/avatar-6.jpg';
 
 const Activity = (): React$Element<any> => {
     return (
-        <Card>
-            <Card.Body>
+        <Card className='mt-2'>
+            <Card.Body className='py-2'>
                 <CardTitle
                     containerClass="d-flex align-items-center justify-content-between mb-2"
-                    title="Recent Activities"
+                    title="Providers List"
                     menuItems={[
                         { label: 'Weekly Report' },
                         { label: 'Monthly Report' },
@@ -34,19 +34,19 @@ const Activity = (): React$Element<any> => {
                                 <div className="d-flex align-items-start">
                                     <img className="me-2 rounded-circle" src={avatar2} width="40" alt="" />
                                     <div>
-                                        <h5 className="mt-0 mb-1">
-                                            Soren Drouin
-                                            <small className="fw-normal ms-3">18 Jan 2019 11:28 pm</small>
+                                        <h5 className="mt-0 mb-1 text-primary fw-semibold">
+                                            Dr.Soren Drouin
+                                        <span className="font-13 text-secondary fw-normal"> - (MBBS,MD)</span>
                                         </h5>
-                                        <span className="font-13">Issue sent to AR...</span>
+                                        <span className="font-13 text-success">Available</span>
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            {/* <td>
                                 <span className="text-muted font-13">Issue</span> <br />
                                 <p className="mb-0">Details</p>
-                            </td>
-                            <td className="table-action" style={{ width: '50px' }}>
+                            </td> */}
+                            {/* <td className="table-action" style={{ width: '50px' }}>
                                 <Dropdown className="float-end" align="end">
                                     <Dropdown.Toggle variant="link" className="arrow-none card-drop p-0 shadow-none">
                                         <i className="mdi mdi-dots-horizontal"></i>
@@ -56,7 +56,7 @@ const Activity = (): React$Element<any> => {
                                         <Dropdown.Item>Action</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
-                            </td>
+                            </td> */}
                         </tr>
 
                         <tr>
@@ -64,28 +64,13 @@ const Activity = (): React$Element<any> => {
                                 <div className="d-flex align-items-start">
                                     <img className="me-2 rounded-circle" src={avatar6} width="40" alt="" />
                                     <div>
-                                        <h5 className="mt-0 mb-1">
+                                        <h5 className="mt-0 mb-1 text-primary fw-semibold">
                                             Anne Simard
-                                            <small className="fw-normal ms-3">18 Jan 2019 11:09 pm</small>
+                                        <span className="font-13 text-secondary fw-normal"> - (MBBS,MD)</span>
                                         </h5>
-                                        <span className="font-13">Assigned task</span>
+                                        <span className="font-13 text-danger">Not available</span>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span className="text-muted font-13">Issue</span> <br />
-                                <p className="mb-0">Details</p>
-                            </td>
-                            <td className="table-action" style={{ width: '50px' }}>
-                                <Dropdown className="float-end" align="end">
-                                    <Dropdown.Toggle variant="link" className="arrow-none card-drop p-0 shadow-none">
-                                        <i className="mdi mdi-dots-horizontal"></i>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item>Settings</Dropdown.Item>
-                                        <Dropdown.Item>Action</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
                             </td>
                         </tr>
 
@@ -94,28 +79,13 @@ const Activity = (): React$Element<any> => {
                                 <div className="d-flex align-items-start">
                                     <img className="me-2 rounded-circle" src={avatar3} width="40" alt="" />
                                     <div>
-                                        <h5 className="mt-0 mb-1">
+                                        <h5 className="mt-0 mb-1 text-primary fw-semibold">
                                             Nicolas Chartier
-                                            <small className="fw-normal ms-3">15 Jan 2019 09:29 pm</small>
+                                        <span className="font-13 text-secondary fw-normal"> - (BDS,MDS)</span>
                                         </h5>
-                                        <span className="font-13">Completed a payment...</span>
+                                        <span className="font-13 text-success">Available</span>
                                     </div>
                                 </div>
-                            </td>
-                            <td>
-                                <span className="text-muted font-13">Issue</span> <br />
-                                <p className="mb-0">Details</p>
-                            </td>
-                            <td className="table-action" style={{ width: '50px' }}>
-                                <Dropdown className="float-end" align="end">
-                                    <Dropdown.Toggle variant="link" className="arrow-none card-drop p-0 shadow-none">
-                                        <i className="mdi mdi-dots-horizontal"></i>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item>Settings</Dropdown.Item>
-                                        <Dropdown.Item>Action</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
                             </td>
                         </tr>
 
@@ -124,29 +94,15 @@ const Activity = (): React$Element<any> => {
                                 <div className="d-flex align-items-start">
                                     <img className="me-2 rounded-circle" src={avatar4} width="40" alt="" />
                                     <div>
-                                        <h5 className="mt-0 mb-1">
+                                        <h5 className="mt-0 mb-1 text-primary fw-semibold">
                                             Gano Cloutier
-                                            <small className="fw-normal ms-3">10 Jan 2019 08:36 pm</small>
+                                        <span className="font-13 text-secondary fw-normal"> - (BHMS)</span>
                                         </h5>
-                                        <span className="font-13">Completed...</span>
+                                        <span className="font-13 text-danger">Not available</span>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span className="text-muted font-13">Issue</span> <br />
-                                <p className="mb-0">Details</p>
-                            </td>
-                            <td className="table-action" style={{ width: '50px' }}>
-                                <Dropdown className="float-end" align="end">
-                                    <Dropdown.Toggle variant="link" className="arrow-none card-drop p-0 shadow-none">
-                                        <i className="mdi mdi-dots-horizontal"></i>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item>Settings</Dropdown.Item>
-                                        <Dropdown.Item>Action</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </td>
+                          
                         </tr>
 
                         <tr>
@@ -154,29 +110,15 @@ const Activity = (): React$Element<any> => {
                                 <div className="d-flex align-items-start">
                                     <img className="me-2 rounded-circle" src={avatar5} width="40" alt="" />
                                     <div>
-                                        <h5 className="mt-0 mb-1">
+                                        <h5 className="mt-0 mb-1 text-primary fw-semibold">
                                             Francis Achin
-                                            <small className="fw-normal ms-3">08 Jan 2019 12:28 pm</small>
+                                        <span className="font-13 text-secondary fw-normal"> - (MBBS,MS)</span>
                                         </h5>
-                                        <span className="font-13">Payment processing...</span>
+                                        <span className="font-13 text-success"> Available</span>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span className="text-muted font-13">Issue</span> <br />
-                                <p className="mb-0">Details</p>
-                            </td>
-                            <td className="table-action" style={{ width: '50px' }}>
-                                <Dropdown className="float-end" align="end">
-                                    <Dropdown.Toggle variant="link" className="arrow-none card-drop p-0 shadow-none">
-                                        <i className="mdi mdi-dots-horizontal"></i>
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item>Settings</Dropdown.Item>
-                                        <Dropdown.Item>Action</Dropdown.Item>
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </td>
+                           
                         </tr>
                     </tbody>
                 </Table>

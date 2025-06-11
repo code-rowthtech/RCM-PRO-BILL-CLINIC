@@ -21,7 +21,7 @@ type CardTitleProps = {
 const CardTitle = ({ title, containerClass, icon, menuItems }: CardTitleProps): React$Element<any> => {
     return (
         <div className={classNames(containerClass)}>
-            {typeof title === 'string' ? <h4 className="header-title">{title}</h4> : title}
+            {typeof title === 'string' ? <h6 className="text-uppercase">{title}</h6> : title}
             <Dropdown>
                 <Dropdown.Toggle as={Link} to="#" className="arrow-none card-drop">
                     <i className={classNames(icon ? icon : 'mdi mdi-dots-vertical')} />
