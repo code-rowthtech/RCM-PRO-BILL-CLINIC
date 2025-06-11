@@ -27,6 +27,7 @@ import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 import Encounter from './Encounter/Encounter';
 import PatientDocs from './Patientdocs';
+import PatientAccess from './PatientAccess';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -784,7 +785,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Communication' && <p>In progress...</p>}
                                             {selectedMainTab === 'Task' && <p>In progress...</p>}
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
                                             {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
                                             {selectedMainTab === 'Balance' && <p>In Progress...</p>}

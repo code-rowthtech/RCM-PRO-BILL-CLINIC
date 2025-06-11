@@ -154,6 +154,12 @@ const MENU_ITEMS = [
             // },
         ],
     },
+     {
+        key: 'auditReport',
+        label: 'Audit Report',
+        url: '/apps/audit-report/list',
+        icon: 'uil uil-graph-bar',
+    },
     // {
     //     key: 'logout',
     //     label: 'Logout',

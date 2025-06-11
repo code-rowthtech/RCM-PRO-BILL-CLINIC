@@ -81,6 +81,8 @@ const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/No
 
 const RoleManagement = React.lazy(() => import('../pages/apps/RoleManagement/index'));
 const RoleSetting = React.lazy(() => import('../pages/apps/Settings/Role/RoleSetting'));
+const AuditReport = React.lazy(() => import('../pages/apps/AuditReport/index'));
+
 
 
 
@@ -388,6 +390,19 @@ const AllRoutes = () => {
                                     path: 'list',
                                     element: hasPermission('view role management') ? (
                                         <LoadComponent component={RoleManagement} />
+                                    ) : (
+                                        <div className="disabled-content">You don't have permission to view this page.</div>
+                                    ),
+                                },
+                            ],
+                        },
+                        {
+                            path: 'audit-report',
+                            children: [
+                                {
+                                    path: 'list',
+                                    element: hasPermission('view audit report') ? (
+                                        <LoadComponent component={AuditReport} />
                                     ) : (
                                         <div className="disabled-content">You don't have permission to view this page.</div>
                                     ),
