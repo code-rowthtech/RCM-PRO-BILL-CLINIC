@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, Row, Table } from 'react-bootstrap';
+import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
@@ -487,9 +487,30 @@ const EncounterSummary = () => {
                                                                         {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
                                                                     </div>
                                                                 </div>
-                                                                <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                                    {medication?.status}
-                                                                </span>
+                                                                <div className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                                    <p>{medication?.status}</p>
+                                                                    {/* <OverlayTrigger
+                                                                        placement="top"
+                                                                        overlay={<Tooltip id="copyTooltip">Copy to clipboard</Tooltip>}
+                                                                    >
+                                                                        <i
+                                                                            className="bi bi-copy fs-5 text-secondary"
+                                                                            style={{ cursor: 'pointer' }}
+                                                                            onClick={(e) => {
+                                                                                navigator.clipboard.writeText('Text to copy');
+                                                                                const icon = e.currentTarget;
+                                                                                icon.classList.remove('bi-copy', 'text-secondary');
+                                                                                icon.classList.add('bi-check', 'text-secondary');
+
+                                                                                setTimeout(() => {
+                                                                                    icon.classList.remove('bi-check', 'text-success');
+                                                                                    icon.classList.add('bi-copy', 'text-secondary');
+                                                                                }, 2000);
+                                                                            }}
+                                                                        />
+                                                                    </OverlayTrigger> */}
+
+                                                                </div>
                                                             </li>
                                                         ))}
                                                     </ul>

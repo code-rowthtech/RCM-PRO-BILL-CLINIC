@@ -2,6 +2,7 @@ import { loggedInUser } from "../../../../../helpers/api/loggedInUser";
 
 export const handlePrintEncounters = (encounterData, patientDetails) => {
     const originalContent = document?.body?.innerHTML;
+    console.log(loggedInUser, 'loggedInUserloggedInUser')
     const printContent = `
          <!DOCTYPE html>
         <html>
@@ -264,6 +265,7 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
         </head>
         <body>
             <div class="header">
+            <img src=${loggedInUser?.logo?.split('?')[0]}/>
                 <h1>Medical Encounter Report</h1>
                 <div class="header-info">
                     <div>
@@ -286,6 +288,20 @@ export const handlePrintEncounters = (encounterData, patientDetails) => {
                     🚨 EMERGENCY ENCOUNTER 🚨
                 </div>
             ` : ''}
+
+             <div class="patient-info">
+                <h2>Clinic Information</h2>
+                <div class="patient-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Name</span>
+                        <span class="detail-value">${loggedInUser?.name || 'Not available'}</span>
+                    </div>
+                     <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">${patientDetails?.email || 'Not available'}</span>
+                    </div>  
+                </div>
+            </div>
 
             <div class="patient-info">
                 <h2>Patient Information</h2>

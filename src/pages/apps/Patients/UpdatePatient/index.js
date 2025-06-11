@@ -8,7 +8,7 @@ import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     getAlcoholHistoryAction, getFamilyGeneticAction, getMedicationAction, getPatientByIdAction,
-    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, updatePatientsAction,
+    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, getVitalsByPatientIdAction, updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
@@ -76,24 +76,28 @@ const UpdatePatientIndex = () => {
     }, []);
 
     useEffect(() => {
+        dispatch(getPatientByIdAction({ id }));
+    }, [dispatch, id])
+
+    useEffect(() => {
         const fetchData = async () => {
-            // First, get the core patient data
-            await dispatch(getPatientByIdAction({ id }));
 
             // Then, fetch important lists
             await dispatch(getProblemListAction({ patientId: id }));
             await dispatch(getMedicationAction({ patientId: id }));
 
             // Finally, fetch the remaining data in parallel
-            dispatch(getSurgicalHistoryAction({ patientId: id }));
-            dispatch(getTobaccooAction({ patientId: id }));
-            dispatch(getFamilyGeneticAction({ patientId: id }));
-            dispatch(getAlcoholHistoryAction({ patientId: id }));
-            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+            await dispatch(getSurgicalHistoryAction({ patientId: id }));
+            await dispatch(getTobaccooAction({ patientId: id }));
+            await dispatch(getFamilyGeneticAction({ patientId: id }));
+            await dispatch(getAlcoholHistoryAction({ patientId: id }));
+            await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+            // await dispatch(getVitalsByPatientIdAction({ patientId: id, effectiveDateTime: effectiveDateTime, limit: 7 }));
         };
-
-        fetchData();
-    }, [dispatch, id]);
+        if (patientDetails && patientDetails?._id === id) {
+            fetchData();
+        }
+    }, [patientDetails, id]);
     // useEffect(() => {
 
     // }, [dispatch]);
@@ -565,6 +569,7 @@ const UpdatePatientIndex = () => {
                                                                     onClick={() => {
                                                                         setSelectedMainTab('Encounter');
                                                                         setCreateEncounter(true)
+                                                                        setExpanded(true);
                                                                     }}
                                                                     className="shadow-none"
                                                                     style={{
