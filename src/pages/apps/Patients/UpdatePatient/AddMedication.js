@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { Modal, Form, Button, Row, Col, Accordion } from 'react-bootstrap';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Modal, Form, Button, Row, Col } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import {
     createMedicationAction,
@@ -8,62 +8,57 @@ import {
     updateMedicationAction,
 } from '../../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { debounce, set } from 'lodash';
-import Datetime from 'react-datetime';
-import 'react-datetime/css/react-datetime.css';
+import { debounce } from 'lodash';
 import { medicationStatus } from '../../../../utils/DataSets/commonData2';
 import { additionalInformation } from '../../../../utils/DataSets/Medication/medicationData';
 import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import SuggestionOffcanvas from './SuggestionOffcanvas';
 import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../redux/suggestions/action';
-import { error } from 'jquery';
 import AddProblem from '../Task Tabs/AddProblem';
+import Spinner from '../../../../constants/Spinner';
 
 export default function AddMedication({ show, onCancel, selectedMedication }) {
     const { register, handleSubmit, setValue, control, getValues, reset, formState: { errors } } = useForm();
     const [searchParams] = useSearchParams();
+    const dropdownRef = useRef(null);
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
-    const drugsData = store?.getDrugsReducer?.data?.ndcProducts || [];
-    const problemList = store?.getProblemListReducer?.data?.problems;
+
+    // STATE VARIABLES
     const [selectedDrug, setSelectedDrug] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
     const [additionalInstruction, setAdditionalInstruction] = useState();
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
-    const handleAddProblemClose = () => setShowAddProblemModal(false);
 
+    // VARIABLE DECLARATIONS
+    const drugsData = store?.getDrugsReducer?.data?.ndcProducts || [];
+    const problemList = store?.getProblemListReducer?.data?.problems;
     const createSuccess = store?.createMedicationReducer?.data?.status;
     const updateSuccess = store?.updateMedicationReducer?.data?.status;
-    useEffect(() => {
-        if (createSuccess === 201) {
-            onCancel();
-            reset();
-            dispatch(getMedicationAction({ patientId: patientId }));
-        }
-    }, [createSuccess]);
-    useEffect(() => {
-        if (updateSuccess === 200) {
-            onCancel();
-            reset();
-            dispatch(getMedicationAction({ patientId: patientId }));
-        }
-    }, [updateSuccess]);
+    const additionalInstructionOptions = additionalInformation?.map((item) => ({
+        value: item,
+        label: item.display,
+    }));
 
-    const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
-    // Debounced search (memoized)
-    const debouncedSearch = useMemo(
-        () =>
-            debounce((searchValue) => {
-                dispatch(getDrugsAction({ skip: 1, search: searchValue }));
-            }, 100),
-        [dispatch]
-    );
+    const selectedInstruction = useMemo(() => {
+        if (!additionalInstruction) return null;
+        return additionalInstructionOptions.find(
+            (option) => option?.value?.code === additionalInstruction?.code
+        );
+    }, [additionalInstruction, additionalInstructionOptions]);
+    // USEEFFECTS
+    useEffect(() => {
+        if (createSuccess === 201 || updateSuccess === 200) {
+            onCancel();
+            reset();
+            dispatch(getMedicationAction({ patientId: patientId }));
+        }
+    }, [createSuccess, updateSuccess]);
 
     useEffect(() => {
         if (selectedMedication) {
@@ -83,6 +78,9 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             setValue('note', selectedMedication?.note?.[0]?.text);
             const updatedAdditionalInstruction =
                 selectedMedication?.dosageInstruction?.[0]?.additionalInstruction?.[0]?.coding?.[0];
+            if (updatedAdditionalInstruction) {
+                setAdditionalInstruction(updatedAdditionalInstruction);
+            }
             setAdditionalInstruction(updatedAdditionalInstruction);
             setValue(
                 'medicationStart',
@@ -94,6 +92,32 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             );
         }
     }, [selectedMedication]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // FUNCTIONS 
+    const handleAddProblemClose = () => setShowAddProblemModal(false);
+
+    const debouncedSearch = useMemo(
+        () =>
+            debounce((searchValue) => {
+                console.log(`searcching ${searchValue}`)
+                dispatch(getDrugsAction({ skip: 1, search: searchValue }));
+            }, 100),
+        [dispatch]
+    );
+
     const handleInputChange = (e) => {
         const value = e.target.value;
         setShowDropdown(true);
@@ -156,39 +180,18 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
         }
     };
 
-    const additionalInstructionOptions = additionalInformation?.map((item) => ({
-        value: item,
-        label: item.display,
-    }));
-
-    const selectedInstruction =
-        additionalInstructionOptions.find((option) => option?.value?.code === additionalInstruction?.[0]?.code) ||
-        additionalInstructionOptions.find((option) => option?.value?.display === additionalInstruction);
 
     const additionalInstructionChange = (selectedOptions) => {
         setAdditionalInstruction(selectedOptions?.value);
     };
 
-    const dropdownRef = useRef(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setShowDropdown(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
     const handleEditorFocus = () => {
         dispatch(createSuggestionAction({ module: 'medical' }));
         setShowSuggestions(true);
     };
+
     const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
         const current = getValues('note'); // from useFormContext or pass as prop
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
@@ -198,6 +201,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
             onHide={() => {
                 onCancel();
                 reset();
+                setAdditionalInstruction();
             }}
             size="lg"
             className={`${showAddProblemModal ? 'd-none' : ''}`}
@@ -332,7 +336,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         <Col sm={6}>
                             <Form.Group>
                                 <Form.Label className="mb-0">Status <span className='text-danger'>*</span></Form.Label>
-                                <Form.Select {...register('status', { required: 'This field is required.' })} disabled={selectedMedication}>
+                                <Form.Select {...register('status', { required: 'This field is required.' })} >
                                     <option value="">Select status</option>
                                     {medicationStatus.map((option) => (
                                         <option key={option.value} value={option.value}>
@@ -421,6 +425,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                             onClick={() => {
                                 onCancel();
                                 reset();
+                                setAdditionalInstruction();
                             }}
                             className="me-2 custom-buttons">
                             Cancel
@@ -431,7 +436,11 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                             }
                             type="submit"
                             className="custom-buttons">
-                            {selectedMedication ? 'Update' : 'Save'}
+                            {store?.createMedicationReducer?.loading || store?.updateMedicationReducer?.loading ?
+                                <Spinner className='spinner-border-sm' color='white' />
+                                :
+                                selectedMedication ? 'Update' : 'Save'
+                            }
                         </Button>
                     </div>
                 </Form>

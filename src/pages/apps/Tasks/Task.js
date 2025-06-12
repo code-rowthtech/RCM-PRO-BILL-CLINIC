@@ -110,9 +110,6 @@ const Task = () => {
                                             ))}
                                         </Form.Select>
                                     </Form.Group>
-                                    {/* <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                            <Form.Control type='date' onChange={(e) => setDueDate(e.target.value)} />
-                                        </Form.Group> */}
                                 </Col>
                                 <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end gap-2">
                                     <div

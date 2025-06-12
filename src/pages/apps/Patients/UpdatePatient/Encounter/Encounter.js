@@ -66,8 +66,8 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                 encounterData: updateEncounter?.data
             };
             setEncounterTabs([...encounterTabs, newTab]);
-            setActiveTab(newTab.id); // Automatically switch to new tab
-            setUpdateEncounter(null); // Reset the flag
+            setActiveTab(newTab.id);
+            setUpdateEncounter(null);
         }
     }, [updateEncounter]);
 
@@ -100,7 +100,6 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
         setShowSettings(false)
     }
 
-    // const [encounterDataArr, setEncounterDataArr] = useState([])
     return (
         <div className="row">
             {/* Tab headers */}
@@ -165,8 +164,6 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 encounterTabs={encounterTabs}
                                 setEncounterTabs={setEncounterTabs}
                                 setActiveTab={setActiveTab}
-                                // setEncounterDataArr={setEncounterDataArr}
-                                // encounterDataArr={encounterDataArr}
                                 setExpanded={setExpanded}
                                 setCreateEncounter={setCreateEncounter}
                             />
@@ -180,10 +177,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 searchNoteType={searchNoteType}
                                 setSearchNoteType={setSearchNoteType}
                                 isCollapsed={isCollapsed}
-                                // encounterDataArr={encounterDataArr}
-                                // setEncounterDataArr={setEncounterDataArr}
                                 setCreateEncounter={setCreateEncounter}
-                            // encounterData={encounterDataArr?.find((ele) => ele?._id === tab?.id)}
                             />
                         )}
                     </div>

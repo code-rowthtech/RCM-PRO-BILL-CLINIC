@@ -5,14 +5,10 @@ import { useForm, Controller } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { encryptMessage } from '../../../../cryptoUtils';
 import { clinicalStatus } from '../../../../utils/DataSets/Allergy/clinicalStatus';
-import { allergyType, severityData } from '../../../../utils/DataSets/Allergy/allergyType';
-import { verificationStatus } from '../../../../utils/DataSets/Allergy/verificationStatus';
-import IdentifierForm from '../../Common Pages/IdentifierForm';
+import { allergyType } from '../../../../utils/DataSets/Allergy/allergyType';
 import { category, criticality } from '../../../../utils/DataSets/Allergy/category';
 import { allergyCode } from '../../../../utils/DataSets/Allergy/allergyCode';
 import AsyncSelect from 'react-select/async';
-import { manifestationData } from '../../../../utils/DataSets/Allergy/manification';
-import { exposureRouteData } from '../../../../utils/DataSets/Allergy/exposureRoute';
 import { createAllergyAction, getAllergiesOfPatientAction } from '../../../../redux/allergyList/action';
 import { getPatientAppointmentAction } from '../../../../redux/ProblemList/action';
 import { createSuggestionAction } from '../../../../redux/suggestions/action';
@@ -21,67 +17,74 @@ import SuggestionOffcanvas from '../UpdatePatient/SuggestionOffcanvas';
 
 const AddAllergy = ({ onCancel }) => {
     const dispatch = useDispatch();
-    const selectRef = useRef();
     const quillRef = useRef(null);
     const [searchParams] = useSearchParams();
-    const patientId = searchParams.get('id');
-    const store = useSelector((state) => state);
-    const appointments = store?.getPatientAppointmentReducer?.data || [];
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
-    const createStatus = store?.createAllergyReducer?.data?.status;
-    const suggestionDataget = store?.createSuggestionsReducer;
-    const [code, setCode] = useState(null);
-    const [substance, setSubstance] = useState(null);
-    const [manifestation, setManifestation] = useState(null); // State to store selected manifestation
-    const [exposureRoute, setExposureRoute] = useState(null); // State to store selected exposure route
-    const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
-    const [submissionType, setSubmissionType] = useState(null);
-    const [isFocused, setIsFocused] = useState(false);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-
     const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        control,
-        reset,
-        clearErrors,
-        watch,
-        getValues,
+        register, handleSubmit, formState: { errors }, setValue, control, reset, watch, getValues
     } = useForm({
         defaultValues: {
             category: 'medication',
         },
     });
 
+    const patientId = searchParams.get('id');
+    const store = useSelector((state) => state);
+    const appointments = store?.getPatientAppointmentReducer?.data?.appointments;
+    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
+    const userId = JSON.parse(sessionStorage.getItem('hyper_user'))?.userId;
+    const createStatus = store?.createAllergyReducer?.data?.status;
+
+    const [code, setCode] = useState(null);
+    const [selectMode, setSelectMode] = useState('appointment'); // 'appointment' or 'date'
+    const [submissionType, setSubmissionType] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+
+
     // Fetch dynamic appointments
     useEffect(() => {
-        dispatch(getPatientAppointmentAction({ patientId }));
-    }, [dispatch, patientId]);
+        const currentPatientId = store?.getPatientAppointmentReducer?.data?.patientId;
+        const currentAppointments = store?.getPatientAppointmentReducer?.data?.appointments;
+
+        if (currentPatientId !== patientId || !currentAppointments) {
+            dispatch(getPatientAppointmentAction({ patientId }));
+        }
+    }, [dispatch, patientId, store?.getPatientAppointmentReducer?.data]);
+
+
+    useEffect(() => {
+        if (createStatus === 200) {
+            if (submissionType === 'saveAndNext') {
+                const data = {
+                    patientId: patientId,
+                    skip: 1,
+                };
+                dispatch(getAllergiesOfPatientAction(data));
+                reset(); // Reset the form fields
+                setCode(null); // Reset the code state
+                onCancel();
+            } else if (submissionType === 'saveAndReset') {
+                reset();
+                setCode(null);
+                setSelectMode('appointment');
+            }
+        }
+    }, [createStatus, patientId, reset, dispatch, onCancel, submissionType]);
     const onSubmit = (data) => {
         const selectedType = allergyType.find((type) => type?.code === data?.allergyType);
         const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
-        const selectedVerificationStatus = verificationStatus.find(
-            (status) => status?.code === data?.verificationStatus
-        );
         const selectedCategory = category.find((item) => item?.code === data?.category);
         const selectedCriticalityOption = criticality.find((option) => option?.code === data?.criticality);
-        const selectedSeverityOption = severityData.find((option) => option?.code === data?.severity);
 
         const payload = {
             patientId: patientId,
             clinicId: clinicId,
-            // doctorId: doctorId,
-            // asserterId: userId,
             recorderId: userId,
             resourceType: 'AllergyIntolerance',
             type: {
                 coding: [
                     {
                         system: selectedType?.system,
-                        // code: selectedType?.code,
                         code: 'Allergy',
                         display: selectedType?.display,
                     },
@@ -98,16 +101,6 @@ const AddAllergy = ({ onCancel }) => {
                 ],
                 text: selectedStatus?.display,
             },
-            // verificationStatus: {
-            //     coding: [
-            //         {
-            //             system: selectedVerificationStatus?.system,
-            //             code: selectedVerificationStatus?.code,
-            //             display: selectedVerificationStatus?.display,
-            //         },
-            //     ],
-            //     text: selectedVerificationStatus?.display,
-            // },
             category: [
                 {
                     system: selectedCategory?.system,
@@ -124,54 +117,6 @@ const AddAllergy = ({ onCancel }) => {
                 coding: code,
                 text: code?.display, // use display text
             },
-            reaction: [
-                {
-                    // substance: {
-                    //     coding: code,
-                    // },
-                    // manifestation: [
-                    //     {
-                    //         concept: {
-                    //             coding: manifestation,
-                    //             text: code?.display, // use display text
-                    //         },
-                    //     },
-                    // ],
-                    // severity: {
-                    //     coding: [
-                    //         {
-                    //             system: selectedSeverityOption?.system,
-                    //             code: selectedSeverityOption?.code,
-                    //             display: selectedSeverityOption?.display,
-                    //         },
-                    //     ],
-                    //     text: selectedSeverityOption?.display,
-                    // },
-                    // exposureRoute: {
-                    //     coding: exposureRoute,
-                    //     text: exposureRoute?.display,
-                    // },
-                    // appointmentId: data?.appointment,
-                    // note: [
-                    //     {
-                    //         text: '',
-                    //         time: '',
-                    //         authorReference: {
-                    //             reference: '',
-                    //             type: '',
-                    //             identifier: {
-                    //                 use: '',
-                    //                 system: '',
-                    //                 value: '',
-                    //             },
-                    //             display: '',
-                    //         },
-                    //     },
-                    // ],
-                },
-            ],
-            // appointmentId: data?.appointment || '',
-            // encounterId: data?.encounter,
             note: [
                 {
                     text: data?.note,
@@ -202,18 +147,18 @@ const AddAllergy = ({ onCancel }) => {
         }
         dispatch(createAllergyAction({ key: encryptMessage(payload) }));
     };
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (quillRef.current && !quillRef.current.contains(event.target)) {
-                setIsFocused(false);
-            }
-        };
+    // useEffect(() => {
+    //     const handleClickOutside = (event) => {
+    //         if (quillRef.current && !quillRef.current.contains(event.target)) {
+    //             setIsFocused(false);
+    //         }
+    //     };
 
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
+    //     document.addEventListener('mousedown', handleClickOutside);
+    //     return () => {
+    //         document.removeEventListener('mousedown', handleClickOutside);
+    //     };
+    // }, []);
     const formattedCodeOption = useMemo(
         () =>
             allergyCode?.map((reason) => ({
@@ -222,17 +167,7 @@ const AddAllergy = ({ onCancel }) => {
             })),
         []
     );
-    const handleCodeChange = useCallback((selectedOption) => {
-        setCode(selectedOption ? selectedOption.value : '');
-    }, []);
 
-    const selectedCodeOption = useMemo(() => {
-        if (!code) return null;
-        return (
-            formattedCodeOption.find((option) => option?.value?.code === code?.code) ||
-            formattedCodeOption.find((option) => option?.value?.display === code)
-        );
-    }, [code, formattedCodeOption]);
     const loadCodeOptions = useCallback(
         (inputValue, callback) => {
             if (!inputValue) {
@@ -248,110 +183,10 @@ const AddAllergy = ({ onCancel }) => {
         },
         [formattedCodeOption]
     );
-    // Manifestation Options
-    const formattedManifestationOption = useMemo(
-        () =>
-            manifestationData?.map((reason) => ({
-                value: reason, // The whole object or unique identifier
-                label: reason.display, // What will be displayed in the dropdown
-            })),
-        [manifestationData]
-    );
 
-    const handleManifestationChange = useCallback((selectedOption) => {
-        setManifestation(selectedOption ? selectedOption.value : null); // Store the whole object or identifier
-    }, []);
-
-    const selectedManifestationOption = useMemo(() => {
-        if (!manifestation) return null;
-        return (
-            formattedManifestationOption.find((option) => option?.value?.code === manifestation?.code) ||
-            formattedManifestationOption.find((option) => option?.value?.display === manifestation)
-        );
-    }, [manifestation, formattedManifestationOption]);
-
-    const loadManifestationOptions = useCallback(
-        (inputValue, callback) => {
-            if (!inputValue) {
-                callback(formattedManifestationOption.slice(0, 10)); // Load first 10 options initially
-                return;
-            }
-
-            const filteredOptions = formattedManifestationOption.filter((option) => {
-                // Check if option.label exists before calling toLowerCase()
-                return option.label && option.label.toLowerCase().includes(inputValue.toLowerCase());
-            });
-
-            callback(filteredOptions.slice(0, 20)); // Limit to first 20 results
-        },
-        [formattedManifestationOption]
-    );
-    const formattedExposurRouteOption = useMemo(
-        () =>
-            exposureRouteData?.map((reason) => ({
-                value: reason, // The whole object or unique identifier
-                label: reason.display, // What will be displayed in the dropdown
-            })),
-        [exposureRouteData]
-    );
-    const handleExposureRouteChange = useCallback((selectedOption) => {
-        setExposureRoute(selectedOption ? selectedOption.value : null); // Store the whole object or identifier
-    }, []);
-
-    const selectedExposureRouteOption = useMemo(() => {
-        if (!exposureRoute) return null;
-        return (
-            formattedExposurRouteOption.find((option) => option?.value?.code === exposureRoute?.code) ||
-            formattedExposurRouteOption.find((option) => option?.value?.display === exposureRoute)
-        );
-    }, [exposureRoute, formattedExposurRouteOption]);
-
-    const loadExposureRouteOptions = useCallback(
-        (inputValue, callback) => {
-            if (!inputValue) {
-                callback(formattedExposurRouteOption.slice(0, 10)); // Load first 10 options initially
-                return;
-            }
-
-            const filteredOptions = formattedExposurRouteOption.filter((option) => {
-                // Check if option.label exists before calling toLowerCase()
-                return option.label && option.label.toLowerCase().includes(inputValue.toLowerCase());
-            });
-
-            callback(filteredOptions.slice(0, 20)); // Limit to first 20 results
-        },
-        [formattedExposurRouteOption]
-    );
-    // useEffect(() => {
-    //     if (createStatus === 200) {
-
-    //     }
-    // }, [createStatus, reset, patientId, dispatch, onCancel]);
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
-    useEffect(() => {
-        if (createStatus === 200) {
-            if (submissionType === 'saveAndNext') {
-                const data = {
-                    patientId: patientId,
-                };
-                dispatch(getAllergiesOfPatientAction(data));
-                reset(); // Reset the form fields
-                setCode(null); // Reset the code state
-                setSubstance(null); // Reset the substance state
-                setManifestation(null); // Reset the manifestation state
-                setExposureRoute(null); // Reset the exposure route state
-                onCancel();
-            } else if (submissionType === 'saveAndReset') {
-                reset();
-                setCode(null);
-                setSubstance(null);
-                setManifestation(null);
-                setExposureRoute(null);
-                setSelectMode('appointment');
-            }
-        }
-    }, [createStatus, patientId, reset, dispatch, onCancel, submissionType]);
+
     const handleEditorFocus = () => {
         dispatch(createSuggestionAction({ module: 'allergy' }));
         setShowSuggestions(true);
@@ -471,7 +306,7 @@ const AddAllergy = ({ onCancel }) => {
                                     </option>
                                 ))}
                             </Form.Select>
-                              {errors.status && (
+                            {errors.status && (
                                 <Form.Text className="text-danger">{errors.status.message}</Form.Text>
                             )}
                         </Form.Group>
@@ -582,7 +417,6 @@ const AddAllergy = ({ onCancel }) => {
                                 'Save & Add Another'
                             )}
                         </Button>
-                        {/* <Button className='custom-buttons'>Save and Add Another</Button> */}
                         <Button
                             className="custom-buttons"
                             type="submit"
@@ -603,196 +437,3 @@ const AddAllergy = ({ onCancel }) => {
 };
 
 export default AddAllergy;
-
-// commented code
-
-{
-    /* <Col sm={6}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="severity" className="mb-0">
-                                Severity
-                            </Form.Label>
-                            <Form.Select
-                                {...register('severity', { required: 'Clinical severity is required' })}
-                                data-has-value={!!watch('severity')}>
-                                <option value="" hidden>
-                                    Select Clinical Status
-                                </option>
-                                {severityData?.map((severity) => (
-                                    <option key={severity?.code} value={severity?.code}>
-                                        {severity?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */
-}
-
-{
-    /* <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="Encounter" className="mb-0">
-                                Encounter
-                            </Form.Label>
-                            <Form.Select
-                                {...register('encounter', { required: 'Encounter is required' })}
-                                data-has-value={!!watch('encounter')}>
-                                <option value="" hidden>
-                                    Select Encounter
-                                </option>
-                                <option value="1">Encounter 1</option>
-                                <option value="2">Encounter 2</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */
-}
-{
-    /* <Col sm={4}>
-                        <Form.Group>
-                            <Form.Label className="mb-0"> Exposure Route</Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadExposureRouteOptions}
-                                defaultOptions={formattedExposurRouteOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedExposureRouteOption} // Ensure this matches the { label, value } format
-                                onChange={handleExposureRouteChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */
-}
-
-{
-    /* <Col sm={4}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Manifestation</Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadManifestationOptions}
-                                defaultOptions={formattedManifestationOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedManifestationOption} // Ensure this matches the { label, value } format
-                                onChange={handleManifestationChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */
-}
-
-{
-    /* 
-                    <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="verificationStatus" className="mb-0">
-                             Verification Status
-                            </Form.Label>
-                            <Form.Select
-                                {...register('verificationStatus', { required: 'Verification Status is required' })}
-                                data-has-value={!!watch('verificationStatus')}>
-                                <option value="">Select Verification Status</option>
-                                {verificationStatus.map((status) => (
-                                    <option key={status?.code} value={status?.code} className="text-capitalize">
-                                        {status?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Form.Group>
-                    </Col> */
-}
-{
-    /* <Col sm={4}>
-                        <Form.Group>
-                            <Form.Label className="mb-0">Substance</Form.Label>
-                            <AsyncSelect
-                                // ref={selectRef}
-                                loadOptions={loadCodeOptions}
-                                defaultOptions={formattedCodeOption.slice(0, 10)} // Show first 10 options initially
-                                isSearchable
-                                className="basic-single"
-                                classNamePrefix="select"
-                                placeholder="&nbsp; Select"
-                                value={selectedCodeOption}
-                                onChange={handleCodeChange}
-                                styles={{
-                                    control: (provided) => ({
-                                        ...provided,
-                                        height: '30px',
-                                        minHeight: '30px',
-                                        border: '0px',
-                                    }),
-                                    placeholder: (provided) => ({
-                                        ...provided,
-                                        fontWeight: 'bold',
-                                        fontSize: '12px',
-                                        paddingBottom: '5px',
-                                    }),
-                                }}
-                            />
-                        </Form.Group>
-                    </Col> */
-}
-{
-    /* <Col sm={12} className="d-flex justify-content-between">
-                        <h4>Add Allergy</h4>
-                        <Button className="custom-buttons" onClick={onCancel}>
-                            Back
-                        </Button>
-                    </Col> */
-}
-{
-    /* <Col sm={4}>
-                        <Form.Group className="mb-1">
-                            <Form.Label htmlFor="allergyType" className="mb-0">
-                                Allergy Type
-                            </Form.Label>
-                            <Form.Select
-                                {...register('allergyType', { required: 'Allergy Type is required' })}
-                                data-has-value={!!watch('allergyType')}>
-                                <option value="" hidden>
-                                    Select Allergy Type
-                                </option>
-                                {allergyType?.map((type) => (
-                                    <option key={type?.code} value={type?.code}>
-                                        {type?.display}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {errors.allergyType && (
-                                <Form.Text className="text-danger fs-6">{errors.allergyType.message}</Form.Text>
-                            )}
-                        </Form.Group>
-                    </Col> */
-}

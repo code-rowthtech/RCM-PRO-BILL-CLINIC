@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AllergyList from '../Task Tabs/AllergyList';
 import ProblemList from '../Task Tabs/ProblemList';
 import Medication from './Medication';
 import VitalStatus from './VitalStatus';
 import { MdAddCircleOutline } from 'react-icons/md';
 import { Form, Modal } from 'react-bootstrap';
-import UpdateAllergy from '../Task Tabs/UpdateTasks/UpdateAllergy';
 import AddAllergy from '../Task Tabs/AddAllergy';
 import AddProblem from '../Task Tabs/AddProblem';
 import UpdateProblem from '../Task Tabs/UpdateTasks/UpdateProblem';
@@ -36,7 +35,7 @@ const tabList = [
     { key: 'Medication List', label: 'Medication List' },
     { key: 'Vitals List', label: 'Vitals List' },
 ];
- 
+
 const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
     const [activeTab, setActiveTab] = useState(defaultTab);
     const [allergyModal, setAllergyModal] = useState(false);
@@ -96,7 +95,7 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
         setMedicationModal(false);
         setSelectedMedication(null);
     };
- 
+
     const handleAddIconClick = () => {
         switch (activeTab) {
             case 'Allergy List':
@@ -121,7 +120,9 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
     const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId, page: currentPage }));
+        if (currentPage !== 1) {
+            dispatch(getVitalsByPatientIdAction({ patientId, page: currentPage, limit: 7 }));
+        }
     }, [currentPage]);
 
     const paginationData = store?.getVitalsByPatientIdReducer?.data?.pagination;
@@ -161,9 +162,9 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                                 opacity: disabled ? 0.5 : 1,
                             }}
                             onClick={() => {
-                                if (!disabled && activeTab === 'Vitals List' && key !== 'Vitals List') {
-                                    dispatch(getVitalsByPatientIdAction({ patientId }));
-                                }
+                                // if (!disabled && key !== 'Vitals List') {
+                                //     dispatch(getVitalsByPatientIdAction({ patientId }));
+                                // }
                                 if (!disabled) {
                                     setActiveTab(key);
                                 }
@@ -217,12 +218,12 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
                     </div>
                 }
             </div>
- 
+
             <div className="pt-1">
                 {activeTab === 'Allergy List' && <AllergyList />}
                 {activeTab === 'Problem List' && <ProblemList />}
                 {activeTab === 'Medication List' && <Medication isAccordionOpen={isAccordionOpen} />}
-                {activeTab === 'Vitals List' && <VitalStatus isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
+                {activeTab === 'Vitals List' && <VitalStatus convertToImperial={convertToImperial} convertFromImperial={convertFromImperial} isAccordionOpen={isAccordionOpen} unitSystem={unitSystem} setUnitSystem={setUnitSystem} />}
             </div>
             {/* Allergy Modal */}
             <Modal show={allergyModal} onHide={() => setAllergyModal(false)} size="lg" centered>
@@ -260,5 +261,5 @@ const SubAllergytabs = ({ isAccordionOpen, defaultTab }) => {
         </div>
     );
 };
- 
+
 export default SubAllergytabs;

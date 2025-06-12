@@ -14,7 +14,7 @@ export function getVitalsApi(params: any): any {
 }
 export function getVitalsByPatientApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getVitalsByPatientId}?patientId=${data?.patientId}&effectiveDateTime=${data?.effectiveDateTime || ''}&limit=${data?.limit || 7}&page=${data?.page || 1}}`);
+    return api.get(`${URL.getVitalsByPatientId}?patientId=${data?.patientId}&effectiveDateTime=${data?.effectiveDateTime || ''}&limit=${data?.limit || 7}&page=${data?.page || 1}`);
 }
 export function getVitalsByAppointmentApi(params: any): any {
     const { data } = params;

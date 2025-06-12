@@ -19,16 +19,5 @@ export function getMedicationDrugsApi(params: any): any {
 
 export function getMedicationApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getMedication}/all?patientId=${data?.patientId}`);
+    return api.get(`${URL.getMedication}/all?patientId=${data?.patientId}&page=${data?.skip || 1}&limit=${data?.limit || 10}`);
 }
-
-// export function updateAllergyApi(params: any): any {
-//     const { data } = params;
-//     return api.create(URL.updateAllergy, data);
-// }
-
-// export function deleteAllergyApi(params: any): any {
-//     const { data } = params;
-//     // return api.delete(URL.deleteAllergyList, data);
-//     return api.delete(`${URL.deleteAllergyList}?id=${data?.id}`);
-// }

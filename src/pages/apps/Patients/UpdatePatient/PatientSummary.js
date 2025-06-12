@@ -6,9 +6,13 @@ import './patientSummary.css'; // Assuming you have a CSS file for styles
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import {
+    getAlcoholHistoryAction,
     getAppointmentsAction,
     getEncounterAction,
     getFamilyGeneticAction,
+    getMedicationAction,
+    getSurgicalHistoryAction,
+    getTemplateAction,
     getTobaccooAction,
     getVitalsByPatientIdAction,
 } from '../../../../redux/actions';
@@ -25,7 +29,8 @@ import NewAppointment from '../../Appointments/NewAppointment';
 import AddMedication from './AddMedication';
 import { handlePrintMedication } from '../../../../helpers/printMedication';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
-const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
+import { getProblemListAction } from '../../../../redux/ProblemList/action';
+const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [searchParams] = useSearchParams();
@@ -52,7 +57,6 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [medicationModal, setMedicationModal] = useState(false);
     useEffect(() => {
         if (store?.getPatientByIdReducer?.data?.data && store?.getPatientByIdReducer?.data?.data === patientId) {
-
             dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
         }
         // dispatch(getEncounterAction({ patientId: patientId }));
@@ -87,6 +91,23 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     //         })
     //     );
     // }, [dispatch, skip]);
+    useEffect(() => {
+        const fetchData = async () => {
+            await dispatch(getProblemListAction({ patientId: patientId }));
+            await dispatch(getMedicationAction({ patientId: patientId, limit: 3 }));
+            await dispatch(getSurgicalHistoryAction({ patientId: patientId }));
+            await dispatch(getTobaccooAction({ patientId: patientId }));
+            await dispatch(getFamilyGeneticAction({ patientId: patientId }));
+            await dispatch(getAlcoholHistoryAction({ patientId: patientId }));
+            await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }));
+            await dispatch(getAllergiesOfPatientAction({ patientId: patientId, limit: 3 }));
+            await dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 1 }));
+
+        };
+        if (patientDetails && patientDetails?._id === patientId && selectedMainTab === "Patient Details") {
+            fetchData();
+        }
+    }, [patientDetails, patientId]);
 
     useEffect(() => {
         if (patientVitals) {
@@ -117,7 +138,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
-        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
     };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);

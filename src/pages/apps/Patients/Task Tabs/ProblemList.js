@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
-import { Link, useSearchParams } from 'react-router-dom';
-import { FiEdit, FiPlus } from 'react-icons/fi';
-import { IoInformationCircleOutline } from 'react-icons/io5';
-import { MdDeleteOutline } from 'react-icons/md';
-import { FaEye } from 'react-icons/fa';
+import { useSearchParams } from 'react-router-dom';
 import AddProblem from './AddProblem';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -14,79 +10,65 @@ import {
 } from '../../../../redux/ProblemList/action';
 import Spinner from '../../../../constants/Spinner';
 import UpdateProblem from './UpdateTasks/UpdateProblem';
+import DeletionModal from '../../../../helpers/deletionModal';
+import Paginations from '../../../../helpers/Paginations';
 
 const ProblemList = () => {
     const dispatch = useDispatch();
-    const [showAddProblem, setShowAddProblem] = useState(false);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
+
     const [problemModal, setProblemModal] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [showUpdateProblem, setShowUpdateProblem] = useState(false);
     const [selectedProblem, setSelectedProblem] = useState(null);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [deletionId, setDeletionId] = useState(null);
+    const [skip, setSkip] = useState(1);
+
     const store = useSelector((state) => state);
     const problemList = store?.getProblemListReducer?.data?.problems;
     const isLoading = store?.getProblemListReducer?.loading;
     const deleteResponse = store?.deleteProblemListReducer?.data?.status;
-    // useEffect(() => {
-    //     if (patientId) {
-    //         dispatch(getProblemListAction({ patientId }));
-    //     }
-    // }, [dispatch, patientId]);
+
+    useEffect(() => {
+        dispatch(getProblemListAction({ patientId, skip }));
+    }, [dispatch, patientId, skip]);
+
     const handleEditClick = (problem) => {
         setSelectedProblem(problem);
         setIsEditMode(true);
         setProblemModal(true);
     };
+
     // delete function
-    const handleDelete = (data) => {
-        dispatch(deleteProblemListAction({ id: data?._id }));
+    const handleDelete = () => {
+        dispatch(deleteProblemListAction({ id: deletionId }));
     };
 
     useEffect(() => {
         if (deleteResponse === 200) {
-            dispatch(getProblemListAction({ patientId }));
+            dispatch(getProblemListAction({ patientId, skip: 1 }));
+            setDeleteModal(false);
         }
     }, [deleteResponse, dispatch, patientId]);
-    const stripHtml = (html) => {
-        // Remove any <ul> or <li> tags with margin
-        return (
-            html
-                ?.replace(/<ul>/g, '<ul style="margin-bottom: 0px !important;">')
-                .replace(/<li>/g, '<li style="margin-bottom: 0px;">')
-                ?.replace(/<[^>]+>/g, '') || ''
-        );
-    };
-    const sanitizeNoteHtml = (html) => {
-        if (!html) return 'N/A';
-        return html
-            .replace(/<ul>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
-            .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
-            .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
+
+    const closeDeleteModal = () => {
+        setDeleteModal(false);
+    }
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
     };
     return (
         <>
             <div>
-                {/* {showAddProblem ? (
-                <AddProblem onCancel={() => setShowAddProblem(false)} />
-            ) : showUpdateProblem ? (
-                <UpdateProblem problem={selectedProblem} onCancel={() => setShowUpdateProblem(false)} />
-            ) : ( */}
                 <Row>
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
-                            <thead className="text-white bg-dark">
+                            <thead className="bg-dark">
                                 <tr>
-                                    <th className="text-white">Problem</th>
-                                    {/* <th className="text-white">Codes</th> */}
-                                    <th className="text-white">ICD-CM Code</th>
-                                    {/* <th className="text-white">Snomed</th> */}
-                                    <th className="text-white">Diagnosed Date</th>
-                                    {/* <th className="text-white">Date Changed</th> */}
-                                    <th className="text-white">Status</th>
-                                    {/* <th className="text-white">Notes</th> */}
-                                    {/* <th className="text-white">Updates</th> */}
-                                    <th className="text-white">Action</th>
+                                    {['S.No.', 'Problem', 'ICD-CM Code', 'Diagnosed Date', 'Status', 'Action']?.map((data, index) => (
+                                        <th key={index}>{data}</th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
@@ -96,35 +78,17 @@ const ProblemList = () => {
                                             <Spinner className="my-5" />
                                         </td>
                                     </tr>
-                                ) : problemList?.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={10} className="text-center">
-                                            <h3 className="my-5">No Problems Found!</h3>
-                                        </td>
-                                    </tr>
-                                ) : (
+                                ) : problemList?.length > 0 ? (
                                     problemList?.map((data, index) => (
                                         <tr key={data.id || index}>
+                                            <td>{index + 1}</td>
                                             <td>{data?.code?.coding?.[0]?.display || 'N/A'}</td>
                                             <td>{data?.code?.coding?.[0]?.code || 'N/A'}</td>
                                             <td>{new Date(data?.onsetDateTime).toLocaleDateString('en-GB')}</td>
                                             <td>{data.clinicalStatus?.coding?.[0]?.display || 'N/A'}</td>
-                                            {/* <td
-                                                className="text-capitalize mb-0"
-                                                title={stripHtml(data?.note?.[0]?.text)}>
-                                                <div
-                                                    dangerouslySetInnerHTML={{
-                                                        __html:
-                                                            data?.note?.[0]?.text?.length > 35
-                                                                ? sanitizeNoteHtml(data?.note?.[0]?.text.slice(0, 34)) +
-                                                                '...'
-                                                                : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
-                                                    }}
-                                                />
-                                            </td>{' '} */}
                                             <td>
                                                 <i
-                                                    className=" bi bi-pencil text-info cursor-pointer"
+                                                    className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                                     onClick={() => {
                                                         handleEditClick(data);
                                                         const requestData = {
@@ -137,18 +101,34 @@ const ProblemList = () => {
                                                 <i
                                                     className="bi bi-trash-fill text-danger cursor-pointer"
                                                     onClick={() => {
-                                                        handleDelete(data);
+                                                        setDeletionId(data?._id)
+                                                        setDeleteModal(true);
                                                     }}
                                                 />
                                             </td>
                                         </tr>
                                     ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={10} className="text-center">
+                                            <h5 className="my-5">No Problems Found!</h5>
+                                        </td>
+                                    </tr>
                                 )}
                             </tbody>
                         </Table>
                     </Col>
+                    <div className="col-12">
+                        <div className="mt-2 d-flex justify-content-end">
+                            <Paginations
+                                currentPage={skip}
+                                totalPages={store?.getProblemListReducer?.data?.pagination?.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </div>
+                    </div>
                 </Row>
-                {/* // )} */}
+                <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={handleDelete} item={'problem'} isLoading={store?.deleteProblemListReducer?.loading} />
             </div>
             <Modal show={problemModal} onHide={() => setProblemModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">

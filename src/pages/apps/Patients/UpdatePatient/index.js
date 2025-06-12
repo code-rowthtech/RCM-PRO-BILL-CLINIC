@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Accordion, Button, Card, Col, Dropdown, Form, Row, Table } from 'react-bootstrap';
 import profileDummy from '../../../../assets/images/profileDummy.png';
-import { IoCalendar, IoClose, IoPrintSharp } from 'react-icons/io5';
+import { IoClose, IoPrintSharp } from 'react-icons/io5';
 import { TbCapture } from 'react-icons/tb';
 import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     getAlcoholHistoryAction, getFamilyGeneticAction, getMedicationAction, getPatientByIdAction,
-    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, getVitalsByPatientIdAction, updatePatientsAction,
+    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
@@ -30,38 +30,57 @@ import PatientDocs from './Patientdocs';
 import PatientAccess from './PatientAccess';
 
 const UpdatePatientIndex = () => {
+    // Imports initialization
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const {
         handleSubmit,
         formState: { errors },
     } = useForm();
-    const menuRef = useRef(null);
     const [searchParams] = useSearchParams();
+
+    // Refs and other variable declaration
+    const menuRef = useRef(null);
+    const videoRef = useRef(null);
+    const canvasRef = useRef(null);
     const id = searchParams.get('id');
+
+    // STORE AND STATE VARIABLES DECLARATIONS
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const [profilePhoto, setProfilePhoto] = useState(profileDummy);
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [printOptions, setPrintOptions] = useState([]);
     const [selectedMainTab, setSelectedMainTab] = useState('Patient Details');
     const [visibleSection, setVisibleSection] = useState('patient'); // Default section
-    const videoRef = useRef(null);
-    const canvasRef = useRef(null);
     const [logoName, setLogoName] = useState('');
     const [logo, setLogo] = useState(null);
     const [activeSubmenu, setActiveSubmenu] = useState(null);
-    const [createdTabs, setCreatedTabs] = useState(['Default Encounter']); // Start with default tab
+    const [uploading, setUploading] = useState(false);
+    const [activeKey, setActiveKey] = useState('0');
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
+    const [encounterTabs, setEncounterTabs] = useState([
+        {
+            id: 1,
+            title: 'Encounter list',
+            type: 'default',
+        }
+    ]);
+    const [expanded, setExpanded] = useState(false);
+    const [createEncounter, setCreateEncounter] = useState(false);
+    const isAccordionOpen = activeKey === '0'; // true or false
+
     const toggleSubmenu = (label) => {
         setActiveSubmenu((prev) => (prev === label ? null : label));
     };
 
-
+    // USEEFFECTS TILL LINE 125
     useEffect(() => {
         const tab = sessionStorage?.getItem('selectedMainTab');
         if (tab) {
             setSelectedMainTab(tab);
         }
     }, []);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -78,36 +97,40 @@ const UpdatePatientIndex = () => {
 
     useEffect(() => {
         dispatch(getPatientByIdAction({ id }));
-    }, [dispatch, id])
+    }, [dispatch, id]);
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         await dispatch(getProblemListAction({ patientId: id }));
+    //         await dispatch(getMedicationAction({ patientId: id }));
+    //         await dispatch(getSurgicalHistoryAction({ patientId: id }));
+    //         await dispatch(getTobaccooAction({ patientId: id }));
+    //         await dispatch(getFamilyGeneticAction({ patientId: id }));
+    //         await dispatch(getAlcoholHistoryAction({ patientId: id }));
+    //         await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+    //     };
+    //     if (patientDetails && patientDetails?._id === id) {
+    //         fetchData();
+    //     }
+    // }, [patientDetails, id]);
 
     useEffect(() => {
-        const fetchData = async () => {
-
-            // Then, fetch important lists
-            await dispatch(getProblemListAction({ patientId: id }));
-            await dispatch(getMedicationAction({ patientId: id }));
-
-            // Finally, fetch the remaining data in parallel
-            await dispatch(getSurgicalHistoryAction({ patientId: id }));
-            await dispatch(getTobaccooAction({ patientId: id }));
-            await dispatch(getFamilyGeneticAction({ patientId: id }));
-            await dispatch(getAlcoholHistoryAction({ patientId: id }));
-            await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
-            // await dispatch(getVitalsByPatientIdAction({ patientId: id, effectiveDateTime: effectiveDateTime, limit: 7 }));
-        };
-        if (patientDetails && patientDetails?._id === id) {
-            fetchData();
+        const elements = document.getElementsByClassName('content-page');
+        for (let el of elements) {
+            if (expanded) {
+                el.style.setProperty('padding-top', '33px', 'important');
+            } else {
+                el.style.setProperty('padding-top', '50px', 'important');
+            }
         }
-    }, [patientDetails, id]);
-    // useEffect(() => {
+    }, [expanded]);
 
-    // }, [dispatch]);
-
+    // Camera functionality to capture profile photos till line 168
     const openCamera = async () => {
-        setIsCameraOpen(true);
         try {
+            setIsCameraOpen(true);
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' }, // Open front camera
+                video: { facingMode: 'user' },
             });
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
@@ -116,82 +139,55 @@ const UpdatePatientIndex = () => {
             console.error('Error accessing camera:', error);
         }
     };
-    const [uploading, setUploading] = useState(false);
-    const capturePhoto = async () => {
+
+    const capturePhoto = () => {
         const canvas = canvasRef.current;
         const video = videoRef.current;
-        if (canvas && video) {
-            const context = canvas.getContext('2d');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (!canvas || !video) return;
 
-            // Convert canvas image to Blob
-            canvas.toBlob(async (blob) => {
-                if (blob) {
-                    const file = new File([blob], `profile-photo-${Date.now()}.png`, { type: 'image/png' });
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    try {
-                        const url = await handleUpload(file, setUploading);
-                        setLogo(url);
-                        setLogoName(file?.name);
-                    } catch (error) {
-                        console.error('Error uploading photo:', error);
-                    }
-                }
-            }, 'image/png');
+        canvas.toBlob(async (blob) => {
+            if (!blob) return;
 
-            stopCamera();
-        }
+            const file = new File([blob], `profile-photo-${Date.now()}.png`, {
+                type: 'image/png',
+            });
+
+            try {
+                const url = await handleUpload(file, setUploading);
+                setLogo(url);
+                setLogoName(file.name);
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+            }
+        }, 'image/png');
+
+        stopCamera();
     };
 
     const stopCamera = () => {
         const stream = videoRef.current?.srcObject;
-        if (stream) {
-            stream.getTracks().forEach((track) => track.stop());
-        }
+        stream?.getTracks().forEach((track) => track.stop());
         setIsCameraOpen(false);
     };
+
     const onSubmit = (data) => {
+        const photoUrl = logo?.url?.split('?')[0] || patientDetails?.photo?.url;
         const payload = {
-            id: id,
-            ...(logo?.url === null
-                ? []
-                : {
-                    photo: [
-                        {
-                            url: logo?.url?.split('?')[0] || patientDetails?.photo?.url,
-                            title: logoName,
-                        },
-                    ],
-                }),
+            id,
+            ...(logo?.url ? {
+                photo: [{ url: photoUrl, title: logoName }],
+            } : {}),
         };
+
         dispatch(updatePatientsAction({ key: encryptMessage(payload) }));
     };
 
-    const [activeKey, setActiveKey] = useState('0');
-    const [showMoreMenu, setShowMoreMenu] = useState(false);
-    const isAccordionOpen = activeKey === '0'; // true or false
-    const [encounterTabs, setEncounterTabs] = useState([
-        {
-            id: 1,
-            title: 'Encounter list',
-            type: 'default',
-        }
-    ]);
-    const [expanded, setExpanded] = useState(false)
-    useEffect(() => {
-        const elements = document.getElementsByClassName('content-page');
-        for (let el of elements) {
-            if (expanded) {
-                el.style.setProperty('padding-top', '33px', 'important');
-            } else {
-                el.style.setProperty('padding-top', '50px', 'important');
-                // el.style.removeProperty('padding-top');
-            }
-        }
-    }, [expanded]);
-    const [createEncounter, setCreateEncounter] = useState(false)
+
 
     return (
         <div className="mt-1 g-0  px-0 mx-0">
@@ -225,7 +221,6 @@ const UpdatePatientIndex = () => {
                                                     e?.stopPropagation();
                                                     if (item.subItems) {
                                                         toggleSubmenu(item.label);
-                                                        // setActiveSubmenu(null);
                                                     } else {
                                                         setActiveKey('0')
                                                         setSelectedMainTab(item.tab);
@@ -256,8 +251,6 @@ const UpdatePatientIndex = () => {
                                                                 onClick={() => {
                                                                     setSelectedMainTab(subItem.tab);
                                                                     sessionStorage.setItem('selectedMainTab', subItem.tab);
-                                                                    // setActiveSubmenu(null);
-                                                                    // setShowMoreMenu(false);
                                                                 }}
                                                                 className="list-group-item submenuItem py-1 text-start fs-6">
                                                                 {subItem.label}
@@ -281,9 +274,6 @@ const UpdatePatientIndex = () => {
                                                                 setSelectedMainTab(data.tab);
                                                                 sessionStorage.setItem('selectedMainTab', data.tab);
                                                                 setShowMoreMenu(false);
-                                                                // setShowMoreMenu(false);
-                                                                // setShowMoreMenu(false);
-                                                                // setShowMoreMenu(false);
                                                             }}
                                                             className="list-group-item submenuItem py-1 text-start fs-6">
                                                             {data.label}
@@ -582,54 +572,6 @@ const UpdatePatientIndex = () => {
                                                                     }}>
                                                                     New Encounter
                                                                 </Button>
-                                                                {/* <Dropdown>
-                                                                    <Dropdown.Toggle className="mt-1 shadow-none "
-                                                                        style={{
-                                                                            fontSize: '10px',
-                                                                            borderRadius: '8px',
-                                                                            padding: '3px 7px 3px 7px',
-                                                                            width: '100px',
-                                                                            backgroundColor: ' #6169d0',
-                                                                        }} id="dropdown-basic">
-                                                                        New Encounter
-                                                                    </Dropdown.Toggle>
-
-
-                                                                    <Dropdown.Menu>
-                                                                        <Dropdown.Item
-                                                                            onClick={() => {
-                                                                                const newTab = {
-                                                                                    id: encounterTabs?.length + 1,
-                                                                                    title: new Date().toISOString().split('T')[0],
-                                                                                    type: 'date',
-                                                                                };
-                                                                                setActiveKey('1')
-                                                                                setEncounterTabs([...encounterTabs, newTab]);
-                                                                                setSelectedMainTab('Encounter'); // Add this line
-                                                                            }}
-                                                                            className='mb-0 fs-6 fw-semibold py-1'
-                                                                        >
-                                                                            <IoCalendar className="me-1" /> By Date
-                                                                        </Dropdown.Item>
-                                                                        <Dropdown.Divider className='m-0' />
-                                                                        <Dropdown.Item
-                                                                            onClick={() => {
-                                                                                const newTab = {
-                                                                                    id: encounterTabs?.length + 1,
-                                                                                    title: 'Clinical Finding',
-                                                                                    type: 'appointment',
-                                                                                };
-                                                                                setActiveKey('1')
-                                                                                setEncounterTabs([...encounterTabs, newTab]);
-                                                                                setSelectedMainTab('Encounter'); // Add this line
-                                                                            }}
-                                                                            className='mb-0 fs-6 fw-semibold py-1'
-                                                                        >
-                                                                            <FaCalendarAlt className="me-1" /> By Appointment
-                                                                        </Dropdown.Item>
-                                                                    </Dropdown.Menu>
-
-                                                                </Dropdown> */}
                                                                 <div className="mt-1 d-flex justify-content-center align-items-center gap-2 ps-2">
                                                                     <Dropdown>
                                                                         <Dropdown.Toggle
@@ -738,6 +680,7 @@ const UpdatePatientIndex = () => {
                                         >
                                             {selectedMainTab === 'Patient Details' && (
                                                 <PatientSummary
+                                                    selectedMainTab={selectedMainTab}
                                                     isAccordionOpen={isAccordionOpen}
                                                     setSelectedMainTab={setSelectedMainTab}
                                                 />
@@ -766,7 +709,7 @@ const UpdatePatientIndex = () => {
                                                     createEncounter={createEncounter}
                                                     setCreateEncounter={setCreateEncounter}
                                                     setEncounterTabs={setEncounterTabs}
-                                                    setSelectedMainTab={setSelectedMainTab} // Pass this prop
+                                                    setSelectedMainTab={setSelectedMainTab}
                                                 />
                                             )}
                                             {[
