@@ -52,7 +52,7 @@ const Appointments = (): React$Element<any> => {
     ];
 
     return (
-        <Card>
+        <Card className='mb-0'>
             <Card.Body className='pt-1 pb-2'>
                 <CardTitle
                     containerClass="d-flex align-items-center justify-content-between mb-2"
