@@ -17,3 +17,6 @@ export * from './socialHistory/action';
 export * from './icdCodes/action';
 export * from './encounter/action';
 export * from './templates/action';
+export * from './Tasks/action';
+export * from './patientAccessHistory/actions';
+export * from './auditReport/actions';

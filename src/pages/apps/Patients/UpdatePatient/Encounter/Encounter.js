@@ -1,18 +1,16 @@
+
 import { useEffect, useState } from 'react';
-import { Tab, Tabs, Card, Offcanvas, Dropdown, Button, Modal } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import { IoClose } from 'react-icons/io5';
-import { FaCalendarAlt } from 'react-icons/fa';
-import { MdOutlineMedicalServices } from 'react-icons/md';
 import './Encounter.css';
 import EncounterList from './EncounterList';
 import DateEncounters from './DateEncounters';
-import AppointmentEncounter from './AppointmentEncounter';
 import { HiMiniBars3BottomLeft } from 'react-icons/hi2';
 import { CiSettings } from "react-icons/ci";
 import EncounterSettingsForm from './EncounterSettings';
 import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { useDispatch } from 'react-redux';
-import { getDoctorsAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
+import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter, isAccordionOpen }) => {
@@ -27,20 +25,6 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     const closeNewEncounterModal = () => {
         setNewEncounterModal(false);
     }
-
-    // Handle new encounter creation
-    // useEffect(() => {
-    //     if (createEncounter) {
-    //         const newTab = {
-    //             id: Date.now(), // Use timestamp for unique ID
-    //             title: new Date().toISOString().split('T')[0], // Use current date as title
-    //             type: 'createEncounter',
-    //         };
-    //         setEncounterTabs([...encounterTabs, newTab]);
-    //         setActiveTab(newTab?.id); // Automatically switch to new tab
-    //         setCreateEncounter(false); // Reset the flag
-    //     }
-    // }, [createEncounter]);
 
     useEffect(() => {
         if (createEncounter) {
@@ -116,21 +100,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
         setShowSettings(false)
     }
 
-    // `The story of hiroshima and nagasaki goes like :
-    // Once there was a time during the World War II when 
-    // the United States dropped atomic bombs on the Japanese
-    // cities of Hiroshima and Nagasaki in August 1945. This
-    // event marked a significant moment in history, leading
-    // to Japan's surrender and the end of the war. The bombings
-    // resulted in immense destruction and loss of life, with long-lasting
-    // effects on the survivors and the environment. The events of Hiroshima
-    // and Nagasaki continue to serve as a powerful reminder of the
-    // devastating consequences of nuclear warfare and the importance
-    // of peace and diplomacy. The story of Hiroshima and Nagasaki is 
-    // a poignant chapter in the history of human conflict, highlighting
-    // the need for global efforts towards disarmament and reconciliation.
-    // The name of the bombs used for the nuclear attacks are as follows:
-    // Fat boy and Little man.`;
+    // const [encounterDataArr, setEncounterDataArr] = useState([])
     return (
         <div className="row">
             {/* Tab headers */}
@@ -155,7 +125,15 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                             className={`cursor-pointer p-1 fs-6 rounded-0 list-group-item  
                                     d-flex align-items-center flex-fill justify-content-center fw-bold 
                                      ${activeTab === tab?.id ? 'active-patient-chart-tab fw-medium border border-muted' : 'border border-muted'}`}
-                            onClick={() => setActiveTab(tab?.id)}
+                            onClick={() => {
+                                if (tab?.type !== 'default') {
+                                    setExpanded(true);
+                                }
+                                if (tab?.type === 'updateEncounter') {
+                                    dispatch(getEncounterByIdAction({ encounterId: tab?.id }))
+                                }
+                                setActiveTab(tab?.id)
+                            }}
                         >
                             <span className="text-nowrap">{tab?.title}</span>
                             {tab.type !== 'default' && (
@@ -187,6 +165,9 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 encounterTabs={encounterTabs}
                                 setEncounterTabs={setEncounterTabs}
                                 setActiveTab={setActiveTab}
+                                // setEncounterDataArr={setEncounterDataArr}
+                                // encounterDataArr={encounterDataArr}
+                                setExpanded={setExpanded}
                                 setCreateEncounter={setCreateEncounter}
                             />
                         ) : (
@@ -199,7 +180,10 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                                 searchNoteType={searchNoteType}
                                 setSearchNoteType={setSearchNoteType}
                                 isCollapsed={isCollapsed}
+                                // encounterDataArr={encounterDataArr}
+                                // setEncounterDataArr={setEncounterDataArr}
                                 setCreateEncounter={setCreateEncounter}
+                            // encounterData={encounterDataArr?.find((ele) => ele?._id === tab?.id)}
                             />
                         )}
                     </div>
@@ -221,23 +205,6 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
                         >
                             Cancel
                         </Button>
-                        {/* <Button 
-                variant="warning" 
-                className="px-4 rounded-pill text-white"
-                onClick={() => {
-                    const today = new Date().toISOString().split('T')[0];
-                    const existingTodayTab = encounterTabs.find(
-                        (tab) => tab.type === 'createEncounter' && tab.title === today
-                    );
-                    if (existingTodayTab) {
-                        setActiveTab(existingTodayTab.id);
-                    }
-                    setNewEncounterModal(false);
-                }}
-            >
-                Update Existing
-            </Button> */}
-
                         <Button
                             className="px-4 custom-buttons"
                             onClick={() => {

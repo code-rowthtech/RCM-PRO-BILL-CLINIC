@@ -152,7 +152,6 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                 updateMedicationAction({ key: encryptMessage(medicationData), medicationId: selectedMedication?._id })
             );
         } else {
-            console.log(medicationData, 'medicationDatamedicationData')
             dispatch(createMedicationAction({ key: encryptMessage(medicationData) }));
         }
     };
@@ -222,7 +221,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                     disabled={selectedMedication}
                                 />
                                 {errors.drugInfo && (
-                                    <span className="text-danger fs-6">{errors.drugInfo.message}</span>
+                                    <span className="text-danger  fs-6">{errors.drugInfo.message}</span>
                                 )}
                                 {drugsData.length > 0 && showDropdown && (
                                     <div
@@ -252,10 +251,16 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         </Col>
                         <Col sm={4}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Frequency <span className='text-danger'>*</span></Form.Label>
-                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: 'This field is required.' })} />
-                                {errors.frequency && (
-                                    <span className="text-danger fs-6">{errors.frequency.message}</span>
+                                <Form.Label className="mb-0">Period Unit <span className='text-danger'>*</span></Form.Label>
+                                <Form.Select {...register('periodUnit', { required: 'This field is required.' })}>
+                                    <option value="">Select unit</option>
+                                    <option value="hours">Hour(s)</option>
+                                    <option value="days">Day(s)</option>
+                                    <option value="weeks">Week(s)</option>
+                                    <option value="months">Month(s)</option>
+                                </Form.Select>
+                                {errors.periodUnit && (
+                                    <span className="text-danger fs-6">{errors.periodUnit.message}</span>
                                 )}
                             </Form.Group>
                         </Col>
@@ -268,18 +273,13 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                 )}
                             </Form.Group>
                         </Col>
+
                         <Col sm={4}>
                             <Form.Group>
-                                <Form.Label className="mb-0">Period Unit <span className='text-danger'>*</span></Form.Label>
-                                <Form.Select {...register('periodUnit', { required: 'This field is required.' })}>
-                                    <option value="">Select unit</option>
-                                    <option value="hours">Hour(s)</option>
-                                    <option value="days">Day(s)</option>
-                                    <option value="weeks">Week(s)</option>
-                                    <option value="months">Month(s)</option>
-                                </Form.Select>
-                                {errors.periodUnit && (
-                                    <span className="text-danger fs-6">{errors.periodUnit.message}</span>
+                                <Form.Label className="mb-0">Frequency <span className='text-danger'>*</span></Form.Label>
+                                <Form.Control type="number" placeholder="e.g. 2" {...register('frequency', { required: 'This field is required.' })} />
+                                {errors.frequency && (
+                                    <span className="text-danger fs-6">{errors.frequency.message}</span>
                                 )}
                             </Form.Group>
                         </Col>

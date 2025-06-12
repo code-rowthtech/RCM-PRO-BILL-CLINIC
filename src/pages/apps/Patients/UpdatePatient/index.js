@@ -8,7 +8,7 @@ import { LiaReceiptSolid } from 'react-icons/lia';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     getAlcoholHistoryAction, getFamilyGeneticAction, getMedicationAction, getPatientByIdAction,
-    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, updatePatientsAction,
+    getSurgicalHistoryAction, getTemplateAction, getTobaccooAction, getVitalsByPatientIdAction, updatePatientsAction,
 } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
 import Spinner from '../../../../constants/Spinner';
@@ -27,6 +27,7 @@ import { getProblemListAction } from '../../../../redux/ProblemList/action';
 import { handlePrintPatientSummary } from '../../../../helpers/printPatientSummary';
 import Encounter from './Encounter/Encounter';
 import PatientDocs from './Patientdocs';
+import PatientAccess from './PatientAccess';
 
 const UpdatePatientIndex = () => {
     const dispatch = useDispatch();
@@ -76,24 +77,28 @@ const UpdatePatientIndex = () => {
     }, []);
 
     useEffect(() => {
+        dispatch(getPatientByIdAction({ id }));
+    }, [dispatch, id])
+
+    useEffect(() => {
         const fetchData = async () => {
-            // First, get the core patient data
-            await dispatch(getPatientByIdAction({ id }));
 
             // Then, fetch important lists
             await dispatch(getProblemListAction({ patientId: id }));
             await dispatch(getMedicationAction({ patientId: id }));
 
             // Finally, fetch the remaining data in parallel
-            dispatch(getSurgicalHistoryAction({ patientId: id }));
-            dispatch(getTobaccooAction({ patientId: id }));
-            dispatch(getFamilyGeneticAction({ patientId: id }));
-            dispatch(getAlcoholHistoryAction({ patientId: id }));
-            dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+            await dispatch(getSurgicalHistoryAction({ patientId: id }));
+            await dispatch(getTobaccooAction({ patientId: id }));
+            await dispatch(getFamilyGeneticAction({ patientId: id }));
+            await dispatch(getAlcoholHistoryAction({ patientId: id }));
+            await dispatch(getTemplateAction({ search: '', skip: 1, limit: 10, status: 'active' }))
+            // await dispatch(getVitalsByPatientIdAction({ patientId: id, effectiveDateTime: effectiveDateTime, limit: 7 }));
         };
-
-        fetchData();
-    }, [dispatch, id]);
+        if (patientDetails && patientDetails?._id === id) {
+            fetchData();
+        }
+    }, [patientDetails, id]);
     // useEffect(() => {
 
     // }, [dispatch]);
@@ -251,7 +256,6 @@ const UpdatePatientIndex = () => {
                                                                 onClick={() => {
                                                                     setSelectedMainTab(subItem.tab);
                                                                     sessionStorage.setItem('selectedMainTab', subItem.tab);
-
                                                                     // setActiveSubmenu(null);
                                                                     // setShowMoreMenu(false);
                                                                 }}
@@ -566,6 +570,7 @@ const UpdatePatientIndex = () => {
                                                                     onClick={() => {
                                                                         setSelectedMainTab('Encounter');
                                                                         setCreateEncounter(true)
+                                                                        setExpanded(true);
                                                                     }}
                                                                     className="shadow-none"
                                                                     style={{
@@ -780,7 +785,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Communication' && <p>In progress...</p>}
                                             {selectedMainTab === 'Task' && <p>In progress...</p>}
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Patient Access' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
                                             {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
                                             {selectedMainTab === 'Balance' && <p>In Progress...</p>}

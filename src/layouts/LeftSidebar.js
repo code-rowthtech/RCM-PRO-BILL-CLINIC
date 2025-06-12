@@ -29,7 +29,6 @@ type SideBarContentProps = {
 
 /* sidebar content */
 const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) => {
-    console.log('metadata', metadata);
     return (
         <>
             {!hideUserProfile && (
@@ -50,19 +49,25 @@ const SideBarContent = ({ hideUserProfile, isCondensed }: SideBarContentProps) =
 
 
 type LeftSidebarProps = {
-    hideLogo: boolean,
-    hideUserProfile: boolean,
-    isLight: boolean,
-    isCondensed: boolean,
+    hideLogo?: boolean,
+    hideUserProfile?: boolean,
+    isLight?: boolean,
+    isCondensed?: boolean,
 };
 
-const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps): React$Element<any> => {
+const LeftSidebar = ({
+    isCondensed = false,
+    isLight = false,
+    hideUserProfile = false,
+    hideLogo = false
+}: LeftSidebarProps = {}): React$Element<any> => {
     const menuNodeRef: any = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
+    // console.log(appointmentsData, 'appointmentsData');
     const statusColors = {
         pending: '#f1c40f', // Yellow
         proposed: '#3498db', // Blue
@@ -126,8 +131,12 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                 status: activeTab,
                 search: search
             }
-            dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
-            dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 20 }));
+            if (!appointmentsData) {
+                dispatch(getPatientsByAppointmentAction({ key: encryptMessage(payload) }))
+            }
+            if (!doctorDetails) {
+                dispatch(getDoctorsAction({ status: true, search: '', page: 1, limit: 20 }));
+            }
 
         }
     }, [location.pathname, dispatch, search, createPatientsResponse, selectedDoctor, activeTab])
@@ -214,9 +223,9 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
                                     <button
                                         data-toggle={
                                             // ele.label === 'Tasks' ||
-                                             ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
+                                            ele.label === 'Billing' || ele.label === 'Help & Support' ? "tooltip" : ''} data-placement="top" title={
                                                 // ele.label === 'Tasks' ||
-                                                 ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
+                                                ele.label === 'Billing' || ele.label === 'Help & Support' ? "In Progress" : ''}
                                         onClick={() => isLogout ? handleCheckLogout(ele.label) : navigate(ele.redirectTo)}
                                         className="px-2 textLeftSidebar bg-transparent border-0"
                                     >
@@ -751,13 +760,6 @@ const LeftSidebar = ({ isCondensed, isLight, hideUserProfile }: LeftSidebarProps
             </div>
         </>
     );
-};
-
-LeftSidebar.defaultProps = {
-    hideLogo: false,
-    hideUserProfile: false,
-    isLight: false,
-    isCondensed: false,
 };
 
 export default LeftSidebar;

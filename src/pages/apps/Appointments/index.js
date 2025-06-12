@@ -111,7 +111,7 @@ const AppointmentsList = ({
             })
         );
     };
-  const handlePageChange = (pageNumber) => {
+    const handlePageChange = (pageNumber) => {
         setSkip(pageNumber);
     };
     return (
@@ -347,7 +347,7 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
     };
     const [showTooltip, setShowTooltip] = useState(false);
 
-  
+
     return (
         <>
             <Row className="mt-2">
@@ -559,9 +559,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                             <ul className="nav nav-pills">
                                                 <li className="nav-item">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'today' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'today' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('today')}>
                                                         <FiSun className="me-1" />
                                                         Today
@@ -569,9 +568,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'upcoming' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('upcoming')}>
                                                         <FiClock className="me-1" />
                                                         Upcoming
@@ -579,9 +577,8 @@ const Appointments = ({ patientsData }: { patientsData: Array<OrderListItems> })
                                                 </li>
                                                 <li className="nav-item ms-2">
                                                     <button
-                                                        className={`nav-link ${
-                                                            appointmentPeriod === 'history' ? 'active' : 'text-black'
-                                                        }`}
+                                                        className={`nav-link ${appointmentPeriod === 'history' ? 'active' : 'text-black'
+                                                            }`}
                                                         onClick={() => setAppointmentPeriod('history')}>
                                                         <FiArchive className="me-1" />
                                                         History

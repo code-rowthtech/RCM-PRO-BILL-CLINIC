@@ -1,23 +1,28 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Badge, Col, Row, Table, Image, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
-import { getEncounterAction } from '../../../../../redux/actions'
+import { getEncounterAction, getEncounterByIdAction } from '../../../../../redux/actions'
 import { useSearchParams } from 'react-router-dom'
 import dummyProfile from '../../../../../assets/images/dummyProfile.png'
 import Spinner from '../../../../../constants/Spinner'
 import ToastHandle from '../../../../../helpers/ToastMessage'
 import { FiFileText } from 'react-icons/fi'
-const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, isAccordionOpen }) => {
+import Paginations from '../../../../../helpers/Paginations'
+import { handlePrintEncounters } from './handlePrintEncounter'
+import { IoPrintSharp } from 'react-icons/io5'
+const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, setExpanded }) => {
     const dispatch = useDispatch()
-    const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams();
+    const [skip, setSkip] = useState(1);
     const id = searchParams.get('id')
     const store = useSelector((state) => state)
     const encounters = store?.getEncounterReducer?.data?.encounters;
-    console.log('encounters', encounters)
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
+
     useEffect(() => {
-        // dispatch(getEncounterAction({ patientId: id }))
-    }, [dispatch, id])
+        dispatch(getEncounterAction({ patientId: id, skip: skip }))
+    }, [skip])
 
     const statusColorMap = {
         planned: 'text-secondary',
@@ -28,6 +33,24 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
         finished: 'text-success',
         cancelled: 'text-danger',
     };
+
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
+
+
+
+    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+
+    // useEffect(() => {
+    //     if (!encounterData || !encounterData._id) return;
+
+    //     const alreadyInArr = encounterDataArr.some((data) => data?._id === encounterData._id);
+
+    //     if (!alreadyInArr) {
+    //         setEncounterDataArr((prev) => [...prev, encounterData]);
+    //     }
+    // }, [encounterData, encounterDataArr]);
 
     return (
         <Row className='my-1'>
@@ -48,7 +71,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                     </thead>
                     <tbody>
                         {store?.getEncounterReducer?.loading ?
-                            <tr>
+                            <tr key=''>
                                 <td colSpan={7} className='text-center py-5'>
                                     <Spinner />
                                 </td>
@@ -56,19 +79,8 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                             :
                             encounters?.length > 0 ?
                                 encounters?.map((item, index) => (
-                                    <tr onClick={() => {
-                                        const newTab = {
-                                            id: item?._id,
-                                            title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
-                                            type: 'updateEncounter',
-                                        };
-                                        if (encounterTabs?.some((data) => data?.id === newTab?.id)) {
-                                            ToastHandle('Encounter is already open in a tab.', 'danger')
-                                        } else {
-                                            setEncounterTabs([...encounterTabs, newTab]);
-                                            setActiveTab(newTab?.id)
-                                        }
-                                    }} key={item?.id}>
+                                    <tr
+                                        key={item?._id}>
                                         <td>{index + 1}</td>
                                         <td className="d-flex align-items-center gap-2">
                                             <Image
@@ -90,19 +102,30 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                         <td className='text-capitalize'>{item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '-'}</td>
                                         <td className='text-capitalize'>{item?.period?.end ? new Date(item?.period?.end)?.toISOString().split('T')?.[0] : '-'}</td>
                                         <td>
+                                            <IoPrintSharp className="fs-4 mb-1 me-1" onClick={() => handlePrintEncounters(item, patientDetails)} />
+                                            {/* <button onClick={() => handlePrintEncounters(item)}>
+                                                Print Encounter
+                                            </button> */}
                                             <i
                                                 className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
                                                 onClick={() => {
+                                                    setExpanded(true);
                                                     const newTab = {
                                                         id: item?._id,
                                                         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
                                                         type: 'updateEncounter',
                                                     };
-                                                    if (encounterTabs?.some((data) => data?.id === newTab?.id)) {
-                                                        ToastHandle('Encounter is already open in a tab.', 'danger')
+                                                    dispatch(getEncounterByIdAction({ encounterId: item?._id }))
+                                                    // Check if the tab already exists
+                                                    const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
+
+                                                    if (existingTab) {
+                                                        // If tab exists, just switch to it instead of showing error
+                                                        setActiveTab(existingTab.id);
                                                     } else {
+                                                        // If tab doesn't exist, add it and switch to it
                                                         setEncounterTabs([...encounterTabs, newTab]);
-                                                        setActiveTab(newTab?.id)
+                                                        setActiveTab(newTab.id);
                                                     }
                                                 }}
                                             />
@@ -130,6 +153,15 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
                 </Table>
             </Col>
+            <div className="col-12">
+                <div className="mt-2 d-flex justify-content-end">
+                    <Paginations
+                        currentPage={skip}
+                        totalPages={store?.getEncounterReducer?.data?.pages}
+                        onPageChange={handlePageChange}
+                    />
+                </div>
+            </div>
         </Row>
     )
 }

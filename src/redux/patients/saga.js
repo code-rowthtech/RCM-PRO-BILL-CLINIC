@@ -5,7 +5,8 @@ import {
     getDocumentsApi, getInsuranceByIdApi, getPatientByIdApi, getPatientsApi,
     getPatientsByAppointmentApi, getResponsiblePartyApi, updateInsuranceApi,
     updatePatientsApi, updateResponsiblePartyApi, uploadDocumentsApi, updateDocumentsApi,
-    deleteDocumentsApi
+    deleteDocumentsApi,
+    getDocumentsByIdApi
 } from './api';
 import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
@@ -452,6 +453,33 @@ function* getDocumentsFunction(data) {
     }
 }
 
+function* getDocumentsByIdFunction(data) {
+    try {
+        yield put({
+            type: PatientsActionTypes.GET_DOCUMENTS_BY_ID_LOADING,
+            payload: {},
+        });
+        const response = yield call(getDocumentsByIdApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: PatientsActionTypes.GET_DOCUMENTS_BY_ID_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: PatientsActionTypes.GET_DOCUMENTS_BY_ID_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: PatientsActionTypes.GET_DOCUMENTS_BY_ID_ERROR,
+            payload: error,
+        });
+    }
+}
+
 export function* callResetUpdate() {
     put({
         type: PatientsActionTypes.RESET_UPDATE_STATUS,
@@ -519,6 +547,10 @@ export function* watchGetDocuments() {
     yield takeEvery(PatientsActionTypes.GET_DOCUMENTS, getDocumentsFunction);
 }
 
+export function* watchGetDocumentById() {
+    yield takeEvery(PatientsActionTypes.GET_DOCUMENTS_BY_ID, getDocumentsByIdFunction);
+}
+
 export function* watchresetState() {
     yield takeEvery(PatientsActionTypes.RESET_UPDATE_STATUS, callResetUpdate);
 }
@@ -534,7 +566,7 @@ function* patientsSaga() {
         fork(watchGetResponsibleParty),
         fork(watchUpdatePatients), fork(watchCreateInsurance), fork(watchUpdateInsurance),
         fork(watchGetInsuranceByPatientId), fork(watchUploadDocuments), fork(watchUpdateDocuments),
-        fork(watchGetDocuments), fork(watchDeleteDocuments),
+        fork(watchGetDocuments), fork(watchDeleteDocuments), fork(watchGetDocumentById),
         fork(watchresetState),
     ]);
 }

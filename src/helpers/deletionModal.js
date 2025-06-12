@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import Spinner from '../constants/Spinner';
 
 const DeletionModal = ({ show, onHide, onConfirm, item = 'item', isLoading = false }) => {
 
@@ -14,7 +15,11 @@ const DeletionModal = ({ show, onHide, onConfirm, item = 'item', isLoading = fal
                     Cancel
                 </Button>
                 <Button disabled={isLoading} className='custom-buttons' onClick={onConfirm}>
-                    Delete
+                    {isLoading ?
+                        <Spinner className='spinner-border-sm' color='white' />
+                        :
+                        `Delete`
+                    }
                 </Button>
             </Modal.Footer>
         </Modal>

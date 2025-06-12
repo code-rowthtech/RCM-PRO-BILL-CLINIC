@@ -205,9 +205,9 @@ select.form-control:not([size]):not([multiple]) {
 }
 
 .form-label {
-    color: black;
+    color: rgba(51, 51, 51, 0.6) !important; /* #333 with 60% opacity */
     font-weight: 500 !important;
-    opacity: 0.6;
+    /* opacity: 0.6; */
     font-size: 12px;
 }
 
@@ -236,6 +236,7 @@ select.form-control:not([size]):not([multiple]) {
 .form-control::placeholder {
     color: #0908084f !important;
     font-size: 12px;
+    font-weight: 400 !important;
 }
 
 table {
@@ -931,6 +932,7 @@ tbody tr:hover {
 .vitalsTableBorder {
     border-bottom: 1px solid rgba(128, 128, 128, 0.281) !important;
 }
+
 .vitalsTable tr td {
     font-size: 12px !important;
     padding-top: 3px !important;
@@ -942,6 +944,7 @@ tbody tr:hover {
     font-size: 13px !important;
     font-weight: 600 !important;
 }
+
 .vitalsFormControl .form-control {
     font-size: 13px !important;
     padding: 0 10px !important;
@@ -1039,7 +1042,7 @@ tbody tr:hover {
 }
 
 .notes-scroll::-webkit-scrollbar-thumb {
-    background-color: #bbb; /* Slightly lighter for subtle look */
+    background-color: #bbb;
     border-radius: 10px;
     border: none;
 }
@@ -1066,7 +1069,7 @@ tbody tr:hover {
     transition-duration: 0.6s;
 }
 .css-1dimb5e-singleValue {
-    margin-left: 5 px !important;
+    margin-left: 5px !important;
 }
 
 .select__input {
@@ -1112,4 +1115,201 @@ option {
 
 .scroll-will-change {
     will-change: transform;
+}
+
+.select__indicator-separator {
+    background-color: transparent !important;
+}
+
+/* .expanded-document {
+    position: relative;
+    width: 95%;
+    margin: 0 auto;
+    transform-origin: top center;
+} */
+
+/* Optional: Add overlay effect when a document is expanded */
+/* .expanded-document::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.expanded-document {
+    position: relative;
+    z-index: 111;
+}
+
+.expanded-document::before {
+    opacity: 0;
+}
+
+.modal-enter {
+    opacity: 0;
+    transform: scale(0.9);
+}
+.modal-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition:
+        opacity 300ms,
+        transform 300ms;
+}
+.modal-exit {
+    opacity: 1;
+}
+.modal-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition:
+        opacity 300ms,
+        transform 300ms;
+}
+
+.modal-overlay.opening {
+    opacity: 0;
+}
+.modal-overlay.closing {
+    opacity: 1;
+}
+.modal-content.opening {
+    transform: translate(var(--original-x), var(--original-y));
+    width: var(--original-width);
+    height: var(--original-height);
+}
+.modal-content.closing {
+    transform: translate(var(--original-x), var(--original-y));
+    width: var(--original-width);
+    height: var(--original-height);
+} */
+
+/* Thin scrollbar for WebKit browsers */
+.thin-scrollbar::-webkit-scrollbar {
+    width: 1px; /* Change to 2px or 1px for even thinner */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent; /* or use a color like #f1f1f1 */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.4); /* Customize thumb color */
+    border-radius: 0px;
+}
+
+/* Optional: Firefox support */
+.thin-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #e8eaed transparent;
+}
+
+/* CSS FOR TABLES WITH FIXED HEADERS LIKE THE DOCUMENTS ADDITION TIME */
+
+.table-scroll {
+    display: block;
+    empty-cells: show;
+}
+
+.table-scroll thead {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.table-scroll tbody {
+    display: block;
+    position: relative;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+.table-scroll tr {
+    width: 100%;
+    display: flex;
+}
+
+.table-scroll td,
+.table-scroll th {
+    flex-basis: 100%;
+    flex-grow: 2;
+    display: block;
+}
+
+.table-scroll.small-first-col td:first-child,
+.table-scroll.small-first-col th:first-child {
+    flex-basis: 20%;
+    flex-grow: 1;
+}
+
+.body-half-screen {
+    max-height: 17.6vh;
+}
+
+.small-col {
+    flex-basis: 10%;
+}
+.text-danger {
+    color: red !important;
+}
+
+/* CK EDITOR */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+@media print {
+    body {
+        margin: 0 !important;
+    }
+}
+
+.main-container {
+    font-family: 'Lato';
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ck-content {
+    font-family: 'Lato';
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.editor-container_classic-editor .editor-container__editor {
+    min-width: 795px;
+    max-width: 795px;
+}
+
+.editor_container__word-count .ck-word-count {
+    color: var(--ck-color-text);
+    display: flex;
+    height: 20px;
+    gap: var(--ck-spacing-small);
+    justify-content: flex-end;
+    font-size: var(--ck-font-size-base);
+    line-height: var(--ck-line-height-base);
+    font-family: var(--ck-font-face);
+    padding: var(--ck-spacing-small) var(--ck-spacing-standard);
+}
+
+.editor-container_include-word-count.editor-container_classic-editor .editor_container__word-count {
+    border: 1px solid var(--ck-color-base-border);
+    border-radius: var(--ck-border-radius);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+}
+
+.editor-container_include-word-count.editor-container_classic-editor
+    .editor-container__editor
+    .ck-editor
+    .ck-editor__editable {
+    border-radius: 0;
 }

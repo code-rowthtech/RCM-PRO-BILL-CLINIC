@@ -19,7 +19,8 @@ import {
     uploadDocumentsReducer,
     getDocumentsReducer,
     updateDocumentsReducer,
-    deleteDocumentsReducer
+    deleteDocumentsReducer,
+    getDocumentsByIdReducer
 } from './patients/reducers';
 import { getSubscriptionReducer, getSubSubscriptionReducer } from './subscriptions/reducers';
 import { createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer, updateSubClinicReducer } from './sub clinic/reducers';
@@ -37,6 +38,9 @@ import { getIcdProcedureReducer } from './icdCodes/reducer';
 import { createEncounterReducer, createEncounterSettingsReducer, getEncounterByIdReducer, getEncounterNotesFieldsReducer, getEncounterNotesTypeReducer, getEncounterReducer, getEncounterSettingsReducer, updateEncounterReducer, updateEncounterSettingsReducer } from './encounter/reducer';
 import { createNoteCategoriesReducer, createSettingsTabsReducer, getNoteCategoriesReducer, getSettingsTabsReducer, updateNoteCategoriesReducer, updateSettingsTabsReducer } from './noteCategories/reducer';
 import { createTemplateReducer, deleteTemplateReducer, getTemplateReducer, updateTemplateReducer } from './templates/reducer';
+import { createUserTasksReducer, getTaskByIdReducer, getUserTasksReducer, updateUserTasksReducer } from './Tasks/reducer';
+import { getPatientsAccessLogsReducer } from './patientAccessHistory/reducers';
+import { getAuditReportReducer } from './auditReport/reducers';
 export default (combineReducers({
     Auth,
     Layout,
@@ -48,7 +52,7 @@ export default (combineReducers({
     createtDoctorsDetailReducer, createtDoctorsReducer, getDoctorDetailsReducer, addReferringDoctorReducer,
     createPatientsReducer, updatePatientsReducer, getPatientByIdReducer, createResponsiblePartyReducer, updateResponsiblePartyReducer, updateInsuranceReducer, createInsuranceReducer, getResponsiblePartyReducer, getDoctorsListReducer, createScheduleReducer, getScheduleReducer, deleteScheduleReducer,
     getDoctorsRolesReducer,
-    getPatientsReducer, uploadDocumentsReducer, getDocumentsReducer, updateDocumentsReducer, deleteDocumentsReducer,
+    getPatientsReducer, uploadDocumentsReducer, getDocumentsReducer, updateDocumentsReducer, deleteDocumentsReducer, getDocumentsByIdReducer,
     getSubscriptionReducer, getSubSubscriptionReducer,
     createRoleDataReducer, updateRoleDataReducer, getRoleDataReducer,
     createSubClinicsReducer, getSubClinicsReducer, getSubClinicTypeReducer, getSubscriptionsReducer, createUpgradeReducer, getSubClinicCityReducer,
@@ -75,4 +79,11 @@ export default (combineReducers({
     createTemplateReducer, updateTemplateReducer, getTemplateReducer, deleteTemplateReducer,
     // settings tabs
     getSettingsTabsReducer, createSettingsTabsReducer, updateSettingsTabsReducer,
+    // TASKS
+    createUserTasksReducer, getUserTasksReducer, updateUserTasksReducer, getTaskByIdReducer,
+    // Patient History Logs
+    getPatientsAccessLogsReducer,
+    // Audit Report
+    getAuditReportReducer,
+    
 }): any);

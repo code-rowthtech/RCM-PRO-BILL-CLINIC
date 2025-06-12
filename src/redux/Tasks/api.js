@@ -2,19 +2,22 @@ import { APICore } from '../../helpers/api/apiCore';
 import * as URL from '../../helpers/api/apiEndpoints';
 const api = new APICore();
 
-export function createTasksApi(params: any): any {
+export function createUserTasksApi(params: any): any {
     const { data } = params;
     return api.create(URL.tasks, data);
 }
-export function getTasksDetailsApi(params: any): any {
+
+export function updateUserTasksApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.tasks}?id=${data?.id}`);
+    return api.update(`${URL.tasks}/${data?.taskId}`, data);
 }
-export function updateTasksApi(params: any): any {
+
+export function getUserTasksApi(params: any): any {
     const { data } = params;
-    return api.create(URL.tasks, data);
+    return api.get(`${URL.tasks}?status=${data?.status}&priority=${data?.priority || ''}&assignedToId=${data?.assignedToId || ''}&page=${data?.skip}&search=${data?.search}`);
 }
-export function deleteTasksApi(params: any): any {
+
+export function getUserTaskByIdApi(params: any): any {
     const { data } = params;
-    return api.delete(`${URL.tasks}?id=${data?.id}`);
+    return api.get(`${URL.tasks}/${data?.taskId}`);
 }

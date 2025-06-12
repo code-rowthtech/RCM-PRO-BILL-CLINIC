@@ -72,6 +72,11 @@ const GET_DOCUMENTS_INITIAL_STATE = {
     data: [],
     loading: false
 }
+
+const GET_DOCUMENTS_BY_ID_INITIAL_STATE = {
+    data: [],
+    loading: false
+}
 export const getPatientsReducer = (state = GET_PATIENTS_INITIAL_STATE, action) => {
     switch (action.type) {
         case PatientsActionTypes.GET_PATIENTS_LOADING:
@@ -140,11 +145,7 @@ export const getPatientByIdReducer = (state = GET_PATIENTS_BY_ID_INITIAL_STATE, 
                 data: action.payload,
                 loading: false
             }
-        // case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-        //     return {
-        //         data: [],
-        //         loading: false
-        //     }
+
         default: return state
     }
 }
@@ -488,6 +489,29 @@ export const getDocumentsReducer = (state = GET_DOCUMENTS_INITIAL_STATE, action)
             };
 
         case PatientsActionTypes.GET_DOCUMENTS_ERROR:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+        default:
+            return state;
+    }
+};
+
+export const getDocumentsByIdReducer = (state = GET_DOCUMENTS_BY_ID_INITIAL_STATE, action) => {
+    switch (action.type) {
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_LOADING:
+            return {
+                data: state.data,
+                loading: true,
+            };
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_SUCCESS:
+            return {
+                data: action.payload,
+                loading: false,
+            };
+
+        case PatientsActionTypes.GET_DOCUMENTS_BY_ID_ERROR:
             return {
                 data: action.payload,
                 loading: false,

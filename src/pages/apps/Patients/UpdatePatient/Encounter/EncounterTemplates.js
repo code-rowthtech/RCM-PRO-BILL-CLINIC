@@ -2,8 +2,8 @@ import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css';
 import Spinner from '../../../../../constants/Spinner';
-import { FiFileText, FiFilter, FiTag, FiLayers, FiList } from 'react-icons/fi';
-import { Badge, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { FiFileText } from 'react-icons/fi';
+import { Badge } from 'react-bootstrap';
 import { IoSearchSharp } from 'react-icons/io5';
 import { FormInput } from '../../../../../components';
 import { getTemplateAction } from '../../../../../redux/actions';
@@ -11,15 +11,16 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TemplateModal from '../../../NotesAndTemplates/Modals/TemplateModal';
 
-const EncounterTemplates = ({ selectedFromList, setSelectedFromList, isAccordionOpen }) => {
+const EncounterTemplates = ({ selectedFromList, setSelectedFromList }) => {
     const store = useSelector((state) => state);
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
     const templatesData = store?.getTemplateReducer?.data?.data;
-    const [searchTemplates, setSearchTemplates] = useState('')
+    const [searchTemplates, setSearchTemplates] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [templateToEdit, setTemplateToEdit] = useState(null);
     const [editIcon, setEditIcon] = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
+
     const closeModal = () => {
         setShowModal(false);
         setTemplateToEdit(null);
@@ -48,25 +49,33 @@ const EncounterTemplates = ({ selectedFromList, setSelectedFromList, isAccordion
                                     </Col>
                                     <Col sm={12}>
                                         <ul className='list-unstyled fs-6 px-2'>
-                                            {item?.list?.map((itemList, index) => (
-                                                <li
-                                                    onClick={() => {
-                                                        setSelectedFromList(prev => ({
-                                                            ...prev,
-                                                            [item?.label]: prev[item?.label]
-                                                                ? `${prev[item?.label]}\n${itemList?.text}`
-                                                                : itemList?.text
-                                                        }));
-
-                                                    }}
-                                                    className='border-bottom py-1 cursor-pointer list-hover' key={index}>{itemList?.text}</li>
-                                            ))}
+                                            {item?.list?.map((itemList, index) => {
+                                                const alreadySelected = selectedFromList?.[item?.label]?.includes(itemList?.text);
+                                                return (
+                                                    <li
+                                                        style={{ backgroundColor: alreadySelected ? 'rgb(232 240 254 / 61%)' : '' }}
+                                                        onClick={() => {
+                                                            if (!alreadySelected) {
+                                                                setSelectedFromList(prev => ({
+                                                                    ...prev,
+                                                                    [item?.label]: prev[item?.label]
+                                                                        ? `${prev[item?.label]}\n${itemList?.text}`
+                                                                        : itemList?.text
+                                                                }));
+                                                            }
+                                                        }}
+                                                        className={`border-bottom py-1 cursor-pointer list-hover ${alreadySelected ? 'text-muted' : ''}`}
+                                                        key={index}
+                                                    >
+                                                        {itemList?.text} {alreadySelected && <Badge bg="success" text="white" className="ms-1">Added</Badge>}
+                                                    </li>
+                                                )
+                                            })}
                                         </ul>
                                     </Col>
                                 </Row>
                             </Col>
                         ))}
-
                     </Row>
                 </Col>
                 :

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, createRef } from 'react';
 import { Col, Button, Row, Form } from 'react-bootstrap';
 import EncounterSummary from './EncounterSummary';
 import { useSelector } from 'react-redux';
@@ -16,10 +16,10 @@ import Spinner from '../../../../../constants/Spinner';
 import PastEncounters from './PastEncounters';
 import { string } from 'prop-types';
 import { Controller } from 'react-hook-form';
-
+import { handlePrintEncounters } from './handlePrintEncounter';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
 const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteType, isAccordionOpen, encounterAction, encounterId }) => {
-
     const [leftTab, setLeftTab] = useState('Summary');
     const [selectedFromList, setSelectedFromList] = useState({})
     const store = useSelector((state) => state);
@@ -40,7 +40,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     const settingsDataMainItems = store?.getEncounterSettingsReducer?.data?.data?.items;
     const createEncounterData = store?.createEncounterReducer;
 
-    // const encounterData=
     const notesFields = store?.getEncounterNotesFieldsReducer?.data?.data?.displaySettings?.mainPanel?.[0]?.sections;
     const notesTypeOptions = store?.getEncounterNotesTypeReducer?.data?.data?.map((data) => ({
         label: data?.title, value: data?._id, isDefault: data?.default
@@ -52,6 +51,24 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
     // Get update encounter data from store
     const updateEncounterData = store?.updateEncounterReducer;
+    const encounterDataGet = store?.getEncounterByIdReducer?.data?.encounter;
+    // useEffect(() => {
+    //     if (!encounterDataGet || !encounterDataGet._id) return;
+
+    //     setEncounterDataArr((prev) => {
+    //         const exists = prev.some((data) => data._id === encounterDataGet._id);
+
+    //         if (exists) {
+    //             // Replace the existing item
+    //             return prev.map((data) =>
+    //                 data._id === encounterDataGet._id ? encounterDataGet : data
+    //             );
+    //         } else {
+    //             // Add as new item
+    //             return [...prev, encounterDataGet];
+    //         }
+    //     });
+    // }, [encounterDataGet]);
 
     // Handle successful encounter creation or update
     useEffect(() => {
@@ -74,23 +91,23 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         updateEncounterData?.data?.status,
     ]);
 
-    useEffect(() => {
-        if (encounterAction === 'updateEncounter') {
-            dispatch(getEncounterByIdAction({ encounterId: encounterId }))
-        }
-    }, [encounterAction])
+    // useEffect(() => {
+    //     if (encounterAction === 'updateEncounter') {
+    //         dispatch(getEncounterByIdAction({ encounterId: encounterId }))
+    //     }
+    // }, [encounterAction])
     // Set default note type and populate form for update
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
-            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption.value }));
+            dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption?.value }));
         }
 
         // Populate form for update operation
         if (encounterAction === 'updateEncounter' && encounterData && notesFields) {
             // Set provider
             if (encounterData?.providerId) {
-                setSelectedProvider(encounterData.providerId);
+                setSelectedProvider(encounterData?.providerId);
             }
 
             // Set form values
@@ -101,7 +118,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             if (encounterData?.class?.coding?.[0]) {
                 setValue('class', encounterData?.class?.coding?.[0]?.code);
             }
-
             if (encounterData?.status) {
                 setValue('status', encounterData?.status);
             }
@@ -114,7 +130,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 encounterData?.data?.forEach(field => {
                     if (field?.type && field?.content?.value) {
                         setValue(field?.type, field?.content?.value);
-                        console.log('Setting field:', field?.type, 'with valuse:', field?.content?.value);
                     }
                 });
             }
@@ -139,16 +154,46 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         if (!selectedFromList) return;
 
         setTimeout(() => {
-            ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach((section) => {
+            ['Subjective', 'Objective', 'Assessment', 'Plan', 'Care Plan', "Notes"].forEach((section) => {
                 if (selectedFromList?.[section]) {
-                    setValue(section, selectedFromList[section]);
+                    setValue(section === 'Care Plan' ? 'CarePlan' : section, selectedFromList[section]);
                 }
             });
         }, 0);
     }, [selectedFromList, setValue]);
 
-
+    const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
+        // For SOAP sections, keep refs for each ReactQuill
+        const quillRefs = useRef({
+            Subjective: createRef(),
+            Objective: createRef(),
+            Assessment: createRef(),
+            Plan: createRef(),
+            CarePlan: createRef(),
+            Notes: createRef(),
+        });
+        const MAX_LENGTH = 1000;
+
+        useEffect(() => {
+            const sections = ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'];
+
+            sections.forEach(section => {
+                const editor = quillRefs.current[section]?.current?.getEditor?.();
+
+                if (editor) {
+                    editor.on('text-change', (delta, oldDelta, source) => {
+                        if (source === 'user') {
+                            const text = editor.getText(); // includes trailing '\n'
+                            if (text.length > MAX_LENGTH + 1) {
+                                editor.deleteText(MAX_LENGTH, text.length);
+                            }
+                        }
+                    });
+                }
+            });
+        }, []);
+
         const getFieldsToRender = () => {
             return (data || [])
                 .filter(field => field.isShown && !excludedFields.includes(field.name))
@@ -157,21 +202,80 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
         const renderField = (field) => {
             const { name, inputType = 'textarea' } = field;
+            const countWords = (text) => {
+                return text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            };
+
+            // Handler for text change with word limit
+            const handleTextChange = (onChange, value, maxWords) => (content) => {
+                const wordCount = countWords(content.replace(/<[^>]*>/g, ' ')); // Strip HTML tags for counting
+                if (wordCount <= maxWords) {
+                    onChange(content);
+                }
+            };
+
             if (name === 'Notes (SOAP)') {
                 return (
                     <div className="" key={name}>
+
                         <h5>{name}</h5>
-                        {['Subjective', 'Objective', 'Assessment', 'Plan'].map(section => (
+                        {['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].map(section => (
                             <Form.Group className="mb-2" key={section}>
-                                <Form.Label className="mb-0">{section}</Form.Label>
+                                <Form.Label className="mb-1 d-flex align-items-center gap-2">
+                                    <span>{section === 'CarePlan' ? 'Care Plan' : section}</span>
+                                    <Form.Select className="w-25 text-black"
+                                        onChange={e => {
+                                            const value = e.target.value;
+                                            if (value && quillRefs.current[section]?.current) {
+                                                const editor = quillRefs.current[section].current.getEditor();
+                                                const range = editor.getSelection(true);
+                                                editor.insertText(range ? range.index : 0, value);
+                                                e.target.value = '';
+                                            }
+                                        }}
+                                    >
+                                        <option value="">Add Patient Info</option>
+                                        {['Address', 'Age', 'Date of Birth', 'Email', 'Patient Name', 'Phone'].map((label, index) => {
+                                            const getValue = () => {
+                                                switch (label) {
+                                                    case 'Address':
+                                                        return patientDetails?.address?.[0]?.line?.[0] || '';
+                                                    case 'Age':
+                                                        return patientDetails?.approxAge ? `${patientDetails.approxAge} years old` : '';
+                                                    case 'Date of Birth':
+                                                        return patientDetails?.birthDate
+                                                            ? new Date(patientDetails.birthDate).toISOString().split('T')[0]
+                                                            : '';
+                                                    case 'Email':
+                                                        return patientDetails?.telecom?.find(t => t.system === 'email')?.value || '';
+                                                    case 'Patient Name':
+                                                        return patientDetails?.name?.find(n => n.use === 'official')?.text || '';
+                                                    case 'Phone':
+                                                        return patientDetails?.telecom?.find(t => t.system === 'phone')?.value || '';
+                                                    default:
+                                                        return '';
+                                                }
+                                            };
+
+                                            return (
+                                                <option key={index} value={getValue()}>
+                                                    {label}
+                                                </option>
+                                            );
+                                        })}
+                                    </Form.Select>
+                                </Form.Label>
                                 <Controller
                                     name={section}
                                     control={control}
                                     render={({ field: { onChange, value } }) => (
                                         <ReactQuill
+                                            ref={quillRefs.current[section]}
                                             theme="snow"
                                             value={value || ''}
-                                            onChange={onChange}
+                                            // onChange={onChange}
+                                            onChange={handleTextChange(onChange, value, 100)}
+
                                             modules={{
                                                 toolbar: [
                                                     ['bold', 'italic', 'underline'],
@@ -215,11 +319,69 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                             )}
                         />
                     ) : (
-                        <Form.Control
-                            {...register(name)}
-                            as={inputType === 'text' ? 'input' : 'textarea'}
-                            rows={inputType === 'text' ? undefined : 3}
+                        // <Form.Control
+                        //     {...register(name)}
+                        //     as={inputType === 'text' ? 'input' : 'textarea'}
+                        //     rows={inputType === 'text' ? undefined : 3}
+                        // />
+                        // <Controller
+                        //     name={name}
+                        //     control={control}
+                        //     render={({ field: { value = '', onChange } }) => (
+                        //         <Form.Control
+                        //             as={inputType === 'text' ? 'input' : 'textarea'}
+                        //             rows={inputType === 'text' ? undefined : 10}
+                        //             value={value}
+                        //             onChange={(e) => {
+                        //                 const input = e.target.value;
+                        //                 const words = input.trim().split(/\s+/).filter(Boolean);
+
+                        //                 // Prevent updating if the last word exceeds 45 characters
+                        //                 const lastWord = words[words.length - 1] || '';
+                        //                 if (lastWord.length > 45) return;
+
+                        //                 const limitedWords = words.slice(0, MAX_LENGTH);
+                        //                 const limitedText = limitedWords.join(' ');
+                        //                 onChange(limitedText);
+                        //             }}
+                        //         />
+                        //     )}
+                        // />
+                        <Controller
+                            name={name}
+                            control={control}
+                            render={({ field: { value = '', onChange } }) => (
+                                <Form.Control
+                                    as={inputType === 'text' ? 'input' : 'textarea'}
+                                    rows={inputType === 'text' ? undefined : 10}
+                                    value={value}
+                                    onChange={(e) => {
+                                        const input = e.target.value;
+
+                                        const words = input.match(/\S+/g) || []; // words are non-space sequences
+                                        const wordCount = words.length;
+
+                                        const lastWordMatch = input.match(/(\S+)$/); // match last word
+                                        const lastWord = lastWordMatch ? lastWordMatch[0] : '';
+
+                                        if (wordCount < MAX_LENGTH) {
+                                            onChange(input);
+                                            return;
+                                        }
+
+                                        // Word count == MAX_LENGTH
+                                        if (wordCount === MAX_LENGTH) {
+                                            // Allow updating only if user is typing inside the last word and it's <= 45 characters
+                                            if (lastWord.length <= 45 && /\S$/.test(input)) {
+                                                onChange(input);
+                                            }
+                                            // Else block (including if trying to type space after last word)
+                                        }
+                                    }}
+                                />
+                            )}
                         />
+
                     )}
                 </Form.Group>
             );
@@ -271,7 +433,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
 
             // Handle SOAP notes specially
             if (name === 'Notes (SOAP)') {
-                ['Subjective', 'Objective', 'Assessment', 'Plan'].forEach(section => {
+                ['Subjective', 'Objective', 'Assessment', 'Plan', 'CarePlan', 'Notes'].forEach(section => {
                     const value = getValues(section) || '';
                     fieldsData.push({
                         type: section,
@@ -361,6 +523,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }
         setIsSessionRunning(!isSessionRunning);
     }, [isSessionRunning, stopwatchTime]);
+
     return (
         <div className='px-0 mt-1  row border h-100  mx-1'>
             <Col className={` px-0 ${isCollapsed ? 'd-none' : ''}`} sm={4}>
@@ -422,7 +585,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                         dispatch(updateEncounterAction({ key: encryptMessage(payload) }));
                                                     }
                                                 }}
-                                                className='border-primary'>
+                                                className='border-primary' >
                                                 <option key='' value='' hidden>Select...</option>
                                                 {encounterTypes?.map((data, index) => (
                                                     <option key={index} value={data?.code}>{data?.code + '-' + data?.display}</option>
@@ -558,7 +721,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                                 className='text-capitalize'>
                                                 <option key='' value=''>Select Status</option>
                                                 {['planned', 'arrived', 'triaged', 'in-progress', 'onleave', 'finished', 'cancelled']?.map((data, index) => (
-                                                    <option value={data} className='text-capitalize' key={index}>{data}</option>
+                                                    <option selected={!encounterData && data === 'arrived'} value={data} className='text-capitalize' key={index}>{data}</option>
                                                 ))}
                                             </Form.Select>
                                         </div>
@@ -625,7 +788,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 control={control}
                             />
                             <div className="row position-relative ">
-                                <div
+                                {/* <div
                                     style={{ top: '8%' }}
                                     className="position-absolute d-flex align-items-center gap-2 py-2">
                                     <Stopwatch
@@ -633,7 +796,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                         time={stopwatchTime}
                                         onToggle={toggleSession}
                                     />
-                                </div>
+                                </div> */}
                                 <div className=" d-flex justify-content-end gap-2 py-2">
                                     <Button
                                         type='Submit'
@@ -641,7 +804,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >
-                                        {encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
+                                        {store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading ?
+                                            <Spinner className='spinner-border-sm' color='white' />
+                                            :
+                                            encounterAction === 'updateEncounter' ? 'Update' : 'Save'}
                                     </Button>
                                 </div>
                             </div>

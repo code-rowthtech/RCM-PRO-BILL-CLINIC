@@ -14,32 +14,29 @@ type SpinnerProps = {
 /**
  * Spinner
  */
-const Spinner = (props: SpinnerProps): React$Element<any> => {
-    const children = props.children || null;
-    const Tag = props.tag || 'div';
-    const color = props.color || 'secondary';
-    const size = props.size || '';
-
+const Spinner = ({
+    tag: Tag = 'div',
+    className,
+    size = '',
+    type = 'bordered',
+    color = 'secondary',
+    children = null,
+}: SpinnerProps): React$Element<any> => {
     return (
         <Tag
             role="status"
             className={classNames(
                 {
-                    'spinner-border': props.type === 'bordered',
-                    'spinner-grow': props.type === 'grow',
+                    'spinner-border': type === 'bordered',
+                    'spinner-grow': type === 'grow',
                 },
                 [`text-${color}`],
                 { [`avatar-${size}`]: size },
-                props.className
+                className
             )}>
             {children}
         </Tag>
     );
-};
-
-Spinner.defaultProps = {
-    tag: 'div',
-    type: 'bordered',
 };
 
 export default Spinner;

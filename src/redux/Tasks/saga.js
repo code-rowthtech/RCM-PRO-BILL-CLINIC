@@ -3,178 +3,160 @@ import { decryptMessage } from '../../cryptoUtils';
 import ToastHandle from '../../helpers/ToastMessage';
 import { TaskConstantTypes } from './constants';
 import {
-    createTasksApi,
-    deleteTasksApi,
-    getTasksDetailsApi,
-    updateTasksApi,
+    createUserTasksApi,
+    getUserTaskByIdApi,
+    getUserTasksApi,
+    updateUserTasksApi,
 } from './api';
 /**
  * Login the user
  * @param {*} payload - username and password
  */
 
-function* createTasksFunction(data) {
+function* createUserTasksFunction(data) {
     try {
         yield put({
-            type: TaskConstantTypes.CREATE_TASKS_LOADING,
+            type: TaskConstantTypes.CREATE_USER_TASKS_LOADING,
             payload: {},
         });
-        const response = yield call(createTasksApi, data);
-        const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 200) {
-            ToastHandle(decryptedData?.message, 'success');
-            yield put({
-                type: TaskConstantTypes.CREATE_TASKS_SUCCESS,
-                payload: { ...decryptedData },
-            });
-            yield put({
-                type: TaskConstantTypes.CREATE_TASKS_RESET,
-                payload: {},
-            });
-        } else {
-            yield put({
-                type: TaskConstantTypes.CREATE_TASKS_ERROR,
-                payload: { ...decryptedData },
-            });
-        }
-    } catch (error) {
-        ToastHandle(error, 'danger');
-        yield put({
-            type: TaskConstantTypes.CREATE_TASKS_ERROR,
-            payload: error,
-        });
-    }
-}
-
-function* getTasksDetailsFunction(data) {
-    try {
-        yield put({
-            type: TaskConstantTypes.GET_TASKS_DETAILS_LOADING,
-            payload: {},
-        });
-        const response = yield call(getTasksDetailsApi, data);
+        const response = yield call(createUserTasksApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 201) {
-            // ToastHandle(decryptedData?.message, 'success');
+            ToastHandle(decryptedData?.message, 'success');
             yield put({
-                type: TaskConstantTypes.GET_TASKS_DETAILS_SUCCESS,
+                type: TaskConstantTypes.CREATE_USER_TASKS_SUCCESS,
                 payload: { ...decryptedData },
             });
             yield put({
-                type: TaskConstantTypes.GET_TASKS_DETAILS_RESET,
+                type: TaskConstantTypes.CREATE_USER_TASKS_RESET,
                 payload: {},
             });
         } else {
             yield put({
-                type: TaskConstantTypes.GET_TASKS_DETAILS_ERROR,
+                type: TaskConstantTypes.CREATE_USER_TASKS_ERROR,
                 payload: { ...decryptedData },
             });
         }
     } catch (error) {
-        // ToastHandle(error, 'danger');
+        ToastHandle(error, 'danger');
         yield put({
-            type: TaskConstantTypes.GET_TASKS_DETAILS_ERROR,
+            type: TaskConstantTypes.CREATE_USER_TASKS_ERROR,
             payload: error,
         });
     }
 }
 
-
-function* updateTasksFunction(data) {
+function* updateUserTasksFunction(data) {
     try {
         yield put({
-            type: TaskConstantTypes.UPDATE_TASKS_LOADING,
+            type: TaskConstantTypes.UPDATE_USER_TASKS_LOADING,
             payload: {},
         });
-        const response = yield call(updateTasksApi, data);
+        const response = yield call(updateUserTasksApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
-                type: TaskConstantTypes.UPDATE_TASKS_SUCCESS,
+                type: TaskConstantTypes.UPDATE_USER_TASKS_SUCCESS,
                 payload: { ...decryptedData },
             });
             yield put({
-                type: TaskConstantTypes.UPDATE_TASKS_RESET,
+                type: TaskConstantTypes.UPDATE_USER_TASKS_RESET,
                 payload: {},
             });
         } else {
             yield put({
-                type: TaskConstantTypes.UPDATE_TASKS_ERROR,
+                type: TaskConstantTypes.UPDATE_USER_TASKS_ERROR,
                 payload: { ...decryptedData },
             });
         }
     } catch (error) {
         ToastHandle(error, 'danger');
         yield put({
-            type: TaskConstantTypes.UPDATE_TASKS_ERROR,
+            type: TaskConstantTypes.UPDATE_USER_TASKS_ERROR,
             payload: error,
         });
     }
 }
 
-function* deleteTasksFunction(data) {
+function* getUserTasksFunction(data) {
     try {
         yield put({
-            type: TaskConstantTypes.DELETE_TASKS_LOADING,
+            type: TaskConstantTypes.GET_USER_TASKS_LOADING,
             payload: {},
         });
-        const response = yield call(deleteTasksApi, data);
+        const response = yield call(getUserTasksApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
-        if (response?.status === 200) {
-            ToastHandle(decryptedData?.message, 'danger');
+        if (response.status === 200) {
             yield put({
-                type: TaskConstantTypes.DELETE_TASKS_SUCCESS,
+                type: TaskConstantTypes.GET_USER_TASKS_SUCCESS,
                 payload: { ...decryptedData },
-            });
-            yield put({
-                type: TaskConstantTypes.DELETE_TASKS_RESET,
-                payload: {},
             });
         } else {
             yield put({
-                type: TaskConstantTypes.DELETE_TASKS_ERROR,
+                type: TaskConstantTypes.GET_USER_TASKS_ERROR,
                 payload: { ...decryptedData },
             });
         }
     } catch (error) {
-        ToastHandle(error, 'danger');
         yield put({
-            type: TaskConstantTypes.DELETE_TASKS_ERROR,
+            type: TaskConstantTypes.GET_USER_TASKS_ERROR,
             payload: error,
         });
     }
 }
 
-export function* callResetUpdate() {
-    put({
-        type: TaskConstantTypes.RESET_UPDATE_STATUS,
-        payload: {},
-    });
+function* getTaskByIdFunction(data) {
+    try {
+        yield put({
+            type: TaskConstantTypes.GET_TASK_BY_ID_LOADING,
+            payload: {},
+        });
+        const response = yield call(getUserTaskByIdApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: TaskConstantTypes.GET_TASK_BY_ID_SUCCESS,
+                payload: { ...decryptedData },
+            });
+        } else {
+            yield put({
+                type: TaskConstantTypes.GET_TASK_BY_ID_ERROR,
+                payload: { ...decryptedData },
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: TaskConstantTypes.GET_TASK_BY_ID_ERROR,
+            payload: error,
+        });
+    }
 }
 
-export function* watchCreateTasks() {
-    yield takeEvery(TaskConstantTypes.CREATE_TASKS, createTasksFunction);
+
+export function* watchCreateUserTasks() {
+    yield takeEvery(TaskConstantTypes.CREATE_USER_TASKS, createUserTasksFunction);
 }
 
-export function* watchGetTasksDetails() {
-    yield takeEvery(TaskConstantTypes.GET_TASKS_DETAILS, getTasksDetailsFunction);
+export function* watchUpdateUserTasks() {
+    yield takeEvery(TaskConstantTypes.UPDATE_USER_TASKS, updateUserTasksFunction);
 }
 
-export function* watchUpdateTasks() {
-    yield takeEvery(TaskConstantTypes.UPDATE_TASKS, updateTasksFunction);
+export function* watchGetUserTasks() {
+    yield takeEvery(TaskConstantTypes.GET_USER_TASKS, getUserTasksFunction);
 }
 
-export function* watchDeleteTasks() {
-    yield takeEvery(TaskConstantTypes.DELETE_TASKS, deleteTasksFunction);
+export function* watchGetUserTaskById() {
+    yield takeEvery(TaskConstantTypes.GET_TASK_BY_ID, getTaskByIdFunction);
 }
-function* tasksSaga() {
+
+
+function* userTasksSaga() {
     yield all([
-        fork(watchCreateTasks),
-        fork(watchGetTasksDetails),
-        fork(watchUpdateTasks),
-        fork(watchDeleteTasks),
+        fork(watchCreateUserTasks),
+        fork(watchUpdateUserTasks),
+        fork(watchGetUserTasks),
+        fork(watchGetUserTaskById),
     ]);
 }
-export default tasksSaga;
+export default userTasksSaga;

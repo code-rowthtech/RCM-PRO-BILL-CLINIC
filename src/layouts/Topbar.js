@@ -82,6 +82,7 @@ const Topbar = ({ hideLogo, navCssClasses, openLeftMenuCallBack, topbarDark }: T
         '/apps/settings/notesType': 'Notes Type',
         '/apps/notes-and-templates/note-templates': 'Note Templates',
         '/apps/notes-and-templates/note-categories': 'Note Categories',
+        '/apps/audit-report/list': 'Audit Report'
     };
 
     const getPageTitle = (pathToTitleMap, pathname, search) => {

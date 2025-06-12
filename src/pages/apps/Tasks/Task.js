@@ -1,45 +1,61 @@
-import { FormInput } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
-import { FiFileText, FiFilter, FiUploadCloud } from 'react-icons/fi';
-import { IoMdClose, IoMdRefresh } from 'react-icons/io';
-import { IoSearchSharp } from 'react-icons/io5';
-import { MdFileDownload } from 'react-icons/md';
-import ReactQuill from 'react-quill';
+import { Button, Card, Col, Form, Row, Table } from 'react-bootstrap';
+import { FiFileText, FiUploadCloud } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
-import Select from 'react-select';
-import { getMastersDataAction } from '../../../redux/settings/action';
 import { useDispatch } from 'react-redux';
 import ModalTask from './ModalTask';
+import { getUserTasksAction } from '../../../redux/actions';
+import Spinner from '../../../constants/Spinner';
+import Paginations from '../../../helpers/Paginations';
 
 const Task = () => {
     const store = useSelector((state) => state);
     const dispatch = useDispatch();
-    const CategoryData = store?.getMastersDataReducer?.data1?.data?.result;
     const [search, setSearch] = useState('');
     const [show, setShow] = useState(false);
+    const [priority, setPriority] = useState('')
+    const [status, setStatus] = useState('');
+    const [dueDate, setDueDate] = useState('')
+    const [skip, setSkip] = useState(1)
+    const [taskData, setTaskData] = useState(null)
+    const createTaskResponse = store?.createUserTasksReducer?.data?.status;
+    const updateTaskResponse = store?.updateUserTasksReducer?.data?.status;
+    const userTasks = store?.getUserTasksReducer?.data;
 
-    // Dummy patient options for select
-    const patientOptions = [
-        { value: '1', label: 'John Doe' },
-        { value: '2', label: 'Jane Smith' },
-        { value: '3', label: 'Alice Johnson' },
-    ];
+    useEffect(() => {
+        if (createTaskResponse === 201 || updateTaskResponse === 200) {
+            handleClose();
+            dispatch(getUserTasksAction({ status: '', skip: skip }))
+        }
+    }, [createTaskResponse, updateTaskResponse])
 
     const handleClose = () => {
         setShow(false);
+        setTaskData(null);
     };
     const handleShow = () => setShow(true);
 
     useEffect(() => {
-        dispatch(getMastersDataAction({ status: '', category: 'task-category', limit: 10, skip: '', search: '' }));
-    }, [dispatch]);
+        dispatch(getUserTasksAction({ status: status, skip: skip, priority: priority, dueDate: dueDate, search: search }))
+    }, [dispatch, skip, priority, status, search]);
 
-    // Form submit handler for ModalTask
-    const handleTaskSubmit = (data) => {
-        console.log('Task Modal Data:', data);
-        // Here you can add logic to update the task list, call API, etc.
-        setShow(false);
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
+
+    const getPriorityClass = (priority) => {
+        switch ((priority || '').toLowerCase()) {
+            case 'routine':
+                return 'text-secondary'; // Gray
+            case 'urgent':
+                return 'text-warning';   // Orange/Yellow
+            case 'asap':
+                return 'text-primary';   // Blue
+            case 'stat':
+                return 'text-danger';    // Red
+            default:
+                return 'text-muted';     // Default muted/gray
+        }
     };
 
     return (
@@ -51,135 +67,121 @@ const Task = () => {
                             <Row>
                                 <Col xs={12} md={6} lg={6} className="mb-1 d-flex gap-2">
                                     <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Assigned</option>
-                                            <option value="all">All</option>
-                                            <option value="me">Me</option>
-                                            <option value="others">Others</option>
+                                        <Form.Select className='text-capitalize' onChange={(e) => setStatus(e.target.value)}>
+                                            <option value="">All Statuses</option>
+                                            {['draft', 'requested', 'received', 'accepted', 'rejected',
+                                                'ready', 'cancelled', 'in-progress', 'on-hold',
+                                                'failed', 'completed', 'entered-in-error']?.map((status, index) => (
+                                                    <option className='text-capitalize' value={status} key={index}>{status}</option>
+                                                ))}
                                         </Form.Select>
                                     </Form.Group>
                                     <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Priority</option>
-                                            <option value="all">All</option>
-                                            <option value="high">High</option>
-                                            <option value="medium">Medium</option>
-                                            <option value="low">Low</option>
+                                        <Form.Select onChange={(e) => setPriority(e.target.value)} className='text-capitalize'>
+                                            <option value="">All Priorities</option>
+                                            {['routine', 'urgent', 'asap', 'stat']?.map((priority, index) => (
+                                                <option className='text-capitalize' value={priority} key={index}>{priority === 'stat' ? 'Stat (Immediate action required)' : priority}</option>
+                                            ))}
                                         </Form.Select>
                                     </Form.Group>
-                                    <Form.Group className="me-2" style={{ minWidth: 140 }}>
-                                        <Form.Select>
-                                            <option value="all">Due Date</option>
-                                            <option value="all">All</option>
-                                            <option value="today">Today</option>
-                                            <option value="this_week">This Week</option>
-                                            <option value="overdue">Overdue</option>
-                                        </Form.Select>
-                                    </Form.Group>
+                                    {/* <Form.Group className="me-2" style={{ minWidth: 140 }}>
+                                            <Form.Control type='date' onChange={(e) => setDueDate(e.target.value)} />
+                                        </Form.Group> */}
                                 </Col>
-                                <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end">
-                                    <Button
-                                        variant=""
-                                        className="d-flex align-items-center custom-buttons text-white gap-1">
-                                        <IoMdRefresh className="fs-5" /> Reset Filter
+                                <Col xs={12} md={6} lg={6} className="mb-1 d-flex justify-content-end gap-2">
+                                    <Form.Control placeholder='Search Task' className='w-25' onChange={(e) => setSearch(e.target.value)} type="text" />
+                                    <Button className="custom-buttons py-0">
+                                        <FiUploadCloud className="fs-5" title='Export All' />
+                                    </Button>
+                                    <Button className="custom-buttons text-nowrap py-1" onClick={handleShow}>
+                                        New Task
                                     </Button>
                                 </Col>
-                                <Col sm={6} className="d-flex align-items-center gap-2 mt-2">
-                                    <Button className="custom-buttons text-white">Active</Button>
-                                    <Button className="custom-buttons text-white">Inactive</Button>
-                                </Col>
-                                <Col sm={6} className="text-end mt-md-0 mt-sm-0 ">
-                                    <Row className="mt-2 align-items-center justify-content-end">
-                                        <Col xs="auto" className="d-flex gap-2">
-                                            <input type="text" className="border-0 rounded-3" />
-                                            <Button className="custom-buttons py-0">
-                                                <FiUploadCloud className="fs-5" title='Export All' />
-                                            </Button>
-
-                                            <Button className="custom-buttons py-1" onClick={handleShow}>
-                                                New Task
-                                            </Button>
-                                        </Col>
-                                    </Row>
-                                </Col>
                             </Row>
-                            <Table responsive className="table-centered table-nowrap mb-0 rounded mt-3">
-                                <thead className="text-white">
-                                    <tr>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Associated Patient
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Title
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Assigned By
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Assigned To
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Status
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Category
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Priority
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Start Date
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Due Date
-                                        </th>
-                                        <th className="text-white py-2" style={{ fontSize: '13px' }}>
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="border-bottom">
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            John Doe
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            Follow-up Call
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            Dr. Smith
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            Nurse Joy
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            Pending
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            Communication
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            High
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            2025-06-04
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            2025-06-10
-                                        </td>
-                                        <td className="py-1" style={{ fontSize: '13px', fontWeight: '400' }}>
-                                            <i
-                                                className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
-                                                // onClick={() => handleEdit(data)}
-                                            ></i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </Table>
+                            <div className="scroll-container mt-2" style={{ height: '69vh', overflowY: 'auto' }}>
+                                <Table responsive className="table-centered table-nowrap mb-0 rounded mt-2">
+                                    <thead className="text-white">
+                                        <tr>
+                                            {['#', 'Title', 'Assigned By', 'Assigned To', 'Status', 'Category', 'Priority', 'Due Date', 'Action'].map((header, index) => (
+                                                <th className="text-white" key={index}>
+                                                    {header}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {store?.getUserTasksReducer?.loading ?
+                                            <tr>
+                                                <td colSpan={9} className='text-center py-5'>
+                                                    <Spinner />
+                                                </td>
+                                            </tr>
+                                            :
+                                            userTasks?.tasks?.length === 0 ?
+                                                <tr>
+                                                    <td colSpan={9} className='text-center py-5'>
+                                                        <div className="d-flex flex-column align-items-center">
+                                                            <FiFileText size={44} className="text-muted mb-0 mt-2" />
+                                                            <h5>No tasks found</h5>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                :
+                                                userTasks?.tasks?.map((task, index) => (
+                                                    <tr className="border-bottom">
+                                                        <td>
+                                                            {index + 1}
+                                                        </td>
+                                                        <td>
+                                                            {task?.description}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.assignedById?.name?.text}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.assignedToId?.name?.text || '-'}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.status}
+                                                        </td>
+                                                        <td className='text-capitalize'>
+                                                            {task?.category || '-'}
+                                                        </td>
+                                                        <td className={`text-capitalize fw-semibold ${getPriorityClass(task?.priority)}`}>
+                                                            {task?.priority || '-'}
+                                                        </td>
+                                                        <td>
+                                                            {task?.dueDate ? new Date(task?.dueDate).toISOString()?.split('T')?.[0] : '-'}
+                                                        </td>
+                                                        <td>
+                                                            <i
+                                                                onClick={() => {
+                                                                    setShow(true);
+                                                                    setTaskData(task);
+                                                                }}
+                                                                className="mdi mdi-square-edit-outline cursor-pointer fs-4 text-primary"
+                                                            ></i>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                        }
+                                    </tbody>
+                                </Table>
+                            </div>
+
+                            <div className="col-12">
+                                <div className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={userTasks?.pagination?.pages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </div>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
-                <ModalTask show={show} handleClose={handleClose} onSubmit={handleTaskSubmit} />
+                <ModalTask taskId={taskData?._id} show={show} handleClose={handleClose} />
             </Row>
         </>
     );

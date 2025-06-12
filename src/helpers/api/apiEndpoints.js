@@ -109,6 +109,11 @@ export const allCodes = `${BaseRoute}/codes/search`;
 export const getPatientAppointment = `${BaseRoute}/app/get-by-patientId`;
 export const getProblemDetails = `${BaseRoute}/getProblemDetails`;
 
+// Patient Access History
+export const getPatientAccessLogs =`${BaseRoute}/patient-access-logs`;
+
+// Audit Report
+export const getAuditReport =`${BaseRoute}/audit-report`;
 
 // Allergy List
 // export const getAllergylist = `${BaseRoute}/getAllergiesList`;

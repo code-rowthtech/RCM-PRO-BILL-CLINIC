@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, Row, Table } from 'react-bootstrap';
+import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
@@ -269,6 +269,7 @@ const EncounterSummary = () => {
         setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
     };
 
+
     return (
         <Row className='position-relative'>
             <Col sm={12} className='mt-0 mt-0' >
@@ -285,19 +286,18 @@ const EncounterSummary = () => {
                             case 'Vitals':
                                 content = (
                                     <Accordion.Body className='p-2 ' style={{ height: '100%' }}>
-                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >
-                                            <thead>
-                                                <tr className='border'>
-                                                    <th className='text-white'>
-                                                        Vital Name
+                                        <Table bordered className={`mb-0 position-relative box-shadow-none vitalsTable ${store?.getVitalsByPatientIdReducer?.loading ? 'opacity-50' : ''}`} >                                            <thead>
+                                            <tr className='border'>
+                                                <th className='text-white'>
+                                                    Vital Name
+                                                </th>
+                                                {sortedDates?.slice(0, 3)?.map(date => (
+                                                    <th className='text-white' key={date}>
+                                                        {formatDate(date)}
                                                     </th>
-                                                    {sortedDates?.map(date => (
-                                                        <th className='text-white' key={date}>
-                                                            {formatDate(date)}
-                                                        </th>
-                                                    ))}
-                                                </tr>
-                                            </thead>
+                                                ))}
+                                            </tr>
+                                        </thead>
                                             <tbody>
                                                 {vitals.map((vital, index) => (
                                                     <tr className='' key={vital.name}>
@@ -307,7 +307,7 @@ const EncounterSummary = () => {
                                                             )}
                                                         </td>
 
-                                                        {sortedDates.map(date => (
+                                                        {sortedDates.slice(0, 3).map(date => (
                                                             <td className='vitalsTableBorder p-0' key={`${vital.name}-${date}`}>
                                                                 {renderVitalCell(vital, date)}
                                                             </td>
@@ -487,9 +487,30 @@ const EncounterSummary = () => {
                                                                         {medication?.dosageInstruction?.[0]?.text?.length > 40 ? medication?.dosageInstruction?.[0]?.text?.slice(0, 39) + '...' : medication?.dosageInstruction?.[0]?.text || ''}
                                                                     </div>
                                                                 </div>
-                                                                <span className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
-                                                                    {medication?.status}
-                                                                </span>
+                                                                <div className={`fw-semibold fs-6 text-capitalize ${statusColorMap[medication.status] || 'text-body'}`}>
+                                                                    <p>{medication?.status}</p>
+                                                                    {/* <OverlayTrigger
+                                                                        placement="top"
+                                                                        overlay={<Tooltip id="copyTooltip">Copy to clipboard</Tooltip>}
+                                                                    >
+                                                                        <i
+                                                                            className="bi bi-copy fs-5 text-secondary"
+                                                                            style={{ cursor: 'pointer' }}
+                                                                            onClick={(e) => {
+                                                                                navigator.clipboard.writeText('Text to copy');
+                                                                                const icon = e.currentTarget;
+                                                                                icon.classList.remove('bi-copy', 'text-secondary');
+                                                                                icon.classList.add('bi-check', 'text-secondary');
+
+                                                                                setTimeout(() => {
+                                                                                    icon.classList.remove('bi-check', 'text-success');
+                                                                                    icon.classList.add('bi-copy', 'text-secondary');
+                                                                                }, 2000);
+                                                                            }}
+                                                                        />
+                                                                    </OverlayTrigger> */}
+
+                                                                </div>
                                                             </li>
                                                         ))}
                                                     </ul>

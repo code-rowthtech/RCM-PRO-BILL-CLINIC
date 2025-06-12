@@ -85,3 +85,8 @@ export const getDocumentsAction = (data): AuthAction => ({
     type: PatientsActionTypes.GET_DOCUMENTS,
     data
 });
+
+export const getDocumentByIdAction = (data): AuthAction => ({
+    type: PatientsActionTypes.GET_DOCUMENTS_BY_ID,
+    data
+});
