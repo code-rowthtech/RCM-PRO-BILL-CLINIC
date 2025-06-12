@@ -100,15 +100,17 @@ const RoleManagement = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={`active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${
+                                        status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
-                                        } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${
+                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
+                                    } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -130,6 +132,7 @@ const RoleManagement = () => {
                                                 type="text"
                                                 value={searchQuery}
                                                 onChange={handleSearchChange}
+                                                placeholder="Search..."
                                                 className="pe-4"
                                                 style={{
                                                     border: 'none',

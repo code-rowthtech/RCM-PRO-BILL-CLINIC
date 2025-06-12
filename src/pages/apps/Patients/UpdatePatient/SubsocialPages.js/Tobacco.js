@@ -251,7 +251,7 @@ const Tobacco = () => {
                         </div>
                     ) : (
                         <Accordion alwaysOpen flush>
-                            {tobaccoHistory.map((item, index) => (
+                            {tobaccoHistory?.map((item, index) => (
                                 <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
                                     <Accordion.Header>
                                         <div

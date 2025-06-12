@@ -52,7 +52,6 @@ const NewDoctor = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const password = watch('password');
-
     const [showModalPic, setShowModalPic] = useState(false);
     const [modalFileUrl, setModalFileUrl] = useState('');
     const [imageLoading, setImageLoading] = useState(true);
@@ -156,7 +155,6 @@ const NewDoctor = () => {
             setLogo(url);
             setLogoName(selectedFile?.name);
         } catch (error) {
-            // console.error('Error during file upload:', error);
         }
     };
 
@@ -842,9 +840,7 @@ const NewDoctor = () => {
                                                                                         onClick={(e) => {
                                                                                             e.stopPropagation();
                                                                                             handleShowModal(
-                                                                                                logo ||
-                                                                                                doctorDetails
-                                                                                                    ?.photo?.[0]?.url
+                                                                                               logo || doctorDetails?.photo?.[0]?.url
                                                                                             );
                                                                                         }}
                                                                                         className="text-dark cursor-pointer"

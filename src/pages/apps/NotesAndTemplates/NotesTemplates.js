@@ -128,6 +128,7 @@ const TemplatesPage = () => {
                                             <FormInput
                                                 type="text"
                                                 value={searchTerm}
+                                                placeholder='Search...'
                                                 onChange={(e) => {
                                                     const currentValue = e.target.value;
                                                     setSearchTerm(currentValue);

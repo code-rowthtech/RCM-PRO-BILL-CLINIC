@@ -26,11 +26,8 @@ const Doctors = () => {
     const doctorDetails = useSelector((state) => state?.getDoctorsReducer?.data?.result);
     const updateStatus = useSelector((state) => state?.createtDoctorsDetailReducer?.data?.status) || [];
     useEffect(() => {
-        const hasFilters = skip !== 1 || doctorDetails === undefined;
-        if (hasFilters) {
             dispatch(getDoctorsAction({ status: status, search: search, page: skip, limit: 10 }));
-        }
-    }, [dispatch, skip]);
+    }, [dispatch, skip,status, search]);
 
     const closeStatusModal = () => setStatusModal(false); // Close status change modal
     const filteredDoctors = doctorDetails;
@@ -98,6 +95,7 @@ const Doctors = () => {
                                                 <FormInput
                                                     type="text"
                                                     value={search}
+                                                    placeholder='Search...'
                                                     onChange={(e) => {
                                                         const currentValue = e.target.value;
                                                         setSearch(currentValue);

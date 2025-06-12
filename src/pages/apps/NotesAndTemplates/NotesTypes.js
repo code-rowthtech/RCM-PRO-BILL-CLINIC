@@ -249,6 +249,7 @@ const NotesTypes = () => {
                                                 <input
                                                     type="text"
                                                     value={search}
+                                                    placeholder='Search...'
                                                     onChange={(e) => setSearch(e.target.value)}
                                                     className="pe-4 form-control"
                                                     style={{

@@ -1119,7 +1119,7 @@ const SubUpdateClinic = () => {
                                                                         ) {
                                                                             value = value.slice(0, 10);
                                                                         } else if (item.type === 'NAIC') {
-                                                                            value = value.slice(0, 5);
+                                                                            value = value.slice(0, 10);
                                                                         }
 
                                                                         handleChange(index, 'number', value);
@@ -1148,25 +1148,35 @@ const SubUpdateClinic = () => {
                                                                             : 'custom-form-fields'
                                                                     }`}>
                                                                     {item.file?.name
-                                                                        ? item.file.name.length > 30
-                                                                            ? item.file.name.slice(0, 25) + '...'
-                                                                            : item.file.name
+                                                                        ? (() => {
+                                                                              const decodedName = decodeURIComponent(
+                                                                                  item.file.name
+                                                                              );
+                                                                              return decodedName.length > 30
+                                                                                  ? decodedName.slice(0, 25) + '...'
+                                                                                  : decodedName;
+                                                                          })()
                                                                         : 'Upload Document'}
-                                                                    {(item?.file?.url ||
-                                                                        subClinicsDetailsGet?.orgLogo?.url) && (
-                                                                        <FiEye
-                                                                            className="cursor-pointer"
-                                                                            onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                                handleShowModal(
-                                                                                    item?.file?.url ||
-                                                                                        subClinicsDetailsGet?.orgLogo
-                                                                                            ?.url
-                                                                                );
-                                                                            }}
-                                                                        />
-                                                                    )}
+                                                                    <div className="d-flex align-items-center gap-2">
+                                                                        {(item?.file?.url ||
+                                                                            subClinicsDetailsGet?.orgLogo?.url) && (
+                                                                            <FiEye
+                                                                                className="cursor-pointer"
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    e.stopPropagation();
+                                                                                    handleShowModal(
+                                                                                        item?.file?.url ||
+                                                                                            subClinicsDetailsGet
+                                                                                                ?.orgLogo?.url
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                        )}
+                                                                        <p className="mb-0">
+                                                                            <FiDownloadCloud />
+                                                                        </p>
+                                                                    </div>
                                                                 </div>
                                                                 <Form.Control
                                                                     type="file"
