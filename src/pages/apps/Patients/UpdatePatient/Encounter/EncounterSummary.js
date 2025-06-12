@@ -72,7 +72,7 @@ const EncounterSummary = () => {
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
-        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
     };
 
 

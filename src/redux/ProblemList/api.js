@@ -4,7 +4,7 @@ const api = new APICore();
 
 export function getProblemListApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getProblemList}?patientId=${data?.patientId}`);
+    return api.get(`${URL.getProblemList}?patientId=${data?.patientId}&limit=${data?.limit || 10}&page=${data?.skip || 1}`);
 }
 
 export function createProblemListApi(params: any): any {

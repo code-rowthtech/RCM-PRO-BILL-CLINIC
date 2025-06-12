@@ -800,7 +800,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                 <div className=" d-flex justify-content-end gap-2 py-2">
                                     <Button
                                         type='Submit'
-                                        style={{ zIndex: 1111 }}
                                         className='custom-buttons'
                                         disabled={store?.createEncounterReducer?.loading || store?.updateEncounterReducer?.loading}
                                     >

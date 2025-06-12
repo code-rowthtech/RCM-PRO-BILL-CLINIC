@@ -7,10 +7,6 @@ import {
     getMedicationApi,
     getMedicationDrugsApi,
     updateMedicationApi
-    // deleteAllergyApi,
-    // getAllergiesOfAPatientApi,
-    // getAllergyDetailsApi,
-    // updateAllergyApi,
 } from './api';
 /**
  * Login the user
@@ -58,7 +54,7 @@ function* updateMedicationFunction(data) {
         });
         const response = yield call(updateMedicationApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             ToastHandle(decryptedData?.message, 'success');
             yield put({
                 type: MedicationActionTypes.UPDATE_MEDICATION_SUCCESS,
@@ -90,7 +86,7 @@ function* getDrugsFunction(data) {
         });
         const response = yield call(getMedicationDrugsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: MedicationActionTypes.GET_MEDICATION_DRUGS_SUCCESS,
                 payload: { ...decryptedData },
@@ -126,10 +122,6 @@ function* getMedicationFunction(data) {
                 type: MedicationActionTypes.GET_MEDICATION_SUCCESS,
                 payload: { ...decryptedData },
             });
-            // yield put({
-            //     type: MedicationActionTypes.GET_MEDICATION_RESET,
-            //     payload: {},
-            // });
         } else {
             yield put({
                 type: MedicationActionTypes.GET_MEDICATION_ERROR,
@@ -144,80 +136,7 @@ function* getMedicationFunction(data) {
     }
 }
 
-// function* updateAllergyFunction(data) {
-//     try {
-//         yield put({
-//             type: MedicationActionTypes.UPDATE_ALLERGY_LOADING,
-//             payload: {},
-//         });
-//         const response = yield call(updateAllergyApi, data);
-//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-//         if (response.status === 200) {
-//             ToastHandle(decryptedData?.message, 'success');
-//             yield put({
-//                 type: MedicationActionTypes.UPDATE_ALLERGY_SUCCESS,
-//                 payload: { ...decryptedData },
-//             });
-//             yield put({
-//                 type: MedicationActionTypes.UPDATE_ALLERGY_RESET,
-//                 payload: {},
-//             });
-//         } else {
-//             yield put({
-//                 type: MedicationActionTypes.UPDATE_ALLERGY_ERROR,
-//                 payload: { ...decryptedData },
-//             });
-//         }
-//     } catch (error) {
-//         ToastHandle(error, 'danger');
-//         yield put({
-//             type: MedicationActionTypes.UPDATE_ALLERGY_ERROR,
-//             payload: error,
-//         });
-//     }
-// }
 
-// function* deleteAllergyFunction(data) {
-//     try {
-//         yield put({
-//             type: MedicationActionTypes.DELETE_ALLERGY_LOADING,
-//             payload: {},
-//         });
-//         const response = yield call(deleteAllergyApi, data);
-//         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-
-//         if (response?.status === 200) {
-//             ToastHandle(response?.message, 'danger');
-//             yield put({
-//                 type: MedicationActionTypes.DELETE_ALLERGY_SUCCESS,
-//                 payload: { ...decryptedData },
-//             });
-//             yield put({
-//                 type: MedicationActionTypes.DELETE_ALLERGY_RESET,
-//                 payload: {},
-//             });
-//         } else {
-//             yield put({
-//                 type: MedicationActionTypes.DELETE_ALLERGY_ERROR,
-//                 payload: { ...decryptedData },
-//             });
-//         }
-//     } catch (error) {
-//         ToastHandle(error, 'danger');
-
-//         yield put({
-//             type: MedicationActionTypes.DELETE_ALLERGY_ERROR,
-//             payload: error,
-//         });
-//     }
-// }
-
-// export function* callResetUpdate() {
-//     put({
-//         type: MedicationActionTypes.RESET_UPDATE_STATUS,
-//         payload: {},
-//     });
-// }
 
 export function* watchCreateMedication() {
     yield takeEvery(MedicationActionTypes.CREATE_MEDICATION, createMedicationFunction);
@@ -234,17 +153,6 @@ export function* watchGetMedication() {
     yield takeEvery(MedicationActionTypes.GET_MEDICATION, getMedicationFunction);
 }
 
-// export function* watchGetAllergiesOfAPatient() {
-//     yield takeEvery(MedicationActionTypes.GET_ALLERGIES_OF_A_PATIENT, getAllergiesOfAPatientFunction);
-// }
-
-// export function* watchUpdateAllergy() {
-//     yield takeEvery(MedicationActionTypes.UPDATE_ALLERGY, updateAllergyFunction);
-// }
-
-// export function* watchDeleteAllergy() {
-//     yield takeEvery(MedicationActionTypes.DELETE_ALLERGY, deleteAllergyFunction);
-// }
 function* medicationSaga() {
     yield all([
         fork(watchCreateMedication),

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
@@ -32,7 +32,39 @@ const Tobacco = () => {
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const deleteSuccess = store?.deleteTobaccooReducer?.data?.status;
-    const updateSuccess = store?.updateTobaccooReducer;
+    const updateSuccess = store?.updateTobaccooReducer; const quillRef = useRef(null);
+    const MAX_WORDS = 1000;
+    const MAX_WORD_LENGTH = 45;
+
+    useEffect(() => {
+        if (quillRef) {
+            const editor = quillRef?.current?.getEditor();
+
+            editor?.on('text-change', (delta, oldDelta, source) => {
+                if (source === 'user') {
+                    const text = editor?.getText().trim();
+                    const words = text ? text.split(/\s+/) : [];
+                    const wordCount = words.length;
+
+                    // Check if any word exceeds the maximum length
+                    const hasLongWord = words.some(word => word.length > MAX_WORD_LENGTH);
+
+                    if (wordCount > MAX_WORDS || hasLongWord) {
+                        // Restore the previous content
+                        editor.setContents(oldDelta);
+
+                        // Show warning message based on the violation
+                        if (hasLongWord) {
+                            // You can replace this with your toast notification system
+                            console.warn(`Words cannot be longer than ${MAX_WORD_LENGTH} characters`);
+                        } else if (wordCount > MAX_WORDS) {
+                            console.warn(`Cannot exceed ${MAX_WORDS} words`);
+                        }
+                    }
+                }
+            });
+        }
+    }, []);
     useEffect(() => {
         if (toEdit) {
             setValue('tobaccoUse', toEdit?.tobaccoUse);
@@ -46,6 +78,9 @@ const Tobacco = () => {
         }
     }, [toEdit]);
 
+    useEffect(() => {
+        dispatch(getTobaccooAction({ patientId: patientId }));
+    }, [dispatch])
     const closeDeleteModal = () => {
         setToDelete(null);
         setDeleteModal(false);
@@ -105,10 +140,6 @@ const Tobacco = () => {
             {/* Left: Form Section */}
             <Col md={6} className="d-flex flex-column border-end px-0 pe-2 scroll-container">
                 <Card.Body className="p-0 pt-2">
-                    {/* <Card.Title className="border-bottom">
-                        <h6 className="fw-bold">Add Tobacco Use</h6>
-                    </Card.Title> */}
-
                     <Form
                         onSubmit={handleSubmit(onSubmit)}
                         style={{
@@ -175,8 +206,8 @@ const Tobacco = () => {
                                 </Form.Group>
                             </Col>
                             <Col xs={12} className='mt-0'>
-                                <Form.Group controlId="notes">
-                                    <Form.Label className="fw-medium mb-1">
+                                <Form.Group controlId="notes">                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                    <div>
                                         Notes{' '}
                                         <span
                                             style={{ cursor: 'pointer' }}
@@ -184,13 +215,38 @@ const Tobacco = () => {
                                             onClick={handleEditorFocus}>
                                             ✨
                                         </span>
-                                    </Form.Label>
+                                    </div>                                        <small className="text-muted">
+                                        {(() => {
+                                            const content = watch('note') || '';
+                                            const plainText = content.replace(/<[^>]*>/g, '').trim();
+                                            const words = plainText.split(/\s+/).filter(Boolean);
+                                            const wordCount = words.length;
+                                            const longestWord = words.reduce((max, word) =>
+                                                word.length > max.length ? word : max,
+                                                '');
+                                            const isLongWord = longestWord.length > MAX_WORD_LENGTH;
+
+                                            return (
+                                                <div>
+                                                    <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                    {/* {isLongWord && (
+                                                        <div className="text-danger" style={{ fontSize: '0.75rem' }}>
+                                                            ({MAX_WORD_LENGTH}+ chars)
+                                                        </div>
+                                                    )} */}
+
+                                                </div>
+                                            );
+                                        })()}
+                                    </small>
+                                </Form.Label>
                                     <Controller
                                         name="note"
                                         control={control}
                                         defaultValue="<ul><li></li></ul>"
                                         render={({ field: { onChange, value } }) => (
                                             <ReactQuill
+                                                ref={quillRef}
                                                 value={value}
                                                 onChange={(content, delta, source) => {
                                                     if (source === 'user') {
@@ -236,10 +292,6 @@ const Tobacco = () => {
             {/* Right: History Section */}
             <Col md={6} className="d-flex flex-column px-0 scroll-container">
                 <Card.Body className="ps-2 py-1 p-0">
-                    {/* <Card.Title className="border-bottom">
-                        <h5 className="fw-semibold mb-0">Tobacco History</h5>
-                    </Card.Title> */}
-
                     {isLoading && !tobaccoHistory?.length ? (
                         <div className="text-center py-4">
                             <Spinner />
@@ -251,7 +303,7 @@ const Tobacco = () => {
                         </div>
                     ) : (
                         <Accordion alwaysOpen flush>
-                            {tobaccoHistory.map((item, index) => (
+                            {tobaccoHistory?.map((item, index) => (
                                 <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
                                     <Accordion.Header>
                                         <div
@@ -287,15 +339,6 @@ const Tobacco = () => {
                                                     // Prevent accordion from toggling
                                                     e.stopPropagation();
                                                 }}>
-                                                <i
-                                                    className="bi bi-trash text-danger cursor-pointer"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setToDelete(item?._id);
-                                                        setDeleteModal(true);
-                                                    }}
-                                                    title="Delete"
-                                                />
                                                 {toEdit && toEdit._id === item._id ? (
                                                     <i
                                                         className="bi bi-x-lg text-danger cursor-pointer"
@@ -307,7 +350,7 @@ const Tobacco = () => {
                                                     />
                                                 ) : (
                                                     <i
-                                                        className="bi bi-pencil text-info cursor-pointer"
+                                                        className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setToEdit(item);
@@ -315,6 +358,15 @@ const Tobacco = () => {
                                                         title="Edit"
                                                     />
                                                 )}
+                                                <i
+                                                    className="bi bi-trash-fill text-danger cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setToDelete(item?._id);
+                                                        setDeleteModal(true);
+                                                    }}
+                                                    title="Delete"
+                                                />
                                             </div>
                                         </div>
                                     </Accordion.Header>
