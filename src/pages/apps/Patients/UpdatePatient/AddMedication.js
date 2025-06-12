@@ -112,6 +112,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
     const debouncedSearch = useMemo(
         () =>
             debounce((searchValue) => {
+                console.log(`searcching ${searchValue}`)
                 dispatch(getDrugsAction({ skip: 1, search: searchValue }));
             }, 100),
         [dispatch]

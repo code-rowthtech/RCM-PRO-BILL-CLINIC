@@ -77,7 +77,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             clearInterval(intervalRef.current); // Stop the stopwatch interval
             setStopwatchTime(0);
             setIsSessionRunning(false);
-            reset();
+            // reset();
         }
         else if (updateEncounterData?.data?.status === 200) {
             setInitialLoading(false);
@@ -97,6 +97,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     //     }
     // }, [encounterAction])
     // Set default note type and populate form for update
+
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
             setNoteType(defaultNoteTypeOption.value);
@@ -161,6 +162,10 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
             });
         }, 0);
     }, [selectedFromList, setValue]);
+
+    useEffect(() => {
+        dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption?.value }));
+    }, [dispatch]);
 
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {

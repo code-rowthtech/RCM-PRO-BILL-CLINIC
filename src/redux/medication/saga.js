@@ -91,10 +91,10 @@ function* getDrugsFunction(data) {
                 type: MedicationActionTypes.GET_MEDICATION_DRUGS_SUCCESS,
                 payload: { ...decryptedData },
             });
-            yield put({
-                type: MedicationActionTypes.GET_MEDICATION_DRUGS_RESET,
-                payload: {},
-            });
+            // yield put({
+            //     type: MedicationActionTypes.GET_MEDICATION_DRUGS_RESET,
+            //     payload: {},
+            // });
         } else {
             yield put({
                 type: MedicationActionTypes.GET_MEDICATION_DRUGS_ERROR,
