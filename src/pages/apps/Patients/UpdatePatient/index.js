@@ -416,132 +416,126 @@ const UpdatePatientIndex = () => {
                                                             <Row className="pt-1 px-2">
                                                                 <Col className="" sm={6} md={4}>
                                                                     <Table className="h-100 box-shadow-none">
-                                                                        <tbody>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 ps-2 py-0 text-nowrap text-muted fw-bold">
-                                                                                    Phone:
-                                                                                </th>
-                                                                                <td
-                                                                                    className={`fs-6 py-0 text-nowrap  ${patientDetails?.telecom?.find(
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Phone:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap  ${patientDetails?.telecom?.find(
+                                                                                    (data) => data?.system === 'phone'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {'+1-' +
+                                                                                    patientDetails?.telecom?.find(
                                                                                         (data) => data?.system === 'phone'
-                                                                                    )?.value
-                                                                                        ? 'text-black'
-                                                                                        : 'text-danger'
-                                                                                        }`}>
-                                                                                    {'+1-' +
-                                                                                        patientDetails?.telecom?.find(
-                                                                                            (data) => data?.system === 'phone'
-                                                                                        )?.value || 'Missing'}
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 ps-2 py-0 text-nowrap text-muted fw-bold">
-                                                                                    Email:
-                                                                                </th>
-                                                                                <td
-                                                                                    className={`fs-6 py-0 text-nowrap text-black ${patientDetails?.telecom?.find(
-                                                                                        (item) => item?.system === 'email'
-                                                                                    )?.value
-                                                                                        ? 'text-black'
-                                                                                        : 'text-danger'
-                                                                                        }`}>
-                                                                                    {patientDetails?.telecom?.find(
-                                                                                        (item) => item?.system === 'email'
                                                                                     )?.value || 'Missing'}
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 ps-2 text-nowrap text-muted fw-bold">
-                                                                                    Address:
-                                                                                </th>
-                                                                                <td
-                                                                                    className={`fs-6 py-0 text-nowrap ${patientDetails?.address?.[0]?.city &&
-                                                                                        patientDetails?.address?.[0]?.state
-                                                                                        ? 'text-black'
-                                                                                        : 'text-danger'
-                                                                                        }`}>
-                                                                                    {patientDetails?.address?.[0]?.city &&
-                                                                                        patientDetails?.address?.[0]?.state
-                                                                                        ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
-                                                                                        : 'Missing'}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Email:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap text-black ${patientDetails?.telecom?.find(
+                                                                                    (item) => item?.system === 'email'
+                                                                                )?.value
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.telecom?.find(
+                                                                                    (item) => item?.system === 'email'
+                                                                                )?.value || 'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Address:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6  text-nowrap ${patientDetails?.address?.[0]?.city &&
+                                                                                    patientDetails?.address?.[0]?.state
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.address?.[0]?.city &&
+                                                                                    patientDetails?.address?.[0]?.state
+                                                                                    ? `${patientDetails.address[0].city}, ${patientDetails.address[0].state}`
+                                                                                    : 'Missing'}
+                                                                            </td>
+                                                                        </tr>
                                                                     </Table>
                                                                 </Col>
 
                                                                 <Col className="" sm={6} md={4}>
                                                                     <Table className="h-100 box-shadow-none">
-                                                                        <tbody>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 ps-2 text-nowrap text-muted fw-bold">
-                                                                                    Primary Provider:
-                                                                                </th>
-                                                                                <td
-                                                                                    className={`fs-6 py-0 text-nowrap ${patientDetails?.doctorId?.name?.[0]
-                                                                                        ?.text
-                                                                                        ? 'text-black'
-                                                                                        : 'text-danger'
-                                                                                        }`}>
-                                                                                    {patientDetails?.doctorId?.name?.[0]
-                                                                                        ?.text || 'Missing'}
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 ps-2 text-nowrap text-muted fw-bold">
-                                                                                    Date Added:
-                                                                                </th>
-                                                                                <td className="fs-6 py-0 text-nowrap text-black">
-                                                                                    {' '}
-                                                                                    {new Date(
-                                                                                        patientDetails?.createdAt
-                                                                                    )?.toLocaleDateString('en-GB')}
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 ps-2 text-nowrap text-muted fw-bold">
-                                                                                    Insurance:
-                                                                                </th>
-                                                                                <td className="fs-6 py-0  text-nowrap text-danger">
-                                                                                    Missing
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Primary Provider:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6 text-nowrap ${patientDetails?.doctorId?.name?.[0]
+                                                                                    ?.text
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.doctorId?.name?.[0]
+                                                                                    ?.text || 'Missing'}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Date Added:
+                                                                            </th>
+                                                                            <td className="fs-6 text-nowrap text-black">
+                                                                                {' '}
+                                                                                {new Date(
+                                                                                    patientDetails?.createdAt
+                                                                                )?.toLocaleDateString('en-GB')}
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 ps-2 text-nowrap text-muted fw-bold">
+                                                                                Insurance:
+                                                                            </th>
+                                                                            <td className="fs-6  text-nowrap text-danger">
+                                                                                Missing
+                                                                            </td>
+                                                                        </tr>
                                                                     </Table>
                                                                 </Col>
                                                                 <Col sm={4}>
                                                                     <Table className="h-100 box-shadow-none">
-                                                                        <tbody>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 px-2 text-nowrap text-muted fw-bold">
-                                                                                    Last Appointment:
-                                                                                </th>
-                                                                                <td className="fs-6 py-0 pe-2 text-nowrap text-black">
-                                                                                    16/04/2025
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 px-2 text-nowrap text-muted fw-bold">
-                                                                                    Next Appointment:
-                                                                                </th>
-                                                                                <td className="fs-6 py-0 pe-2 text-nowrap text-black">
-                                                                                    26/05/2025
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr className="">
-                                                                                <th className="fs-6 py-0 px-2 text-nowrap text-muted fw-bold">
-                                                                                    Follow Up Reason:
-                                                                                </th>
-                                                                                <td
-                                                                                    className={`fs-6 py-0 pe-2 text-capitalize text-nowrap ${patientDetails?.followupReason
-                                                                                        ? 'text-black'
-                                                                                        : 'text-danger'
-                                                                                        }`}>
-                                                                                    {patientDetails?.followupReason ||
-                                                                                        'Missing'}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </tbody>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Last Appointment:
+                                                                            </th>
+                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                                16/04/2025
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Next Appointment:
+                                                                            </th>
+                                                                            <td className="fs-6 pe-2 text-nowrap text-black">
+                                                                                26/05/2025
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr className="">
+                                                                            <th className="fs-6 px-2 text-nowrap text-muted fw-bold">
+                                                                                Follow Up Reason:
+                                                                            </th>
+                                                                            <td
+                                                                                className={`fs-6 pe-2 text-capitalize text-nowrap ${patientDetails?.followupReason
+                                                                                    ? 'text-black'
+                                                                                    : 'text-danger'
+                                                                                    }`}>
+                                                                                {patientDetails?.followupReason ||
+                                                                                    'Missing'}
+                                                                            </td>
+                                                                        </tr>
                                                                     </Table>
                                                                 </Col>
                                                             </Row>

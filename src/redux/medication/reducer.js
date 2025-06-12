@@ -85,11 +85,11 @@ export const getDrugsReducer = (state = GET_DRUGS_INITIAL_STATE, action) => {
                 data: action.payload,
                 loading: false,
             };
-        case MedicationActionTypes.GET_MEDICATION_DRUGS_RESET:
-            return {
-                data: [],
-                loading: false,
-            };
+        // case MedicationActionTypes.GET_MEDICATION_DRUGS_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
 
         case MedicationActionTypes.GET_MEDICATION_DRUGS_ERROR:
             return {
