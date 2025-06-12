@@ -38,19 +38,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
         setSkip(pageNumber);
     };
 
-
-
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
-
-    // useEffect(() => {
-    //     if (!encounterData || !encounterData._id) return;
-
-    //     const alreadyInArr = encounterDataArr.some((data) => data?._id === encounterData._id);
-
-    //     if (!alreadyInArr) {
-    //         setEncounterDataArr((prev) => [...prev, encounterData]);
-    //     }
-    // }, [encounterData, encounterDataArr]);
 
     return (
         <Row className='my-1'>
@@ -60,13 +48,9 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                     className="table-centered table-nowrap mb-0  rounded">
                     <thead className="text-white">
                         <tr>
-                            <th className="text-white">S.no</th>
-                            <th className="text-white">Provider</th>
-                            <th className="text-white">Encounter Type</th>
-                            <th className="text-white">Status</th>
-                            <th className='text-white'>Start Date</th>
-                            <th className='text-white'>End Date</th>
-                            <th className="text-white">Action</th>
+                            {['S.no', 'Provider', 'Encounter Type', 'Status', 'Start Date', 'End Date', 'Action']?.map((data) => (
+                                <th>{data}</th>
+                            ))}
                         </tr>
                     </thead>
                     <tbody>
@@ -103,9 +87,6 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                         <td className='text-capitalize'>{item?.period?.end ? new Date(item?.period?.end)?.toISOString().split('T')?.[0] : '-'}</td>
                                         <td>
                                             <IoPrintSharp className="fs-4 mb-1 me-1" onClick={() => handlePrintEncounters(item, patientDetails)} />
-                                            {/* <button onClick={() => handlePrintEncounters(item)}>
-                                                Print Encounter
-                                            </button> */}
                                             <i
                                                 className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
                                                 onClick={() => {
@@ -115,15 +96,11 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                                         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
                                                         type: 'updateEncounter',
                                                     };
-                                                    dispatch(getEncounterByIdAction({ encounterId: item?._id }))
-                                                    // Check if the tab already exists
+                                                    dispatch(getEncounterByIdAction({ encounterId: item?._id }));
                                                     const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
-
                                                     if (existingTab) {
-                                                        // If tab exists, just switch to it instead of showing error
-                                                        setActiveTab(existingTab.id);
+                                                        setActiveTab(existingTab?.id);
                                                     } else {
-                                                        // If tab doesn't exist, add it and switch to it
                                                         setEncounterTabs([...encounterTabs, newTab]);
                                                         setActiveTab(newTab.id);
                                                     }
@@ -148,9 +125,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                     </td>
                                 </tr>
                         }
-
                     </tbody>
-
                 </Table>
             </Col>
             <div className="col-12">

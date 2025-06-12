@@ -14,7 +14,7 @@ export function getAllergyDetailsApi(params: any): any {
 
 export function getAllergiesOfAPatientApi(params: any): any {
     const { data } = params;
-    return api.get(`${URL.getAllergiesOfAPatient}?patientId=${data?.patientId}`);
+    return api.get(`${URL.getAllergiesOfAPatient}?patientId=${data?.patientId}&limit=${data?.limit || 10}&page=${data?.skip || 1}`);
 }
 
 export function updateAllergyApi(params: any): any {

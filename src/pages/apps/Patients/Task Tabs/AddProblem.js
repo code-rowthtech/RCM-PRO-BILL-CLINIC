@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import {
     createProblemListAction,
     getAllCodeAction,
@@ -22,19 +22,32 @@ import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+        reset,
+        getValues,
+        setValue,
+        watch,
+    } = useForm();
+
     const patientId = searchParams.get('id');
     const [searchQuery, setSearchQuery] = useState('');
-    const store = useSelector((state) => state);
-    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    const appointments = store?.getPatientAppointmentReducer?.data || [];
+
     const [submissionType, setSubmissionType] = useState(null);
     const [selectedProblem, setSelectedProblem] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
     const [showAppointmentModal, setShowAppointmentModal] = useState(false);
-    const closeAppointmentModal = () => {
-        setShowAppointmentModal(false);
-    }
+
+    const store = useSelector((state) => state);
+    const createAppointmentResponse = store?.createAppointmentReducer?.data?.status;
+    const addProblemStatus = store?.createProblemListReducer?.data?.status;
+    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
+    const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
+
+
     useEffect(() => {
         if (createAppointmentResponse === 201) {
             dispatch(
@@ -51,34 +64,21 @@ const AddProblem = ({ onCancel }) => {
         }
     }, [createAppointmentResponse]);
 
-    const addProblemStatus = store?.createProblemListReducer?.data?.status;
-
-    const {
-        register,
-        handleSubmit,
-        control,
-        formState: { errors },
-        reset,
-        getValues,
-        setValue,
-        watch,
-    } = useForm();
-
     // Fetch dynamic ICD codes
     useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-            dispatch(getAllCodeAction({ search: searchQuery }));
-        }, 300); // 300ms debounce
-
-        return () => clearTimeout(delayDebounce);
+        dispatch(getAllCodeAction({ search: searchQuery }));
     }, [dispatch, searchQuery]);
 
     // Fetch dynamic appointments
     useEffect(() => {
-        dispatch(getPatientAppointmentAction({ patientId }));
-    }, [dispatch, patientId]);
+        const currentPatientId = store?.getPatientAppointmentReducer?.data?.patientId;
+        const currentAppointments = store?.getPatientAppointmentReducer?.data?.appointments;
 
-    // Set ICD code from selected problem
+        if (currentPatientId !== patientId || !currentAppointments) {
+            dispatch(getPatientAppointmentAction({ patientId }));
+        }
+    }, [dispatch, patientId, store?.getPatientAppointmentReducer?.data]);
+
     useEffect(() => {
         if (selectedProblem) {
             setValue('icdCode', selectedProblem.value || '');
@@ -86,6 +86,10 @@ const AddProblem = ({ onCancel }) => {
             setValue('icdCode', '');
         }
     }, [selectedProblem, setValue]);
+
+    const closeAppointmentModal = () => {
+        setShowAppointmentModal(false);
+    }
 
     const formattedOptions = allCodeICDs.map((code) => ({
         value: code.value,
@@ -136,7 +140,7 @@ const AddProblem = ({ onCancel }) => {
                 },
             ],
         };
-        dispatch(createProblemListAction(payload)); // Uncomment to dispatch the action
+        dispatch(createProblemListAction(payload));
     };
 
     useEffect(() => {
@@ -173,14 +177,6 @@ const AddProblem = ({ onCancel }) => {
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
-                {/* <Col sm={12} className="d-flex justify-content-between">
-                    <h4>Add Problem</h4>
-                    <Button className="custom-buttons" type="button">
-                        Back
-                    </Button>
-                </Col> */}
-
-                {/* Problem selection with dynamic ICD lookup */}
                 <Col sm={6}>
                     <Form.Group className="mb-1">
                         <Form.Label className="mb-0">Problem</Form.Label>
@@ -230,17 +226,6 @@ const AddProblem = ({ onCancel }) => {
                     </Form.Group>
                 </Col>
 
-                {/* ICD Version - fixed to ICD-10 */}
-                {/* <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">ICD Version</Form.Label>
-                        <Form.Select disabled {...register('icdVersion')} style={{ cursor: 'not-allowed' }}>
-                            <option value="ICD-10">ICD-10</option>
-                        </Form.Select>
-                    </Form.Group>
-                </Col> */}
-
-                {/* ICD 10 Code - auto-filled */}
                 <Col sm={6}>
                     <Form.Group>
                         <Form.Label className="mb-0">ICD 10 Code</Form.Label>
@@ -312,14 +297,6 @@ const AddProblem = ({ onCancel }) => {
                     </Form.Group>
                 </Col>
 
-                {/* Onset Date */}
-                {/* <Col sm={6}>
-                    <Form.Group>
-                        <Form.Label className="mb-0">Datetime Onset</Form.Label>
-                        <Form.Control type="date" {...register('onsetDate')} />
-                    </Form.Group>
-                </Col> */}
-
                 {/* Note */}
                 <Col xs={12}>
                     <Form.Group controlId="note">
@@ -367,7 +344,6 @@ const AddProblem = ({ onCancel }) => {
                     </Form.Group>
                 </Col>
 
-                {/* Action Buttons */}
                 <Col sm={12} className="d-flex justify-content-end gap-1 mt-3">
                     <Button
                         className="custom-buttons"
@@ -390,7 +366,7 @@ const AddProblem = ({ onCancel }) => {
                         {store?.createProblemListReducer?.loading && submissionType === 'saveAndNext' ? (
                             <Spinner animation="border" size="sm" className="text-white" />
                         ) : (
-                            'Save & Next'
+                            'Save & Exit'
                         )}
                     </Button>
                 </Col>

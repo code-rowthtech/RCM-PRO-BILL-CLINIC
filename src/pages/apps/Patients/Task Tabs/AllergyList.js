@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Table, Button, Modal } from 'react-bootstrap';
-import { Link, useSearchParams } from 'react-router-dom';
-import { FiEdit, FiPlus } from 'react-icons/fi';
-import { IoInformationCircleOutline } from 'react-icons/io5';
-import { MdDeleteOutline } from 'react-icons/md';
-import { FaEye } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { Row, Col, Table, Modal } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
 import AddAllergy from './AddAllergy';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../../constants/Spinner';
@@ -14,16 +10,20 @@ import {
     getAllergyDetailsAction,
 } from '../../../../redux/allergyList/action';
 import UpdateAllergy from './UpdateTasks/UpdateAllergy';
+import Paginations from '../../../../helpers/Paginations';
+import DeletionModal from '../../../../helpers/deletionModal';
 
 const AllergyList = () => {
-    const [showAddAllergy, setShowAddAllergy] = useState(false);
-    const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
-    const [selectedAllergy, setSelectedAllergy] = useState(null);
-    const [isEditMode, setIsEditMode] = useState(false);
     const [searchParams] = useSearchParams();
-    const [allergyModal, setAllergyModal] = useState(false);
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
+
+    const [showUpdateAllergy, setShowUpdateAllergy] = useState(false);
+    const [selectedAllergy, setSelectedAllergy] = useState(null);
+    const [allergyModal, setAllergyModal] = useState(false);
+    const [skip, setSkip] = useState(1);
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [deletionId, setDeletionId] = useState(null)
     const store = useSelector((state) => state);
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const deleteStatus = store?.deleteAllergyReducer?.data?.status;
@@ -31,94 +31,62 @@ const AllergyList = () => {
     useEffect(() => {
         const data = {
             patientId: patientId,
+            skip: skip,
         };
-
         dispatch(getAllergiesOfPatientAction(data));
-    }, [dispatch, patientId]);
-
-    const handleEditClick = (allergy) => {
-        setSelectedAllergy(allergy);
-        setShowUpdateAllergy(true);
-        setAllergyModal(true); // Open Modal
-    };
+    }, [dispatch, patientId, skip]);
 
     useEffect(() => {
         if (deleteStatus === 200) {
             const data = {
                 patientId: patientId,
+                skip: skip,
             };
             dispatch(getAllergiesOfPatientAction(data));
+            setDeleteModal(false);
         }
     }, [deleteStatus, dispatch, patientId]);
-    const stripHtml = (html) => {
-        // Remove any <ul> or <li> tags with margin
-        return (
-            html
-                ?.replace(/<ul>/g, '<ul style="margin-bottom: 0px !important;">')
-                .replace(/<li>/g, '<li style="margin-bottom: 0px;">')
-                ?.replace(/<[^>]+>/g, '') || ''
-        );
+
+    const handleDelete = () => {
+        dispatch(deleteAllergyAction({ id: deletionId }));
     };
-    const sanitizeNoteHtml = (html) => {
-        if (!html) return 'N/A';
-        return html
-            .replace(/<ul>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
-            .replace(/<p>/g, '<ul style="margin-bottom: 0px; padding-left: 0px;">')
-            .replace(/<li>/g, '<li style="margin-bottom: 0px;">');
+    const closeDeleteModal = () => {
+        setDeleteModal(false);
+    }
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
     };
 
-    const handleDelete = (data) => {
-        dispatch(deleteAllergyAction({ id: data?._id }));
+    const handleEditClick = (allergy) => {
+        setSelectedAllergy(allergy);
+        setShowUpdateAllergy(true);
+        setAllergyModal(true);
     };
     return (
         <>
             <div className="scroll-container" style={{ overflowX: 'hidden', height: '70vh' }}>
                 <Row>
-                    {/* <Col sm={12} className="d-flex justify-content-between"> */}
-                    {/* <h6>Allergy List</h6> */}
-                    {/* <Button
-                            className="custom-buttons text-nowrap"
-                            onClick={() => {
-                                setSelectedAllergy(null); // Clear any previously selected allergy
-                                setShowUpdateAllergy(false); // Ensure update mode is off
-                                setAllergyModal(true); // Open the modal
-                            }}>
-                            <FiPlus className="fs-5 text-white" />
-                            &nbsp; Add Allergy
-                        </Button> */}
-                    {/* </Col> */}
                     <Col sm={12}>
                         <Table responsive className="table-centered table-nowrap mb-0">
                             <thead className="text-white bg-dark">
                                 <tr key="">
-                                    <th className="text-white">S.No.</th>
-
-                                    {/* <th className="text-white">Verification Status</th> */}
-                                    <th className="text-white">Clinical Status</th>
-                                    <th className="text-white">Category</th>
-                                    <th className="text-white">Allergy</th>
-                                    {/* <th className="text-white">Verification Status</th> */}
-                                    {/* <th className="text-white">Criticality</th> */}
-                                    <th className="text-white">Date</th>
-                                    {/* <th className="text-white">Notes</th> */}
-                                    <th className="text-white">Action</th>
+                                    {['S.No.', 'Clinical Status', 'Category', 'Allergy', 'Date', 'Action']?.map((data, index) => (
+                                        <th key={index}>{data}</th>
+                                    ))}
                                 </tr>
                             </thead>
                             {store?.getAllergiesOfAPatientReducer?.loading ? (
-                                <tr>
-                                    <td className="text-center" colSpan={10}>
-                                        <Spinner className=" my-5 " />
-                                    </td>
-                                </tr>
+                                <tbody>
+                                    <tr>
+                                        <td className="text-center" colSpan={10}>
+                                            <Spinner className=" my-5 " />
+                                        </td>
+                                    </tr>
+                                </tbody>
+
                             ) : (
                                 <tbody>
-                                    {allergyData?.length === 0 ? (
-                                        <tr key="">
-                                            <td colSpan={10} className="text-center">
-                                                <h3 className="my-5">No Allergy Found!</h3>
-                                            </td>
-                                        </tr>
-                                    ) : (
+                                    {allergyData?.length > 0 ? (
                                         allergyData?.map((data, index) => (
                                             <tr key={index}>
                                                 <td className="text-capitalize">{index + 1}.</td>
@@ -135,39 +103,14 @@ const AllergyList = () => {
                                                         ? data?.code?.coding?.[0]?.display?.slice(0, 29) + '...'
                                                         : data?.code?.coding?.[0]?.display || 'N/A'}
                                                 </td>
-                                                {/* <td className="text-capitalize">
-                                                        {data?.verificationStatus?.coding?.[0]?.display || 'N/A'}
-                                                    </td> */}
-                                                {/* <td className="text-capitalize">
-                                                        {data?.type?.coding?.[0]?.display || 'N/A'}
-                                                    </td> */}
-
-                                                {/* <td className="text-capitalize">
-                                                        {data?.criticality?.display || 'N/A'}
-                                                    </td> */}
                                                 <td className="text-capitalize">
                                                     {data?.onset?.onsetDateTime
                                                         ? new Date(data.onset.onsetDateTime).toISOString().split('T')[0]
                                                         : 'N/A'}
                                                 </td>
-
-                                                {/* <td
-                                                    className="text-capitalize mb-0"
-                                                    title={stripHtml(data?.note?.[0]?.text)}>
-                                                    <div
-                                                        dangerouslySetInnerHTML={{
-                                                            __html:
-                                                                data?.note?.[0]?.text?.length > 35
-                                                                    ? sanitizeNoteHtml(
-                                                                          data?.note?.[0]?.text.slice(0, 34)
-                                                                      ) + '...'
-                                                                    : sanitizeNoteHtml(data?.note?.[0]?.text) || 'N/A',
-                                                        }}
-                                                    />
-                                                </td> */}
                                                 <td>
                                                     <i
-                                                        className=" bi bi-pencil text-info cursor-pointer"
+                                                        className="mdi mdi-square-edit-outline cursor-pointer fs-5"
                                                         onClick={() => {
                                                             handleEditClick(data);
                                                             const requestData = {
@@ -180,21 +123,36 @@ const AllergyList = () => {
                                                     <i
                                                         className="bi bi-trash-fill text-danger cursor-pointer"
                                                         onClick={() => {
-                                                            handleDelete(data);
+                                                            setDeletionId(data?._id)
+                                                            setDeleteModal(true);
                                                         }}
                                                     />
                                                 </td>
                                             </tr>
                                         ))
+                                    ) : (
+                                        <tr key="">
+                                            <td colSpan={10} className="text-center">
+                                                <h5 className="my-5">No Allergy Found!</h5>
+                                            </td>
+                                        </tr>
                                     )}
                                 </tbody>
                             )}
                         </Table>
                     </Col>
+                    <div className="col-12">
+                        <div className="mt-2 d-flex justify-content-end">
+                            <Paginations
+                                currentPage={skip}
+                                totalPages={store?.getAllergiesOfAPatientReducer?.data?.totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </div>
+                    </div>
                 </Row>
-                {/* )} */}
             </div>
-
+            <DeletionModal show={deleteModal} onHide={closeDeleteModal} onConfirm={handleDelete} item={'selected allergy'} isLoading={store?.deleteAllergyReducer?.loading} />
             <Modal show={allergyModal} onHide={() => setAllergyModal(false)} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0 ">
                     <Modal.Title className="mb-0"> {showUpdateAllergy ? 'Update Allergy' : 'Add Allergy'}</Modal.Title>
@@ -202,7 +160,7 @@ const AllergyList = () => {
                 <Modal.Body>
                     {showUpdateAllergy ? (
                         <UpdateAllergy
-                            allergy={selectedAllergy}
+                            // allergy={selectedAllergy}
                             onCancel={() => {
                                 setShowUpdateAllergy(false);
                                 setAllergyModal(false);

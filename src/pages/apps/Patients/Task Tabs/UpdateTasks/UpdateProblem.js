@@ -16,43 +16,62 @@ import { clinicalStatus } from '../../../../../utils/DataSets/Allergy/clinicalSt
 import SuggestionOffcanvas from '../../UpdatePatient/SuggestionOffcanvas';
 import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
+import Spinner from '../../../../../constants/Spinner';
 
 const UpdateProblem = ({ onCancel, problem }) => {
     const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
-    const [searchQuery, setSearchQuery] = useState('');
-    const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
-    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
-    const appointments = store?.getPatientAppointmentReducer?.data || [];
-    const updateProblemListResponse = store?.updateProblemListReducer?.data?.status;
-    const [showSuggestions, setShowSuggestions] = useState(false);
     const {
         register,
         handleSubmit,
         control,
         setValue,
         getValues,
-        watch,
-        reset,
         formState: { errors },
     } = useForm();
-    const [selectedProblem, setSelectedProblem] = useState(null);
 
+    // STATE VARIABLES
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedProblem, setSelectedProblem] = useState(null);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+
+    // CONSTANT VARIABLES
+    const patientId = searchParams.get('id');
+    const allCodeICDs = store?.getALLCodesReducer?.data?.codes || [];
+    const appointments = store?.getPatientAppointmentReducer?.data?.appointments || [];
+    const updateProblemListResponse = store?.updateProblemListReducer?.data?.status;
     const formattedOptions = allCodeICDs.map((code) => ({
         value: code.value,
         label: `${code.title} - ${code.codeType}`,
         system: 'http://hl7.org/fhir/condition-code',
         display: code.title,
     }));
+
+    // USEEFFECTS
     useEffect(() => {
-        dispatch(getPatientAppointmentAction({ patientId }));
-    }, [dispatch, patientId]);
+        if (updateProblemListResponse === 200) {
+            onCancel();
+            const data = {
+                patientId: patientId,
+            };
+            dispatch(getProblemListAction(data));
+        }
+    }, [updateProblemListResponse]);
+
+    useEffect(() => {
+        const currentPatientId = store?.getPatientAppointmentReducer?.data?.patientId;
+        const currentAppointments = store?.getPatientAppointmentReducer?.data?.appointments;
+
+        if (currentPatientId !== patientId || !currentAppointments) {
+            dispatch(getPatientAppointmentAction({ patientId }));
+        }
+    }, [dispatch, patientId, store?.getPatientAppointmentReducer?.data]);
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
             dispatch(getAllCodeAction({ search: searchQuery }));
-        }, 300); // 300ms debounce
+        }, 300);
         return () => clearTimeout(delayDebounce);
     }, [dispatch, searchQuery]);
 
@@ -61,6 +80,7 @@ const UpdateProblem = ({ onCancel, problem }) => {
             setValue('icdCode', selectedProblem.value);
         }
     }, [selectedProblem, setValue]);
+
     useEffect(() => {
         if (problem) {
             const selected = {
@@ -77,7 +97,20 @@ const UpdateProblem = ({ onCancel, problem }) => {
             setValue('datetimeDiagnosis', problem?.onsetDateTime?.split('T')[0]);
             setValue('note', problem?.note?.[0]?.text);
         }
-    }, [problem, setValue]);
+    }, [problem, appointments, setValue]);
+
+
+    // FUNCTIONALITY FUNCTIONS
+    const handleEditorFocus = () => {
+        dispatch(createSuggestionAction({ module: 'problem' }));
+        setShowSuggestions(true);
+    };
+
+    const handleSuggestionSelect = (suggestionText) => {
+        const current = getValues('note'); // from useFormContext or pass as prop
+        setValue('note', `${current}<p>${suggestionText}</p>`);
+    };
+
     const onSubmit = (data) => {
         const selected = data.problem;
         const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
@@ -94,11 +127,7 @@ const UpdateProblem = ({ onCancel, problem }) => {
                 ],
                 text: selected?.display,
             },
-            // recorder: '',
-            // asserter: '',
-            // encounter: '',
             problem: data.problem,
-            // icdVersion: data.icdVersion,
             icdCode: data.icdCode,
             clinicalStatus: {
                 coding: [
@@ -112,7 +141,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
             },
             appointment: data.appointment,
             onsetDateTime: data.diagnosisDate,
-            // onsetDate: data.onsetDate,
             note: [
                 {
                     authorReference: {
@@ -129,24 +157,6 @@ const UpdateProblem = ({ onCancel, problem }) => {
         dispatch(updateProblemListAction({ key: encryptMessage(payload) }));
     };
 
-    useEffect(() => {
-        if (updateProblemListResponse === 200) {
-            onCancel();
-            const data = {
-                patientId: patientId,
-            };
-            dispatch(getProblemListAction(data));
-        }
-    }, [updateProblemListResponse, dispatch]);
-    const handleEditorFocus = () => {
-        dispatch(createSuggestionAction({ module: 'problem' }));
-        setShowSuggestions(true);
-    };
-    const handleSuggestionSelect = (suggestionText) => {
-        // Append suggestion to existing note
-        const current = getValues('note'); // from useFormContext or pass as prop
-        setValue('note', `${current}<p>${suggestionText}</p>`);
-    };
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
             <Row>
@@ -160,12 +170,12 @@ const UpdateProblem = ({ onCancel, problem }) => {
                             render={({ field }) => (
                                 <Select
                                     {...field}
-                                    value={field.value} // ← This ensures the Select input is controlled
+                                    value={field.value}
                                     classNamePrefix="select"
                                     options={formattedOptions}
                                     onChange={(selected) => {
                                         field.onChange(selected);
-                                        setSelectedProblem(selected); // For updating icdCode
+                                        setSelectedProblem(selected);
                                     }}
                                     onInputChange={(value, { action }) => {
                                         if (action === 'input-change') {
@@ -292,8 +302,12 @@ const UpdateProblem = ({ onCancel, problem }) => {
                 </Col>
 
                 <Col sm={12} className="d-flex justify-content-end gap-2 mt-3">
-                    <Button type="submit" className="custom-buttons">
-                        Update
+                    <Button type="submit" className="custom-buttons" disabled={store?.updateProblemListReducer?.loading}>
+                        {store?.updateProblemListReducer?.loading ?
+                            <Spinner className='spinner-border-sm' color='white' />
+                            :
+                            `Update`
+                        }
                     </Button>
                 </Col>
             </Row>
