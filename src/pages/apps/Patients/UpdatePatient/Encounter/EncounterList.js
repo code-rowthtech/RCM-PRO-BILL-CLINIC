@@ -11,7 +11,7 @@ import { FiFileText } from 'react-icons/fi'
 import Paginations from '../../../../../helpers/Paginations'
 import { handlePrintEncounters } from './handlePrintEncounter'
 import { IoPrintSharp } from 'react-icons/io5'
-const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, setEncounterDataArr, encounterDataArr }) => {
+const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreateEncounter, setExpanded }) => {
     const dispatch = useDispatch()
     const [searchParams] = useSearchParams();
     const [skip, setSkip] = useState(1);
@@ -42,15 +42,15 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
     const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
 
-    useEffect(() => {
-        if (!encounterData || !encounterData._id) return;
+    // useEffect(() => {
+    //     if (!encounterData || !encounterData._id) return;
 
-        const alreadyInArr = encounterDataArr.some((data) => data?._id === encounterData._id);
+    //     const alreadyInArr = encounterDataArr.some((data) => data?._id === encounterData._id);
 
-        if (!alreadyInArr) {
-            setEncounterDataArr((prev) => [...prev, encounterData]);
-        }
-    }, [encounterData, encounterDataArr]);
+    //     if (!alreadyInArr) {
+    //         setEncounterDataArr((prev) => [...prev, encounterData]);
+    //     }
+    // }, [encounterData, encounterDataArr]);
 
     return (
         <Row className='my-1'>
@@ -71,7 +71,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                     </thead>
                     <tbody>
                         {store?.getEncounterReducer?.loading ?
-                            <tr>
+                            <tr key=''>
                                 <td colSpan={7} className='text-center py-5'>
                                     <Spinner />
                                 </td>
@@ -80,26 +80,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                             encounters?.length > 0 ?
                                 encounters?.map((item, index) => (
                                     <tr
-                                        //  onClick={() => {
-                                        //     const newTab = {
-                                        //         id: item?._id,
-                                        //         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',
-                                        //         type: 'updateEncounter',
-                                        //     };
-                                        //     dispatch(getEncounterByIdAction({ encounterId: item?._id }))
-                                        //     // Check if the tab already exists
-                                        //     const existingTab = encounterTabs.find((data) => data?.id === newTab?.id);
-
-                                        //     if (existingTab) {
-                                        //         // If tab exists, just switch to it instead of showing error
-                                        //         setActiveTab(existingTab.id);
-                                        //     } else {
-                                        //         // If tab doesn't exist, add it and switch to it
-                                        //         setEncounterTabs([...encounterTabs, newTab]);
-                                        //         setActiveTab(newTab.id);
-                                        //     }
-                                        // }}
-                                        key={item?.id}>
+                                        key={item?._id}>
                                         <td>{index + 1}</td>
                                         <td className="d-flex align-items-center gap-2">
                                             <Image
@@ -128,6 +109,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                                             <i
                                                 className=" mdi mdi-square-edit-outline fs-4 cursor-pointer"
                                                 onClick={() => {
+                                                    setExpanded(true);
                                                     const newTab = {
                                                         id: item?._id,
                                                         title: item?.period?.start ? new Date(item?.period?.start)?.toISOString().split('T')?.[0] : '',

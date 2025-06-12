@@ -43,8 +43,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
-    const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
+    // const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const encounters = store?.getEncounterReducer?.data?.encounters;
 
@@ -52,9 +51,12 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false);
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
-        dispatch(getEncounterAction({ patientId: patientId }));
-    }, [dispatch]);
+        if (store?.getPatientByIdReducer?.data?.data && store?.getPatientByIdReducer?.data?.data === patientId) {
+
+            dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+        }
+        // dispatch(getEncounterAction({ patientId: patientId }));
+    }, [store?.getPatientByIdReducer?.data?.data, patientId]);
 
     const getSeverityBadge = (severity) => {
         if (!severity || !severity.code || !severity.display) return null;
@@ -74,17 +76,17 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
 
-    useEffect(() => {
-        dispatch(
-            getAppointmentsAction({
-                clinicId: loggedInUser?.clinicId,
-                patientId: patientId,
-                status: 'upcoming',
-                skip: skip,
-                limit: 4,
-            })
-        );
-    }, [dispatch, skip]);
+    // useEffect(() => {
+    //     dispatch(
+    //         getAppointmentsAction({
+    //             clinicId: loggedInUser?.clinicId,
+    //             patientId: patientId,
+    //             status: 'upcoming',
+    //             skip: skip,
+    //             limit: 4,
+    //         })
+    //     );
+    // }, [dispatch, skip]);
 
     useEffect(() => {
         if (patientVitals) {
@@ -95,13 +97,13 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
             );
         }
     }, [patientVitals]);
-    useEffect(() => {
-        const data = {
-            patientId: patientId,
-        };
+    // useEffect(() => {
+    //     const data = {
+    //         patientId: patientId,
+    //     };
 
-        dispatch(getAllergiesOfPatientAction(data));
-    }, [dispatch, patientId]);
+    //     dispatch(getAllergiesOfPatientAction(data));
+    // }, [dispatch, patientId]);
     const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
     const [showAppointmentModal, setShowAppointmentModal] = useState(false);
@@ -564,7 +566,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
             </Col>
 
             {/* Appointments Card - Full Width */}
-            <Col sm={12} className="patient-summary-card">
+            {/* <Col sm={12} className="patient-summary-card">
                 <Card className="shadow-sm mb-0">
                     <Card.Header className="p-1 d-flex justify-content-between align-items-center bg-light">
                         <div className="d-flex align-items-center">
@@ -589,7 +591,6 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                                         <th className="fs-6 text-white">Provider</th>
                                         <th className="fs-6 text-white">Reason</th>
                                         <th className="fs-6 text-white">Type</th>
-                                        {/* <th className="fs-6 text-white">Location</th> */}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -651,7 +652,7 @@ const PatientSummary = ({ isAccordionOpen, setSelectedMainTab }) => {
                         </div>
                     </Card.Body>
                 </Card>
-            </Col>
+            </Col> */}
             <Modal show={showAddAllergyModal} onHide={handleAddAllergyClose} size="lg" centered>
                 <Modal.Header closeButton className="px-2 py-0">
                     <Modal.Title className="">Add Allergy</Modal.Title>

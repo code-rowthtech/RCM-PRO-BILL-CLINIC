@@ -145,11 +145,7 @@ export const getPatientByIdReducer = (state = GET_PATIENTS_BY_ID_INITIAL_STATE, 
                 data: action.payload,
                 loading: false
             }
-        // case PatientsActionTypes.STATE_EMPTY_INTIAL_STATE:
-        //     return {
-        //         data: [],
-        //         loading: false
-        //     }
+
         default: return state
     }
 }
