@@ -356,7 +356,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                 </Row>
                                 <Row className="mt-2">
                                     <Col sm={12}>
-                                        <Row>
+                                        <Row className='pe-0'>
                                             <h5>
                                                 Other Documents
                                                 <span
@@ -365,7 +365,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                             </h5>
                                             {documents?.map((data, index) => (
                                                 <>
-                                                    <Row key={data.id}>
+                                                    <Row key={data.id} className='pe-0'>
                                                         <div className="col-md-3 col-12">
                                                             <Form.Group className="mb-1">
                                                                 <Form.Label className="mb-0">Document Name</Form.Label>
@@ -427,7 +427,7 @@ const DoctorQualifications = ({ setActiveTab, docId }) => {
                                                             </Form.Group>
                                                         </div>
 
-                                                        <div className="col-md-3 col-12">
+                                                        <div className="col-md-3 col-12 pe-0">
                                                             <div className="mb-1 d-flex flex-column position-relative">
                                                                 <Form.Group className="mb-1">
                                                                     <Form.Label className="mb-0">Document</Form.Label>

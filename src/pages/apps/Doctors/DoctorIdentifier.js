@@ -283,10 +283,28 @@ const DoctorIdentifierForm = ({
                         <Form.Control
                             type="text"
                             placeholder="Document Number"
-                            maxLength={10}
+                            maxLength={12}
                             value={item?.number || item?.value}
-                            onChange={(e) => handleChange(index, 'number', e.target.value)}
+                            onChange={(e) => {
+                                // Only allow alphanumeric for Medicaid
+                                if (
+                                    item?.type?.code === 'Medicaid' &&
+                                    e.target.value &&
+                                    !/^[A-Za-z0-9]*$/.test(e.target.value)
+                                ) {
+                                    return;
+                                }
+                                handleChange(index, 'number', e.target.value);
+                            }}
                         />
+                        {/* Show error only for Medicaid */}
+                        {item?.type?.code === 'Medicaid' &&
+                            item?.number &&
+                            !/^[A-Za-z0-9]{9,12}$/.test(item.number) && (
+                                <span className="text-danger">
+                                    Must be 9-12 alphanumeric characters (no special characters)
+                                </span>
+                            )}
                     </Col>
                     <Col sm={3}>
                         <Form.Label className="mb-0 mt-2">Issuing Authority</Form.Label>
@@ -320,10 +338,10 @@ const DoctorIdentifierForm = ({
                             min={
                                 item?.ennumerationDate
                                     ? (() => {
-                                        const start = new Date(item.ennumerationDate);
-                                        start.setDate(start.getDate() + 1);
-                                        return start.toISOString().split('T')[0];
-                                    })()
+                                          const start = new Date(item.ennumerationDate);
+                                          start.setDate(start.getDate() + 1);
+                                          return start.toISOString().split('T')[0];
+                                      })()
                                     : new Date().toISOString().split('T')[0]
                             }
                             onChange={(e) => handleChange(index, 'expiry', e.target.value)}
@@ -358,16 +376,17 @@ const DoctorIdentifierForm = ({
                         </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
                             <span>
                                 {identifierDocument[index]
                                     ? 'Uploading...'
                                     : item.file?.name
-                                        ? item.file.name.length > 30
-                                            ? item.file.name.slice(0, 25) + '...'
-                                            : item.file.name
-                                        : 'Upload Document'}
+                                      ? item.file.name.length > 30
+                                          ? item.file.name.slice(0, 25) + '...'
+                                          : item.file.name
+                                      : 'Upload Document'}
                             </span>
                             <div className="d-flex align-items-center gap-2">
                                 {item.file?.url && (
@@ -491,7 +510,7 @@ const DoctorIdentifierForm = ({
                             value={item?.ennumerationDate || ''}
                             onChange={(e) => handleLicensureChange(index, 'ennumerationDate', e.target.value)}
                             maxLength={10}
-                        // onChange={(e) => handleChange(index, 'number', e.target.value)}
+                            // onChange={(e) => handleChange(index, 'number', e.target.value)}
                         />
                     </Col>
                     <Col sm={3}>
@@ -532,16 +551,17 @@ const DoctorIdentifierForm = ({
                         </Form.Label>
                         <div
                             onClick={() => document.getElementById(`fileInput-licensure-${index}`).click()}
-                            className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
-                                }`}>
+                            className={`custom-file-upload justify-content-between cursor-pointer ${
+                                item?.file?.name ? 'form-control' : 'custom-form-fields'
+                            }`}>
                             <span>
                                 {licensureDocument[index]
                                     ? 'Uploading...'
                                     : item.file?.name
-                                        ? item.file.name.length > 30
-                                            ? item.file.name.slice(0, 25) + '...'
-                                            : item.file.name
-                                        : 'Upload Document'}
+                                      ? item.file.name.length > 30
+                                          ? item.file.name.slice(0, 25) + '...'
+                                          : item.file.name
+                                      : 'Upload Document'}
                             </span>
                             <div className="d-flex align-items-center gap-2">
                                 {item.file?.url && (

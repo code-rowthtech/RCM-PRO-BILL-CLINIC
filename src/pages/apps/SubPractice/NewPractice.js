@@ -1188,7 +1188,7 @@ const NewPractice = () => {
                                                                             ) {
                                                                                 value = value.slice(0, 10);
                                                                             } else if (item.type === 'NAIC') {
-                                                                                value = value.slice(0, 5);
+                                                                                value = value.slice(0, 10);
                                                                             }
 
                                                                             handleChange(index, 'number', value);
