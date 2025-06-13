@@ -28,6 +28,7 @@ import { handlePrintPatientSummary } from '../../../../helpers/printPatientSumma
 import Encounter from './Encounter/Encounter';
 import PatientDocs from './Patientdocs';
 import PatientAccess from './PatientAccess';
+import DrugInteraction from './DrugInteractions/DrugInteraction';
 
 const UpdatePatientIndex = () => {
     // Imports initialization
@@ -730,7 +731,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                             {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Drug Interactions' && <p>In progress...</p>}
+                                            {selectedMainTab === 'Drug Interactions' && <DrugInteraction/>}
                                             {selectedMainTab === 'Balance' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Payment' && <p>In Progress...</p>}
                                             {[
