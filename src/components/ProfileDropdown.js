@@ -70,7 +70,7 @@ const ProfileDropdown = (props: ProfileDropdownProps, state: ProfileDropdownStat
     const user = JSON.parse(sessionStorage.getItem('hyper_user'));
     const userName = user?.name || '';
     const changedLogo = sessionStorage.getItem('logo');
-    const logo = JSON.parse(sessionStorage.getItem('hyper_user'))?.logo;
+    const logo = changedLogo || user?.logo;
     const handleOtpGeneration = () => {
         dispatch(changeEmailAction());
     };

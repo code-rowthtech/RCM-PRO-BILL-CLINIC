@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
@@ -25,12 +25,18 @@ import { dataList, familyGenticList } from '../../../../../utils/DataSets/relati
 import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 import { encryptMessage } from '../../../../../cryptoUtils';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
+import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
+import ToastHandle from '../../../../../helpers/ToastMessage';
+
+const MAX_WORDS = 1000;
+const WAX_WORD_LENGTH = 45;
 
 const FamilyHistory = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
+    const quillRef = useRef();
 
     // Form handling
     const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm({
@@ -63,10 +69,21 @@ const FamilyHistory = () => {
     const deleteSuccess = store?.deleteFamilyGenticReducer?.data?.status;
     const isLoading = store?.getFamilyGeneticReducer?.loading;
 
-    // Effects
+    // Effects & Hooks
     useEffect(() => {
         dispatch(getFamilyGeneticAction({ patientId: patientId }));
     }, [dispatch, patientId]);
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
 
     useEffect(() => {
         const delayDebounce = setTimeout(() => {
@@ -125,6 +142,7 @@ const FamilyHistory = () => {
         setToEdit(null);
         setSearchQuery('');
     };
+
 
     const closeDeleteModal = () => {
         setToDelete(null);
@@ -368,20 +386,36 @@ const FamilyHistory = () => {
 
                             <Col xs={12} className="mt-0">
                                 <Form.Group controlId="notes">
-                                    <Form.Label className="fw-medium mb-0">
-                                        Notes{' '}
-                                        <span
-                                            style={{ cursor: 'pointer' }}
-                                            title="Notes Suggestions"
-                                            onClick={handleEditorFocus}>
-                                            ✨
-                                        </span>
+                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            Notes{' '}
+                                            <span
+                                                style={{ cursor: 'pointer' }}
+                                                title="Notes Suggestions"
+                                                onClick={handleEditorFocus}>
+                                                ✨
+                                            </span>
+                                        </div>
+                                        <small className="text-muted">
+                                            {(() => {
+                                                const content = watch('note') || '';
+                                                const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                const wordCount = words?.length;
+                                                return (
+                                                    <div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </small>
                                     </Form.Label>
                                     <Controller
                                         name="note"
                                         control={control}
                                         render={({ field: { onChange, value } }) => (
                                             <ReactQuill
+                                                ref={quillRef}
                                                 value={value}
                                                 onChange={onChange}
                                                 theme="snow"

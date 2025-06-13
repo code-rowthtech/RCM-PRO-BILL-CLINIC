@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Col, Row, Form, Button, Card, Accordion } from 'react-bootstrap';
 import ReactQuill from 'react-quill';
@@ -19,7 +19,11 @@ import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import Select from 'react-select';
 import { getAllCodeAction } from '../../../../../redux/ProblemList/action';
 import DeletionModal from '../../../../../helpers/deletionModal';
+import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
+import ToastHandle from '../../../../../helpers/ToastMessage';
 
+const MAX_WORDS = 1000;
+const WAX_WORD_LENGTH = 45;
 const MedicalHistory = () => {
     const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
@@ -37,7 +41,20 @@ const MedicalHistory = () => {
     const [toDelete, setToDelete] = useState(null);
     const [toEdit, setToEdit] = useState(null);
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
-    
+    const quillRef = useRef(null);
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
+
+
     const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
 
     useEffect(() => {
@@ -82,12 +99,12 @@ const MedicalHistory = () => {
             setValue(
                 'startDate',
                 toEdit?.effectivePeriod?.start
-                    ? new Date(toEdit?.effectivePeriod?.start).toISOString().split('T')[0]
+                    ? new Date(toEdit?.effectivePeriod?.start)?.toISOString()?.split('T')[0]
                     : ''
             );
             setValue(
                 'endDate',
-                toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end).toISOString().split('T')[0] : ''
+                toEdit?.effectivePeriod?.end ? new Date(toEdit?.effectivePeriod?.end)?.toISOString()?.split('T')[0] : ''
             );
             setValue('note', toEdit?.note?.[0]?.text || '<ul><li></li></ul>');
         } else {
@@ -154,7 +171,7 @@ const MedicalHistory = () => {
     }));
 
     const startDate = watch('startDate');
-    
+
     const handleReset = () => {
         setToEdit(null);
         setSelectedProblem(null);
@@ -239,14 +256,29 @@ const MedicalHistory = () => {
                             </Col>
                             <Col xs={12} className='mt-0'>
                                 <Form.Group controlId="notes">
-                                    <Form.Label className="fw-medium mb-1">
-                                        Notes{' '}
-                                        <span
-                                            style={{ cursor: 'pointer' }}
-                                            title="Notes Suggestions"
-                                            onClick={handleEditorFocus}>
-                                            ✨
-                                        </span>
+                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            Notes{' '}
+                                            <span
+                                                style={{ cursor: 'pointer' }}
+                                                title="Notes Suggestions"
+                                                onClick={handleEditorFocus}>
+                                                ✨
+                                            </span>
+                                        </div>
+                                        <small className="text-muted">
+                                            {(() => {
+                                                const content = watch('note') || '';
+                                                const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                const wordCount = words?.length;
+                                                return (
+                                                    <div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </small>
                                     </Form.Label>
                                     <Controller
                                         name="note"
@@ -254,6 +286,7 @@ const MedicalHistory = () => {
                                         defaultValue="<ul><li></li></ul>"
                                         render={({ field: { onChange, value } }) => (
                                             <ReactQuill
+                                                ref={quillRef}
                                                 value={value}
                                                 onChange={(content, delta, source) => {
                                                     if (source === 'user') {
@@ -327,10 +360,10 @@ const MedicalHistory = () => {
                                                     (
                                                     {item?.note?.[0]?.time
                                                         ? new Date(item.note[0].time).toLocaleDateString('en-US', {
-                                                              month: 'short',
-                                                              day: 'numeric',
-                                                              year: 'numeric',
-                                                          })
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            year: 'numeric',
+                                                        })
                                                         : 'No date'}
                                                     -
                                                     {item?.note?.[0]?.time
@@ -380,7 +413,7 @@ const MedicalHistory = () => {
                                     <Accordion.Body className="pt-0 p-0">
                                         {item?.note?.[0]?.text ? (
                                             <div
-                                                className="ql-editor p-1 rounded scroll-container notes-scroll" 
+                                                className="ql-editor p-1 rounded scroll-container notes-scroll"
                                                 dangerouslySetInnerHTML={{ __html: item.note[0].text }}
                                                 style={{ fontSize: '0.875rem', overflowY: 'scroll', height: '150px' }}
                                             />

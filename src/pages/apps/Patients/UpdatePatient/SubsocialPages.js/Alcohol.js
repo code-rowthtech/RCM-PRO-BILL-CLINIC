@@ -21,6 +21,7 @@ const Alcohol = () => {
     const deleteResponse = store?.deleteAlcoholHistoryReducer?.data?.status
     const updateResponse = store?.updateAlcoholHistoryReducer?.data?.status
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
+    console.log(alcoholData, 'alcoholData')
     const { register, handleSubmit, reset, control, watch, getValues, setValue } = useForm();
     const [entries, setEntries] = useState([]);
     const watchUseStatus = watch("useStatus");
@@ -29,6 +30,11 @@ const Alcohol = () => {
     const [toEdit, setToEdit] = useState(null)
     const [deleteModal, setDeleteModal] = useState(false);
 
+    useEffect(() => {
+        if (!alcoholData) {
+            dispatch(getAlcoholHistoryAction({ patientId }))
+        }
+    }, [alcoholData])
 
     useEffect(() => {
         if (toEdit) {
@@ -68,6 +74,7 @@ const Alcohol = () => {
             dispatch(getAlcoholHistoryAction({ patientId: patientId }))
         }
     }, [deleteResponse])
+
     useEffect(() => {
         if (watchUseStatus === 'Current User') {
             // Clear fields that are only for "Former User"
@@ -176,7 +183,7 @@ const Alcohol = () => {
                                                 <Form.Label className='mb-0'>Alcohol use frequency</Form.Label>
                                                 <Form.Select {...register('frequency')} required>
                                                     <option key='' value=''>Select</option>
-                                                    {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown'].map((data) => {
+                                                    {['Occasionally', 'Weekly', 'Daily', 'Heavy', 'Unknown']?.map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
                                                     })}
 
@@ -189,7 +196,7 @@ const Alcohol = () => {
                                                 <Form.Label className='mb-0'>Standard drinks per occasion</Form.Label>
                                                 <Form.Select {...register('quantityPerOccasion')} required>
                                                     <option key='' value=''>Select</option>
-                                                    {['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more'].map((data) => {
+                                                    {['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more']?.map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
                                                     })}
                                                 </Form.Select>
@@ -201,7 +208,7 @@ const Alcohol = () => {
                                                     <Form.Label className='mb-0'>Heavy intake frequency</Form.Label>
                                                     <Form.Select {...register('heavyIntakeFrequency')} required>
                                                         <option key='' value=''>Select</option>
-                                                        {['Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'].map((data) => {
+                                                        {['Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily']?.map((data) => {
                                                             return <option value={data} key={data}>{data}</option>;
                                                         })}
                                                     </Form.Select>
@@ -214,7 +221,7 @@ const Alcohol = () => {
                                                 <Form.Label className='mb-0'>What types of alcohol do you usually consume?</Form.Label>
                                                 <Form.Select {...register('alcoholType')} required>
                                                     <option key='' value=''>Select</option>
-                                                    {['Beer', 'Wine', 'Spirits', 'Other', 'All'].map((data) => {
+                                                    {['Beer', 'Wine', 'Spirits', 'Other', 'All']?.map((data) => {
                                                         return <option value={data} key={data}>{data}</option>;
                                                     })}
 
@@ -337,7 +344,7 @@ const Alcohol = () => {
                         </div>
                     ) : (
                         <Accordion alwaysOpen flush>
-                            {alcoholData.map((item, index) => (
+                            {alcoholData?.map((item, index) => (
                                 <Accordion.Item eventKey={index.toString()} key={index} className="rounded-1">
                                     <Accordion.Header>
                                         <div

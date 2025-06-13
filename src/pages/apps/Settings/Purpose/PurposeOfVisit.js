@@ -155,6 +155,7 @@ const POV = () => {
                                                     setSearch(e.target.value);
                                                     setSkip(1);
                                                 }}
+                                                placeholder='Search...'
                                                 className="pe-4"
                                                 style={{
                                                     border: 'none',

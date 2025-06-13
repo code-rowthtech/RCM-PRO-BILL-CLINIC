@@ -27,13 +27,13 @@ const ProjectDashboardPage = (): React$Element<React$FragmentType> => {
                 <Col lg={12} className='mt-1'>
                     <Tasks />
                 </Col>
-                <Col lg={6}>
-                    <Activity />
-                </Col>
+
                 <Col lg={6} className=''>
                     <Statistics data={analyticsResponse} />
                 </Col>
-
+                <Col lg={6}>
+                    <Activity />
+                </Col>
             </Row> */}
         </div>
     );

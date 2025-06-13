@@ -32,7 +32,8 @@ const Tobacco = () => {
     const [toDelete, setToDelete] = useState(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const deleteSuccess = store?.deleteTobaccooReducer?.data?.status;
-    const updateSuccess = store?.updateTobaccooReducer; const quillRef = useRef(null);
+    const updateSuccess = store?.updateTobaccooReducer;
+    const quillRef = useRef(null);
     const MAX_WORDS = 1000;
     const MAX_WORD_LENGTH = 45;
 
@@ -206,40 +207,42 @@ const Tobacco = () => {
                                 </Form.Group>
                             </Col>
                             <Col xs={12} className='mt-0'>
-                                <Form.Group controlId="notes">                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
-                                    <div>
-                                        Notes{' '}
-                                        <span
-                                            style={{ cursor: 'pointer' }}
-                                            title="Notes Suggestions"
-                                            onClick={handleEditorFocus}>
-                                            ✨
-                                        </span>
-                                    </div>                                        <small className="text-muted">
-                                        {(() => {
-                                            const content = watch('note') || '';
-                                            const plainText = content.replace(/<[^>]*>/g, '').trim();
-                                            const words = plainText.split(/\s+/).filter(Boolean);
-                                            const wordCount = words.length;
-                                            const longestWord = words.reduce((max, word) =>
-                                                word.length > max.length ? word : max,
-                                                '');
-                                            const isLongWord = longestWord.length > MAX_WORD_LENGTH;
+                                <Form.Group controlId="notes">
+                                    <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                        <div>
+                                            Notes{' '}
+                                            <span
+                                                style={{ cursor: 'pointer' }}
+                                                title="Notes Suggestions"
+                                                onClick={handleEditorFocus}>
+                                                ✨
+                                            </span>
+                                        </div>
+                                        <small className="text-muted">
+                                            {(() => {
+                                                const content = watch('note') || '';
+                                                const plainText = content.replace(/<[^>]*>/g, '').trim();
+                                                const words = plainText.split(/\s+/).filter(Boolean);
+                                                const wordCount = words.length;
+                                                const longestWord = words.reduce((max, word) =>
+                                                    word.length > max.length ? word : max,
+                                                    '');
+                                                // const isLongWord = longestWord.length > MAX_WORD_LENGTH;
 
-                                            return (
-                                                <div>
-                                                    <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                    {/* {isLongWord && (
+                                                return (
+                                                    <div>
+                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                        {/* {isLongWord && (
                                                         <div className="text-danger" style={{ fontSize: '0.75rem' }}>
                                                             ({MAX_WORD_LENGTH}+ chars)
                                                         </div>
                                                     )} */}
 
-                                                </div>
-                                            );
-                                        })()}
-                                    </small>
-                                </Form.Label>
+                                                    </div>
+                                                );
+                                            })()}
+                                        </small>
+                                    </Form.Label>
                                     <Controller
                                         name="note"
                                         control={control}

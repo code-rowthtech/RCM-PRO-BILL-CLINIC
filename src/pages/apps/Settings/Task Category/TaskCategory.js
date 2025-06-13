@@ -150,6 +150,7 @@ const TaskCategory = () => {
                                                 <FormInput
                                                     type="text"
                                                     value={search}
+                                                    placeholder='Search...'
                                                     onChange={(e) => {
                                                         setSearch(e.target.value);
                                                         setSkip(1);

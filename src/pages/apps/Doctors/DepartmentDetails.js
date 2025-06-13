@@ -215,8 +215,8 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                             </h5>
                                         </Col>
                                         {taxonomyCodesList?.map((data, index) => (
-                                            <Row key={index} className="mb-2">
-                                                <Col sm={3}>
+                                            <Row key={index} className="pe-0">
+                                                <Col sm={3} className='mb-1'>
                                                     <Form.Label className="mb-0">Code</Form.Label>
                                                     <AsyncSelect
                                                         loadOptions={loadTaxonomyOptions}
@@ -266,7 +266,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         maxLength={10}
                                                     />
                                                 </Col>
-                                                <Col sm={3}>
+                                                <Col sm={3} style={{paddingRight:'3px'}}>
                                                     <Form.Label className="mb-0">Type</Form.Label>
                                                     <Form.Select
                                                         value={data.type || 'primary'}
@@ -280,7 +280,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         <option value="secondary">Secondary</option>
                                                     </Form.Select>
                                                 </Col>
-                                                <Col sm={3}>
+                                                <Col sm={3} className='pe-0' style={{paddingLeft:'20px '}}>
                                                     <Form.Label className="mb-0">State</Form.Label>
                                                     <Form.Select
                                                         value={data.state}
