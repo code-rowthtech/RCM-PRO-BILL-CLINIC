@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Accordion, Button, Col, Dropdown, Form, Modal, Offcanvas, OverlayTrigger, Row, Table, Tooltip } from 'react-bootstrap';
+import { Accordion, Col, Modal, Row, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import './Encounter.css'
 import Spinner from '../../../../../constants/Spinner';
@@ -8,11 +8,12 @@ import { defaultVitals } from '../../../../../utils/DataSets/commonData2';
 import AddAllergy from '../../Task Tabs/AddAllergy';
 import AddProblem from '../../Task Tabs/AddProblem';
 import AddMedication from '../AddMedication';
-import { AiOutlineSortDescending } from 'react-icons/ai';
-import { getVitalsByPatientIdAction } from '../../../../../redux/actions';
+import { getMedicationAction, getVitalsByPatientIdAction } from '../../../../../redux/actions';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import VitalStatus from '../VitalStatus';
+import { getAllergiesOfPatientAction } from '../../../../../redux/allergyList/action';
+import { getProblemListAction } from '../../../../../redux/ProblemList/action';
 
 const convertFromImperial = (value, vitalName) => {
     if (vitalName === 'Height') return (value * 2.54).toFixed(2); // in to cm
@@ -41,51 +42,34 @@ const metricUnits = {
 };
 
 const EncounterSummary = () => {
-    const now = new Date();
-    const store = useSelector((state) => state);
-    const formatTwoDigits = (n) => n.toString().padStart(2, '0');
-    const [searchParams] = useSearchParams();
-    const dispatch = useDispatch()
 
+    // VARIABLE INITIALIZATIONS
+    const now = new Date();
+    const dispatch = useDispatch()
+    const store = useSelector((state) => state);
+    const [searchParams] = useSearchParams();
+
+    // STATE VARIABLES
     const [unitSystem, setUnitSystem] = useState('imperial')
     const [vitals, setVitals] = useState(defaultVitals);
-
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
-
-    const patienteffectiveVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
-    useEffect(() => {
-        if (patienteffectiveVitals) {
-            setEffectiveDateTime(
-                patienteffectiveVitals?.effectiveDateTime
-                    ? new Date(patienteffectiveVitals?.effectiveDateTime)?.toISOString().split('T')[0]
-                    : ''
-            );
-        }
-    }, [patienteffectiveVitals]);
-    const patientId = searchParams.get('id');
-
-    // MODAL FUNCTIONALITIES
     const [showAddAllergyModal, setShowAddAllergyModal] = useState(false);
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
     const [medicationModal, setMedicationModal] = useState(false);
     const [vitalsModal, setVitalsModal] = useState(false);
 
-    const closeVitalsModal = () => {
-        setVitalsModal(false);
-        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
-    };
-
-
-    const handleAddProblemClose = () => setShowAddProblemModal(false);
-    const handleAddAllergyClose = () => setShowAddAllergyModal(false);
-    const closeMedicationModal = () => {
-        setMedicationModal(false);
-    };
-
-    const [visitDateTime, setVisitDateTime] = useState({
-        date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
-        time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
+    const [visibleSections, setVisibleSections] = useState({
+        allergy: true,
+        socialhistory: true,
+        vitals: true,
+        problems: true,
+        medications: true,
     });
+    const [activeKey, setActiveKey] = useState("1");
+
+    // CONSTANT DECLARATIONS
+    const patientId = searchParams.get('id');
+    const patienteffectiveVitals = store?.getVitalsByPatientIdReducer?.data?.data?.[0];
     const settingsDataItems = store?.getEncounterSettingsReducer?.data?.data?.items?.find((data) => data?.name === 'Summary');
     const defaultMenuItems = [
         { _id: '1', name: 'Vitals', order: 0, hide: true },
@@ -103,37 +87,30 @@ const EncounterSummary = () => {
         ? store.getFamilyGeneticReducer.data.familyMedicalHistory
         : [];
 
-    // const socialHistoryData = [
-    //     ...tobaccoHistory.slice(0, 2),
-    //     ...familyGeneticHistory.slice(0, 2)
-    // ];
+
+
     const socialHistoryData = {
         tobaccoHistory: tobaccoHistory.slice(0, 2),
         familyGeneticHistory: familyGeneticHistory.slice(0, 2)
     }
-    const [showFilter, setShowFilter] = useState(false);
-
-    const [visibleSections, setVisibleSections] = useState({
-        allergy: true,
-        socialhistory: true,
-        vitals: true,
-        problems: true,
-        medications: true,
-    });
-
-    const toggleSection = (section) => {
-        setVisibleSections((prev) => ({ ...prev, [section]: !prev[section] }));
-    };
-
     const allergyData = store?.getAllergiesOfAPatientReducer?.data?.allergies;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const problemData = store?.getProblemListReducer?.data?.problems;
-    const clinicId = JSON.parse(sessionStorage.getItem('hyper_user'))?.clinicId;
     const appointmentsList = store?.getAppointmentsReducer?.data?.appointments;
     const medicationList = store?.getMedicationReducer?.data?.medicationRequests;
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
+    const disabledDates = patientVitals?.map(vital => vital.effectiveDateTime) || [];
 
+    const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
+        const date = vitalGroup.effectiveDateTime;
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(...vitalGroup.vitals);
+        return acc;
+    }, {});
 
+    console.log(allergyData, problemData, medicationList, patientVitals, 'shubham')
     const statusColorMap = {
         active: 'text-success',
         'on-hold': 'text-warning',
@@ -143,6 +120,53 @@ const EncounterSummary = () => {
         stopped: 'text-secondary',
         draft: 'text-muted',
         unknown: 'text-dark'
+    };
+    // Get sorted dates (newest first)
+    const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
+        new Date(b) - new Date(a)
+    );
+
+
+    // USEEFFECTS
+    useEffect(() => {
+        if (patienteffectiveVitals) {
+            setEffectiveDateTime(
+                patienteffectiveVitals?.effectiveDateTime
+                    ? new Date(patienteffectiveVitals?.effectiveDateTime)?.toISOString().split('T')[0]
+                    : ''
+            );
+        }
+    }, [patienteffectiveVitals]);
+
+
+    useEffect(() => {
+        if (!allergyData) {
+            dispatch(getAllergiesOfPatientAction({ patientId: patientId, limit: 3 }));
+        }
+        if (!problemData) {
+            dispatch(getProblemListAction({ patientId: patientId }))
+        }
+        if (!medicationList) {
+            dispatch(getMedicationAction({ patientId: patientId, limit: 3 }))
+        }
+    }, [allergyData, problemData, medicationList])
+
+    // FUNCTIONS
+    const handleAddProblemClose = () => setShowAddProblemModal(false);
+
+    const handleAddAllergyClose = () => setShowAddAllergyModal(false);
+
+    const closeMedicationModal = () => {
+        setMedicationModal(false);
+    };
+
+    const handleToggle = (key) => {
+        setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
+    };
+
+    const closeVitalsModal = () => {
+        setVitalsModal(false);
+        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
     };
 
     const getSeverityBadge = (severity) => {
@@ -163,44 +187,13 @@ const EncounterSummary = () => {
         return <span className={`ms-2 text-${variant}`}>{severity.display}</span>;
     };
 
-    const isDateDisabled = (dateString) => disabledDates.includes(dateString);
-    const disabledDates = patientVitals?.map(vital => vital.effectiveDateTime) || [];
     const getDisplayUnit = (vital) => {
         if (vital.unitKey) {
             return unitSystem === 'imperial' ? imperialUnits[vital.unitKey] : metricUnits[vital.unitKey];
         }
         return vital.unit || '';
     };
-    const handleDateChange = (e) => {
-        const newDate = e.target.value;
 
-        if (isDateDisabled(newDate)) {
-            alert("This date already has recorded vitals. Please choose another date.");
-            return;
-        }
-
-        setVisitDateTime(prev => ({
-            ...prev,
-            date: newDate,
-        }));
-    };
-
-    // Handle time change (unchanged)
-    const handleTimeChange = (e) => {
-        setVisitDateTime(prev => ({
-            ...prev,
-            time: e.target.value,
-        }));
-    };
-
-    const groupedVitals = patientVitals && patientVitals?.reduce((acc, vitalGroup) => {
-        const date = vitalGroup.effectiveDateTime;
-        if (!acc[date]) {
-            acc[date] = [];
-        }
-        acc[date].push(...vitalGroup.vitals);
-        return acc;
-    }, {});
     const findVitalValue = (vitalName, date) => {
         if (!groupedVitals[date]) return null;
 
@@ -243,10 +236,6 @@ const EncounterSummary = () => {
         return value;
     };
 
-    // Get sorted dates (newest first)
-    const sortedDates = Object.keys(groupedVitals).sort((a, b) =>
-        new Date(b) - new Date(a)
-    );
     const renderVitalCell = (vital, date) => {
         const value = findVitalValue(vital.name, date);
 
@@ -263,12 +252,13 @@ const EncounterSummary = () => {
 
         return value || '-';
     };
-    const [activeKey, setActiveKey] = useState("1");
 
-    const handleToggle = (key) => {
-        setActiveKey(prev => (prev === key ? null : key)); // toggle open/close
-    };
 
+    // const formatTwoDigits = (n) => n.toString().padStart(2, '0');
+    // const [visitDateTime, setVisitDateTime] = useState({
+    //     date: now.toISOString().split('T')[0], // "YYYY-MM-DD"
+    //     time: `${formatTwoDigits(now.getHours())}:${formatTwoDigits(now.getMinutes())}`, // "HH:mm"
+    // });
 
     return (
         <Row className='position-relative'>

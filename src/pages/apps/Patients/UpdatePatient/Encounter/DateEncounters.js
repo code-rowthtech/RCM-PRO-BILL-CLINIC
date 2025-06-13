@@ -163,10 +163,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         }, 0);
     }, [selectedFromList, setValue]);
 
-    useEffect(() => {
-        dispatch(getEncounterNotesFieldsAction({ noteId: defaultNoteTypeOption?.value }));
-    }, [dispatch]);
-
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
     const NoteFormFields = ({ data = [], excludedFields = [], control }) => {
         // For SOAP sections, keep refs for each ReactQuill
