@@ -22,12 +22,9 @@ const Patients = () => {
     const patientsData = store?.getPatientsReducer?.data?.data;
 
     useEffect(() => {
-        const hasFilters = skip !== 1 || patientsData === undefined;
         const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
-        if (hasFilters) {
             dispatch(getPatientsAction(payload));
-        }
-    }, [dispatch, skip]);
+    }, [dispatch, skip, search]);
     // useEffect(() => {
     //     const data = {
     //         clinicId: clinicId,
