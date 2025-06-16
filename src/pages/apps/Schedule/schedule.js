@@ -13,6 +13,7 @@ import Select from 'react-select';
 import { getScheduleAction } from '../../../redux/schedule/action';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDoctorsAction } from '../../../redux/actions';
+import Paginations from '../../../helpers/Paginations';
 
 const Schedule = () => {
     const store = useSelector((state) => state);
@@ -80,11 +81,12 @@ const Schedule = () => {
             clinicId: clinicId,
             fromDate: startDate || null,
             toDate: endDate || null,
+            page : skip,
             ...(selectedDoctor?.value ? { doctorId: selectedDoctor?.value } : {}),
         };
 
         dispatch(getScheduleAction({ key: encryptMessage(payload) }));
-    }, [startDate, endDate, clinicId, selectedDoctor, dispatch]);
+    }, [startDate, endDate, clinicId, selectedDoctor, dispatch, skip]);
 
     const handleInputChange = (data, type) => {
         if (type === 'doctor') {
@@ -100,7 +102,9 @@ const Schedule = () => {
     const handleAddHoliday = () => {
         navigate('/apps/schedule/addHoliday');
     };
-
+    const handlePageChange = (pageNumber) => {
+        setSkip(pageNumber);
+    };
     return (
         <div className="schedule-container">
             <Row className="mt-2">
@@ -122,7 +126,7 @@ const Schedule = () => {
                                                         e.preventDefault();
                                                         setActiveTab(tab);
                                                     }}>
-                                                    {tab === 'DoctorHolidays' && 'Doctor Time Off'}
+                                                    {tab === 'DoctorHolidays' && 'Provider Time Off'}
                                                     {/* {tab === 'breaks' && 'Breaks'} */}
                                                     {tab === 'schedules' && 'Schedules'}
                                                 </a>
@@ -149,7 +153,7 @@ const Schedule = () => {
                                                         onChange={(data) => handleSearchInputChange(data, 'doctor')}
                                                         name="doctorName"
                                                         options={doctorOptions}
-                                                        placeholder="Select Doctor"
+                                                        placeholder="Select Provider"
                                                         getOptionLabel={(e) =>
                                                             e.label.replace(/\b\w/g, (char) => char.toUpperCase())
                                                         }
@@ -214,9 +218,19 @@ const Schedule = () => {
                                     </Row>
                                 </Col>
                             </Row>
+                          
 
                             {/* Tab Content */}
                             <div className="mt-1">{renderTabContent()}</div>
+                              <Row>
+                                <Col className="mt-2 d-flex justify-content-end">
+                                    <Paginations
+                                        currentPage={skip}
+                                        totalPages={store?.getScheduleReducer?.data?.totalPages}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </Col>
+                            </Row>
                         </Card.Body>
                     </Card>
                 </Col>

@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
-import { Spinner, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Col, Spinner, Table } from 'react-bootstrap';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteScheduleAction, getScheduleAction } from '../../../redux/schedule/action';
 import { encryptMessage } from '../../../cryptoUtils';
+import Paginations from '../../../helpers/Paginations';
 
 const DoctorHoliday = () => {
     const dispatch = useDispatch();
@@ -40,12 +41,13 @@ const DoctorHoliday = () => {
     const deleteHandle = (id) => {
         dispatch(deleteScheduleAction(id));
     };
+  
     return (
         <div>
             <Table
                 responsive
                 className="table-centered table-nowrap mb-0  rounded"
-                style={{ height: scheduleResponse?.length === 0 ? '74vh' : 'auto' }}>
+                style={{ height: scheduleResponse?.length === 0 ? '75vh' : 'auto' }}>
                 <thead className="text-white">
                     <tr>
                         <th className="text-white " style={{ fontSize: '13px' }}>
@@ -68,20 +70,20 @@ const DoctorHoliday = () => {
                 <tbody>
                     {isLoading ? (
                         <tr>
-                            <td colSpan={5} className="text-center ">
+                            <td colSpan={7} className="text-center ">
                                 <Spinner animation="border" role="status" />
                             </td>
                         </tr>
                     ) : scheduleResponse.length === 0 ? (
                         <tr>
-                            <td colSpan={5} className="text-center">
+                            <td colSpan={7} className="text-center">
                                 <h3 className="my-5">No Data Found</h3>
                             </td>
                         </tr>
                     ) : (
                         scheduleResponse.map((holiday, index) => (
                             <tr key={holiday?.id || index}>
-                                <td className="" style={{ fontSize: '13px', fontWeight: '400' }}>
+                                <td className="" style={{ fontSize: '13px', fontWeight: '400', cursor: 'none' }}>
                                     {index + 1}
                                 </td>
                                 <td className="text-capitalize " style={{ fontSize: '13px', fontWeight: '400' }}>

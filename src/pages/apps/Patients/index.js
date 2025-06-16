@@ -9,6 +9,7 @@ import { getPatientsAction, updatePatientsAction } from '../../../redux/patients
 import Paginations from '../../../helpers/Paginations';
 import { IoSearchSharp } from 'react-icons/io5';
 import dummyProfile from '../../../assets/images/dummyProfile.png';
+import { IoMdClose } from 'react-icons/io';
 const Patients = () => {
     const navigate = useNavigate('');
     const [smShow, setSmShow] = useState(false);
@@ -23,7 +24,7 @@ const Patients = () => {
 
     useEffect(() => {
         const payload = { search: search, page: skip, limit: 10, clinicId: clinicId };
-            dispatch(getPatientsAction(payload));
+        dispatch(getPatientsAction(payload));
     }, [dispatch, skip, search]);
     // useEffect(() => {
     //     const data = {
@@ -72,15 +73,17 @@ const Patients = () => {
                                     <Button
                                         onClick={() => setStatus(true)}
                                         disabled
-                                        className={`me-md-2 active_inactive_buttons ${status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
+                                        className={`me-md-2 active_inactive_buttons ${
+                                            status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                        }`}>
                                         Active
                                     </Button>
                                     <Button
                                         onClick={() => setStatus(false)}
                                         disabled
-                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${!status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
-                                            }`}>
+                                        className={`me-md-2 ms-sm-1 active_inactive_buttons text-nowrap ${
+                                            !status ? ' text-white py-' : 'bg-white border-primary text-dark py-'
+                                        }`}>
                                         Inactive
                                     </Button>
                                 </Col>
@@ -88,7 +91,7 @@ const Patients = () => {
                                 <Col sm={6} className="text-end">
                                     <Row className="gy-2 gx-2 align-items-center justify-content-xl-end justify-content-between">
                                         <Col xs="auto" className="d-flex gap-2">
-                                            <div
+                                            {/* <div
                                                 className="input_search_box"
                                                 style={{
                                                     display: 'flex',
@@ -127,6 +130,77 @@ const Patients = () => {
                                                         backgroundColor: '#ccc',
                                                     }}
                                                 />
+                                            </div> */}
+                                            <div
+                                                className="input_search_box position-relative"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    borderRadius: '4px',
+                                                    backgroundColor: '#e8f0fe',
+                                                    padding: '0px 5px',
+                                                    minWidth: 180,
+                                                }}>
+                                                <FormInput
+                                                    type="text"
+                                                    value={search}
+                                                    placeholder="Search..."
+                                                    onChange={(e) => {
+                                                        const currentValue = e.target.value;
+                                                        setSearch(currentValue);
+                                                        dispatch(
+                                                            getPatientsAction({
+                                                                search: currentValue,
+                                                                page: 1,
+                                                                limit: 10,
+                                                                clinicId: clinicId,
+                                                            })
+                                                        );
+                                                    }}
+                                                    className="pe-4"
+                                                    style={{
+                                                        border: 'none',
+                                                        outline: 'none',
+                                                        flex: 1,
+                                                        backgroundColor: '#ccc',
+                                                        paddingRight: 30,
+                                                    }}
+                                                />
+                                                {search ? (
+                                                    <IoMdClose
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onClick={() => {
+                                                            setSearch('');
+                                                            dispatch(
+                                                                getPatientsAction({
+                                                                    search: '',
+                                                                    page: 1,
+                                                                    limit: 10,
+                                                                    clinicId: clinicId,
+                                                                })
+                                                            );
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <IoSearchSharp
+                                                        style={{
+                                                            fontSize: '1.2rem',
+                                                            color: 'lightgray',
+                                                            position: 'absolute',
+                                                            right: 10,
+                                                            top: '50%',
+                                                            transform: 'translateY(-50%)',
+                                                        }}
+                                                    />
+                                                )}
                                             </div>
                                             <Button onClick={handleNewPatients} className="custom-buttons py-1">
                                                 New Patient
@@ -198,31 +272,36 @@ const Patients = () => {
                                                             <div className="text-capitalize">
                                                                 {data?.gender || 'N/A'}
                                                                 <div
-                                                                    className={`${data?.birthDate
-                                                                        ? ''
-                                                                        : 'text-danger fs-6 fw-semibold'
-                                                                        }`}>
+                                                                    className={`${
+                                                                        data?.birthDate
+                                                                            ? ''
+                                                                            : 'text-danger fs-6 fw-semibold'
+                                                                    }`}>
                                                                     {data?.birthDate
                                                                         ? new Date(data?.birthDate)
-                                                                            .toISOString()
-                                                                            .split('T')[0]
+                                                                              .toISOString()
+                                                                              .split('T')[0]
                                                                         : 'Missing'}
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div>
-                                                                {'+1-' + (data?.telecom?.find(
-                                                                    (item) => item?.system === 'phone' && item?.use === 'home'
-                                                                )?.value || 'N/A')}
+                                                                {'+1-' +
+                                                                    (data?.telecom?.find(
+                                                                        (item) =>
+                                                                            item?.system === 'phone' &&
+                                                                            item?.use === 'home'
+                                                                    )?.value || 'N/A')}
 
                                                                 <div
-                                                                    className={`${data?.telecom?.find(
-                                                                        (item) => item?.system === 'email'
-                                                                    )?.value
-                                                                        ? ''
-                                                                        : 'text-danger'
-                                                                        }`}>
+                                                                    className={`${
+                                                                        data?.telecom?.find(
+                                                                            (item) => item?.system === 'email'
+                                                                        )?.value
+                                                                            ? ''
+                                                                            : 'text-danger'
+                                                                    }`}>
                                                                     {data?.telecom?.find(
                                                                         (item) => item?.system === 'email'
                                                                     )?.value || 'Email (Missing)'}
@@ -236,10 +315,10 @@ const Patients = () => {
                                                             {data?.address?.[0]?.line?.[0]?.length > 30
                                                                 ? data?.address?.[0]?.line?.[0]?.slice(0, 29) + '...'
                                                                 : data?.address?.[0]?.line?.[0] || (
-                                                                    <span className="text-danger fw-semibold fs-6">
-                                                                        Missing
-                                                                    </span>
-                                                                )}
+                                                                      <span className="text-danger fw-semibold fs-6">
+                                                                          Missing
+                                                                      </span>
+                                                                  )}
 
                                                             <div className="fw-semibold fs-6">
                                                                 {[data?.address?.[0]?.city, data?.address?.[0]?.state]

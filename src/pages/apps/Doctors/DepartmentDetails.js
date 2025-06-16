@@ -16,6 +16,8 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     const store = useSelector((state) => state);
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data?.states;
+    const createResponse = store?.createtDoctorsDetailReducer?.data?.status
+    console.log(createResponse,'createResponse')
     const id = doctorDetails?._id;
     const { handleSubmit, setValue } = useForm();
     const [searchParams] = useSearchParams();
@@ -120,6 +122,15 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
         };
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
+    useEffect(()=>{
+       
+        if(createResponse=== 200){
+               const payload = {
+                id: updateId,
+            };
+            dispatch(getDoctorDetailsAction(payload))
+        }
+    },[createResponse])
     useEffect(() => {
         if (doctorDetails && updateId) {
             const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({
@@ -216,39 +227,47 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                         </Col>
                                         {taxonomyCodesList?.map((data, index) => (
                                             <Row key={index} className="pe-0">
-                                                <Col sm={3} className='mb-1'>
-                                                    <Form.Label className="mb-0">Code</Form.Label>
-                                                    <AsyncSelect
-                                                        loadOptions={loadTaxonomyOptions}
-                                                        defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
-                                                        isSearchable
-                                                        className="basic-single"
-                                                        classNamePrefix="select"
-                                                        placeholder="&nbsp; Select"
-                                                        value={
-                                                            formattedTaxonomyOptions.find(
-                                                                (opt) => opt.value === data.code
-                                                            ) ||
-                                                            formattedTaxonomyOptions.find(
-                                                                (opt) => opt.value.code === data.code.code
-                                                            )
-                                                        }
-                                                        onChange={(selected) => handleTaxonomyChange(selected, index)}
-                                                        styles={{
-                                                            control: (provided) => ({
-                                                                ...provided,
-                                                                height: '30px',
-                                                                minHeight: '30px',
-                                                                border: '0px',
-                                                            }),
-                                                            placeholder: (provided) => ({
-                                                                ...provided,
-                                                                fontWeight: 'bold',
-                                                                fontSize: '12px',
-                                                                paddingBottom: '5px',
-                                                            }),
-                                                        }}
-                                                    />
+                                                <Col sm={3} className="mb-1">
+                                                    <Form.Group>
+                                                        <Form.Label className="mb-0">Code</Form.Label>
+                                                        <AsyncSelect
+                                                            loadOptions={loadTaxonomyOptions}
+                                                            defaultOptions={formattedTaxonomyOptions.slice(0, 10)}
+                                                            isSearchable
+                                                            className="basic-single"
+                                                            classNamePrefix="select"
+                                                            placeholder=" Select"
+                                                            value={
+                                                                formattedTaxonomyOptions.find(
+                                                                    (opt) => opt.value === data.code
+                                                                ) ||
+                                                                formattedTaxonomyOptions.find(
+                                                                    (opt) => opt.value.code === data.code.code
+                                                                )
+                                                            }
+                                                            onChange={(selected) =>
+                                                                handleTaxonomyChange(selected, index)
+                                                            }
+                                                            styles={{
+                                                                control: (provided) => ({
+                                                                    ...provided,
+                                                                    height: '30px',
+                                                                    minHeight: '30px',
+                                                                    border: '0px',
+                                                                    zIndex: 9999,
+                                                                }),
+                                                                placeholder: (provided) => ({
+                                                                    ...provided,
+                                                                    fontWeight: 'bold',
+                                                                    fontSize: '12px',
+                                                                    paddingBottom: '5px',
+                                                                }),
+                                                                menuPortal: (base) => ({ ...base, zIndex: 9999 }), // ensures it's on top
+                                                            }}
+                                                            menuPortalTarget={document.body} // renders menu to body
+                                                            menuPosition="fixed" // avoids clipping
+                                                        />
+                                                    </Form.Group>
                                                 </Col>
 
                                                 <Col sm={3}>
@@ -266,7 +285,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         maxLength={10}
                                                     />
                                                 </Col>
-                                                <Col sm={3} style={{paddingRight:'3px'}}>
+                                                <Col sm={3} style={{ paddingRight: '3px' }}>
                                                     <Form.Label className="mb-0">Type</Form.Label>
                                                     <Form.Select
                                                         value={data.type || 'primary'}
@@ -280,7 +299,7 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
                                                         <option value="secondary">Secondary</option>
                                                     </Form.Select>
                                                 </Col>
-                                                <Col sm={3} className='pe-0' style={{paddingLeft:'20px '}}>
+                                                <Col sm={3} className="pe-0" style={{ paddingLeft: '20px ' }}>
                                                     <Form.Label className="mb-0">State</Form.Label>
                                                     <Form.Select
                                                         value={data.state}

@@ -224,7 +224,7 @@ const ScheduleTab = () => {
             <div className="row">
                 <div className="col-md-3 col-sm-6 col-12 mb-1 responnsible-party-select">
                     <label htmlFor="doctorName" className="form-label" style={{ fontWeight: 'bold' }}>
-                        Doctor Name<span className="text-danger">*</span>
+                        Provider Name<span className="text-danger">*</span>
                     </label>
                     <Select
                         className="basic-single"
@@ -236,7 +236,7 @@ const ScheduleTab = () => {
                         onChange={(data) => handleSearchInputChange(data, 'doctor')}
                         name="doctorName"
                         options={doctorOptions}
-                        placeholder="Select Doctor"
+                        placeholder="Select Provider"
                         getOptionLabel={(e) =>
                             e.label.replace(/\b\w/g, (char) => char.toUpperCase())
                         }

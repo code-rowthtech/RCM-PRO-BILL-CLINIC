@@ -871,13 +871,16 @@ table {
 }
 
 .lowerMenu {
-    height: 36vh;
+    height: 22vh;
     display: flex;
     flex-direction: column-reverse;
 }
+.mainLogo{
+    height: 8px;
+}
 
 .media_mob {
-    height: 64vh;
+    height: 78vh;
 }
 
 .patient-menu-container {
@@ -928,7 +931,7 @@ table {
 }
 
 tbody tr:hover {
-    cursor: pointer !important;
+    /* cursor: pointer !important; */
     background-color: #f1f1f1 !important;
     transition-duration: 0.4s !important;
     transition-timing-function: ease-in-out !important;
