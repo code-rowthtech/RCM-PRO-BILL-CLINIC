@@ -118,11 +118,11 @@ export const getDepartmentDataReducer = (state = GET_DEPARTMENT_DATA_INITIAL_STA
                 data: action.payload,
                 loading: false,
             };
-        case SettingsActionTypes.GET_DEPARTMENT_DATA_RESET:
-            return {
-                data: [],
-                loading: false,
-            };
+        // case SettingsActionTypes.GET_DEPARTMENT_DATA_RESET:
+        //     return {
+        //         data: [],
+        //         loading: false,
+        //     };
         case SettingsActionTypes.GET_DEPARTMENT_DATA_ERROR:
             return {
                 data: action.payload,

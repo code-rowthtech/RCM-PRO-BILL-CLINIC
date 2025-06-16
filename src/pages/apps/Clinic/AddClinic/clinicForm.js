@@ -121,6 +121,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
+    console.log(clinicsDataGet,'getapi')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
@@ -184,7 +185,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
-                city: addr.city || '',
+                city: addr?.[0]?.city || '',
                 state: addr.state || '',
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
@@ -309,6 +310,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             poc: pocs,
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
+        console.log(newPayload,'newpayload')
     };
     const logoFileInputRef = useRef(null);
     const handleLogoClick = () => {
@@ -494,7 +496,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ToastHandle('Maximun 3 addresses are allowed.', 'danger');
             return;
         }
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
+        setAddresses([...addresses, { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
     };
 
     const removeIdentifier = (index) => {
