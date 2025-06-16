@@ -137,7 +137,7 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
 
     const closeVitalsModal = () => {
         setVitalsModal(false);
-        // dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
+        dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
     };
     const handleAddProblemClose = () => setShowAddProblemModal(false);
     const handleAppointmentClose = () => setShowAppointmentModal(false);
