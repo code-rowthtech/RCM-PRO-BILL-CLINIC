@@ -35,6 +35,7 @@ const Designation = () => {
     const createResponse = store?.createMastersDataReducer?.data?.status;
     const tableGetData = store?.getMastersDataReducer?.data1?.data?.result;
     const updateResponse = store?.updateMastersDataReducer?.data?.status;
+    console.log({tableGetData})
     const closeAddModal = () => {
         setAddDesiginationModal(false);
         setEdit(null);
