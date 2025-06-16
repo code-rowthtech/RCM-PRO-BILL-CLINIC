@@ -52,23 +52,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
     // Get update encounter data from store
     const updateEncounterData = store?.updateEncounterReducer;
     const encounterDataGet = store?.getEncounterByIdReducer?.data?.encounter;
-    // useEffect(() => {
-    //     if (!encounterDataGet || !encounterDataGet._id) return;
-
-    //     setEncounterDataArr((prev) => {
-    //         const exists = prev.some((data) => data._id === encounterDataGet._id);
-
-    //         if (exists) {
-    //             // Replace the existing item
-    //             return prev.map((data) =>
-    //                 data._id === encounterDataGet._id ? encounterDataGet : data
-    //             );
-    //         } else {
-    //             // Add as new item
-    //             return [...prev, encounterDataGet];
-    //         }
-    //     });
-    // }, [encounterDataGet]);
 
     // Handle successful encounter creation or update
     useEffect(() => {
@@ -90,13 +73,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         createEncounterData?.data?.status,
         updateEncounterData?.data?.status,
     ]);
-
-    // useEffect(() => {
-    //     if (encounterAction === 'updateEncounter') {
-    //         dispatch(getEncounterByIdAction({ encounterId: encounterId }))
-    //     }
-    // }, [encounterAction])
-    // Set default note type and populate form for update
 
     useEffect(() => {
         if (!noteType && defaultNoteTypeOption) {
@@ -135,7 +111,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                 });
             }
         }
-    }, [noteType, defaultNoteTypeOption, encounterAction, encounterData, setValue, notesFields]);
+    }, [noteType, defaultNoteTypeOption, notesTypeOptions, encounterAction, encounterData, setValue, notesFields]);
     const defaultTabs = ['Summary', 'Templates', 'Past Encounters'];
     const visibleTabs =
         settingsDataMainItems?.length > 0
@@ -276,7 +252,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                                             value={value || ''}
                                             // onChange={onChange}
                                             onChange={handleTextChange(onChange, value, 100)}
-
                                             modules={{
                                                 toolbar: [
                                                     ['bold', 'italic', 'underline'],
@@ -320,34 +295,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                             )}
                         />
                     ) : (
-                        // <Form.Control
-                        //     {...register(name)}
-                        //     as={inputType === 'text' ? 'input' : 'textarea'}
-                        //     rows={inputType === 'text' ? undefined : 3}
-                        // />
-                        // <Controller
-                        //     name={name}
-                        //     control={control}
-                        //     render={({ field: { value = '', onChange } }) => (
-                        //         <Form.Control
-                        //             as={inputType === 'text' ? 'input' : 'textarea'}
-                        //             rows={inputType === 'text' ? undefined : 10}
-                        //             value={value}
-                        //             onChange={(e) => {
-                        //                 const input = e.target.value;
-                        //                 const words = input.trim().split(/\s+/).filter(Boolean);
-
-                        //                 // Prevent updating if the last word exceeds 45 characters
-                        //                 const lastWord = words[words.length - 1] || '';
-                        //                 if (lastWord.length > 45) return;
-
-                        //                 const limitedWords = words.slice(0, MAX_LENGTH);
-                        //                 const limitedText = limitedWords.join(' ');
-                        //                 onChange(limitedText);
-                        //             }}
-                        //         />
-                        //     )}
-                        // />
                         <Controller
                             name={name}
                             control={control}
@@ -401,6 +348,7 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
         );
     };
     const [providerError, setProviderError] = useState(false);
+
     const onSubmit = (data) => {
         const encounterTypeSelected = encounterTypes?.find((e) => e?.code === data?.type);
         const encounterClassSelected = encounterClassCodes?.find((e) => e?.code === data?.class);
@@ -546,7 +494,6 @@ const DateEncounters = ({ isCollapsed, searchNoteType, expanded, setSearchNoteTy
                         {leftTab === 'Summary' && <EncounterSummary />}
                         {leftTab === 'Templates' && <EncounterTemplates selectedFromList={selectedFromList} setSelectedFromList={setSelectedFromList} />}
                         {leftTab === 'Past Encounters' && <PastEncounters />}
-                        {/* {leftTab === 'PMH' && <>PMH</>} */}
                     </Col>
                 </Row>
             </Col>

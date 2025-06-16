@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Col, Row, Form, Button, Card, ListGroup, Accordion } from 'react-bootstrap';
 import { useForm, Controller } from 'react-hook-form';
 import ReactQuill from 'react-quill';
@@ -11,9 +11,14 @@ import { encryptMessage } from '../../../../../cryptoUtils';
 import { useSearchParams } from 'react-router-dom';
 import DeletionModal from '../../../../../helpers/deletionModal';
 import Spinner from '../../../../../constants/Spinner';
+import ToastHandle from '../../../../../helpers/ToastMessage';
+import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
 
+const MAX_WORDS = 10;
+const WAX_WORD_LENGTH = 45;
 const Alcohol = () => {
     const dispatch = useDispatch();
+    const quillRef = useRef(null);
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
@@ -34,7 +39,7 @@ const Alcohol = () => {
         if (!alcoholData) {
             dispatch(getAlcoholHistoryAction({ patientId }))
         }
-    }, [alcoholData])
+    }, [alcoholData, dispatch])
 
     useEffect(() => {
         if (toEdit) {
@@ -144,6 +149,19 @@ const Alcohol = () => {
         setShowSuggestions(false);
     };
     const heavyFrequency = watch('frequency')
+
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
     return (
         <Row className="scroll-container" style={{ overflowY: 'scroll', overflowX: 'hidden', height: "100%" }}>
             {/* Left Side - Form */}
@@ -267,11 +285,29 @@ const Alcohol = () => {
                                     <Row>
                                         <Col xs={12}>
                                             <Form.Group controlId="notes">
-                                                <Form.Label className="fw-medium mb-0">
-                                                    Notes{' '}
-                                                    <span style={{ cursor: 'pointer' }} title='Notes Suggestions' onClick={handleEditorFocus}>
-                                                        ✨
-                                                    </span>
+                                                <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        Notes{' '}
+                                                        <span
+                                                            style={{ cursor: 'pointer' }}
+                                                            title="Notes Suggestions"
+                                                            onClick={handleEditorFocus}>
+                                                            ✨
+                                                        </span>
+                                                    </div>
+                                                    <small className="text-muted">
+                                                        {(() => {
+                                                            const content = watch('note') || '';
+                                                            const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                            const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                            const wordCount = words?.length;
+                                                            return (
+                                                                <div>
+                                                                    <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                                                </div>
+                                                            );
+                                                        })()}
+                                                    </small>
                                                 </Form.Label>
 
                                                 <Controller
@@ -281,6 +317,7 @@ const Alcohol = () => {
                                                     render={({ field: { onChange, value } }) => (
                                                         <ReactQuill
                                                             value={value}
+                                                            ref={quillRef}
                                                             onChange={(content, delta, source) => {
                                                                 if (source === 'user') {
                                                                     onChange(content);

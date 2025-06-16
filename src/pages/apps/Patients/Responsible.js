@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Spinner } from 'react-bootstrap';
+import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import AddressForm from '../Common Pages/AddressForm';
 import TelecomFrom from '../Common Pages/TelecomFrom';
@@ -8,6 +8,7 @@ import { encryptMessage } from '../../../cryptoUtils';
 import { createResponsiblePartyAction } from '../../../redux/actions';
 import { dataList } from '../../../utils/DataSets/relations.data';
 import Select from 'react-select';
+import Spinner from '../../../constants/Spinner';
 
 const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const store = useSelector((state) => state);
@@ -21,7 +22,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-
+    console.log(patientDetails, 'patientDetails23456')
     const {
         register,
         handleSubmit,
@@ -31,7 +32,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     } = useForm();
 
     useEffect(() => {
-        if (patientDetails) {
+        if (patientDetails && patientDetails?._id === patientId) {
             setValue('title', patientDetails?.name?.[0]?.prefix);
             setValue('fullName', patientDetails?.name?.[0]?.text);
             setValue('gender', patientDetails?.gender);
@@ -112,7 +113,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
         <>
             <Form onSubmit={handleSubmit(onSubmit)}>
                 <div className="row px-0 ">
-                    <div className="row  pb-2 pt-1 pe-0">
+                    <div className="row pt-1 pe-0">
                         <div className="col-md-3 col-12 pe-1">
                             <Form.Label className="mb-0">
                                 Title <span className="text-danger">*</span>
@@ -166,7 +167,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                             />
                             {errors.dateOfBirth && <span className="text-danger">{errors.dateOfBirth.message}</span>}
                         </div>
-                        <Col sm={3} className="mb-2">
+                        <Col sm={3} className="">
                             <Form.Group>
                                 <Form.Label className="mb-0">Emergency Contact Relation</Form.Label>
                                 <Select
@@ -224,7 +225,7 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
                         style={{ width: '200px' }}
                         type="submit">
                         {store?.createResponsiblePartyReducer?.loading ? (
-                            <Spinner animation="border" role="status" />
+                            <Spinner className='spinner-border-sm' color='white' />
                         ) : (
                             ' Save & Continue Editing'
                         )}

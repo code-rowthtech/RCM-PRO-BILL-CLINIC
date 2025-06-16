@@ -6,16 +6,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
     getStatesByCountryAction,
-    getCitiesAction,
-    getCities2Action,
-    getCities3Action,
     updatePatientsAction,
+    getCities4Action,
 } from '../../../redux/actions';
 import Select from 'react-select';
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
-import { handleUpload } from '../../../helpers/HandleUpload';
-import { CiCircleMinus } from 'react-icons/ci';
 import { raceOptions } from '../../../utils/DataSets/race.data';
 import { ethnicityOptions } from '../../../utils/DataSets/enthnicity.data';
 import { genderIdentityOptions } from '../../../utils/DataSets/genderIdentities';
@@ -72,7 +68,8 @@ const Demographicdetails = ({
     const [selectedState, setSelectedState] = useState(null);
     const statesData = store?.getStatesReducer?.data;
     const updateResponse = store?.updatePatientsReducer?.data?.status;
-    const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
+    const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
+    console.log(store?.getCitiesReducer, 'cities4')
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
@@ -81,7 +78,7 @@ const Demographicdetails = ({
         if (employerCitySearch) {
             setValue('employerCity', employerCitySearch);
         }
-    }, [employerCitySearch, cities3]);
+    }, [employerCitySearch, cities4]);
 
     const onSubmit = (data) => {
         const selectedGenderIdentity = genderIdentityOptions.find((option) => option.show === data.genderIdentity);
@@ -291,9 +288,11 @@ const Demographicdetails = ({
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
+        console.log(key, 'var key')
         setSelectedState(e.target.value);
-        dispatch(getCitiesAction({ state_code: key, name: '', limit: 25 }));
+        dispatch(getCities4Action({ state_code: key, name: '', limit: 25 }));
     };
+
     const formattedEthnicityOptions = ethnicityOptions.map((ethnicity) => ({
         value: ethnicity, // Code as the value
         label: ethnicity.display, // Display text as the label
@@ -820,7 +819,7 @@ const Demographicdetails = ({
                                     <Col sm={6}>
                                         <Form.Group className="">
                                             <Form.Label className="mb-0">State</Form.Label>
-                                            <Form.Select {...register('employerStateName')}>
+                                            <Form.Select {...register('employerStateName')} onChange={(e) => handleStateSelection(e)}>
                                                 <option value="" hidden>
                                                     State
                                                 </option>
@@ -847,7 +846,7 @@ const Demographicdetails = ({
                                                 <option hidden value="">
                                                     {store?.getCitiesReducer?.loading ? 'Loading...' : 'City'}
                                                 </option>
-                                                {cities3?.map((data) => (
+                                                {cities4?.map((data) => (
                                                     <option key={data?.name} value={data?.name}>
                                                         {data?.name}
                                                     </option>

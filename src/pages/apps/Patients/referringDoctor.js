@@ -10,6 +10,7 @@ import {
 import us from '../../../assets/images/flags/us.jpg';
 import { encryptMessage } from '../../../cryptoUtils';
 import AddressForm from '../Common Pages/AddressForm';
+import { loggedInUser } from '../../../helpers/api/loggedInUser';
 
 const ReferringDoctor = ({ patientId, setActiveTab }) => {
     const store = useSelector((state) => state);
@@ -58,7 +59,7 @@ const ReferringDoctor = ({ patientId, setActiveTab }) => {
     const onSubmit = (data) => {
         const payload = {
             patientId: patientId,
-            clinicId: clinicId,
+            clinicId: loggedInUser?.clinicId,
             identifier: [
                 {
                     use: 'official',

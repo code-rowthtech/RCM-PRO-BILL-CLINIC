@@ -236,7 +236,7 @@ export const getStatesReducer = (state = GET_STATES_INITIAL_STATE, action) => {
 }
 export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
     switch (action.type) {
-        case ClinicsActionTypes.GET_CITIES_LOADING:
+        case ClinicsActionTypes.GET_CITIES1_LOADING:
             return {
                 ...state,
                 cities1: {
@@ -244,7 +244,7 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
                     loading: true
                 }
             };
-        case ClinicsActionTypes.GET_CITIES_SUCCESS:
+        case ClinicsActionTypes.GET_CITIES1_SUCCESS:
             return {
                 ...state,
                 cities1: {
@@ -252,7 +252,7 @@ export const getCitiesReducer = (state = GET_CITIES_INITIAL_STATE, action) => {
                     loading: false
                 }
             };
-        case ClinicsActionTypes.GET_CITIES_ERROR:
+        case ClinicsActionTypes.GET_CITIES1_ERROR:
             return {
                 ...state,
                 cities1: {
@@ -453,13 +453,13 @@ export const createSubscriptionPlanReducer = (state = CREATE_SUBSCRIPTION_PLAN_I
             return {
                 data: [],
                 loading: false
-            }                
+            }
         case ClinicsActionTypes.CREATE_SUBSCRIPTION_ERROR:
             return {
                 data: action.payload,
                 loading: false
             }
-      
+
         default: return state
     }
 }

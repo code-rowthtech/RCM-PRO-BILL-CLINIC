@@ -110,7 +110,7 @@ const EncounterSummary = () => {
         return acc;
     }, {});
 
-    console.log(allergyData, problemData, medicationList, patientVitals, 'shubham')
+    // console.log(allergyData, problemData, medicationList, patientVitals, 'shubham')
     const statusColorMap = {
         active: 'text-success',
         'on-hold': 'text-warning',

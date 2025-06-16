@@ -55,12 +55,12 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     const [effectiveDateTime, setEffectiveDateTime] = useState('');
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false);
-    useEffect(() => {
-        if (store?.getPatientByIdReducer?.data?.data && store?.getPatientByIdReducer?.data?.data === patientId) {
-            dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 7 }));
-        }
-        // dispatch(getEncounterAction({ patientId: patientId }));
-    }, [store?.getPatientByIdReducer?.data?.data, patientId]);
+    // useEffect(() => {
+    //     if (store?.getPatientByIdReducer?.data?.data && store?.getPatientByIdReducer?.data?.data === patientId) {
+    //         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 5 }));
+    //     }
+    //     // dispatch(getEncounterAction({ patientId: patientId }));
+    // }, [store?.getPatientByIdReducer?.data?.data, patientId]);
 
     const getSeverityBadge = (severity) => {
         if (!severity || !severity.code || !severity.display) return null;

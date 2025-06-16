@@ -19,14 +19,19 @@ import ReactQuill from 'react-quill';
 import { createSuggestionAction } from '../../../../redux/suggestions/action';
 import AddProblem from '../Task Tabs/AddProblem';
 import Spinner from '../../../../constants/Spinner';
+import ToastHandle from '../../../../helpers/ToastMessage';
+import useQuillWordLimit from '../../../../helpers/quillWordLimit';
 
+const MAX_WORDS = 10;
+const WAX_WORD_LENGTH = 45;
 export default function AddMedication({ show, onCancel, selectedMedication }) {
-    const { register, handleSubmit, setValue, control, getValues, reset, formState: { errors } } = useForm();
+    const { register, handleSubmit, setValue, watch, control, getValues, reset, formState: { errors } } = useForm();
     const [searchParams] = useSearchParams();
     const dropdownRef = useRef(null);
     const patientId = searchParams.get('id');
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
+    const quillRef = useRef();
 
     // STATE VARIABLES
     const [selectedDrug, setSelectedDrug] = useState(null);
@@ -195,6 +200,19 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
         const current = getValues('note'); // from useFormContext or pass as prop
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
+
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
     return (
         <Modal
             show={show}
@@ -374,14 +392,29 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                         </Col>
                         <Col xs={12}>
                             <Form.Group controlId="note">
-                                <Form.Label className="fw-medium mb-0">
-                                    Notes{' '}
-                                    <span
-                                        style={{ cursor: 'pointer' }}
-                                        title="Notes Suggestions"
-                                        onClick={handleEditorFocus}>
-                                        ✨
-                                    </span>
+                                <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                                    <div>
+                                        Notes{' '}
+                                        <span
+                                            style={{ cursor: 'pointer' }}
+                                            title="Notes Suggestions"
+                                            onClick={handleEditorFocus}>
+                                            ✨
+                                        </span>
+                                    </div>
+                                    <small className="text-muted">
+                                        {(() => {
+                                            const content = watch('note') || '';
+                                            const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                            const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                            const wordCount = words?.length;
+                                            return (
+                                                <div>
+                                                    <div>{`${wordCount || 0} / ${MAX_WORDS} words`}</div>
+                                                </div>
+                                            );
+                                        })()}
+                                    </small>
                                 </Form.Label>
                                 <Controller
                                     name="note"
@@ -389,6 +422,7 @@ export default function AddMedication({ show, onCancel, selectedMedication }) {
                                     defaultValue="<ul><li></li></ul>"
                                     render={({ field: { onChange, value } }) => (
                                         <ReactQuill
+                                            ref={quillRef}
                                             value={value}
                                             onChange={(content, delta, source) => {
                                                 if (source === 'user') {

@@ -156,7 +156,7 @@ function* getEncounterFunction(data) {
         });
         const response = yield call(getEncounterApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_SUCCESS,
                 payload: { ...decryptedData },
@@ -183,7 +183,7 @@ function* getEncounterSettingsFunction(data) {
         });
         const response = yield call(getEncounterSettingsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_SETTINGS_SUCCESS,
                 payload: { ...decryptedData },
@@ -209,7 +209,7 @@ function* getEncounterByIdFunction(data) {
         });
         const response = yield call(getEncounterByIdApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_BY_ID_SUCCESS,
                 payload: { ...decryptedData },
@@ -236,7 +236,7 @@ function* getEncounterNotesTypeFunction(data) {
         });
         const response = yield call(getEncounterNotesTypeApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_NOTES_SUCCESS,
                 payload: { ...decryptedData },
@@ -263,7 +263,7 @@ function* getEncounterNotesFieldsFunction(data) {
         });
         const response = yield call(getEncounterNoteFieldsApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
-        if (response.status === 201) {
+        if (response.status === 200) {
             yield put({
                 type: EncounterActionTypes.GET_ENCOUNTER_NOTES_FIELDS_SUCCESS,
                 payload: { ...decryptedData },

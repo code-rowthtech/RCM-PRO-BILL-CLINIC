@@ -29,7 +29,7 @@ export const getStatesByCountryAction = (data): AuthAction => ({
 });
 
 export const getCitiesAction = (data) => ({
-    type: ClinicsActionTypes.GET_CITIES,
+    type: ClinicsActionTypes.GET_CITIES1,
     data
 });
 

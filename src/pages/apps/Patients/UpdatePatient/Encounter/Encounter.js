@@ -12,6 +12,7 @@ import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
+import { loggedInUser } from '../../../../../helpers/api/loggedInUser';
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter, isAccordionOpen }) => {
     const dispatch = useDispatch()
@@ -92,7 +93,7 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     }, [dispatch])
 
     useEffect(() => {
-        dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType }))
+        dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: loggedInUser?.clinicId, userId: loggedInUser?._id }))
     }, [dispatch, searchNoteType])
 
     const [showSettings, setShowSettings] = useState(false)

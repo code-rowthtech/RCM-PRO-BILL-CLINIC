@@ -246,7 +246,7 @@ const PatientDetails = ({ patientId, isAccordionOpen }) => {
 
     return (
         <Form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
-            <div className=' scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+            <div className=' scroll-container mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <div className="row ">
                     <div className="col-md-3 col-12">
                         <Form.Group>

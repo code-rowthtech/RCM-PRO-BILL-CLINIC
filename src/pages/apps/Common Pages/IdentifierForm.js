@@ -83,7 +83,10 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
         setIdentifiers(updatedIdentifiers);
     };
 
+    const [selectedIndex, setSelectedIndex] = useState(null);
+
     const handleIdentifierFileChange = async (e, index) => {
+        setSelectedIndex(index)
         const selectedFile = e.target.files[0];
         if (!selectedFile) return;
 
@@ -98,6 +101,7 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                         name: selectedFile.name,
                     },
                 };
+                setSelectedIndex(null)
                 return updatedDetails;
             });
         } catch (error) {
@@ -194,12 +198,12 @@ const IdentifierForm = ({ defaultIdentifiers = [], onChange, setIdentifiers, ide
                             onClick={() => document.getElementById(`fileInput-identifier-${index}`).click()}
                             className={`custom-file-upload justify-content-between cursor-pointer ${item?.file?.name ? 'form-control' : 'custom-form-fields'
                                 }`}>
-                            {identifierDocument
+                            {index === selectedIndex
                                 ? 'Uploading...'
                                 : item.file?.name
-                                    ? item.file.name.length > 30
-                                        ? item.file.name.slice(0, 25) + '...'
-                                        : item.file.name
+                                    ? item?.file?.name?.length > 30
+                                        ? item?.file?.name?.slice(0, 25) + '...'
+                                        : item?.file?.name
                                     : 'Upload Document'}
                             <p className="mb-0">
                                 <FiDownloadCloud />

@@ -5,11 +5,10 @@ import ReactQuill from 'react-quill';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     createSurgicalHistoryAction,
-    createTobaccooAction,
+
     deleteSurgicalHistoryAction,
     getICDProcedureAction,
     getSurgicalHistoryAction,
-    getTobaccooAction,
     updateSurgicalHistoryAction,
 } from '../../../../../redux/actions';
 import { encryptMessage } from '../../../../../cryptoUtils';
@@ -28,6 +27,8 @@ const MAX_WORDS = 1000;
 const WAX_WORD_LENGTH = 45;
 const SurgicalHistory = () => {
     const dispatch = useDispatch();
+    const quillRef = useRef(null);
+
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const store = useSelector((state) => state);
@@ -60,20 +61,12 @@ const SurgicalHistory = () => {
         dispatch(deleteSurgicalHistoryAction({ id: toDelete }));
     };
 
-    const quillRef = useRef(null);
 
-    const handleLimitExceed = ({ type, message }) => {
-        ToastHandle(message, 'danger');
-    };
-
-    useQuillWordLimit({
-        quillRef,
-        maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
-    });
-
-
+    useEffect(() => {
+        if (!surgicalHistory) {
+            dispatch(getSurgicalHistoryAction({ patientId: patientId }));
+        }
+    }, [surgicalHistory, dispatch])
 
     useEffect(() => {
         if (toEdit) {
@@ -184,6 +177,20 @@ const SurgicalHistory = () => {
         setSelectedIcdProcedure(null);
         setToEdit(null);
     };
+
+
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
     return (
         <Row className="py-0 m-auto">
             <Col md={6} className="d-flex  flex-column border-end px-0 pe-2 scroll-container">

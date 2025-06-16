@@ -1,21 +1,19 @@
 // VitalStatus.js
-import React, { useEffect, useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import { Table, Button, Form } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Table, Form } from 'react-bootstrap';
 import { defaultVitals } from '../../../../utils/DataSets/commonData2';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import { useDispatch, useSelector } from 'react-redux';
-import { createVitalsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { createVitalsAction, getVitalsByPatientIdAction, updateVitalsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { handlePrintVitals } from '../../../../helpers/printVitals';
 import Spinner from '../../../../constants/Spinner';
 
-const conversionMap = {
-    Temperature: { imperial: '°F', metric: '°C' },
-    Height: { imperial: 'in', metric: 'cm' },
-    Weight: { imperial: 'lbs', metric: 'kg' },
-};
+// const conversionMap = {
+//     Temperature: { imperial: '°F', metric: '°C' },
+//     Height: { imperial: 'in', metric: 'cm' },
+//     Weight: { imperial: 'lbs', metric: 'kg' },
+// };
 // Add these helper functions near the top of your file
 
 const imperialUnits = {
@@ -32,41 +30,11 @@ const metricUnits = {
     'Head Circumference': 'cm',
 };
 
-// const convertValue = (value, fromUnit, toUnit) => {
-//     const num = parseFloat(value);
-//     if (isNaN(num)) return value;
-
-//     if (fromUnit === 'kg' && toUnit === 'lbs') return (num * 2.20462).toFixed(2);
-//     if (fromUnit === 'lbs' && toUnit === 'kg') return (num / 2.20462).toFixed(2);
-
-//     if (fromUnit === 'cm' && toUnit === 'in') return (num / 2.54).toFixed(2);
-//     if (fromUnit === 'in' && toUnit === 'cm') return (num * 2.54).toFixed(2);
-
-//     if (fromUnit === 'C' && toUnit === 'F') return ((num * 9) / 5 + 32).toFixed(2);
-//     if (fromUnit === 'F' && toUnit === 'C') return (((num - 32) * 5) / 9).toFixed(2);
-
-//     return value;
-// };
-
-// const getVitalType = (vitalName) => {
-//     switch (vitalName) {
-//         case 'Blood Glucose':
-//         case 'Cholesterol':
-//         case 'Triglycerides':
-//             return 'dropdown';
-//         case 'Waist Circumference':
-//         case 'Hip Circumference':
-//             return 'number';
-//         default:
-//             return 'number';
-//     }
-// };
 
 const formatDate = (dateString) => {
     const options = { day: 'numeric', month: 'short' };
     return new Date(dateString).toLocaleDateString('en-GB', options);
 };
-
 
 export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem, convertFromImperial, convertToImperial }) {
     const dispatch = useDispatch();
@@ -76,12 +44,12 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
-
+    const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
 
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId, limit: 7 }))
+        dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
     }, [dispatch])
 
     const validationSchema = {
@@ -377,14 +345,69 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
 
     const renderVitalCell = (vital, date) => {
         const value = findVitalValue(vital.name, date);
+        if (date === editingDate) {
+            if (vital.type === 'bp') {
+                const bpValue = value || { systolic: '', diastolic: '' };
+                return (
+                    <div className="d-flex">
+                        <Form.Control
+                            type="number"
+                            defaultValue={bpValue.systolic}
+                            onBlur={(e) => handleUpdateVital(
+                                vital.name,
+                                { systolic: e.target.value, diastolic: bpValue.diastolic },
+                                date
+                            )}
+                            size="sm"
+                            className="me-1"
+                        />
+                        /
+                        <Form.Control
+                            type="number"
+                            defaultValue={bpValue.diastolic}
+                            onBlur={(e) => handleUpdateVital(
+                                vital.name,
+                                { systolic: bpValue.systolic, diastolic: e.target.value },
+                                date
+                            )}
+                            size="sm"
+                            className="ms-1"
+                        />
+                    </div>
+                );
+            }
 
+            if (vital.type === 'dropdown') {
+                return (
+                    <Form.Select
+                        defaultValue={value || ''}
+                        onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date)}
+                        size="sm"
+                    >
+                        <option value="">Select</option>
+                        {vital.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </Form.Select>
+                );
+            }
+
+            return (
+                <Form.Control
+                    type="number"
+                    defaultValue={value || ''}
+                    onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date)}
+                    size="sm"
+                />
+            );
+        }
+
+        // Original display logic
         if (vital.type === 'bp') {
-            const bpValue = value || { systolic: '', diastolic: '' };
+            const bpValue = value || { systolic: '-', diastolic: '-' };
             return (
                 <div className="d-flex">
-                    <span>{bpValue.systolic || '-'}</span>
+                    <span>{bpValue.systolic}</span>
                     <span>/</span>
-                    <span>{bpValue.diastolic || '-'}</span>
+                    <span>{bpValue.diastolic}</span>
                 </div>
             );
         }
@@ -432,6 +455,135 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         }));
     };
 
+    const handleUpdateVital = (vitalName, newValue, date) => {
+        // Find the vital group for this date
+        const vitalGroup = patientVitals.find(vg => vg.effectiveDateTime === date);
+
+        // Prepare the base observation structure
+        const vital = vitals.find(v => v.name === vitalName);
+        if (!vital) return;
+
+        const effectiveDateTime = date.includes('T') ? date : `${date}T${visitDateTime.time}:00`;
+
+        let observation;
+
+        if (vital.type === 'bp') {
+            // Handle blood pressure
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                component: [
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8480-6",
+                                display: "Systolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(newValue.systolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    },
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8462-4",
+                                display: "Diastolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(newValue.diastolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    }
+                ]
+            };
+        } else if (vital.type === 'dropdown') {
+            // Handle dropdown vitals
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                valueString: newValue
+            };
+        } else {
+            // Handle numeric vitals with unit conversion if needed
+            let valueToSend = parseFloat(newValue);
+            let unitToSend = getDisplayUnit(vital);
+
+            if (unitSystem === 'metric') {
+                if (vital.name === 'Height') {
+                    valueToSend = convertToImperial(valueToSend, 'Height');
+                    unitToSend = 'in';
+                }
+                else if (vital.name === 'Weight') {
+                    valueToSend = convertToImperial(valueToSend, 'Weight');
+                    unitToSend = 'lbs';
+                }
+                else if (vital.name === 'Temperature') {
+                    valueToSend = convertToImperial(valueToSend, 'Temperature');
+                    unitToSend = '°F';
+                }
+            }
+
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                valueQuantity: {
+                    value: valueToSend,
+                    unit: unitToSend,
+                    system: "http://unitsofmeasure.org",
+                    code: unitToSend === 'in' ? '[in_i]' :
+                        unitToSend === 'lbs' ? '[lb_av]' :
+                            unitToSend === '°F' ? '[degF]' : unitToSend
+                }
+            };
+        }
+
+        // Dispatch the appropriate action based on whether it's an update or new entry
+        if (vitalGroup?._id) {
+            // Update existing vital
+            dispatch(updateVitalsAction({
+                id: vitalGroup._id,
+                key: encryptMessage(observation)
+            }));
+        } else {
+            // Create new vital entry
+            dispatch(createVitalsAction({
+                key: encryptMessage(observation)
+            }));
+        }
+    };
     return (
         <div className='scroll-container ' style={{
             height: isAccordionOpen ? "55vh" : "73vh",
@@ -447,6 +599,22 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         {sortedDates?.map(date => (
                             <th className='text-white' key={date}>
                                 {formatDate(date)}
+                                {editingDate === date ? (
+                                    <i
+                                        className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"
+                                        onClick={() => {
+                                            // Save all changes for this date
+                                            setEditingDate(null);
+                                        }}
+                                        title="Save changes"
+                                    />
+                                ) : (
+                                    <i
+                                        className="mdi mdi-square-edit-outline ms-2 cursor-pointer fs-4 text-warning"
+                                        onClick={() => setEditingDate(date)}
+                                        title="Edit vitals"
+                                    />
+                                )}
                             </th>
                         ))}
                         <th style={{ background: '#f8f9fa' }}>
@@ -458,10 +626,9 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                     min={new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0]}
                                     max={new Date().toISOString().split("T")[0]}
                                 />
-
                                 <Form.Control
                                     type="time"
-                                    value={visitDateTime.time}
+                                    value={visitDateTime?.time}
                                     onChange={handleTimeChange}
                                 />
                             </div>

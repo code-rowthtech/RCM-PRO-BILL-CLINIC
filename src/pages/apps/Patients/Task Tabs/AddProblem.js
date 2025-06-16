@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap';
 import Select from 'react-select';
@@ -18,9 +18,14 @@ import AppointmentForm from '../../Appointments/Tabs/AppointmentForm';
 import { IoMdClose } from 'react-icons/io';
 import { getAppointmentsAction } from '../../../../redux/actions';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
+import ToastHandle from '../../../../helpers/ToastMessage';
+import useQuillWordLimit from '../../../../helpers/quillWordLimit';
 
+const MAX_WORDS = 10;
+const WAX_WORD_LENGTH = 45;
 const AddProblem = ({ onCancel }) => {
     const dispatch = useDispatch();
+    const quillRef = useRef();
     const [searchParams] = useSearchParams();
     const {
         register,
@@ -173,6 +178,18 @@ const AddProblem = ({ onCancel }) => {
         setValue('note', `${current}<p>${suggestionText}</p>`);
     };
 
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed
+    });
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
@@ -300,11 +317,29 @@ const AddProblem = ({ onCancel }) => {
                 {/* Note */}
                 <Col xs={12}>
                     <Form.Group controlId="note">
-                        <Form.Label className="fw-medium mb-0">
-                            Notes{' '}
-                            <span style={{ cursor: 'pointer' }} title="Notes Suggestions" onClick={handleEditorFocus}>
-                                ✨
-                            </span>
+                        <Form.Label className="fw-medium mb-1 d-flex justify-content-between align-items-center">
+                            <div>
+                                Notes{' '}
+                                <span
+                                    style={{ cursor: 'pointer' }}
+                                    title="Notes Suggestions"
+                                    onClick={handleEditorFocus}>
+                                    ✨
+                                </span>
+                            </div>
+                            <small className="text-muted">
+                                {(() => {
+                                    const content = watch('note') || '';
+                                    const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                    const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                    const wordCount = words?.length;
+                                    return (
+                                        <div>
+                                            <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
+                                        </div>
+                                    );
+                                })()}
+                            </small>
                         </Form.Label>
 
                         <Controller
@@ -313,6 +348,7 @@ const AddProblem = ({ onCancel }) => {
                             defaultValue="<ul><li></li></ul>"
                             render={({ field: { onChange, value } }) => (
                                 <ReactQuill
+                                    ref={quillRef}
                                     value={value}
                                     onChange={(content, delta, source) => {
                                         if (source === 'user') {
