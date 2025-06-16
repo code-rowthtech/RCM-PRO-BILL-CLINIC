@@ -187,14 +187,7 @@ const AppMenu = ({ menuItems, isCondensed }: AppMenuProps): React$Element<React$
 
     return (
         <>
-            <ul className="side-nav " ref={menuRef} id="main-side-menu">
-                <li className="text-center py-3">
-                    {isCondensed === true  ? (
-                        <img src={logo_sm} alt="" height="25" className="logo-condensed" />
-                    ) : (
-                        <img src={logo} alt="" height="25" className="logo-full" />
-                    )}
-                </li>
+            <ul className="side-nav" ref={menuRef} id="main-side-menu" style={{marginTop:'60px'}}>
                 {(menuItems || []).map((item, idx) => {
                     return (
                         <React.Fragment key={idx}>

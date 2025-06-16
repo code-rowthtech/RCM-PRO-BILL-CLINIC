@@ -121,7 +121,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
     const clinicsDataGet = store?.getClinicsReducer?.data?.clinic;
-    console.log(clinicsDataGet,'getapi')
     const setField = (key, value) => value && setValue(key, value);
     useEffect(() => {
         if (clinicsDataGet) {
@@ -310,7 +309,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             poc: pocs,
         };
         dispatch(createClinicAction({ key: encryptMessage(newPayload) }));
-        console.log(newPayload,'newpayload')
     };
     const logoFileInputRef = useRef(null);
     const handleLogoClick = () => {
@@ -458,7 +456,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [addresses, setAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
-    console.log(addresses, 'addresses');
 
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);

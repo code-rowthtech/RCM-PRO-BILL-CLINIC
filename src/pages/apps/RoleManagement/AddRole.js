@@ -36,7 +36,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
     const designationData = store?.getMastersDataReducer?.data1?.data?.result;
     const designationDataLoading = store?.getMastersDataReducer?.data?.loading;
     const departmentGetData = store?.getDepartmentDataReducer?.data?.result;
-console.log({designationData})
+
     const {
         register,
         reset,

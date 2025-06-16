@@ -154,12 +154,22 @@ const MENU_ITEMS = [
             // },
         ],
     },
-     {
+    {
         key: 'auditReport',
         label: 'Audit Report',
         url: '/apps/audit-report/list',
         icon: 'uil uil-graph-bar',
     },
+    {
+        label: 'Billing',
+        icon: 'uil uil-money-bill',
+        redirectTo: '#',
+    },
+   {
+    label: 'Help & Support',
+    icon: 'uil uil-question-circle', // Unicons equivalent of help/support
+    redirectTo: '#',
+}
     // {
     //     key: 'logout',
     //     label: 'Logout',
