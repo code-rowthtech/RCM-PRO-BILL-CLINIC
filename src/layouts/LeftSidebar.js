@@ -360,7 +360,7 @@ const LeftSidebar = ({
                     <>
                         {!isCondensed ? (
                             <ul style={{ listStyle: 'none' }} className="px-0">
-                                <li className="text-center py-3 ">
+                                <li className="text-center  py-3 ">
                                     <img
                                         onClick={() => navigate('/')}
                                         className="cursor-pointer"
@@ -636,7 +636,7 @@ const LeftSidebar = ({
                         ) : (
                             // small side bar
                             <ul style={{ listStyle: 'none' }} className="px-0 ">
-                                <li className="text-center py-3">
+                                <li className="text-center py-3 ">
                                     <img
                                         className="cursor-pointer"
                                         onClick={() => navigate('/')}
@@ -768,15 +768,9 @@ const LeftSidebar = ({
                     //     )}
                     //     {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
                     // </>
-                    <div className="parentLeftSidebar mb-3">
-                        <li className="text-center navbar-nav py-3 mainLogo" style={{ position: 'fixed', top: 0, }}>
-                            {isCondensed === true ? (
-                                <img src={logo_sm} alt="" height="25" className="logo-condensed" style={{ marginLeft: '25px' }} />
-                            ) : (
-                                <img src={logo} alt="" height="25" className="logo-full" style={{ marginLeft: '58px' }} />
-                            )}
-                        </li>
-                        <div className="media_mob scroll-container">
+                    <div className="parentLeftSidebar mb-3" >
+
+                        <div className="media_mob ">
                             {!isCondensed && (
                                 <SimpleBar timeout={500} scrollbarMaxSize={320}>
                                     <SideBarContent
