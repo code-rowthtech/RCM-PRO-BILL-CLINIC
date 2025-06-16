@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Badge, Col, Row, Table, Image, Button } from 'react-bootstrap'
+import { Col, Row, Table, Image, Button } from 'react-bootstrap'
 import { useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux'
 import { getEncounterAction, getEncounterByIdAction } from '../../../../../redux/actions'
 import { useSearchParams } from 'react-router-dom'
 import dummyProfile from '../../../../../assets/images/dummyProfile.png'
 import Spinner from '../../../../../constants/Spinner'
-import ToastHandle from '../../../../../helpers/ToastMessage'
 import { FiFileText } from 'react-icons/fi'
 import Paginations from '../../../../../helpers/Paginations'
 import { handlePrintEncounters } from './handlePrintEncounter'
@@ -22,7 +21,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
 
     useEffect(() => {
         dispatch(getEncounterAction({ patientId: id, skip: skip }))
-    }, [skip])
+    }, [skip, dispatch, id])
 
     const statusColorMap = {
         planned: 'text-secondary',
@@ -38,7 +37,7 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
         setSkip(pageNumber);
     };
 
-    const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
+    // const encounterData = store?.getEncounterByIdReducer?.data?.encounter;
 
     return (
         <Row className='my-1'>
@@ -48,8 +47,8 @@ const EncounterList = ({ encounterTabs, setEncounterTabs, setActiveTab, setCreat
                     className="table-centered table-nowrap mb-0  rounded">
                     <thead className="text-white">
                         <tr>
-                            {['S.no', 'Provider', 'Encounter Type', 'Status', 'Start Date', 'End Date', 'Action']?.map((data) => (
-                                <th>{data}</th>
+                            {['S.no', 'Provider', 'Encounter Type', 'Status', 'Start Date', 'End Date', 'Action']?.map((data, index) => (
+                                <th key={index}>{data}</th>
                             ))}
                         </tr>
                     </thead>

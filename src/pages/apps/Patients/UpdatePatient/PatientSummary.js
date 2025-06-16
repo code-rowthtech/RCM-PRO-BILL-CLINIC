@@ -56,11 +56,10 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
     const [skip, setSkip] = useState(1);
     const [medicationModal, setMedicationModal] = useState(false);
     // useEffect(() => {
-    //     if (store?.getPatientByIdReducer?.data?.data && store?.getPatientByIdReducer?.data?.data === patientId) {
+    //     if (effectiveDateTime !== '') {
     //         dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: effectiveDateTime, limit: 5 }));
     //     }
-    //     // dispatch(getEncounterAction({ patientId: patientId }));
-    // }, [store?.getPatientByIdReducer?.data?.data, patientId]);
+    // }, [effectiveDateTime]);
 
     const getSeverityBadge = (severity) => {
         if (!severity || !severity.code || !severity.display) return null;
@@ -176,7 +175,10 @@ const PatientSummary = ({ setSelectedMainTab, selectedMainTab }) => {
                                 className="fs-6 fw-semibold bg-white px-1 me-1 border border-1 border-muted"
                                 type="date"
                                 value={effectiveDateTime}
-                                onChange={(e) => setEffectiveDateTime(e.target.value)}
+                                onChange={(e) => {
+                                    //  setEffectiveDateTime()
+                                    dispatch(getVitalsByPatientIdAction({ patientId, effectiveDateTime: e.target.value, limit: 5 }))
+                                }}
                             />
                             <MdAddCircleOutline
                                 onClick={() => setVitalsModal(true)}

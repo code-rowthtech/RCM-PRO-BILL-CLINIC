@@ -189,7 +189,9 @@ const SurgicalHistory = () => {
         quillRef,
         maxWords: MAX_WORDS,
         maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
     });
     return (
         <Row className="py-0 m-auto">

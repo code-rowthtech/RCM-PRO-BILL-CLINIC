@@ -17,6 +17,8 @@ import Spinner from '../../../../../constants/Spinner';
 import { createSuggestionAction } from '../../../../../redux/suggestions/action';
 import SuggestionOffcanvas from '../SuggestionOffcanvas';
 import DeletionModal from '../../../../../helpers/deletionModal';
+import ToastHandle from '../../../../../helpers/ToastMessage';
+import useQuillWordLimit from '../../../../../helpers/quillWordLimit';
 
 const Tobacco = () => {
     const dispatch = useDispatch();
@@ -34,38 +36,39 @@ const Tobacco = () => {
     const deleteSuccess = store?.deleteTobaccooReducer?.data?.status;
     const updateSuccess = store?.updateTobaccooReducer;
     const quillRef = useRef(null);
-    const MAX_WORDS = 1000;
+    const MAX_WORDS = 10;
     const MAX_WORD_LENGTH = 45;
 
-    useEffect(() => {
-        if (quillRef) {
-            const editor = quillRef?.current?.getEditor();
+    // useEffect(() => {
+    //     if (quillRef) {
+    //         const editor = quillRef?.current?.getEditor();
 
-            editor?.on('text-change', (delta, oldDelta, source) => {
-                if (source === 'user') {
-                    const text = editor?.getText().trim();
-                    const words = text ? text.split(/\s+/) : [];
-                    const wordCount = words.length;
+    //         editor?.on('text-change', (delta, oldDelta, source) => {
+    //             if (source === 'user') {
+    //                 const text = editor?.getText().trim();
+    //                 const words = text ? text.split(/\s+/) : [];
+    //                 const wordCount = words.length;
 
-                    // Check if any word exceeds the maximum length
-                    const hasLongWord = words.some(word => word.length > MAX_WORD_LENGTH);
+    //                 // Check if any word exceeds the maximum length
+    //                 const hasLongWord = words.some(word => word.length > MAX_WORD_LENGTH);
 
-                    if (wordCount > MAX_WORDS || hasLongWord) {
-                        // Restore the previous content
-                        editor.setContents(oldDelta);
+    //                 if (wordCount > MAX_WORDS || hasLongWord) {
+    //                     // Restore the previous content
+    //                     editor.setContents(oldDelta);
 
-                        // Show warning message based on the violation
-                        if (hasLongWord) {
-                            // You can replace this with your toast notification system
-                            console.warn(`Words cannot be longer than ${MAX_WORD_LENGTH} characters`);
-                        } else if (wordCount > MAX_WORDS) {
-                            console.warn(`Cannot exceed ${MAX_WORDS} words`);
-                        }
-                    }
-                }
-            });
-        }
-    }, []);
+    //                     // Show warning message based on the violation
+    //                     if (hasLongWord) {
+    //                         // You can replace this with your toast notification system
+    //                         console.warn(`Words cannot be longer than ${MAX_WORD_LENGTH} characters`);
+    //                     } else if (wordCount > MAX_WORDS) {
+    //                         console.warn(`Cannot exceed ${MAX_WORDS} words`);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // }, []);
+
     useEffect(() => {
         if (toEdit) {
             setValue('tobaccoUse', toEdit?.tobaccoUse);
@@ -136,6 +139,21 @@ const Tobacco = () => {
         setDeleteModal(false);
         setShowSuggestions(false);
     };
+
+    // react quill word limit
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: MAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
+    });
     return (
         <Row className=" py-0 m-auto">
             {/* Left: Form Section */}
@@ -221,23 +239,12 @@ const Tobacco = () => {
                                         <small className="text-muted">
                                             {(() => {
                                                 const content = watch('note') || '';
-                                                const plainText = content.replace(/<[^>]*>/g, '').trim();
-                                                const words = plainText.split(/\s+/).filter(Boolean);
-                                                const wordCount = words.length;
-                                                const longestWord = words.reduce((max, word) =>
-                                                    word.length > max.length ? word : max,
-                                                    '');
-                                                // const isLongWord = longestWord.length > MAX_WORD_LENGTH;
-
+                                                const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
+                                                const words = plainText?.split(/\s+/)?.filter(Boolean);
+                                                const wordCount = words?.length;
                                                 return (
                                                     <div>
-                                                        <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
-                                                        {/* {isLongWord && (
-                                                        <div className="text-danger" style={{ fontSize: '0.75rem' }}>
-                                                            ({MAX_WORD_LENGTH}+ chars)
-                                                        </div>
-                                                    )} */}
-
+                                                        <div>{`${wordCount || 0} / ${MAX_WORDS} words`}</div>
                                                     </div>
                                                 );
                                             })()}

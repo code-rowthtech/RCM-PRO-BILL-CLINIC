@@ -928,7 +928,7 @@ table {
 }
 
 tbody tr:hover {
-    cursor: pointer !important;
+    /* cursor: pointer !important; */
     background-color: #f1f1f1 !important;
     transition-duration: 0.4s !important;
     transition-timing-function: ease-in-out !important;

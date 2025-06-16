@@ -74,6 +74,7 @@ const AddAllergy = ({ onCancel }) => {
             }
         }
     }, [createStatus, patientId, reset, dispatch, onCancel, submissionType]);
+
     const onSubmit = (data) => {
         const selectedType = allergyType.find((type) => type?.code === data?.allergyType);
         const selectedStatus = clinicalStatus.find((item) => item?.code === data?.status);
@@ -200,7 +201,9 @@ const AddAllergy = ({ onCancel }) => {
         quillRef,
         maxWords: MAX_WORDS,
         maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
     });
     return (
         <div>
@@ -378,7 +381,7 @@ const AddAllergy = ({ onCancel }) => {
                                         const content = watch('note') || '';
                                         const plainText = quillRef?.current?.getEditor()?.getText()?.trim();
                                         const words = plainText?.split(/\s+/)?.filter(Boolean);
-                                        const wordCount = words?.length;
+                                        const wordCount = words?.length > MAX_WORDS ? MAX_WORDS : words?.length;
                                         return (
                                             <div>
                                                 <div>{`${wordCount} / ${MAX_WORDS} words`}</div>
