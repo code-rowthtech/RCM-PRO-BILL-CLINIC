@@ -870,18 +870,18 @@ table {
     transition-duration: 0.5s !important;
 }
 
-.lowerMenu {
+/* .lowerMenu {
     height: 22vh;
     display: flex;
     flex-direction: column-reverse;
-}
-.mainLogo{
+} */
+.mainLogo {
     height: 8px;
 }
 
-.media_mob {
+/* .media_mob {
     height: 78vh;
-}
+} */
 
 .patient-menu-container {
     box-shadow:
