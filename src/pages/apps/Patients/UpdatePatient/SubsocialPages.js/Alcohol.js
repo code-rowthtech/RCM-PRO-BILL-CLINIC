@@ -26,7 +26,6 @@ const Alcohol = () => {
     const deleteResponse = store?.deleteAlcoholHistoryReducer?.data?.status
     const updateResponse = store?.updateAlcoholHistoryReducer?.data?.status
     const alcoholData = store?.getAlcoholHistoryReducer?.data?.data;
-    console.log(alcoholData, 'alcoholData')
     const { register, handleSubmit, reset, control, watch, getValues, setValue } = useForm();
     const [entries, setEntries] = useState([]);
     const watchUseStatus = watch("useStatus");

@@ -17,7 +17,6 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
     const doctorDetails = store?.getDoctorDetailsReducer?.data?.result;
     const statesData = store?.getStatesReducer?.data?.states;
     const createResponse = store?.createtDoctorsDetailReducer?.data?.status
-    console.log(createResponse,'createResponse')
     const id = doctorDetails?._id;
     const { handleSubmit, setValue } = useForm();
     const [searchParams] = useSearchParams();
@@ -122,15 +121,15 @@ const DepartmentDetails = ({ setActiveTab, docId }) => {
         };
         dispatch(createDoctorDetailAction({ key: encryptMessage(payload) }));
     };
-    useEffect(()=>{
-       
-        if(createResponse=== 200){
-               const payload = {
+    useEffect(() => {
+
+        if (createResponse === 200) {
+            const payload = {
                 id: updateId,
             };
             dispatch(getDoctorDetailsAction(payload))
         }
-    },[createResponse])
+    }, [createResponse])
     useEffect(() => {
         if (doctorDetails && updateId) {
             const updatedTaxonomyCodes = doctorDetails?.taxonomy?.map((item, index) => ({

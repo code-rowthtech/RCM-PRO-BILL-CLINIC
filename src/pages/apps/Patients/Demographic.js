@@ -69,7 +69,6 @@ const Demographicdetails = ({
     const statesData = store?.getStatesReducer?.data;
     const updateResponse = store?.updatePatientsReducer?.data?.status;
     const cities4 = store?.getCitiesReducer?.cities4?.data?.cities;
-    console.log(store?.getCitiesReducer, 'cities4')
     useEffect(() => {
         dispatch(getStatesByCountryAction());
     }, [dispatch]);
@@ -288,7 +287,6 @@ const Demographicdetails = ({
     const handleStateSelection = (e) => {
         const selectedOption = e.target.selectedOptions[0];
         const key = JSON.parse(selectedOption.getAttribute('data-key'));
-        console.log(key, 'var key')
         setSelectedState(e.target.value);
         dispatch(getCities4Action({ state_code: key, name: '', limit: 25 }));
     };

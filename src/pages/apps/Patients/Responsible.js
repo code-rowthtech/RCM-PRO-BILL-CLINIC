@@ -22,7 +22,6 @@ const Responsiblle = ({ patientId, activeTab, setActiveTab }) => {
     const [responsibleTelecom, setResponsibleTelecom] = useState([{ system: '', value: '', use: '' }]);
     const createResponse = store?.createResponsiblePartyReducer?.data?.status;
     const patientDetails = store?.getPatientByIdReducer?.data?.data;
-    console.log(patientDetails, 'patientDetails23456')
     const {
         register,
         handleSubmit,

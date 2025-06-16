@@ -49,7 +49,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
-    console.log(patientVitals, 'patientVitals')
     useEffect(() => {
         dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
     }, [dispatch])
@@ -258,7 +257,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                     }
                 ]
             };
-            console.log(bpObservation, 'bpObservation')
             dispatch(createVitalsAction({ key: encryptMessage(bpObservation) }));
         }
         else if (vital.type === 'dropdown') {
@@ -340,8 +338,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     };
     const renderVitalCell = (vital, date) => {
         const { value, _id } = findVitalValue(vital.name, date);
-        console.log(vital, date)
-        console.log(value, _id)
         if (date === editingDate) {
             if (vital.type === 'bp') {
                 const bpValue = value || { systolic: '', diastolic: '' };
@@ -453,7 +449,6 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         }));
     };
 
-    console.log(vitals, 'vitalGroup')
     const handleUpdateVital = (vitalName, newValue, date, vitalId) => {
         const vital = vitals.find(v => v.name === vitalName);
         if (!vital) return;
@@ -568,13 +563,11 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
 
         // Dispatch update or create action
         if (vitalId) {
-            console.log('Updating vital:', { id: vitalId, observation });
             observation._id = vitalId;
             dispatch(updateVitalsAction({
                 key: encryptMessage(observation)
             }));
         } else {
-            console.log('Creating new vital:', { observation });
             dispatch(createVitalsAction({
                 key: encryptMessage(observation)
             }));

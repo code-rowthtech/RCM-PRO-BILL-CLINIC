@@ -65,7 +65,6 @@ const LeftSidebar = ({
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const appointmentsData = store?.getPatientsByAppointmentReducer?.data?.appointments;
-    // console.log(appointmentsData, 'appointmentsData');
     const statusColors = {
         pending: '#f1c40f', // Yellow
         proposed: '#3498db', // Blue
@@ -283,9 +282,8 @@ const LeftSidebar = ({
                                     doctorDetails.map((data) => (
                                         <li
                                             key={data?._id}
-                                            className={`py-2  rounded ${
-                                                selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                            }`}
+                                            className={`py-2  rounded ${selectedDoctor === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                                }`}
                                             style={{ cursor: 'pointer', transition: '0.3s' }}
                                             onClick={() => handleSelectDoctor(data?._id)}>
                                             {data?.userDetails?.firstName} {data?.userDetails?.lastName}
@@ -307,9 +305,8 @@ const LeftSidebar = ({
                             appointmentDetails.map((data) => (
                                 <li
                                     key={data?._id}
-                                    className={`py-2 px-3 rounded ${
-                                        selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
-                                    }`}
+                                    className={`py-2 px-3 rounded ${selectedAppointment === data?._id ? 'bg-primary text-white' : 'hover-effect'
+                                        }`}
                                     style={{ cursor: 'pointer', transition: '0.3s' }}
                                     onClick={() => handleSelectAppointment(data?._id)}>
                                     {data?.appointmentType}
@@ -359,7 +356,7 @@ const LeftSidebar = ({
                 className={`leftside-menu ${location?.pathname === '/apps/patients/update-patient' || location?.pathname === '/apps/patients/new-patient' ? 'px-0' : ''}`}
                 ref={menuNodeRef}>
                 {location?.pathname === '/apps/patients/update-patient' ||
-                location?.pathname === '/apps/patients/new-patient' ? (
+                    location?.pathname === '/apps/patients/new-patient' ? (
                     <>
                         {!isCondensed ? (
                             <ul style={{ listStyle: 'none' }} className="px-0">
@@ -772,11 +769,11 @@ const LeftSidebar = ({
                     //     {isCondensed && <SideBarContent isLight={isLight} hideUserProfile={hideUserProfile} />}
                     // </>
                     <div className="parentLeftSidebar mb-3">
-                        <li className="text-center navbar-nav py-3 mainLogo" style={{ position: 'fixed', top: 0,  }}>
+                        <li className="text-center navbar-nav py-3 mainLogo" style={{ position: 'fixed', top: 0, }}>
                             {isCondensed === true ? (
-                                <img src={logo_sm} alt="" height="25" className="logo-condensed"  style={{marginLeft:'25px'}} />
+                                <img src={logo_sm} alt="" height="25" className="logo-condensed" style={{ marginLeft: '25px' }} />
                             ) : (
-                                <img src={logo} alt="" height="25" className="logo-full" style={{marginLeft:'58px'}} />
+                                <img src={logo} alt="" height="25" className="logo-full" style={{ marginLeft: '58px' }} />
                             )}
                         </li>
                         <div className="media_mob scroll-container">
@@ -784,7 +781,7 @@ const LeftSidebar = ({
                                 <SimpleBar timeout={500} scrollbarMaxSize={320}>
                                     <SideBarContent
                                         data-aos="fade-down"
-                                        menuClickHandler={() => {}}
+                                        menuClickHandler={() => { }}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />
@@ -804,7 +801,7 @@ const LeftSidebar = ({
                                     {!isCondensed && <div className="leftSideBarLine"></div>}
                                     <SideBarContentDown
                                         data-aos="fade-down"
-                                        menuClickHandler={() => {}}
+                                        menuClickHandler={() => { }}
                                         isLight={isLight}
                                         hideUserProfile={hideUserProfile}
                                     />
