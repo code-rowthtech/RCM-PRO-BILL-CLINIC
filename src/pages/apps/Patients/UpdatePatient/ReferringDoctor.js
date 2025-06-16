@@ -111,7 +111,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
 
     return (
         <Form onSubmit={handleSubmit(onSubmit)}>
-            <div className='scroll-container ' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
+            <div className='scroll-container mt-1' style={{ overflowX: 'hidden', height: isAccordionOpen ? '54.7vh' : '70vh' }}>
                 <Row className="pb-2">
                     <Col sm={12}>
                         <span className="text-black fw-semibold form-label">Personal Details</span>
@@ -211,7 +211,7 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                 <AddressForm addresses={referringDoctorAddress} setAddresses={setReferringDoctorAddress} />
             </div>
             <div className="d-flex gap-2 align-items-end justify-content-end my-1">
-                <Button className="cancel-button" onClick={() => reset()}>
+                {/* <Button className="cancel-button" onClick={() => reset()}>
                     Clear
                 </Button>
                 <Button
@@ -221,11 +221,11 @@ const ReferringDoctor = ({ setActiveTab, activeTab, isAccordionOpen }) => {
                     className="custom-buttons"
                     type="submit">
                     Save & Add Another
-                </Button>
+                </Button> */}
                 <Button
-                    onClick={() => {
-                        setSubmissionType('saveAndNext');
-                    }}
+                    // onClick={() => {
+                    //     setSubmissionType('saveAndNext');
+                    // }}
                     disabled={store?.addReferringDoctorReducer?.loading}
                     className="custom-buttons"
                     style={{ width: '200px' }}

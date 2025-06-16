@@ -3,7 +3,7 @@ import { Row, Col, Form } from 'react-bootstrap';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { FiDownloadCloud } from 'react-icons/fi';
 import { CiCircleMinus } from 'react-icons/ci';
-import { getCities2Action, getCities3Action, getCitiesAction } from '../../../redux/actions';
+import { getCities2Action, getCities3Action, getCitiesAction, getStatesByCountryAction } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import ToastHandle from '../../../helpers/ToastMessage';
 import { useLocation } from 'react-router-dom';
@@ -20,6 +20,12 @@ const AddressForm = ({ addresses, setAddresses }) => {
     const cities1 = store?.getCitiesReducer?.cities1?.data?.cities;
     const cities2 = store?.getCitiesReducer?.cities2?.data?.cities;
     const cities3 = store?.getCitiesReducer?.cities3?.data?.cities;
+
+    useEffect(() => {
+        if (statesData?.length === 0) {
+            dispatch(getStatesByCountryAction());
+        }
+    }, [statesData, dispatch])
     const [selectedLocation, setSelectedLocation] = useState(null);
     const {
         control,
@@ -30,16 +36,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
         formState: { errors },
         watch,
     } = useForm();
-    // const addAddress = () => {
-    //     if (addresses?.length === 3) {
-    //         ToastHandle('Maximun 3 addresses are allowed.', 'danger');
-    //         return;
-    //     }
-    //     setAddresses([
-    //         ...addresses,
-    //         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: '' },
-    //     ]);
-    // };
+
     const addAddress = () => {
         if (addresses?.length === 3) {
             ToastHandle('Maximum 3 addresses are allowed.', 'danger');
@@ -94,16 +91,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
             }
         });
     };
-
-    // const handleAddressChange = (index, field, value) => {
-    //     const updatedAddresses = [...addresses];
-    //     if (field === 'line') {
-    //         updatedAddresses[index].line[0] = value; // update street address
-    //     } else {
-    //         updatedAddresses[index][field] = value;
-    //     }
-    //     setAddresses(updatedAddresses);
-    // };
 
     const handleAddressChange = (index, field, value) => {
         if (field === 'type' && addresses?.some((address, i) => i !== index && address?.type === value)) {
@@ -201,7 +188,6 @@ const AddressForm = ({ addresses, setAddresses }) => {
         });
     };
 
-
     const removeAddressLine = (addressIndex, lineIndex) => {
         if (addresses[addressIndex].line.length > 1) {
             const updatedAddresses = [...addresses];
@@ -223,7 +209,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                 </Col>
             </Row>
             {addresses?.map((item, index) => (
-                <Row key={index} className="mb-0">
+                <Row key={index} className="mb-1 position-relative">
                     <Col sm={3} className="mb-0" style={{ height: 'fit-content' }}>
                         <Form.Label className="mb-0">Type</Form.Label>
                         <Form.Select
@@ -352,7 +338,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                         )}
                     </Col>
                     {item.line.slice(1).map((line, lineIndex) => (
-                        <Col key={lineIndex} sm={3} className="mb-1 position-relative" style={{ height: 'fit-content' }}>
+                        <Col key={lineIndex} sm={3} className="mb-1" style={{ height: 'fit-content' }}>
                             <Form.Label className="mb-0">
                                 Line {lineIndex + 2}
                                 <span
@@ -374,7 +360,7 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             value={item.state || ''}
                             {...register(`address[${index}].state`)}
                             onChange={(e) => handleStateSelection(e, item?.type, index)}>
-                            <option value="">Select State</option>
+                            <option value="">{store?.getStatesReducer?.loading ? `Loading...` : `Select State`}</option>
                             {statesData?.states?.map((data) => (
                                 <option key={data.id} data-key={JSON.stringify(data)} value={data.name}>
                                     {data.name}
@@ -392,8 +378,27 @@ const AddressForm = ({ addresses, setAddresses }) => {
                             onChange={(e) => {
                                 handleAddressChange(index, 'city', e.target.value);
                             }}
+                            disabled={item?.type === 'physical'
+                                ? store?.getCitiesReducer?.cities1?.loading
+                                : item?.type === 'postal'
+                                    ? store?.getCitiesReducer?.cities2?.loading
+                                    : store?.getCitiesReducer?.cities3?.loading}
                         >
-                            <option value="">{store?.getCitiesReducer?.loading ? 'Loading...' : 'Select City'}</option>
+                            <option value="">
+                                {
+                                    item?.type === 'physical'
+                                        ? store?.getCitiesReducer?.cities1?.loading
+                                            ? 'Loading...'
+                                            : 'Select City'
+                                        : item?.type === 'postal'
+                                            ? store?.getCitiesReducer?.cities2?.loading
+                                                ? 'Loading...'
+                                                : 'Select City'
+                                            : store?.getCitiesReducer?.cities3?.loading
+                                                ? 'Loading...'
+                                                : 'Select City'
+                                }
+                            </option>
                             {(() => {
                                 const cities =
                                     item?.type === 'physical' ? cities1 :
@@ -402,13 +407,24 @@ const AddressForm = ({ addresses, setAddresses }) => {
 
                                 return cities?.map((data) => (
                                     <option key={data?._id} value={data?.name}>
-                                        {data?.name}
+                                        {
+                                            item?.type === 'physical'
+                                                ? store?.getCitiesReducer?.cities1?.loading
+                                                    ? 'Loading...'
+                                                    : data?.name
+                                                : item?.type === 'postal'
+                                                    ? store?.getCitiesReducer?.cities2?.loading
+                                                        ? 'Loading...'
+                                                        : data?.name
+                                                    : store?.getCitiesReducer?.cities3?.loading
+                                                        ? 'Loading...'
+                                                        : data?.name
+                                        }
                                     </option>
                                 ));
                             })()}
                         </Form.Select>
                     </Col>
-
                     <Col sm={3} style={{ height: 'fit-content' }}>
                         <Form.Group className="mb-0">
                             <Form.Label className="mb-0">Postal Code</Form.Label>
@@ -431,17 +447,18 @@ const AddressForm = ({ addresses, setAddresses }) => {
                                     handleAddressChange(index, 'postalCode', e.target.value);
                                 }}
                             />
-                            {addresses.length > 1 && index !== 0 && (
-                                <span
-                                    className="text-danger cursor-pointer position-absolute fs-5 fw-bold"
-                                    style={{ right: '-10%', top: '50%' }}
-                                    onClick={() => removeAddress(index)}>
-                                    <CiCircleMinus />
-                                </span>
-                            )}
                             {errors.postalCode && <span className="text-danger">{errors.postalCode.message}</span>}
                         </Form.Group>
                     </Col>
+                    {addresses.length > 1 && index !== 0 && (
+
+
+                        <CiCircleMinus
+                            style={{ top: '75%', right: '-0.5%' }}
+                            onClick={() => removeAddress(index)}
+                            className="text-danger px-0 cursor-pointer position-absolute w-auto fs-5 " />
+
+                    )}
                 </Row>
             ))}
         </Form>

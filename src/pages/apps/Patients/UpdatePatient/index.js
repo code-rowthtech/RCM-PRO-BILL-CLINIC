@@ -276,7 +276,7 @@ const UpdatePatientIndex = () => {
                                                                 sessionStorage.setItem('selectedMainTab', data.tab);
                                                                 setShowMoreMenu(false);
                                                             }}
-                                                            className="list-group-item submenuItem py-1 text-start fs-6">
+                                                            className="list-group-item  py-1 text-start fs-6">
                                                             {data.label}
                                                         </li>
                                                     ))}
@@ -731,7 +731,7 @@ const UpdatePatientIndex = () => {
                                             {selectedMainTab === 'Imaging Requests' && <p>In progress...</p>}
                                             {selectedMainTab === 'Patient Access' && <PatientAccess />}
                                             {selectedMainTab === 'Lab Request' && <p>In progress...</p>}
-                                            {selectedMainTab === 'Drug Interactions' && <DrugInteraction/>}
+                                            {selectedMainTab === 'Drug Interactions' && <DrugInteraction />}
                                             {selectedMainTab === 'Balance' && <p>In Progress...</p>}
                                             {selectedMainTab === 'Payment' && <p>In Progress...</p>}
                                             {[

@@ -184,7 +184,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
                 type: addr.type || '', // Make sure type is included
                 use: addr.use || '',
                 line: addr.line && Array.isArray(addr.line) ? addr.line : [''],
-                city: addr.city || '',
+                city: addr?.[0]?.city || '',
                 state: addr.state || '',
                 postalCode: addr.postalCode || '',
                 country: addr.country || 'US',
@@ -456,7 +456,6 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
     const [addresses, setAddresses] = useState([
         { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }, // Default address
     ]);
-    console.log(addresses, 'addresses');
 
     const [activeAddressIndex, setActiveAddressIndex] = useState(null);
     const [addressFocused, setAddressFocused] = useState(false);
@@ -494,7 +493,7 @@ const ClinicForm = ({ setActiveTab, setClinicId, clinicId, setBillingId }) => {
             ToastHandle('Maximun 3 addresses are allowed.', 'danger');
             return;
         }
-        setAddresses([...addresses, { use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
+        setAddresses([...addresses, { type: '', use: '', line: [''], city: '', state: '', postalCode: '', country: 'US' }]);
     };
 
     const removeIdentifier = (index) => {

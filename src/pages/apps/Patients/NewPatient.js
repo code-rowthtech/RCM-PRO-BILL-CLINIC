@@ -500,14 +500,14 @@ const NewPatient = () => {
                                     </li>
                                 )}
 
-                                <li className="nav-item">
+                                {/* <li className="nav-item">
                                     <button
                                         className={`text-black nav-link fw-medium ${activeTab === 'insurance' ? 'active fw-bold' : ''
                                             }`}
                                         onClick={() => handleTabChange('insurance')}>
                                         Insurance
                                     </button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <div className="d-flex">

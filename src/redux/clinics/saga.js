@@ -253,24 +253,24 @@ function* getStatesFunction(data) {
 function* getCitiesFunction(data) {
     try {
         yield put({
-            type: ClinicsActionTypes.GET_CITIES_LOADING,
+            type: ClinicsActionTypes.GET_CITIES1_LOADING,
         });
         const response = yield call(getCityByStateApi, data);
         const decryptedData = JSON.parse(decryptMessage(response.data.data));
         if (response.status === 200) {
             yield put({
-                type: ClinicsActionTypes.GET_CITIES_SUCCESS,
+                type: ClinicsActionTypes.GET_CITIES1_SUCCESS,
                 payload: decryptedData,
             });
         } else {
             yield put({
-                type: ClinicsActionTypes.GET_CITIES_ERROR,
+                type: ClinicsActionTypes.GET_CITIES1_ERROR,
                 payload: decryptedData,
             });
         }
     } catch (error) {
         yield put({
-            type: ClinicsActionTypes.GET_CITIES_ERROR,
+            type: ClinicsActionTypes.GET_CITIES1_ERROR,
             payload: error,
         });
     }
@@ -323,6 +323,31 @@ function* getCities3Function(data) {
     } catch (error) {
         yield put({
             type: ClinicsActionTypes.GET_CITIES3_ERROR,
+            payload: error,
+        });
+    }
+}
+function* getCities4Function(data) {
+    try {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES4_LOADING,
+        });
+        const response = yield call(getCityByStateApi, data);
+        const decryptedData = JSON.parse(decryptMessage(response.data.data));
+        if (response.status === 200) {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES4_SUCCESS,
+                payload: decryptedData,
+            });
+        } else {
+            yield put({
+                type: ClinicsActionTypes.GET_CITIES4_ERROR,
+                payload: decryptedData,
+            });
+        }
+    } catch (error) {
+        yield put({
+            type: ClinicsActionTypes.GET_CITIES4_ERROR,
             payload: error,
         });
     }
@@ -473,7 +498,7 @@ export function* watchGetStates() {
     yield takeEvery(ClinicsActionTypes.GET_STATES, getStatesFunction);
 }
 export function* watchGetCities() {
-    yield takeEvery(ClinicsActionTypes.GET_CITIES, getCitiesFunction);
+    yield takeEvery(ClinicsActionTypes.GET_CITIES1, getCitiesFunction);
 }
 
 export function* watchGetCities2() {
@@ -482,6 +507,9 @@ export function* watchGetCities2() {
 
 export function* watchGetCities3() {
     yield takeEvery(ClinicsActionTypes.GET_CITIES3, getCities3Function);
+}
+export function* watchGetCities4() {
+    yield takeEvery(ClinicsActionTypes.GET_CITIES4, getCities4Function);
 }
 
 export function* watchGetClinicById() {
@@ -521,6 +549,7 @@ function* clinicsSaga() {
         fork(watchGetStates),
         fork(watchGetCities),
         fork(watchGetCities2),
+        fork(watchGetCities3), fork(watchGetCities4),
         fork(watchCreateSubscriptions),
         fork(watchDeleteClinicOnboarding),
         fork(watchCreateContract),
@@ -528,7 +557,6 @@ function* clinicsSaga() {
         fork(watchgetClinicsTypeState),
         fork(watchStandardContract),
         fork(watchChangeEmail),
-        fork(watchGetCities3),
     ]);
 }
 export default clinicsSaga;

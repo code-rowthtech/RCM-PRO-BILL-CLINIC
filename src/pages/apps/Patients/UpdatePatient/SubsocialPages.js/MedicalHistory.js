@@ -43,16 +43,6 @@ const MedicalHistory = () => {
     const updateResponse = store?.updateMedicalHistoryReducer?.data?.status;
     const quillRef = useRef(null);
 
-    const handleLimitExceed = ({ type, message }) => {
-        ToastHandle(message, 'danger');
-    };
-
-    useQuillWordLimit({
-        quillRef,
-        maxWords: MAX_WORDS,
-        maxWordLength: WAX_WORD_LENGTH,
-        onLimitExceed: handleLimitExceed
-    });
 
 
     const { register, handleSubmit, reset, getValues, control, setValue, watch } = useForm();
@@ -177,6 +167,19 @@ const MedicalHistory = () => {
         setSelectedProblem(null);
         reset();
     };
+
+    const handleLimitExceed = ({ type, message }) => {
+        ToastHandle(message, 'danger');
+    };
+
+    useQuillWordLimit({
+        quillRef,
+        maxWords: MAX_WORDS,
+        maxWordLength: WAX_WORD_LENGTH,
+        onLimitExceed: handleLimitExceed,
+        setValue,
+        fieldName: 'note',
+    });
 
     return (
         <Row className="py-0 m-auto">

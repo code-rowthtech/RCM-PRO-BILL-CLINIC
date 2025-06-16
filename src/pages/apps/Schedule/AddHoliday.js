@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Form } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createScheduleAction } from '../../../redux/schedule/action';
 import { encryptMessage } from '../../../cryptoUtils';
@@ -23,7 +23,6 @@ const AddHoliday = () => {
         value: data._id,
         label: data?.name[0]?.text + ' ',
     }));
-
     useEffect(() => {
         if (addResponse === 200) {
             reset();
@@ -39,6 +38,7 @@ const AddHoliday = () => {
     }, [addResponse, status, skip , ]);
     const {
         register,
+        control,
         handleSubmit,
         reset,
         formState: { errors },
@@ -107,21 +107,30 @@ const AddHoliday = () => {
                                             <Form.Label className="mb-0">
                                                 Provider Name<span className="text-danger">*</span>
                                             </Form.Label>
-                                            <Select
-                                                className="basic-single"
-                                                classNamePrefix="select"
-                                                isLoading={store?.getDoctorsReducer?.loading}
-                                                isClearable={true}
-                                                isSearchable={true}
-                                                onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')} // Pass inputValue and type
-                                                onChange={(data) => handleChange(data, 'doctor')}
-                                                name="doctorName"
-                                                options={doctorOptions}
-                                                placeholder="Select Doctor Name"
-                                            />
-                                            {errors.doctorName && (
-                                                <span className="text-danger">{errors.doctorName.message}</span>
-                                            )}
+                                          <Controller
+    name="doctor"
+    control={control}
+    rules={{ required: 'Please select the provider' }}
+    render={({ field }) => (
+        <Select
+            {...field}
+            classNamePrefix="select"
+            isLoading={store?.getDoctorsReducer?.loading}
+            isClearable={true}
+            isSearchable={true}
+            options={doctorOptions}
+            onChange={(val) => {
+                field.onChange(val);
+                setSelectedDoctor(val); // update local state if needed
+            }}
+            onInputChange={(inputValue) => handleInputChange(inputValue, 'doctor')}
+            placeholder="Select Provider Name"
+        />
+    )}
+/>
+{errors.doctor && <span className="text-danger">{errors.doctor.message}</span>}
+
+                                        
                                         </Form.Group>
 
                                         <Form.Group className="mb-1">

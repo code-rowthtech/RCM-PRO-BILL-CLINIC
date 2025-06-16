@@ -75,7 +75,6 @@ const NotesType = React.lazy(() => import('../pages/apps/Settings/NotesType/note
 const Templates = React.lazy(() => import('../pages/apps/Settings/Templates/templates'))
 const TaskCategory = React.lazy(() => import('../pages/apps/Settings/Task Category/TaskCategory'));
 // Notes Templates
-const NotesAndTemplates = React.lazy(() => import('../pages/apps/NotesAndTemplates/Index'));
 const ClinicalNotesType = React.lazy(()=> import ('../pages/apps/NotesAndTemplates/NotesTypes'));
 const NotesTemplates = React.lazy(()=>import('../pages/apps/NotesAndTemplates/NotesTemplates'));
 
@@ -439,7 +438,7 @@ const AllRoutes = () => {
                                 {
                                     path: 'list',
                                     element: hasPermission('view notes and templates') ? (
-                                        <LoadComponent component={NotesAndTemplates} />
+                                        <LoadComponent component={NotesTemplates} />
                                         ) : (
                                              <div className="disabled-content">You don't have permission to view this page.</div>
                                             )

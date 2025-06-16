@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Spinner } from 'react-bootstrap';
+import { Button, Col, Form } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import AddressForm from '../../Common Pages/AddressForm';
@@ -9,6 +9,7 @@ import { encryptMessage } from '../../../../cryptoUtils';
 import { createResponsiblePartyAction } from '../../../../redux/actions';
 import { dataList } from '../../../../utils/DataSets/relations.data';
 import Select from 'react-select';
+import Spinner from '../../../../constants/Spinner';
 
 const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     const store = useSelector((state) => state);
@@ -33,9 +34,9 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
     } = useForm();
 
     useEffect(() => {
-        if (patientDetails && patientId) {
-            setValue('title', patientDetails?.name?.[0]?.prefix);
-            setValue('fullName', patientDetails?.name?.[0]?.text);
+        if ((patientDetails && patientId) && patientDetails?._id === patientId) {
+            setValue('title', patientDetails?.relatedPerson?.name?.[0]?.prefix);
+            setValue('fullName', patientDetails?.relatedPerson?.name?.find((data) => data?.use === 'official')?.text);
             setValue('gender', patientDetails?.gender);
             setRela(patientDetails?.relatedPerson?.relationship?.[0]?.coding?.[0]);
             setValue(
@@ -96,17 +97,17 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
         dispatch(createResponsiblePartyAction({ key: encryptMessage(payload) }));
     };
 
-    useEffect(() => {
-        if (createResponse === 201) {
-            if (submissionType === 'saveAndNext') {
-                reset(); // Reset the form
-                // setActiveTab('referringDoctor');
-            } else if (submissionType === 'saveAndReset') {
-                reset();
-                // setActiveTab('personalDetails');
-            }
-        }
-    }, [createResponse]);
+    // useEffect(() => {
+    //     if (createResponse === 201) {
+    //         // if (submissionType === 'saveAndNext') {
+    //         //     // reset(); // Reset the form
+    //         //     // setActiveTab('referringDoctor');
+    //         // } else if (submissionType === 'saveAndReset') {
+    //         //     reset();
+    //         //     // setActiveTab('personalDetails');
+    //         // }
+    //     }
+    // }, [createResponse]);
     const relationshipOption = dataList?.map((relation) => ({
         value: relation, // Code as the value
         label: relation.display, // Display text as the label
@@ -209,28 +210,28 @@ const ResponsiblleParty = ({ activeTab, setActiveTab, isAccordionOpen }) => {
                 <hr />
                 <TelecomFrom constantContact={responsibleTelecom} setConstantContact={setResponsibleTelecom} />
             </div>
-            <div className="d-flex gap-2 align-items-end justify-content-end my-1">
-                <Button className="cancel-button" onClick={() => reset()}>
+            <div className="d-flex gap-2 align-items-end justify-content-end my-1 pt-2">
+                {/* <Button className="cancel-button" onClick={() => reset()}>
                     Clear
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                     onClick={() => {
                         setSubmissionType('saveAndReset');
                     }}
                     className="custom-buttons"
                     type="submit">
                     Save & Add Another
-                </Button>
+                </Button> */}
                 <Button
-                    onClick={() => {
-                        setSubmissionType('saveAndNext');
-                    }}
+                    // onClick={() => {
+                    //     setSubmissionType('saveAndNext');
+                    // }}
                     disabled={store?.createResponsiblePartyReducer?.loading}
                     className="custom-buttons"
                     style={{ width: '200px' }}
                     type="submit">
                     {store?.createResponsiblePartyReducer?.loading ? (
-                        <Spinner animation="border" role="status" />
+                        <Spinner className='spinner-border-sm' color='white' />
                     ) : (
                         'Save & Continue Editing'
                     )}

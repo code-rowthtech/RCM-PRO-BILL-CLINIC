@@ -1,21 +1,20 @@
 // VitalStatus.js
-import React, { useEffect, useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import { Table, Button, Form } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Table, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { defaultVitals } from '../../../../utils/DataSets/commonData2';
 import { useSearchParams } from 'react-router-dom';
 import { loggedInUser } from '../../../../helpers/api/loggedInUser';
 import { useDispatch, useSelector } from 'react-redux';
-import { createVitalsAction, getVitalsByPatientIdAction } from '../../../../redux/actions';
+import { createVitalsAction, getVitalsByPatientIdAction, updateVitalsAction } from '../../../../redux/actions';
 import { encryptMessage } from '../../../../cryptoUtils';
-import { handlePrintVitals } from '../../../../helpers/printVitals';
 import Spinner from '../../../../constants/Spinner';
+import ToastHandle from '../../../../helpers/ToastMessage';
 
-const conversionMap = {
-    Temperature: { imperial: '°F', metric: '°C' },
-    Height: { imperial: 'in', metric: 'cm' },
-    Weight: { imperial: 'lbs', metric: 'kg' },
-};
+// const conversionMap = {
+//     Temperature: { imperial: '°F', metric: '°C' },
+//     Height: { imperial: 'in', metric: 'cm' },
+//     Weight: { imperial: 'lbs', metric: 'kg' },
+// };
 // Add these helper functions near the top of your file
 
 const imperialUnits = {
@@ -32,56 +31,26 @@ const metricUnits = {
     'Head Circumference': 'cm',
 };
 
-// const convertValue = (value, fromUnit, toUnit) => {
-//     const num = parseFloat(value);
-//     if (isNaN(num)) return value;
-
-//     if (fromUnit === 'kg' && toUnit === 'lbs') return (num * 2.20462).toFixed(2);
-//     if (fromUnit === 'lbs' && toUnit === 'kg') return (num / 2.20462).toFixed(2);
-
-//     if (fromUnit === 'cm' && toUnit === 'in') return (num / 2.54).toFixed(2);
-//     if (fromUnit === 'in' && toUnit === 'cm') return (num * 2.54).toFixed(2);
-
-//     if (fromUnit === 'C' && toUnit === 'F') return ((num * 9) / 5 + 32).toFixed(2);
-//     if (fromUnit === 'F' && toUnit === 'C') return (((num - 32) * 5) / 9).toFixed(2);
-
-//     return value;
-// };
-
-// const getVitalType = (vitalName) => {
-//     switch (vitalName) {
-//         case 'Blood Glucose':
-//         case 'Cholesterol':
-//         case 'Triglycerides':
-//             return 'dropdown';
-//         case 'Waist Circumference':
-//         case 'Hip Circumference':
-//             return 'number';
-//         default:
-//             return 'number';
-//     }
-// };
 
 const formatDate = (dateString) => {
     const options = { day: 'numeric', month: 'short' };
     return new Date(dateString).toLocaleDateString('en-GB', options);
 };
 
-
 export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem, convertFromImperial, convertToImperial }) {
     const dispatch = useDispatch();
     const store = useSelector((state) => state);
     const [vitals, setVitals] = useState(defaultVitals);
+
     // const [newVital, setNewVital] = useState('');
     const [searchParams] = useSearchParams();
     const patientId = searchParams.get('id');
     const patientVitals = store?.getVitalsByPatientIdReducer?.data?.data || [];
-
+    const [editingDate, setEditingDate] = useState(null);
     const now = new Date();
     const formatTwoDigits = (n) => n.toString().padStart(2, '0');
-
     useEffect(() => {
-        dispatch(getVitalsByPatientIdAction({ patientId, limit: 7 }))
+        dispatch(getVitalsByPatientIdAction({ patientId, limit: 5 }))
     }, [dispatch])
 
     const validationSchema = {
@@ -334,57 +303,105 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
     };
     // Update the findVitalValue function to handle unit conversions
     const findVitalValue = (vitalName, date) => {
-        if (!groupedVitals[date]) return null;
+        if (!groupedVitals[date]) return { value: null, _id: null };
 
         const vital = groupedVitals[date].find(v =>
             v.code?.coding?.[0]?.display === vitalName ||
             v.code?.text === vitalName
         );
 
-        if (!vital) return null;
+        if (!vital) return { value: null, _id: null };
 
+        let value;
         if (vital.component && vital.component.length > 0) {
-            // Handle blood pressure case (no conversion needed)
             const systolic = vital.component.find(c =>
                 c.code?.coding?.[0]?.code === "8480-6"
             )?.valueQuantity?.value;
-
             const diastolic = vital.component.find(c =>
                 c.code?.coding?.[0]?.code === "8462-4"
             )?.valueQuantity?.value;
-
-            return { systolic: systolic || '', diastolic: diastolic || '' };
-        }
-
-        // Get the stored value (always in imperial units)
-        let value = vital.valueQuantity?.value || vital.valueString || '';
-
-        // Convert to metric if needed for display
-        if (unitSystem === 'metric') {
-            if (vitalName === 'Height') {
-                value = convertFromImperial(value, 'Height');
-            }
-            else if (vitalName === 'Weight') {
-                value = convertFromImperial(value, 'Weight');
-            }
-            else if (vitalName === 'Temperature') {
-                value = convertFromImperial(value, 'Temperature');
+            value = { systolic: systolic || '', diastolic: diastolic || '' };
+        } else {
+            value = vital.valueQuantity?.value || vital.valueString || '';
+            if (unitSystem === 'metric') {
+                if (vitalName === 'Height') {
+                    value = convertFromImperial(value, 'Height');
+                } else if (vitalName === 'Weight') {
+                    value = convertFromImperial(value, 'Weight');
+                } else if (vitalName === 'Temperature') {
+                    value = convertFromImperial(value, 'Temperature');
+                }
             }
         }
 
-        return value;
+        return { value, _id: vital._id };
     };
-
     const renderVitalCell = (vital, date) => {
-        const value = findVitalValue(vital.name, date);
+        const { value, _id } = findVitalValue(vital.name, date);
+        if (date === editingDate) {
+            if (vital.type === 'bp') {
+                const bpValue = value || { systolic: '', diastolic: '' };
+                return (
+                    <div className="d-flex">
+                        <Form.Control
+                            type="number"
+                            defaultValue={bpValue.systolic}
+                            onBlur={(e) => handleUpdateVital(
+                                vital.name,
+                                { systolic: e.target.value, diastolic: bpValue.diastolic },
+                                date,
+                                _id // Pass the vital's _id
+                            )}
+                            size="sm"
+                            className="me-1"
+                        />
+                        /
+                        <Form.Control
+                            type="number"
+                            defaultValue={bpValue.diastolic}
+                            onBlur={(e) => handleUpdateVital(
+                                vital.name,
+                                { systolic: bpValue.systolic, diastolic: e.target.value },
+                                date,
+                                _id // Pass the vital's _id
+                            )}
+                            size="sm"
+                            className="ms-1"
+                        />
+                    </div>
+                );
+            }
+
+            if (vital.type === 'dropdown') {
+                return (
+                    <Form.Select
+                        defaultValue={value || ''}
+                        onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
+                        size="sm"
+                    >
+                        <option value="">Select</option>
+                        {vital.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </Form.Select>
+                );
+            }
+
+            return (
+                <Form.Control
+                    type="number"
+                    defaultValue={value || ''}
+                    onBlur={(e) => handleUpdateVital(vital.name, e.target.value, date, _id)}
+                    size="sm"
+                />
+            );
+        }
 
         if (vital.type === 'bp') {
-            const bpValue = value || { systolic: '', diastolic: '' };
+            const bpValue = value || { systolic: '-', diastolic: '-' };
             return (
                 <div className="d-flex">
-                    <span>{bpValue.systolic || '-'}</span>
+                    <span>{bpValue.systolic}</span>
                     <span>/</span>
-                    <span>{bpValue.diastolic || '-'}</span>
+                    <span>{bpValue.diastolic}</span>
                 </div>
             );
         }
@@ -414,7 +431,7 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         const newDate = e.target.value;
 
         if (isDateDisabled(newDate)) {
-            alert("This date already has recorded vitals. Please choose another date.");
+            ToastHandle("This date already has recorded vitals. Please choose another date.", 'danger')
             return;
         }
 
@@ -432,6 +449,133 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
         }));
     };
 
+    const handleUpdateVital = (vitalName, newValue, date, vitalId) => {
+        const vital = vitals.find(v => v.name === vitalName);
+        if (!vital) return;
+
+        const effectiveDateTime = date.includes('T') ? date : `${date}T${visitDateTime.time}:00`;
+
+        let observation;
+        if (vital.type === 'bp') {
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                component: [
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8480-6",
+                                display: "Systolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(newValue.systolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    },
+                    {
+                        code: {
+                            coding: [{
+                                system: "http://loinc.org",
+                                code: "8462-4",
+                                display: "Diastolic blood pressure"
+                            }]
+                        },
+                        valueQuantity: {
+                            value: parseFloat(newValue.diastolic),
+                            unit: "mmHg",
+                            system: "http://unitsofmeasure.org",
+                            code: "mm[Hg]"
+                        }
+                    }
+                ]
+            };
+        } else if (vital.type === 'dropdown') {
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                valueString: newValue
+            };
+        } else {
+            let valueToSend = parseFloat(newValue);
+            let unitToSend = getDisplayUnit(vital);
+
+            if (unitSystem === 'metric') {
+                if (vital.name === 'Height') {
+                    valueToSend = convertToImperial(valueToSend, 'Height');
+                    unitToSend = 'in';
+                } else if (vital.name === 'Weight') {
+                    valueToSend = convertToImperial(valueToSend, 'Weight');
+                    unitToSend = 'lbs';
+                } else if (vital.name === 'Temperature') {
+                    valueToSend = convertToImperial(valueToSend, 'Temperature');
+                    unitToSend = '°F';
+                }
+            }
+
+            observation = {
+                code: {
+                    coding: [{
+                        system: vital.system,
+                        code: vital.code,
+                        display: vital.name
+                    }]
+                },
+                effectiveDateTime,
+                subject: patientId,
+                createdBy: loggedInUser?._id,
+                valueQuantity: {
+                    value: valueToSend,
+                    unit: unitToSend,
+                    system: "http://unitsofmeasure.org",
+                    code: unitToSend === 'in' ? '[in_i]' :
+                        unitToSend === 'lbs' ? '[lb_av]' :
+                            unitToSend === '°F' ? '[degF]' : unitToSend
+                }
+            };
+        }
+
+        // Validate before dispatching
+        const error = validateVital({ ...vital, value: newValue });
+        if (error) {
+            setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+            return;
+        }
+
+        // Dispatch update or create action
+        if (vitalId) {
+            observation._id = vitalId;
+            dispatch(updateVitalsAction({
+                key: encryptMessage(observation)
+            }));
+        } else {
+            dispatch(createVitalsAction({
+                key: encryptMessage(observation)
+            }));
+        }
+    };
+    const showTooltip = patientVitals?.some(
+        data => data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
+    );
     return (
         <div className='scroll-container ' style={{
             height: isAccordionOpen ? "55vh" : "73vh",
@@ -447,6 +591,22 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                         {sortedDates?.map(date => (
                             <th className='text-white' key={date}>
                                 {formatDate(date)}
+                                {editingDate === date ? (
+                                    <i
+                                        className="bi bi-check-square ms-2 cursor-pointer fs-4 text-success"
+                                        onClick={() => {
+                                            // Save all changes for this date
+                                            setEditingDate(null);
+                                        }}
+                                        title="Save changes"
+                                    />
+                                ) : (
+                                    <i
+                                        className="mdi mdi-square-edit-outline ms-2 cursor-pointer fs-4 text-warning"
+                                        onClick={() => setEditingDate(date)}
+                                        title="Edit vitals"
+                                    />
+                                )}
                             </th>
                         ))}
                         <th style={{ background: '#f8f9fa' }}>
@@ -458,10 +618,9 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                     min={new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split("T")[0]}
                                     max={new Date().toISOString().split("T")[0]}
                                 />
-
                                 <Form.Control
                                     type="time"
-                                    value={visitDateTime.time}
+                                    value={visitDateTime?.time}
                                     onChange={handleTimeChange}
                                 />
                             </div>
@@ -483,70 +642,71 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                 </td>
                             ))}
 
-                            <td className='p-0 fs-6 w-25 vitalsTableBorder' style={{ background: '#f8f9fa' }}>
-                                {vital.name === 'BMI' ? (
-                                    <Form.Control
-                                        type="number"
-                                        value={vital.value}
-                                        readOnly
-                                        disabled
-                                        size="sm"
-                                        style={{ cursor: 'not-allowed' }}
-                                    />
-                                ) : vital.type === 'bp' ? (
-                                    <>
-                                        <div className="d-flex">
-                                            <Form.Control
-                                                type="number"
-                                                value={vital.value.systolic}
-                                                className="me-1"
-                                                step="0.1"
-                                                onChange={(e) => handleVitalChange(index, 'systolic', e.target.value)}
-                                                onBlur={() => {
-                                                    const error = validateVital(vital);
-                                                    setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
-                                                    if (!error) submitObservation(vital);
-                                                }}
-                                                size="sm"
-                                            />
-                                            /
-                                            <Form.Control
-                                                type="number"
-                                                value={vital.value.diastolic}
-                                                className="ms-1"
-                                                step="0.1"
-                                                onChange={(e) => handleVitalChange(index, 'diastolic', e.target.value)}
-                                                onBlur={() => {
-                                                    const error = validateVital(vital);
-                                                    setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
-                                                    if (!error) submitObservation(vital);
-                                                }}
-                                                size="sm"
-                                            />
-                                        </div>
-                                        {validationErrors[vital.name] && (
-                                            <div className="text-danger small">{validationErrors[vital.name]}</div>
-                                        )}
-                                    </>
-                                ) : vital.type === 'dropdown' ? (
-                                    <Form.Select
-                                        value={vital.value}
-                                        onChange={(e) => handleVitalChange(index, null, e.target.value)}
-                                        onBlur={() => {
-                                            const error = validateVital(vital);
-                                            setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
-                                            if (!error) submitObservation(vital);
-                                        }}
-                                        size="sm"
-                                    >
-                                        <option value="">Select</option>
-                                        {vital.options.map(opt => <option key={opt}>{opt}</option>)}
-                                    </Form.Select>
-                                ) : (
-                                    <>
+                            <OverlayTrigger
+                                placement="top"
+                                overlay={
+                                    showTooltip ? (
+                                        <Tooltip>
+                                            Vitals for the selected day have already been recorded. You can edit them instead of recreating.
+                                        </Tooltip>
+                                    ) : <></>
+                                }
+                            >
+                                <td className="p-0 fs-6 w-25 vitalsTableBorder" style={{ background: '#f8f9fa', cursor: showTooltip ? 'not-allowed' : 'default' }}>
+                                    {vital.name === 'BMI' ? (
                                         <Form.Control
                                             type="number"
-                                            step="0.1"
+                                            value={vital.value}
+                                            readOnly
+                                            disabled
+                                            size="sm"
+                                            style={{ cursor: 'not-allowed' }}
+                                        />
+                                    ) : vital.type === 'bp' ? (
+                                        <>
+                                            <div className="d-flex">
+                                                <Form.Control
+                                                    type="number"
+                                                    value={vital.value.systolic}
+                                                    className="me-1"
+                                                    step="0.1"
+                                                    onChange={(e) => handleVitalChange(index, 'systolic', e.target.value)}
+                                                    onBlur={() => {
+                                                        const error = validateVital(vital);
+                                                        setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                        if (!error) submitObservation(vital);
+                                                    }}
+                                                    size="sm"
+                                                    disabled={patientVitals?.some(
+                                                        data =>
+                                                            data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
+                                                    )}
+                                                />
+                                                /
+                                                <Form.Control
+                                                    type="number"
+                                                    value={vital.value.diastolic}
+                                                    className="ms-1"
+                                                    step="0.1"
+                                                    onChange={(e) => handleVitalChange(index, 'diastolic', e.target.value)}
+                                                    onBlur={() => {
+                                                        const error = validateVital(vital);
+                                                        setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                        if (!error) submitObservation(vital);
+                                                    }}
+                                                    size="sm"
+                                                    disabled={patientVitals?.some(
+                                                        data =>
+                                                            data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
+                                                    )}
+                                                />
+                                            </div>
+                                            {validationErrors[vital.name] && (
+                                                <div className="text-danger small">{validationErrors[vital.name]}</div>
+                                            )}
+                                        </>
+                                    ) : vital.type === 'dropdown' ? (
+                                        <Form.Select
                                             value={vital.value}
                                             onChange={(e) => handleVitalChange(index, null, e.target.value)}
                                             onBlur={() => {
@@ -555,13 +715,39 @@ export default function VitalStatus({ isAccordionOpen, unitSystem, setUnitSystem
                                                 if (!error) submitObservation(vital);
                                             }}
                                             size="sm"
-                                        />
-                                        {validationErrors[vital.name] && (
-                                            <div className="text-danger small">{validationErrors[vital.name]}</div>
-                                        )}
-                                    </>
-                                )}
-                            </td>
+                                            disabled={patientVitals?.some(
+                                                data =>
+                                                    data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
+                                            )}
+                                        >
+                                            <option value="">Select</option>
+                                            {vital.options.map(opt => <option key={opt}>{opt}</option>)}
+                                        </Form.Select>
+                                    ) : (
+                                        <>
+                                            <Form.Control
+                                                type="number"
+                                                step="0.1"
+                                                value={vital.value}
+                                                onChange={(e) => handleVitalChange(index, null, e.target.value)}
+                                                onBlur={() => {
+                                                    const error = validateVital(vital);
+                                                    setValidationErrors(prev => ({ ...prev, [vital.name]: error }));
+                                                    if (!error) submitObservation(vital);
+                                                }}
+                                                size="sm"
+                                                disabled={patientVitals?.some(
+                                                    data =>
+                                                        data?.effectiveDateTime?.split('T')[0] === visitDateTime?.date
+                                                )}
+                                            />
+                                            {validationErrors[vital.name] && (
+                                                <div className="text-danger small">{validationErrors[vital.name]}</div>
+                                            )}
+                                        </>
+                                    )}
+                                </td>
+                            </OverlayTrigger>
                         </tr>
                     ))}
                 </tbody>

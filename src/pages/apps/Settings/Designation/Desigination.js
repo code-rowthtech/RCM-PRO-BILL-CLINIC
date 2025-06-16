@@ -112,17 +112,15 @@ const Designation = () => {
                                 <Button
                                     variant={status === false ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(true)}
-                                    className={` active_inactive_buttons ${
-                                        status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={` active_inactive_buttons ${status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Active
                                 </Button>
                                 <Button
                                     variant={status === true ? 'outlined' : ''}
                                     onClick={() => handleStatusChange(false)}
-                                    className={`active_inactive_buttons ${
-                                        !status ? 'text-white' : 'bg-white border-primary text-dark'
-                                    } me-2 py-1`}>
+                                    className={`active_inactive_buttons ${!status ? 'text-white' : 'bg-white border-primary text-dark'
+                                        } me-2 py-1`}>
                                     Inactive
                                 </Button>
                             </Col>
@@ -343,7 +341,7 @@ const Designation = () => {
                             </Button>
                             <Button type="submit" className="custom-buttons">
                                 {store?.createMastersDataReducer?.loading ||
-                                store?.updateMastersDataReducer?.loading ? (
+                                    store?.updateMastersDataReducer?.loading ? (
                                     <div class="spinner-border spinner-border-sm" role="status">
                                         <span class="visually-hidden">Loading...</span>
                                     </div>

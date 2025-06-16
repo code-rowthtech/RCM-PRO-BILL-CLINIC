@@ -12,6 +12,23 @@ import { BiCollapse, BiExpand } from 'react-icons/bi';
 import { useDispatch } from 'react-redux';
 import { getDoctorsAction, getEncounterByIdAction, getEncounterNotesTypeAction, getEncounterSettingsAction } from '../../../../../redux/actions';
 import { useSelector } from 'react-redux';
+import { decryptMessage } from '../../../../../cryptoUtils';
+
+let decryptedUser = null;
+
+const encryptedData = localStorage.getItem('encryptedUserData');
+
+if (encryptedData) {
+    try {
+        decryptedUser = JSON.parse(decryptMessage(encryptedData));
+    } catch (err) {
+        console.error("Failed to decrypt user data:", err);
+        // Optionally: redirect to login or handle auth cleanup
+    }
+} else {
+    console.warn("No encrypted user data found in localStorage.");
+    // Optionally: redirect to login or show unauthorized message
+}
 
 const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, createEncounter, setCreateEncounter, updateEncounter, setUpdateEncounter, isAccordionOpen }) => {
     const dispatch = useDispatch()
@@ -92,8 +109,10 @@ const Encounter = ({ encounterTabs, setEncounterTabs, setExpanded, expanded, cre
     }, [dispatch])
 
     useEffect(() => {
-        dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType }))
-    }, [dispatch, searchNoteType])
+        if (!store?.getEncounterNotesTypeReducer?.data?.data) {
+            dispatch(getEncounterNotesTypeAction({ skip: 1, search: searchNoteType, clinicId: decryptedUser?.clinicId, userId: decryptedUser?._id }))
+        }
+    }, [dispatch, searchNoteType, store?.getEncounterNotesTypeReducer?.data?.data])
 
     const [showSettings, setShowSettings] = useState(false)
     const closeSettings = () => {

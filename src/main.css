@@ -356,7 +356,8 @@ table {
     padding: 6px 8px;
     width: 100%;
     background-color: #e8f0fe !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
 }
 
 .file-upload-label {
@@ -870,14 +871,18 @@ table {
 }
 
 .lowerMenu {
-    height: 36vh;
+    height: 22vh;
     display: flex;
     flex-direction: column-reverse;
 }
+.mainLogo{
+    height: 8px;
+}
 
 .media_mob {
-    height: 64vh;
+    height: 78vh;
 }
+
 .patient-menu-container {
     box-shadow:
         0 3px 6px rgba(0, 0, 0, 0.16),
@@ -926,7 +931,7 @@ table {
 }
 
 tbody tr:hover {
-    cursor: pointer !important;
+    /* cursor: pointer !important; */
     background-color: #f1f1f1 !important;
     transition-duration: 0.4s !important;
     transition-timing-function: ease-in-out !important;
@@ -1267,4 +1272,8 @@ option {
 .paddingNone tr {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
+}
+
+.css-1dimb5e-singleValue {
+    margin-left: 0px !important;
 }

@@ -195,7 +195,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
             prevTelecom.map((contact, index) => (index === field ? { ...contact, value } : contact))
         );
     };
-
+          
     return (
         <>
             <Modal centered show={show} size="lg" onHide={close}>
@@ -280,7 +280,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                     {errors.email && <span className="text-danger fs-6">{errors.email.message}</span>}
                                 </Form.Group>
                             </Col>
-                            {!dataToEdit &&
+                            {!dataToEdit && (
                                 <Row className={`mx-auto px-0${dataToEdit ? 'd-none ' : ''}`}>
                                     <Col sm={6}>
                                         <Form.Group className="mb-2 position-relative">
@@ -296,27 +296,28 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                     minLength: dataToEdit
                                                         ? false
                                                         : {
-                                                            value: 8,
-                                                            message: 'Password must be at least 8 characters',
-                                                        },
+                                                              value: 8,
+                                                              message: 'Password must be at least 8 characters',
+                                                          },
                                                     maxLength: dataToEdit
                                                         ? false
                                                         : {
-                                                            value: 16,
-                                                            message: 'Password must not exceed 16 characters',
-                                                        },
+                                                              value: 16,
+                                                              message: 'Password must not exceed 16 characters',
+                                                          },
                                                     validate: dataToEdit
                                                         ? false
                                                         : {
-                                                            noEmpty: (value) =>
-                                                                value.trim() !== '' ||
-                                                                'Password cannot be empty or only spaces',
-                                                            noSpacesBeforeText: (value) =>
-                                                                !/^\s/.test(value) || 'First character cannot be a space',
-                                                            isStrong: (value) =>
-                                                                strongRegex.test(value) ||
-                                                                'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
-                                                        },
+                                                              noEmpty: (value) =>
+                                                                  value.trim() !== '' ||
+                                                                  'Password cannot be empty or only spaces',
+                                                              noSpacesBeforeText: (value) =>
+                                                                  !/^\s/.test(value) ||
+                                                                  'First character cannot be a space',
+                                                              isStrong: (value) =>
+                                                                  strongRegex.test(value) ||
+                                                                  'Password must be strong (8-16 characters, at least one uppercase, one number, one special character)',
+                                                          },
                                                 })}
                                                 onChange={(e) => {
                                                     handlePasswordChange(e);
@@ -350,9 +351,10 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                     validate: dataToEdit
                                                         ? false
                                                         : {
-                                                            matchPassword: (value) =>
-                                                                value === watch('password') || 'Passwords do not match',
-                                                        },
+                                                              matchPassword: (value) =>
+                                                                  value === watch('password') ||
+                                                                  'Passwords do not match',
+                                                          },
                                                 })}
                                                 onChange={() => trigger('confirmPassword')}
                                                 maxLength={16}
@@ -366,12 +368,14 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 {passwordVisibility.confirmPassword ? <FaEyeSlash /> : <FaEye />}
                                             </span>
                                             {errors.confirmPassword?.type === 'matchPassword' && (
-                                                <span className="text-danger fs-6">{errors.confirmPassword.message}</span>
+                                                <span className="text-danger fs-6">
+                                                    {errors.confirmPassword.message}
+                                                </span>
                                             )}
                                         </Form.Group>
                                     </Col>
                                 </Row>
-                            }
+                            )}
                             <Col sm={6}>
                                 <Form.Group className="mb-1">
                                     <Form.Label className="mb-0">
@@ -410,7 +414,6 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                             <img src={us} alt="country code flag" width={16} />
                                             +1
                                         </InputGroup.Text>
-
                                         {/* Contact Input */}
                                         <Form.Control
                                             type="tel"
@@ -418,28 +421,28 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                                                 'phone',
                                                 !id
                                                     ? {
-                                                        required: dataToEdit ? false : 'Contact number is required',
-                                                        pattern: {
-                                                            value: /^[0-9]*$/,
-                                                            message: 'Contact must be numeric only',
-                                                        },
-                                                        maxLength: {
-                                                            value: 10,
-                                                            message: 'Contact must not exceed 10 digits',
-                                                        },
-                                                        minLength: {
-                                                            value: 10,
-                                                            message: 'Contact must not be less than 10 digits',
-                                                        },
-                                                        validate: {
-                                                            noEmpty: (value) =>
-                                                                value.trim() !== '' ||
-                                                                'Contact cannot be empty or only spaces',
-                                                            noSpacesBeforeText: (value) =>
-                                                                !/^\s/.test(value) ||
-                                                                'First character cannot be a space',
-                                                        },
-                                                    }
+                                                          required: dataToEdit ? false : 'Contact number is required',
+                                                          pattern: {
+                                                              value: /^[0-9]*$/,
+                                                              message: 'Contact must be numeric only',
+                                                          },
+                                                          maxLength: {
+                                                              value: 10,
+                                                              message: 'Contact must not exceed 10 digits',
+                                                          },
+                                                          minLength: {
+                                                              value: 10,
+                                                              message: 'Contact must not be less than 10 digits',
+                                                          },
+                                                          validate: {
+                                                              noEmpty: (value) =>
+                                                                  value.trim() !== '' ||
+                                                                  'Contact cannot be empty or only spaces',
+                                                              noSpacesBeforeText: (value) =>
+                                                                  !/^\s/.test(value) ||
+                                                                  'First character cannot be a space',
+                                                          },
+                                                      }
                                                     : {}
                                             )}
                                             placeholder="1234567890"
@@ -496,231 +499,67 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
 
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className="mb-0">
+                                    <Form.Label className="mb-0 d-flex align-items-center">
                                         Designation <span className="text-danger">*</span>
+                                                <i
+                                                    className="bi bi-plus-circle text-primary ms-1"
+                                                    style={{ fontSize: '0.9rem' }} onClick={() => setAddDesiginationModal(true)}></i>
                                     </Form.Label>
-                                    <div style={{ position: 'relative' }}>
-                                        {designationData?.length === 0 ? (
-                                            <Dropdown
-                                                show={isDropdownDesignation}
-                                                onToggle={(isDropdownDesignation) =>
-                                                    setIsDropdownDesignation(isDropdownDesignation)
-                                                }>
-                                                <Dropdown.Toggle
-                                                    variant="outline-secondary"
-                                                    className="w-100 text-start border border-secondary text-muted bg-white"
-                                                    style={{
-                                                        borderRadius: '4px',
-                                                        fontWeight: '600',
-                                                    }}>
-                                                    Select Designation
-                                                </Dropdown.Toggle>
-
-                                                <Dropdown.Menu
-                                                    style={{
-                                                        width: '100%',
-                                                        maxHeight: '200px',
-                                                        overflowY: 'auto',
-                                                    }}
-                                                    className="border border-secondary">
-                                                    {designationDataLoading ? (
-                                                        <Dropdown.Item disabled>Loading...</Dropdown.Item>
-                                                    ) : (
-                                                        <div
-                                                            style={{
-                                                                padding: '10px',
-                                                                textAlign: 'center',
-                                                                color: '#f00',
-                                                                fontSize: '12px',
-                                                            }}
-                                                            className="d-flex">
-                                                            No data
-                                                            <Button
-                                                                variant="primary"
-                                                                size="sm"
-                                                                style={{ fontSize: '12px', marginLeft: '10px' }}
-                                                                onClick={() => setAddDesiginationModal(true)} // Show Designation Modal
-                                                            >
-                                                                Add Designation
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                </Dropdown.Menu>
-                                            </Dropdown>
+                                    <Form.Select
+                                        {...register('designation', {
+                                            required: dataToEdit ? false : 'Designation is required',
+                                        })}
+                                        className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}>
+                                        {designationDataLoading ? (
+                                            <div className="d-flex justify-content-center">
+                                                <div className="spinner-border" role="status">
+                                                    <span className="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
                                         ) : (
-                                            <Form.Select
-                                                {...register('designation', {
-                                                    required: dataToEdit ? false : 'Designation is required',
-                                                })}
-                                                className={`text-dark border border-secondary ${desigination ? ' custom-date-input-select' : 'custom-date-input'}`}>
-                                                {designationDataLoading ? (
-                                                    <div className="d-flex justify-content-center">
-                                                        <div className="spinner-border" role="status">
-                                                            <span className="visually-hidden">Loading...</span>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <>
-                                                        <option value="" className="select" hidden>
-                                                            Select Designation
-                                                        </option>
-                                                        {designationData?.map((data) => (
-                                                            <option
-                                                                key={data?._id}
-                                                                className="text-dark text-capitalize"
-                                                                value={data?.name}>
-                                                                {data?.name}
-                                                            </option>
-                                                        ))}
-                                                    </>
-                                                )}
-                                            </Form.Select>
+                                            <>
+                                                <option value="" className="select" hidden>
+                                                    Select Designation
+                                                </option>
+                                                {designationData?.map((data) => (
+                                                    <option
+                                                        key={data?._id}
+                                                        className="text-dark text-capitalize"
+                                                        value={data?.name}>
+                                                        {data?.name}
+                                                    </option>
+                                                ))}
+                                            </>
                                         )}
-                                    </div>
+                                    </Form.Select>
                                     {errors.designation && (
                                         <span className="text-danger fs-6">{errors.designation.message}</span>
                                     )}
                                 </Form.Group>
                             </Col>
-
-                            {/* <Col sm={6}>
-                                <Form.Group className="mb-2">
-                                    <Form.Label className="mb-0">
-                                        Department <span className="text-danger">*</span>
-                                    </Form.Label>
-                                    <div style={{ position: 'relative' }}>
-                                        {departmentGetData?.length === 0 ? (
-                                            <Dropdown
-                                                show={isDropdownClicked}
-                                                onToggle={(isDropdownClicked) =>
-                                                    setIsDropdownClicked(isDropdownClicked)
-                                                }>
-                                                <Dropdown.Toggle
-                                                    variant="outline-secondary"
-                                                    className="w-100 text-start border border-secondary text-muted bg-white"
-                                                    style={{
-                                                        borderRadius: '4px',
-                                                        fontWeight: '600',
-                                                    }}
-                                                    hidden>
-                                                    Select Department
-                                                </Dropdown.Toggle>
-
-                                                <Dropdown.Menu
-                                                    style={{
-                                                        width: '100%',
-                                                        maxHeight: '200px',
-                                                        overflowY: 'auto',
-                                                    }}
-                                                    className="border border-secondary">
-                                                    <div
-                                                        style={{
-                                                            padding: '10px',
-                                                            textAlign: 'center',
-                                                            color: '#f00',
-                                                            fontSize: '12px',
-                                                        }}>
-                                                        No data
-                                                        <Button
-                                                            variant="primary"
-                                                            size="sm"
-                                                            style={{ fontSize: '12px', marginLeft: '10px' }}
-                                                            onClick={() => setAddDesiginationModal(true)} // Show Department Modal
-                                                        >
-                                                            Add Department
-                                                        </Button>
-                                                    </div>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        ) : (
-                                            <Form.Select
-                                                {...register('department', {
-                                                    required: dataToEdit ? false : 'Department is required',
-                                                })}
-                                                className={`text-dark border border-secondary ${department ? ' custom-date-input-select' : 'custom-date-input'}`}>
-                                                <option value="" hidden>
-                                                    Select Department
-                                                </option>
-                                                {departmentGetData?.map((data) => (
-                                                    <option
-                                                        className="text-capitalize"
-                                                        key={data?._id}
-                                                        value={data.name}>
-                                                        {data?.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        )}
-                                    </div>
-                                    {errors.department && (
-                                        <span className="text-danger fs-6">{errors.department.message}</span>
-                                    )}
-                                </Form.Group>
-                            </Col> */}
-
                             <Col sm={6}>
                                 <Form.Group className="mb-2">
-                                    <Form.Label className="mb-0">
-                                        Role <span className="text-danger">*</span>
+                                    <Form.Label className="mb-0 d-flex align-items-center">
+                                        <span>Role</span>
+                                        <span className="text-danger">*</span>
+                                                <i
+                                                    className="bi bi-plus-circle text-primary ms-1"
+                                                    style={{ fontSize: '0.9rem' }} onClick={() => setShowModal(true)}></i>
                                     </Form.Label>
-                                    <div style={{ position: 'relative' }}>
-                                        {decryptedRolesData?.length === 0 ? (
-                                            <Dropdown
-                                                show={isDropdownOpen}
-                                                onToggle={(isOpen) => setIsDropdownOpen(isOpen)}>
-                                                <Dropdown.Toggle
-                                                    variant="outline-secondary"
-                                                    className="w-100 text-start border border-secondary text-muted bg-white"
-                                                    style={{
-                                                        borderRadius: '4px',
-                                                        fontWeight: '600',
-                                                    }}>
-                                                    Select Role
-                                                </Dropdown.Toggle>
-
-                                                <Dropdown.Menu
-                                                    style={{
-                                                        width: '100%',
-                                                        maxHeight: '200px',
-                                                        overflowY: 'auto',
-                                                    }}
-                                                    className="border border-secondary">
-                                                    <div
-                                                        style={{
-                                                            padding: '10px',
-                                                            textAlign: 'center',
-                                                            color: '#f00',
-                                                            fontSize: '12px',
-                                                        }}>
-                                                        No data
-                                                        <Button
-                                                            variant="primary"
-                                                            size="sm"
-                                                            style={{ fontSize: '12px', marginLeft: '10px' }}
-                                                            onClick={() => setShowModal(true)} // Show Role Modal
-                                                        >
-                                                            Add Role
-                                                        </Button>
-                                                    </div>
-                                                </Dropdown.Menu>
-                                            </Dropdown>
-                                        ) : (
-                                            <Form.Select
-                                                {...register('roleId', {
-                                                    required: dataToEdit ? false : 'Role is required',
-                                                })}
-                                                className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}>
-                                                <option value="" hidden>
-                                                    Select Role
-                                                </option>
-                                                {decryptedRolesData?.map((data) => (
-                                                    <option className="text-capitalize" key={data._id} value={data._id}>
-                                                        {data.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        )}
-                                    </div>
+                                    <Form.Select
+                                        {...register('roleId', {
+                                            required: dataToEdit ? false : 'Role is required',
+                                        })}
+                                        className={`text-dark border border-secondary ${role ? ' custom-date-input-select' : 'custom-date-input'}`}>
+                                        <option value="" hidden>
+                                            Select Role
+                                        </option>
+                                        {decryptedRolesData?.map((data) => (
+                                            <option className="text-capitalize" key={data._id} value={data._id}>
+                                                {data.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
                                     {errors.roleId && <span className="text-danger fs-6">{errors.roleId.message}</span>}
                                 </Form.Group>
                             </Col>
@@ -785,6 +624,7 @@ const AddRole = ({ show, dataToEdit, setDataToEdit, setAddDepartmentModal }) => 
                 setAddDepartmentModal={setAddDepartmentalModal}
                 closeAddModal={closeAddModal}
             />
+            
         </>
     );
 };
